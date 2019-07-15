@@ -25,29 +25,29 @@ In this example one AC3 audio stream and one H264 video stream are multiplexed.
 
 ## Additional parameters of audio and video tracks:
 
-fps - For video and subtitle tracks you can define the fps (see example above). If fps is not specified, it is determined from the stream.
+* fps - For video and subtitle tracks you can define the fps (see example above). If fps is not specified, it is determined from the stream.
 
-level - Allows you to overwrite the field level in the H264 stream. For example, you can change the profile High@5.1 to High@4.1.
+* level - Allows you to overwrite the field level in the H264 stream. For example, you can change the profile High@5.1 to High@4.1.
 Note that it only updates the header. The H264 stream may not meet the requirements of a lower level.
 
-insertSEI - Parameter is used only for H.264 video. When activated, it does the following: if the original video does not contain SEI picture timing and SEI buffering period, then the info is added to the stream. This option is recommended for better compatibility with the Sony Playstation 3.
+* insertSEI - Parameter is used only for H.264 video. When activated, it does the following: if the original video does not contain SEI picture timing and SEI buffering period, then the info is added to the stream. This option is recommended for better compatibility with the Sony Playstation 3.
 
-contSPS - Parameter is used only for H.264 video. When enabled, and the original video doesn't contain cyclic repetitive elements SPS/PPS (when imported from MKV it can be recorded only one time at the beginning of the file), the SPS/PPS will be added to the stream before each key frame. We recommend that you always enable this option.
+* contSPS - Parameter is used only for H.264 video. When enabled, and the original video doesn't contain cyclic repetitive elements SPS/PPS (when imported from MKV it can be recorded only one time at the beginning of the file), the SPS/PPS will be added to the stream before each key frame. We recommend that you always enable this option.
 
 Note: The video player Dune HD can not decode a repeated SPS component in x264 streams, perhaps this is an error in the current firmware.
 
-delPulldown - For video streams. Deletes pulldown flags of the track. Attention! When using delPulldown usually a new value fps is required, different from values in the stream. For example, if the stream has fps=29.97, after setting delPulldown you have to input fps=23.976.
+* delPulldown - For video streams. Deletes pulldown flags of the track. Attention! When using delPulldown usually a new value fps is required, different from values in the stream. For example, if the stream has fps=29.97, after setting delPulldown you have to input fps=23.976.
 
-timeshift - For audio and subtitle tracks supported. Setting of timeshift may be more or less than zero.
+* timeshift - For audio and subtitle tracks supported. Setting of timeshift may be more or less than zero.
 Values in milliseconds (ms at the end) or in seconds (s at the end). This option allows audio track in time to move forward (positive value) or backward.
 
-down-to-dts - Available only to DTS-HD tracks. Makes conversion DTS-HD into standard DTS.
+* down-to-dts - Available only to DTS-HD tracks. Makes conversion DTS-HD into standard DTS.
 
-down-to-ac3 - Is only available for TRUE-HD tracks with AC3 inside the nucleus (usually written on Blu-ray discs).
+* down-to-ac3 - Is only available for TRUE-HD tracks with AC3 inside the nucleus (usually written on Blu-ray discs).
 
-track - Starting with version 0.9.96 a reference to the track behind other containers. In this case, you must indicate the track number inside the container.
+* track - Starting with version 0.9.96 a reference to the track behind other containers. In this case, you must indicate the track number inside the container.
 
-mplsFile - A reference to the MPLS file, where the media file is the current track. This information allows a more accurate file joining of the append operation. The option is only available for tracks that are inside M2TS files. The value indicates the MPLS file number.
+* mplsFile - A reference to the MPLS file, where the media file is the current track. This information allows a more accurate file joining of the append operation. The option is only available for tracks that are inside M2TS files. The value indicates the MPLS file number.
 For example: mplsFile=00048
 The file is searched on media in subdirectories ./../PLAYLIST and ./../BACKUP/PLAYLIST
 
@@ -57,17 +57,17 @@ This option is automatically filled in the GUI when you open a MPLS file.
 
 ## Settings for text subtitles SRT:
 
-video-width - The width of the video in pixels
-video-height - The height of the video in pixels
-fps - Frames per second of video
-bottom-offset - Depart from the lower edge while displaying text.
-font-name - The name of the font used in quotes
-font-color - Font color, for example, 0x00FFFFFF. Color can be defined in hexadecimal or decimal form.
-font-size - The font size
-font-italic - Italic display text
-font-bold - Bold display text
-font-underline - Underlined text
-font-strikeout - Crossed text
+* video-width - The width of the video in pixels
+* video-height - The height of the video in pixels
+* fps - Frames per second of video
+* bottom-offset - Depart from the lower edge while displaying text.
+* font-name - The name of the font used in quotes
+* font-color - Font color, for example, 0x00FFFFFF. Color can be defined in hexadecimal or decimal form.
+* font-size - The font size
+* font-italic - Italic display text
+* font-bold - Bold display text
+* font-underline - Underlined text
+* font-strikeout - Crossed text
 
 In SRT subs also supported by the following text tags, the syntax and parameters which coincide with HTML:
 `<b>, <i>, <u>, <strike>, <font>`. The font size default 3 (size of font-size in dpi).
@@ -80,10 +80,10 @@ For example:
 </b>
 ```
 Supported containers:
-- TS/M2TS/MTS
-- EVO / VOB / MPG
-- MKV
-- MPLS (Blu-ray media play list file)
+* TS/M2TS/MTS
+* EVO / VOB / MPG
+* MKV
+* MPLS (Blu-ray media play list file)
 
 For a track number, run: tsMuxer <container file name>.
 To start multiplexing open Windows Terminal, Far or another file manager and type:
@@ -93,16 +93,16 @@ tsMuxer <meta name of the file> <TS file name>
 ```
 
 Names of codecs in the meta file:
-V_MPEG4/ISO/AVC - H264
-V_MS/VFW/WVC1 - VC1
-V_MPEG-2 - MPEG2
-A_AC3 - DD (AC3) / DD (E-AC3) / True HD (True HD only tracks with AC3 core inside).
-A_AAC - AAC
-A_DTS - DTS / DTS-HD
-A_MP3 - MPEG audio layer 1/2/3
-A_LPCM - raw pcm data or PCM WAVE file
-S_HDMV / PGS - subtitle format presentation graphic stream.
-S_TEXT/UTF8 - subtitle format SRT. The text file should be in unicode. Any formats: UTF-8, UTF-16 (little-endian, big-endian), UTF-32 (little-endian, big-endian).
+* V_MPEG4/ISO/AVC - H264
+* V_MS/VFW/WVC1 - VC1
+* V_MPEG-2 - MPEG2
+* A_AC3 - DD (AC3) / DD (E-AC3) / True HD (True HD only tracks with AC3 core inside).
+* A_AAC - AAC
+* A_DTS - DTS / DTS-HD
+* A_MP3 - MPEG audio layer 1/2/3
+* A_LPCM - raw pcm data or PCM WAVE file
+* S_HDMV / PGS - subtitle format presentation graphic stream.
+* S_TEXT/UTF8 - subtitle format SRT. The text file should be in unicode. Any formats: UTF-8, UTF-16 (little-endian, big-endian), UTF-32 (little-endian, big-endian).
 
 
 ## Options of tsMuxeR in cmd line MUXOPT
@@ -146,12 +146,12 @@ For example: --maxbitrate=19423.432
 
 --split-size - To cut output file size. The length of each part will always be a little less than imposed values.
 Values should be written using one of the following prefixes:
-Kb - meaning specified in kilobytes (1000 bytes).
-Kib - the value specified in units of 2^10 bytes.
-mb - the value specified in megabytes (1000000 bytes).
-mib - the value specified in units of 2^20 bytes.
-gb - the value stated in gigabytes (1000000000 bytes).
-gib - the value specified in units of 2^30 bytes.
+* Kb - meaning specified in kilobytes (1000 bytes).
+* Kib - the value specified in units of 2^10 bytes.
+* mb - the value specified in megabytes (1000000 bytes).
+* mib - the value specified in units of 2^20 bytes.
+* gb - the value stated in gigabytes (1000000000 bytes).
+* gib - the value specified in units of 2^30 bytes.
 
 tsMuxer does not use external filters (codecs). 
 
