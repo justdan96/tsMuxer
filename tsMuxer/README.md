@@ -8,13 +8,17 @@ In the first line of meta file can be specified additional parameters that apply
 The following lines indicate a list of tracks and their parameters.
 The format is as follows:
 
+```
 <code name>, <file name>, <parameters>
+```
 
 Parameters are comma separated. Each parameter indicates the name and value.
 Example META file:
 
+```
 V_MPEG4/ISO/AVC, D:\media\test\stream.h264, fps=25
 A_AC3, D:\media\test\stream.ac3, timeshift=-10000ms
+```
 
 In this example one AC3 audio stream and one H264 video stream are multiplexed.
 
@@ -70,10 +74,11 @@ In SRT subs also supported by the following text tags, the syntax and parameters
 
 For example:
 
+```
 <b><font size=5 color="deepskyblue" name="Arial"><u>Test</u>
 <font size= 4 color="#806040">colored</font>text</font>
 </b>
-
+```
 Supported containers:
 - TS/M2TS/MTS
 - EVO / VOB / MPG
@@ -83,7 +88,9 @@ Supported containers:
 For a track number, run: tsMuxer <container file name>.
 To start multiplexing open Windows Terminal, Far or another file manager and type:
 
+```
 tsMuxer <meta name of the file> <TS file name>
+```
 
 Names of codecs in the meta file:
 V_MPEG4/ISO/AVC - H264
