@@ -70,7 +70,7 @@ font-underline - Underlined text
 font-strikeout - Crossed text
 
 In SRT subs also supported by the following text tags, the syntax and parameters which coincide with HTML:
-<b>, <i>, <u>, <strike>, <font>. The font size default 3 (size of font-size in dpi).
+`<b>, <i>, <u>, <strike>, <font>`. The font size default 3 (size of font-size in dpi).
 
 For example:
 
