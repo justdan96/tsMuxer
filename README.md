@@ -105,7 +105,7 @@ qt4-qmake \
 libqt4-dev
 ```
 
-Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://dropapk.com/6308nkz3zpej). 
+Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://dropapk.com/6308nkz3zpej) or [here](https://drive.google.com/file/d/1pvQoYIvwRlH2DPYQNTrBvFhF6E54QUpE/view?usp=sharing). 
 
 Once you download the package you have to install it, the easiest thing is to extract the tar directly into the correct folder as root (I know, this needs to be improved!). Assuming you downloaded the tar to /home/me/Downloads:
 
