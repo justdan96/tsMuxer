@@ -185,7 +185,8 @@ int TextSubtitlesRenderFT::loadFont(const string& fontName, FT_Face& face)
 		int error = FT_New_Face( library, fontName.c_str(), 0, &face ); 
 		if (error)
 			return error;
-		m_fontMap.insert(make_pair<string, FT_Face>(fontName, face));
+		// m_fontMap.insert(make_pair<string, FT_Face>(fontName, face));
+		m_fontMap.insert(make_pair(fontName, face));
 	}
 	else 
 		face = itr->second;

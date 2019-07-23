@@ -108,7 +108,8 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                     delete sps;
 					return rez;
                 }
-                m_spsMap.insert(make_pair<uint32_t, SPSUnit*>(sps->seq_parameter_set_id, sps));
+                // m_spsMap.insert(make_pair<uint32_t, SPSUnit*>(sps->seq_parameter_set_id, sps));
+                m_spsMap.insert(make_pair(sps->seq_parameter_set_id, sps));
                 if (tmpDescr.empty())
 				    tmpDescr = sps->getStreamDescr();
 				break;
@@ -126,7 +127,8 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                     delete pps;
                     break;
                 }
-                m_ppsMap.insert(make_pair<uint32_t, PPSUnit*>(pps->pic_parameter_set_id, pps));
+                // m_ppsMap.insert(make_pair<uint32_t, PPSUnit*>(pps->pic_parameter_set_id, pps));
+                m_ppsMap.insert(make_pair(pps->pic_parameter_set_id, pps));
 				break;
             }
 			case nuSEI:

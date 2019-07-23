@@ -7,13 +7,14 @@ ifeq ($(MAKECMDGOALS),release)
     BUILD=-Os
 endif 
 
+DIRS=../bin ../install
 CC=g++
 DEFINES  = -DLINUX -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
 CFLAGS   = -c -fpic -fexceptions -m32
 INCPATH  = -I../libmediation -I/usr/include/freetype2
 STATIC_LIBS = ../libmediation/libmediationl.a
 LFLAGS   = -m32
-LDFLAGS  = -lpthread -lrt -lfreetype -m32
+LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
 TARGET   = ../bin/tsMuxeR
 
 SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
@@ -26,8 +27,9 @@ SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src
 ./src/simplePacketizerReader.cpp ./src/singleFileMuxer.cpp ./src/srtStreamReader.cpp ./src/stdafx.cpp ./src/textSubtitles.cpp ./src/textSubtitlesRender.cpp \
 ./src/textSubtitlesRenderFT.cpp  ./src/tsDemuxer.cpp ./src/tsMuxer.cpp ./src/tsPacket.cpp ./src/utf8Converter.cpp ./src/vc1Parser.cpp ./src/combinedH264Demuxer.cpp
 
-
 OBJECTS=$(SOURCES:.cpp=.o)
+
+$(shell mkdir -p $(DIRS))
 
 all: $(SOURCES) $(TARGET)
 .PHONY : debug release 
@@ -47,9 +49,8 @@ clean:
 install:
 	cp ../bin/tsMuxeR ../install/
 	cp ../bin/tsMuxerGUI ../install/
-	cp ../release_notes.txt ../install/
+	cp ../CHANGELOG.md ../install/release_notes.txt
 	upx --lzma ../install/tsMuxeR
 	upx --lzma ../install/tsMuxerGUI
-	tar -cf ../tsMuxeR.tar -C ../install .
-	gzip ../tsMuxeR.tar
+	tar -czf ../tsMuxeR.tar.gz -C ../install .
                 

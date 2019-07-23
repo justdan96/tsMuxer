@@ -1,0 +1,41 @@
+BUILD=
+
+ifeq ($(MAKECMDGOALS),debug) 
+    BUILD=
+endif 
+ifeq ($(MAKECMDGOALS),release) 
+    BUILD=-Os
+endif 
+#ifeq (!$(findstring $(BUILD),debug release)) 
+#    $(error BUILD=$(BUILD) is unknown, must be BUILD=release or BUILD=debug) 
+#endif
+
+CC=gcc
+DEFINES  = -DMAC -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPORT -DDEBUG_NEW12=new -DNO_SYSTEM_EXCEPT
+CFLAGS   = -c 
+INCPATH  = -I./
+LFLAGS   = 
+LIBS     = -lpthread
+LDFLAGS  =
+TARGET   = libmediationl.a
+
+SOURCES= fs/directory.cpp fs/osdep/file_unix.cpp system/osdep/condvar_linux.cpp system/osdep/mutex_linux.cpp \
+system/osdep/terminatablethread_linux.cpp types/types.cpp time/time.cpp
+
+OBJECTS=$(SOURCES:.cpp=.o)
+
+all: $(SOURCES) $(TARGET)
+.PHONY : debug release 
+debug: all 
+release: all
+
+$(TARGET): $(OBJECTS)
+	ar cr $@ $(OBJECTS)
+        
+.cpp.o: 
+	$(CC) $(DEFINES) $(BUILD) $(LFLAGS) $(CFLAGS)  $(INCPATH) $? $(LDFLAGS) -o $@ 
+	
+clean:
+	rm -f $(OBJECTS)
+	rm -f ./libmediation.so
+	rm -f ./libmediationl.a                

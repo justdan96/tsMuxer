@@ -43,15 +43,25 @@ or are worried that the code isn't being followed, please contact the owner of t
 
 ## Language
 
-tsMuxer is written is C++. Specifically it was written for Windows on Visual C++ 2008. It can also be compiled for Linux and Mac. 
+tsMuxer is written in C++. It can be compiled for Windows, Linux and Mac. 
 
 ## History
 
-This project was created by Roman Vasilenko, with the last public release 20th January 2014. It was open sourced on 15th July 2019, to aid the future development.
+This project was created by Roman Vasilenko, with the last public release 20th January 2014. It was open sourced on 23rd July 2019, to aid the future development.
 
 ## Installation
 
 All executable are created to be portable, so you can just save and extract the compressed package for your platform. 
+
+## Todo
+
+The following is a list of changes that will need to be made to the original source code and project in general:
+
+* swapping custom includes from libmediation to their standard library equivalents
+* the code uses my_htonl, my_ntohll, etc - these can be swapped for the standard library versions
+* the program currently only compiles 32-bit executables, even on 64-bit systems, a multi-architecture approach is needed
+* consider making static executables for Linux, to make the program more portable
+* create a multi-platform build pipeline, maybe using dockcross
 
 ## Contributing
 
@@ -76,13 +86,56 @@ You can report issues directly on Github, that would be a really useful contribu
 
 ### Building
 
-To build the project you will need a machine for your chosen platform. Then for Linux or Mac run:
+To build the project you will need a machine for your chosen platform. In this example we will use Linux, specifically Ubuntu 19 64-bit. 
+
+First we have to install the pre-requisites. On Ubuntu you can run the following to install all required packages:
 
 ```
+sudo apt-get install libfreetype6-dev \
+build-essential \
+flex \
+libelf-dev \
+libc6-dev \
+binutils-dev \
+libdwarf-dev \
+libc6-dev-i386 \
+g++-multilib \
+upx \
+qt4-qmake \
+libqt4-dev
+```
+
+Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://dropapk.com/6308nkz3zpej). 
+
+Once you download the package you have to install it, the easiest thing is to extract the tar directly into the correct folder as root (I know, this needs to be improved!). Assuming you downloaded the tar to /home/me/Downloads:
+
+```
+cd /lib32
+sudo tar --strip-components=1 -xvf /home/me/Downloads/ubuntu-libfreetype-lib32.tar.gz lib32
+```
+
+With all the dependencies set up we can now actually compile the code.
+
+Open the folder where the git repo is stored in a terminal and run the following:
+
+```
+# compile tsMuxer to ../bin
+cd tsMuxer
 make
-```
 
-On Windows you need to Build the Visual C++ project.
+# generate the tsMuxerGUI makefile
+cd ..
+cd tsMuxerGUI
+qmake
+
+# compile tsMuxerGUI to ../bin
+make
+
+# UPX compress the executables, then create a release package as tsMuxeR.tar.gz from the install folder
+cd ..
+cd tsMuxer
+make install
+```
 
 ## Financing
 
