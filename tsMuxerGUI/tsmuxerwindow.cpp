@@ -2540,7 +2540,7 @@ void TsMuxerWindow::updateMaxOffsets()
 bool TsMuxerWindow::eventFilter(QObject *obj, QEvent* event)
 {
     if (obj == ui.label_Donate && event->type() == QEvent::MouseButtonPress) {
-        QDesktopServices::openUrl(QUrl("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8GV76SGDBA8HW"));
+        QDesktopServices::openUrl(QUrl("https://github.com/justdan96/tsMuxer"));
         return true;
     }
     else {

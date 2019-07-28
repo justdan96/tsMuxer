@@ -9,13 +9,21 @@ endif
 
 DIRS=../bin ../install
 CC=g++
-DEFINES  = -DLINUX -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
+
+ifdef OS
+   DEFINES  = -DWIN32 -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
+   TARGET   = ../bin/tsMuxeR.exe
+   LDFLAGS  = -lpthread -lz -lfreetype -m32
+else
+   DEFINES  = -DLINUX -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
+   TARGET   = ../bin/tsMuxeR
+   LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
+endif
+
 CFLAGS   = -c -fpic -fexceptions -m32
 INCPATH  = -I../libmediation -I/usr/include/freetype2
 STATIC_LIBS = ../libmediation/libmediationl.a
 LFLAGS   = -m32
-LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
-TARGET   = ../bin/tsMuxeR
 
 SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
 ./src/avCodecs.cpp ./src/base64.cpp ./src/bitStream.cpp ./src/blurayHelper.cpp ./src/bufferedFileReader.cpp ./src/bufferedFileWriter.cpp \
@@ -47,8 +55,8 @@ clean:
 	rm -f ./tsMuxeR*
 	
 install:
-	cp ../bin/tsMuxeR ../install/
-	cp ../bin/tsMuxerGUI ../install/
+	cp ../bin/tsMuxeR* ../install/
+	cp ../bin/tsMuxerGUI* ../install/
 	cp ../CHANGELOG.md ../install/release_notes.txt
 	upx --lzma ../install/tsMuxeR
 	upx --lzma ../install/tsMuxerGUI

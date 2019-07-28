@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\bitStream">
+      <UniqueIdentifier>{7fb16609-e071-4e9d-a6db-fd137960a4c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\demuxer">
+      <UniqueIdentifier>{5c893c0c-cff8-41fc-aa7e-a8ada6f70449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\codecs">
+      <UniqueIdentifier>{7cc7c252-881d-4b67-b5dd-d1704c107ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\muxer">
+      <UniqueIdentifier>{c6be6624-7966-43a5-b2ce-3cd8fb8647d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bufferedIO">
+      <UniqueIdentifier>{4eb5e24a-8593-4d86-8450-a3968143ac7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ts">
+      <UniqueIdentifier>{70e95d0c-f98f-438d-95cf-a57e6202af6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\streamReader">
+      <UniqueIdentifier>{368551f3-563f-4147-9f90-88f89b2c62ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\textSubtitles">
+      <UniqueIdentifier>{43e7804f-cfe7-4fc0-ae3b-653a54bd6bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\iso">
+      <UniqueIdentifier>{4dafca9e-b447-4f9e-af40-abd303d2aca7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\blank_patterns.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\blurayHelper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vod_common.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bitstream.h">
+      <Filter>Source Files\bitStream</Filter>
+    </ClInclude>
+    <ClInclude Include="src\abstractDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\avPacket.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\combinedH264Demuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ioContextDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\matroskaDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\metaDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\movDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\programStreamDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\subTrackFilter.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tsDemuxer.h">
+      <Filter>Source Files\demuxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\aac.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ac3Codec.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\avcodecs.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hevc.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\matroskaParser.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mp3Codec.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpegAudioStreamReader.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpegVideo.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\nalUnits.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vc1Parser.h">
+      <Filter>Source Files\codecs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\abstractMuxer.h">
+      <Filter>Source Files\muxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\muxerManager.h">
+      <Filter>Source Files\muxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\singleFileMuxer.h">
+      <Filter>Source Files\muxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tsMuxer.h">
+      <Filter>Source Files\muxer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AbstractReader.h">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bufferedFileReader.h">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bufferedFileWriter.h">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BufferedReader.h">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bufferedReaderManager.h">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pesPacket.h">
+      <Filter>Source Files\ts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\tsPacket.h">
+      <Filter>Source Files\ts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\aacStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\abstractStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ac3StreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dtsStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dvbSubStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\h264StreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hevcStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lpcmStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpeg2StreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mpegStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\psgStreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\simplePacketizerReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vc1StreamReader.h">
+      <Filter>Source Files\streamReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\convertUTF.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\srtStreamReader.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textSubtitles.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textSubtitlesRender.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textSubtitlesRenderWin32.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utf8Converter.h">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\iso_writer.h">
+      <Filter>Source Files\iso</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\blurayHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vod_common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bitStream.cpp">
+      <Filter>Source Files\bitStream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AbstractDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\combinedH264Demuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ioContextDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\matroskaDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\metaDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\movDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\programStreamDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tsDemuxer.cpp">
+      <Filter>Source Files\demuxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\aac.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ac3Codec.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hevc.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\matroskaParser.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mp3Codec.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpegAudioStreamReader.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpegVideo.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nalUnits.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vc1Parser.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\wave.cpp">
+      <Filter>Source Files\codecs</Filter>
+    </ClCompile>
+    <ClCompile Include="src\abstractMuxer.cpp">
+      <Filter>Source Files\muxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\muxerManager.cpp">
+      <Filter>Source Files\muxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\singleFileMuxer.cpp">
+      <Filter>Source Files\muxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tsMuxer.cpp">
+      <Filter>Source Files\muxer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bufferedFileReader.cpp">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bufferedFileWriter.cpp">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bufferedReader.cpp">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bufferedReaderManager.cpp">
+      <Filter>Source Files\bufferedIO</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pesPacket.cpp">
+      <Filter>Source Files\ts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tsPacket.cpp">
+      <Filter>Source Files\ts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\aacStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ac3StreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dtsStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dvbSubStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\h264StreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hevcStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lpcmStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpeg2StreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mpegStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\psgStreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simplePacketizerReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vc1StreamReader.cpp">
+      <Filter>Source Files\streamReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\convertUTF.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\srtStreamReader.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textSubtitles.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textSubtitlesRender.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textSubtitlesRenderFT.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textSubtitlesRenderWin32.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utf8Converter.cpp">
+      <Filter>Source Files\textSubtitles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\iso_writer.cpp">
+      <Filter>Source Files\iso</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,39 +1,31 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tsMuxer", "tsMuxer.vcproj", "{B68F6E62-BC10-43D1-86B4-E70209DCAB06}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32} = {EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tsMuxer", "tsMuxer.vcxproj", "{B68F6E62-BC10-43D1-86B4-E70209DCAB06}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmediationlight", "..\libmediation\libmediationlight.vcproj", "{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmediationlight", "..\libmediation\libmediationlight.vcxproj", "{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
-		release-shared|Win32 = release-shared|Win32
-		release-static|Win32 = release-static|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.Debug|Win32.Build.0 = Debug|Win32
 		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.Release|Win32.ActiveCfg = Release|Win32
 		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.Release|Win32.Build.0 = Release|Win32
-		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.release-shared|Win32.ActiveCfg = release-shared|Win32
-		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.release-shared|Win32.Build.0 = release-shared|Win32
-		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.release-static|Win32.ActiveCfg = release-shared|Win32
-		{B68F6E62-BC10-43D1-86B4-E70209DCAB06}.release-static|Win32.Build.0 = release-shared|Win32
 		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.Debug|Win32.ActiveCfg = Debug|Win32
 		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.Debug|Win32.Build.0 = Debug|Win32
 		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.Release|Win32.ActiveCfg = Release|Win32
 		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.Release|Win32.Build.0 = Release|Win32
-		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.release-shared|Win32.ActiveCfg = release-static|Win32
-		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.release-shared|Win32.Build.0 = release-static|Win32
-		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.release-static|Win32.ActiveCfg = release-static|Win32
-		{EF8C2A0A-9D81-4A06-BB82-4D59BC038D32}.release-static|Win32.Build.0 = release-static|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3AAD8D45-E0B4-46BF-B37B-388D50AE76F4}
 	EndGlobalSection
 EndGlobal

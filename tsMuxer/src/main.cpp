@@ -26,7 +26,7 @@ SingleFileMuxerFactory singleFileMuxerFactory;
 
 static const char EXCEPTION_ERR_MSG[] = ". It does not have to be! Please contact application support team for more information.";
 
-const char* APP_VERSION = "2.6.14";
+const char* APP_VERSION = "2.6.15";
 
 //const static uint32_t BLACK_PL_NUM = 1900;
 //const static uint32_t BLACK_FILE_NUM = 1900;
@@ -513,7 +513,7 @@ All parameters in this group started with two dashes:\n\
 
 int main(int argc, char** argv)
 {	
-	LTRACE(LT_INFO, 2, "Network Optix tsMuxeR.  Version " << APP_VERSION << ". www.networkoptix.com");
+	LTRACE(LT_INFO, 2, "tsMuxeR version " << APP_VERSION << ". github.com/justdan96/tsMuxer");
 	int firstMplsOffset = 0;    
 	int firstM2tsOffset = 0;
 	int blankNum = 1900;

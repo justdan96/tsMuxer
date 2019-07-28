@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\fs">
+      <UniqueIdentifier>{5a37396c-0679-4c75-ad70-3528fe3bc67d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\fs\osdep">
+      <UniqueIdentifier>{3f0e0ac3-bbca-4050-9211-c2aa2d0995d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system">
+      <UniqueIdentifier>{b142eab4-2826-4743-a6e7-2d0fa70c8692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\osdep">
+      <UniqueIdentifier>{228fe01f-5bd3-4afe-961a-9753bed8eed7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\time">
+      <UniqueIdentifier>{942cb350-a10f-466b-b4c7-a7a447cbad48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\types">
+      <UniqueIdentifier>{747bef7e-23ec-4d11-a8be-c69ffb8008be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\containers">
+      <UniqueIdentifier>{da7de9b5-651b-4b80-81df-d495bf73792e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="fs\directory.cpp">
+      <Filter>Source Files\fs</Filter>
+    </ClCompile>
+    <ClCompile Include="fs\osdep\file_win32.cpp">
+      <Filter>Source Files\fs\osdep</Filter>
+    </ClCompile>
+    <ClCompile Include="system\osdep\condvar_win32.cpp">
+      <Filter>Source Files\system\osdep</Filter>
+    </ClCompile>
+    <ClCompile Include="system\osdep\mutex_win32.cpp">
+      <Filter>Source Files\system\osdep</Filter>
+    </ClCompile>
+    <ClCompile Include="system\osdep\terminatablethread_win32.cpp">
+      <Filter>Source Files\system\osdep</Filter>
+    </ClCompile>
+    <ClCompile Include="time\time.cpp">
+      <Filter>Source Files\time</Filter>
+    </ClCompile>
+    <ClCompile Include="types\types.cpp">
+      <Filter>Source Files\types</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fs\directory.h">
+      <Filter>Source Files\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="fs\file.h">
+      <Filter>Source Files\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="fs\textfile.h">
+      <Filter>Source Files\fs</Filter>
+    </ClInclude>
+    <ClInclude Include="system\condvar.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="system\mutex.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="system\terminatablethread.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="time\time.h">
+      <Filter>Source Files\time</Filter>
+    </ClInclude>
+    <ClInclude Include="types\types.h">
+      <Filter>Source Files\types</Filter>
+    </ClInclude>
+    <ClInclude Include="containers\safequeue.h">
+      <Filter>Source Files\containers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

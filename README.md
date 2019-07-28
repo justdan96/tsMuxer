@@ -62,6 +62,7 @@ The following is a list of changes that will need to be made to the original sou
 * the program currently only compiles 32-bit executables, even on 64-bit systems, a multi-architecture approach is needed
 * consider making static executables for Linux, to make the program more portable
 * create a multi-platform build pipeline, maybe using dockcross
+* both Windows and Linux builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
 
 ## Contributing
 
@@ -86,7 +87,9 @@ You can report issues directly on Github, that would be a really useful contribu
 
 ### Building
 
-To build the project you will need a machine for your chosen platform. In this example we will use Linux, specifically Ubuntu 19 64-bit. 
+#### Linux
+
+In this example we will use Ubuntu 19 64-bit. 
 
 First we have to install the pre-requisites. On Ubuntu you can run the following to install all required packages:
 
@@ -105,7 +108,7 @@ qt4-qmake \
 libqt4-dev
 ```
 
-Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://dropapk.com/6308nkz3zpej) or [here](https://drive.google.com/file/d/1pvQoYIvwRlH2DPYQNTrBvFhF6E54QUpE/view?usp=sharing). 
+Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://drive.google.com/file/d/1pvQoYIvwRlH2DPYQNTrBvFhF6E54QUpE/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/ubuntu-libfreetype-lib32.tar.gz). 
 
 Once you download the package you have to install it, the easiest thing is to extract the tar directly into the correct folder as root (I know, this needs to be improved!). Assuming you downloaded the tar to /home/me/Downloads:
 
@@ -136,6 +139,60 @@ cd ..
 cd tsMuxer
 make install
 ```
+
+#### Windows
+
+To compile tsMuxer and tsMuxerGUI on Windows you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
+
+When selecting the installer options please specify:
+
+* Visual Studio core editor
+* Just-In-Time debugger
+* Visual C++ core desktop features
+* VC 2017 version ... tools
+* C++ profiling tools
+* Visual C++ ATL for x86 and x64
+* Windows 8.1 SDK and UCRT SDK
+* MSBuild Tools
+* Visual C++ Build Tools core features
+* Visual C++ 2017 Redistributable Update
+* Windows 10 SDK
+* Visual C++ tools for CMake
+* Testing tools core features - Build Tools
+* C++/CLI support
+
+Next you will need to set up the Windows build dependencies. At the moment these aren't portable, so you will have to follow these steps exactly or the build will fail. We need to set up Freetype and Zlib as they aren't included in the MSVC libraries. 
+
+You can download a compressed archive of these files [here](https://drive.google.com/file/d/1gZZPxZk6zwU8TV_XiVytJJvN4WvPviCQ/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/windows-libfreetype-libz.zip). 
+
+Once you download the package you have to install it, you need to  extract the ZIP directly into the root of the C:\ drive (I know, this needs to be improved!). If the path "C:\windev2\include\" exists you know it is set up correctly.
+
+With all the dependencies set up we can now actually compile the code.
+
+Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
+
+Next to compile tsMuxerGUI you will require a Qt4 installation that is compatible with Visual C++ 2017. This is not generally available, so must be installed manually - again, this is not portable, so you will have to follow these steps exactly or the build will fail.
+
+You can download a compressed archive of a Qt 4.8.7 installation compiled for MSVC++ 2017 32-bit from [here](https://drive.google.com/file/d/1ugv5x-ZCDPlIwUkvFJooki4GxRo1eBBn/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/qt-4.8.7-vs2017-32.zip). 
+
+Once you download the package you have to install it, you need to  extract the ZIP directly into the root of the C:\ drive (I know, this needs to be improved!). If the path "C:\Qt\qt-4.8.7-vs2017-32\bin\" exists you know it is set up correctly.
+
+To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
+
+```
+set PATH=C:\Qt\qt-4.8.7-vs2017-32\bin;%PATH%
+"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
+qmake
+nmake
+```
+
+You will find the following files will be created in ..\bin:
+
+* QtCore4.dll
+* QtGui4.dll
+* tsMuxerGUI.exe
+* tsMuxerGUI.exe.manifest
+* tsMuxerGUI.pdb
 
 ## Financing
 
