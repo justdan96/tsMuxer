@@ -14,16 +14,26 @@ ifdef OS
    DEFINES  = -DWIN32 -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
    TARGET   = ../bin/tsMuxeR.exe
    LDFLAGS  = -lpthread -lz -lfreetype -m32
+   CFLAGS   = -c -fpic -fexceptions -m32
+   LFLAGS   = -m32
 else
    DEFINES  = -DLINUX -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
    TARGET   = ../bin/tsMuxeR
-   LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
+   UNAME_P := $(shell uname -p)
+   ifneq ($(filter arm%,$(UNAME_P)),)
+      #arm
+	  LDFLAGS  = -lpthread -lrt -lz -lfreetype
+	  CFLAGS   = -c -fpic -fexceptions
+	  LFLAGS   =
+   else
+      LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
+	  CFLAGS   = -c -fpic -fexceptions -m32
+	  LFLAGS   = -m32
+   endif
 endif
 
-CFLAGS   = -c -fpic -fexceptions -m32
 INCPATH  = -I../libmediation -I/usr/include/freetype2
 STATIC_LIBS = ../libmediation/libmediationl.a
-LFLAGS   = -m32
 
 SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
 ./src/avCodecs.cpp ./src/base64.cpp ./src/bitStream.cpp ./src/blurayHelper.cpp ./src/bufferedFileReader.cpp ./src/bufferedFileWriter.cpp \
