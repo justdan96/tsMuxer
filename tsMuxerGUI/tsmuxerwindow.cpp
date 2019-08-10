@@ -3,6 +3,9 @@
 #include <QApplication>
 #include <QUrl>
 #include <QSettings>
+#include <QMessageBox>
+#include <QFontDialog>
+#include <QColorDialog>
 
 #ifdef WIN32
 #include "windows.h"

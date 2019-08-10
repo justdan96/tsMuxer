@@ -108,8 +108,13 @@ binutils-dev \
 libdwarf-dev \
 libc6-dev-i386 \
 g++-multilib \
-qt4-qmake \
-libqt4-dev \
+qt5-qmake \
+qtbase5-dev \
+qtdeclarative5-dev \
+qtmultimedia5-dev \
+libqt5multimediawidgets5 \
+libqt5multimedia5-plugins \
+libqt5multimedia5
 libfreetype6-dev \
 upx \
 zlib1g-dev \
@@ -118,10 +123,12 @@ git
 # on Ubuntu:
 sudo apt-get install checkinstall
 sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 
 # on Debian:
 sudo apt-get -t buster-backports install checkinstall
 sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 ```
 
 With all the dependencies set up we can now actually compile the code.
