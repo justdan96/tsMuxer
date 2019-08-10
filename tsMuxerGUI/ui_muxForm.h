@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'muxForm.ui'
 **
-** Created by: Qt User Interface Compiler version 4.8.5
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,21 +10,19 @@
 #define UI_MUXFORM_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QGroupBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QProgressBar>
-#include <QtGui/QPushButton>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QSplitter>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtGui/QIcon>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -198,15 +196,15 @@ public:
 
     void retranslateUi(QDialog *muxForm)
     {
-        muxForm->setWindowTitle(QApplication::translate("muxForm", "Muxing in progress", 0, QApplication::UnicodeUTF8));
-        groupBox->setTitle(QApplication::translate("muxForm", "Status and progress", 0, QApplication::UnicodeUTF8));
-        muxLabel->setText(QApplication::translate("muxForm", "Muxing in progress.", 0, QApplication::UnicodeUTF8));
-        progressLabel->setText(QApplication::translate("muxForm", "Progress: 100.0%", 0, QApplication::UnicodeUTF8));
-        groupBox_2->setTitle(QApplication::translate("muxForm", "Output", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("muxForm", "tsMuxeR output:", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("muxForm", "Errors:", 0, QApplication::UnicodeUTF8));
-        okBtn->setText(QApplication::translate("muxForm", "OK", 0, QApplication::UnicodeUTF8));
-        abortBtn->setText(QApplication::translate("muxForm", "Abort", 0, QApplication::UnicodeUTF8));
+        muxForm->setWindowTitle(QCoreApplication::translate("muxForm", "Muxing in progress", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("muxForm", "Status and progress", nullptr));
+        muxLabel->setText(QCoreApplication::translate("muxForm", "Muxing in progress.", nullptr));
+        progressLabel->setText(QCoreApplication::translate("muxForm", "Progress: 100.0%", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("muxForm", "Output", nullptr));
+        label_3->setText(QCoreApplication::translate("muxForm", "tsMuxeR output:", nullptr));
+        label_4->setText(QCoreApplication::translate("muxForm", "Errors:", nullptr));
+        okBtn->setText(QCoreApplication::translate("muxForm", "OK", nullptr));
+        abortBtn->setText(QCoreApplication::translate("muxForm", "Abort", nullptr));
     } // retranslateUi
 
 };

@@ -108,8 +108,13 @@ binutils-dev \
 libdwarf-dev \
 libc6-dev-i386 \
 g++-multilib \
-qt4-qmake \
-libqt4-dev \
+qt5-qmake \
+qtbase5-dev \
+qtdeclarative5-dev \
+qtmultimedia5-dev \
+libqt5multimediawidgets5 \
+libqt5multimedia5-plugins \
+libqt5multimedia5
 libfreetype6-dev \
 upx \
 zlib1g-dev \
@@ -118,10 +123,12 @@ git
 # on Ubuntu:
 sudo apt-get install checkinstall
 sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 
 # on Debian:
 sudo apt-get -t buster-backports install checkinstall
 sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 ```
 
 With all the dependencies set up we can now actually compile the code.
@@ -202,6 +209,8 @@ With all the dependencies set up we can now actually compile the code.
 
 Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
 
+Next to compile tsMuxerGUI you will require a Qt5 installation that is compatible with Visual C++ 2017. For this example we will be using Qt 5.12, as that is the LTS release. You can download it [here](https://download.qt.io/official_releases/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe). 
+
 Next to compile tsMuxerGUI you will require a Qt4 installation that is compatible with Visual C++ 2017. This is not generally available, so must be installed manually - again, this is not portable, so you will have to follow these steps exactly or the build will fail.
 
 You can download a compressed archive of a Qt 4.8.7 installation compiled for MSVC++ 2017 32-bit from [here](https://drive.google.com/file/d/1ugv5x-ZCDPlIwUkvFJooki4GxRo1eBBn/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/qt-4.8.7-vs2017-32.zip). 
@@ -211,19 +220,26 @@ Once you download the package you have to install it, you need to  extract the Z
 To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
 
 ```
-set PATH=C:\Qt\qt-4.8.7-vs2017-32\bin;%PATH%
+set PATH=C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin;%PATH%
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
 qmake
 nmake
+copy bin\tsMuxerGUI.exe ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Core.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Gui.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Multimedia.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Network.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Widgets.dll ..\bin\
 ```
 
 You will find the following files will be created in ..\bin:
 
-* QtCore4.dll
-* QtGui4.dll
+* Qt5Core.dll
+* Qt5Gui.dll
+* Qt5Multimedia.dll
+* Qt5Network.dll
+* Qt5Widgets.dll
 * tsMuxerGUI.exe
-* tsMuxerGUI.exe.manifest
-* tsMuxerGUI.pdb
 
 ## Financing
 

@@ -1,13 +1,15 @@
-#ifndef __LANG_CODES
-#define __LANG_CODES
+#ifndef LANG_CODES_H_
+#define LANG_CODES_H_
 
-struct QtvLangCode 
+#include <QString>
+
+struct QtvLangCode
 {
  QString code;
  QString lang;
 };
 
-const char* shortLangList[][2] =
+static const char* shortLangList[][2] =
 {
 {"chi","Chinese"},
 {"nld","\"Dutch; Flemish\""},
@@ -24,7 +26,7 @@ const char* shortLangList[][2] =
 {"swe","Swedish\""}
 };
 
-const char* fullLangList[][2]=
+static const char* fullLangList[][2]=
 {
 {"ace","Acehnese, Achinese"},
 {"ach","Acoli"},
