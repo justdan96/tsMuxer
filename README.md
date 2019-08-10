@@ -61,7 +61,8 @@ The following is a list of changes that will need to be made to the original sou
 * the code uses my_htonl, my_ntohll, etc - these can be swapped for the standard library versions
 * the program currently only compiles 32-bit executables, even on 64-bit systems, a multi-architecture approach is needed
 * consider making static executables for Linux, to make the program more portable
-* create a multi-platform build pipeline, maybe using dockcross
+* build for Windows requires Visual Studio 2017 and compiling through GUI - we need to create a Makefile equivalent
+* create a multi-platform build pipeline, maybe using dockcross or if that doesn't work creating a custom WinPE image just for compiling on Windows
 * both Windows and Linux builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
 
 ## Contributing
@@ -89,13 +90,17 @@ You can report issues directly on Github, that would be a really useful contribu
 
 #### Linux
 
-In this example we will use Ubuntu 19 64-bit. 
+For these examples we have successfully used Ubuntu 19 64-bit and Debian 10 64-bit. 
 
-First we have to install the pre-requisites. On Ubuntu you can run the following to install all required packages:
+First we have to install the pre-requisites. On Debian 10 you have to enable the "buster-backports" repo. Then on Debian or Ubuntu you can run the following to install all required packages:
 
 ```
-sudo apt-get install libfreetype6-dev \
-build-essential \
+# add 32-bit architecture 
+sudo dpkg --add-architecture i386
+sudo apt-get update
+
+# download/install dependencies
+sudo apt-get install build-essential \
 flex \
 libelf-dev \
 libc6-dev \
@@ -103,18 +108,20 @@ binutils-dev \
 libdwarf-dev \
 libc6-dev-i386 \
 g++-multilib \
-upx \
 qt4-qmake \
-libqt4-dev
-```
+libqt4-dev \
+libfreetype6-dev \
+upx \
+zlib1g-dev \
+git
 
-Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://drive.google.com/file/d/1pvQoYIvwRlH2DPYQNTrBvFhF6E54QUpE/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/ubuntu-libfreetype-lib32.tar.gz). 
+# on Ubuntu:
+sudo apt-get install checkinstall
+sudo apt-get install libfreetype6-dev:i386
 
-Once you download the package you have to install it, the easiest thing is to extract the tar directly into the correct folder as root (I know, this needs to be improved!). Assuming you downloaded the tar to /home/me/Downloads:
-
-```
-cd /lib32
-sudo tar --strip-components=1 -xvf /home/me/Downloads/ubuntu-libfreetype-lib32.tar.gz lib32
+# on Debian:
+sudo apt-get -t buster-backports install checkinstall
+sudo apt-get install libfreetype6-dev:i386
 ```
 
 With all the dependencies set up we can now actually compile the code.
@@ -122,9 +129,14 @@ With all the dependencies set up we can now actually compile the code.
 Open the folder where the git repo is stored in a terminal and run the following:
 
 ```
+# build libmediation
+cd libmediation
+make -j$(nproc)
+
 # compile tsMuxer to ../bin
+cd ..
 cd tsMuxer
-make
+make -j$(nproc)
 
 # generate the tsMuxerGUI makefile
 cd ..
@@ -132,12 +144,31 @@ cd tsMuxerGUI
 qmake
 
 # compile tsMuxerGUI to ../bin
-make
+make -j$(nproc)
 
-# UPX compress the executables, then create a release package as tsMuxeR.tar.gz from the install folder
-cd ..
-cd tsMuxer
-make install
+# create lower case links, then create installable deb package and move it to $HOME
+cd ../bin
+ln -s tsMuxeR tsmuxer
+ln -s tsMuxerGUI tsmuxergui
+sudo checkinstall \
+    --pkgname=tsmuxer \
+    --pkgversion="1:$(./tsmuxer | \
+                      grep "tsMuxeR version" | \
+                      cut -f3 -d " " | \
+                      sed 's/.$//')-git-$(\
+                      git rev-parse --short HEAD)-$(\
+                      date --rfc-3339=date | sed 's/-//g')" \
+    --backup=no \
+    --deldoc=yes \
+    --delspec=yes \
+    --deldesc=yes \
+    --strip=yes \
+    --stripso=yes \
+    --addso=yes \
+    --fstrans=no \
+    --default cp -R * /usr/bin && \
+mv *.deb ~/
+cd $HOME
 ```
 
 #### Windows
