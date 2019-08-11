@@ -6,14 +6,13 @@
 
 #include "textSubtitlesRenderFT.h"
 
-#include "vod_common.h"
-#include "vodCoreException.h"
-#include "utf8Converter.h"
-#include "math.h"
+#include "../vod_common.h"
+#include "../vodCoreException.h"
+#include "../utf8Converter.h"
+#include "../math.h"
 #include <fs/directory.h>
 #include <map>
 #include <algorithm>
-#include "vod_common.h"
 
 #ifdef WIN32
 const static char FONT_ROOT[] = "c:/WINDOWS/Fonts"; // for debug only

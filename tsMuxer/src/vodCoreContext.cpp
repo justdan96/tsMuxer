@@ -2,7 +2,7 @@
 #include "vodTransport.h"
 
 #include "vod_common.h"
-#include <include/fs/systemlog.h>
+#include <fs/systemlog.h>
 
 #define NO_SCALING     0
 #define FFMPEG_SCALING 1

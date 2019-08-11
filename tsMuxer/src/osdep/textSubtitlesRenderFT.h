@@ -1,7 +1,7 @@
 #ifndef __TEXT_SUBTITLES_RENDER_FT_H
 #define __TEXT_SUBTITLES_RENDER_FT_H
 
-#include "textSubtitlesRender.h"
+#include "../textSubtitlesRender.h"
 #include <map>
 #include <ft2build.h>  
 
