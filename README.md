@@ -63,7 +63,11 @@ The following is a list of changes that will need to be made to the original sou
 * consider making static executables for Linux, to make the program more portable
 * build for Windows requires Visual Studio 2017 and compiling through GUI - we need to create a Makefile equivalent
 * create a multi-platform build pipeline, maybe using dockcross or if that doesn't work creating a custom WinPE image just for compiling on Windows
-* both Windows and Linux builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
+* Windows builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
+* the program doesn't support MPEG-4 ASP, even though MPEG-4 ASP is defined in the TS specification
+* no Opus audio support
+* [several](https://forum.doom9.org/showthread.php?p=1880216#post1880216) [muxing](https://forum.doom9.org/showthread.php?p=1881372#post1881372) [bugs](https://forum.doom9.org/showthread.php?p=1881509#post1881509) when muxing a HEVC/UHD stream - results in an out-of-sync stream
+* has issues with 24-bit DTS Express
 
 ## Contributing
 
@@ -114,9 +118,8 @@ qtdeclarative5-dev \
 qtmultimedia5-dev \
 libqt5multimediawidgets5 \
 libqt5multimedia5-plugins \
-libqt5multimedia5
+libqt5multimedia5 \
 libfreetype6-dev \
-upx \
 zlib1g-dev \
 git
 
@@ -178,9 +181,59 @@ mv *.deb ~/
 cd $HOME
 ```
 
-#### Windows
+#### Windows (Msys2)
 
-To compile tsMuxer and tsMuxerGUI on Windows you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
+To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2 i686](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands:
+
+```
+pacman -Syu
+pacman -Sy --needed base-devel \
+mingw-w64-i686-toolchain \
+git mingw-w64-i686-cmake \
+flex \
+libelf-devel \
+mingw-w64-i686-freetype \
+mingw-w64-i686-qt5-static \
+mingw-w64-i686-zlib \
+zlib-devel
+```
+
+Close the Msys2 prompt and then open a Mingw32 prompt. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
+
+```
+echo 'load(win32/windows_vulkan_sdk)' > /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+echo 'QMAKE_LIBS_VULKAN       =' >> /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+```
+
+With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
+
+```
+# build libmediation
+cd libmediation
+make -j$(nproc)
+
+# compile tsMuxer to ../bin
+cd ..
+cd tsMuxer
+make -j$(nproc)
+
+
+# generate the tsMuxerGUI makefile
+export PATH=$PATH:/mingw32/qt5-static/bin
+cd ..
+cd tsMuxerGUI
+qmake
+
+# compile tsMuxerGUI to ../bin
+make release
+cp bin/tsMuxerGUI.exe ../bin/
+```
+
+This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
+
+#### Windows (Visual C++ 2017)
+
+To compile tsMuxer and tsMuxerGUI on Windows with Visual C++ 2017 you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
 
 When selecting the installer options please specify:
 

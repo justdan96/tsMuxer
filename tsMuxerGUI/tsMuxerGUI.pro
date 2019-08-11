@@ -19,3 +19,8 @@ greaterThan(QT_MAJOR_VERSION, 4) { # QT5+
 mac {
  ICON = tsmuxerGUI.icns
 }
+
+win32 {
+   RC_ICONS = tsMuxerGUI.ico
+   CONFIG += static
+}
