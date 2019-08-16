@@ -19,6 +19,8 @@ ifdef OS
    else
       INCPATH  = -I../libmediation -I/usr/include/freetype2
    endif
+   CFLAGS   = -c -fpic -fexceptions -m32
+   LFLAGS   = -m32
    SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
 ./src/avCodecs.cpp ./src/base64.cpp ./src/bitStream.cpp ./src/blurayHelper.cpp ./src/bufferedFileReader.cpp ./src/bufferedFileWriter.cpp \
 ./src/bufferedReader.cpp ./src/bufferedReaderManager.cpp  ./src/convertUTF.cpp ./src/crc.cpp ./src/dtsStreamReader.cpp ./src/vc1StreamReader.cpp \
@@ -31,7 +33,9 @@ ifdef OS
 else
    DEFINES  = -DLINUX -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
    TARGET   = ../bin/tsMuxeR
-   LDFLAGS  = -lpthread -lrt -lz -lfreetype -m32
+	 LDFLAGS  = -lpthread -lrt -lz -lfreetype
+	 CFLAGS   = -c -fpic -fexceptions
+	 LFLAGS   =
    INCPATH  = -I../libmediation -I/usr/include/freetype2
    SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
 ./src/avCodecs.cpp ./src/base64.cpp ./src/bitStream.cpp ./src/blurayHelper.cpp ./src/bufferedFileReader.cpp ./src/bufferedFileWriter.cpp \
@@ -44,9 +48,7 @@ else
 ./src/textSubtitlesRenderFT.cpp  ./src/tsDemuxer.cpp ./src/tsMuxer.cpp ./src/tsPacket.cpp ./src/utf8Converter.cpp ./src/vc1Parser.cpp ./src/combinedH264Demuxer.cpp
 endif
 
-CFLAGS   = -c -fpic -fexceptions -m32
 STATIC_LIBS = ../libmediation/libmediationl.a
-LFLAGS   = -m32
 
 OBJECTS=$(SOURCES:.cpp=.o)
 

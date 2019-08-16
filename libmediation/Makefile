@@ -16,19 +16,21 @@ ifdef OS
    SOURCES= fs/directory.cpp fs/osdep/file_win32.cpp system/osdep/condvar_win32.cpp system/osdep/mutex_win32.cpp \
 system/osdep/terminatablethread_win32.cpp types/types.cpp time/time.cpp
    LIBS     = -lpthread -lwinmm
+   LFLAGS   = -m32
+   LDFLAGS   =
+   CFLAGS   = -c -m32
 else
    INCPATH  = -I./
    DEFINES  = -DLINUX -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPORT -DDEBUG_NEW12=new -DNO_SYSTEM_EXCEPT
    SOURCES= fs/directory.cpp fs/osdep/file_unix.cpp system/osdep/condvar_linux.cpp system/osdep/mutex_linux.cpp \
 system/osdep/terminatablethread_linux.cpp types/types.cpp time/time.cpp
    LIBS     = -lpthread
+   LFLAGS   =
+   LDFLAGS  =
+   CFLAGS   = -c
 endif
 
 CC=gcc
-CFLAGS   = -c -m32
-
-LFLAGS   = -m32
-LDFLAGS  =
 TARGET   = libmediationl.a
 
 OBJECTS=$(SOURCES:.cpp=.o)
