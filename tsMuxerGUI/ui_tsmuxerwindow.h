@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'tsmuxerwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 4.8.5
+** Created by: Qt User Interface Compiler version 5.13.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,30 +10,29 @@
 #define UI_TSMUXERWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QCheckBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QGridLayout>
-#include <QtGui/QGroupBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QListWidget>
-#include <QtGui/QPushButton>
-#include <QtGui/QRadioButton>
-#include <QtGui/QSpacerItem>
-#include <QtGui/QSpinBox>
-#include <QtGui/QSplitter>
-#include <QtGui/QTabWidget>
-#include <QtGui/QTableWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QTimeEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <QtGui/QIcon>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QSplitter>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QTimeEdit>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -369,7 +368,6 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(addBtn->sizePolicy().hasHeightForWidth());
         addBtn->setSizePolicy(sizePolicy1);
-        addBtn->setDefault(false);
         addBtn->setFlat(false);
 
         verticalLayout->addWidget(addBtn);
@@ -513,6 +511,11 @@ public:
         gridLayout->addWidget(checkFPS, 0, 0, 1, 1);
 
         comboBoxFPS = new QComboBox(tabSheetVideo);
+        comboBoxFPS->addItem(QString());
+        comboBoxFPS->addItem(QString());
+        comboBoxFPS->addItem(QString());
+        comboBoxFPS->addItem(QString());
+        comboBoxFPS->addItem(QString());
         comboBoxFPS->setObjectName(QString::fromUtf8("comboBoxFPS"));
         comboBoxFPS->setEnabled(false);
         sizePolicy1.setHeightForWidth(comboBoxFPS->sizePolicy().hasHeightForWidth());
@@ -536,6 +539,21 @@ public:
         gridLayout->addWidget(checkBoxSecondaryVideo, 0, 5, 1, 1);
 
         comboBoxLevel = new QComboBox(tabSheetVideo);
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
+        comboBoxLevel->addItem(QString());
         comboBoxLevel->setObjectName(QString::fromUtf8("comboBoxLevel"));
         comboBoxLevel->setEnabled(false);
         sizePolicy1.setHeightForWidth(comboBoxLevel->sizePolicy().hasHeightForWidth());
@@ -556,6 +574,11 @@ public:
         gridLayout->addWidget(labelAR, 1, 3, 3, 1);
 
         comboBoxAR = new QComboBox(tabSheetVideo);
+        comboBoxAR->addItem(QString());
+        comboBoxAR->addItem(QString());
+        comboBoxAR->addItem(QString());
+        comboBoxAR->addItem(QString());
+        comboBoxAR->addItem(QString());
         comboBoxAR->setObjectName(QString::fromUtf8("comboBoxAR"));
         comboBoxAR->setEnabled(false);
         sizePolicy1.setHeightForWidth(comboBoxAR->sizePolicy().hasHeightForWidth());
@@ -580,6 +603,9 @@ public:
         gridLayout->addItem(horizontalSpacer_24, 0, 6, 2, 1);
 
         comboBoxSEI = new QComboBox(tabSheetVideo);
+        comboBoxSEI->addItem(QString());
+        comboBoxSEI->addItem(QString());
+        comboBoxSEI->addItem(QString());
         comboBoxSEI->setObjectName(QString::fromUtf8("comboBoxSEI"));
         sizePolicy2.setHeightForWidth(comboBoxSEI->sizePolicy().hasHeightForWidth());
         comboBoxSEI->setSizePolicy(sizePolicy2);
@@ -779,8 +805,8 @@ public:
         editMaxBitrate->setObjectName(QString::fromUtf8("editMaxBitrate"));
         editMaxBitrate->setEnabled(false);
         editMaxBitrate->setDecimals(3);
-        editMaxBitrate->setMaximum(100000);
-        editMaxBitrate->setValue(99.99);
+        editMaxBitrate->setMaximum(99999.990000000005239);
+        editMaxBitrate->setValue(99.989999999999995);
 
         gridLayout_3->addWidget(editMaxBitrate, 0, 1, 1, 1);
 
@@ -795,7 +821,7 @@ public:
         editMinBitrate->setObjectName(QString::fromUtf8("editMinBitrate"));
         editMinBitrate->setEnabled(false);
         editMinBitrate->setDecimals(3);
-        editMinBitrate->setMaximum(100000);
+        editMinBitrate->setMaximum(99999.990000000005239);
 
         gridLayout_3->addWidget(editMinBitrate, 1, 1, 1, 1);
 
@@ -841,8 +867,8 @@ public:
         editCBRBitrate->setObjectName(QString::fromUtf8("editCBRBitrate"));
         editCBRBitrate->setEnabled(false);
         editCBRBitrate->setDecimals(3);
-        editCBRBitrate->setMaximum(100000);
-        editCBRBitrate->setValue(8000);
+        editCBRBitrate->setMaximum(99999.990000000005239);
+        editCBRBitrate->setValue(8000.000000000000000);
 
         gridLayout_4->addWidget(editCBRBitrate, 0, 1, 1, 1);
 
@@ -1141,6 +1167,10 @@ public:
         gridLayout_13->addWidget(label_24, 0, 0, 1, 1);
 
         comboBoxPipCorner = new QComboBox(groupBoxPip);
+        comboBoxPipCorner->addItem(QString());
+        comboBoxPipCorner->addItem(QString());
+        comboBoxPipCorner->addItem(QString());
+        comboBoxPipCorner->addItem(QString());
         comboBoxPipCorner->setObjectName(QString::fromUtf8("comboBoxPipCorner"));
 
         gridLayout_13->addWidget(comboBoxPipCorner, 0, 1, 1, 1);
@@ -1164,6 +1194,11 @@ public:
         gridLayout_13->addWidget(label_26, 1, 0, 1, 1);
 
         comboBoxPipSize = new QComboBox(groupBoxPip);
+        comboBoxPipSize->addItem(QString());
+        comboBoxPipSize->addItem(QString());
+        comboBoxPipSize->addItem(QString());
+        comboBoxPipSize->addItem(QString());
+        comboBoxPipSize->addItem(QString());
         comboBoxPipSize->setObjectName(QString::fromUtf8("comboBoxPipSize"));
 
         gridLayout_13->addWidget(comboBoxPipSize, 1, 1, 1, 1);
@@ -1253,13 +1288,19 @@ public:
         editSplitSize->setObjectName(QString::fromUtf8("editSplitSize"));
         editSplitSize->setEnabled(false);
         editSplitSize->setDecimals(3);
-        editSplitSize->setMinimum(0.001);
-        editSplitSize->setMaximum(100000);
-        editSplitSize->setValue(1);
+        editSplitSize->setMinimum(0.001000000000000);
+        editSplitSize->setMaximum(99999.990000000005239);
+        editSplitSize->setValue(1.000000000000000);
 
         gridLayout_5->addWidget(editSplitSize, 2, 1, 1, 1);
 
         comboBoxMeasure = new QComboBox(groupBox_6);
+        comboBoxMeasure->addItem(QString());
+        comboBoxMeasure->addItem(QString());
+        comboBoxMeasure->addItem(QString());
+        comboBoxMeasure->addItem(QString());
+        comboBoxMeasure->addItem(QString());
+        comboBoxMeasure->addItem(QString());
         comboBoxMeasure->setObjectName(QString::fromUtf8("comboBoxMeasure"));
         comboBoxMeasure->setEnabled(false);
 
@@ -1465,10 +1506,10 @@ public:
         lineSpacing = new QDoubleSpinBox(groupBox_8);
         lineSpacing->setObjectName(QString::fromUtf8("lineSpacing"));
         lineSpacing->setDecimals(1);
-        lineSpacing->setMinimum(0.5);
-        lineSpacing->setMaximum(2);
-        lineSpacing->setSingleStep(0.1);
-        lineSpacing->setValue(1);
+        lineSpacing->setMinimum(0.500000000000000);
+        lineSpacing->setMaximum(2.000000000000000);
+        lineSpacing->setSingleStep(0.100000000000000);
+        lineSpacing->setValue(1.000000000000000);
 
         gridLayout_12->addWidget(lineSpacing, 0, 3, 1, 1);
 
@@ -1479,6 +1520,11 @@ public:
         gridLayout_12->addWidget(label_22, 1, 0, 1, 1);
 
         comboBoxAnimation = new QComboBox(groupBox_8);
+        comboBoxAnimation->addItem(QString());
+        comboBoxAnimation->addItem(QString());
+        comboBoxAnimation->addItem(QString());
+        comboBoxAnimation->addItem(QString());
+        comboBoxAnimation->addItem(QString());
         comboBoxAnimation->setObjectName(QString::fromUtf8("comboBoxAnimation"));
 
         gridLayout_12->addWidget(comboBoxAnimation, 1, 1, 1, 1);
@@ -1887,8 +1933,8 @@ public:
 
         verticalLayout_10->addLayout(horizontalLayout_4);
 
-#ifndef QT_NO_SHORTCUT
-#endif // QT_NO_SHORTCUT
+#if QT_CONFIG(shortcut)
+#endif // QT_CONFIG(shortcut)
         QWidget::setTabOrder(tabWidget, inputFilesLV);
         QWidget::setTabOrder(inputFilesLV, addBtn);
         QWidget::setTabOrder(addBtn, trackLV);
@@ -1957,6 +2003,7 @@ public:
         retranslateUi(TsMuxerWindow);
 
         tabWidget->setCurrentIndex(0);
+        addBtn->setDefault(false);
         tabWidgetTracks->setCurrentIndex(0);
         comboBoxMeasure->setCurrentIndex(4);
 
@@ -1966,314 +2013,298 @@ public:
 
     void retranslateUi(QWidget *TsMuxerWindow)
     {
-        TsMuxerWindow->setWindowTitle(QApplication::translate("TsMuxerWindow", "tsMuxeR GUI 2.6.13", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("TsMuxerWindow", "Input files:", 0, QApplication::UnicodeUTF8));
-        addBtn->setText(QApplication::translate("TsMuxerWindow", "add", 0, QApplication::UnicodeUTF8));
-        btnAppend->setText(QApplication::translate("TsMuxerWindow", "join", 0, QApplication::UnicodeUTF8));
-        removeFile->setText(QApplication::translate("TsMuxerWindow", "remove", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("TsMuxerWindow", "Tracks:", 0, QApplication::UnicodeUTF8));
+        TsMuxerWindow->setWindowTitle(QCoreApplication::translate("TsMuxerWindow", "tsMuxeR GUI 2.6.13", nullptr));
+        label_3->setText(QCoreApplication::translate("TsMuxerWindow", "Input files:", nullptr));
+        addBtn->setText(QCoreApplication::translate("TsMuxerWindow", "add", nullptr));
+        btnAppend->setText(QCoreApplication::translate("TsMuxerWindow", "join", nullptr));
+        removeFile->setText(QCoreApplication::translate("TsMuxerWindow", "remove", nullptr));
+        label_2->setText(QCoreApplication::translate("TsMuxerWindow", "Tracks:", nullptr));
         QTableWidgetItem *___qtablewidgetitem = trackLV->horizontalHeaderItem(0);
-        ___qtablewidgetitem->setText(QApplication::translate("TsMuxerWindow", "#", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem->setText(QCoreApplication::translate("TsMuxerWindow", "#", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = trackLV->horizontalHeaderItem(1);
-        ___qtablewidgetitem1->setText(QApplication::translate("TsMuxerWindow", "source file", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem1->setText(QCoreApplication::translate("TsMuxerWindow", "source file", nullptr));
         QTableWidgetItem *___qtablewidgetitem2 = trackLV->horizontalHeaderItem(2);
-        ___qtablewidgetitem2->setText(QApplication::translate("TsMuxerWindow", "codec", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem2->setText(QCoreApplication::translate("TsMuxerWindow", "codec", nullptr));
         QTableWidgetItem *___qtablewidgetitem3 = trackLV->horizontalHeaderItem(3);
-        ___qtablewidgetitem3->setText(QApplication::translate("TsMuxerWindow", "lang", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem3->setText(QCoreApplication::translate("TsMuxerWindow", "lang", nullptr));
         QTableWidgetItem *___qtablewidgetitem4 = trackLV->horizontalHeaderItem(4);
-        ___qtablewidgetitem4->setText(QApplication::translate("TsMuxerWindow", "track info", 0, QApplication::UnicodeUTF8));
-        moveupBtn->setText(QApplication::translate("TsMuxerWindow", "up", 0, QApplication::UnicodeUTF8));
-        movedownBtn->setText(QApplication::translate("TsMuxerWindow", "down", 0, QApplication::UnicodeUTF8));
-        removeTrackBtn->setText(QApplication::translate("TsMuxerWindow", "remove", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem4->setText(QCoreApplication::translate("TsMuxerWindow", "track info", nullptr));
+        moveupBtn->setText(QCoreApplication::translate("TsMuxerWindow", "up", nullptr));
+        movedownBtn->setText(QCoreApplication::translate("TsMuxerWindow", "down", nullptr));
+        removeTrackBtn->setText(QCoreApplication::translate("TsMuxerWindow", "remove", nullptr));
         imageVideo->setText(QString());
-        checkFPS->setText(QApplication::translate("TsMuxerWindow", "Change fps:", 0, QApplication::UnicodeUTF8));
-        comboBoxFPS->clear();
-        comboBoxFPS->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "24", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "25", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "30", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "24000/1001", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "30000/1001", 0, QApplication::UnicodeUTF8)
-        );
-        checkBoxRemovePulldown->setText(QApplication::translate("TsMuxerWindow", "Remove pulldown", 0, QApplication::UnicodeUTF8));
-        checkBoxSecondaryVideo->setText(QApplication::translate("TsMuxerWindow", "Secondary (PIP)", 0, QApplication::UnicodeUTF8));
-        comboBoxLevel->clear();
-        comboBoxLevel->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "1.0", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "1.1", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "1.2", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "1.3", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "2.0", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "2.1", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "2.2", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "3.0", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "3.1", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "3.2", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "4.0", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "4.1", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "4.2", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "5.0", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "5.1", 0, QApplication::UnicodeUTF8)
-        );
-        labelAR->setText(QApplication::translate("TsMuxerWindow", "AR", 0, QApplication::UnicodeUTF8));
-        comboBoxAR->clear();
-        comboBoxAR->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "As source", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "1:1 (Square)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "4:3", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "16:9", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "2.21:1", 0, QApplication::UnicodeUTF8)
-        );
-        checkBoxLevel->setText(QApplication::translate("TsMuxerWindow", "Change level:", 0, QApplication::UnicodeUTF8));
-        checkBoxSPS->setText(QApplication::translate("TsMuxerWindow", "Continually insert SPS/PPS", 0, QApplication::UnicodeUTF8));
-        comboBoxSEI->clear();
-        comboBoxSEI->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "Do not change SEI and VUI data", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Insert SEI and VUI data if absent", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Always rebuild  SEI and VUI data", 0, QApplication::UnicodeUTF8)
-        );
-        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetVideo), QApplication::translate("TsMuxerWindow", "General track options", 0, QApplication::UnicodeUTF8));
+        checkFPS->setText(QCoreApplication::translate("TsMuxerWindow", "Change fps:", nullptr));
+        comboBoxFPS->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "24", nullptr));
+        comboBoxFPS->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "25", nullptr));
+        comboBoxFPS->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "30", nullptr));
+        comboBoxFPS->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "24000/1001", nullptr));
+        comboBoxFPS->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "30000/1001", nullptr));
+
+        checkBoxRemovePulldown->setText(QCoreApplication::translate("TsMuxerWindow", "Remove pulldown", nullptr));
+        checkBoxSecondaryVideo->setText(QCoreApplication::translate("TsMuxerWindow", "Secondary (PIP)", nullptr));
+        comboBoxLevel->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "1.0", nullptr));
+        comboBoxLevel->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "1.1", nullptr));
+        comboBoxLevel->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "1.2", nullptr));
+        comboBoxLevel->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "1.3", nullptr));
+        comboBoxLevel->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "2.0", nullptr));
+        comboBoxLevel->setItemText(5, QCoreApplication::translate("TsMuxerWindow", "2.1", nullptr));
+        comboBoxLevel->setItemText(6, QCoreApplication::translate("TsMuxerWindow", "2.2", nullptr));
+        comboBoxLevel->setItemText(7, QCoreApplication::translate("TsMuxerWindow", "3.0", nullptr));
+        comboBoxLevel->setItemText(8, QCoreApplication::translate("TsMuxerWindow", "3.1", nullptr));
+        comboBoxLevel->setItemText(9, QCoreApplication::translate("TsMuxerWindow", "3.2", nullptr));
+        comboBoxLevel->setItemText(10, QCoreApplication::translate("TsMuxerWindow", "4.0", nullptr));
+        comboBoxLevel->setItemText(11, QCoreApplication::translate("TsMuxerWindow", "4.1", nullptr));
+        comboBoxLevel->setItemText(12, QCoreApplication::translate("TsMuxerWindow", "4.2", nullptr));
+        comboBoxLevel->setItemText(13, QCoreApplication::translate("TsMuxerWindow", "5.0", nullptr));
+        comboBoxLevel->setItemText(14, QCoreApplication::translate("TsMuxerWindow", "5.1", nullptr));
+
+        labelAR->setText(QCoreApplication::translate("TsMuxerWindow", "AR", nullptr));
+        comboBoxAR->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "As source", nullptr));
+        comboBoxAR->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "1:1 (Square)", nullptr));
+        comboBoxAR->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "4:3", nullptr));
+        comboBoxAR->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "16:9", nullptr));
+        comboBoxAR->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "2.21:1", nullptr));
+
+        checkBoxLevel->setText(QCoreApplication::translate("TsMuxerWindow", "Change level:", nullptr));
+        checkBoxSPS->setText(QCoreApplication::translate("TsMuxerWindow", "Continually insert SPS/PPS", nullptr));
+        comboBoxSEI->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "Do not change SEI and VUI data", nullptr));
+        comboBoxSEI->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "Insert SEI and VUI data if absent", nullptr));
+        comboBoxSEI->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "Always rebuild  SEI and VUI data", nullptr));
+
+        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetVideo), QCoreApplication::translate("TsMuxerWindow", "General track options", nullptr));
         imageSubtitles->setText(QString());
         imageAudio->setText(QString());
-        label_18->setText(QApplication::translate("TsMuxerWindow", "Delay (in ms):", 0, QApplication::UnicodeUTF8));
-        dtsDwnConvert->setText(QApplication::translate("TsMuxerWindow", "Downconvert HD audio", 0, QApplication::UnicodeUTF8));
-        secondaryCheckBox->setText(QApplication::translate("TsMuxerWindow", "Seconday", 0, QApplication::UnicodeUTF8));
-        checkBoxKeepFps->setText(QApplication::translate("TsMuxerWindow", "Bind to video FPS", 0, QApplication::UnicodeUTF8));
-        offsetsLabel->setText(QApplication::translate("TsMuxerWindow", "3d offset:", 0, QApplication::UnicodeUTF8));
-        label_19->setText(QApplication::translate("TsMuxerWindow", "Language:", 0, QApplication::UnicodeUTF8));
-        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetAudio), QApplication::translate("TsMuxerWindow", "General track options", 0, QApplication::UnicodeUTF8));
-        radioButton_4->setText(QApplication::translate("TsMuxerWindow", "Demux to multi channels WAVE file", 0, QApplication::UnicodeUTF8));
-        radioButton_5->setText(QApplication::translate("TsMuxerWindow", "Demux to several mono WAVE files", 0, QApplication::UnicodeUTF8));
-        radioButton_6->setText(QApplication::translate("TsMuxerWindow", "Demux to RAW PCM stream", 0, QApplication::UnicodeUTF8));
-        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(demuxLpcmOptions), QApplication::translate("TsMuxerWindow", "Demux options", 0, QApplication::UnicodeUTF8));
-        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetFake), QApplication::translate("TsMuxerWindow", "General track options", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(GeneralTab), QApplication::translate("TsMuxerWindow", "Input", 0, QApplication::UnicodeUTF8));
-        groupBox7->setTitle(QApplication::translate("TsMuxerWindow", "Bitrate", 0, QApplication::UnicodeUTF8));
-        checkBoxVBR->setText(QApplication::translate("TsMuxerWindow", "Mux VBR", 0, QApplication::UnicodeUTF8));
-        checkBoxRVBR->setText(QApplication::translate("TsMuxerWindow", "Restricted VBR", 0, QApplication::UnicodeUTF8));
-        label_5->setText(QApplication::translate("TsMuxerWindow", "Max bitrate, kbps", 0, QApplication::UnicodeUTF8));
-        label_6->setText(QApplication::translate("TsMuxerWindow", "Min bitrate, kbps", 0, QApplication::UnicodeUTF8));
-        checkBoxCBR->setText(QApplication::translate("TsMuxerWindow", "Mux CBR", 0, QApplication::UnicodeUTF8));
-        label_7->setText(QApplication::translate("TsMuxerWindow", "Bitrate, kbps", 0, QApplication::UnicodeUTF8));
-        label_8->setText(QApplication::translate("TsMuxerWindow", "VBV Buffer size, ms", 0, QApplication::UnicodeUTF8));
-        groupBox_5->setTitle(QApplication::translate("TsMuxerWindow", "General", 0, QApplication::UnicodeUTF8));
-        checkBoxSound->setText(QApplication::translate("TsMuxerWindow", "Play sound at end", 0, QApplication::UnicodeUTF8));
-        checkBoxNewAudioPes->setText(QApplication::translate("TsMuxerWindow", "Generate HDMV compatible TS", 0, QApplication::UnicodeUTF8));
-        checkBoxCrop->setText(QApplication::translate("TsMuxerWindow", "Restore cropped video to full size", 0, QApplication::UnicodeUTF8));
-        GroupBox114->setTitle(QApplication::translate("TsMuxerWindow", "Default output folder", 0, QApplication::UnicodeUTF8));
-        radioButtonStoreOutput->setText(QApplication::translate("TsMuxerWindow", "Use the latest output folder name", 0, QApplication::UnicodeUTF8));
-        radioButtonOutoutInInput->setText(QApplication::translate("TsMuxerWindow", "Place output folder to a input folder", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("TsMuxerWindow", "General", 0, QApplication::UnicodeUTF8));
-        groupBox_3->setTitle(QApplication::translate("TsMuxerWindow", "Chapters", 0, QApplication::UnicodeUTF8));
-        radioButtonNoChapters->setText(QApplication::translate("TsMuxerWindow", "No chapters", 0, QApplication::UnicodeUTF8));
-        radioButtonAutoChapter->setText(QApplication::translate("TsMuxerWindow", "Insert chapter every", 0, QApplication::UnicodeUTF8));
-        label_4->setText(QApplication::translate("TsMuxerWindow", "minutes", 0, QApplication::UnicodeUTF8));
-        radioButtonCustomChapters->setText(QApplication::translate("TsMuxerWindow", "Custom chapters list", 0, QApplication::UnicodeUTF8));
-        label_9->setText(QApplication::translate("TsMuxerWindow", "Chapters:", 0, QApplication::UnicodeUTF8));
-        memoChapters->setHtml(QApplication::translate("TsMuxerWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        label_18->setText(QCoreApplication::translate("TsMuxerWindow", "Delay (in ms):", nullptr));
+        dtsDwnConvert->setText(QCoreApplication::translate("TsMuxerWindow", "Downconvert HD audio", nullptr));
+        secondaryCheckBox->setText(QCoreApplication::translate("TsMuxerWindow", "Seconday", nullptr));
+        checkBoxKeepFps->setText(QCoreApplication::translate("TsMuxerWindow", "Bind to video FPS", nullptr));
+        offsetsLabel->setText(QCoreApplication::translate("TsMuxerWindow", "3d offset:", nullptr));
+        label_19->setText(QCoreApplication::translate("TsMuxerWindow", "Language:", nullptr));
+        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetAudio), QCoreApplication::translate("TsMuxerWindow", "General track options", nullptr));
+        radioButton_4->setText(QCoreApplication::translate("TsMuxerWindow", "Demux to multi channels WAVE file", nullptr));
+        radioButton_5->setText(QCoreApplication::translate("TsMuxerWindow", "Demux to several mono WAVE files", nullptr));
+        radioButton_6->setText(QCoreApplication::translate("TsMuxerWindow", "Demux to RAW PCM stream", nullptr));
+        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(demuxLpcmOptions), QCoreApplication::translate("TsMuxerWindow", "Demux options", nullptr));
+        tabWidgetTracks->setTabText(tabWidgetTracks->indexOf(tabSheetFake), QCoreApplication::translate("TsMuxerWindow", "General track options", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(GeneralTab), QCoreApplication::translate("TsMuxerWindow", "Input", nullptr));
+        groupBox7->setTitle(QCoreApplication::translate("TsMuxerWindow", "Bitrate", nullptr));
+        checkBoxVBR->setText(QCoreApplication::translate("TsMuxerWindow", "Mux VBR", nullptr));
+        checkBoxRVBR->setText(QCoreApplication::translate("TsMuxerWindow", "Restricted VBR", nullptr));
+        label_5->setText(QCoreApplication::translate("TsMuxerWindow", "Max bitrate, kbps", nullptr));
+        label_6->setText(QCoreApplication::translate("TsMuxerWindow", "Min bitrate, kbps", nullptr));
+        checkBoxCBR->setText(QCoreApplication::translate("TsMuxerWindow", "Mux CBR", nullptr));
+        label_7->setText(QCoreApplication::translate("TsMuxerWindow", "Bitrate, kbps", nullptr));
+        label_8->setText(QCoreApplication::translate("TsMuxerWindow", "VBV Buffer size, ms", nullptr));
+        groupBox_5->setTitle(QCoreApplication::translate("TsMuxerWindow", "General", nullptr));
+        checkBoxSound->setText(QCoreApplication::translate("TsMuxerWindow", "Play sound at end", nullptr));
+        checkBoxNewAudioPes->setText(QCoreApplication::translate("TsMuxerWindow", "Generate HDMV compatible TS", nullptr));
+        checkBoxCrop->setText(QCoreApplication::translate("TsMuxerWindow", "Restore cropped video to full size", nullptr));
+        GroupBox114->setTitle(QCoreApplication::translate("TsMuxerWindow", "Default output folder", nullptr));
+        radioButtonStoreOutput->setText(QCoreApplication::translate("TsMuxerWindow", "Use the latest output folder name", nullptr));
+        radioButtonOutoutInInput->setText(QCoreApplication::translate("TsMuxerWindow", "Place output folder to a input folder", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QCoreApplication::translate("TsMuxerWindow", "General", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("TsMuxerWindow", "Chapters", nullptr));
+        radioButtonNoChapters->setText(QCoreApplication::translate("TsMuxerWindow", "No chapters", nullptr));
+        radioButtonAutoChapter->setText(QCoreApplication::translate("TsMuxerWindow", "Insert chapter every", nullptr));
+        label_4->setText(QCoreApplication::translate("TsMuxerWindow", "minutes", nullptr));
+        radioButtonCustomChapters->setText(QCoreApplication::translate("TsMuxerWindow", "Custom chapters list", nullptr));
+        label_9->setText(QCoreApplication::translate("TsMuxerWindow", "Chapters:", nullptr));
+        memoChapters->setHtml(QCoreApplication::translate("TsMuxerWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"></p></body></html>", 0, QApplication::UnicodeUTF8));
-        BDOptionsGroupBox->setTitle(QApplication::translate("TsMuxerWindow", "Options", 0, QApplication::UnicodeUTF8));
-        checkBoxBlankPL->setText(QApplication::translate("TsMuxerWindow", "Add blank playlist for cropped video", 0, QApplication::UnicodeUTF8));
-        BlackplaylistLabel->setText(QApplication::translate("TsMuxerWindow", "Blank playlist", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("TsMuxerWindow", "First MPLS file", 0, QApplication::UnicodeUTF8));
-        label_10->setText(QApplication::translate("TsMuxerWindow", "First M2TS file", 0, QApplication::UnicodeUTF8));
-        muxTimeEdit->setDisplayFormat(QApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", 0, QApplication::UnicodeUTF8));
-        label_20->setText(QApplication::translate("TsMuxerWindow", "Start mux time", 0, QApplication::UnicodeUTF8));
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"></p></body></html>", nullptr));
+        BDOptionsGroupBox->setTitle(QCoreApplication::translate("TsMuxerWindow", "Options", nullptr));
+        checkBoxBlankPL->setText(QCoreApplication::translate("TsMuxerWindow", "Add blank playlist for cropped video", nullptr));
+        BlackplaylistLabel->setText(QCoreApplication::translate("TsMuxerWindow", "Blank playlist", nullptr));
+        label->setText(QCoreApplication::translate("TsMuxerWindow", "First MPLS file", nullptr));
+        label_10->setText(QCoreApplication::translate("TsMuxerWindow", "First M2TS file", nullptr));
+        muxTimeEdit->setDisplayFormat(QCoreApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", nullptr));
+        label_20->setText(QCoreApplication::translate("TsMuxerWindow", "Start mux time", nullptr));
         muxTimeClock->setSuffix(QString());
         muxTimeClock->setPrefix(QString());
-        label_23->setText(QApplication::translate("TsMuxerWindow", "45 Khz clock:", 0, QApplication::UnicodeUTF8));
-        groupBox_11->setTitle(QApplication::translate("TsMuxerWindow", "3D settings", 0, QApplication::UnicodeUTF8));
-        rightEyeCheckBox->setText(QApplication::translate("TsMuxerWindow", "Use base video stream for right eye", 0, QApplication::UnicodeUTF8));
-        groupBoxPip->setTitle(QApplication::translate("TsMuxerWindow", "PIP settings", 0, QApplication::UnicodeUTF8));
-        label_24->setText(QApplication::translate("TsMuxerWindow", "Corner", 0, QApplication::UnicodeUTF8));
-        comboBoxPipCorner->clear();
-        comboBoxPipCorner->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "Top Left", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Top Right", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Bottom Right", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Bottom Left", 0, QApplication::UnicodeUTF8)
-        );
-        label_25->setText(QApplication::translate("TsMuxerWindow", "Horizontal offset", 0, QApplication::UnicodeUTF8));
-        label_26->setText(QApplication::translate("TsMuxerWindow", "Size", 0, QApplication::UnicodeUTF8));
-        comboBoxPipSize->clear();
-        comboBoxPipSize->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "Not scale", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Half (x 1/2)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Quoter (x 1/4)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "One and Half (x 1.5)", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Full Screen", 0, QApplication::UnicodeUTF8)
-        );
-        label_27->setText(QApplication::translate("TsMuxerWindow", "Vertical offset", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("TsMuxerWindow", "Blu-ray", 0, QApplication::UnicodeUTF8));
-        groupBox_6->setTitle(QApplication::translate("TsMuxerWindow", "Splitting", 0, QApplication::UnicodeUTF8));
-        noSplit->setText(QApplication::translate("TsMuxerWindow", "No split", 0, QApplication::UnicodeUTF8));
-        splitByDuration->setText(QApplication::translate("TsMuxerWindow", "Split by duration every", 0, QApplication::UnicodeUTF8));
-        labelSplitByDur->setText(QApplication::translate("TsMuxerWindow", "sec", 0, QApplication::UnicodeUTF8));
-        splitBySize->setText(QApplication::translate("TsMuxerWindow", "Split by size every", 0, QApplication::UnicodeUTF8));
-        comboBoxMeasure->clear();
-        comboBoxMeasure->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "KB", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "KiB", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "MB", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "MiB", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "GB", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "GiB", 0, QApplication::UnicodeUTF8)
-        );
-        groupBox_7->setTitle(QApplication::translate("TsMuxerWindow", "Cutting", 0, QApplication::UnicodeUTF8));
-        checkBoxCut->setText(QApplication::translate("TsMuxerWindow", "Enable cutting", 0, QApplication::UnicodeUTF8));
-        label_11->setText(QApplication::translate("TsMuxerWindow", "Start", 0, QApplication::UnicodeUTF8));
-        label_12->setText(QApplication::translate("TsMuxerWindow", "End", 0, QApplication::UnicodeUTF8));
-        cutStartTimeEdit->setDisplayFormat(QApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", 0, QApplication::UnicodeUTF8));
-        cutEndTimeEdit->setDisplayFormat(QApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", 0, QApplication::UnicodeUTF8));
-        label_28->setText(QApplication::translate("TsMuxerWindow", "(h:mm:ss.ms)", 0, QApplication::UnicodeUTF8));
-        label_29->setText(QApplication::translate("TsMuxerWindow", "(h:mm:ss.ms)", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("TsMuxerWindow", "Split && cut", 0, QApplication::UnicodeUTF8));
-        groupBox_8->setTitle(QApplication::translate("TsMuxerWindow", " Default text based subtitles font: ", 0, QApplication::UnicodeUTF8));
+        label_23->setText(QCoreApplication::translate("TsMuxerWindow", "45 Khz clock:", nullptr));
+        groupBox_11->setTitle(QCoreApplication::translate("TsMuxerWindow", "3D settings", nullptr));
+        rightEyeCheckBox->setText(QCoreApplication::translate("TsMuxerWindow", "Use base video stream for right eye", nullptr));
+        groupBoxPip->setTitle(QCoreApplication::translate("TsMuxerWindow", "PIP settings", nullptr));
+        label_24->setText(QCoreApplication::translate("TsMuxerWindow", "Corner", nullptr));
+        comboBoxPipCorner->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "Top Left", nullptr));
+        comboBoxPipCorner->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "Top Right", nullptr));
+        comboBoxPipCorner->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "Bottom Right", nullptr));
+        comboBoxPipCorner->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "Bottom Left", nullptr));
+
+        label_25->setText(QCoreApplication::translate("TsMuxerWindow", "Horizontal offset", nullptr));
+        label_26->setText(QCoreApplication::translate("TsMuxerWindow", "Size", nullptr));
+        comboBoxPipSize->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "Not scale", nullptr));
+        comboBoxPipSize->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "Half (x 1/2)", nullptr));
+        comboBoxPipSize->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "Quoter (x 1/4)", nullptr));
+        comboBoxPipSize->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "One and Half (x 1.5)", nullptr));
+        comboBoxPipSize->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "Full Screen", nullptr));
+
+        label_27->setText(QCoreApplication::translate("TsMuxerWindow", "Vertical offset", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("TsMuxerWindow", "Blu-ray", nullptr));
+        groupBox_6->setTitle(QCoreApplication::translate("TsMuxerWindow", "Splitting", nullptr));
+        noSplit->setText(QCoreApplication::translate("TsMuxerWindow", "No split", nullptr));
+        splitByDuration->setText(QCoreApplication::translate("TsMuxerWindow", "Split by duration every", nullptr));
+        labelSplitByDur->setText(QCoreApplication::translate("TsMuxerWindow", "sec", nullptr));
+        splitBySize->setText(QCoreApplication::translate("TsMuxerWindow", "Split by size every", nullptr));
+        comboBoxMeasure->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "KB", nullptr));
+        comboBoxMeasure->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "KiB", nullptr));
+        comboBoxMeasure->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "MB", nullptr));
+        comboBoxMeasure->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "MiB", nullptr));
+        comboBoxMeasure->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "GB", nullptr));
+        comboBoxMeasure->setItemText(5, QCoreApplication::translate("TsMuxerWindow", "GiB", nullptr));
+
+        groupBox_7->setTitle(QCoreApplication::translate("TsMuxerWindow", "Cutting", nullptr));
+        checkBoxCut->setText(QCoreApplication::translate("TsMuxerWindow", "Enable cutting", nullptr));
+        label_11->setText(QCoreApplication::translate("TsMuxerWindow", "Start", nullptr));
+        label_12->setText(QCoreApplication::translate("TsMuxerWindow", "End", nullptr));
+        cutStartTimeEdit->setDisplayFormat(QCoreApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", nullptr));
+        cutEndTimeEdit->setDisplayFormat(QCoreApplication::translate("TsMuxerWindow", "H:mm:ss.zzz", nullptr));
+        label_28->setText(QCoreApplication::translate("TsMuxerWindow", "(h:mm:ss.ms)", nullptr));
+        label_29->setText(QCoreApplication::translate("TsMuxerWindow", "(h:mm:ss.ms)", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("TsMuxerWindow", "Split && cut", nullptr));
+        groupBox_8->setTitle(QCoreApplication::translate("TsMuxerWindow", " Default text based subtitles font: ", nullptr));
         QTableWidgetItem *___qtablewidgetitem5 = listViewFont->horizontalHeaderItem(0);
-        ___qtablewidgetitem5->setText(QApplication::translate("TsMuxerWindow", "New Column", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem5->setText(QCoreApplication::translate("TsMuxerWindow", "New Column", nullptr));
         QTableWidgetItem *___qtablewidgetitem6 = listViewFont->horizontalHeaderItem(1);
-        ___qtablewidgetitem6->setText(QApplication::translate("TsMuxerWindow", "New Column", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem6->setText(QCoreApplication::translate("TsMuxerWindow", "New Column", nullptr));
         QTableWidgetItem *___qtablewidgetitem7 = listViewFont->verticalHeaderItem(0);
-        ___qtablewidgetitem7->setText(QApplication::translate("TsMuxerWindow", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem7->setText(QCoreApplication::translate("TsMuxerWindow", "New Row", nullptr));
         QTableWidgetItem *___qtablewidgetitem8 = listViewFont->verticalHeaderItem(1);
-        ___qtablewidgetitem8->setText(QApplication::translate("TsMuxerWindow", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem8->setText(QCoreApplication::translate("TsMuxerWindow", "New Row", nullptr));
         QTableWidgetItem *___qtablewidgetitem9 = listViewFont->verticalHeaderItem(2);
-        ___qtablewidgetitem9->setText(QApplication::translate("TsMuxerWindow", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem9->setText(QCoreApplication::translate("TsMuxerWindow", "New Row", nullptr));
         QTableWidgetItem *___qtablewidgetitem10 = listViewFont->verticalHeaderItem(3);
-        ___qtablewidgetitem10->setText(QApplication::translate("TsMuxerWindow", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem10->setText(QCoreApplication::translate("TsMuxerWindow", "New Row", nullptr));
         QTableWidgetItem *___qtablewidgetitem11 = listViewFont->verticalHeaderItem(4);
-        ___qtablewidgetitem11->setText(QApplication::translate("TsMuxerWindow", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem11->setText(QCoreApplication::translate("TsMuxerWindow", "New Row", nullptr));
 
         const bool __sortingEnabled = listViewFont->isSortingEnabled();
         listViewFont->setSortingEnabled(false);
         QTableWidgetItem *___qtablewidgetitem12 = listViewFont->item(0, 0);
-        ___qtablewidgetitem12->setText(QApplication::translate("TsMuxerWindow", "Name:", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem12->setText(QCoreApplication::translate("TsMuxerWindow", "Name:", nullptr));
         QTableWidgetItem *___qtablewidgetitem13 = listViewFont->item(0, 1);
-        ___qtablewidgetitem13->setText(QApplication::translate("TsMuxerWindow", "Arial", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem13->setText(QCoreApplication::translate("TsMuxerWindow", "Arial", nullptr));
         QTableWidgetItem *___qtablewidgetitem14 = listViewFont->item(1, 0);
-        ___qtablewidgetitem14->setText(QApplication::translate("TsMuxerWindow", "Size:", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem14->setText(QCoreApplication::translate("TsMuxerWindow", "Size:", nullptr));
         QTableWidgetItem *___qtablewidgetitem15 = listViewFont->item(1, 1);
-        ___qtablewidgetitem15->setText(QApplication::translate("TsMuxerWindow", "65", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem15->setText(QCoreApplication::translate("TsMuxerWindow", "65", nullptr));
         QTableWidgetItem *___qtablewidgetitem16 = listViewFont->item(2, 0);
-        ___qtablewidgetitem16->setText(QApplication::translate("TsMuxerWindow", "Color:", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem16->setText(QCoreApplication::translate("TsMuxerWindow", "Color:", nullptr));
         QTableWidgetItem *___qtablewidgetitem17 = listViewFont->item(2, 1);
-        ___qtablewidgetitem17->setText(QApplication::translate("TsMuxerWindow", "0xffffffff", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem17->setText(QCoreApplication::translate("TsMuxerWindow", "0xffffffff", nullptr));
         QTableWidgetItem *___qtablewidgetitem18 = listViewFont->item(3, 0);
-        ___qtablewidgetitem18->setText(QApplication::translate("TsMuxerWindow", "Charset:", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem18->setText(QCoreApplication::translate("TsMuxerWindow", "Charset:", nullptr));
         QTableWidgetItem *___qtablewidgetitem19 = listViewFont->item(3, 1);
-        ___qtablewidgetitem19->setText(QApplication::translate("TsMuxerWindow", "Default", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem19->setText(QCoreApplication::translate("TsMuxerWindow", "Default", nullptr));
         QTableWidgetItem *___qtablewidgetitem20 = listViewFont->item(4, 0);
-        ___qtablewidgetitem20->setText(QApplication::translate("TsMuxerWindow", "Options:", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem20->setText(QCoreApplication::translate("TsMuxerWindow", "Options:", nullptr));
         listViewFont->setSortingEnabled(__sortingEnabled);
 
-        fontButton->setText(QApplication::translate("TsMuxerWindow", "Font", 0, QApplication::UnicodeUTF8));
-        colorButton->setText(QApplication::translate("TsMuxerWindow", "Color", 0, QApplication::UnicodeUTF8));
-        label_13->setText(QApplication::translate("TsMuxerWindow", "Additional border, pixels:", 0, QApplication::UnicodeUTF8));
-        label_21->setText(QApplication::translate("TsMuxerWindow", "line spacing:", 0, QApplication::UnicodeUTF8));
-        label_22->setText(QApplication::translate("TsMuxerWindow", "Fade in/out animation:", 0, QApplication::UnicodeUTF8));
-        comboBoxAnimation->clear();
-        comboBoxAnimation->insertItems(0, QStringList()
-         << QApplication::translate("TsMuxerWindow", "None", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Fast", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Medium", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Slow", 0, QApplication::UnicodeUTF8)
-         << QApplication::translate("TsMuxerWindow", "Very slow", 0, QApplication::UnicodeUTF8)
-        );
-        groupBox_9->setTitle(QApplication::translate("TsMuxerWindow", " Vertical position: ", 0, QApplication::UnicodeUTF8));
-        radioButton->setText(QApplication::translate("TsMuxerWindow", "Top of screen", 0, QApplication::UnicodeUTF8));
-        label_14->setText(QApplication::translate("TsMuxerWindow", "top offset, pixels:", 0, QApplication::UnicodeUTF8));
-        radioButton_2->setText(QApplication::translate("TsMuxerWindow", "Screen center", 0, QApplication::UnicodeUTF8));
-        radioButton_3->setText(QApplication::translate("TsMuxerWindow", "Bottom of screen", 0, QApplication::UnicodeUTF8));
-        label_15->setText(QApplication::translate("TsMuxerWindow", "bottom offset, pixels:", 0, QApplication::UnicodeUTF8));
-        groupBox_10->setTitle(QApplication::translate("TsMuxerWindow", " Horizontal position: ", 0, QApplication::UnicodeUTF8));
-        rbhLeft->setText(QApplication::translate("TsMuxerWindow", "Left of screen", 0, QApplication::UnicodeUTF8));
-        label_17->setText(QApplication::translate("TsMuxerWindow", "left offset, pixels:", 0, QApplication::UnicodeUTF8));
-        rbhCenter->setText(QApplication::translate("TsMuxerWindow", "Screen center", 0, QApplication::UnicodeUTF8));
-        rbhRight->setText(QApplication::translate("TsMuxerWindow", "Right of screen", 0, QApplication::UnicodeUTF8));
-        label_16->setText(QApplication::translate("TsMuxerWindow", "right offset, pixels:", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("TsMuxerWindow", "Subtitles", 0, QApplication::UnicodeUTF8));
-        textEdit->setHtml(QApplication::translate("TsMuxerWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><title>Network Optix tsMuxeR</title><style type=\"text/css\">\n"
+        fontButton->setText(QCoreApplication::translate("TsMuxerWindow", "Font", nullptr));
+        colorButton->setText(QCoreApplication::translate("TsMuxerWindow", "Color", nullptr));
+        label_13->setText(QCoreApplication::translate("TsMuxerWindow", "Additional border, pixels:", nullptr));
+        label_21->setText(QCoreApplication::translate("TsMuxerWindow", "line spacing:", nullptr));
+        label_22->setText(QCoreApplication::translate("TsMuxerWindow", "Fade in/out animation:", nullptr));
+        comboBoxAnimation->setItemText(0, QCoreApplication::translate("TsMuxerWindow", "None", nullptr));
+        comboBoxAnimation->setItemText(1, QCoreApplication::translate("TsMuxerWindow", "Fast", nullptr));
+        comboBoxAnimation->setItemText(2, QCoreApplication::translate("TsMuxerWindow", "Medium", nullptr));
+        comboBoxAnimation->setItemText(3, QCoreApplication::translate("TsMuxerWindow", "Slow", nullptr));
+        comboBoxAnimation->setItemText(4, QCoreApplication::translate("TsMuxerWindow", "Very slow", nullptr));
+
+        groupBox_9->setTitle(QCoreApplication::translate("TsMuxerWindow", " Vertical position: ", nullptr));
+        radioButton->setText(QCoreApplication::translate("TsMuxerWindow", "Top of screen", nullptr));
+        label_14->setText(QCoreApplication::translate("TsMuxerWindow", "top offset, pixels:", nullptr));
+        radioButton_2->setText(QCoreApplication::translate("TsMuxerWindow", "Screen center", nullptr));
+        radioButton_3->setText(QCoreApplication::translate("TsMuxerWindow", "Bottom of screen", nullptr));
+        label_15->setText(QCoreApplication::translate("TsMuxerWindow", "bottom offset, pixels:", nullptr));
+        groupBox_10->setTitle(QCoreApplication::translate("TsMuxerWindow", " Horizontal position: ", nullptr));
+        rbhLeft->setText(QCoreApplication::translate("TsMuxerWindow", "Left of screen", nullptr));
+        label_17->setText(QCoreApplication::translate("TsMuxerWindow", "left offset, pixels:", nullptr));
+        rbhCenter->setText(QCoreApplication::translate("TsMuxerWindow", "Screen center", nullptr));
+        rbhRight->setText(QCoreApplication::translate("TsMuxerWindow", "Right of screen", nullptr));
+        label_16->setText(QCoreApplication::translate("TsMuxerWindow", "right offset, pixels:", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QCoreApplication::translate("TsMuxerWindow", "Subtitles", nullptr));
+        textEdit->setHtml(QCoreApplication::translate("TsMuxerWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><title>tsMuxeR</title><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://www.smlabs.net/tsmuxer_en.html\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline; color:#0000ff;\">Network Optix tsMuxeR</span></a><span style=\" font-size:8pt;\"> \342\200\223 the software utility to create TS and M2TS files for IP broadcasting as well as for viewing at hardware video players (i.e., Dune HD Ultra, Sony Playstation3, Samsung Smart TV and others). </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-inden"
-                        "t:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Network Optix tsMuxeR is a freeware. </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"https://github.com/justdan96/tsMuxer\"><span style=\" font-size:8pt; font-weight:600; text-decoration: underline; color:#0000ff;\">tsMuxeR</span></a><span style=\" font-size:8pt;\"> \342\200\223 the software utility to create TS and M2TS files for IP broadcasting as well as for viewing at hardware video players (i.e., Dune HD Ultra, Sony Playstation3, Samsung Smart TV and others). </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span"
+                        " style=\" font-size:8pt;\">tsMuxeR is open source. </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Supported incoming formats: </span></p>\n"
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">TS; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">M2TS; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">SIFF;</li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-"
-                        "indent:0; text-indent:0px;\">MOV;</li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MP4;</li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MOV;</li>\n"
+""
+                        "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MP4;</li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MKV;</li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Blu-ray; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Demux option. </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Supported videocodecs: </span></p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\""
-                        " font-size:8pt;\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">H.264/MVC </li>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12px"
+                        "; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">H.264/MVC </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Microsoft VC-1; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MPEG-2. </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Supported audiocodecs: </span></p>\n"
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">AAC; </li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; m"
-                        "argin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">AC3 / E-AC3(DD+); </li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-"
+                        "right:0px; -qt-block-indent:0; text-indent:0px;\">AC3 / E-AC3(DD+); </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Dolby True HD (for streams with AC3 core only); </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">DTS/ DTS-HD; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LPCM. </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Supported subtitle types: </span></p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12p"
-                        "x; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">M2TS Presentation graphic stream. </li>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; mar"
+                        "gin-right:0px; -qt-block-indent:0; text-indent:0px;\">M2TS Presentation graphic stream. </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">SRT text subtitles </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Supported containers and formats: </span></p>\n"
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Elementary stream; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Transport stream TS and M2TS; </li>\n"
-"<li style=\" font-size:"
-                        "8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Program stream EVO/VOB/MPG; </li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bot"
+                        "tom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Program stream EVO/VOB/MPG; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Matroska MKV/MKA. </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">MP4/MOV. </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Main features: </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"></p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-to"
-                        "p:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3D blu-ray support;</li>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px;"
+                        " margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3D blu-ray support;</li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Automatic or manual fps adjustment while mixing; </li></ul>\n"
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Level changing as well as SEI, SPS/PPS elements and NAL unit delimiter cycle insertion while mixing H.264; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Audio tracks and subtitles time shifting; </li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -q"
-                        "t-block-indent:0; text-indent:0px;\">Ability to extract DTS core from DTS-HD; </li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Abili"
+                        "ty to extract DTS core from DTS-HD; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to extract AC3 core from True-HD; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to join files; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to adjust fps for subtitles; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to convert LPCM streams into WAVE and vice versa; </li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"
-                        "\">Track language information injection into blu-ray structure and TS header; </li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Track language information injection in"
+                        "to blu-ray structure and TS header; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to cut source files; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to split output file; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to detect audio delay for TS/M2TS/MPG/VOB/EVO sources; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to remove pulldown info from stream; </li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
-                        "nt:0px;\">Ability to open Blu-ray playlist (MPLS) files; </li>\n"
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to open Blu-ray playlist"
+                        " (MPLS) files; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ability to convert SRT subtitles to PGS; </li>\n"
 "<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Tags for SRT subtitles support - tags for changing font, color, size, etc.; tag's syntax is similar to HTML; </li>\n"
-"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">United cross-platform GUI - Windows, Linux, MacOS. </li></ul></body></html>", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(About), QApplication::translate("TsMuxerWindow", "About", 0, QApplication::UnicodeUTF8));
+"<li style=\" font-size:8pt;\" style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">United cross-platform GUI - Windows, Linux, MacOS. </li></ul></body></html>", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(About), QCoreApplication::translate("TsMuxerWindow", "About", nullptr));
         groupBox->setTitle(QString());
-        groupBox_4->setTitle(QApplication::translate("TsMuxerWindow", "Output", 0, QApplication::UnicodeUTF8));
-        radioButtonTS->setText(QApplication::translate("TsMuxerWindow", "TS muxing", 0, QApplication::UnicodeUTF8));
-        radioButtonM2TS->setText(QApplication::translate("TsMuxerWindow", "M2TS muxing", 0, QApplication::UnicodeUTF8));
-        radioButtonBluRayISO->setText(QApplication::translate("TsMuxerWindow", "Blu-ray ISO", 0, QApplication::UnicodeUTF8));
-        radioButtonBluRay->setText(QApplication::translate("TsMuxerWindow", "Blu-ray folder", 0, QApplication::UnicodeUTF8));
-        radioButtonAVCHD->setText(QApplication::translate("TsMuxerWindow", "AVCHD folder", 0, QApplication::UnicodeUTF8));
-        radioButtonDemux->setText(QApplication::translate("TsMuxerWindow", "Demux", 0, QApplication::UnicodeUTF8));
-        DiskLabel->setText(QApplication::translate("TsMuxerWindow", "Disk label", 0, QApplication::UnicodeUTF8));
-        FilenameLabel->setText(QApplication::translate("TsMuxerWindow", "File name", 0, QApplication::UnicodeUTF8));
-        btnBrowse->setText(QApplication::translate("TsMuxerWindow", "Browse", 0, QApplication::UnicodeUTF8));
-        groupBox_2->setTitle(QApplication::translate("TsMuxerWindow", "Meta file", 0, QApplication::UnicodeUTF8));
-        buttonMux->setText(QApplication::translate("TsMuxerWindow", "Sta&rt muxing", 0, QApplication::UnicodeUTF8));
-        buttonSaveMeta->setText(QApplication::translate("TsMuxerWindow", "Save meta file", 0, QApplication::UnicodeUTF8));
+        groupBox_4->setTitle(QCoreApplication::translate("TsMuxerWindow", "Output", nullptr));
+        radioButtonTS->setText(QCoreApplication::translate("TsMuxerWindow", "TS muxing", nullptr));
+        radioButtonM2TS->setText(QCoreApplication::translate("TsMuxerWindow", "M2TS muxing", nullptr));
+        radioButtonBluRayISO->setText(QCoreApplication::translate("TsMuxerWindow", "Blu-ray ISO", nullptr));
+        radioButtonBluRay->setText(QCoreApplication::translate("TsMuxerWindow", "Blu-ray folder", nullptr));
+        radioButtonAVCHD->setText(QCoreApplication::translate("TsMuxerWindow", "AVCHD folder", nullptr));
+        radioButtonDemux->setText(QCoreApplication::translate("TsMuxerWindow", "Demux", nullptr));
+        DiskLabel->setText(QCoreApplication::translate("TsMuxerWindow", "Disk label", nullptr));
+        FilenameLabel->setText(QCoreApplication::translate("TsMuxerWindow", "File name", nullptr));
+        btnBrowse->setText(QCoreApplication::translate("TsMuxerWindow", "Browse", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("TsMuxerWindow", "Meta file", nullptr));
+        buttonMux->setText(QCoreApplication::translate("TsMuxerWindow", "Sta&rt muxing", nullptr));
+        buttonSaveMeta->setText(QCoreApplication::translate("TsMuxerWindow", "Save meta file", nullptr));
     } // retranslateUi
 
 };

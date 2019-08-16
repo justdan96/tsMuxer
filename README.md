@@ -61,8 +61,13 @@ The following is a list of changes that will need to be made to the original sou
 * the code uses my_htonl, my_ntohll, etc - these can be swapped for the standard library versions
 * the program currently only compiles 32-bit executables, even on 64-bit systems, a multi-architecture approach is needed
 * consider making static executables for Linux, to make the program more portable
-* create a multi-platform build pipeline, maybe using dockcross
-* both Windows and Linux builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
+* build for Windows requires Visual Studio 2017 and compiling through GUI - we need to create a Makefile equivalent
+* create a multi-platform build pipeline, maybe using dockcross or if that doesn't work creating a custom WinPE image just for compiling on Windows
+* Windows builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
+* the program doesn't support MPEG-4 ASP, even though MPEG-4 ASP is defined in the TS specification
+* no Opus audio support
+* [several](https://forum.doom9.org/showthread.php?p=1880216#post1880216) [muxing](https://forum.doom9.org/showthread.php?p=1881372#post1881372) [bugs](https://forum.doom9.org/showthread.php?p=1881509#post1881509) when muxing a HEVC/UHD stream - results in an out-of-sync stream
+* has issues with 24-bit DTS Express
 
 ## Contributing
 
@@ -89,13 +94,17 @@ You can report issues directly on Github, that would be a really useful contribu
 
 #### Linux
 
-In this example we will use Ubuntu 19 64-bit. 
+For these examples we have successfully used Ubuntu 19 64-bit and Debian 10 64-bit. 
 
-First we have to install the pre-requisites. On Ubuntu you can run the following to install all required packages:
+First we have to install the pre-requisites. On Debian 10 you have to enable the "buster-backports" repo. Then on Debian or Ubuntu you can run the following to install all required packages:
 
 ```
-sudo apt-get install libfreetype6-dev \
-build-essential \
+# add 32-bit architecture 
+sudo dpkg --add-architecture i386
+sudo apt-get update
+
+# download/install dependencies
+sudo apt-get install build-essential \
 flex \
 libelf-dev \
 libc6-dev \
@@ -103,18 +112,26 @@ binutils-dev \
 libdwarf-dev \
 libc6-dev-i386 \
 g++-multilib \
-upx \
-qt4-qmake \
-libqt4-dev
-```
+qt5-qmake \
+qtbase5-dev \
+qtdeclarative5-dev \
+qtmultimedia5-dev \
+libqt5multimediawidgets5 \
+libqt5multimedia5-plugins \
+libqt5multimedia5 \
+libfreetype6-dev \
+zlib1g-dev \
+git
 
-Unfortunately on Ubuntu this isn't enough. We need to install libfreetype and it's dependencies as 32-bit libraries. You can download a compressed archive of these files [here](https://drive.google.com/file/d/1pvQoYIvwRlH2DPYQNTrBvFhF6E54QUpE/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/ubuntu-libfreetype-lib32.tar.gz). 
+# on Ubuntu:
+sudo apt-get install checkinstall
+sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 
-Once you download the package you have to install it, the easiest thing is to extract the tar directly into the correct folder as root (I know, this needs to be improved!). Assuming you downloaded the tar to /home/me/Downloads:
-
-```
-cd /lib32
-sudo tar --strip-components=1 -xvf /home/me/Downloads/ubuntu-libfreetype-lib32.tar.gz lib32
+# on Debian:
+sudo apt-get -t buster-backports install checkinstall
+sudo apt-get install libfreetype6-dev:i386
+sudo apt-get install qt5-default
 ```
 
 With all the dependencies set up we can now actually compile the code.
@@ -122,9 +139,14 @@ With all the dependencies set up we can now actually compile the code.
 Open the folder where the git repo is stored in a terminal and run the following:
 
 ```
+# build libmediation
+cd libmediation
+make -j$(nproc)
+
 # compile tsMuxer to ../bin
+cd ..
 cd tsMuxer
-make
+make -j$(nproc)
 
 # generate the tsMuxerGUI makefile
 cd ..
@@ -132,17 +154,86 @@ cd tsMuxerGUI
 qmake
 
 # compile tsMuxerGUI to ../bin
-make
+make -j$(nproc)
 
-# UPX compress the executables, then create a release package as tsMuxeR.tar.gz from the install folder
-cd ..
-cd tsMuxer
-make install
+# create lower case links, then create installable deb package and move it to $HOME
+cd ../bin
+ln -s tsMuxeR tsmuxer
+ln -s tsMuxerGUI tsmuxergui
+sudo checkinstall \
+    --pkgname=tsmuxer \
+    --pkgversion="1:$(./tsmuxer | \
+                      grep "tsMuxeR version" | \
+                      cut -f3 -d " " | \
+                      sed 's/.$//')-git-$(\
+                      git rev-parse --short HEAD)-$(\
+                      date --rfc-3339=date | sed 's/-//g')" \
+    --backup=no \
+    --deldoc=yes \
+    --delspec=yes \
+    --deldesc=yes \
+    --strip=yes \
+    --stripso=yes \
+    --addso=yes \
+    --fstrans=no \
+    --default cp -R * /usr/bin && \
+mv *.deb ~/
+cd $HOME
 ```
 
-#### Windows
+#### Windows (Msys2)
 
-To compile tsMuxer and tsMuxerGUI on Windows you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
+To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2 i686](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands:
+
+```
+pacman -Syu
+pacman -Sy --needed base-devel \
+mingw-w64-i686-toolchain \
+git mingw-w64-i686-cmake \
+flex \
+libelf-devel \
+mingw-w64-i686-freetype \
+mingw-w64-i686-qt5-static \
+mingw-w64-i686-zlib \
+zlib-devel
+```
+
+Close the Msys2 prompt and then open a Mingw32 prompt. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
+
+```
+echo 'load(win32/windows_vulkan_sdk)' > /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+echo 'QMAKE_LIBS_VULKAN       =' >> /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+```
+
+With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
+
+```
+# build libmediation
+cd libmediation
+make -j$(nproc)
+
+# compile tsMuxer to ../bin
+cd ..
+cd tsMuxer
+make -j$(nproc)
+
+
+# generate the tsMuxerGUI makefile
+export PATH=$PATH:/mingw32/qt5-static/bin
+cd ..
+cd tsMuxerGUI
+qmake
+
+# compile tsMuxerGUI to ../bin
+make release
+cp bin/tsMuxerGUI.exe ../bin/
+```
+
+This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
+
+#### Windows (Visual C++ 2017)
+
+To compile tsMuxer and tsMuxerGUI on Windows with Visual C++ 2017 you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
 
 When selecting the installer options please specify:
 
@@ -171,6 +262,8 @@ With all the dependencies set up we can now actually compile the code.
 
 Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
 
+Next to compile tsMuxerGUI you will require a Qt5 installation that is compatible with Visual C++ 2017. For this example we will be using Qt 5.12, as that is the LTS release. You can download it [here](https://download.qt.io/official_releases/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe). 
+
 Next to compile tsMuxerGUI you will require a Qt4 installation that is compatible with Visual C++ 2017. This is not generally available, so must be installed manually - again, this is not portable, so you will have to follow these steps exactly or the build will fail.
 
 You can download a compressed archive of a Qt 4.8.7 installation compiled for MSVC++ 2017 32-bit from [here](https://drive.google.com/file/d/1ugv5x-ZCDPlIwUkvFJooki4GxRo1eBBn/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/qt-4.8.7-vs2017-32.zip). 
@@ -180,19 +273,26 @@ Once you download the package you have to install it, you need to  extract the Z
 To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
 
 ```
-set PATH=C:\Qt\qt-4.8.7-vs2017-32\bin;%PATH%
+set PATH=C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin;%PATH%
 "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
 qmake
 nmake
+copy bin\tsMuxerGUI.exe ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Core.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Gui.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Multimedia.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Network.dll ..\bin\
+copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Widgets.dll ..\bin\
 ```
 
 You will find the following files will be created in ..\bin:
 
-* QtCore4.dll
-* QtGui4.dll
+* Qt5Core.dll
+* Qt5Gui.dll
+* Qt5Multimedia.dll
+* Qt5Network.dll
+* Qt5Widgets.dll
 * tsMuxerGUI.exe
-* tsMuxerGUI.exe.manifest
-* tsMuxerGUI.pdb
 
 ## Financing
 
