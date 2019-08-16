@@ -60,7 +60,7 @@ File::File():
 {
 }
 
-File::File( const char* fName, unsigned int oflag, unsigned int systemDependentFlags ) throw ( std::runtime_error ):
+File::File( const char* fName, unsigned int oflag, unsigned int systemDependentFlags ) /* throw ( std::runtime_error ) */:
     AbstractOutputStream(),
 	m_impl( INVALID_HANDLE_VALUE ),
 	m_name ( fName ),

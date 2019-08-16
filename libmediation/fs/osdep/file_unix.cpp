@@ -57,7 +57,7 @@ File::File():
 {
 }
 
-File::File ( const char* fName, unsigned int oflag, unsigned int systemDependentFlags ) throw ( std::runtime_error ):
+File::File ( const char* fName, unsigned int oflag, unsigned int systemDependentFlags ) /* throw ( std::runtime_error ) */:
     m_name ( fName ),
     m_pos(0)
 {

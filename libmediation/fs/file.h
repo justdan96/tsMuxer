@@ -60,7 +60,7 @@ public:
 	File( 
 		const char* fName, 
 		unsigned int oflag,
-		unsigned int systemDependentFlags = 0 ) throw ( std::runtime_error );
+		unsigned int systemDependentFlags = 0 ) /* throw ( std::runtime_error ) */;
 	virtual ~File();
 
 	//! Открытие файла
