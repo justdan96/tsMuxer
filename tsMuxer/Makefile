@@ -22,8 +22,8 @@ ifeq ("$(MSYSTEM)", "MINGW32")
 else
       INCPATH  = -I../libmediation -I/mingw64/include/freetype2
       LDFLAGS  = -lpthread -lz -lfreetype -lwinmm -lgdi32 -lgdiplus -static
-      CFLAGS   = -c -fpic -fexceptions
-      LFLAGS   = -
+      CFLAGS   = -c -fpic -fexceptions -fpermissive
+      LFLAGS   = 
 endif
    else
       INCPATH  = -I../libmediation -I/usr/include/freetype2
