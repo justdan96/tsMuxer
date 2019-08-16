@@ -13,14 +13,24 @@ CC=g++
 ifdef OS
    DEFINES  = -DWIN32 -DLIBMEDIATION_API=  -DDISABLE_LOG_SUPPORT
    TARGET   = ../bin/tsMuxeR.exe
-   LDFLAGS  = -lpthread -lz -lfreetype -lwinmm -lgdi32 -lgdiplus -m32 -static
    ifdef MSYSTEM
+ifeq ("$(MSYSTEM)", "MINGW32")
       INCPATH  = -I../libmediation -I/mingw32/include/freetype2
+      LDFLAGS  = -lpthread -lz -lfreetype -lwinmm -lgdi32 -lgdiplus -m32 -static
+      CFLAGS   = -c -fpic -fexceptions -m32
+      LFLAGS   = -m32
+else
+      INCPATH  = -I../libmediation -I/mingw64/include/freetype2
+      LDFLAGS  = -lpthread -lz -lfreetype -lwinmm -lgdi32 -lgdiplus -static
+      CFLAGS   = -c -fpic -fexceptions
+      LFLAGS   = -
+endif
    else
       INCPATH  = -I../libmediation -I/usr/include/freetype2
+      LDFLAGS  = -lpthread -lz -lfreetype -lwinmm -lgdi32 -lgdiplus -static
+      CFLAGS   = -c -fpic -fexceptions
+      LFLAGS   = 
    endif
-   CFLAGS   = -c -fpic -fexceptions -m32
-   LFLAGS   = -m32
    SOURCES= ./src/aac.cpp ./src/aacStreamReader.cpp ./src/AbstractDemuxer.cpp ./src/abstractMuxer.cpp ./src/ac3Codec.cpp ./src/ac3StreamReader.cpp \
 ./src/avCodecs.cpp ./src/base64.cpp ./src/bitStream.cpp ./src/blurayHelper.cpp ./src/bufferedFileReader.cpp ./src/bufferedFileWriter.cpp \
 ./src/bufferedReader.cpp ./src/bufferedReaderManager.cpp  ./src/convertUTF.cpp ./src/crc.cpp ./src/dtsStreamReader.cpp ./src/vc1StreamReader.cpp \
@@ -73,6 +83,4 @@ clean:
 install:
 	cp ../bin/tsMuxeR* ../install/
 	cp ../bin/tsMuxerGUI* ../install/
-	cp ../CHANGELOG.md ../install/release_notes.txt
-	
-                
+	cp ../CHANGELOG.md ../install/release_notes.txt  

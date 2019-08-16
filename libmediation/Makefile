@@ -16,9 +16,21 @@ ifdef OS
    SOURCES= fs/directory.cpp fs/osdep/file_win32.cpp system/osdep/condvar_win32.cpp system/osdep/mutex_win32.cpp \
 system/osdep/terminatablethread_win32.cpp types/types.cpp time/time.cpp
    LIBS     = -lpthread -lwinmm
-   LFLAGS   = -m32
-   LDFLAGS   =
-   CFLAGS   = -c -m32
+   ifdef MSYSTEM
+ifeq ("$(MSYSTEM)", "MINGW32")
+      LFLAGS   = -m32
+      LDFLAGS  =
+      CFLAGS   = -c -m32
+else
+      LFLAGS   =
+      LDFLAGS  =
+      CFLAGS   = -c
+endif
+   else
+      LFLAGS   =
+      LDFLAGS  =
+      CFLAGS   = -c
+   endif
 else
    INCPATH  = -I./
    DEFINES  = -DLINUX -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPORT -DDEBUG_NEW12=new -DNO_SYSTEM_EXCEPT
@@ -50,4 +62,3 @@ clean:
 	rm -f $(OBJECTS)
 	rm -f ./libmediation.so
 	rm -f ./libmediationl.a
-                
