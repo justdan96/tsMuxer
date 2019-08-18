@@ -189,20 +189,25 @@ To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and i
 pacman -Syu
 pacman -Sy --needed base-devel \
 mingw-w64-i686-toolchain \
+mingw-w64-x86_64-toolchain \
 git mingw-w64-i686-cmake \
+mingw-w64-x86_64-cmake \
 flex \
 libelf-devel \
 mingw-w64-i686-freetype \
+mingw-w64-x86_64-freetype \
 mingw-w64-i686-qt5-static \
+mingw-w64-x86_64-qt5-static \
 mingw-w64-i686-zlib \
+mingw-w64-x86_64-zlib \
 zlib-devel
 ```
 
-Close the Msys2 prompt and then open a Mingw32 prompt. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
+Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
 
 ```
-echo 'load(win32/windows_vulkan_sdk)' > /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
-echo 'QMAKE_LIBS_VULKAN       =' >> /mingw32/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+echo 'load(win32/windows_vulkan_sdk)' > $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
+echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
 ```
 
 With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
@@ -217,9 +222,8 @@ cd ..
 cd tsMuxer
 make -j$(nproc)
 
-
 # generate the tsMuxerGUI makefile
-export PATH=$PATH:/mingw32/qt5-static/bin
+export PATH=$PATH:$MINGW_PREFIX/qt5-static/bin
 cd ..
 cd tsMuxerGUI
 qmake
