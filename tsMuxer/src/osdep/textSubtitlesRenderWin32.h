@@ -1,7 +1,7 @@
 #ifndef __TEXT_SUBTITLES_RENDER_WIN_H
 #define __TEXT_SUBTITLES_RENDER_WIN_H
 
-#include "textsubtitlesrender.h"
+#include "../textSubtitlesRender.h"
 #include "windows.h"
 
 namespace text_subtitles 

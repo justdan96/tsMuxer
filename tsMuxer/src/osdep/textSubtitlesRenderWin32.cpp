@@ -1,6 +1,6 @@
 #include "textSubtitlesRenderWin32.h"
-#include "vodCoreException.h"
-#include "vod_common.h"
+#include "../vodCoreException.h"
+#include "../vod_common.h"
 #include <gdiplus.h>
 
 using namespace std;

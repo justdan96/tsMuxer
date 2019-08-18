@@ -3,12 +3,12 @@
 
 #ifdef WIN32
 #   include <winerror.h>
-#   include "textSubtitlesRenderWin32.h"
+#   include "osdep/textSubtitlesRenderWin32.h"
 #   ifdef WIN32_DEBUG_FREETYPE
-#       include "textSubtitlesRenderFT.h"
+#       include "osdep/textSubtitlesRenderFT.h"
 #   endif
 #else
-#   include "textSubtitlesRenderFT.h"
+#   include "osdep/textSubtitlesRenderFT.h"
 #endif
 
 #include "memory.h"
