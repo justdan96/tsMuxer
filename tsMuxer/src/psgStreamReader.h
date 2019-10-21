@@ -9,8 +9,6 @@
 #include "textSubtitlesRender.h"
 #include "textSubtitles.h"
 
-class text_subtitles::TextToPGSConverter;
-
 class PGSStreamReader: public AbstractStreamReader 
 {
 public:
