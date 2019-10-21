@@ -51,8 +51,8 @@ int16_t  strToInt16( const char* const );
 uint16_t  strToInt16u( const char* const );
 int8_t  strToInt8( const char* const );
 uint8_t  strToInt8u( const char* const );
-double  strToDouble( const char* const );   // В преобразуемом числе должно быть не более 15 знаков
-double  strWToDouble( const wchar_t* const );   // В преобразуемом числе должно быть не более 15 знаков
+double  strToDouble( const char* const );   // The length of the string should not exceed 15 characters
+double  strWToDouble( const wchar_t* const );   // The length of the string should not exceed 15 characters
 bool  strToBool( const char* const );
 bool  strEndWith(const std::string& str, const std::string& substr);
 bool  strStartWith(const std::string& str, const std::string& substr);
@@ -84,9 +84,9 @@ std::string  int32ToStr( const int32_t&);
 std::string  int32uToStr( const uint32_t&);
 std::string  int32ToHex( const int32_t&);
 std::string  int32uToHex( const uint32_t&);
-//! Преобразование дробного числа в строку.
+//! Conversion of a floating-point number into a string.
 /*!
-	 Если precision = -1, то выводится 4 цифры после запятой.
+	 When precision = -1, the output contains four digits after the comma.
 */
 std::string  doubleToStr( const double& x, int precision = -1 );
 
@@ -98,7 +98,7 @@ void  int8uToStr( const uint8_t&, char* const buf );
 
 std::string  boolToStr( const bool& );
 
-// Работа со строками
+// Work on lines
 std::string  strToUpperCase( const std::string& src);
 std::string  strToLowerCase( const std::string& src);
 

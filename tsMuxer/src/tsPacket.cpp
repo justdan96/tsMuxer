@@ -280,9 +280,9 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
 		bitReader.skipBits(3); // reserved
 		pcr_pid = bitReader.getBits(13);
 
-		// По дефолту ставим video=pcr pid. 
-		// У зашифрованного канала veriMatrix 239.255.2.58:5500 не раскрывается видео PID.
-		// Похоже что в поле es_info_len мусор?
+		// we set video=pcr pid by default. 
+		// the video PID is not available in the scrambled channel veriMatrix 239.255.2.58:5500.
+		// Is that similar to the es_info_len crap?
 		video_pid = pcr_pid; 
 
 		bitReader.skipBits(4); // reserved

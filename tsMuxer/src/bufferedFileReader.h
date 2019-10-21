@@ -9,7 +9,7 @@
 #include <fs/systemlog.h>
 #include "vodCoreException.h"
 
-// »спользуетс€ дл€ автоматического перехода на чтение следующего файла по заданному списку
+// Used to automatically switch to reading the next file in a given list
 class FileListIterator: public FileNameIterator
 {
 public:

@@ -14,11 +14,12 @@ namespace mtime
 
 namespace mtime
 {
-	// возвращает число милисекунд, прошедшее с момента запуска системы (под Windows) или
-	// с неопределённого системного события в Linux.
+
+	// returns the number of milliseconds which have passed since the system started (under Windows) or
+	// since an unspecified point in time under Linux.
 	uint32_t  clockGetTime();
 
-	// возвращает число микросекунд, прошедшее с момента неопределённого системного события.
+	// returns the number of microseconds which have passed since an unspecified point in time.
 	uint64_t  clockGetTimeEx(); 
 
 };

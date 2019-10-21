@@ -17,7 +17,7 @@ Revision 1.3  2006/08/30 13:00:09  andreyk
 *** empty log message ***
 
 Revision 1.2  2006/06/15 17:04:26  andreyk
-Создано единое хранилище voip-сессий.
+РЎРѕР·РґР°РЅРѕ РµРґРёРЅРѕРµ С…СЂР°РЅРёР»РёС‰Рµ voip-СЃРµСЃСЃРёР№.
 
 Revision 1.1  2006/04/19 17:00:03  mike
 *** empty log message ***

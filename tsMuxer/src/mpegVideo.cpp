@@ -40,10 +40,10 @@ MPEGRawDataHeader::~MPEGRawDataHeader() {
 uint32_t MPEGRawDataHeader::serialize(uint8_t* buffer)
 {
 	if (!m_headerIncludedToBuff) {
-		// В buffer не включен pictureHeader. Сериализуем его
-		// todo not implemented. Пока эта ветка нигде не используется
+		// buffer does not include pictureHeader. we're serializing it.
+		// todo not implemented. this branch is currently never entered.
 	}
-	// В буфер включено все, включая pictureHeader
+	// the buffer includes everything - the pictureHeader as well
 	memcpy(buffer, m_data_buffer, m_data_buffer_len);
 	
 	uint32_t rez = m_data_buffer_len;

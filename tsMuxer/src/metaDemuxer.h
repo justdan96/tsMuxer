@@ -72,8 +72,8 @@ struct StreamInfo {
     bool m_isSubStream;
 };
 
-// drpReadSequence - поток идет непрерывно
-// drpFragmented   - поток разбросан кусками по исходному контейнеру
+// drpReadSequence - the stream is not fragmented
+// drpFragmented   - the stream is fragmented according to the resulting container
 enum DemuxerReadPolicy {drpReadSequence, drpFragmented};
 
 class METADemuxer;

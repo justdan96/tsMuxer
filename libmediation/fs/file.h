@@ -36,7 +36,7 @@ public:
 };
 
 
-//! Класс, предоставляющий интерфейс для работы с файлами
+//! A class which represents an interface for working with files.
 class  File: public AbstractOutputStream
 {
 public:
@@ -48,14 +48,14 @@ public:
 	};
 
 	File();
-	//! Конструктор
+	//! Constructor
 	/*!
-		Создаёт объект и открывает файл. Если файл открыть не удалось, то кидается исключение.
-		\param fName Имя файла
-		\param oflag Битовая маска параметров открываемого файла
-		\param systemDependentFlags Системно-зависимые флаги для открытия файла. 
-			В реализации для win32 значение этого параметра передаётся в параметр dwFlagsAndAttributes функции CreateFile,
-			в реализации для unix - во второй параметр(oflag) функции open.
+		Creates the object and opens the file. If opening was unsuccessful, throws an exception.
+		\param fName Name of the file.
+		\param oflag A bitmask of the opened file's parameters.
+		\param systemDependentFlags System-dependent flags for opening the file.
+			In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
+			In the unix implementation, this is the second parameter to the open function.
 	*/
 	File( 
 		const char* fName, 
@@ -63,52 +63,51 @@ public:
 		unsigned int systemDependentFlags = 0 ) /* throw ( std::runtime_error ) */;
 	virtual ~File();
 
-	//! Открытие файла
+	//! Open the file
 	/*!
-		Если файл уже открыт, то он закрывается
-		\param fName Имя файла
-		\param oflag Битовая маска параметров открываемого файла
-		\param systemDependentFlags Системно-зависимые флаги для открытия файла. 
-			В реализации для win32 значение этого параметра передаётся в параметр dwFlagsAndAttributes функции CreateFile,
-			в реализации для unix - во второй параметр(oflag) функции open.
-		\return true, если файл удачно открыт, false в противном случае
+		If a file is already open, it will be closed.
+        \param oflag A bitmask of the opened file's parameters.
+		\param systemDependentFlags System-dependent flags for opening the file.
+			In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
+			In the unix implementation, this is the second parameter to the open function.
+		\return true if the file was opened successfully, false otherwise
 	*/
 	virtual bool open( 
 		const char* fName, 
 		unsigned int oflag,
 		unsigned int systemDependentFlags = 0 ) override;
-	//! Закрыть файл
+	//! Close the file
 	/*!
-		\return true, если файл закрыт, false в случае ошибки
+		\return true, if the file was closed, false in case of an error
 	*/
 	virtual bool close() override;
 
-	//! Чтение файла
+	//! Read the file
 	/*!
-		Читает в буфер максимум count байт из файла. Возвращает число считанных из файла байт.
-		\return Число считанных из файла байт, 0 при попытке чтения из конца файла, -1 в случае ошибки чтения.
+		Reads at most count bytes from the file. Returns the number of bytes actually read.
+		\return Number of bytes actually read, 0 if the end of the file was reached, -1 in case of an error.
 	*/
 	int read( void* buffer, uint32_t count ) const;
-	//! Запись в файл
+	//! Write to the file
 	/*!
-		\return Число байт, записанных в файл. -1 в случае ошибки (например, недостаточно места на диске).
+		\return The number of bytes written into the file. -1 in case of an error (for example, if the disk is full).
 	*/
 	virtual int write( const void* buffer, uint32_t count ) override;
-	//!Сбросить изменения на диск
+	//! Write changes into the disk.
 	/*!
-		Сброс изменений на диск
+		Write changes into the disk
 	*/
 	virtual void sync() override;
 
-	//! Проверка, открыт ли файл
+	//! Check if the file is open.
 	/*!
-		\return true, если файл открыт, false в противном случае.
+		\return true if the file is open, false otherwise.
 	*/
 	bool isOpen() const;
 
-	//!Получение размера файла
+	//! Get the size of the file
 	/*!
-		\return Текущий размер файла
+		\return Current size of the file
 	*/
 	bool size( uint64_t* const fileSize ) const;
 
@@ -120,18 +119,18 @@ public:
             return -1;
     }
 
-	//!Перемещение курсора по файлу
+	//! Relocate the file cursor
 	/*!
 		\param offset 
 		\param whence
-		\return положение указателя после перемещения, или uint64_t(-1) в случае ошибки.
+		\return Location of the cursor after relocating it, or uint64_t(-1) in case of an error.
 	*/
 	uint64_t seek( int64_t offset, SeekMethod whence = smBegin);
 
-	//!Изменение размера файла
+	//! Change the size of the file
 	/*!
-		Положение файлового курсора после вызова этой функции не определено.
-		\param newFileSize Новый размер файла. Эта функция может как увеличить размер файла, так и сократить его.
+		The location of the file cursor after calling this function is undefined.
+		\param newFileSize New size of the file. This function can both enlarge, as well as reduce the file size.
 	*/
 	bool truncate( uint64_t newFileSize);
 	

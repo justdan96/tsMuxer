@@ -33,7 +33,7 @@ double MpegAudioStreamReader::getFrameDurationNano() {
 	//return (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
 	double rez = (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
 	if (m_layer == 3 && m_nb_channels == 1)
-		rez /= 2; // todo: „то это? сам не понимаю, но зачем то надо поставить
+		rez /= 2; // todo: what is that? I myself don't understand why it's necessary to leave it here.
 	return rez;
 }
 
