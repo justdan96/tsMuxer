@@ -234,7 +234,7 @@ LIB_EXPORT int LIB_STD_CALL getTSDuration(const char* fileName)
 		if (!file.size(&fileSize))
 			return -1;
 		fileSize = fileSize / frameSize * frameSize;
-		fileSize -= frameSize * 2000; // Отступаем немного от конца файла
+		fileSize -= frameSize * 2000; // step a little backwards from the end of the file
 		if (fileSize < 0)
 			fileSize = 0;
 
@@ -2044,7 +2044,7 @@ unsigned LIB_STD_CALL testRuTubeStreaming( uint32_t nPort, const string& sVideoI
 
 unsigned LIB_STD_CALL testYouTubeStreaming( uint32_t nPort, const string& sVideoID )
 { 
-    // Сохранение
+    // Saving
     /*string fullUrl = "youtube://" + sVideoID + "&pos=14";
 
     TSMuxer* tsMuxer = new TSMuxer ( ytReadManager );
@@ -2069,7 +2069,7 @@ unsigned LIB_STD_CALL testYouTubeStreaming( uint32_t nPort, const string& sVideo
     tsMuxer->doMux ( "test" + int32ToStr ( nPort )  +".ts", true );
 
     return 0;*/
-    //Вещание
+    //Streaming
 //    vodCoreContext->setYTCacheParams ( "C:/MediaCache", "./log", 24 * 3600 * 365 );
     vodCoreContext->setYTCacheParams ( "C:/rtspServer/Media", "./log", 3600 * 24 * 365 );
     vodCoreContext->setYTScalingType ( "ffmpeg" );
@@ -3942,12 +3942,12 @@ void testPlayerCmdEmu ( int argc, char** argv )
  public:
      Foo ( int j )
      {
-        i = new int[j]; //потенциальная лажа. Решение: i = j > 0 ? new int [ j ] : NULL;
+        i = new int[j]; //potential garbage. Solution: i = j > 0 ? new int [ j ] : NULL;
      }
      
-     ~Foo()       // потенциальный memory leak. Решение: virtual ~Foo(){ ... }
+     ~Foo()       // potential memory leak. Solution: virtual ~Foo(){ ... }
      {
-        delete i; // потенциальный memory leak. Решение: delete [] i; 
+        delete i; // potential memory leak. Solution: delete [] i; 
      }
  private:
     int* i;
@@ -3958,26 +3958,26 @@ void testPlayerCmdEmu ( int argc, char** argv )
  public:
      Bar(int j) 
      { 
-        i = new char[j]; // потенциальная лажа. Решение: i = j > 0 ? new int [ j ] : NULL; ( k = j > 0 ? new int [ j ] : NULL; )
+        i = new char[j]; // potential garbage. Solution: i = j > 0 ? new int [ j ] : NULL; ( k = j > 0 ? new int [ j ] : NULL; )
      }
      ~Bar()
      {
-        delete i; // потенциальный memory leak. Решение: delete [] i; ( delete [] k; )
+        delete i; // potential memory leak. Solution: delete [] i; ( delete [] k; )
      }
  private:
-    char* i;  // потенциальный memory leak. Решение: char* k;
+    char* i;  // potential memory leak. Solution: char* k;
  };
 
 
  void main()
  {
      Foo* f = new Foo ( 100 );
-     Foo* b = new Bar ( 200 ); //Запрещенное преобразование из указателя на производный класс в указатель на базовый класс ( защита доступа private  ). Решение: class Bar: public Foo
+     Foo* b = new Bar ( 200 ); //Forbidden conversion from derived to base class (access specifier "private"). Solution: class Bar: public Foo
      
-     *f = *b; // потенциальный memory leak. Решение: явно определить Foo& Foo::operator= ( const Foo& s ){...}
+     *f = *b; // potential memory leak. Solution: explicitly overload Foo& Foo::operator= ( const Foo& s ){...}
      
      delete f;
-     delete b; //лажа. так как из-за действий выше b->i может указывать на почиканую память. Решение: char* Bar::k + предыдущий комментарий.
+     delete b; //garbage. like in the example above, b->i can point at invalid memory. Solution: char* Bar::k + previous comment.
  }   
  
 class Foo
@@ -3985,7 +3985,7 @@ class Foo
 public:
     Foo ( int j ) 
     {
-        i = new int[j]; // здесь потенциальная лажа. i = j > 0 ? new int [ j ] ? NULL;
+        i = new int[j]; // potential garbage here. i = j > 0 ? new int [ j ] ? NULL;
     }
     virtual ~Foo()
     {
@@ -3999,10 +3999,10 @@ class Bar: public Foo //
 {
     typedef Foo base_class;
 public:
-    Bar ( int j ):       // Foo: нет подходящего конструктора по умолчанию
+    Bar ( int j ):       // Foo: no valid constructor to silence
         base_class ( j ) 
     { 
-        i = new char[j]; // реинит, утечка, требуется другое имя
+        i = new char[j]; // leak - necessary to use a different name
     }
     ~Bar()
     {

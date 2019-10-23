@@ -79,8 +79,8 @@ typedef std::map < uint32_t, StreamData > DemuxedData;
 typedef std::set<uint32_t>                 PIDSet;
 //typedef std::map<uint32_t, std::vector<uint8_t> > DemuxedData;
 
-// Используется для автоматического перехода на чтение следующего файла, когда заканчивается текущий.
-// Этот класс имплиминтирует ф-ю, которая определяет имя следующего файла.
+// Used to automatically switch to reading the next file while the current one ends.
+// This class implements file-IO, which determines the name of the next file.
 class FileNameIterator {
 public:
 	virtual std::string getNextName() = 0;

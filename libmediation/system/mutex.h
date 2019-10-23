@@ -5,7 +5,7 @@ class  Mutex
 {
 	friend class ScopedLock;
 public:
-	//!Этот класс должен использоваться только в одном потоке
+	//! This class should be used only in one stream.
 	class  ScopedLock
 	{
 		friend class ConditionVariable;

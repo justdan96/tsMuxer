@@ -13,12 +13,12 @@ public:
 class  TerminatableThread: public Terminatable
 {
 public:
-	//! После создания объекта треда необходимо вызвать run(thread) до первого использования треда
+	//! After creating the thread object, it's necessary to call run(thread) until the thread's first usage.
 	TerminatableThread();
-	//! Деструктор дожидается окончания работы треда и уничтожает объект
+	//! The destructor waits until the thread ends its work and destroys the object.
 	virtual ~TerminatableThread(); 
 
-	//! Запуск объекта треда. Должна быть вызвана непосредственно после создания объекта.
+	//! Launch the thread. Should be called immediately after creating the thread object.
 	static void run( TerminatableThread* const );
 
 	void join();
@@ -26,7 +26,7 @@ public:
 
 
 protected:
-	//! Главная функция треда. Должна быть реализована в потомках.
+	//! Main thread function. Should be implemented in derived classes.
 	virtual void thread_main() = 0;
 
 private:

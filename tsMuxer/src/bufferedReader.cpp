@@ -20,11 +20,11 @@ BufferedReader::BufferedReader (uint32_t blockSize, uint32_t allocSize, uint32_t
     m_readQueue ( QUEUE_MAX_SIZE ),
 	m_id(0)
 {
-    // размер читаемых блоков
+    // size of the blocks being read
     m_blockSize = blockSize; 
-    // размер выдел€емой пам€ти под блок (может превышать размер блока, остаток пам€ти используетс€ дл€ нужд пользовател€
+    // size of the memory reserved per-block (can exceed the block size, in which case the rest of the memory can be used by the user)
     m_allocSize = allocSize ? allocSize : blockSize;
-    // ѕорог предчтени€ данных
+    // data preread threshold
     m_prereadThreshold = prereadThreshold ? prereadThreshold : m_blockSize / 2;
 }
 
@@ -111,9 +111,9 @@ void BufferedReader::deleteReader(uint32_t readerID)
 			return;
 		ReaderData* data = iterator->second;
 		if (data->m_atQueue > 0)
-			data->m_deleted = true; // ¬ очереди есть запросы на чтение в эту структуру.
+			data->m_deleted = true; // There are requests in the queue for reading into this structure.
 		else {
-			delete iterator->second; // Ќет сто€щих в очереди запросов на чтение. ”дал€ем сразу
+			delete iterator->second; // No outstanding requests for reading in the queue. Delete immediately.
 			m_readers.erase(iterator);
 		}
 		rSize = m_readers.size();
@@ -129,7 +129,7 @@ uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& re
 		map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
 		if (itr != m_readers.end()) {
 			data = itr->second;
-			if (!data->m_nextBlockSize && !data->m_notified) { // Ќет начитанного след блока и нет команды на его чтение
+			if (!data->m_nextBlockSize && !data->m_notified) { // No fragments of this block found, and no requests for reading this block
 				data->m_notified = true;
 				data->m_atQueue++;
 				m_readQueue.push(readerID);

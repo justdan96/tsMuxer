@@ -7,9 +7,9 @@
 #include "pesPacket.h"
 #include <fs/file.h>
 
-// Абстрактный класс для чтения данных кодека из файла
-// Исользуется для синхронизации и мьюксинга потоков данных
-// PTS и DTS возвращаемого AV пакета измеряется в наносекундах.
+// Abstract class for reading codec data from a file
+// Used to synchronize and mux data streams
+// PTS and DTS of the returned AV packet is measured in nanoseconds.
 
 const static int PTS_CONST_OFFSET = 0;
 

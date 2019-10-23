@@ -85,7 +85,7 @@ protected:
 	bool m_headerIncludedToBuff;
 	int m_data_buffer_len;
 	int m_max_data_len;
-	// буфер для сквозного копирования в выходной поток
+	// buffer for general copying into the output stream
 };
 
 class MPEGSequenceHeader: public MPEGRawDataHeader
@@ -169,7 +169,7 @@ class MPEGPictureHeader: public MPEGRawDataHeader {
 public:
 	uint16_t ref;
 	uint8_t pict_type;
-	uint16_t vbv_delay; // задержка перед отображением фрейма
+	uint16_t vbv_delay; // stop before reflecting the frame
 
 	// used only for b-frame and p-frames
 	int full_pel[2];

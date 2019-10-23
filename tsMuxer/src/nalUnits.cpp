@@ -319,7 +319,7 @@ int ceil_log2(double val)
 	int mask = 1 << (bits-1);
 	iVal = (int) val;
 	if (iVal - mask == 0 && frac == 0)
-		return bits-1; // Например: cail(log2(8.0)) = 3, а для 8.2 или 9.0 уже 4
+		return bits-1; // For example: cail(log2(8.0)) = 3, but for 8.2 or 9.0 it's 4
 	else
 		return bits;
 }
