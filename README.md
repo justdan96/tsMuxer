@@ -121,6 +121,7 @@ libqt5multimedia5-plugins \
 libqt5multimedia5 \
 libfreetype6-dev \
 zlib1g-dev \
+ninja \
 git
 
 # on Ubuntu:
