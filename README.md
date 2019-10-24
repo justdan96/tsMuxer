@@ -139,14 +139,10 @@ With all the dependencies set up we can now actually compile the code.
 Open the folder where the git repo is stored in a terminal and run the following:
 
 ```
-# build libmediation
-cd libmediation
-make -j$(nproc)
-
-# compile tsMuxer to ../bin
-cd ..
-cd tsMuxer
-make -j$(nproc)
+# build libmediation and tsMuxer
+mkdir build
+cd build
+cmake ../ -G Ninja
 
 # generate the tsMuxerGUI makefile
 cd ..

@@ -1,4 +1,5 @@
-cmake_minimum_required (VERSION 3.4)
+cmake_minimum_required (VERSION 3.0)
+# cmake_minimum_required (VERSION 3.4)
 project (tsmuxer)
 
 FILE(GLOB tsmuxer_sources RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -8,27 +9,45 @@ FILE(GLOB tsmuxer_sources RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
 
 LIST(REMOVE_ITEM tsmuxer_sources "tsMuxer/src/vodCoreContext.cpp" "tsMuxer/src/vodTransport.cpp")
 
+# set different sources for Windows and *nix
 if (MSVC OR MINGW)
     LIST(APPEND tsmuxer_sources "tsMuxer/src/osdep/textSubtitlesRenderWin32.cpp" "tsMuxer/src/osdep/textSubtitlesRenderWin32.h")
+    # set it to be static
+    set (CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
 else()
     LIST(APPEND tsmuxer_sources "tsMuxer/src/osdep/textSubtitlesRenderFT.cpp" "tsMuxer/src/osdep/textSubtitlesRenderFT.h")
+    # set it to be static, fix static linking errors for pthread and libpng
+    set (CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static -pthread -Wl,--whole-archive -lpthread -lpng -Wl,--no-whole-archive")
 endif()
 
+# use C++ 11
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# find static libraries
+set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 
+# create the executable for tsmuxer
 add_executable (tsmuxer ${tsmuxer_sources})
+
+# add libmediation
 add_subdirectory (libmediation)
 
+# freetype2 as a dependency
 find_package (PkgConfig REQUIRED)
 pkg_check_modules (FREETYPE2 REQUIRED freetype2)
 
+# add libmediation and freetype to the include folders
 include_directories(tsmuxer "${PROJECT_SOURCE_DIR}/libmediation" ${FREETYPE2_INCLUDE_DIRS})
-target_link_libraries (tsmuxer pthread z mediation ${FREETYPE2_LIBRARIES})
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPORT")
+# set some common flags, such as permissive
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPORT -fpermissive")
 if (MSVC OR MINGW)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32")
+  # add gdiplus manually
+  target_link_libraries (tsmuxer pthread z mediation ${FREETYPE2_LIBRARIES} gdiplus)
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX")
+  # no need for gdiplus, reorder the others
+  target_link_libraries (tsmuxer png z pthread mediation ${FREETYPE2_LIBRARIES})
 endif()
 
 install (TARGETS tsmuxer DESTINATION bin)
