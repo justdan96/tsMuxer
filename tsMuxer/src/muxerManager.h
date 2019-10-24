@@ -67,7 +67,7 @@ private:
     bool m_asyncMode;
     //int32_t m_fileBlockSize;
     std::string m_outFileName;
-    ConditionVariable reinitCond;
+    std::condition_variable reinitCond;
     METADemuxer m_metaDemuxer;
     int64_t m_cutStart;
     int64_t m_cutEnd;

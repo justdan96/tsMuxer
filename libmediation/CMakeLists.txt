@@ -10,19 +10,15 @@ FILE(GLOB mediation_sources RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
   "fs/logstream.h"
   "fs/systemlog.h"
   "fs/textfile.h"
-  "system/condvar.h"
-  "system/mutex.h"
   "system/terminatablethread.h"
-  "time/time.cpp"
-  "time/time.h"
   "types/types.cpp"
   "types/types.h"
 )
 
 IF(MSVC OR MINGW)
-    LIST(APPEND mediation_sources "fs/osdep/file_win32.cpp" "system/osdep/common_win32.cpp" "system/osdep/condvar_win32.cpp" "system/osdep/mutex_win32.cpp" "system/osdep/terminatablethread_win32.cpp")
+    LIST(APPEND mediation_sources "fs/osdep/file_win32.cpp" "system/osdep/common_win32.cpp" "system/osdep/terminatablethread_win32.cpp")
 ELSE()
-    LIST(APPEND mediation_sources "fs/osdep/file_unix.cpp" "system/osdep/condvar_linux.cpp" "system/osdep/mutex_linux.cpp" "system/osdep/terminatablethread_linux.cpp")
+    LIST(APPEND mediation_sources "fs/osdep/file_unix.cpp" "system/osdep/terminatablethread_linux.cpp")
 ENDIF()
 
 add_library (mediation ${mediation_sources})

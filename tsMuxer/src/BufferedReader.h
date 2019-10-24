@@ -5,7 +5,6 @@
 #include <map>
 #include <types/types.h>
 #include <system/terminatablethread.h>
-#include <system/mutex.h>
 #include <containers/safequeue.h>
 #include "abstractreader.h"
 #include "abstractDemuxer.h"
@@ -99,16 +98,16 @@ protected:
 	bool m_terminated;
 	WaitableSafeQueue<uint32_t> m_readQueue;
 	ReaderData* getReader(uint32_t readerID);
-	ConditionVariable m_readCond;
-	Mutex m_readMtx;
+	std::condition_variable m_readCond;
+	std::mutex m_readMtx;
 
 private:
 	int m_id;
-	Mutex m_readersMtx;
+	std::mutex m_readersMtx;
 	std::map<uint32_t, ReaderData*> m_readers;
 	static uint32_t m_newReaderID;
 	static uint32_t createNewReaderID();
-	static Mutex m_genReaderMtx;
+	static std::mutex m_genReaderMtx;
 };
 
 #endif
