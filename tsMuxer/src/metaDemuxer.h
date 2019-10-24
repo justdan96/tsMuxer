@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <chrono>
 #include <queue>
 #include "vod_common.h"
 #include "vodCoreException.h"
@@ -177,7 +178,7 @@ private:
 	int m_lastReadRez;
 	ContainerToReaderWrapper m_containerReader;
 	int m_lastProgressY;
-	uint64_t m_lastReportTime;
+	std::chrono::steady_clock::time_point m_lastReportTime;
 	uint64_t m_totalSize;
 	bool m_flushDataMode;
 	const BufferedReaderManager& m_readManager;

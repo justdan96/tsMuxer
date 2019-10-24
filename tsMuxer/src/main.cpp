@@ -3,7 +3,6 @@
 #include "metaDemuxer.h"
 #include "tsMuxer.h"
 #include "singleFileMuxer.h"
-#include <time/time.h>
 #include <fs/directory.h>
 #include <fs/textfile.h>
 #include <vector>
@@ -261,7 +260,8 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
 		pattern = pattern_1280;
 		patternSize = sizeof(pattern_1280);
 	}
-	string tmpFileName = appDir + string("blank_") + int64ToStr(mtime::clockGetTimeEx()) + string(".264");
+    auto fname_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	string tmpFileName = appDir + string("blank_") + std::to_string(fname_time) + string(".264");
 	File file;
 	if (!file.open(tmpFileName.c_str(), File::ofWrite))
 		THROW(ERR_COMMON, "can't create file " << tmpFileName);
@@ -647,7 +647,7 @@ int main(int argc, char** argv)
 		}
 		string fileExt = extractFileExt(argv[2]);
 		fileExt = strToUpperCase(fileExt);
-		uint64_t startTime = mtime::clockGetTimeEx();
+		auto startTime = std::chrono::steady_clock::now();
 
 		int autoChapterLen = 0;
 		vector<double> customChapterList;
@@ -730,19 +730,20 @@ int main(int argc, char** argv)
 			sMuxer.doMux(unquoteStr(argv[2]), 0);
 			LTRACE(LT_INFO, 2, "Demux complete.");
 		}
-		uint64_t endTime = mtime::clockGetTimeEx();
-		int seconds = (double)(endTime - startTime)/1e6 + 0.5;
-		int minutes = seconds/60;
+		auto endTime = std::chrono::steady_clock::now();
+        auto totalTime = endTime - startTime;
+		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(totalTime);
+		auto minutes = std::chrono::duration_cast<std::chrono::minutes>(totalTime);
 		if (muxMode) {
 			LTRACE2(LT_INFO, "Muxing time: ");
 		}
 		else
 			LTRACE2(LT_INFO, "Demuxing time: ");
-		if (minutes > 0) {
-			LTRACE2(LT_INFO, minutes << " min ");
-			seconds -= minutes*60;
+		if (minutes.count() > 0) {
+			LTRACE2(LT_INFO, minutes.count() << " min ");
+			seconds -= minutes;
 		}
-		LTRACE(LT_INFO, 2, seconds << " sec");
+		LTRACE(LT_INFO, 2, seconds.count() << " sec");
 
         return 0;
 	} catch(runtime_error& e) {

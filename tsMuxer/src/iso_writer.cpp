@@ -1,7 +1,5 @@
 #include "iso_writer.h"
 #include <assert.h>
-#include "time/time.h"
-#include <time.h>
 #include "vod_common.h"
 #include <string.h>
 #include <stdlib.h>
@@ -557,7 +555,6 @@ int64_t ISOFile::size() const
 
 IsoWriter::IsoWriter()
 {
-    srand(mtime::clockGetTime());
     m_volumeId = random32();
     m_appId = std::string("*tsMuxeR ") + std::string(APP_VERSION);
     m_impId = std::string("*tsMuxeR ") + int32ToHex(random32());

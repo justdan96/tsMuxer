@@ -11,7 +11,7 @@
 using namespace std;
 
 uint32_t BufferedReader::m_newReaderID = 0;
-Mutex BufferedReader::m_genReaderMtx;
+std::mutex BufferedReader::m_genReaderMtx;
 const unsigned QUEUE_MAX_SIZE = 4096;
 
 BufferedReader::BufferedReader (uint32_t blockSize, uint32_t allocSize, uint32_t prereadThreshold):
@@ -30,14 +30,14 @@ BufferedReader::BufferedReader (uint32_t blockSize, uint32_t allocSize, uint32_t
 
 ReaderData* BufferedReader::getReader(uint32_t readerID)
 {
-	Mutex::ScopedLock lock(&m_readersMtx);
+	std::lock_guard<std::mutex> lock(m_readersMtx);
 	map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
 	return itr != m_readers.end() ? itr->second : 0;
 }
 
 bool BufferedReader::incSeek(uint32_t readerID, int64_t offset)
 {
-	Mutex::ScopedLock lock(&m_readersMtx);
+	std::lock_guard<std::mutex> lock(m_readersMtx);
 	map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
 	if (itr != m_readers.end()) {
 		ReaderData* data = itr->second;
@@ -87,7 +87,7 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
 	data->m_lastBlock = false;
 	size_t rSize;
 	{
-		Mutex::ScopedLock lock(&m_readersMtx);
+		std::lock_guard<std::mutex> lock(m_readersMtx);
 		newReaderID = createNewReaderID();
 		m_readers.insert(make_pair(newReaderID, data));
 		rSize = m_readers.size();
@@ -105,7 +105,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
 {
 	size_t rSize;
 	{
-		Mutex::ScopedLock lock(&m_readersMtx); 
+		std::lock_guard<std::mutex> lock(m_readersMtx); 
 		std::map<uint32_t, ReaderData*>::iterator iterator = m_readers.find(readerID);
 		if (iterator == m_readers.end())
 			return;
@@ -125,7 +125,7 @@ uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& re
 {
 	ReaderData* data = 0;
 	{
-		Mutex::ScopedLock lock(&m_readersMtx);
+		std::lock_guard<std::mutex> lock(m_readersMtx);
 		map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
 		if (itr != m_readers.end()) {
 			data = itr->second;
@@ -144,9 +144,9 @@ uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& re
 
 	if (!data->m_nextBlockSize)
 	{
-		Mutex::ScopedLock lk(&m_readMtx);
+		std::unique_lock<std::mutex> lk(m_readMtx);
 		while(data->m_nextBlockSize == 0 && !data->m_eof) 
-			m_readCond.wait(&lk);
+			m_readCond.wait(lk);
 	}
 	readCnt = data->m_nextBlockSize >= 0 ? data->m_nextBlockSize : 0;
 	rez     = data->m_eof ? DATA_EOF : NO_ERROR;
@@ -171,7 +171,7 @@ void BufferedReader::notify(uint32_t readerID, uint32_t dataReaded)
     if (data == 0)
 	return;
     if (dataReaded >= m_prereadThreshold && !data->m_notified) {
-	Mutex::ScopedLock lock(&m_readersMtx);
+	std::lock_guard<std::mutex> lock(m_readersMtx);
 	data->m_notified = true;
 	data->m_atQueue++;
 	m_readQueue.push(readerID);
@@ -180,7 +180,7 @@ void BufferedReader::notify(uint32_t readerID, uint32_t dataReaded)
 								
 uint32_t BufferedReader::getReaderCount()
 {
-	Mutex::ScopedLock lock(&m_readersMtx);
+	std::lock_guard<std::mutex> lock(m_readersMtx);
 	return (uint32_t) m_readers.size();
 }
 
@@ -250,14 +250,14 @@ void BufferedReader::thread_main()
 					}
 
 					{
-						Mutex::ScopedLock lk(&m_readMtx);
+						std::lock_guard<std::mutex> lk(m_readMtx);
 						data->m_nextBlockSize = bytesReaded;
 						m_readCond.notify_one();
 					}
 				}
 
 				{
-					Mutex::ScopedLock lock(&m_readersMtx);
+					std::lock_guard<std::mutex> lock(m_readersMtx);
 					data->m_atQueue--;
 					if (data->m_deleted && data->m_atQueue == 0) {
 						delete data;
@@ -277,7 +277,7 @@ void BufferedReader::thread_main()
 void BufferedReader::setFileIterator(FileNameIterator* itr, int readerID)
 {
     assert(readerID != -1);
-    Mutex::ScopedLock lock(&m_readersMtx);
+    std::lock_guard<std::mutex> lock(m_readersMtx);
     std::map<uint32_t, ReaderData*>::iterator reader = m_readers.find(readerID);
     if (reader != m_readers.end())
         reader->second->itr = itr;

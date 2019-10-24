@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <iomanip>
+#include <chrono>
 
 #include <types/types.h>
 #include <fs/textfile.h>
@@ -45,7 +46,6 @@ METADemuxer::METADemuxer(const BufferedReaderManager& readManager):
 {
 	m_flushDataMode = false;
 	m_totalSize = 0;
-	m_lastReportTime = 0;
 	m_lastProgressY = 0;
 	m_lastReadRez = 0;
 }
@@ -1143,8 +1143,8 @@ string METADemuxer::findBluRayFile(const string& streamDir, const string& reques
 
 void METADemuxer::updateReport(bool checkTime) 
 {
-	uint64_t currentTime = mtime::clockGetTimeEx();
-	if (!checkTime || currentTime - m_lastReportTime > 250000ull) {
+	auto currentTime = std::chrono::steady_clock::now();
+	if (!checkTime || currentTime - m_lastReportTime > std::chrono::microseconds(250000)) {
 		uint64_t currentProcessedSize = 0;
 		double progress = 100.0;
 		if (m_totalSize > 0) {

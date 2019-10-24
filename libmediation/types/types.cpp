@@ -15,7 +15,7 @@
 #include "fs/directory.h"
 
 #include <algorithm>
-
+#include <random>
 
 using namespace std;
 
@@ -514,5 +514,7 @@ uint16_t  my_ntohs( const uint16_t val )
 
 uint32_t random32()
 {
-    return ((uint32_t) rand() << 16) + rand();
+    static std::random_device dev;
+    static std::minstd_rand raand(dev());
+    return static_cast<std::uint32_t>(raand());
 }
