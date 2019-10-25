@@ -178,6 +178,47 @@ mv *.deb ~/
 cd $HOME
 ```
 
+#### Windows (MXE on Linux)
+
+To compile tsMuxer and tsMuxerGUI for Windows using MXE on Linux you must follow the steps below on Ubuntu:
+
+```
+# setup pre-reqs
+sudo apt-get install -y software-properties-common
+sudo apt-get install -y apt-transport-https
+sudo apt-get install -y checkinstall
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276
+
+# add MXE repo
+sudo add-apt-repository -y 'deb https://mirror.mxe.cc/repos/apt stretch main'
+sudo apt-get update
+
+# install necessary MXE components for building tsmuxer
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-zlib
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-harfbuzz
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-freetype
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-cmake
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-ccache
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-autotools
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-qt5
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-autotools
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-ccache
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cc
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cmake
+
+# manually fix some weird symlinks
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
+```
+
+
+
 #### Windows (Msys2)
 
 To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2 i686](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands:
