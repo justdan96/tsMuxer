@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef WIN32
+#   include <time.h>
+#endif
+
 extern const char* APP_VERSION;
 
 

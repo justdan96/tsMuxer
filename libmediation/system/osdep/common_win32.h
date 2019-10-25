@@ -11,7 +11,7 @@
 
 #include <stdexcept>
 
-
-void initializeAllAccessSecurityDescriptor( SECURITY_DESCRIPTOR* const sa ) throw ( std::runtime_error );
+// void initializeAllAccessSecurityDescriptor( SECURITY_DESCRIPTOR* const sa ) throw ( std::runtime_error );^M
+void initializeAllAccessSecurityDescriptor( SECURITY_DESCRIPTOR* const sa );
 
 #endif	//COMMON_WIN32_H

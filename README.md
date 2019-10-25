@@ -178,6 +178,47 @@ mv *.deb ~/
 cd $HOME
 ```
 
+#### Windows (MXE on Linux)
+
+To compile tsMuxer and tsMuxerGUI for Windows using MXE on Linux you must follow the steps below on Ubuntu:
+
+```
+# setup pre-reqs
+sudo apt-get install -y software-properties-common
+sudo apt-get install -y apt-transport-https
+sudo apt-get install -y checkinstall
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276
+
+# add MXE repo
+sudo add-apt-repository -y 'deb https://mirror.mxe.cc/repos/apt stretch main'
+sudo apt-get update
+
+# install necessary MXE components for building tsmuxer
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-zlib
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-harfbuzz
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-freetype
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-cmake
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-ccache
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-autotools
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-qt5
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-autotools
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-ccache
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cc
+sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cmake
+
+# manually fix some weird symlinks
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
+sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
+sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
+```
+
+
+
 #### Windows (Msys2)
 
 To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2 i686](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands:
@@ -210,14 +251,10 @@ echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/c
 With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
 
 ```
-# build libmediation
-cd libmediation
-make -j$(nproc)
-
-# compile tsMuxer to ../bin
-cd ..
-cd tsMuxer
-make -j$(nproc)
+# compile tsmuxer
+mkdir build
+cd build
+cmake ../ -G Ninja
 
 # generate the tsMuxerGUI makefile
 export PATH=$PATH:$MINGW_PREFIX/qt5-static/bin
@@ -264,12 +301,6 @@ With all the dependencies set up we can now actually compile the code.
 Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
 
 Next to compile tsMuxerGUI you will require a Qt5 installation that is compatible with Visual C++ 2017. For this example we will be using Qt 5.12, as that is the LTS release. You can download it [here](https://download.qt.io/official_releases/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe). 
-
-Next to compile tsMuxerGUI you will require a Qt4 installation that is compatible with Visual C++ 2017. This is not generally available, so must be installed manually - again, this is not portable, so you will have to follow these steps exactly or the build will fail.
-
-You can download a compressed archive of a Qt 4.8.7 installation compiled for MSVC++ 2017 32-bit from [here](https://drive.google.com/file/d/1ugv5x-ZCDPlIwUkvFJooki4GxRo1eBBn/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/qt-4.8.7-vs2017-32.zip). 
-
-Once you download the package you have to install it, you need to  extract the ZIP directly into the root of the C:\ drive (I know, this needs to be improved!). If the path "C:\Qt\qt-4.8.7-vs2017-32\bin\" exists you know it is set up correctly.
 
 To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
 

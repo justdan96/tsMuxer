@@ -5,8 +5,9 @@
 #include <fs/systemlog.h>
 #include "abstractreader.h"
 
+#ifndef NO_ERROR
 #define NO_ERROR 0
-
+#endif
 
 using namespace std;
 
