@@ -210,14 +210,10 @@ echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/c
 With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
 
 ```
-# build libmediation
-cd libmediation
-make -j$(nproc)
-
-# compile tsMuxer to ../bin
-cd ..
-cd tsMuxer
-make -j$(nproc)
+# compile tsmuxer
+mkdir build
+cd build
+cmake ../ -G Ninja
 
 # generate the tsMuxerGUI makefile
 export PATH=$PATH:$MINGW_PREFIX/qt5-static/bin
@@ -264,12 +260,6 @@ With all the dependencies set up we can now actually compile the code.
 Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
 
 Next to compile tsMuxerGUI you will require a Qt5 installation that is compatible with Visual C++ 2017. For this example we will be using Qt 5.12, as that is the LTS release. You can download it [here](https://download.qt.io/official_releases/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe). 
-
-Next to compile tsMuxerGUI you will require a Qt4 installation that is compatible with Visual C++ 2017. This is not generally available, so must be installed manually - again, this is not portable, so you will have to follow these steps exactly or the build will fail.
-
-You can download a compressed archive of a Qt 4.8.7 installation compiled for MSVC++ 2017 32-bit from [here](https://drive.google.com/file/d/1ugv5x-ZCDPlIwUkvFJooki4GxRo1eBBn/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/qt-4.8.7-vs2017-32.zip). 
-
-Once you download the package you have to install it, you need to  extract the ZIP directly into the root of the C:\ drive (I know, this needs to be improved!). If the path "C:\Qt\qt-4.8.7-vs2017-32\bin\" exists you know it is set up correctly.
 
 To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
 
