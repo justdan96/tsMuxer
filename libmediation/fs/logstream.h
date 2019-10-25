@@ -60,7 +60,7 @@ class LogStream;
 //------------------------------------------------------------------------------------
 //			loglevel manipulator class declaration
 //------------------------------------------------------------------------------------
-class LIBMEDIATION_API loglevel 
+class loglevel 
 {
 public:
 	loglevel(uint32_t);
@@ -74,7 +74,7 @@ public:
 //			LogStream class declaration
 //------------------------------------------------------------------------------------
 // This class is thread-safe
-class LIBMEDIATION_API LogStream 
+class LogStream 
 : 
 	public AlternativeFileStream 
 {
@@ -145,12 +145,12 @@ private:
 
 };	// LogStream
 //------------------------------------------------------------------------------------
-void LIBMEDIATION_API bufToLogStream( 
+void bufToLogStream( 
 	const char* const buf, 
 	const uint32_t& length,
 	LogStream* const stream,
   	bool printLength = true );
 
-LIBMEDIATION_API AlternativeFileStream& operator<<( AlternativeFileStream&, const loglevel& manip );
+AlternativeFileStream& operator<<( AlternativeFileStream&, const loglevel& manip );
 
 #endif
