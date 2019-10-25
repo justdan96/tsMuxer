@@ -1,5 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
-# cmake_minimum_required (VERSION 3.4)
+cmake_minimum_required (VERSION 3.1)
 project (tsmuxer)
 
 FILE(GLOB tsmuxer_sources RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -21,7 +20,7 @@ else()
 endif()
 
 # use C++ 11
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 11)
 # find static libraries
 set (CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 
@@ -31,9 +30,17 @@ add_executable (tsmuxer ${tsmuxer_sources})
 # add libmediation
 add_subdirectory (libmediation)
 
-# freetype2 as a dependency
+# use pkg-config for getting our dependencies
 find_package (PkgConfig REQUIRED)
+
+# freetype2 as a dependency
 pkg_check_modules (FREETYPE2 REQUIRED freetype2)
+
+# zlib as a dependency
+pkg_check_modules (ZLIB REQUIRED zlib)
+
+#libpng as a dependency
+pkg_check_modules (LIBPNG libpng REQUIRED)
 
 # add libmediation and freetype to the include folders
 include_directories(tsmuxer "${PROJECT_SOURCE_DIR}/libmediation" ${FREETYPE2_INCLUDE_DIRS})
@@ -43,11 +50,11 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLIBMEDIATION_API= -DDISABLE_LOG_SUPPO
 if (MSVC OR MINGW)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32")
   # add gdiplus manually
-  target_link_libraries (tsmuxer pthread z mediation ${FREETYPE2_LIBRARIES} gdiplus)
+  target_link_libraries (tsmuxer pthread ${ZLIB_LIBRARIES} mediation ${FREETYPE2_LIBRARIES} gdiplus)
 else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX")
   # no need for gdiplus, reorder the others
-  target_link_libraries (tsmuxer png z pthread mediation ${FREETYPE2_LIBRARIES})
+  target_link_libraries (tsmuxer ${LIBPNG_LIBRARIES} ${ZLIB_LIBRARIES} pthread mediation ${FREETYPE2_LIBRARIES})
 endif()
 
 install (TARGETS tsmuxer DESTINATION bin)

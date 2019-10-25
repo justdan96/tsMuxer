@@ -2,7 +2,7 @@
 #define __T_TYPES_H
 
 #ifdef WIN32
-#include <Winsock2.h>
+#include <winsock2.h>
 #else
 #include <netinet/in.h>
 #endif
