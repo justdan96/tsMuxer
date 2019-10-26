@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "matroskaParser.h"
 #include "vodCoreException.h"

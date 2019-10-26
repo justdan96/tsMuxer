@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <limits.h>
 #include "bufferedReaderManager.h"
 #include <fs/systemlog.h>

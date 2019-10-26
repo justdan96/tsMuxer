@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "abstractDemuxer.h"
 #include "subTrackFilter.h"

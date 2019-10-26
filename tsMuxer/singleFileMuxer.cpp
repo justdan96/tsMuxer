@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <fs/directory.h>
 #include "singleFileMuxer.h"
 #include "vodCoreException.h"

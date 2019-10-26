@@ -1,10 +1,13 @@
-#include "stdafx.h"
 #include "bufferedFileReader.h"
 #include <iostream>
 #include <fs/systemlog.h>
 #include "vod_common.h"
 #include "vodCoreException.h"
 
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 using namespace std;
 

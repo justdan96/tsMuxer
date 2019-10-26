@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "base64.h"
 #include <iostream>

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "tsDemuxer.h"
 #include "avCodecs.h"

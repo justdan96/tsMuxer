@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "lpcmStreamReader.h"
 #include "vod_common.h"
 #include <sstream>

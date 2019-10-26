@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "aac.h"
 #include "bitStream.h"
 #include "vod_common.h"

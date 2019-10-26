@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #ifndef WIN32
 #endif
@@ -9,6 +8,7 @@
 #include <fs/systemlog.h>
 #include "nalUnits.h"
 #include "math.h"
+#include <algorithm>
 
 const static double EPSILON = 5e-5;
 const static int64_t MAX_PULLDOWN_ASYNC = 100000000ll;
@@ -62,7 +62,7 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
 		}
         if (decodeRez == 0) {
 		    avPacket.data = m_tmpBuffer;
-		    avPacket.size = min(MAX_AV_PACKET_SIZE, m_tmpBufferLen);
+		    avPacket.size = std::min(MAX_AV_PACKET_SIZE, m_tmpBufferLen);
         }
 		if (m_tmpBufferLen > MAX_AV_PACKET_SIZE) {
 			LTRACE(LT_ERROR, 2, "Too large last buffer (" << m_tmpBufferLen << " bytes). Truncate buffer to " << 
@@ -128,7 +128,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 	}
 
 	if (m_bufEnd - m_curPos < MAX_AV_PACKET_SIZE) {
-		uint8_t* nextNal = NALUnit::findNALWithStartCode(min(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
+		uint8_t* nextNal = NALUnit::findNALWithStartCode(std::min(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
 		if (nextNal == m_bufEnd) {
 			storeBufferRest();
 			return NEED_MORE_DATA;
@@ -178,7 +178,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 			return 0; // return zero AV packet for new frame
 		}
 	}
-	uint8_t* findEnd = min(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
+	uint8_t* findEnd = std::min(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
 	uint8_t* nal = NALUnit::findNALWithStartCode(m_curPos + isNal, findEnd, m_longCodesAllowed);
 
 	if (nal == findEnd) 

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "vod_common.h"
 #include <fs/directory.h>

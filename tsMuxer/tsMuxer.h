@@ -1,7 +1,6 @@
 #ifndef __TS_MUXER_H
 #define __TS_MUXER_H
 
-#include "stdafx.h"
 #include <types/types.h>
 #include <map>
 #include <vector>

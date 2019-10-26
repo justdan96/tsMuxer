@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "utf8Converter.h"
 #include "convertUTF.h"
 #include "vodCoreException.h"
@@ -8,7 +7,7 @@
 #include "memory.h"
 
 #ifdef WIN32
-#include "winerror.h"
+#include <windows.h>
 #else
 #include <locale.h>
 #include <iconv.h>

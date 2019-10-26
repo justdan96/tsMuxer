@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "dvbSubStreamReader.h"
 
 #if 1

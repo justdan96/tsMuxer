@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "bufferedFileWriter.h"
 #include <fs/systemlog.h>

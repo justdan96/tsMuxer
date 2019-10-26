@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include <sstream>
 #include "bitStream.h"
 #include "avCodecs.h"
