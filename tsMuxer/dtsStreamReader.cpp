@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "dtsStreamReader.h"
 #include <sstream>
+#include <algorithm>
 
 enum DCAExtensionMask {
     DCA_EXT_CORE       = 0x001, ///< core in core substream
@@ -740,7 +740,7 @@ int DTSStreamReader::buf14To16(uint8_t *p_out, const uint8_t *p_in, int i_in, in
 
         if( bits_out < 8 )
         {
-			int need = min( 8 - bits_out, bits_in );
+			int need = std::min( 8 - bits_out, bits_in );
             cur <<= need;
             cur |= ( tmp >> (bits_in - need) );
             tmp <<= (8 - bits_in + need);

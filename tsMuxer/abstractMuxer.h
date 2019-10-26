@@ -1,7 +1,6 @@
 #ifndef __ABSTRACT_MUXER_H
 #define __ABSTRACT_MUXER_H
 
-#include "stdafx.h"
 #include <fs/file.h>
 #include <fs/systemlog.h>
 #include "metaDemuxer.h"

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "memory.h"
 #include "srtStreamReader.h"

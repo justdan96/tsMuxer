@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "tsMuxer.h"
 #include "pesPacket.h"
@@ -18,6 +17,10 @@
 #include <fs/textfile.h>
 #include "iso_writer.h"
 
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 using namespace std;
 

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "mp3Codec.h"
 

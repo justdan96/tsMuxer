@@ -604,9 +604,6 @@ void IsoWriter::setVolumeLabel(const std::string& value)
 bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISOBlocks)
 {
     int systemFlags = 0;
-#ifdef WIN32
-    systemFlags += FILE_FLAG_NO_BUFFERING;
-#endif
     if (!m_file.open(fileName.c_str(), File::ofWrite, systemFlags))
         return false;
 

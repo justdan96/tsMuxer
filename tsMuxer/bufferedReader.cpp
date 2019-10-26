@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "BufferedReader.h"
 #include "vod_common.h"

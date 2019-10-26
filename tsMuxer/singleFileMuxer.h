@@ -1,7 +1,6 @@
 #ifndef __SINGLE_FILE_MUXER_H
 #define __SINGLE_FILE_MUXER_H
 
-#include "stdafx.h"
 #include <types/types.h>
 #include "abstractMuxer.h"
 #include "avPacket.h"

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "combinedH264Demuxer.h"
 #include "avCodecs.h"

@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "simplePacketizerReader.h"
 
 #include "vod_common.h"

@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #if 1
 extern bool sLastMsg;
@@ -21,15 +23,7 @@ class Process {
 public:
 	static void sleep(int millisec)
 	{
-#ifdef WIN32
-		Sleep( millisec );
-#else
-		struct timespec requested_time;
-		requested_time.tv_sec = millisec / 1000;
-		requested_time.tv_nsec = (millisec % 1000) * 1000000;
-		struct timespec remaining;
-		nanosleep( &requested_time, &remaining );
-#endif
+		std::this_thread::sleep_for(std::chrono::milliseconds(millisec));
 	}
 };
 

@@ -45,7 +45,6 @@ add_executable (tsmuxer
   simplePacketizerReader.cpp
   singleFileMuxer.cpp
   srtStreamReader.cpp
-  stdafx.cpp
   textSubtitles.cpp
   textSubtitlesRender.cpp
   tsDemuxer.cpp

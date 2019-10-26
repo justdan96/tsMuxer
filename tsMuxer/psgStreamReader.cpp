@@ -1,4 +1,3 @@
-#include "stdafx.h"
 
 #include "tsPacket.h"
 #include "avCodecs.h"

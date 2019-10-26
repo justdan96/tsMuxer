@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "textSubtitles.h"
 
 #ifdef WIN32

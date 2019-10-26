@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "programStreamDemuxer.h"
 #include "pesPacket.h"
 #include "tsPacket.h"

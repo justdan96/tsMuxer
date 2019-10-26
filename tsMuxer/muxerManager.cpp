@@ -1,6 +1,5 @@
 #include "muxerManager.h"
 
-#include "stdafx.h"
 
 #include "muxerManager.h"
 #include "vodCoreException.h"
