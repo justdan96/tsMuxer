@@ -251,20 +251,11 @@ echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/c
 With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
 
 ```
-# compile tsmuxer
 mkdir build
 cd build
 cmake ../ -G Ninja
-
-# generate the tsMuxerGUI makefile
-export PATH=$PATH:$MINGW_PREFIX/qt5-static/bin
-cd ..
-cd tsMuxerGUI
-qmake
-
-# compile tsMuxerGUI to ../bin
-make release
-cp bin/tsMuxerGUI.exe ../bin/
+cmake . --build
+cp tsMuxer/tsmuxer.exe tsMuxerGUI/tsMuxeR.exe
 ```
 
 This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.

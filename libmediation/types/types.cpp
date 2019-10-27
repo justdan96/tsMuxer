@@ -1,5 +1,6 @@
 #include "types.h"
 
+#include <cstring>
 #include <sstream>
 #include <iomanip>
 #include <memory.h>
