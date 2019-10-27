@@ -78,20 +78,18 @@ function(pkg_check_modules_with_static prefix req_or_opt package)
 endfunction()
 
 find_package (Threads REQUIRED)
+find_package (PkgConfig)
 
-if (WIN32)
-  target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
-else()
-  find_package (PkgConfig REQUIRED)
-  pkg_check_modules_with_static (FREETYPE2 REQUIRED freetype2)
+if (PkgConfig_FOUND)
   pkg_check_modules_with_static (ZLIB REQUIRED zlib)
-  target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
+  if (NOT WIN32)
+    pkg_check_modules_with_static (FREETYPE2 REQUIRED freetype2)
+  endif()
 endif()
 
 target_include_directories(tsmuxer PRIVATE
   "${PROJECT_SOURCE_DIR}/../libmediation"
   ${ZLIB_INCLUDE_DIRS}
-  ${FREETYPE2_INCLUDE_DIRS}
 )
 target_link_libraries(tsmuxer
   mediation
@@ -100,9 +98,12 @@ target_link_libraries(tsmuxer
 )
 
 if (WIN32)
-  target_link_libraries (tsmuxer gdiplus)
-else ()
-  target_link_libraries (tsmuxer ${FREETYPE2_LIBRARIES})
+  target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
+  target_link_libraries(tsmuxer gdiplus)
+else()
+  target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
+  target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES})
+  target_include_directories(tsmuxer PRIVATE ${FREETYPE2_INCLUDE_DIRS})
 endif()
 
 install (TARGETS tsmuxer DESTINATION bin)
