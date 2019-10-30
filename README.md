@@ -96,65 +96,77 @@ You can report issues directly on Github, that would be a really useful contribu
 
 For these examples we have successfully used Ubuntu 19 64-bit and Debian 10 64-bit. 
 
-First we have to install the pre-requisites. On Debian 10 you have to enable the "buster-backports" repo. Then on Debian or Ubuntu you can run the following to install all required packages:
+First we have to install the pre-requisites. On Debian 10 you have to enable the "buster-backports" repo. Then on Debian or Ubuntu you can run the following to install all required packages for your chosen platform:
 
+Common:
+```
+sudo apt-get update
+sudo apt-get install build-essential \
+g++-multilib
+ninja
+
+# on Ubuntu:
+sudo apt-get install checkinstall
+
+# on Debian:
+sudo apt-get -t buster-backports install checkinstall
+```
+
+32-bit:
 ```
 # add 32-bit architecture 
 sudo dpkg --add-architecture i386
 sudo apt-get update
 
 # download/install dependencies
-sudo apt-get install build-essential \
-flex \
-libelf-dev \
-libc6-dev \
-binutils-dev \
-libdwarf-dev \
-libc6-dev-i386 \
-g++-multilib \
+sudo apt-get install libc6-dev-i386 \
+sudo apt-get install libfreetype6-dev:i386
+```
+
+64-bit:
+```
+sudo apt-get update
+sudo apt-get install libc6-dev \
+libfreetype6-dev \
+zlib1g-dev \
+```
+
+If you also intend to build the GUI then you require:
+
+64-bit:
+```
+sudo apt-get install qt5-default \
 qt5-qmake \
 qtbase5-dev \
 qtdeclarative5-dev \
 qtmultimedia5-dev \
 libqt5multimediawidgets5 \
 libqt5multimedia5-plugins \
-libqt5multimedia5 \
-libfreetype6-dev \
-zlib1g-dev \
-ninja \
-git
-
-# on Ubuntu:
-sudo apt-get install checkinstall
-sudo apt-get install libfreetype6-dev:i386
-sudo apt-get install qt5-default
-
-# on Debian:
-sudo apt-get -t buster-backports install checkinstall
-sudo apt-get install libfreetype6-dev:i386
-sudo apt-get install qt5-default
+libqt5multimedia5
 ```
 
 With all the dependencies set up we can now actually compile the code.
 
-Open the folder where the git repo is stored in a terminal and run the following:
+Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
 
 ```
-# build libmediation and tsMuxer
-mkdir build
-cd build
-cmake ../ -G Ninja
+# build the project
+./rebuild_linux.sh
+```
 
-# generate the tsMuxerGUI makefile
-cd ..
-cd tsMuxerGUI
-qmake
+Or run the following to build the GUI as well:
 
-# compile tsMuxerGUI to ../bin
-make -j$(nproc)
+```
+# build the project
+./rebuild_linux_with_gui.sh
+```
 
+Next run the below to create a DEB file:
+```
 # create lower case links, then create installable deb package and move it to $HOME
 cd ../bin
+cp ../build/tsMuxer/tsmuxer .
+cp ../build/tsMuxerGUI/tsmuxergui .
 ln -s tsMuxeR tsmuxer
 ln -s tsMuxerGUI tsmuxergui
 sudo checkinstall \
@@ -200,7 +212,6 @@ sudo apt-get install -y mxe-x86-64-w64-mingw32.static-freetype
 sudo apt-get install -y mxe-x86-64-w64-mingw32.static-cmake
 sudo apt-get install -y mxe-x86-64-w64-mingw32.static-ccache
 sudo apt-get install -y mxe-x86-64-w64-mingw32.static-autotools
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-qt5
 sudo apt-get install -y mxe-x86-64-pc-linux-gnu-autotools
 sudo apt-get install -y mxe-x86-64-pc-linux-gnu-ccache
 sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cc
@@ -217,28 +228,65 @@ sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x
 sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
 ```
 
+If you want to compile the GUI as well you also need to install the below (please note Qt5 takes up a LOT of disk space!):
+```
+sudo apt-get install -y mxe-x86-64-w64-mingw32.static-qt5
+```
 
+With all the dependencies set up we can now actually compile the code.
+
+Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
+
+```
+# build the project
+./rebuild_mxe.sh
+```
+
+Or run the following to build the GUI as well:
+
+```
+# build the project
+./rebuild_mxe_with_gui.sh
+```
 
 #### Windows (Msys2)
 
-To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2 i686](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands:
+To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands, depending on which build you require:
 
+Common:
 ```
 pacman -Syu
 pacman -Sy --needed base-devel \
-mingw-w64-i686-toolchain \
-mingw-w64-x86_64-toolchain \
-git mingw-w64-i686-cmake \
-mingw-w64-x86_64-cmake \
 flex \
-libelf-devel \
-mingw-w64-i686-freetype \
-mingw-w64-x86_64-freetype \
-mingw-w64-i686-qt5-static \
-mingw-w64-x86_64-qt5-static \
-mingw-w64-i686-zlib \
-mingw-w64-x86_64-zlib \
 zlib-devel
+```
+
+32-bit:
+```
+pacman -Sy --needed mingw-w64-i686-toolchain \
+mingw-w64-i686-cmake \
+mingw-w64-i686-freetype \
+mingw-w64-i686-zlib
+```
+
+64-bit:
+```
+pacman -Sy --needed mingw-w64-x86_64-toolchain \
+mingw-w64-x86_64-cmake \
+mingw-w64-x86_64-freetype \
+mingw-w64-x86_64-zlib
+```
+
+If you intend to build the GUI as well you need to also install these, depending on your platform (please note Qt5 takes up a LOT of disk space!):
+
+32-bit:
+```
+pacman -Sy --needed mingw-w64-i686-qt5-static
+```
+
+64-bit:
+```
+pacman -Sy --needed mingw-w64-x86_64-qt5-static
 ```
 
 Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
@@ -260,62 +308,88 @@ cp tsMuxer/tsmuxer.exe tsMuxerGUI/tsMuxeR.exe
 
 This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
 
-#### Windows (Visual C++ 2017)
+#### MacOS (osxcross on Linux)
 
-To compile tsMuxer and tsMuxerGUI on Windows with Visual C++ 2017 you will require Visual Studio 2017 Community Edtion. You can run the installer from [here](https://aka.ms/vs/15/release/vs_buildtools.exe).
+To use osxcross on Ubuntu to compile for OSX, first run the following commands:
 
-When selecting the installer options please specify:
+```
+# setup pre-reqs
+sudo apt-get install -y clang
+sudo apt-get install -y patch lzma-dev libxml2-dev libssl-dev python curl
+```
 
-* Visual Studio core editor
-* Just-In-Time debugger
-* Visual C++ core desktop features
-* VC 2017 version ... tools
-* C++ profiling tools
-* Visual C++ ATL for x86 and x64
-* Windows 8.1 SDK and UCRT SDK
-* MSBuild Tools
-* Visual C++ Build Tools core features
-* Visual C++ 2017 Redistributable Update
-* Windows 10 SDK
-* Visual C++ tools for CMake
-* Testing tools core features - Build Tools
-* C++/CLI support
+Next you have a choice - compile osxcross from source or use a prepared package. To compile osxcross from source:
 
-Next you will need to set up the Windows build dependencies. At the moment these aren't portable, so you will have to follow these steps exactly or the build will fail. We need to set up Freetype and Zlib as they aren't included in the MSVC libraries. 
+```
+# set up a new osxcross installation
+cd /tmp
+git clone https://github.com/tpoechtrager/osxcross.git
+cd osxcross
+curl -sLo tarballs/MacOSX10.10.sdk.tar.xz "https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/MacOSX10.10.sdk.tar.xz"
 
-You can download a compressed archive of these files [here](https://drive.google.com/file/d/1gZZPxZk6zwU8TV_XiVytJJvN4WvPviCQ/view?usp=sharing) or [here](https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/windows-libfreetype-libz.zip). 
+export SDK_VERSION="10.10"
+export OSX_VERSION_MIN="10.6"
+UNATTENDED=1 ./build.sh
 
-Once you download the package you have to install it, you need to  extract the ZIP directly into the root of the C:\ drive (I know, this needs to be improved!). If the path "C:\windev2\include\" exists you know it is set up correctly.
+rm -rf "target/SDK/MacOSX10.10.sdk/usr/share/man"
+
+# copy to permanent home as root
+sudo su -
+cp -r target /usr/lib/osxcross                                                                                    
+cp -r tools /usr/lib/osxcross/ 
+exit
+
+# remove temporary folder
+cd ..
+rm -rf osxcross
+```
+
+To install osxcross from a pre-compiled package for Ubuntu 19 x86_64:
+
+```
+# download the package to /tmp
+curl -sLo /tmp/osxcross-6acb50-20191025.tgz "https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/osxcross-6acb50-20191025.tgz"
+
+# extract to correct location
+sudo su -
+cd /tmp
+mkdir /usr/lib/osxcross
+tar -xzf osxcross-6acb50-20191025.tgz --strip-components=1 -C /usr/lib/osxcross
+exit
+
+# remove tar file
+rm -f osxcross-6acb50-20191025.tgz
+```
+
+Now to setup the tsMuxer build dependencies for osxcross:
+
+```
+# install freetype and zlib in root session with osxcross-macports, dependencies for tsMuxer build
+sudo su -
+export MACOSX_DEPLOYMENT_TARGET=10.10
+export PATH=/usr/lib/osxcross/bin:/usr/lib/osxcross/tools:$PATH
+/usr/lib/osxcross/bin/osxcross-conf
+/usr/lib/osxcross/bin/osxcross-macports
+/usr/lib/osxcross/bin/osxcross-macports install freetype
+/usr/lib/osxcross/bin/osxcross-macports install zlib
+exit
+```
 
 With all the dependencies set up we can now actually compile the code.
 
-Firstly, to compile tsMuxer open the tsMuxer.sln file in Visual Studio, right click the name of the solution and select "Build". Output files are created in ..\bin.
-
-Next to compile tsMuxerGUI you will require a Qt5 installation that is compatible with Visual C++ 2017. For this example we will be using Qt 5.12, as that is the LTS release. You can download it [here](https://download.qt.io/official_releases/qt/5.12/5.12.0/qt-opensource-windows-x86-5.12.0.exe). 
-
-To compile tsMuxerGUI you need to open the tsMuxerGUI folder in a command prompt and then run the following commands:
+Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
 
 ```
-set PATH=C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin;%PATH%
-"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars32.bat"
-qmake
-nmake
-copy bin\tsMuxerGUI.exe ..\bin\
-copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Core.dll ..\bin\
-copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Gui.dll ..\bin\
-copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Multimedia.dll ..\bin\
-copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Network.dll ..\bin\
-copy C:\Qt\Qt5.12.4\5.12.4\msvc2017\bin\Qt5Widgets.dll ..\bin\
+# build the project
+./rebuild_osxcross.sh
 ```
 
-You will find the following files will be created in ..\bin:
+Or run the following to build the GUI as well:
 
-* Qt5Core.dll
-* Qt5Gui.dll
-* Qt5Multimedia.dll
-* Qt5Network.dll
-* Qt5Widgets.dll
-* tsMuxerGUI.exe
+```
+# build the project
+./rebuild_osxcross_with_gui.sh
+```
 
 ## Financing
 

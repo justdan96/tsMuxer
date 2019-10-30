@@ -9,7 +9,8 @@
 #include "../vod_common.h"
 #include "../vodCoreException.h"
 #include "../utf8Converter.h"
-#include "../math.h"
+// #include "../math.h"
+#include <math.h>
 #include <fs/directory.h>
 #include <map>
 #include <algorithm>
