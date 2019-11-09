@@ -92,6 +92,43 @@ You can report issues directly on Github, that would be a really useful contribu
 
 ### Building
 
+#### Docker (All Platforms)
+
+You can use our [Docker container](https://github.com/justdan96/tsmuxer_build) to build tsMuxer for your chosen platform. To build the GUI you will need to follow the instructions specifically for your platform.
+
+To create the builds using the Docker container, follow the steps below:
+
+1. Pull `justdan96/tsmuxer_build` from the Docker repository:
+```
+docker pull justdan96/tsmuxer_build
+```
+
+Or build `justdan96/tsmuxer_build` from source:
+```
+git clone https://github.com/justdan96/tsmuxer_build.git
+cd tsmuxer_build
+docker build -t justdan96/tsmuxer_build .
+```
+
+2. Browse to the tsMuxer repository and run one of the following commands:
+
+*Linux*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_linux_docker.sh"
+```
+
+*Windows*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_mxe_docker.sh"
+```
+
+*OSX*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_osxcross_docker.sh"
+```
+
+The executable binary will be saved to the "\bin" folder.
+
 #### Linux
 
 For these examples we have successfully used Ubuntu 19 64-bit and Debian 10 64-bit. 
