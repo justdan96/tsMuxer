@@ -1,0 +1,14 @@
+name: Build for Linux
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: build-for-linux
+    - run: ./rebuild_linux_docker.sh
+    - uses: docker://justdan96/tsmuxer_build:latest
