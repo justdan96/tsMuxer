@@ -15,5 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
       name: checkout
+      
     - run: ./rebuild_linux_docker.sh
       name: build-for-linux
+      
+    - uses: actions/upload-artifact@master
+      with:
+         name: tsMuxeR
+         path: bin
+      name: upload-artefact
