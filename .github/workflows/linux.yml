@@ -16,11 +16,14 @@ jobs:
     - uses: actions/checkout@master
       name: checkout
       
+    - run: rm -f bin/.gitkeep
+      name: clean-bin-folder
+      
     - run: ./rebuild_linux_docker.sh
       name: build-for-linux
       
     - uses: actions/upload-artifact@master
       with:
-         name: tsMuxeR
+         name: tsMuxer
          path: bin
       name: upload-artefact
