@@ -9,6 +9,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: build-for-linux
+      name: checkout
     - run: ./rebuild_linux_docker.sh
-    - uses: docker://justdan96/tsmuxer_build:latest
+      uses: docker://justdan96/tsmuxer_build:latest
+      name: build-for-linux
