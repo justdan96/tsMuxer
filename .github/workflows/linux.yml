@@ -7,9 +7,13 @@ jobs:
 
     runs-on: ubuntu-latest
     
+    container:
+      image: docker://justdan96/tsmuxer_build:latest
+      volumes:
+      - /workspace:/github/workspace
+    
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@master
       name: checkout
     - run: ./rebuild_linux_docker.sh
-      uses: docker://justdan96/tsmuxer_build:latest
       name: build-for-linux
