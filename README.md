@@ -59,15 +59,13 @@ The following is a list of changes that will need to be made to the original sou
 
 * swapping custom includes from libmediation to their standard library equivalents
 * the code uses my_htonl, my_ntohll, etc - these can be swapped for the standard library versions
-* the program currently only compiles 32-bit executables, even on 64-bit systems, a multi-architecture approach is needed
-* consider making static executables for Linux, to make the program more portable
-* build for Windows requires Visual Studio 2017 and compiling through GUI - we need to create a Makefile equivalent
-* create a multi-platform build pipeline, maybe using dockcross or if that doesn't work creating a custom WinPE image just for compiling on Windows
-* Windows builds require extra files to be downloaded and manually copied into place in order for the builds to succeed - we need to work on that
 * the program doesn't support MPEG-4 ASP, even though MPEG-4 ASP is defined in the TS specification
 * no Opus audio support
 * [several](https://forum.doom9.org/showthread.php?p=1880216#post1880216) [muxing](https://forum.doom9.org/showthread.php?p=1881372#post1881372) [bugs](https://forum.doom9.org/showthread.php?p=1881509#post1881509) when muxing a HEVC/UHD stream - results in an out-of-sync stream
 * has issues with 24-bit DTS Express
+* issues with the 3D plane lists when there are mismatches between the MPLS and M2TS
+* a [bug](https://forum.doom9.org/showpost.php?p=1888650&postcount=74) with unsynchronised AV in HEVC files because the coded picture buffer is not large enough
+* a [bug](https://forum.doom9.org/showthread.php?p=1880216#post1880216) with UHD HEVC where the [wrong stream type is used](https://forum.doom9.org/showpost.php?p=1888746&postcount=75) 
 
 ## Contributing
 
@@ -91,6 +89,43 @@ If you’re not familiar with open-source workflows or our set of technologies, 
 You can report issues directly on Github, that would be a really useful contribution given that we lack some user testing on the project. Please document as much as possible the steps to reproduce your problem (even better with screenshots).
 
 ### Building
+
+#### Docker (All Platforms)
+
+You can use our [Docker container](https://github.com/justdan96/tsmuxer_build) to build tsMuxer for your chosen platform. To build the GUI you will need to follow the instructions specifically for your platform.
+
+To create the builds using the Docker container, follow the steps below:
+
+1. Pull `justdan96/tsmuxer_build` from the Docker repository:
+```
+docker pull justdan96/tsmuxer_build
+```
+
+Or build `justdan96/tsmuxer_build` from source:
+```
+git clone https://github.com/justdan96/tsmuxer_build.git
+cd tsmuxer_build
+docker build -t justdan96/tsmuxer_build .
+```
+
+2. Browse to the tsMuxer repository and run one of the following commands:
+
+*Linux*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_linux_docker.sh"
+```
+
+*Windows*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_mxe_docker.sh"
+```
+
+*OSX*
+```
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_osxcross_docker.sh"
+```
+
+The executable binary will be saved to the "\bin" folder.
 
 #### Linux
 
@@ -390,6 +425,34 @@ Or run the following to build the GUI as well:
 # build the project
 ./rebuild_osxcross_with_gui.sh
 ```
+
+## Testing
+
+In absence of a full test suite currently we are creating some basic tests that can be performed. 
+
+The first test is a simple MKV to M2TS test with the first 2 minutes of Big Buck Bunny. 
+
+You need the file bbb-2mins.mkv and to either use the M2TS option in tsMuxerGUI or use the following meta file:
+
+```
+MUXOPT --no-pcr-on-video-pid --new-audio-pes --vbr  --vbv-len=500
+V_MPEG-2, "bbb-2mins.mkv", track=1, lang=und
+A_AC3, "bbb-2mins.mkv", track=2, lang=und
+```
+
+The MD5 sums of the original file and the output file should be:
+```
+a239a724cba1381a5956b50cb8b46754  bbb-2mins.mkv
+62342b056d37e44fae4e48161d6208bf  bbb-2mins-from-linux-meta.m2ts
+```
+
+We will have also done the same with the test file [Life Untouched](https://uhdsample.com/6-life-untouched-4k-demo-60fps-hdr10.html). Results of the MD5 sums for the original and output file are below:
+```
+f2db8f6647f4f2a0b2417aed296fee73  Life Untouched 4K Demo.mp4
+aba9ee3a3211cd09ba4833a610faff22  Life Untouched 4K Demo.m2ts
+```
+
+We need more sample files with 3D and multiple subtitle tracks if possible so if you have any ways of testing these files (particularly in relation to the bugs in the TODO section) please let us know?
 
 ## Financing
 
