@@ -38,8 +38,8 @@ static const uint8_t STREAM_TYPE_PRIVATE_SECTION = 0x05;
 static const uint8_t STREAM_TYPE_PRIVATE_DATA    = 0x06;
 static const uint8_t STREAM_TYPE_VIDEO_MPEG4     = 0x10;
 static const uint8_t STREAM_TYPE_VIDEO_H264      = 0x1b;
-//static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x24;
-static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x06;
+static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x24;
+//static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x06;
 static const uint8_t STREAM_TYPE_VIDEO_MVC       = 0x20;
 static const uint8_t STREAM_TYPE_VIDEO_VC1       = 0xea;
 
