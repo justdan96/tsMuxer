@@ -1,0 +1,31 @@
+name: Build for Mac
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    container:
+      image: docker://justdan96/tsmuxer_build:latest
+      volumes:
+      - /workspace:/github/workspace
+    
+    steps:
+    - uses: actions/checkout@master
+      name: checkout
+      
+    - run: rm -f bin/.gitkeep
+      name: clean-bin-folder
+      
+    - run: ./rebuild_osxcross_docker.sh
+      name: build-for-mac
+      
+    - uses: actions/upload-artifact@master
+      with:
+         name: tsMuxer
+         path: bin
+      name: upload-artefact
