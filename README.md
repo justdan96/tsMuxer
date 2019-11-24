@@ -53,6 +53,12 @@ This project was created by Roman Vasilenko, with the last public release 20th J
 
 All executable are created to be portable, so you can just save and extract the compressed package for your platform. 
 
+The workflow to automatically create pre-compiled binaries for Windows, Mac and Linux is not quite finished yet.
+
+*However* on each push to the master branch on GitHub, executables are created with GitHub Actions. To download the pre-compiled binaries head over to the following URL (you must be logged in) https://github.com/justdan96/tsMuxer/actions and click on the latest action for your chosen platform (Windows, Mac or Linux). In the Artifacts section in the top-right you can download a ZIP file containing the executable for tsMuxer. 
+
+At the moment only the CLI is included, the GUI is not yet available.
+
 ## Todo
 
 The following is a list of changes that will need to be made to the original source code and project in general:
