@@ -48,7 +48,7 @@ uint8_t* AACCodec::findAacFrame(uint8_t* buffer, uint8_t* end)
 
 int AACCodec::getFrameSize(uint8_t* buffer)
 {
-	return buffer[4]*8 + (buffer[5] >> 5);
+	return ((buffer[3] & 0x03) << 11) + (buffer[4] << 3) + (buffer[5] >> 5);
 }
 
 bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
