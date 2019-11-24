@@ -183,6 +183,7 @@ public:
 			if (frameSize == 0) 
 				frameSize = m_sc->m_index[m_sc->m_indexCur++];
 			if (isAAC) {
+				m_aacRaw.m_channels = m_sc->channels;
 				m_aacRaw.buildADTSHeader(dst, frameSize + AAC_HEADER_LEN);
 				memcpy(dst + AAC_HEADER_LEN, buff, frameSize);
 				dst += frameSize + AAC_HEADER_LEN;
@@ -1451,6 +1452,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
 			if (st->parsed_priv_data) {
 				((MovParsedAudioTrackData*)st->parsed_priv_data)->isAAC = true;
 				st->parsed_priv_data->setPrivData(st->codec_priv, st->codec_priv_size);
+				st->channels = (st->codec_priv[1] >> 3) & 0x0f; 
 			}
         }
     }
