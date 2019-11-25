@@ -167,31 +167,31 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     {
         unsigned int numblkscod, strmtyp, substreamid;
 
-        strmtyp = gbc.getBits( 2);
+        strmtyp = gbc.getBits(2);
         if (strmtyp == 3)
             return AC3_PARSE_ERROR_SYNC; // invalid stream type
 
         substreamid = gbc.getBits(3);
 
-        m_frame_size = (gbc.getBits( 11) + 1) * 2;
+        m_frame_size = (gbc.getBits(11) + 1) * 2;
         if (m_frame_size < AC3_HEADER_SIZE)
             return 0; // invalid header size
 
-        int fscod = gbc.getBits( 2);
+        int fscod = gbc.getBits(2);
 
         if (fscod == 3) {
-            m_fscod2 = gbc.getBits( 2);
+            m_fscod2 = gbc.getBits(2);
             numblkscod = 3;
             if(m_fscod2 == 3)
                 return AC3_PARSE_ERROR_SYNC;
 
             m_sample_rate = ff_ac3_freqs[m_fscod2] / 2;
         } else {
-            numblkscod = gbc.getBits( 2);
+            numblkscod = gbc.getBits(2);
             m_sample_rate = ff_ac3_freqs[m_fscod];
         }
 
-        int acmodExt = gbc.getBits( 3);
+        int acmodExt = gbc.getBits(3);
         int lfeonExt = gbc.getBit();
 
         m_samples = eac3_blocks[numblkscod] * 256;
@@ -221,26 +221,26 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_bsidBase = m_bsid; // id except AC3+ frames
         m_samples = AC3_FRAME_SIZE;
         m_crc1 = gbc.getBits(16);
-        m_fscod = gbc.getBits( 2);
+        m_fscod = gbc.getBits(2);
         if(m_fscod == 3)
             return AC3_PARSE_ERROR_SAMPLE_RATE;
 
-        m_frmsizecod = gbc.getBits( 6);
+        m_frmsizecod = gbc.getBits(6);
         if(m_frmsizecod > 37)
             return AC3_PARSE_ERROR_FRAME_SIZE;
 
 	    gbc.skipBits(5); // skip bsid, already got it
 
-        m_bsmod = gbc.getBits( 3);
-        m_acmod = gbc.getBits( 3);
+        m_bsmod = gbc.getBits(3);
+        m_acmod = gbc.getBits(3);
         if((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO) {
-            m_cmixlev = gbc.getBits( 2);
+            m_cmixlev = gbc.getBits(2);
         }
         if(m_acmod & 4) {
-            m_surmixlev = gbc.getBits( 2);
+            m_surmixlev = gbc.getBits(2);
         }
         if(m_acmod == AC3_ACMOD_STEREO) {
-            m_dsurmod = gbc.getBits( 2);
+            m_dsurmod = gbc.getBits(2);
         }
         m_lfeon = gbc.getBit();
 
@@ -440,32 +440,32 @@ int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
     }
     else {
         int test_crc1 = gbc.getBits(16);
-        int test_fscod = gbc.getBits( 2);
+        int test_fscod = gbc.getBits(2);
         if(test_fscod == 3)
             return AC3_PARSE_ERROR_SAMPLE_RATE;
 
-        int test_frmsizecod = gbc.getBits( 6);
+        int test_frmsizecod = gbc.getBits(6);
         if(test_frmsizecod > 37)
             return AC3_PARSE_ERROR_FRAME_SIZE;
 
 	    gbc.skipBits(5); // skip bsid, already got it
 
-        int test_bsmod = gbc.getBits( 3);
-        int test_acmod = gbc.getBits( 3);
+        int test_bsmod = gbc.getBits(3);
+        int test_acmod = gbc.getBits(3);
 
 	    if (test_fscod != m_fscod || /*(test_frmsizecod>>1) != (m_frmsizecod>>1) ||*/
 		    test_bsmod != m_bsmod /*|| test_acmod != m_acmod*/)
             return AC3_PARSE_ERROR_SYNC;
 
         if((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO) {
-            int test_cmixlev = gbc.getBits( 2);
+            int test_cmixlev = gbc.getBits(2);
         }
         if(m_acmod & 4) {
-            int test_surmixlev = gbc.getBits( 2);
+            int test_surmixlev = gbc.getBits(2);
         }
 
         if(m_acmod == AC3_ACMOD_STEREO) {
-            int test_dsurmod = gbc.getBits( 2);
+            int test_dsurmod = gbc.getBits(2);
 		    if (test_dsurmod != m_dsurmod)
 	            return AC3_PARSE_ERROR_SYNC;
         }
