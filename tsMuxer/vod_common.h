@@ -94,7 +94,7 @@ struct AVRational{
 
 typedef std::vector<std::pair<int, int> > PriorityDataInfo; // mark some data as priority data
 
-enum DiskType {DT_NONE, DT_BLURAY, DT_AVCHD};
+enum DiskType {DT_NONE, DT_BLURAY, UHD_BLURAY, DT_AVCHD};
 
 uint16_t AV_RB16(const uint8_t* buffer);
 uint32_t AV_RB24(const uint8_t* buffer);
