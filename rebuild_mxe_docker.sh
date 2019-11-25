@@ -9,4 +9,4 @@ make
 cp tsMuxer/tsmuxer.exe ../bin/tsMuxeR.exe
 cd ..
 rm -rf build
-ls ../bin/tsMuxeR.exe
+ls ./bin/tsMuxeR.exe
