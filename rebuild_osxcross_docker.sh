@@ -10,4 +10,4 @@ make
 cp tsMuxer/tsmuxer ../bin/tsMuxeR
 cd ..
 rm -rf build
-ls ../bin/tsMuxeR
+ls ./bin/tsMuxeR
