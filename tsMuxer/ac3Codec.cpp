@@ -196,6 +196,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_channels = ff_ac3_channels[m_acmod] + m_lfeon;
         m_samples = eac3_blocks[numblkscod] * 256;
         m_bit_rateExt = m_frame_size * (m_sample_rate) * 8 / (m_samples);
+        m_bit_rate = 0;
 
         gbc.skipBits(5); // skip bsid, already got it
         m_bsidBase = m_bsid;
