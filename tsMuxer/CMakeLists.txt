@@ -67,6 +67,7 @@ if(TSMUXER_STATIC_BUILD)
   else()
     set (CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
   endif()
+  set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 endif()
 
 function(pkg_check_modules_with_static prefix req_or_opt package)
@@ -91,11 +92,16 @@ target_include_directories(tsmuxer PRIVATE
   "${PROJECT_SOURCE_DIR}/../libmediation"
   ${ZLIB_INCLUDE_DIRS}
 )
-target_link_libraries(tsmuxer
-  mediation
-  Threads::Threads
-  ${ZLIB_LIBRARIES}
-)
+
+# this part looks messy as it is working around a bug in pthread when static linking
+SET(THREADSLIB Threads::Threads)
+if(TSMUXER_STATIC_BUILD)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    message("-- Static Linux build, will link whole pthread!")
+    SET(THREADSLIB -pthread -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
+  endif()
+endif()
+target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
 
 if (WIN32)
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
