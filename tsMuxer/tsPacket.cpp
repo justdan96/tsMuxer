@@ -1434,6 +1434,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 	std::string version_number;
 	if (dt == DT_BLURAY)
 		version_number = "0200";
+	else if (dt == UHD_BLURAY)
+		version_number = "0300";
 	else 
 		version_number = "0100";
 	CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
@@ -2853,6 +2855,8 @@ int MovieObject::compose(uint8_t* buffer, int len, DiskType dt)
 	CLPIStreamInfo::writeString("MOBJ", writer, 4);
 	if (dt == DT_BLURAY)
 		CLPIStreamInfo::writeString("0200", writer, 4);
+	else if (dt == UHD_BLURAY)
+		CLPIStreamInfo::writeString("0300", writer, 4);
 	else
 		CLPIStreamInfo::writeString("0100", writer, 4);
 	writer.putBits(32,0); //uint32_t ExtensionData_start_address  
