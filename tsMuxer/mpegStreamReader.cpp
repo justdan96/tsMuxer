@@ -62,12 +62,8 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
 		}
         if (decodeRez == 0) {
 		    avPacket.data = m_tmpBuffer;
-		    avPacket.size = std::min(MAX_AV_PACKET_SIZE, m_tmpBufferLen);
+		    avPacket.size = m_tmpBufferLen;
         }
-		if (m_tmpBufferLen > MAX_AV_PACKET_SIZE) {
-			LTRACE(LT_ERROR, 2, "Too large last buffer (" << m_tmpBufferLen << " bytes). Truncate buffer to " << 
-				   MAX_AV_PACKET_SIZE << " bytes. It does not have to be!");
-		}
 	}
 
 	avPacket.pts = m_curPts + m_timeOffset;
@@ -127,12 +123,10 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 			return NEED_MORE_DATA;
 	}
 
-	if (m_bufEnd - m_curPos < MAX_AV_PACKET_SIZE) {
-		uint8_t* nextNal = NALUnit::findNALWithStartCode(std::min(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
-		if (nextNal == m_bufEnd) {
-			storeBufferRest();
-			return NEED_MORE_DATA;
-		}
+	uint8_t* nextNal = NALUnit::findNALWithStartCode(std::min(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
+	if (nextNal == m_bufEnd) {
+		storeBufferRest();
+		return NEED_MORE_DATA;
 	}
 
 	int isNal = bufFromNAL();
