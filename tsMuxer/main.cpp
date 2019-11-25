@@ -91,7 +91,9 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
                 }
 			}
 
-			if (str.find("--blu-ray") != string::npos)
+			if (str.find("--blu-ray v3") != string::npos)
+				result =  UHD_BLURAY;
+			else if (str.find("--blu-ray") != string::npos)
 				result =  DT_BLURAY;
 			else if (str.find("--avchd") != string::npos)
 				result =  DT_AVCHD;
