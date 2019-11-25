@@ -199,7 +199,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 
         gbc.skipBits(5); // skip bsid, already got it
         m_bsidBase = m_bsid;
-        for (int i = 0; i < (acmodExt ? 1 : 2); i++) {
+        for (int i = 0; i < (m_acmod ? 1 : 2); i++) {
             gbc.skipBits(5); // skip dialog normalization
             if (gbc.getBit()) {
                 gbc.skipBits(8); //skip Compression gain word
