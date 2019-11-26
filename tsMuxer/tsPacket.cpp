@@ -1581,9 +1581,12 @@ void MPLSParser::UO_mask_table(BitStreamReader& reader)
 }
 
 void MPLSParser::parsePlayList(uint8_t* buffer, int len) {
+	# NOTE: see https://github.com/lerks/BluRay/wiki/MPLS
 	BitStreamReader reader;
 	reader.setBuffer(buffer, buffer + len);
 	uint32_t length = reader.getBits(32);
+    int startBits = reader.getBitsLeft();
+
 	reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	int number_of_PlayItems = reader.getBits(16);//16 uimsbf
 	number_of_SubPaths = reader.getBits(16); //16 uimsbf
@@ -1593,6 +1596,12 @@ void MPLSParser::parsePlayList(uint8_t* buffer, int len) {
 	for (int SubPath_id=0; SubPath_id<number_of_SubPaths; SubPath_id++) {
 		//SubPath(); // not implemented now
 	}
+
+    int endBits = reader.getBitsLeft();
+    int toPassBits = length * 8 - (startBits - endBits);
+    if (toPassBits > 0) {
+        reader.skipBits(toPassBits);
+    }
 }
 
 MPLSStreamInfo& MPLSParser::getMainStream()
@@ -2082,8 +2091,11 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
 
 void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
 {
+	# NOTE: see https://github.com/lerks/BluRay/wiki/PlayItem
 	MPLSPlayItem newItem;
 	int length = reader.getBits(16);
+    int startBits = reader.getBitsLeft();
+
 	char clip_Information_file_name[6];
 	char clip_codec_identifier[5];
 	CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
@@ -2121,6 +2133,12 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
 		}
 	}
 	STN_table(reader, PlayItem_id);
+
+    int endBits = reader.getBitsLeft();
+    int toPassBits = length * 8 - (startBits - endBits);
+    if (toPassBits > 0) {
+        reader.skipBits(toPassBits);
+    }
 }
 
 void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::vector<PMTIndex>& pmtIndexList)
@@ -2406,7 +2424,10 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
 void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 {
+	# NOTE: see https://github.com/lerks/BluRay/wiki/STNTable
 	int length = reader.getBits(16); //16 uimsbf
+    int startBits = reader.getBitsLeft();
+	
 	reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	number_of_primary_video_stream_entries = reader.getBits(8); //8 uimsbf
 	number_of_primary_audio_stream_entries = reader.getBits(8); //8 uimsbf
@@ -2506,6 +2527,12 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 		}
 		//}
 	}
+
+    int endBits = reader.getBitsLeft();
+    int toPassBits = length * 8 - (startBits - endBits);
+    if (toPassBits > 0) {
+        reader.skipBits(toPassBits);
+    }
 }
 
 // ------------- M2TSStreamInfo -----------------------
@@ -2684,7 +2711,10 @@ MPLSStreamInfo::~MPLSStreamInfo()
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader) 
 {
+	# NOTE: see https://github.com/lerks/BluRay/wiki/StreamEntry
 	int length = reader.getBits(8); //8 uimsbf
+    int startBits = reader.getBitsLeft();
+	
 	type = reader.getBits(8); //8 bslbf
 	if (type==1) {
 		streamPID = reader.getBits(16); //16 uimsbf
@@ -2701,6 +2731,12 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 		reader.skipBits(32); //reserved_for_future_use 40 bslbf
 		reader.skipBits(8);
 	}
+
+    int endBits = reader.getBitsLeft();
+    int toPassBits = length * 8 - (startBits - endBits);
+    if (toPassBits > 0) {
+        reader.skipBits(toPassBits);
+    }
 }
 
 void MPLSStreamInfo::composePGS_SS_StreamEntry(BitStreamWriter& writer, int entryNum)
@@ -2749,7 +2785,10 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader) 
 {
+	# NOTE: see https://github.com/lerks/BluRay/wiki/StreamAttributes
 	int length = reader.getBits(8); // 8 uimsbf
+    int startBits = reader.getBitsLeft();
+	
 	stream_coding_type = reader.getBits(8); //8 bslbf
 	if (isVideoStreamType(stream_coding_type))
 	{
@@ -2775,6 +2814,12 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 		character_code = reader.getBits(8); //8 bslbf
 		CLPIStreamInfo::readString(language_code, reader, 3);
 	}
+
+    int endBits = reader.getBitsLeft();
+    int toPassBits = length * 8 - (startBits - endBits);
+    if (toPassBits > 0) {
+        reader.skipBits(toPassBits);
+    }
 }
 
 void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer) 
