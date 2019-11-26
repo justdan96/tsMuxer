@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>893</width>
-    <height>794</height>
+    <width>1020</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>660</width>
+    <width>800</width>
     <height>650</height>
    </size>
   </property>
@@ -20,7 +20,7 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>tsMuxeR GUI 2.6.13</string>
+   <string>tsMuxeR GUI 2.6.15</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
@@ -2667,6 +2667,26 @@ p, li { white-space: pre-wrap; }
              </widget>
             </item>
             <item>
+             <widget class="QRadioButton" name="radioButtonBluRayISOUHD">
+              <property name="text">
+               <string>UHD Blu-ray ISO</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radioButtonBluRayUHD">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>UHD Blu-ray folder</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QRadioButton" name="radioButtonAVCHD">
               <property name="text">
                <string>AVCHD folder</string>
@@ -2932,6 +2952,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>radioButtonTS</tabstop>
   <tabstop>radioButtonM2TS</tabstop>
   <tabstop>radioButtonBluRay</tabstop>
+  <tabstop>radioButtonBluRayUHD</tabstop>
   <tabstop>radioButtonDemux</tabstop>
   <tabstop>outFileName</tabstop>
   <tabstop>btnBrowse</tabstop>

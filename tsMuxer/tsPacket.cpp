@@ -1583,7 +1583,7 @@ void MPLSParser::UO_mask_table(BitStreamReader& reader)
 }
 
 void MPLSParser::parsePlayList(uint8_t* buffer, int len) {
-	# NOTE: see https://github.com/lerks/BluRay/wiki/MPLS
+	//NOTE: see https://github.com/lerks/BluRay/wiki/MPLS
 	BitStreamReader reader;
 	reader.setBuffer(buffer, buffer + len);
 	uint32_t length = reader.getBits(32);
@@ -2093,7 +2093,7 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
 
 void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
 {
-	# NOTE: see https://github.com/lerks/BluRay/wiki/PlayItem
+	// NOTE: see https://github.com/lerks/BluRay/wiki/PlayItem
 	MPLSPlayItem newItem;
 	int length = reader.getBits(16);
     int startBits = reader.getBitsLeft();
@@ -2426,7 +2426,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
 void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 {
-	# NOTE: see https://github.com/lerks/BluRay/wiki/STNTable
+	// NOTE: see https://github.com/lerks/BluRay/wiki/STNTable
 	int length = reader.getBits(16); //16 uimsbf
     int startBits = reader.getBitsLeft();
 	
@@ -2713,7 +2713,7 @@ MPLSStreamInfo::~MPLSStreamInfo()
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader) 
 {
-	# NOTE: see https://github.com/lerks/BluRay/wiki/StreamEntry
+	// NOTE: see https://github.com/lerks/BluRay/wiki/StreamEntry
 	int length = reader.getBits(8); //8 uimsbf
     int startBits = reader.getBitsLeft();
 	
@@ -2787,7 +2787,7 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader) 
 {
-	# NOTE: see https://github.com/lerks/BluRay/wiki/StreamAttributes
+	// NOTE: see https://github.com/lerks/BluRay/wiki/StreamAttributes
 	int length = reader.getBits(8); // 8 uimsbf
     int startBits = reader.getBitsLeft();
 	

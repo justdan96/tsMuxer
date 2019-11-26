@@ -91,7 +91,7 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
                 }
 			}
 
-			if (str.find("--blu-ray v3") != string::npos)
+			if (str.find("--blu-ray-v3") != string::npos)
 				result =  UHD_BLURAY;
 			else if (str.find("--blu-ray") != string::npos)
 				result =  DT_BLURAY;
@@ -486,6 +486,7 @@ All parameters in this group started with two dashes:\n\
                     is created as folder on HDD.  For BD3D disks ssif files are\n\
                     not  created at  this  case.  If output file name  has .iso\n\
                     extension, then BD disk is created as image file.\n\
+--blu-ray-v3        As above - except mux to UHD BD disks.\n\
 --avchd             Mux to AVCHD disk.\n\
 --cut-start         Trim the beginning of the file.  Value should be  completed\n\
                     with  \"ms\"  (the number of milliseconds),  \"s\" (seconds) or\n\
