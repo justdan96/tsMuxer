@@ -110,7 +110,7 @@ bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int ex
 
 bool BlurayHelper::createBluRayDirs()
 {
-    if (m_dt == DT_BLURAY) 
+    if (m_dt == DT_BLURAY || m_dt == UHD_BLURAY) 
     {
         if (m_isoWriter) {
             m_isoWriter->createDir("BDMV/META");
@@ -168,7 +168,10 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
 
     if (m_dt == DT_BLURAY) {
         bdMovieObjectData[5] = bdIndexData[5] = '2';
-        bdIndexData[15] = 0;
+        fileSize = 0x78;
+    }
+    else if (m_dt == UHD_BLURAY) {
+        bdMovieObjectData[5] = bdIndexData[5] = '3';
         fileSize = 0x78;
     }
     else {
@@ -226,6 +229,8 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     string version_number;
     if (m_dt == DT_BLURAY)
         memcpy(&clpiParser.version_number, "0200", 5);
+    else if (m_dt == UHD_BLURAY)
+        memcpy(&clpiParser.version_number, "0300", 5);
     else
         memcpy(&clpiParser.version_number, "0100", 5);
     clpiParser.clip_stream_type = 1; // AV stream
@@ -238,6 +243,9 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     if (doLog) {
         if (m_dt == DT_BLURAY) {
             LTRACE(LT_INFO, 2, "Creating Blu-ray stream info and seek index");
+        }
+        else if (m_dt == UHD_BLURAY) {
+            LTRACE(LT_INFO, 2, "Creating UHD Blu-ray stream info and seek index");
         }
         else {
             LTRACE(LT_INFO, 2, "Creating AVCHD stream info and seek index");
@@ -410,6 +418,9 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer,
 
     if (dt == DT_BLURAY) {
         LTRACE(LT_INFO, 2, "Creating Blu-ray playlist");
+    }
+    else if (dt == UHD_BLURAY) {
+        LTRACE(LT_INFO, 2, "Creating UHD Blu-ray playlist");
     }
     else {
         LTRACE(LT_INFO, 2, "Creating AVCHD playlist");
