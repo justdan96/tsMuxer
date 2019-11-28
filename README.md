@@ -59,19 +59,208 @@ The workflow to automatically create pre-compiled binaries for Windows, Mac and 
 
 At the moment only the CLI is included, the GUI is not yet available.
 
+## Usage
+
+### GUI
+
+The simplest thing to do is to use the tsMuxerGUI. A screenshot of that can be seen below:
+
+![tsMuxerGUI_Screenshot](https://user-images.githubusercontent.com/503722/69820496-209e5e00-11f9-11ea-81b2-8c130b6e0e89.png)
+
+### Command Line
+
+Alternatively you can use tsMuxer via the command-line. 
+
+Examples:
+```
+    tsMuxeR <media file name>
+    tsMuxeR <meta file name> <out file/dir name>
+```
+
+tsMuxeR can be run in track detection mode or muxing mode. If run tsMuxeR  with only  one argument  then tsMuxeR  display  input track information  required to construct  meta  file.  If run tsMuxeR  with two arguments tsMuxeR start muxing or demuxing process.
+
+### Meta file format
+File MUST has extension .meta.  This file  define files you want to  multiplex. First line of meta file contain additional parameters that apply to all tracks. In this case the line should begin with the word MUXOPT.
+
+Following lines indicate a list of tracks  and their parameters.  The format is as follows:   `<code name>,   <file name>,   <parameters>`   Parameters are comma separated. Each parameter indicates the name and value.
+Example of META file:
+```
+MUXOPT --blu-ray
+V_MPEG4/ISO/AVC, D:/media/test/stream.h264, fps=25
+A_AC3, D:/media/test/stream.ac3, timeshift=-10000ms
+```
+In this example one AC3 audio stream and one H264 video stream are  multiplexed to BD disk.  Input file name can reference to elementary stream or track inside container.
+
+Supported input containers:
+* TS/M2TS/MTS
+* EVO/VOB/MPG/MPEG
+* MKV
+* MOV/MP4
+* MPLS (Blu-ray media play list file)
+
+Names of codecs in the meta file:
+
+Meta File Code    | Description 
+---               | --- 
+V_MPEGH/ISO/HEVC  | H.265/HEVC 
+V_MPEG4/ISO/AVC   | H.264/AVC 
+V_MPEG4/ISO/MVC   | H.264/MVC 
+V_MS/VFW/WVC1     | VC1 
+V_MPEG-2          | MPEG2 
+A_AC3             | AC3/AC3+/TRUE-HD 
+A_AAC             | AAC 
+A_DTS             | DTS/DTS-Express/DTS-HD 
+A_MP3             | MPEG audio layer 1/2/3 
+A_LPCM            | raw pcm data or PCM WAV file 
+S_HDMV/PGS        | Presentation graphic stream (BD subtitle format) 
+S_TEXT/UTF8       | SRT subtitle format.  Encoding MUST be  UTF-8/UTF-16/UTF-32 
+
+Each track may has addition parameters.  Track parameters do not  have dash. If parameter value has several words, parameter must be enclosed in quotes.
+
+Common additional parameters for any type of track:
+
+Parameter         | Description 
+---               | --- 
+track             | track number if input file is container. 
+lang              | track language. MUST contains exact 3 letters. 
+
+Additional parameters for audio tracks:
+
+Parameter         | Description 
+---               | --- 
+timeshift         | Shift audio track to future (positive value) or to past. Measured at milliseconds. 
+down-to-dts       | Available only for DTS-HD tracks. Filter out HD part. 
+down-to-ac3       | Available only for TRUE-HD tracks. Filter out HD part. 
+secondary         | Mux as secondary audio.  Available for DD+ and DTS-Express. 
+
+Additional parameters for video tracks:
+
+Parameter         | Description 
+---               | --- 
+fps               | Video fps. If not defined, default value auto detected from a source stream if present. If not, default value 23.976. 
+delPulldown       | Remove pulldown from the track if exists.  This option lead to fps change from 30 to 24 if pulldown exists. 
+ar                | Override video aspect ratio. 16:9, 4:3 e.t.c. 
+
+Additional parameters for H.264 video tracks:
+
+Parameter         | Description 
+---               | --- 
+level             | Overwrite  level in the H264 stream.  Note:  option  update headers only. The H264 stream may not meet the requirements of a lower level. 
+insertSEI         | If original   stream  does not contain  SEI picture timing, SEI buffering period or VUI parameters,  then add this data to the stream. This option is recommended for BD muxing. 
+forceSEI          | Add SEI picture timing, buffering period and VUI parameters to the stream. Rebuild data If data already exist. 
+contSPS           | If original video doesn't contain  repetitive SPS/PPS  then SPS/PPS will be added to the stream before  each key frame. This option is recommended for BD muxing. 
+subTrack          | Used  for  combined  AVC/MVC  tracks  only.  TsMuxeR always demultiplex  such  tracks to separate  AVC and MVC streams. This parameter defined reference to AVC part(if value=1) or to MVC part (if value=2). 
+secondary         | Mux as secondary video (PIP). 
+pipCorner         | Corner for PIP video. Allowed values: "TopLeft","TopRight", "BottomRight", "BottomLeft". 
+pipHOffset        | PIP window horizontal offset from the corner in pixels. 
+pipVOffset        | PIP window vertical offset from the corner in pixels. 
+pipScale          | PIP window scale factor. Allowed values: "1", "1/2", "1/4", "1.5", "fullScreen". 
+pipLumma          | Allow PIP window to be transparent. Transparent colors  are lumma colors in range `[0..pipLumma]`. 
+
+Additional parameters for PG and SRT tracks:
+
+Parameter         | Description 
+---               | --- 
+video-width       | The width of the video in pixels. 
+video-height      | The height of the video in pixels. 
+fps               | Video fps.  Recommended  to  define this parameter for more carefully timing processing. 
+3d-plane          | Parameter  defines  number  of  the '3D offset track' which placed inside MVC track.  Each message has individual 3D offset. This information stored inside 3D offset track. 
+
+Additional parameters for SRT tracks:
+
+Parameter         | Description 
+---               | --- 
+font-name         | Font name to render. 
+font-color        | Font color. Color can be defined in hexadecimal or  decimal format. If color 24 bit long  (for instance 0xFF00FF)  it's  define RGB components.  IF color 32 bit long  (for instance 0x80FF00FF) it's define ARGB components. 
+font-size         | Font size in pixels. 
+font-italic       | Italic display text. 
+font-bold         | Bold display text. 
+font-underline    | Underlined text. 
+font-strikeout    | Strikethrough text. 
+bottom-offset     | Distance from the lower edge while displaying text. 
+font-border       | Outline width. 
+fadein-time       | Time in ms for smooth subtitle appearance. 
+fadeout-time      | Time in ms for smooth subtitle disappearance. 
+line-spacing      | Interval between lines. Default value 1.0. 
+
+tsMuxeR  supports  addition  tag inside  SRT track.  The syntax  and parameters coincide with HTML: `<b>, <i>, <u>, <strike>, <font>`. Default relative font size (used in these tags) - 3.  For example:
+```
+<b><font size=5 color="deepskyblue" name="Arial"><u>Test</u>
+<font size= 4 color="#806040">colored</font>text</font>
+</b>
+```
+
+Global addition parameters placed in the first line of the META file  (MUXOPT). All parameters in this group started with two dashes:
+```
+--pcr-on-video-pid  Do not allocate separate PID for PCR, use an existing video
+                    PID.
+--new-audio-pes     Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and
+                    DTS-HD. Parameter is auto activated for BD muxing.
+--vbr               Use variable bitrate.
+--minbitrate        Sets the lower limit of the vbr bitrate.  If the stream has
+                    a  smaller bitrate  then NULL  packets will be inserted  to
+                    hold the limit.
+--maxbitrate        The upper limit of the vbr bitrate.
+--cbr               Muxing mode  with a fixed bitrate.  Options --vbr and --cbr
+                    should not be used together.
+--vbv-len           The  length  of the  virtual  buffer  in milliseconds.  The
+                    default value  is 500.  Typically, this  option  is used in
+                    together with --cbr. The parameter is similar to  the value
+                    of  vbv-buffer-size  in  the  x264  coder,  but  defined in
+                    milliseconds instead of kbit.
+--no-asyncio        Do not  create  a separate thread  for writing.  Also, this
+                    option  disable  flag  FILE_FLAG_NO_BUFFERING  for writing.
+                    Deprecated option.
+--auto-chapters     Number.  Insert a chapter every <nn> minutes. Used only for
+                    BD/AVCHD mode.
+--custom-chapters   A semicolon delimited list of string in format hh:mm:ss.zzz
+--demux             In this mode selected audio  and video tracks are stored as
+                    separate files instead of muxing. utput name must be folder
+                    name.  All selected  effects  (such as change  of level for
+                    h264) are processed.  When demux,  certain types  of tracks
+                    always get changed on storing into a file:
+                    - Subtitles in a Presentation Graphic Stream  are converted
+                      into sup format.
+                    - PCM audio are saved as WAV files.
+--blu-ray           Mux to BD disks. If output file name is folder,  bluray disk
+                    is created as folder on HDD.  For BD3D disks ssif files are
+                    not  created at  this  case.  If output file name  has .iso
+                    extension, then BD disk is created as image file.
+--blu-ray-v3        As above - except mux to UHD BD disks.
+--avchd             Mux to AVCHD disk.
+--cut-start         Trim the beginning of the file.  Value should be  completed
+                    with  "ms"  (the number of milliseconds),  "s" (seconds) or
+                    "min" (minutes).
+--cut-end           Trim  the end of the file.  Value should be  completed with
+                    "ms" (the number of milliseconds), "s" (seconds) or "min"
+                    (minutes).
+--split-duration    Split output to several files.The time specified in seconds
+--split-size        Split  output to several files.  Values  should be  written
+                    using one of the following postfix: Kb,kib, mb,mib, gb,gib.
+--right-eye         Use base video stream for right eye. Used for 3DBD only.
+--start-time        Timestamp of the first video frame. May be defined as 45Khz
+                    clock (just a number) or as time in format hh:mm:ss.zzz
+--mplsOffset        The number of the first MPLS file.  Used for  BD disk mode.
+--m2tsOffset        The number of the first M2TS file.  Used for  BD disk mode.
+--insertBlankPL     Add extra  short playlist.  Used for cropped video muxed to
+                    BD disk.
+--blankOffset       Blank playlist number.
+--label             Disk label for muxing to ISO file.
+--extra-iso-space   Allocate extra space  in 64K units  for ISO  disk  metadata
+                    (file and directory names). Normally, tsMuxeR allocate this
+                    space automatically. But if split condition generates a lot
+                    of small files, extra ISO space may be required to define.
+```
+
 ## Todo
 
 The following is a list of changes that will need to be made to the original source code and project in general:
 
-* swapping custom includes from libmediation to their standard library equivalents
-* the code uses my_htonl, my_ntohll, etc - these can be swapped for the standard library versions
 * the program doesn't support MPEG-4 ASP, even though MPEG-4 ASP is defined in the TS specification
 * no Opus audio support
 * [several](https://forum.doom9.org/showthread.php?p=1880216#post1880216) [muxing](https://forum.doom9.org/showthread.php?p=1881372#post1881372) [bugs](https://forum.doom9.org/showthread.php?p=1881509#post1881509) when muxing a HEVC/UHD stream - results in an out-of-sync stream
 * has issues with 24-bit DTS Express
 * issues with the 3D plane lists when there are mismatches between the MPLS and M2TS
-* a [bug](https://forum.doom9.org/showpost.php?p=1888650&postcount=74) with unsynchronised AV in HEVC files because the coded picture buffer is not large enough
-* a [bug](https://forum.doom9.org/showthread.php?p=1880216#post1880216) with UHD HEVC where the [wrong stream type is used](https://forum.doom9.org/showpost.php?p=1888746&postcount=75) 
 
 ## Contributing
 
@@ -90,347 +279,13 @@ We’ll take care of tagging your issue with the appropriated labels and answer 
 
 If you’re not familiar with open-source workflows or our set of technologies, do not hesitate to ask for help! We can mentor you or propose good first bugs (as labeled in our issues). Also welcome to add your name to Credits section of this document.
 
-### Submitting bugs
+## Submitting Bugs
 
 You can report issues directly on Github, that would be a really useful contribution given that we lack some user testing on the project. Please document as much as possible the steps to reproduce your problem (even better with screenshots).
 
-### Building
+## Building
 
-#### Docker (All Platforms)
-
-You can use our [Docker container](https://github.com/justdan96/tsmuxer_build) to build tsMuxer for your chosen platform. To build the GUI you will need to follow the instructions specifically for your platform.
-
-To create the builds using the Docker container, follow the steps below:
-
-1. Pull `justdan96/tsmuxer_build` from the Docker repository:
-```
-docker pull justdan96/tsmuxer_build
-```
-
-Or build `justdan96/tsmuxer_build` from source:
-```
-git clone https://github.com/justdan96/tsmuxer_build.git
-cd tsmuxer_build
-docker build -t justdan96/tsmuxer_build .
-```
-
-2. Browse to the tsMuxer repository and run one of the following commands:
-
-*Linux*
-```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_linux_docker.sh"
-```
-
-*Windows*
-```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_mxe_docker.sh"
-```
-
-*OSX*
-```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_osxcross_docker.sh"
-```
-
-The executable binary will be saved to the "\bin" folder.
-
-#### Linux
-
-For these examples we have successfully used Ubuntu 19 64-bit and Debian 10 64-bit. 
-
-First we have to install the pre-requisites. On Debian 10 you have to enable the "buster-backports" repo. Then on Debian or Ubuntu you can run the following to install all required packages for your chosen platform:
-
-Common:
-```
-sudo apt-get update
-sudo apt-get install build-essential \
-g++-multilib
-ninja
-
-# on Ubuntu:
-sudo apt-get install checkinstall
-
-# on Debian:
-sudo apt-get -t buster-backports install checkinstall
-```
-
-32-bit:
-```
-# add 32-bit architecture 
-sudo dpkg --add-architecture i386
-sudo apt-get update
-
-# download/install dependencies
-sudo apt-get install libc6-dev-i386 \
-sudo apt-get install libfreetype6-dev:i386
-```
-
-64-bit:
-```
-sudo apt-get update
-sudo apt-get install libc6-dev \
-libfreetype6-dev \
-zlib1g-dev \
-```
-
-If you also intend to build the GUI then you require:
-
-64-bit:
-```
-sudo apt-get install qt5-default \
-qt5-qmake \
-qtbase5-dev \
-qtdeclarative5-dev \
-qtmultimedia5-dev \
-libqt5multimediawidgets5 \
-libqt5multimedia5-plugins \
-libqt5multimedia5
-```
-
-With all the dependencies set up we can now actually compile the code.
-
-Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
-
-```
-# build the project
-./rebuild_linux.sh
-```
-
-Or run the following to build the GUI as well:
-
-```
-# build the project
-./rebuild_linux_with_gui.sh
-```
-
-Next run the below to create a DEB file:
-```
-# create lower case links, then create installable deb package and move it to $HOME
-cd ../bin
-cp ../build/tsMuxer/tsmuxer .
-cp ../build/tsMuxerGUI/tsmuxergui .
-ln -s tsMuxeR tsmuxer
-ln -s tsMuxerGUI tsmuxergui
-sudo checkinstall \
-    --pkgname=tsmuxer \
-    --pkgversion="1:$(./tsmuxer | \
-                      grep "tsMuxeR version" | \
-                      cut -f3 -d " " | \
-                      sed 's/.$//')-git-$(\
-                      git rev-parse --short HEAD)-$(\
-                      date --rfc-3339=date | sed 's/-//g')" \
-    --backup=no \
-    --deldoc=yes \
-    --delspec=yes \
-    --deldesc=yes \
-    --strip=yes \
-    --stripso=yes \
-    --addso=yes \
-    --fstrans=no \
-    --default cp -R * /usr/bin && \
-mv *.deb ~/
-cd $HOME
-```
-
-#### Windows (MXE on Linux)
-
-To compile tsMuxer and tsMuxerGUI for Windows using MXE on Linux you must follow the steps below on Ubuntu:
-
-```
-# setup pre-reqs
-sudo apt-get install -y software-properties-common
-sudo apt-get install -y apt-transport-https
-sudo apt-get install -y checkinstall
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276
-
-# add MXE repo
-sudo add-apt-repository -y 'deb https://mirror.mxe.cc/repos/apt stretch main'
-sudo apt-get update
-
-# install necessary MXE components for building tsmuxer
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-zlib
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-harfbuzz
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-freetype
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-cmake
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-ccache
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-autotools
-sudo apt-get install -y mxe-x86-64-pc-linux-gnu-autotools
-sudo apt-get install -y mxe-x86-64-pc-linux-gnu-ccache
-sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cc
-sudo apt-get install -y mxe-x86-64-pc-linux-gnu-cmake
-
-# manually fix some weird symlinks
-sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
-sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
-sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-g++
-sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/x86_64-w64-mingw32.static-gcc
-sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
-sudo rm /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
-sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-g++ /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/g++
-sudo ln -s /usr/lib/mxe/usr/bin/x86_64-w64-mingw32.static-gcc /usr/lib/mxe/usr/x86_64-pc-linux-gnu/bin/gcc
-```
-
-If you want to compile the GUI as well you also need to install the below (please note Qt5 takes up a LOT of disk space!):
-```
-sudo apt-get install -y mxe-x86-64-w64-mingw32.static-qt5
-```
-
-With all the dependencies set up we can now actually compile the code.
-
-Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
-
-```
-# build the project
-./rebuild_mxe.sh
-```
-
-Or run the following to build the GUI as well:
-
-```
-# build the project
-./rebuild_mxe_with_gui.sh
-```
-
-#### Windows (Msys2)
-
-To compile tsMuxer and tsMuxerGUI on Windows with Msys2, you must download and install [Msys2](https://www.msys2.org/). Once you have Msys2 fully configured, open an Msys2 prompt and run the following commands, depending on which build you require:
-
-Common:
-```
-pacman -Syu
-pacman -Sy --needed base-devel \
-flex \
-zlib-devel
-```
-
-32-bit:
-```
-pacman -Sy --needed mingw-w64-i686-toolchain \
-mingw-w64-i686-cmake \
-mingw-w64-i686-freetype \
-mingw-w64-i686-zlib
-```
-
-64-bit:
-```
-pacman -Sy --needed mingw-w64-x86_64-toolchain \
-mingw-w64-x86_64-cmake \
-mingw-w64-x86_64-freetype \
-mingw-w64-x86_64-zlib
-```
-
-If you intend to build the GUI as well you need to also install these, depending on your platform (please note Qt5 takes up a LOT of disk space!):
-
-32-bit:
-```
-pacman -Sy --needed mingw-w64-i686-qt5-static
-```
-
-64-bit:
-```
-pacman -Sy --needed mingw-w64-x86_64-qt5-static
-```
-
-Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
-
-```
-echo 'load(win32/windows_vulkan_sdk)' > $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
-echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
-```
-
-With that fixed, browse to the location of the tsMuxer repo and then run the following commands:
-
-```
-mkdir build
-cd build
-cmake ../ -G Ninja
-cmake . --build
-cp tsMuxer/tsmuxer.exe tsMuxerGUI/tsMuxeR.exe
-```
-
-This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
-
-#### MacOS (osxcross on Linux)
-
-To use osxcross on Ubuntu to compile for OSX, first run the following commands:
-
-```
-# setup pre-reqs
-sudo apt-get install -y clang
-sudo apt-get install -y patch lzma-dev libxml2-dev libssl-dev python curl
-```
-
-Next you have a choice - compile osxcross from source or use a prepared package. To compile osxcross from source:
-
-```
-# set up a new osxcross installation
-cd /tmp
-git clone https://github.com/tpoechtrager/osxcross.git
-cd osxcross
-curl -sLo tarballs/MacOSX10.10.sdk.tar.xz "https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/MacOSX10.10.sdk.tar.xz"
-
-export SDK_VERSION="10.10"
-export OSX_VERSION_MIN="10.6"
-UNATTENDED=1 ./build.sh
-
-rm -rf "target/SDK/MacOSX10.10.sdk/usr/share/man"
-
-# copy to permanent home as root
-sudo su -
-cp -r target /usr/lib/osxcross                                                                                    
-cp -r tools /usr/lib/osxcross/ 
-exit
-
-# remove temporary folder
-cd ..
-rm -rf osxcross
-```
-
-To install osxcross from a pre-compiled package for Ubuntu 19 x86_64:
-
-```
-# download the package to /tmp
-curl -sLo /tmp/osxcross-6acb50-20191025.tgz "https://s3.eu.cloud-object-storage.appdomain.cloud/justdan96-public/osxcross-6acb50-20191025.tgz"
-
-# extract to correct location
-sudo su -
-cd /tmp
-mkdir /usr/lib/osxcross
-tar -xzf osxcross-6acb50-20191025.tgz --strip-components=1 -C /usr/lib/osxcross
-exit
-
-# remove tar file
-rm -f osxcross-6acb50-20191025.tgz
-```
-
-Now to setup the tsMuxer build dependencies for osxcross:
-
-```
-# install freetype and zlib in root session with osxcross-macports, dependencies for tsMuxer build
-sudo su -
-export MACOSX_DEPLOYMENT_TARGET=10.10
-export PATH=/usr/lib/osxcross/bin:/usr/lib/osxcross/tools:$PATH
-/usr/lib/osxcross/bin/osxcross-conf
-/usr/lib/osxcross/bin/osxcross-macports
-/usr/lib/osxcross/bin/osxcross-macports install freetype
-/usr/lib/osxcross/bin/osxcross-macports install zlib
-exit
-```
-
-With all the dependencies set up we can now actually compile the code.
-
-Open the folder where the git repo is stored in a terminal and run the following to build just the command-line program:
-
-```
-# build the project
-./rebuild_osxcross.sh
-```
-
-Or run the following to build the GUI as well:
-
-```
-# build the project
-./rebuild_osxcross_with_gui.sh
-```
+For full details on building tsMuxer for your platform please see the document on [COMPILING](COMPILING.md).
 
 ## Testing
 
