@@ -8,7 +8,6 @@
 #include <fs/systemlog.h>
 #include "nalUnits.h"
 #include "math.h"
-#include <algorithm>
 
 const static double EPSILON = 5e-5;
 const static int64_t MAX_PULLDOWN_ASYNC = 100000000ll;
