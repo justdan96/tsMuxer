@@ -1338,7 +1338,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
 			setSplitSize(strToDouble(prefix.c_str())*coeff);
 			m_computeMuxStats = true;
 		}
-		else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--avchd") {
+		else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--blu-ray-v3" || paramPair[0] == "--avchd") {
 			m_bluRayMode = true;
             m_computeMuxStats = true;
 		}
