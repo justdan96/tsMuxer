@@ -4,6 +4,7 @@
 #include "abstractStreamReader.h"
 #include "limits.h"
 #include "vod_common.h"
+#include <algorithm>
 
 const static int TMP_BUFFER_SIZE = 1024*1024*8;
 

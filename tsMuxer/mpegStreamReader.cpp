@@ -8,7 +8,6 @@
 #include <fs/systemlog.h>
 #include "nalUnits.h"
 #include "math.h"
-#include <algorithm>
 
 const static double EPSILON = 5e-5;
 const static int64_t MAX_PULLDOWN_ASYNC = 100000000ll;
@@ -123,7 +122,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 			return NEED_MORE_DATA;
 	}
 
-	uint8_t* nextNal = NALUnit::findNALWithStartCode(std::min(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
+	uint8_t* nextNal = NALUnit::findNALWithStartCode((std::min)(m_curPos + 3,m_bufEnd), m_bufEnd, m_longCodesAllowed);
 	if (nextNal == m_bufEnd) {
 		storeBufferRest();
 		return NEED_MORE_DATA;
@@ -172,7 +171,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 			return 0; // return zero AV packet for new frame
 		}
 	}
-	uint8_t* findEnd = std::min(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
+	uint8_t* findEnd = (std::min)(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
 	uint8_t* nal = NALUnit::findNALWithStartCode(m_curPos + isNal, findEnd, m_longCodesAllowed);
 
 	if (nal == findEnd) 

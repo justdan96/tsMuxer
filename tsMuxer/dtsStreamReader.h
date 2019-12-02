@@ -2,6 +2,7 @@
 #define __DTS_STREAM_READER
 
 #include "simplePacketizerReader.h"
+#include <algorithm>
 
 class DTSStreamReader: public SimplePacketizerReader {
 public:
