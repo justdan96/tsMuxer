@@ -2553,6 +2553,8 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
         *video_format = interlaced ? 1 : 3;
     else if (isPal)
         *video_format = interlaced ? 2 : 7;
+    else if (width >= 2600)
+        *video_format = 8; // UHD
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6; // as 1920x1080
     else
