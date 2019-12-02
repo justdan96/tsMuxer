@@ -41,6 +41,7 @@ private:
     HevcVpsUnit* m_vps;
     HevcSpsUnit* m_sps;
     HevcPpsUnit* m_pps;
+    HevcSeiUnit* m_sei; // HDR Metadata
     bool m_firstFrame;
     
     int m_frameNum;
