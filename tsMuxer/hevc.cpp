@@ -833,15 +833,15 @@ int HevcSeiUnit::deserialize() {
 				nbyte = m_reader.getBits(8);
 				payloadSize += nbyte;
 			}
-			if (payloadType == 137) {
+			if (payloadType == 137) { // mastering_display_colour_volume
 				primariesGreen = m_reader.getBits(32);
 				primariesBlue = m_reader.getBits(32);
 				primariesRed = m_reader.getBits(32);
 				white_point = m_reader.getBits(32);
 				mastering_luminance = (m_reader.getBits(32)/10000) << 8 + m_reader.getBits(32);
 			}
-			else if (payloadType == 144)
-				maxCLL = m_reader.getBits(32);
+			else if (payloadType == 144) // content_light_level_info
+				maxCLL = m_reader.getBits(32); // maxCLL, maxFALL
 			else for (int i = 0; i < payloadSize; i++)
 				m_reader.skipBits(8);
 		} while (m_reader.showBits(8) != 0x80);
