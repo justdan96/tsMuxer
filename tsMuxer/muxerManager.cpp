@@ -334,7 +334,7 @@ void MuxerManager::parseMuxOpt(const string& opts)
         else if (paramPair[0] == "--extra-iso-space") {
             m_extraIsoBlocks = strToInt32(paramPair[1]);
         }
-        else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--avchd") {
+        else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--blu-ray-v3" || paramPair[0] == "--avchd") {
             m_bluRayMode = true;
         }
         else if (paramPair[0] == "--demux") {
