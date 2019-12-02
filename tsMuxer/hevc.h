@@ -169,6 +169,18 @@ public:
     int num_extra_slice_header_bits;
 };
 
+struct HevcSeiUnit: public HevcUnit // HDR Metadata
+{
+	HevcSeiUnit();
+	int deserialize();
+	int primariesGreen;
+	int primariesBlue;
+	int primariesRed;
+	int white_point;
+	int mastering_luminance;
+	int maxCLL;
+};
+
 struct HevcSliceHeader: public HevcUnit
 {
     HevcSliceHeader();
