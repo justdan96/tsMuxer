@@ -59,6 +59,24 @@ The workflow to automatically create pre-compiled binaries for Windows, Mac and 
 
 At the moment only the CLI is included, the GUI is not yet available.
 
+### Windows
+
+The ZIP file for Windows can just be unzipped and the executables can be used straight away - there are no dependencies.
+
+### Linux
+
+The ZIP file for Linux can just be unzipped and the executables can be used straight away. The CLI doesn't have any dependencies. The GUI does have dependencies, but issues with these can be avoided with AppImage. 
+
+### MacOS
+
+This ZIP file for MacOS can just be unzipped and the executables can be used after installing a couple of dependencies. To install those run the commands below in the Terminal:
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+brew install freetype
+brew install zlib
+```
+
 ## Usage
 
 ### GUI
