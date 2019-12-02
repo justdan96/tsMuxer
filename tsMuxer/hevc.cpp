@@ -807,6 +807,52 @@ int HevcPpsUnit::deserialize()
     }
 }
 
+// ----------------------- HevcSeiUnit ------------------------
+
+HevcSeiUnit::HevcSeiUnit():
+	primariesGreen(0), primariesBlue(0), primariesRed(0), white_point(0), mastering_luminance(0), maxCLL(0) { }
+
+int HevcSeiUnit::deserialize() {
+	int rez = HevcUnit::deserialize();
+	if (rez)
+		return rez;
+	try {
+		int payloadType;
+		int payloadSize;
+		int nbyte;
+		do {
+			payloadType = 0;
+			payloadSize = 0;
+			nbyte = 0xFF;
+			while (nbyte == 0xFF) {
+				nbyte = m_reader.getBits(8);
+				payloadType += nbyte;
+			}
+			nbyte = 0xFF;
+			while (nbyte == 0xFF) {
+				nbyte = m_reader.getBits(8);
+				payloadSize += nbyte;
+			}
+			if (payloadType == 137) {
+				primariesGreen = m_reader.getBits(32);
+				primariesBlue = m_reader.getBits(32);
+				primariesRed = m_reader.getBits(32);
+				white_point = m_reader.getBits(32);
+				mastering_luminance = (m_reader.getBits(32)/10000) << 8 + m_reader.getBits(32);
+			}
+			else if (payloadType == 144)
+				maxCLL = m_reader.getBits(32);
+			else for (int i = 0; i < payloadSize; i++)
+				m_reader.skipBits(8);
+		} while (m_reader.showBits(8) != 0x80);
+
+		return 0;
+	}
+	catch (VodCoreException & e) {
+		return NOT_ENOUGHT_BUFFER;
+	}
+}
+
 // -----------------------  HevcSliceHeader() -------------------------------------
 
 HevcSliceHeader::HevcSliceHeader():
