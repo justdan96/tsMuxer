@@ -12,6 +12,7 @@ HEVCStreamReader::HEVCStreamReader():
     m_vps(0),
     m_sps(0),
     m_pps(0),
+    m_sei(0), // HDR Metadata
     m_firstFrame(true),
     m_frameNum(0),
     m_fullPicOrder(0),
