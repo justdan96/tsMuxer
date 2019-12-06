@@ -1207,7 +1207,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
     m_nextFrameFound = false;
     m_nextFrameIdr = false;
 	m_pict_type = -1;
-	m_pict_type = std::max(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
+	m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
 	
     //if (firstSlice.orig_slice_type >= 5) // all other slice at this picture must be same type
 	//	return 0; // OK
