@@ -9,7 +9,7 @@
 
 #define override
 
-#ifdef WIN32
+#ifdef _WIN32
 #define strcasecmp stricmp
 #endif
  char* strnstr(const char *s1, const char *s2, size_t len);

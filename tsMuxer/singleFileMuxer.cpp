@@ -148,7 +148,7 @@ void SingleFileMuxer::openDstFile()
 	//if (!createDir(dstFileName, true))
 	//	THROW(ERR_CANT_CREATE_FILE, "Can't create output directory " << dstFileName);
 	int systemFlags = 0;
-#ifdef WIN32
+#ifdef _WIN32
 		if (m_owner->isAsyncMode())
 			systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif
@@ -198,7 +198,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
 		streamInfo->m_part++;
 		int systemFlags = 0;
 		streamInfo->m_bufLen = 0;
-#ifdef WIN32
+#ifdef _WIN32
 		if (m_owner->isAsyncMode())
 			systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif

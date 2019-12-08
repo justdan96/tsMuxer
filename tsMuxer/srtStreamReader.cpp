@@ -97,7 +97,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
 		m_short_R = my_htons(0x0d00);
 	}
 	else {
-#ifdef WIN32
+#ifdef _WIN32
 		m_srcFormat = UtfConverter::sfANSI;  // default value for win32
 #else
 		//m_srcFormat = UtfConverter::sfDefault;

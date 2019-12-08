@@ -17,7 +17,7 @@
 #include <fs/textfile.h>
 #include "iso_writer.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -1376,7 +1376,7 @@ void TSMuxer::openDstFile()
     m_muxFile = m_fileFactory ? m_fileFactory->createFile() : new File();
 
 	int systemFlags = 0;
-#ifdef WIN32
+#ifdef _WIN32
 	if (m_owner->isAsyncMode())
 		systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif

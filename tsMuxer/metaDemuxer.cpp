@@ -1160,7 +1160,7 @@ void METADemuxer::updateReport(bool checkTime)
 
 void METADemuxer::lineBack() 
 {
-#ifdef WIN32
+#ifdef _WIN32
 	HANDLE consoleOutput;
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE); 

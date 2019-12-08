@@ -1,6 +1,6 @@
-#if !defined(WIN32) || defined(WIN32_DEBUG_FREETYPE)
+#if !defined(_WIN32) || defined(WIN32_DEBUG_FREETYPE)
 
-#ifdef WIN32
+#ifdef _WIN32
 #pragma comment(lib, "../../freetype/lib/freetype.lib")
 #endif
 
@@ -15,13 +15,11 @@
 #include <map>
 #include <algorithm>
 
-#ifdef WIN32
+#if defined(_WIN32)
 const static char FONT_ROOT[] = "c:/WINDOWS/Fonts"; // for debug only
-#endif
-#ifdef LINUX
+#elif __linux__ == 1
 const static char FONT_ROOT[] = "/usr/share/fonts/";
-#endif
-#ifdef MAC
+#elif defined(__APPLE__) && defined(__MACH__)
 const static char FONT_ROOT[] = "/Library/Fonts/";
 #endif
 
