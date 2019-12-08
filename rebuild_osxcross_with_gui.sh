@@ -7,3 +7,35 @@ mkdir build
 cd build
 x86_64-apple-darwin14-cmake ../ -DCMAKE_TOOLCHAIN_FILE=/usr/lib/osxcross/toolchain.cmake -DTSMUXER_GUI=ON
 make
+cp tsMuxer/tsmuxer ../bin/tsMuxeR
+cp -r tsMuxerGUI/tsMuxerGUI.app ../bin/tsMuxerGUI.app
+cp tsMuxer/tsmuxer ../bin/tsMuxerGUI.app/Contents/MacOS/tsMuxeR
+cd ..
+
+# add a new relative path to the executable, to the libs folder we create
+x86_64-apple-darwin14-install_name_tool -add_rpath @executable_path/../libs ./bin/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI
+mkdir -p ./bin/tsMuxerGUI.app/Contents/libs/
+
+# paths to the libraries on this machine
+for LIB in `x86_64-apple-darwin14-otool -L ./bin/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI | awk '/@rpath/ {gsub(/@rpath\//, "", $1) ; print $1 }'`
+do
+	mkdir -p `dirname ./bin/tsMuxerGUI.app/Contents/libs/$LIB`
+	cp /usr/lib/osxcross/macports/pkgs/opt/local/lib/$LIB ./bin/tsMuxerGUI.app/Contents/libs/$LIB
+done
+
+# copy in the cocoa plugin manually
+mkdir -p ./bin/tsMuxerGUI.app/Contents/plugins/platforms/
+cp /usr/lib/osxcross/macports/pkgs/opt/local/plugins/platforms/libqcocoa.dylib ./bin/tsMuxerGUI.app/Contents/plugins/platforms/libqcocoa.dylib
+
+# paths to the libraries on this machine
+for LIB in `x86_64-apple-darwin14-otool -L ./bin/tsMuxerGUI.app/Contents/plugins/platforms/libqcocoa.dylib| awk '/@rpath/ {gsub(/@rpath\//, "", $1) ; print $1 }'`
+do
+	mkdir -p `dirname ./bin/tsMuxerGUI.app/Contents/libs/$LIB`
+	cp /usr/lib/osxcross/macports/pkgs/opt/local/lib/$LIB ./bin/tsMuxerGUI.app/Contents/libs/$LIB
+done
+
+# add the Qt configuration file, so the plugins can be found
+cat << EOF > ./bin/tsMuxerGUI.app/Contents/Resources/qt.conf
+[Paths]
+Plugins=plugins
+EOF
