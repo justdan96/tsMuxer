@@ -19,20 +19,20 @@ public:
 		m_longCodesAllowed = false;
 		m_prevFrameDelay = 0;
 	}
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 
-	virtual int getStreamWidth() const {return m_sequence.width;}
-	virtual int getStreamHeight()const {return m_sequence.height;}
-	virtual bool getInterlaced() {return !m_sequence.progressive_sequence;}
+	int getStreamWidth() const override {return m_sequence.width;}
+	int getStreamHeight()const override {return m_sequence.height;}
+	bool getInterlaced() override {return !m_sequence.progressive_sequence;}
 
 protected:
-	virtual const CodecInfo& getCodecInfo() {return mpeg2CodecInfo;};
-	virtual int intDecodeNAL(uint8_t* buff);
-	virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen);
-	virtual void updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen);
-	virtual double getStreamFPS(void * curNalUnit) { return m_sequence.getFrameRate();};
-	virtual bool isIFrame() {return m_lastIFrame;}
+	const CodecInfo& getCodecInfo() override {return mpeg2CodecInfo;};
+	int intDecodeNAL(uint8_t* buff) override;
+	void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
+	void updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
+	double getStreamFPS(void * curNalUnit) override { return m_sequence.getFrameRate();};
+	bool isIFrame() override {return m_lastIFrame;}
 private:
 	bool m_streamMsgPrinted;
 	int m_lastRef;

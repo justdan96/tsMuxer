@@ -16,13 +16,13 @@ class TSMuxer: public AbstractMuxer
     typedef AbstractMuxer base_class;
 public:
 	TSMuxer(MuxerManager* owner);
-	~TSMuxer();
-	virtual void intAddStream(const std::string& streamName,
+	~TSMuxer() override;
+	void intAddStream(const std::string& streamName,
 		                      const std::string& codecName, int streamIndex, 
  		                      const std::map<std::string, std::string>& params,
 							  AbstractStreamReader* codecReader) override;
-	virtual bool doFlush() override;
-	virtual bool close();
+	bool doFlush() override;
+	bool close() override;
 	
 	int getVBVLength() { return m_vbvLen / 90; }
 	void setNewStyleAudioPES(bool val) {m_useNewStyleAudioPES = val;}
@@ -32,7 +32,7 @@ public:
 	void setPCROnVideoPID(bool val) {m_pcrOnVideo = val;}
 	void setMaxBitrate(int val) {m_cbrBitrate = val;}
 	void setMinBitrate(int val) {m_minBitrate = val;}
-	virtual void openDstFile() override;
+	void openDstFile() override;
 	void setVBVBufferLen(int value);
 	const PIDListMap& getPidList() const {return m_pmt.pidList;}
 	std::vector<int64_t> getFirstPts();
@@ -42,9 +42,9 @@ public:
     int splitFileCnt() const { return m_fileNames.size(); }
 	void setSplitDuration(uint64_t value) {m_splitDuration = value;}
 	void setSplitSize(uint64_t value) {m_splitSize = value;}
-	virtual void parseMuxOpt(const std::string& opts) override;
+	void parseMuxOpt(const std::string& opts) override;
 
-    virtual void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
+    void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
     std::string getFileNameByIdx(int idx);
     int getFirstFileNum() const;
     bool isInterleaveMode() const;
@@ -54,7 +54,7 @@ public:
 
     void setPtsOffset(int64_t value);
 protected:
-    virtual bool muxPacket(AVPacket& avPacket);
+    bool muxPacket(AVPacket& avPacket) override;
 	virtual void internalReset();
 	void setMuxFormat(const std::string& format);
 	bool isSplitPoint(const AVPacket& avPacket);
@@ -86,14 +86,14 @@ private:
     }
     void writePATPMT(int64_t pcr, bool force = false);
     void writePCR(uint64_t newPCR);
-    virtual std::string getNextName(const std::string curName) override;
+    std::string getNextName(const std::string curName) override;
     void writeEmptyPacketWithPCRTest(int64_t pcrVal);
     bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited);
     int writeOutFile(uint8_t* buffer, int len);
 
     void joinToMasterFile() override;
-    virtual void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;
-    virtual void setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock) override;
+    void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;
+    void setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock) override;
 
     AbstractOutputStream* getDstFile() { return m_muxFile; }
     void flushTSBuffer();
@@ -201,7 +201,7 @@ private:
 class TSMuxerFactory: public AbstractMuxerFactory
 {
 public:
-    virtual AbstractMuxer* newInstance(MuxerManager* owner) const override { return new TSMuxer(owner); }
+    AbstractMuxer* newInstance(MuxerManager* owner) const override { return new TSMuxer(owner); }
 };
 
 #endif

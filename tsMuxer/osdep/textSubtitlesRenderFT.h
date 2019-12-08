@@ -16,14 +16,14 @@ class TextSubtitlesRenderFT : public TextSubtitlesRender
 {
 public:
 	TextSubtitlesRenderFT();
-	virtual ~TextSubtitlesRenderFT();
-	virtual void setRenderSize(int width, int height);
-	virtual void drawText(const std::wstring& text, RECT* rect);
-	virtual void setFont(const Font& font);
-	virtual void getTextSize(const std::wstring& text, SIZE* mSize);
-	virtual int getLineSpacing() override;
-    virtual int getBaseline() override;
-	virtual void flushRasterBuffer();
+	~TextSubtitlesRenderFT() override;
+	void setRenderSize(int width, int height) override;
+	void drawText(const std::wstring& text, RECT* rect) override;
+	void setFont(const Font& font) override;
+	void getTextSize(const std::wstring& text, SIZE* mSize) override;
+	int getLineSpacing() override;
+    int getBaseline() override;
+	void flushRasterBuffer() override;
 private:
 	static FT_Library library; 
 	static std::map<std::string, std::string> m_fontNameToFile;

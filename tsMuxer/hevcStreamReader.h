@@ -10,24 +10,24 @@ class HEVCStreamReader: public MPEGStreamReader
 {
 public:
     HEVCStreamReader();
-    virtual ~HEVCStreamReader();
-    virtual int getTSDescriptor(uint8_t* dstBuff);
+    ~HEVCStreamReader() override;
+    int getTSDescriptor(uint8_t* dstBuff) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
-    virtual bool needSPSForSplit() const override { return false; }
+    bool needSPSForSplit() const override { return false; }
 protected:
-    virtual const CodecInfo& getCodecInfo() override {return hevcCodecInfo;};
+    const CodecInfo& getCodecInfo() override {return hevcCodecInfo;};
     virtual int intDecodeNAL(uint8_t* buff) override;
 
-    virtual double getStreamFPS(void * curNalUnit) override;
-    virtual int getStreamWidth() const  override;
-    virtual int getStreamHeight() const  override;
-    virtual bool getInterlaced()  override {return false;}
-    virtual bool isIFrame() {return m_lastIFrame;}
+    double getStreamFPS(void * curNalUnit) override;
+    int getStreamWidth() const  override;
+    int getStreamHeight() const  override;
+    bool getInterlaced()  override {return false;}
+    bool isIFrame() override {return m_lastIFrame;}
 
-    virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
-    virtual int getFrameDepth() override { return m_frameDepth; }
+    void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
+    int getFrameDepth() override { return m_frameDepth; }
     virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override;
-    virtual void onSplitEvent() { m_firstFileFrame = true; }
+    void onSplitEvent() override { m_firstFileFrame = true; }
 private:
     bool isSlice(int nalType) const;
     void incTimings();

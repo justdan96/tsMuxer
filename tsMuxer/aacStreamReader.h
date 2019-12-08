@@ -9,18 +9,18 @@ class AACStreamReader: public SimplePacketizerReader, public AACCodec {
 public:
 public:
 	AACStreamReader(): SimplePacketizerReader() {};
-	virtual int getTSDescriptor(uint8_t* dstBuff) {return 0;}
-	virtual int getFreq() {return m_sample_rate;}
-	virtual int getChannels() {return m_channels;}
+	int getTSDescriptor(uint8_t* dstBuff) override {return 0;}
+	int getFreq() override {return m_sample_rate;}
+	int getChannels() override {return m_channels;}
 protected:
-	virtual unsigned getHeaderLen();
-	virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes);
-	virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end) {
+	unsigned getHeaderLen() override;
+	int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
+	uint8_t* findFrame(uint8_t* buff, uint8_t* end) override {
 		return findAacFrame(buff,end);
 	}
-	virtual double getFrameDurationNano() {return (INTERNAL_PTS_FREQ * m_samples) / (double) m_sample_rate;}
-	virtual const CodecInfo& getCodecInfo() {return aacCodecInfo;}
-	virtual const std::string getStreamInfo(); 
+	double getFrameDurationNano() override {return (INTERNAL_PTS_FREQ * m_samples) / (double) m_sample_rate;}
+	const CodecInfo& getCodecInfo() override {return aacCodecInfo;}
+	const std::string getStreamInfo() override; 
 };
 
 #endif

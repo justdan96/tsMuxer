@@ -16,7 +16,7 @@ public:
   void muxFinished(int exitCode, const QString& prefix);
   void setProcess(QProcess* proc);
 protected:
-  virtual void closeEvent (QCloseEvent * event );
+  void closeEvent (QCloseEvent * event ) override;
 private slots:
   void onProgressChanged();
   void onAbort();

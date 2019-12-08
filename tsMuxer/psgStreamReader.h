@@ -23,19 +23,19 @@ public:
 	};
 
 	PGSStreamReader();
-	~PGSStreamReader() {
+	~PGSStreamReader() override {
 		delete [] m_imgBuffer;
 		delete [] m_rgbBuffer;
 		delete [] m_scaledRgbBuffer;
 		delete [] m_renderedData;
 		delete m_render;
 	}
-	virtual int readPacket(AVPacket& avPacket);
-	virtual int flushPacket(AVPacket& avPacket);
-	virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false);
-	virtual uint64_t getProcessedSize();
+	int readPacket(AVPacket& avPacket) override;
+	int flushPacket(AVPacket& avPacket) override;
+	void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+	uint64_t getProcessedSize() override;
 	CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType, int containerStreamIndex); 
-	virtual const CodecInfo& getCodecInfo() {return pgsCodecInfo;}
+	const CodecInfo& getCodecInfo() override {return pgsCodecInfo;}
 	//void setDemuxMode(bool value) {m_demuxMode = value;}
 	static int calcFpsIndex(double fps);
 
@@ -56,7 +56,7 @@ public:
     int ssPGOffset;
 
 protected:
-	virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData);
+	int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override;
 private:
 	struct PGSRenderedBlock
 	{

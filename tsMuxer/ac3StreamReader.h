@@ -21,45 +21,45 @@ public:
         m_nextAc3Time = 0;
         m_thdFrameOffset = 0;
 	};
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	void setNewStyleAudioPES(bool value) {m_useNewStyleAudioPES = value;}
-	virtual void setTestMode(bool value) {AC3Codec::setTestMode(value);}
-	virtual int getFreq() {return AC3Codec::m_sample_rate;}
-	virtual int getAltFreq() {
+	void setTestMode(bool value) override {AC3Codec::setTestMode(value);}
+	int getFreq() override {return AC3Codec::m_sample_rate;}
+	int getAltFreq() override {
 		if (m_downconvertToAC3)
 			return AC3Codec::m_sample_rate;
 		else
 			return mh.subType == MLPHeaderInfo::stUnknown ? AC3Codec::m_sample_rate : mh.group1_samplerate;
 	}
-	virtual int getChannels() {return AC3Codec::m_channels;}
-    virtual bool isPriorityData(AVPacket* packet) override;
-    virtual bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
+	int getChannels() override {return AC3Codec::m_channels;}
+    bool isPriorityData(AVPacket* packet) override;
+    bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
 protected:
-	virtual unsigned getHeaderLen() {return AC3Codec::getHeaderLen();}
-	virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) {
+	unsigned getHeaderLen() override {return AC3Codec::getHeaderLen();}
+	int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override {
 		skipBeforeBytes = 0;
 		return AC3Codec::decodeFrame(buff, end, skipBytes);
 	}
-	virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end) {
+	uint8_t* findFrame(uint8_t* buff, uint8_t* end) override {
 		return AC3Codec::findFrame(buff, end);
 	}
-	virtual double getFrameDurationNano(){
+	double getFrameDurationNano() override{
 		return AC3Codec::getFrameDurationNano();
 	}
-	virtual const CodecInfo& getCodecInfo(){
+	const CodecInfo& getCodecInfo() override{
 		return AC3Codec::getCodecInfo();
 	}
-	virtual const std::string getStreamInfo() {
+	const std::string getStreamInfo() override {
 		return AC3Codec::getStreamInfo();
 	}
-	virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket);
+	void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
 
 
-    virtual int readPacket(AVPacket& avPacket) override;
-    virtual int flushPacket(AVPacket& avPacket) override;
+    int readPacket(AVPacket& avPacket) override;
+    int flushPacket(AVPacket& avPacket) override;
     int readPacketTHD(AVPacket& avPacket);
 
-    virtual bool needMPLSCorrection() const override;
+    bool needMPLSCorrection() const override;
 
 private:
 	bool m_useNewStyleAudioPES;

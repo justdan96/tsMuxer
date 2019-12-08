@@ -5,10 +5,6 @@
 #include <vector>
 #include <cstdint>
 
-//class Serializator;
-
-#define override
-
 #ifdef WIN32
 #define strcasecmp stricmp
 #endif

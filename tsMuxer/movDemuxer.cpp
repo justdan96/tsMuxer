@@ -162,7 +162,7 @@ public:
 	{
 		isAAC = false;
 	}
-	virtual void setPrivData(uint8_t* buff, int size) {
+	void setPrivData(uint8_t* buff, int size) override {
 		m_buff = buff;
 		m_size = size;	
 		m_aacRaw.m_channels = m_sc->channels;
@@ -174,7 +174,7 @@ public:
 		m_aacRaw.m_layer = 0;
 		m_aacRaw.m_rdb = 0;
 	}
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size)
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override
 	{
 		uint8_t* dst = pkt->data;
 		uint8_t* srcEnd = buff + size;
@@ -195,7 +195,7 @@ public:
 			buff += frameSize;
 		}
 	}
-	virtual int newBufferSize(uint8_t* buff, int size) 
+	int newBufferSize(uint8_t* buff, int size) override 
 	{
 		int frameCnt = 0;
 		int left = size;
@@ -231,7 +231,7 @@ public:
     {
 
     }
-	virtual void setPrivData(uint8_t* buff, int size) {
+	void setPrivData(uint8_t* buff, int size) override {
 		spsPpsList.clear();
 		if (size < 6)
 			THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
@@ -284,7 +284,7 @@ public:
 			THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size);
 	}
 
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size)
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override
 	{
 		uint8_t* dst = pkt->data;
 		if (!spsPpsList.empty()) {
@@ -314,7 +314,7 @@ public:
 		}
 	}
 
-	virtual int newBufferSize(uint8_t* buff, int size) 
+	int newBufferSize(uint8_t* buff, int size) override 
 	{
 		uint8_t* end = buff + size;
 		int nalCnt = 0;
@@ -350,7 +350,7 @@ public:
     {
     }
 
-    virtual void setPrivData(uint8_t* buff, int size) 
+    void setPrivData(uint8_t* buff, int size) override 
     {
         spsPpsList = hevc_extract_priv_data(buff, size, &nal_length_size);
     }
@@ -377,13 +377,13 @@ public:
 		return m_sc->stts_data[sttsPos].duration;
 	}
 
-	virtual void setPrivData(uint8_t* buff, int size) {
+	void setPrivData(uint8_t* buff, int size) override {
 		m_buff = buff;
 		m_size = size;
 		sttsCnt = 0;
 		sttsPos = -1;
 	}
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size)
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override
 	{
 		uint8_t* end = buff + size;
 		std::string prefix;
@@ -411,7 +411,7 @@ public:
 		m_timeOffset = endTime;
 	}
 
-	virtual int newBufferSize(uint8_t* buff, int size) 
+	int newBufferSize(uint8_t* buff, int size) override 
 	{
 		if (size <= 2)
 			return 0;

@@ -25,27 +25,27 @@ public:
         m_lastChannelRemapPos = 0;
 	}
 	void setNewStyleAudioPES(bool value) {m_useNewStyleAudioPES = value;}
-	virtual int getTSDescriptor(uint8_t* dstBuff);
-	virtual int getFreq() {return m_freq;}
-	virtual int getChannels() {return m_channels;}
+	int getTSDescriptor(uint8_t* dstBuff) override;
+	int getFreq() override {return m_freq;}
+	int getChannels() override {return m_channels;}
 	//void setDemuxMode(bool value) {m_demuxMode = value;}
 	void setFirstFrame(bool value) {m_firstFrame = value;}
-	virtual bool beforeFileCloseEvent(File& file);
+	bool beforeFileCloseEvent(File& file) override;
     void setHeadersType(LPCMHeaderType value);
 protected:
-	virtual unsigned getHeaderLen() {return 4;}
-	virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes,int& skipBeforeBytes);
-	virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end);
-	virtual double getFrameDurationNano();
-    virtual const CodecInfo& getCodecInfo();
-	virtual const std::string getStreamInfo();
-	void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket);
-	virtual void setTestMode(bool value) {m_testMode = value;}
-	virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData);
-	virtual int readPacket(AVPacket& avPacket);
-	virtual int flushPacket(AVPacket& avPacket);
-	virtual void onSplitEvent() {m_firstFrame = true;}
-    virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false);
+	unsigned getHeaderLen() override {return 4;}
+	int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes,int& skipBeforeBytes) override;
+	uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
+	double getFrameDurationNano() override;
+    const CodecInfo& getCodecInfo() override;
+	const std::string getStreamInfo() override;
+	void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
+	void setTestMode(bool value) override {m_testMode = value;}
+	int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override;
+	int readPacket(AVPacket& avPacket) override;
+	int flushPacket(AVPacket& avPacket) override;
+	void onSplitEvent() override {m_firstFrame = true;}
+    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
 private:
 	LPCMHeaderType m_headerType;
 	bool m_useNewStyleAudioPES;

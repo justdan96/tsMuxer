@@ -75,7 +75,7 @@ public:
 	uint8_t* m_data_buffer;
 	virtual bool addRawData(uint8_t* buffer, int len,  bool headerIncluded, bool isHeader);
 	MPEGRawDataHeader(int maxBufferLen);
-	~MPEGRawDataHeader();
+	~MPEGRawDataHeader() override;
 	virtual uint32_t serialize(uint8_t* buffer);
 	uint32_t getDataBufferLen() {return m_data_buffer_len;}
 	void clearRawBuffer(){
@@ -132,7 +132,7 @@ public:
 	int pan_scan_width;
 	int pan_scan_height;
 	MPEGSequenceHeader(int bufferSize);
-	~MPEGSequenceHeader() {};
+	~MPEGSequenceHeader() override {};
 	uint8_t* deserialize(uint8_t* buf, int buf_size);
 	uint8_t* deserializeExtension(BitStreamReader& bitContext);
 	uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
@@ -218,18 +218,18 @@ public:
 
 	// methods
 	MPEGPictureHeader(int bufferSize);
-	~MPEGPictureHeader() {};
+	~MPEGPictureHeader() override {};
 
 	uint8_t* deserialize(uint8_t* buf, int buf_size);
 	uint8_t* deserializeCodingExtension(BitStreamReader& bitContext);
 	uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
 
-	uint32_t serialize(uint8_t* buffer);
+	uint32_t serialize(uint8_t* buffer) override;
 	uint32_t getPictureSize();
 	void setTempRef(uint32_t number);
 	void setVbvDelay(uint16_t val);
 
-	bool addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader);
+	bool addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader) override;
 	void buildHeader();
 	void buildCodingExtension();
 	const char* getPictTypeStr() const {

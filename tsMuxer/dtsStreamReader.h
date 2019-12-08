@@ -33,23 +33,23 @@ public:
         m_dtsEsChannels = 0;
         m_testMode = false;
 	};
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	void setDownconvertToDTS(bool value) {m_downconvertToDTS = value;}
 	bool getDownconvertToDTS() {return m_downconvertToDTS;}
 	DTSHD_SUBTYPE getDTSHDMode() {return m_hdType;}
 	void setNewStyleAudioPES(bool value) {m_useNewStyleAudioPES = value;}
-	virtual int getFreq() {return hd_pi_sample_rate ? hd_pi_sample_rate : pi_sample_rate;}
-	virtual int getChannels() {return hd_pi_channels ? hd_pi_channels : pi_channels;}
-    virtual bool isPriorityData(AVPacket* packet) override;
-    virtual bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
-    virtual void setTestMode(bool value) override {m_testMode = value;}
+	int getFreq() override {return hd_pi_sample_rate ? hd_pi_sample_rate : pi_sample_rate;}
+	int getChannels() override {return hd_pi_channels ? hd_pi_channels : pi_channels;}
+    bool isPriorityData(AVPacket* packet) override;
+    bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
+    void setTestMode(bool value) override {m_testMode = value;}
 protected:
-	virtual unsigned getHeaderLen() {return DTS_HEADER_SIZE;}; 
-	virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes); 
-	virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end); 
-	virtual double getFrameDurationNano(); 
+	unsigned getHeaderLen() override {return DTS_HEADER_SIZE;}; 
+	int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override; 
+	uint8_t* findFrame(uint8_t* buff, uint8_t* end) override; 
+	double getFrameDurationNano() override; 
 	//virtual bool isSubFrame() {return m_state == stDecodeHD2;} 
-	virtual const CodecInfo& getCodecInfo() 
+	const CodecInfo& getCodecInfo() override 
 	{
         if (m_dts_hd_mode) {
             if (m_hdType == DTS_SUBTYPE_EXPRESS)
@@ -60,9 +60,9 @@ protected:
 		else
 			return dtsCodecInfo;
 	}
-	virtual const std::string getStreamInfo(); 
-    virtual bool needSkipFrame(const AVPacket& packet) override;
-	virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket);
+	const std::string getStreamInfo() override;
+    bool needSkipFrame(const AVPacket& packet) override;
+	void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
 private:
 	enum DTSHD_SUBTYPE m_hdType;
 	enum DTSDecodeState {stDecodeDTS, stDecodeHD, stDecodeHD2};

@@ -15,7 +15,7 @@ class BlurayHelper: public FileFactory
 {
 public:
     BlurayHelper();
-    ~BlurayHelper();
+    ~BlurayHelper() override;
 
     bool open(const std::string& dst, DiskType dt, int64_t diskSize = 0, int extraISOBlocks = 0);
     bool createBluRayDirs();
@@ -33,8 +33,8 @@ public:
     void close();
     // file factory interface
 
-    virtual AbstractOutputStream* createFile() override;
-    virtual bool isVirtualFS() const override;
+    AbstractOutputStream* createFile() override;
+    bool isVirtualFS() const override;
     void setVolumeLabel(const std::string& label);
 private:
     std::string m_dstPath;
