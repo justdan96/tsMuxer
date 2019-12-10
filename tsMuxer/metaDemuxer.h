@@ -117,18 +117,18 @@ public:
 		m_discardedSize = 0;
 		m_terminated = false;
 	}
-	virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0);
-	virtual void notify(uint32_t readerID, uint32_t dataReaded) {return;}
-	virtual uint32_t createReader(int readBuffOffset = 0);
-	virtual void deleteReader(uint32_t readerID);
-	virtual bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0);
+	uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
+	void notify(uint32_t readerID, uint32_t dataReaded) override {return;}
+	uint32_t createReader(int readBuffOffset = 0) override;
+	void deleteReader(uint32_t readerID) override;
+	bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
 	void setFileIterator(const char* streamName, FileNameIterator* itr);
 	void resetDelayedMark();
 	int64_t getDiscardedSize() {
 		return m_discardedSize;
 	};
 
-    virtual bool gotoByte(uint32_t readerID, uint64_t seekDist)  { return false; }
+    bool gotoByte(uint32_t readerID, uint64_t seekDist) override  { return false; }
 	void terminate();
 	void openAllStream();
 	std::map<std::string, DemuxerData> m_demuxers;
@@ -158,18 +158,18 @@ class METADemuxer: public AbstractDemuxer
 public:
 	//METADemuxer(const BufferedReaderManager& readManager, const char* streamName);
 	METADemuxer(const BufferedReaderManager& readManager);
-	virtual ~METADemuxer();
+	~METADemuxer() override;
 	//virtual void initStream();
 	virtual int readPacket(AVPacket& avPacket);
-	virtual void readClose();
-	virtual uint64_t getDemuxedSize();
+	void readClose() override;
+	uint64_t getDemuxedSize() override;
 	int addStream(const std::string codec, const std::string& codecStreamName, 
 			       const std::map<std::string,std::string>& addParams);
-	virtual void openFile(const std::string& streamName);
+	void openFile(const std::string& streamName) override;
 	const std::vector<StreamInfo>& getStreamInfo() {return m_codecInfo;}
 	static DetectStreamRez DetectStreamReader(BufferedReaderManager& readManager, const std::string& fileName, bool calcDuration);
 	std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
-	virtual int getLastReadRez() {return m_lastReadRez;}
+	int getLastReadRez() override {return m_lastReadRez;}
     int64_t totalSize() const { return m_totalSize; }
     std::string mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum);
     std::string mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum);

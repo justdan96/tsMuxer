@@ -9,17 +9,17 @@ class MatroskaDemuxer: public IOContextDemuxer
 {
 public:
 	MatroskaDemuxer(const BufferedReaderManager& readManager);
-	virtual ~MatroskaDemuxer() {readClose();}
-	void openFile(const std::string& streamName);
+	~MatroskaDemuxer() override {readClose();}
+	void openFile(const std::string& streamName) override;
 	virtual int readPacket(AVPacket& avPacket); // not implemented
-	virtual void readClose();
-	virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize);
-	virtual void getTrackList(std::map<uint32_t,TrackInfo>& trackList);
-	virtual std::vector<AVChapter> getChapters();
+	void readClose() override;
+	int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
+	void getTrackList(std::map<uint32_t,TrackInfo>& trackList) override;
+	std::vector<AVChapter> getChapters() override;
 
-    virtual bool isPidFilterSupported() const { return true; }
+    bool isPidFilterSupported() const override { return true; }
 
-    virtual int64_t getFileDurationNano() const override { return fileDuration; }
+    int64_t getFileDurationNano() const override { return fileDuration; }
 private:
 	typedef Track MatroskaTrack;
 	typedef IOContextTrackType MatroskaTrackType;

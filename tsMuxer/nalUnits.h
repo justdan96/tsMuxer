@@ -103,8 +103,8 @@ public:
 	const static int PCT_I_SI_P_SP_B_FRAMES = 7;
 	int primary_pic_type;
 	NALDelimiter(): NALUnit(nuDelimiter) {}
-	int deserialize(uint8_t* buffer, uint8_t* end);
-	int serialize(uint8_t* dstBuffer);
+	int deserialize(uint8_t* buffer, uint8_t* end) override;
+	int serialize(uint8_t* dstBuffer) override;
 };
 
 class PPSUnit: public NALUnit 
@@ -141,7 +141,7 @@ public:
     */
 
 	PPSUnit(): NALUnit(), m_ready(false) {}
-	virtual ~PPSUnit() {}
+	~PPSUnit() override {}
 	bool isReady() {return m_ready;}
 	int deserialize();
 	// duplicate PPS and change ppsID and cabac parameter for new PPS
@@ -257,7 +257,7 @@ public:
 
 
 	SPSUnit();
-	virtual ~SPSUnit() {
+	~SPSUnit() override {
 	}
 	bool isReady() {return m_ready;}
 	int deserialize();
@@ -286,7 +286,7 @@ class SEIUnit: public NALUnit
 {
 public:
 	SEIUnit(): NALUnit(), pic_struct(0), m_cpb_removal_delay_baseaddr(0), m_cpb_removal_delay_bitpos(0), number_of_offset_sequences(-1), metadataPtsOffset(0), m_mvcHeaderLen(0), m_mvcHeaderStart(0) {}
-	virtual ~SEIUnit() {}
+	~SEIUnit() override {}
 	void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
 
     void serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader);
@@ -369,7 +369,7 @@ public:
     int anchor_pic_flag;
 
 	SliceUnit();
-	virtual ~SliceUnit() {
+	~SliceUnit() override {
 		;
 	}
 	int deserialize(uint8_t* buffer, uint8_t* end, 

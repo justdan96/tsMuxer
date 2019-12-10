@@ -32,7 +32,7 @@ public:
 		m_streamAR = m_ar = AR_KEEP_DEFAULT; 
         m_spsPpsFound = false;
 	}
-	virtual ~MPEGStreamReader() {delete [] m_tmpBuffer;}
+	~MPEGStreamReader() override {delete [] m_tmpBuffer;}
 	void setFPS(double fps) {
 		m_fps = fps;
 		if (fps > 0)
@@ -48,10 +48,10 @@ public:
 		return m_streamAR;
 	}
 	void setAspectRatio(VideoAspectRatio ar) {m_ar = ar;}
-	virtual uint64_t getProcessedSize();
-	virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false);
-	virtual int readPacket(AVPacket& avPacket);
-	virtual int flushPacket(AVPacket& avPacket);
+	uint64_t getProcessedSize() override;
+	void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+	int readPacket(AVPacket& avPacket) override;
+	int flushPacket(AVPacket& avPacket) override;
 	virtual int getStreamWidth() const = 0;
 	virtual int getStreamHeight() const = 0;
 	virtual bool getInterlaced() = 0;

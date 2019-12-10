@@ -14,16 +14,16 @@ class MovDemuxer: public IOContextDemuxer
 {
 public:
 	MovDemuxer(const BufferedReaderManager& readManager);
-	virtual ~MovDemuxer() {readClose();}
-	void openFile(const std::string& streamName);
-	virtual void readClose();
-	virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize);
-	virtual void getTrackList(std::map<uint32_t,TrackInfo>& trackList);
-	virtual double getTrackFps(uint32_t trackId);
+	~MovDemuxer() override {readClose();}
+	void openFile(const std::string& streamName) override;
+	void readClose() override;
+	int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
+	void getTrackList(std::map<uint32_t,TrackInfo>& trackList) override;
+	double getTrackFps(uint32_t trackId) override;
     virtual int readPacket(AVPacket &) {return 0;}
-    virtual void setFileIterator(FileNameIterator* itr) override;
-    virtual bool isPidFilterSupported() const { return true; }
-    virtual int64_t getFileDurationNano() const override;
+    void setFileIterator(FileNameIterator* itr) override;
+    bool isPidFilterSupported() const override { return true; }
+    int64_t getFileDurationNano() const override;
 private:
 	struct MOVParseTableEntry;
 	struct MOVAtom

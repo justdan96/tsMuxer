@@ -38,16 +38,16 @@ class CombinedH264Demuxer: public AbstractDemuxer, public CombinedH264Reader
 {
 public:
     CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName);
-    virtual ~CombinedH264Demuxer();
-    void openFile(const std::string& streamName);
-    virtual void readClose();
-    virtual uint64_t getDemuxedSize();
-    virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize);
-    virtual void getTrackList(std::map<uint32_t, TrackInfo>& trackList);
-    virtual int getLastReadRez() {return m_lastReadRez; };
-    virtual void setFileIterator(FileNameIterator* itr) override;
+    ~CombinedH264Demuxer() override;
+    void openFile(const std::string& streamName) override;
+    void readClose() override;
+    uint64_t getDemuxedSize() override;
+    int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
+    void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
+    int getLastReadRez() override {return m_lastReadRez; };
+    void setFileIterator(FileNameIterator* itr) override;
 
-    virtual bool isPidFilterSupported() const { return true; }
+    bool isPidFilterSupported() const override { return true; }
 private:
     const BufferedReaderManager& m_readManager;
     AbstractReader* m_bufferedReader;
@@ -60,8 +60,8 @@ class CombinedH264Filter: public SubTrackFilter, public CombinedH264Reader
 {
 public:
     CombinedH264Filter(int demuxedPID);
-    virtual ~CombinedH264Filter() {}
-    virtual int demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket) override;
+    ~CombinedH264Filter() override {}
+    int demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket) override;
 };
 
 

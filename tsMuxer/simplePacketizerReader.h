@@ -10,13 +10,13 @@ class SimplePacketizerReader: public AbstractStreamReader {
 public:
 	//static const int NOT_ENOUGHT_BUFFER = -10;
 	SimplePacketizerReader();
-	~SimplePacketizerReader() {
+	~SimplePacketizerReader() override {
 		//delete [] m_tmpBuffer;
 	}
-	virtual int readPacket(AVPacket& avPacket);
-	virtual int flushPacket(AVPacket& avPacket);
-	virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false);
-	virtual uint64_t getProcessedSize();
+	int readPacket(AVPacket& avPacket) override;
+	int flushPacket(AVPacket& avPacket) override;
+	void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+	uint64_t getProcessedSize() override;
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len, 
 		                               ContainerType containerType, 
 									   int containerDataType, 
