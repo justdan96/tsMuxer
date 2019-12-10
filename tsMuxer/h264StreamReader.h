@@ -3,6 +3,7 @@
 
 #include <map>
 #include <iostream>
+#include <algorithm>
 #include "avPacket.h"
 #include "mpegStreamReader.h"
 #include "nalUnits.h"

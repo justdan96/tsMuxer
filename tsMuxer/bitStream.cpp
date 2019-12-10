@@ -1,7 +1,7 @@
 #include "bitStream.h"
 
 #include <cstdint>
-
+                  
 int BitStream::m_maskInitialized = 0;
 unsigned BitStream::m_masks[INT_BIT + 1];
 

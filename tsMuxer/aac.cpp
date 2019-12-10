@@ -17,16 +17,16 @@ const int AACCodec::object_type[9] = {1, // 'AAC_MAIN' -> AAC Main
 								   19, // ER_LTP
 								   23, // LD
 								   27 //DRM_ER_LC
-                                  };  
+								  };
 */
 
 const int AACCodec::aac_sample_rates[16] = {
-    96000, 88200, 64000, 48000, 44100, 32000,
-    24000, 22050, 16000, 12000, 11025, 8000, 7350
+	96000, 88200, 64000, 48000, 44100, 32000,
+	24000, 22050, 16000, 12000, 11025, 8000, 7350
 };
 
 const int AACCodec::aac_channels[8] = {
-    0, 1, 2, 3, 4, 5, 6, 8
+	0, 1, 2, 3, 4, 5, 6, 8
 };
 
 uint8_t* AACCodec::findAacFrame(uint8_t* buffer, uint8_t* end)

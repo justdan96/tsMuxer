@@ -103,7 +103,7 @@ int PGSStreamReader::calcFpsIndex(double fps)
 	for (int i = 0; i < 16; i++)
 		if (fabs(pgs_frame_rates[i]-fps)<1e-4)
 			return i;
-	THROW(ERR_COMMON, "Non standart fps value do not supported for PGS streams");
+	THROW(ERR_COMMON, "Non standard fps value are not supported for PGS streams");
 }
 
 void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)

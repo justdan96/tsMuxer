@@ -4,6 +4,7 @@
 #include "iso_writer.h"
 #include "psgStreamReader.h"
 #include "tsPacket.h"
+#include "hevc.h"
 
 using namespace std;
 
@@ -42,8 +43,7 @@ uint8_t bdIndexData[] =  {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-    0x00, 0x00, 0x00, 0x01, 0x30, 0x30, 0x30, 0x30, 0x30, 0x01, 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    0x00, 0x00, 0x00, 0x01, 0x30, 0x30, 0x30, 0x30, 0x30, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 uint8_t bdMovieObjectData[] = 
@@ -153,6 +153,7 @@ bool BlurayHelper::createBluRayDirs()
 
 bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum, bool stereoMode) 
 {
+    uint8_t* emptyCommand;
     int fileSize = sizeof(bdIndexData);
     string prefix = m_isoWriter ? "" : m_dstPath;
     AbstractOutputStream* file;
@@ -170,17 +171,23 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
         bdMovieObjectData[5] = bdIndexData[5] = '2';
         fileSize = 0x78;
     }
-    else if (m_dt == UHD_BLURAY) {
-        bdMovieObjectData[5] = bdIndexData[5] = '3';
-        fileSize = 0x78;
-    }
-    else {
+	else if (m_dt == UHD_BLURAY) { 
+		bdMovieObjectData[5] = bdIndexData[5] = '3';
+		fileSize = 0x9C; // + 36-byte UHD Extension Data
+        bdIndexData[15] = 0x78;
+        emptyCommand = bdIndexData + 0x78;
+        memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
+                             "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
+                             "\x00\x00\x00\x08\x51\x00\x01\x00\x00\x00\x00\x00", 36);
+        bdIndexData[0x96] = (byte)*HDR10_metadata;
+	} 
+	else {
         bdMovieObjectData[5] = bdIndexData[5] = '1';
         bdIndexData[15] = 0x78;
     }
     bdIndexData[0x2c] = stereoMode ? 0x60 : 0; // set initial_output_mode_preference and SS_content_exist_flag
 
-    uint8_t* emptyCommand =  bdMovieObjectData + 78;
+    emptyCommand =  bdMovieObjectData + 78;
     if (usedBlackPL) {
         memcpy(emptyCommand,   "\x42\x82\x00\x00", 4);
         uint32_t blackPlNum = my_htonl(blankNum);
@@ -229,8 +236,8 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     string version_number;
     if (m_dt == DT_BLURAY)
         memcpy(&clpiParser.version_number, "0200", 5);
-    else if (m_dt == UHD_BLURAY)
-        memcpy(&clpiParser.version_number, "0300", 5);
+	else if (m_dt == UHD_BLURAY) 
+		memcpy(&clpiParser.version_number, "0300", 5); 
     else
         memcpy(&clpiParser.version_number, "0100", 5);
     clpiParser.clip_stream_type = 1; // AV stream
@@ -244,9 +251,9 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         if (m_dt == DT_BLURAY) {
             LTRACE(LT_INFO, 2, "Creating Blu-ray stream info and seek index");
         }
-        else if (m_dt == UHD_BLURAY) {
-            LTRACE(LT_INFO, 2, "Creating UHD Blu-ray stream info and seek index");
-        }
+		else if (m_dt == UHD_BLURAY) { 
+			LTRACE(LT_INFO, 2, "Creating UHD Blu-ray stream info and seek index"); 
+		} 
         else {
             LTRACE(LT_INFO, 2, "Creating AVCHD stream info and seek index");
         }
@@ -419,9 +426,9 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer,
     if (dt == DT_BLURAY) {
         LTRACE(LT_INFO, 2, "Creating Blu-ray playlist");
     }
-    else if (dt == UHD_BLURAY) {
-        LTRACE(LT_INFO, 2, "Creating UHD Blu-ray playlist");
-    }
+	else if (dt == UHD_BLURAY) { 
+		LTRACE(LT_INFO, 2, "Creating UHD Blu-ray playlist"); 
+	} 
     else {
         LTRACE(LT_INFO, 2, "Creating AVCHD playlist");
     }

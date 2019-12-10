@@ -41,6 +41,7 @@ private:
     HevcVpsUnit* m_vps;
     HevcSpsUnit* m_sps;
     HevcPpsUnit* m_pps;
+	HevcSeiUnit* m_sei;
     bool m_firstFrame;
     
     int m_frameNum;
@@ -55,6 +56,7 @@ private:
     MemoryBlock m_vpsBuffer;
     MemoryBlock m_spsBuffer;
     MemoryBlock m_ppsBuffer;
+    MemoryBlock m_seiBuffer;
     bool m_firstFileFrame;
     int m_vpsCounter;
     int m_vpsSizeDiff;

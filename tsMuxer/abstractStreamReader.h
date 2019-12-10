@@ -20,7 +20,7 @@ public:
 	enum ContainerType {ctNone, ctEVOB, ctVOB, ctM2TS, ctTS, ctMKV, ctMOV, ctSUP, ctLPCM, ctSRT, ctMultiH264, ctExternal}; 
 	const static int NEED_MORE_DATA = 1;
 	const static int INTERNAL_READ_ERROR = 2;
-	AbstractStreamReader():  BaseAbstractStreamReader(), m_flags(0), m_timeOffset(0), m_containerType(ctNone), m_demuxMode(false), m_secondary(false) {
+	AbstractStreamReader() : BaseAbstractStreamReader(), m_flags(0), m_timeOffset(0), m_containerType(ctNone), m_demuxMode(false), m_secondary(false) {
 	}
 	virtual ~AbstractStreamReader() {}
 	virtual uint64_t getProcessedSize() = 0;

@@ -5,7 +5,6 @@
 #include "math.h"
 #include "vodCoreException.h"
 #include "tsPacket.h"
-#include <algorithm>
 
 using namespace std;
 
@@ -333,7 +332,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 	if (needInsSpsPps)
 	{
         avPacket.flags |=  AVPacket::IS_SPS_PPS_IN_GOP;
-
+        
         // Why the check for 250 : unless we see the 2nd IDR frame, we can only see that the stream runs with open GOPs
         // (open GOPs with one IDR at start for the whole movie do happen). That's why there's also a check that there's a
         // SPS before for the first I-frame in the first GOP in a normal stream. There's nothing scary about that - we simply
@@ -1207,7 +1206,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
     m_nextFrameFound = false;
     m_nextFrameIdr = false;
 	m_pict_type = -1;
-	m_pict_type = std::max(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
+	m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
 	
     //if (firstSlice.orig_slice_type >= 5) // all other slice at this picture must be same type
 	//	return 0; // OK
@@ -1241,7 +1240,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
                     m_nextFrameIdr = slice.isIDR();
 					return 0; // next frame found
                 }
-				m_pict_type = std::max(m_pict_type, sliceTypeToPictType(slice.slice_type));
+				m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(slice.slice_type));
 				break;
             /*
             case nuDelimiter:

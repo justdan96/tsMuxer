@@ -45,7 +45,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     vector<StreamInfo>& ci = m_metaDemuxer.getCodecInfo();
     bool mvcTrackFirst = false;
     bool firstH264Track = true;
-    for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr) 
+	for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr) 
     {
         StreamInfo& si = *itr;
         H264StreamReader* h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
@@ -334,7 +334,7 @@ void MuxerManager::parseMuxOpt(const string& opts)
         else if (paramPair[0] == "--extra-iso-space") {
             m_extraIsoBlocks = strToInt32(paramPair[1]);
         }
-        else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--avchd") {
+        else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--blu-ray-v3" || paramPair[0] == "--avchd") {
             m_bluRayMode = true;
         }
         else if (paramPair[0] == "--demux") {

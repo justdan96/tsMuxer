@@ -2,16 +2,19 @@
 #include "nalUnits.h"
 #include <fs/systemlog.h>
 #include "vodCoreException.h"
+#include "hevc.h"
 
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
+int HDR10_metadata[7] = { 1,0,0,0,0,0,0 };
 
 HEVCStreamReader::HEVCStreamReader(): 
     MPEGStreamReader(),
     m_vps(0),
     m_sps(0),
     m_pps(0),
+	m_sei(0),
     m_firstFrame(true),
     m_frameNum(0),
     m_fullPicOrder(0),
@@ -32,6 +35,7 @@ HEVCStreamReader::~HEVCStreamReader()
     delete m_vps;
     delete m_sps;
     delete m_pps;
+    delete m_sei;
 }
 
 
@@ -74,6 +78,16 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                     return rez;
                 break;
             }
+            case NAL_SEI_PREFIX: {
+                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+                if (!m_sei)
+                    m_sei = new HevcSeiUnit();
+                m_sei->decodeBuffer(nal, nextNal);
+                if (m_sei->deserialize() != 0)
+                    return rez;
+                break;
+            }
+
         }
     }
 
@@ -288,6 +302,25 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     m_spsPpsFound = true;
                     storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
                     break;
+                case NAL_SEI_PREFIX:
+                    if (nextNal == m_bufEnd)
+                        return NOT_ENOUGHT_BUFFER;
+                    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
+
+                    if (!m_sei)
+                        m_sei = new HevcSeiUnit();
+                    m_sei->decodeBuffer(curPos, nextNalWithStartCode);
+                    rez = m_sei->deserialize();
+                    if (rez)
+                        return rez;
+                    storeBuffer(m_seiBuffer, curPos, nextNalWithStartCode);
+                    break;
+                case NAL_DV:
+                    if (!m_sei)
+                        m_sei = new HevcSeiUnit();
+                    if (curPos[1] == 1)
+                        m_sei->isDV = true;
+                    break;
             }
         }
         prevPos = curPos;
@@ -347,15 +380,15 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     }
 
     bool needInsSpsPps = m_firstFileFrame && !(avPacket.flags &  AVPacket::IS_SPS_PPS_IN_GOP);
-	if (needInsSpsPps)
-	{
+    if (needInsSpsPps)
+    {
         avPacket.flags |=  AVPacket::IS_SPS_PPS_IN_GOP;
 
         curPos = writeBuffer(m_vpsBuffer, curPos, dstEnd);
         curPos = writeBuffer(m_spsBuffer, curPos, dstEnd);
         curPos = writeBuffer(m_ppsBuffer, curPos, dstEnd);
-	}
+    }
 
     m_firstFileFrame = false;
-	return curPos - dstBuffer;
+    return curPos - dstBuffer;
 }

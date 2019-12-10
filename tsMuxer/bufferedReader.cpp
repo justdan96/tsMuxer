@@ -105,7 +105,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
 {
 	size_t rSize;
 	{
-		std::lock_guard<std::mutex> lock(m_readersMtx); 
+		std::lock_guard<std::mutex> lock(m_readersMtx);
 		std::map<uint32_t, ReaderData*>::iterator iterator = m_readers.find(readerID);
 		if (iterator == m_readers.end())
 			return;
@@ -277,7 +277,7 @@ void BufferedReader::thread_main()
 void BufferedReader::setFileIterator(FileNameIterator* itr, int readerID)
 {
     assert(readerID != -1);
-    std::lock_guard<std::mutex> lock(m_readersMtx);
+	std::lock_guard<std::mutex> lock(m_readersMtx);
     std::map<uint32_t, ReaderData*>::iterator reader = m_readers.find(readerID);
     if (reader != m_readers.end())
         reader->second->itr = itr;
