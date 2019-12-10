@@ -42,3 +42,6 @@ if test -f ./bin/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI; then
 Plugins=plugins
 EOF
 fi
+
+rm -rf build
+ls ./bin/tsMuxeR && ls ./bin/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI
