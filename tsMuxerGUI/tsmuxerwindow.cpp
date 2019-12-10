@@ -229,8 +229,8 @@ QString myUnquoteStr(const QString &val) { return unquoteStr(val); }
 QnCheckBoxedHeaderView::QnCheckBoxedHeaderView(QWidget *parent)
     : base_type(Qt::Horizontal, parent), m_checkState(Qt::Unchecked),
       m_checkColumnIndex(0) {
-  connect(this, SIGNAL(sectionClicked(int)), this,
-          SLOT(at_sectionClicked(int)));
+  connect(this, &QnCheckBoxedHeaderView::sectionClicked, this,
+          &QnCheckBoxedHeaderView::at_sectionClicked);
 }
 
 Qt::CheckState QnCheckBoxedHeaderView::checkState() const {
@@ -370,8 +370,8 @@ TsMuxerWindow::TsMuxerWindow()
   m_header->setVisible(true);
   m_header->setSectionsClickable(true);
 
-  connect(m_header, SIGNAL(checkStateChanged(Qt::CheckState)), this,
-          SLOT(at_sectionCheckstateChanged(Qt::CheckState)));
+  connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this,
+          &TsMuxerWindow::at_sectionCheckstateChanged);
 
   /////////////////////////////////////////////////////////////
   for (int i = 0; i <= 3600; i += 5 * 60)
@@ -391,171 +391,174 @@ TsMuxerWindow::TsMuxerWindow()
     ui.listViewFont->item(i, 1)->setFlags(ui.listViewFont->item(i, 0)->flags() &
                                           (~Qt::ItemIsEditable));
   }
-  connect(&opacityTimer, SIGNAL(timeout()), this, SLOT(onOpacityTimer()));
-  connect(ui.trackLV, SIGNAL(itemSelectionChanged()), this,
-          SLOT(trackLVItemSelectionChanged()));
-  connect(ui.trackLV, SIGNAL(itemChanged(QTableWidgetItem *)), this,
-          SLOT(trackLVItemChanged(QTableWidgetItem *)));
-  connect(ui.inputFilesLV, SIGNAL(currentRowChanged(int)), this,
-          SLOT(inputFilesLVChanged()));
-  connect(ui.addBtn, SIGNAL(clicked()), this, SLOT(onAddBtnClick()));
-  connect(ui.btnAppend, SIGNAL(clicked()), this, SLOT(onAppendButtonClick()));
-  connect(ui.removeFile, SIGNAL(clicked()), this, SLOT(onRemoveBtnClick()));
-  connect(ui.removeTrackBtn, SIGNAL(clicked()), this,
-          SLOT(onRemoveTrackButtonClick()));
-  connect(ui.moveupBtn, SIGNAL(clicked()), this, SLOT(onMoveUpButtonCLick()));
-  connect(ui.movedownBtn, SIGNAL(clicked()), this,
-          SLOT(onMoveDownButtonCLick()));
-  connect(ui.checkFPS, SIGNAL(stateChanged(int)), this,
-          SLOT(onVideoCheckBoxChanged(int)));
-  connect(ui.checkBoxLevel, SIGNAL(stateChanged(int)), this,
-          SLOT(onVideoCheckBoxChanged(int)));
-  connect(ui.comboBoxSEI, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onVideoCheckBoxChanged(int)));
-  connect(ui.checkBoxSecondaryVideo, SIGNAL(stateChanged(int)), this,
-          SLOT(onVideoCheckBoxChanged(int)));
-  connect(ui.checkBoxSPS, SIGNAL(stateChanged(int)), this,
-          SLOT(onVideoCheckBoxChanged(int)));
-  connect(ui.checkBoxRemovePulldown, SIGNAL(stateChanged(int)), this,
-          SLOT(onPulldownCheckBoxChanged(int)));
-  connect(ui.comboBoxFPS, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onVideoComboBoxChanged(int)));
-  connect(ui.comboBoxLevel, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onVideoComboBoxChanged(int)));
-  connect(ui.comboBoxAR, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onVideoComboBoxChanged(int)));
-  connect(ui.checkBoxKeepFps, SIGNAL(stateChanged(int)), this,
-          SLOT(onAudioSubtitlesParamsChanged()));
-  connect(ui.dtsDwnConvert, SIGNAL(stateChanged(int)), this,
-          SLOT(onAudioSubtitlesParamsChanged()));
-  connect(ui.secondaryCheckBox, SIGNAL(stateChanged(int)), this,
-          SLOT(onAudioSubtitlesParamsChanged()));
-  connect(ui.langComboBox, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onAudioSubtitlesParamsChanged()));
-  connect(ui.offsetsComboBox, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onAudioSubtitlesParamsChanged()));
-  connect(ui.comboBoxPipCorner, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.comboBoxPipSize, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.spinBoxPipOffsetH, SIGNAL(valueChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.spinBoxPipOffsetV, SIGNAL(valueChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.checkBoxSound, SIGNAL(stateChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.editDelay, SIGNAL(valueChanged(int)), this,
-          SLOT(onEditDelayChanged(int)));
-  connect(ui.muxTimeEdit, SIGNAL(timeChanged(QTime)), this,
-          SLOT(updateMuxTime1()));
-  connect(ui.muxTimeClock, SIGNAL(valueChanged(int)), this,
-          SLOT(updateMuxTime2()));
-  connect(ui.fontButton, SIGNAL(clicked()), this, SLOT(onFontBtnClicked()));
-  connect(ui.colorButton, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()));
-  connect(ui.checkBoxVBR, SIGNAL(clicked()), this,
-          SLOT(onGeneralCheckboxClicked()));
-  connect(ui.spinBoxMplsNum, SIGNAL(valueChanged(int)), this,
-          SLOT(onGeneralCheckboxClicked()));
-  connect(ui.spinBoxM2tsNum, SIGNAL(valueChanged(int)), this,
-          SLOT(onGeneralCheckboxClicked()));
-  connect(ui.checkBoxBlankPL, SIGNAL(clicked()), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.BlackplaylistCombo, SIGNAL(valueChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.checkBoxNewAudioPes, SIGNAL(clicked()), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.checkBoxCrop, SIGNAL(stateChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.checkBoxRVBR, SIGNAL(clicked()), this,
-          SLOT(onGeneralCheckboxClicked()));
-  connect(ui.checkBoxCBR, SIGNAL(clicked()), this,
-          SLOT(onGeneralCheckboxClicked()));
+  const auto comboBoxIndexChanged = QOverload<int>::of(&QComboBox::currentIndexChanged);
+  const auto spinBoxValueChanged = QOverload<int>::of(&QSpinBox::valueChanged);
+  const auto doubleSpinBoxValueChanged = QOverload<double>::of(&QDoubleSpinBox::valueChanged);
+  connect(&opacityTimer, &QTimer::timeout, this, &TsMuxerWindow::onOpacityTimer);
+  connect(ui.trackLV, &QTableWidget::itemSelectionChanged, this,
+          &TsMuxerWindow::trackLVItemSelectionChanged);
+  connect(ui.trackLV, &QTableWidget::itemChanged, this,
+          &TsMuxerWindow::trackLVItemChanged);
+  connect(ui.inputFilesLV, &QListWidget::currentRowChanged, this,
+          &TsMuxerWindow::inputFilesLVChanged);
+  connect(ui.addBtn, &QPushButton::clicked, this, &TsMuxerWindow::onAddBtnClick);
+  connect(ui.btnAppend, &QPushButton::clicked, this, &TsMuxerWindow::onAppendButtonClick);
+  connect(ui.removeFile, &QPushButton::clicked, this, &TsMuxerWindow::onRemoveBtnClick);
+  connect(ui.removeTrackBtn, &QPushButton::clicked, this,
+          &TsMuxerWindow::onRemoveTrackButtonClick);
+  connect(ui.moveupBtn, &QPushButton::clicked, this, &TsMuxerWindow::onMoveUpButtonCLick);
+  connect(ui.movedownBtn, &QPushButton::clicked, this,
+          &TsMuxerWindow::onMoveDownButtonCLick);
+  connect(ui.checkFPS, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onVideoCheckBoxChanged);
+  connect(ui.checkBoxLevel, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onVideoCheckBoxChanged);
+  connect(ui.comboBoxSEI, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onVideoCheckBoxChanged);
+  connect(ui.checkBoxSecondaryVideo, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onVideoCheckBoxChanged);
+  connect(ui.checkBoxSPS, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onVideoCheckBoxChanged);
+  connect(ui.checkBoxRemovePulldown, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onPulldownCheckBoxChanged);
+  connect(ui.comboBoxFPS, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onVideoComboBoxChanged);
+  connect(ui.comboBoxLevel, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onVideoComboBoxChanged);
+  connect(ui.comboBoxAR, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onVideoComboBoxChanged);
+  connect(ui.checkBoxKeepFps, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onAudioSubtitlesParamsChanged);
+  connect(ui.dtsDwnConvert, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onAudioSubtitlesParamsChanged);
+  connect(ui.secondaryCheckBox, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onAudioSubtitlesParamsChanged);
+  connect(ui.langComboBox, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onAudioSubtitlesParamsChanged);
+  connect(ui.offsetsComboBox, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onAudioSubtitlesParamsChanged);
+  connect(ui.comboBoxPipCorner, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.comboBoxPipSize, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.spinBoxPipOffsetH, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.spinBoxPipOffsetV, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.checkBoxSound, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.editDelay, spinBoxValueChanged, this,
+          &TsMuxerWindow::onEditDelayChanged);
+  connect(ui.muxTimeEdit, &QTimeEdit::timeChanged, this,
+          &TsMuxerWindow::updateMuxTime1);
+  connect(ui.muxTimeClock, spinBoxValueChanged, this,
+          &TsMuxerWindow::updateMuxTime2);
+  connect(ui.fontButton, &QPushButton::clicked, this, &TsMuxerWindow::onFontBtnClicked);
+  connect(ui.colorButton, &QPushButton::clicked, this, &TsMuxerWindow::onColorBtnClicked);
+  connect(ui.checkBoxVBR, &QPushButton::clicked, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
+  connect(ui.spinBoxMplsNum, spinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
+  connect(ui.spinBoxM2tsNum, spinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
+  connect(ui.checkBoxBlankPL, &QPushButton::clicked, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.BlackplaylistCombo, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.checkBoxNewAudioPes, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.checkBoxCrop, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.checkBoxRVBR, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
+  connect(ui.checkBoxCBR, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
   // connect(ui.checkBoxuseAsynIO,	   SIGNAL(stateChanged(int)), this,
   // SLOT(onSavedParamChanged()));
-  connect(ui.radioButtonStoreOutput, SIGNAL(clicked()), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.radioButtonOutoutInInput, SIGNAL(clicked()), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.editVBVLen, SIGNAL(valueChanged(int)), this,
-          SLOT(onGeneralSpinboxValueChanged()));
-  connect(ui.editMaxBitrate, SIGNAL(valueChanged(double)), this,
-          SLOT(onGeneralSpinboxValueChanged()));
-  connect(ui.editMinBitrate, SIGNAL(valueChanged(double)), this,
-          SLOT(onGeneralSpinboxValueChanged()));
-  connect(ui.editCBRBitrate, SIGNAL(valueChanged(double)), this,
-          SLOT(onGeneralSpinboxValueChanged()));
-  connect(ui.rightEyeCheckBox, SIGNAL(stateChanged(int)), this,
-          SLOT(updateMetaLines()));
-  connect(ui.radioButtonAutoChapter, SIGNAL(clicked()), this,
-          SLOT(onChapterParamsChanged()));
-  connect(ui.radioButtonNoChapters, SIGNAL(clicked()), this,
-          SLOT(onChapterParamsChanged()));
-  connect(ui.radioButtonCustomChapters, SIGNAL(clicked()), this,
-          SLOT(onChapterParamsChanged()));
-  connect(ui.spinEditChapterLen, SIGNAL(valueChanged(int)), this,
-          SLOT(onChapterParamsChanged()));
-  connect(ui.memoChapters, SIGNAL(textChanged()), this,
-          SLOT(onChapterParamsChanged()));
-  connect(ui.noSplit, SIGNAL(clicked()), this, SLOT(onSplitCutParamsChanged()));
-  connect(ui.splitByDuration, SIGNAL(clicked()), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.splitBySize, SIGNAL(clicked()), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.spinEditSplitDuration, SIGNAL(valueChanged(int)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.editSplitSize, SIGNAL(valueChanged(double)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.comboBoxMeasure, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.checkBoxCut, SIGNAL(stateChanged(int)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.cutStartTimeEdit, SIGNAL(timeChanged(QTime)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.cutEndTimeEdit, SIGNAL(timeChanged(QTime)), this,
-          SLOT(onSplitCutParamsChanged()));
-  connect(ui.spinEditBorder, SIGNAL(valueChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.comboBoxAnimation, SIGNAL(currentIndexChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.lineSpacing, SIGNAL(valueChanged(double)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.spinEditOffset, SIGNAL(valueChanged(int)), this,
-          SLOT(onSavedParamChanged()));
-  connect(ui.radioButtonTS, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonM2TS, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonBluRay, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonBluRayISO, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonBluRayUHD, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonBluRayISOUHD, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonAVCHD, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.radioButtonDemux, SIGNAL(clicked()), this,
-          SLOT(RadioButtonMuxClick()));
-  connect(ui.outFileName, SIGNAL(textChanged(const QString &)), this,
-          SLOT(outFileNameChanged()));
-  connect(ui.DiskLabelEdit, SIGNAL(textChanged(const QString &)), this,
-          SLOT(onGeneralCheckboxClicked()));
-  connect(ui.btnBrowse, SIGNAL(clicked()), this, SLOT(saveFileDialog()));
-  connect(ui.buttonMux, SIGNAL(clicked()), this, SLOT(startMuxing()));
-  connect(ui.buttonSaveMeta, SIGNAL(clicked()), this,
-          SLOT(saveMetaFileBtnClick()));
-  connect(ui.radioButtonOutoutInInput, SIGNAL(stateChanged(int)), this,
-          SLOT(onSavedParamChanged()));
+  connect(ui.radioButtonStoreOutput, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.radioButtonOutoutInInput, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.editVBVLen, spinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralSpinboxValueChanged);
+  connect(ui.editMaxBitrate, doubleSpinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralSpinboxValueChanged);
+  connect(ui.editMinBitrate, doubleSpinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralSpinboxValueChanged);
+  connect(ui.editCBRBitrate, doubleSpinBoxValueChanged, this,
+          &TsMuxerWindow::onGeneralSpinboxValueChanged);
+  connect(ui.rightEyeCheckBox, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::updateMetaLines);
+  connect(ui.radioButtonAutoChapter, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onChapterParamsChanged);
+  connect(ui.radioButtonNoChapters, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onChapterParamsChanged);
+  connect(ui.radioButtonCustomChapters, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onChapterParamsChanged);
+  connect(ui.spinEditChapterLen, spinBoxValueChanged, this,
+          &TsMuxerWindow::onChapterParamsChanged);
+  connect(ui.memoChapters, &QTextEdit::textChanged, this,
+          &TsMuxerWindow::onChapterParamsChanged);
+  connect(ui.noSplit, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.splitByDuration, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.splitBySize, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.spinEditSplitDuration, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.editSplitSize, doubleSpinBoxValueChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.comboBoxMeasure, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.checkBoxCut, &QCheckBox::stateChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.cutStartTimeEdit, &QTimeEdit::timeChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.cutEndTimeEdit, &QTimeEdit::timeChanged, this,
+          &TsMuxerWindow::onSplitCutParamsChanged);
+  connect(ui.spinEditBorder, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.comboBoxAnimation, comboBoxIndexChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.lineSpacing, doubleSpinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.spinEditOffset, spinBoxValueChanged, this,
+          &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.radioButtonTS, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonM2TS, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonBluRay, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonBluRayISO, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonBluRayUHD, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonBluRayISOUHD, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonAVCHD, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.radioButtonDemux, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::RadioButtonMuxClick);
+  connect(ui.outFileName, &QLineEdit::textChanged, this,
+          &TsMuxerWindow::outFileNameChanged);
+  connect(ui.DiskLabelEdit, &QLineEdit::textChanged, this,
+          &TsMuxerWindow::onGeneralCheckboxClicked);
+  connect(ui.btnBrowse, &QAbstractButton::clicked, this, &TsMuxerWindow::saveFileDialog);
+  connect(ui.buttonMux, &QAbstractButton::clicked, this, &TsMuxerWindow::startMuxing);
+  connect(ui.buttonSaveMeta, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::saveMetaFileBtnClick);
+  connect(ui.radioButtonOutoutInInput, &QAbstractButton::clicked, this,
+          &TsMuxerWindow::onSavedParamChanged);
 
-  connect(&proc, SIGNAL(readyReadStandardOutput()), this,
-          SLOT(readFromStdout()));
-  connect(&proc, SIGNAL(readyReadStandardError()), this,
-          SLOT(readFromStderr()));
-  connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this,
-          SLOT(onProcessFinished(int, QProcess::ExitStatus)));
-  connect(&proc, SIGNAL(error(QProcess::ProcessError)), this,
-          SLOT(onProcessError(QProcess::ProcessError)));
+  connect(&proc, &QProcess::readyReadStandardOutput, this,
+          &TsMuxerWindow::readFromStdout);
+  connect(&proc, &QProcess::readyReadStandardError, this,
+          &TsMuxerWindow::readFromStderr);
+  connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
+          &TsMuxerWindow::onProcessFinished);
+  connect(&proc, QOverload<QProcess::ProcessError>::of(&QProcess::error), this,
+          &TsMuxerWindow::onProcessError);
 
   ui.DiskLabel->setVisible(false);
   ui.DiskLabelEdit->setVisible(false);
@@ -889,9 +892,9 @@ void TsMuxerWindow::addFile() {
   // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
   // disconnect(this, SIGNAL(codecListReady()));
   disconnect();
-  connect(this, SIGNAL(tsMuxerSuccessFinished()), this, SLOT(getCodecInfo()));
-  connect(this, SIGNAL(codecListReady()), this, SLOT(continueAddFile()));
-  connect(this, SIGNAL(fileAdded()), this, SLOT(addFile()));
+  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::getCodecInfo);
+  connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAddFile);
+  connect(this, &TsMuxerWindow::fileAdded, this, &TsMuxerWindow::addFile);
   runInMuxMode = false;
   tsMuxerExecute(QStringList() << newFileName);
 }
@@ -2115,9 +2118,9 @@ void TsMuxerWindow::appendFile() {
   // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
   // disconnect(this, SIGNAL(codecListReady()));
   disconnect();
-  connect(this, SIGNAL(tsMuxerSuccessFinished()), this, SLOT(getCodecInfo()));
-  connect(this, SIGNAL(codecListReady()), this, SLOT(continueAppendFile()));
-  connect(this, SIGNAL(fileAppended()), this, SLOT(appendFile()));
+  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::getCodecInfo);
+  connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAppendFile);
+  connect(this, &TsMuxerWindow::fileAppended, this, &TsMuxerWindow::appendFile);
   runInMuxMode = false;
   tsMuxerExecute(QStringList() << newFileName);
 }

@@ -5,10 +5,10 @@ const static int MAX_ERRORS_CNT = 10000;
 MuxForm::MuxForm(QWidget *parent)
     : QDialog(parent, Qt::WindowMaximizeButtonHint), muxProcess(0) {
   ui.setupUi(this);
-  connect(ui.progressBar, SIGNAL(valueChanged(int)), this,
-          SLOT(onProgressChanged()));
-  connect(ui.abortBtn, SIGNAL(clicked()), this, SLOT(onAbort()));
-  connect(ui.okBtn, SIGNAL(clicked()), this, SLOT(close()));
+  connect(ui.progressBar, &QProgressBar::valueChanged, this,
+          &MuxForm::onProgressChanged);
+  connect(ui.abortBtn, &QPushButton::clicked, this, &MuxForm::onAbort);
+  connect(ui.okBtn, &QPushButton::clicked, this, &MuxForm::close);
 }
 
 void MuxForm::closeEvent(QCloseEvent *event) {
