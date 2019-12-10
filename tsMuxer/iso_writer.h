@@ -259,11 +259,11 @@ class ISOFile: public AbstractOutputStream
 {
 public:
     ISOFile(IsoWriter* owner): AbstractOutputStream(), m_owner(owner), m_entry(0) {}
-    virtual ~ISOFile() { close(); }
+    ~ISOFile() override { close(); }
 
-    virtual int write(const void* data, uint32_t len) override;
-    virtual bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0 ) override;
-    virtual void sync() override;
+    int write(const void* data, uint32_t len) override;
+    bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0 ) override;
+    void sync() override;
     virtual bool close() override;
     virtual int64_t size() const override;
     void setSubMode(bool value);

@@ -26,7 +26,7 @@ class BufferedFileWriter: public TerminatableThread
 {
 public:
 	BufferedFileWriter ();
-	~BufferedFileWriter();
+	~BufferedFileWriter() override;
 	void terminate();
 	inline int getQueueSize() {return (int) m_writeQueue.size();}
 	inline bool addWriterData(const WriterData& data)
@@ -42,7 +42,7 @@ public:
 	}
 	bool isQueueEmpty() { return m_nothingToExecute;}
 protected:
-	void thread_main();
+	void thread_main() override;
 private:
 	bool m_nothingToExecute;
 	int m_lastErrorCode;

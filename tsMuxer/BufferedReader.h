@@ -77,21 +77,21 @@ class BufferedReader: public AbstractReader, TerminatableThread
 public:
 	const static int UNKNOWN_READERID = 3;
 	BufferedReader ( uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
-	virtual ~BufferedReader();
-	uint32_t createReader(int readBuffOffset = 0);
-	virtual void deleteReader(uint32_t readerID); // unregister readed
-	virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0);
-	virtual void notify(uint32_t readerID, uint32_t dataReaded); // reader must call notificate when part of data handled
+	~BufferedReader() override;
+	uint32_t createReader(int readBuffOffset = 0) override;
+	void deleteReader(uint32_t readerID) override; // unregister readed
+	uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
+	void notify(uint32_t readerID, uint32_t dataReaded) override; // reader must call notificate when part of data handled
 	uint32_t getReaderCount();
 	void terminate();
 	void setFileIterator(FileNameIterator* itr, int readerID);
 	bool incSeek(uint32_t readerID, int64_t offset);
-    virtual bool gotoByte(uint32_t readerID, uint64_t seekDist)  { return false; }
+    bool gotoByte(uint32_t readerID, uint64_t seekDist) override  { return false; }
 
 	void setId(int value) { m_id = value; }
 protected:
     virtual ReaderData* intCreateReader() = 0;
-    void thread_main();
+    void thread_main() override;
 
 protected:
 	bool m_started;

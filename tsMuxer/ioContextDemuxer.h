@@ -79,10 +79,10 @@ class IOContextDemuxer: public AbstractDemuxer
 {
 public:
 	IOContextDemuxer(const BufferedReaderManager& readManager);
-    virtual ~IOContextDemuxer();
-	virtual void setFileIterator(FileNameIterator* itr) override;
-	virtual uint64_t getDemuxedSize();
-	virtual int getLastReadRez() {return m_lastReadRez;};
+    ~IOContextDemuxer() override;
+	void setFileIterator(FileNameIterator* itr) override;
+	uint64_t getDemuxedSize() override;
+	int getLastReadRez() override {return m_lastReadRez;};
 	int64_t getProcessedBytes() { return m_processedBytes; }
 protected:
 	const static int MAX_STREAMS = 64;

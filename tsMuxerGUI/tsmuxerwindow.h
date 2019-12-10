@@ -1,12 +1,6 @@
 #ifndef TSMUXER_H_
 #define TSMUXER_H_
 
-#if defined(__GNUC__) && ((__GNUC__ < 4) || \
-    (__GNUC__ == 4 && __GNUC_MINOR__ <= 6))
-#define override
-#endif
-
-
 #include <QtGui>
 #include <QFileDialog>
 #include <QProcess>
@@ -35,9 +29,9 @@ public:
 signals:
     void checkStateChanged(Qt::CheckState state);
 protected:
-    virtual void paintEvent(QPaintEvent *e) override;
-    virtual void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
-    virtual QSize sectionSizeFromContents(int logicalIndex) const override;
+    void paintEvent(QPaintEvent *e) override;
+    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
+    QSize sectionSizeFromContents(int logicalIndex) const override;
     private slots:
         void at_sectionClicked(int logicalIndex);
 private:
@@ -166,8 +160,8 @@ private slots:
     void updateMuxTime1();
     void updateMuxTime2();
 protected:
-    virtual void closeEvent(QCloseEvent * event ) override;
-    virtual bool eventFilter(QObject *obj, QEvent* event) override;
+    void closeEvent(QCloseEvent * event ) override;
+    bool eventFilter(QObject *obj, QEvent* event) override;
     void updateMaxOffsets();
     void updateCustomChapters();
 

@@ -61,7 +61,7 @@ public:
 		const char* fName, 
 		unsigned int oflag,
 		unsigned int systemDependentFlags = 0 ) /* throw ( std::runtime_error ) */;
-	virtual ~File();
+	~File() override;
 
 	//! Open the file
 	/*!
@@ -72,7 +72,7 @@ public:
 			In the unix implementation, this is the second parameter to the open function.
 		\return true if the file was opened successfully, false otherwise
 	*/
-	virtual bool open( 
+	bool open( 
 		const char* fName, 
 		unsigned int oflag,
 		unsigned int systemDependentFlags = 0 ) override;
@@ -80,7 +80,7 @@ public:
 	/*!
 		\return true, if the file was closed, false in case of an error
 	*/
-	virtual bool close() override;
+	bool close() override;
 
 	//! Read the file
 	/*!
@@ -92,12 +92,12 @@ public:
 	/*!
 		\return The number of bytes written into the file. -1 in case of an error (for example, if the disk is full).
 	*/
-	virtual int write( const void* buffer, uint32_t count ) override;
+	int write( const void* buffer, uint32_t count ) override;
 	//! Write changes into the disk.
 	/*!
 		Write changes into the disk
 	*/
-	virtual void sync() override;
+	void sync() override;
 
 	//! Check if the file is open.
 	/*!
@@ -111,7 +111,7 @@ public:
 	*/
 	bool size( uint64_t* const fileSize ) const;
 
-    virtual int64_t size() const override {
+    int64_t size() const override {
         uint64_t result;
         if (size(&result))
             return (int64_t) result;

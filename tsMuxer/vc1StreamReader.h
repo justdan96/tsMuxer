@@ -18,23 +18,23 @@ public:
 		m_longCodesAllowed = false;
 		m_nextFrameAddr = 0;
 	}
-	virtual ~VC1StreamReader() {}
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	~VC1StreamReader() override {}
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
-    virtual bool skipNal(uint8_t* nal) override;
-    virtual bool needSPSForSplit() const override { return true; }
+    bool skipNal(uint8_t* nal) override;
+    bool needSPSForSplit() const override { return true; }
 protected:
-	virtual const CodecInfo& getCodecInfo() {return vc1CodecInfo;};
-	virtual int intDecodeNAL(uint8_t* buff);
-	virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen);
-	virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket);
-	virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData);
-	virtual double getStreamFPS(void * curNalUnit) { return m_sequence.getFPS();};
-	virtual int getStreamWidth() const {return m_sequence.coded_width;}
-	virtual int getStreamHeight() const {return m_sequence.coded_height;}
-	virtual bool getInterlaced() {return m_sequence.interlace;}
-	virtual bool isIFrame() {return m_lastIFrame;}
-	virtual void onSplitEvent() {
+	const CodecInfo& getCodecInfo() override {return vc1CodecInfo;};
+	int intDecodeNAL(uint8_t* buff) override;
+	void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
+	void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
+	int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override;
+	double getStreamFPS(void * curNalUnit) override { return m_sequence.getFPS();};
+	int getStreamWidth() const override {return m_sequence.coded_width;}
+	int getStreamHeight() const override {return m_sequence.coded_height;}
+	bool getInterlaced() override {return m_sequence.interlace;}
+	bool isIFrame() override {return m_lastIFrame;}
+	void onSplitEvent() override {
 		m_firstFileFrame = true;
 	}
 private:
