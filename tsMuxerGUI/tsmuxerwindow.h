@@ -184,7 +184,7 @@ private:
     };
 
     bool checkFileDuplicate(const QString& fileName);
-    void shellExecute(const QString& process, const QStringList& args);
+    void tsMuxerExecute(const QStringList& args);
     void addLines(const QByteArray& arr, QList<QString>& outList, bool isError);
     void doAppendInt(const QString& fileName, const QString& parentFileName, double duration, bool doublePrefix, MplsType mplsRole);
     bool isDiskOutput() const;

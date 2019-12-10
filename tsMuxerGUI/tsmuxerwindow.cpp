@@ -893,10 +893,7 @@ void TsMuxerWindow::addFile() {
   connect(this, SIGNAL(codecListReady()), this, SLOT(continueAddFile()));
   connect(this, SIGNAL(fileAdded()), this, SLOT(addFile()));
   runInMuxMode = false;
-  shellExecute(
-      QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) +
-          QDir::separator() + "tsMuxeR",
-      QStringList() << newFileName);
+  tsMuxerExecute(QStringList() << newFileName);
 }
 
 bool TsMuxerWindow::checkFileDuplicate(const QString &fileName) {
@@ -1417,14 +1414,26 @@ void TsMuxerWindow::onProcessError(QProcess::ProcessError error) {
   msgBox.exec();
 }
 
-void TsMuxerWindow::shellExecute(const QString &process,
-                                 const QStringList &args) {
+static QString getTsMuxerBinaryPath() {
+  const auto applicationDirPath =
+    QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + QDir::separator();
+  for(auto binaryName : {"tsmuxer", "tsMuxeR"}) {
+    auto binaryPath = applicationDirPath + binaryName;
+    if (QFile::exists(binaryPath)) {
+      return binaryPath;
+    }
+  }
+  return QString();
+}
+
+void TsMuxerWindow::tsMuxerExecute(const QStringList &args) {
+  const auto exePath = getTsMuxerBinaryPath();
   ui.buttonMux->setEnabled(false);
   procStdOutput.clear();
   procErrOutput.clear();
   processFinished = false;
   processExitCode = -1;
-  proc.start(process, args);
+  proc.start(exePath, args);
   if (muxForm.isVisible())
     muxForm.setProcess(&proc);
 }
@@ -2110,10 +2119,7 @@ void TsMuxerWindow::appendFile() {
   connect(this, SIGNAL(codecListReady()), this, SLOT(continueAppendFile()));
   connect(this, SIGNAL(fileAppended()), this, SLOT(appendFile()));
   runInMuxMode = false;
-  shellExecute(
-      QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) +
-          QDir::separator() + "tsMuxeR",
-      QStringList() << newFileName);
+  tsMuxerExecute(QStringList() << newFileName);
 }
 
 void TsMuxerWindow::continueAppendFile() {
@@ -2396,10 +2402,7 @@ void TsMuxerWindow::startMuxing() {
   disconnect();
   // QCoreApplication::dir
   runInMuxMode = true;
-  shellExecute(
-      QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) +
-          QDir::separator() + "tsMuxeR",
-      QStringList() << metaName << quoteStr(ui.outFileName->text()));
+  tsMuxerExecute(QStringList() << metaName << quoteStr(ui.outFileName->text()));
 }
 
 void TsMuxerWindow::saveMetaFileBtnClick() {
