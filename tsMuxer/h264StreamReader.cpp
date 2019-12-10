@@ -5,7 +5,6 @@
 #include "math.h"
 #include "vodCoreException.h"
 #include "tsPacket.h"
-#include <algorithm>
 
 using namespace std;
 
@@ -1241,7 +1240,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
                     m_nextFrameIdr = slice.isIDR();
 					return 0; // next frame found
                 }
-				m_pict_type = std::max(m_pict_type, sliceTypeToPictType(slice.slice_type));
+				m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(slice.slice_type));
 				break;
             /*
             case nuDelimiter:

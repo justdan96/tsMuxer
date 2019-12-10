@@ -675,7 +675,6 @@ int main(int argc, char** argv)
                     throw runtime_error(string("Can't create output file ") + dstFile);
                 blurayHelper.setVolumeLabel(isoDiskLabel);
 				blurayHelper.createBluRayDirs();
-				blurayHelper.writeBluRayFiles(insertBlankPL, firstMplsOffset, blankNum, stereoMode);
 				dstFile = blurayHelper.m2tsFileName(firstM2tsOffset);
 			}
 			if (muxerManager.getTrackCnt() == 0)
@@ -683,6 +682,7 @@ int main(int argc, char** argv)
             muxerManager.doMux(dstFile, dt != DT_NONE ? &blurayHelper : 0);
 			if (dt != DT_NONE) 
 			{
+				blurayHelper.writeBluRayFiles(insertBlankPL, firstMplsOffset, blankNum, stereoMode);
                 TSMuxer* mainMuxer = dynamic_cast<TSMuxer*> (muxerManager.getMainMuxer());
                 TSMuxer* subMuxer = dynamic_cast<TSMuxer*> (muxerManager.getSubMuxer());
 

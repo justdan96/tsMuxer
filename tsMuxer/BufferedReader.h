@@ -5,6 +5,7 @@
 #include <map>
 #include <types/types.h>
 #include <system/terminatablethread.h>
+#include <mutex>
 #include <containers/safequeue.h>
 #include "abstractreader.h"
 #include "abstractDemuxer.h"
