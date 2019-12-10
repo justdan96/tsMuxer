@@ -6,7 +6,7 @@
 #include "vod_common.h"
 #include "memory.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <locale.h>
@@ -70,7 +70,7 @@ namespace UtfConverter
     {
 		if (widesize == 0)
 			return L"";
-#ifdef WIN32
+#if defined(_WIN32)
 		else if (srcFormat == sfANSI) 
 		{
             wchar_t* widestringnative = new wchar_t[widesize+1];
@@ -80,8 +80,7 @@ namespace UtfConverter
             delete [] widestringnative;
             return resultstring;
 		}
-#endif
-#ifdef LINUX
+#elif __linux__ == 1
 		/*
 		else if (srcFormat == sfDefault) 
 		{

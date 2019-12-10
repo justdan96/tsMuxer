@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include <time.h>
 #endif
 

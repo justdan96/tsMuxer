@@ -1,6 +1,6 @@
 #include "textSubtitles.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #   include <winerror.h>
 #   include "osdep/textSubtitlesRenderWin32.h"
 #   ifdef WIN32_DEBUG_FREETYPE
@@ -40,7 +40,7 @@ TextToPGSConverter::TextToPGSConverter(bool sourceIsText): /*TextSubtitlesRender
     m_minLine = 0;
     m_maxLine = 0;
 	if (sourceIsText) {
-#ifdef WIN32
+#ifdef _WIN32
 #ifdef WIN32_DEBUG_FREETYPE
     m_textRender = new TextSubtitlesRenderFT;
 #else

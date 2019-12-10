@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #else
 #include <stddef.h>
@@ -19,19 +19,9 @@
 
 using namespace std;
 
-#ifdef SOLARIS
-typedef struct mydirent 
-{
-	ino_t           d_ino;          /* "inode number" of entry */
-	off_t           d_off;          /* offset of disk directory entry */
-	unsigned short  d_reclen;       /* length of this record */
-	char            d_name[PATH_MAX];      /* name of file */
-} mydirent_t;
-#endif
-
 char getDirSeparator()
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return '\\';
 #else
 	return '/';
@@ -43,7 +33,7 @@ string extractFileDir( const string& fileName )
 	size_t index = fileName.find_last_of('/');
 	if( index != string::npos )
 		return fileName.substr( 0, index+1 );
-#ifdef WIN32
+#ifdef _WIN32
 	index = fileName.find_last_of('\\');
 	if( index != string::npos )
 		return fileName.substr( 0, index+1 );
@@ -55,10 +45,10 @@ string extractFileDir( const string& fileName )
 bool fileExists( const string& fileName )
 {
 	bool fileExists = false;
-#ifdef WIN32
+#ifdef _WIN32
 	struct _stat64 buf;
 	fileExists = _stat64( fileName.c_str(), &buf ) == 0;
-#else	// LINUX
+#else
 	struct stat64 buf;
 	fileExists = stat64( fileName.c_str(), &buf ) == 0;
 #endif
@@ -69,10 +59,10 @@ bool fileExists( const string& fileName )
 uint64_t getFileSize ( const std::string& fileName )
 {
     bool res = false;
-#ifdef WIN32
+#ifdef _WIN32
     struct _stat64 fileStat;
     res = _stat64( fileName.c_str(), &fileStat ) == 0;
-#else	// LINUX
+#else
     struct stat64 fileStat;
     res = stat64( fileName.c_str(), &fileStat ) == 0;
 #endif
@@ -98,13 +88,13 @@ bool createDir(
 			if( dirEnd != string::npos )
 			{
 				string parentDir = dirName.substr( 0, dirEnd );
-#if defined(LINUX) || defined(SOLARIS) || defined(MAC)
+#if __linux__ == 1 || (defined(__APPLE__) && defined(__MACH__))
 				if( mkdir( parentDir.c_str(), S_IREAD | S_IWRITE | S_IEXEC ) == -1 )
 				{
 					if( errno != EEXIST )
 						return false;
 				}
-#elif defined(WIN32)
+#elif defined(_WIN32)
 				if (parentDir.size() == 0 || parentDir[parentDir.size()-1] == ':' || 
                     parentDir == string("\\\\.")  || parentDir == string("\\\\.\\") || // UNC patch prefix
                     (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size()-1] == '}')) // UNC patch prefix
@@ -119,16 +109,16 @@ bool createDir(
 		}
 	}
 
-#if defined(LINUX) || defined(SOLARIS) || defined(MAC)
+#if __linux__ == 1 || (defined(__APPLE__) && defined(__MACH__))
 	return mkdir( dirName.c_str(),  S_IREAD | S_IWRITE | S_IEXEC ) == 0;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	return CreateDirectory( dirName.c_str(), 0 ) != 0;
 #endif
 }
 
 bool deleteFile( const string& fileName )
 {
-#if defined(LINUX) || defined(SOLARIS) || defined(MAC)
+#if __linux__ == 1 || (defined(__APPLE__) && defined(__MACH__))
 	return unlink( fileName.c_str() ) == 0;
 #else
 	if( DeleteFile(fileName.c_str()) )
@@ -147,7 +137,7 @@ bool deleteFile( const string& fileName )
 
 
 //-----------------------------------------------------------------------------
-#if defined(WIN32) 
+#if defined(_WIN32) 
 /** windows implementation */
 //-----------------------------------------------------------------------------
 #include <windows.h>
@@ -205,7 +195,7 @@ bool findDirs(
 
     return true;
 }
-#elif defined(LINUX) || defined(MAC)
+#elif __linux__ == 1 || (defined(__APPLE__) && defined(__MACH__))
 #include <fnmatch.h>
 
 bool findFiles( 

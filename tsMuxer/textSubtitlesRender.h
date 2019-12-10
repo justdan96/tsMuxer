@@ -5,7 +5,7 @@
 #include <map>
 #include <types/types.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "windows.h"
 #endif
 
@@ -15,7 +15,7 @@ namespace text_subtitles
 const static int DEFAULT_BROWSER_STYLE_FS = 3;
 const static double BROWSER_FONT_STYLE_INC_COEFF = 1.4142135623730950488016887242097; // example: font 2 > font1 to 20% 
 
-#ifndef WIN32
+#ifndef _WIN32
 struct RGBQUAD {
         uint8_t rgbBlue;
         uint8_t rgbGreen;

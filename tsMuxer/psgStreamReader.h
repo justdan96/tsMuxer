@@ -15,7 +15,7 @@ public:
 	struct BitmapInfo {
 		int Width;
 		int Height;
-#ifdef WIN32
+#ifdef _WIN32
         RGBQUAD* buffer; // rgb triple buffer
 #else
         text_subtitles::RGBQUAD* buffer;

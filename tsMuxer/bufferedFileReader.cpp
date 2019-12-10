@@ -4,7 +4,7 @@
 #include "vod_common.h"
 #include "vodCoreException.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -19,7 +19,7 @@ bool FileReaderData::openStream()
     
     if ( !rez ) 
     {
-#ifdef WIN32
+#ifdef _WIN32
         char msgBuf [ 32*1024 ];
         
         memset ( msgBuf, 0, sizeof(msgBuf) );
