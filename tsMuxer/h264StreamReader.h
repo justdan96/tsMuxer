@@ -126,9 +126,9 @@ private:
 	int sliceTypeToPictType(int slice_type);
 	uint8_t* writeNalPrefix(uint8_t* curPos);
 	bool findPPSForward(uint8_t* buff);
-	void updateHDRParam(SPSUnit* sps);
+	void updateHRDParam(SPSUnit* sps);
 	int processSEI(uint8_t* buff);
-	int getNalHdrLen(uint8_t* nal);
+	int getNalHrdLen(uint8_t* nal);
     int writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUnit& sei, uint8_t payloadType);
 
 	uint8_t* m_nextFrameAddr;
