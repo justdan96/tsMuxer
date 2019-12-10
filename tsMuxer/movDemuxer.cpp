@@ -1452,7 +1452,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
 			if (st->parsed_priv_data) {
 				((MovParsedAudioTrackData*)st->parsed_priv_data)->isAAC = true;
 				st->parsed_priv_data->setPrivData(st->codec_priv, st->codec_priv_size);
-				st->channels = (st->codec_priv[1] >> 3) & 0x0f;
+				st->channels = (st->codec_priv[1] >> 3) & 0x0f; 
 			}
         }
     }

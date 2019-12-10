@@ -10,8 +10,6 @@
 #include <set>
 #include <chrono>
 #include <queue>
-#include <iomanip>
-#include <chrono>
 #include "vod_common.h"
 #include "vodCoreException.h"
 #include "bufferedReaderManager.h"
@@ -75,8 +73,8 @@ struct StreamInfo {
     bool m_isSubStream;
 };
 
-// drpReadSequence - поток идет непрерывно
-// drpFragmented   - поток разбросан кусками по исходному контейнеру
+// drpReadSequence - the stream is not fragmented
+// drpFragmented   - the stream is fragmented according to the resulting container
 enum DemuxerReadPolicy {drpReadSequence, drpFragmented};
 
 class METADemuxer;

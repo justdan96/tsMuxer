@@ -45,7 +45,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     vector<StreamInfo>& ci = m_metaDemuxer.getCodecInfo();
     bool mvcTrackFirst = false;
     bool firstH264Track = true;
-	for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr) 
+    for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr) 
     {
         StreamInfo& si = *itr;
         H264StreamReader* h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);

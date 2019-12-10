@@ -186,7 +186,7 @@ void TSMuxer::intAddStream(const std::string& streamName,
             m_videoTrackCnt++;
 		}
 		else {
-			tsStreamIndex = 0x1B00 + m_videoSecondTrackCnt;
+			tsStreamIndex = 6912 + m_videoSecondTrackCnt;
 			m_videoSecondTrackCnt++;
 		}
 	}

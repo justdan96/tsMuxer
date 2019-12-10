@@ -23,7 +23,7 @@ public:
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 
 	virtual int getStreamWidth() const {return m_sequence.width;}
-	virtual int getStreamHeight() const {return m_sequence.height;}
+	virtual int getStreamHeight()const {return m_sequence.height;}
 	virtual bool getInterlaced() {return !m_sequence.progressive_sequence;}
 
 protected:
