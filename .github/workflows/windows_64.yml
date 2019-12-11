@@ -1,4 +1,4 @@
-name: Build for Windows
+name: Build for Windows 64-bit
 
 on:
   push:
