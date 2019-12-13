@@ -99,6 +99,10 @@ private:
     void flushTSBuffer();
     void finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFile, bool recursive = true);
     void gotoNextFile(uint64_t newPts);
+    int getStreamPID(const std::string& codecName, int streamIndex,
+                     const std::map<std::string, std::string>& params,
+                     bool isSecondary) const;
+    int* getStreamCounter(const std::string& codecName, bool isSecondary);
 private:
     //bool m_iFrameFound;
 	//File* m_muxFile;
