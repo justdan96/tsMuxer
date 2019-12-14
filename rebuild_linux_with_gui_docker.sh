@@ -7,4 +7,8 @@ cp tsMuxer/tsmuxer ../bin/tsMuxeR
 cp tsMuxerGUI/tsMuxerGUI ../bin/tsMuxerGUI
 cd ..
 rm -rf build
-ls ./bin/tsMuxeR && ls ./bin/tsMuxerGUI
+mkdir ./bin/lnx
+mv ./bin/tsMuxeR ./bin/lnx/tsMuxeR
+mv ./bin/tsMuxerGUI ./bin/lnx/tsMuxerGUI
+zip -jr ./bin/lnx.zip ./bin/lnx
+ls ./bin/lnx/tsMuxeR && ls ./bin/lnx/tsMuxerGUI && ls ./bin/lnx.zip
