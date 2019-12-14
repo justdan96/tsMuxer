@@ -57,7 +57,7 @@ bool isValidCustomPID(int pid) {
     case NULL_PID:
         return false;
     default:
-        return pid < NULL_PID;
+        return pid > 0 && pid < NULL_PID;
     }
 }
 }
