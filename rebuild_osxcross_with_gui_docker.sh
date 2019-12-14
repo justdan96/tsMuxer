@@ -49,4 +49,4 @@ mkdir ./bin/mac
 mv ./bin/tsMuxeR ./bin/mac/tsMuxeR
 mv ./bin/tsMuxerGUI.app ./bin/mac/tsMuxerGUI.app
 zip -r ./bin/mac.zip ./bin/mac
-ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/lnx.zip
+ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip
