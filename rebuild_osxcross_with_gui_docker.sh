@@ -44,4 +44,9 @@ EOF
 fi
 
 rm -rf build
-ls ./bin/tsMuxeR && ls ./bin/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI
+
+mkdir ./bin/mac
+mv ./bin/tsMuxeR ./bin/mac/tsMuxeR
+mv ./bin/tsMuxerGUI.app ./bin/mac/tsMuxerGUI.app
+zip -jr ./bin/mac.zip ./bin/mac
+ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip

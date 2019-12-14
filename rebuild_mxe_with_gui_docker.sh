@@ -31,4 +31,8 @@ cd ..
 rm -rf build
 rm -f ./tsMuxerGUI/tsMuxerGUI.pro
 
-ls ./bin/tsMuxeR.exe && ls ./bin/tsMuxerGUI.exe
+mkdir ./bin/w64
+mv ./bin/tsMuxeR.exe ./bin/w64/tsMuxeR.exe
+mv ./bin/tsMuxerGUI.exe ./bin/w64/tsMuxerGUI.exe
+zip -jr ./bin/w64.zip ./bin/w64
+ls ./bin/w64/tsMuxeR.exe && ls ./bin/w64/tsMuxerGUI.exe && ls ./bin/w64.zip
