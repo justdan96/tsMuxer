@@ -1,3 +1,4 @@
+#!/bin/bash
 # BINTRAY_USER
 # BINTRAY_API_KEY
 BINTRAY_REPO=tsMuxer
