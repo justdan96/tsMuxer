@@ -1,0 +1,41 @@
+name: Nightly Releases
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    container:
+      image: docker://justdan96/tsmuxer_build:latest
+      volumes:
+      - /workspace:/github/workspace
+    
+    steps:
+    - uses: actions/checkout@master
+      name: checkout
+      
+    - run: rm -f bin/.gitkeep
+      name: clean-bin-folder
+      
+    - run: ./rebuild_linux_with_gui_docker.sh
+      name: build-for-linux
+      
+    - run: ./rebuild_mxe_with_gui_docker.sh
+      name: build-for-win64
+      
+    - run: ./rebuild_mxe32_with_gui_docker.sh
+      name: build-for-win32
+      
+    - run: ./rebuild_osxcross_with_gui_docker.sh
+      name: build-for-mac
+      
+    - run: ./bintray_nightly_upload.sh
+      name: upload-to-bintray-nightly
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      

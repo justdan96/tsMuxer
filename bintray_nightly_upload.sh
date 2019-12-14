@@ -24,7 +24,7 @@ else
     # upload the ZIP files to the version we just created on bintray
     curl -T ./bin/mac.zip -u$BINTRAY_USER:$BINTRAY_API_KEY -H "X-Bintray-Package:$PCK_NAME" -H "X-Bintray-Version:$version_date"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/mac-nightly-$version_date.zip
     curl -T ./bin/w32.zip -u$BINTRAY_USER:$BINTRAY_API_KEY -H "X-Bintray-Package:$PCK_NAME" -H "X-Bintray-Version:$version_date"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/w32-nightly-$version_date.zip
-    curl -T ./bin/w63.zip -u$BINTRAY_USER:$BINTRAY_API_KEY -H "X-Bintray-Package:$PCK_NAME" -H "X-Bintray-Version:$version_date"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/w64-nightly-$version_date.zip
+    curl -T ./bin/w64.zip -u$BINTRAY_USER:$BINTRAY_API_KEY -H "X-Bintray-Package:$PCK_NAME" -H "X-Bintray-Version:$version_date"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/w64-nightly-$version_date.zip
     curl -T ./bin/lnx.zip -u$BINTRAY_USER:$BINTRAY_API_KEY -H "X-Bintray-Package:$PCK_NAME" -H "X-Bintray-Version:$version_date"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/lnx-nightly-$version_date.zip
     
     # update the latest commit on bintray
