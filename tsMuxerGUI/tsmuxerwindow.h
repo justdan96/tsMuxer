@@ -1,13 +1,21 @@
 #ifndef TSMUXER_H_
 #define TSMUXER_H_
 
-#include <QtGui>
-#include <QFileDialog>
+#include <QWidget>
+#include <QHeaderView>
 #include <QProcess>
-#include <QSound>
+#include <QTimer>
 
-#include "ui_tsmuxerwindow.h"
-#include "muxForm.h"
+class QFileDialog;
+class QTemporaryFile;
+class QSound;
+class QTableWidgetItem;
+class QComboBox;
+
+class MuxForm;
+namespace Ui {
+class TsMuxerWindow;
+}
 
 typedef QList<double> ChapterList;
 
@@ -16,7 +24,6 @@ enum MplsType {
     MPLS_PRIMARY,
     MPLS_M2TS,
 };
-
 
 class QnCheckBoxedHeaderView: public QHeaderView {
     Q_OBJECT
@@ -208,7 +215,7 @@ private:
     //QTemporaryFile* tempFile;
     //QString tempFileName;
     QString metaName;
-    Ui::TsMuxerWindow ui;
+    Ui::TsMuxerWindow* ui;
     QFileDialog* openFileDialog;
     int disableUpdatesCnt;
     bool processFinished;
@@ -223,7 +230,7 @@ private:
     QString oldFileName;
     bool outFileNameDisableChange;
     QString saveDialogFilter;
-    MuxForm muxForm;
+    MuxForm* muxForm;
     QString newFileName;
     QList<QtvCodecInfo> codecList;
     ChapterList chapters;
