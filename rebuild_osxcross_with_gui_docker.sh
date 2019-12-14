@@ -48,5 +48,5 @@ rm -rf build
 mkdir ./bin/mac
 mv ./bin/tsMuxeR ./bin/mac/tsMuxeR
 mv ./bin/tsMuxerGUI.app ./bin/mac/tsMuxerGUI.app
-zip -jr ./bin/mac.zip ./bin/mac
+zip -r ./bin/mac.zip ./bin/mac
 ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip
