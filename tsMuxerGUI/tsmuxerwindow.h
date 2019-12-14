@@ -17,33 +17,14 @@ namespace Ui {
 class TsMuxerWindow;
 }
 
+class QnCheckBoxedHeaderView;
+
 typedef QList<double> ChapterList;
 
 enum MplsType {
     MPLS_NONE,
     MPLS_PRIMARY,
     MPLS_M2TS,
-};
-
-class QnCheckBoxedHeaderView: public QHeaderView {
-    Q_OBJECT
-        typedef QHeaderView base_type;
-public:
-    explicit QnCheckBoxedHeaderView(QWidget *parent = nullptr);
-
-    Qt::CheckState checkState() const;
-    void setCheckState(Qt::CheckState state);
-signals:
-    void checkStateChanged(Qt::CheckState state);
-protected:
-    void paintEvent(QPaintEvent *e) override;
-    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
-    QSize sectionSizeFromContents(int logicalIndex) const override;
-    private slots:
-        void at_sectionClicked(int logicalIndex);
-private:
-    Qt::CheckState m_checkState;
-    int m_checkColumnIndex;
 };
 
 struct QtvCodecInfo
