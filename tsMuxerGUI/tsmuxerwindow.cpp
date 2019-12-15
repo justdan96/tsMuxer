@@ -1417,8 +1417,8 @@ static QString getTsMuxerBinaryPath() {
   const auto applicationDirPath =
     QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + QDir::separator();
   for(auto binaryName : {"tsmuxer", "tsMuxeR"}) {
-    auto binaryPath = applicationDirPath + binaryName;
-    if (QFile::exists(binaryPath)) {
+    auto binaryPath = QStandardPaths::findExecutable(binaryName, {applicationDirPath});
+    if (!binaryPath.isEmpty()) {
       return binaryPath;
     }
   }
