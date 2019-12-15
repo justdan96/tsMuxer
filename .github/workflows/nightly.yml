@@ -1,8 +1,8 @@
 name: Nightly Releases
 
 on:
-  push:
-    branches: [master]
+  schedule:
+    - cron:  '1 1 * * *'
 
 jobs:
   build:
