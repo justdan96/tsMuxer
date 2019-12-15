@@ -568,9 +568,10 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
 		writer.putBits(2,0); //reserved_for_future_use 2 bslbf
 		writer.putBit(0); // cc_flag
 		writer.putBit(0); // reserved
-		if (*HDR10_metadata &  0x02) writer.putBits(8, 0x12); // HDR10
+		if (HDR & 18) writer.putBits(8, 0x12); // HDR10 or HDR10plus
+		else if (HDR == 4) writer.putBits(8, 0x22); // DV
 		else writer.putBits(8, 0);
-		if (*HDR10_metadata & 0x10) writer.putBits(8, 0x80); // HDR10plus
+		if (HDR == 16) writer.putBits(8, 0x80); // HDR10plus
 		else writer.putBits(8, 0);
 		composeISRC(writer);
 		writer.putBits(32, 0); // reserved_for_future_use 32 bslbf
@@ -2320,10 +2321,12 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 		int stream_coding_type = streamInfo[i].stream_coding_type;
 		if (isVideoStreamType(stream_coding_type))
 		{
-			if (!streamInfo[i].isSecondary)
-				number_of_primary_video_stream_entries++;
-			else
+			if (streamInfo[i].isSecondary)
 				number_of_secondary_video_stream_entries++;
+			else if (streamInfo[i].HDR == 4)
+				number_of_DolbyVision_video_stream_entries++;
+			else
+				number_of_primary_video_stream_entries++;
 		} else if (isAudioStreamType(stream_coding_type))
 		{
             if (!streamInfo[i].isSecondary)
@@ -2345,17 +2348,17 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 	    writer.putBits(8,number_of_secondary_audio_stream_entries);
 	    writer.putBits(8, number_of_secondary_video_stream_entries);  //int number_of_secondary_video_stream_entries. Now subpath used for second video stream
 	    writer.putBits(8,0); // number_of_PiP_PG_textST_stream_entries_plus
-		writer.putBits(8, number_of_DolbyVision_video_stream_entries); // number_of_DolbyVision_video_stream_entries
+		writer.putBits(8, number_of_DolbyVision_video_stream_entries);
 	    writer.putBits(32,0); //reserved_for_future_use 32 bslbf
     }
 
 	//if (number_of_SubPaths == 0)
     
     // video
-	for (int i = 0; i < number_of_primary_video_stream_entries; i++) 
+	for (int i = 0; i < streamInfo.size(); i++)
     {
 		int stream_coding_type = streamInfo[i].stream_coding_type;
-		if (!streamInfo[i].isSecondary && isVideoStreamType(stream_coding_type)) {
+		if (isVideoStreamType(stream_coding_type) && !streamInfo[i].isSecondary && streamInfo[i].HDR != 4) {
 			streamInfo[i].composeStreamEntry(writer, PlayItem_id);
 			streamInfo[i].composeStreamAttributes(writer);
             if (stream_coding_type == 0x20) // MVC
@@ -2447,6 +2450,18 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
             secondaryVNum++;
 		}
 	}
+
+	// DV video
+	for (int i = 0; i < streamInfo.size(); i++)
+	{
+		int stream_coding_type = streamInfo[i].stream_coding_type;
+		if (isVideoStreamType(stream_coding_type) && streamInfo[i].HDR == 4) {
+			streamInfo[i].type = 4; 
+			streamInfo[i].composeStreamEntry(writer, PlayItem_id);
+			streamInfo[i].composeStreamAttributes(writer);
+		}
+	}
+
 
     if (isSSEx && writer.getBitsCount() % 32 != 0)
         writer.putBits(16, 0);
@@ -2638,6 +2653,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
 		{
             width = vStream->getStreamWidth();
             height = vStream->getStreamHeight();
+			HDR = vStream->getStreamHDR();
             VideoAspectRatio ar = vStream->getStreamAR();
             blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar,
                                &video_format, &frame_rate_index, &aspect_ratio_index);
@@ -2693,6 +2709,7 @@ M2TSStreamInfo::M2TSStreamInfo(const M2TSStreamInfo& other)
     number_of_offset_sequences = other.number_of_offset_sequences;
     width = other.width;
     height = other.height;
+	HDR = other.HDR;
     aspect_ratio_index = other.aspect_ratio_index;
     audio_presentation_type = other.audio_presentation_type;
     sampling_frequency_index = other.sampling_frequency_index;
@@ -2829,6 +2846,7 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 		writer.putBits(8, 0);
 		writer.putBits(16, streamPID); //16 uimsbf
 		writer.putBits(32, 0); //reserved_for_future_use 40 bslbf
+		writer.putBits(8, 0);
 	}
 	else
 		THROW (ERR_COMMON, "Unsupported media type for AVCHD/Blu-ray muxing");
@@ -2885,9 +2903,10 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
 	{
 		writer.putBits(4, video_format); //4 bslbf
 		writer.putBits(4, frame_rate_index); // 4 bslbf
-		if (*HDR10_metadata & 0x02) writer.putBits(8, 0x12); // HDR10
+		if (HDR & 18) writer.putBits(8, 0x12); // HDR10 or HDR10plus
+		else if (HDR == 4) writer.putBits(8, 0x22); // DV
 		else writer.putBits(8, 0);
-		if (*HDR10_metadata & 0x10) writer.putBits(8, 0x40); // HDR10plus
+		if (HDR == 16) writer.putBits(8, 0x40); // HDR10plus
 		else writer.putBits(8, 0);
 		writer.putBits(8, 0); //reserved_for_future_use 8 bslbf
 	} else if (isAudioStreamType(stream_coding_type))

@@ -21,6 +21,7 @@ protected:
     virtual double getStreamFPS(void * curNalUnit) override;
     virtual int getStreamWidth() const  override;
     virtual int getStreamHeight() const  override;
+    virtual int getStreamHDR() const  override;
     virtual bool getInterlaced()  override {return false;}
     virtual bool isIFrame() {return m_lastIFrame;}
 

@@ -837,7 +837,6 @@ int HevcSeiUnit::deserialize()
 				payloadSize += nbyte;
 			}
 			if (payloadType == 137 && !isHDR10) { // mastering_display_colour_volume
-                *HDR10_metadata = 0x03; // 00011 = HDR10+SDR
                 HDR10_metadata[1] = m_reader.getBits(32); // display_primaries Green
                 HDR10_metadata[2] = m_reader.getBits(32); // display_primaries Red
                 HDR10_metadata[3] = m_reader.getBits(32); // display_primaries Blue
@@ -846,18 +845,21 @@ int HevcSeiUnit::deserialize()
 			}
             else if (payloadType == 144 && !isHDR10) { // content_light_level_info
                 isHDR10 = true;
-                HDR10_metadata[6] = m_reader.getBits(32); // maxCLL, maxFALL
+                *HDR10_metadata |= 2; // HDR10 flag
+                 int maxCLL = m_reader.getBits(32); // maxCLL, maxFALL
+                 if (maxCLL != 0) HDR10_metadata[6] = maxCLL;
             }
-			else if (payloadType == 4 && isHDR10 && !isHDR10plus) { // HDR10Plus Metadata
+			else if (payloadType == 4 && !isHDR10plus) { // HDR10Plus Metadata
                 m_reader.skipBits(8); // country_code
 				m_reader.skipBits(32); // terminal_provider
 				int application_identifier = m_reader.getBits(8);
 				int application_version = m_reader.getBits(8);
 				int num_windows = m_reader.getBits(2);
 				m_reader.skipBits(6);
-                if (application_identifier == 4 && application_version == 1 && num_windows == 1) {
+                if (application_identifier == 4 && application_version == 1 && num_windows == 1)
+                {
                     isHDR10plus = true;
-                    *HDR10_metadata = 0x13; // 10011 = HDR10plus+HDR10+SDR
+                    *HDR10_metadata |= 16; // HDR10plus flag
                 }
 				payloadSize -= 8;
 				for (int i = 0; i < payloadSize; i++)

@@ -32,6 +32,7 @@ public:
 	virtual int readPacket(AVPacket& avPacket) = 0;
 	virtual int flushPacket(AVPacket& avPacket) = 0;
 	virtual int getTSDescriptor(uint8_t* dstBuff) {return 0;}
+	virtual int getStreamHDR() const { return 0; }
 	virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) {}
 	virtual void setStreamIndex(int index) {m_streamIndex = index;}
 	int getStreamIndex() const { return m_streamIndex; }

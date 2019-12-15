@@ -24,6 +24,7 @@ public:
 
 	virtual int getStreamWidth() const {return m_sequence.width;}
 	virtual int getStreamHeight()const {return m_sequence.height;}
+	virtual int getStreamHDR()const { return 0; }
 	virtual bool getInterlaced() {return !m_sequence.progressive_sequence;}
 
 protected:

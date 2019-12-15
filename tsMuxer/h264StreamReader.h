@@ -51,6 +51,7 @@ protected:
 	virtual int getFrameDepth() { return m_frameDepth; }
 	virtual int getStreamWidth() const;
 	virtual int getStreamHeight() const;
+	virtual int getStreamHDR() const { return 0; }
 	virtual bool getInterlaced();
 	virtual bool isIFrame() { return m_lastIFrame; }
     //virtual bool isIFrame() { return m_lastSliceIDR; }

@@ -32,6 +32,7 @@ protected:
 	virtual double getStreamFPS(void * curNalUnit) { return m_sequence.getFPS();};
 	virtual int getStreamWidth() const {return m_sequence.coded_width;}
 	virtual int getStreamHeight() const {return m_sequence.coded_height;}
+	virtual int getStreamHDR() const { return 0; }
 	virtual bool getInterlaced() {return m_sequence.interlace;}
 	virtual bool isIFrame() {return m_lastIFrame;}
 	virtual void onSplitEvent() {

@@ -87,7 +87,15 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                     return rez;
                 break;
             }
-
+            case NAL_DV: {
+                if (!m_sei)
+                    m_sei = new HevcSeiUnit();
+                if (nal[1] == 1 && !m_sei->isDV) {
+                    m_sei->isDV = true;
+                    *HDR10_metadata |= 4; // Dolby Vision flag
+                }
+                break;
+            }
         }
     }
 
@@ -102,6 +110,10 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 
 int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff)
 {
+    if (m_firstFrame) {
+        checkStream(m_buffer, m_bufEnd - m_buffer);
+    }
+
     *dstBuff++ = 0x05; // registreation descriptor tag
     *dstBuff++ = 4;
     memcpy(dstBuff, "HEVC", 4);
@@ -140,6 +152,11 @@ int HEVCStreamReader::getStreamWidth() const
 int HEVCStreamReader::getStreamHeight() const  
 {
     return m_sps ? m_sps->pic_height_in_luma_samples : 0;
+}
+
+int HEVCStreamReader::getStreamHDR() const
+{
+    return m_sei->isDV ? 4 : (m_sei->isHDR10plus ? 16 : (m_sei->isHDR10 ? 2 : 1));
 }
 
 double HEVCStreamReader::getStreamFPS(void * curNalUnit)
@@ -301,25 +318,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                         return rez;
                     m_spsPpsFound = true;
                     storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
-                    break;
-                case NAL_SEI_PREFIX:
-                    if (nextNal == m_bufEnd)
-                        return NOT_ENOUGHT_BUFFER;
-                    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
-
-                    if (!m_sei)
-                        m_sei = new HevcSeiUnit();
-                    m_sei->decodeBuffer(curPos, nextNalWithStartCode);
-                    rez = m_sei->deserialize();
-                    if (rez)
-                        return rez;
-                    storeBuffer(m_seiBuffer, curPos, nextNalWithStartCode);
-                    break;
-                case NAL_DV:
-                    if (!m_sei)
-                        m_sei = new HevcSeiUnit();
-                    if (curPos[1] == 1)
-                        m_sei->isDV = true;
                     break;
             }
         }

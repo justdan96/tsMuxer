@@ -54,6 +54,7 @@ public:
 	virtual int flushPacket(AVPacket& avPacket);
 	virtual int getStreamWidth() const = 0;
 	virtual int getStreamHeight() const = 0;
+	virtual int getStreamHDR() const = 0;
 	virtual bool getInterlaced() = 0;
 	void setRemovePulldown(bool value) {m_removePulldown = value;}
 	virtual int getFrameDepth() {return 1;}

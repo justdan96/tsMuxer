@@ -291,7 +291,7 @@ struct PS_stream_map
 
 struct M2TSStreamInfo 
 {
-    M2TSStreamInfo(): streamPID(0), character_code(0), width(0), height(0), frame_rate_index(3), video_format(0), isSecondary(false) {}
+    M2TSStreamInfo(): streamPID(0), character_code(0), width(0), height(0), HDR(0), frame_rate_index(3), video_format(0), isSecondary(false) {}
 	M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
     M2TSStreamInfo(const M2TSStreamInfo& other);
 
@@ -302,6 +302,7 @@ struct M2TSStreamInfo
     int number_of_offset_sequences;
     int width;
 	int height;
+	int HDR;
 	int aspect_ratio_index;
 	int audio_presentation_type;
 	int sampling_frequency_index;
