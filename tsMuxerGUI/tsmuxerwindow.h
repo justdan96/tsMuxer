@@ -1,6 +1,8 @@
 #ifndef TSMUXER_H_
 #define TSMUXER_H_
 
+#include "codecinfo.h"
+
 #include <QWidget>
 #include <QHeaderView>
 #include <QProcess>
@@ -25,71 +27,6 @@ enum MplsType {
     MPLS_NONE,
     MPLS_PRIMARY,
     MPLS_M2TS,
-};
-
-struct QtvCodecInfo
-{
-  QtvCodecInfo():
-    trackID(0),
-    width(0),
-    height(0),
-    displayName(),
-    programName(),
-    descr(),
-    lang(),
-    delay(0),
-    subTrack(0),
-    dtsDownconvert(false),
-    isSecondary(false),
-    offsetId(-1),
-    maxPgOffsets(0),
-    fileList(),
-    checkFPS(false),
-    checkLevel(false),
-    addSEIMethod(1),
-    addSPS(true),
-    delPulldown(-1),
-    fpsText(),
-    fpsTextOrig(),
-    levelText(),
-    nested(0),
-    parent(nullptr),
-    child(nullptr),
-    bindFps(true),
-    mplsFiles(),
-    arText(),
-    enabledByDefault(true) {}
-
-  int trackID;
-  int width;
-  int height;
-  QString displayName;
-  QString programName;
-  QString descr;
-  QString lang;
-  int delay;
-  int subTrack;
-  bool dtsDownconvert;
-  bool isSecondary;
-  int offsetId;
-  int maxPgOffsets;
-  QList<QString> fileList;
-  bool checkFPS;
-  bool checkLevel;
-  int addSEIMethod;
-  bool addSPS;
-  int delPulldown;
-  QString fpsText;
-  QString fpsTextOrig;
-  QString levelText;
-  // for append
-  int nested;
-  QtvCodecInfo* parent;
-  QtvCodecInfo* child;
-  bool bindFps;
-  QStringList mplsFiles;
-  QString arText;
-  bool enabledByDefault;
 };
 
 class TsMuxerWindow: public QWidget

@@ -1,6 +1,7 @@
 #include "tsmuxerwindow.h"
 #include "ui_tsmuxerwindow.h"
 #include "muxForm.h"
+#include "codecinfo.h"
 #include "lang_codes.h"
 #include "checkboxedheaderview.h"
 
@@ -1078,8 +1079,7 @@ void TsMuxerWindow::continueAddFile() {
     ui->trackLV->setRowHeight(ui->trackLV->rowCount() - 1, 18);
     QTableWidgetItem *item = new QTableWidgetItem("");
     item->setCheckState(info.enabledByDefault ? Qt::Checked : Qt::Unchecked);
-    QtvCodecInfo *__info = new QtvCodecInfo();
-    *__info = info;
+    auto __info = new QtvCodecInfo(info);
     item->setData(Qt::UserRole, (qlonglong)(void *)__info);
     ui->trackLV->setCurrentItem(item);
 
