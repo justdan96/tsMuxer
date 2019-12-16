@@ -18,12 +18,12 @@ protected:
     virtual const CodecInfo& getCodecInfo() override {return hevcCodecInfo;};
     virtual int intDecodeNAL(uint8_t* buff) override;
 
-    virtual double getStreamFPS(void * curNalUnit) override;
-    virtual int getStreamWidth() const  override;
-    virtual int getStreamHeight() const  override;
-    virtual int getStreamHDR() const  override;
-    virtual bool getInterlaced()  override {return false;}
-    virtual bool isIFrame() {return m_lastIFrame;}
+    double getStreamFPS(void * curNalUnit) override;
+    int getStreamWidth() const  override;
+    int getStreamHeight() const  override;
+    int getStreamHDR() const  override;
+    bool getInterlaced()  override {return false;}
+    bool isIFrame() {return m_lastIFrame;}
 
     virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     virtual int getFrameDepth() override { return m_frameDepth; }
