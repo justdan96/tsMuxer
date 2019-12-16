@@ -22,10 +22,10 @@ public:
 	virtual int getTSDescriptor(uint8_t* dstBuff);
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 
-	virtual int getStreamWidth() const {return m_sequence.width;}
-	virtual int getStreamHeight()const {return m_sequence.height;}
-	virtual int getStreamHDR()const { return 0; }
-	virtual bool getInterlaced() {return !m_sequence.progressive_sequence;}
+	int getStreamWidth() const override {return m_sequence.width;}
+	int getStreamHeight() const override {return m_sequence.height;}
+	int getStreamHDR() const override { return 0; }
+	bool getInterlaced() override {return !m_sequence.progressive_sequence;}
 
 protected:
 	virtual const CodecInfo& getCodecInfo() {return mpeg2CodecInfo;};
