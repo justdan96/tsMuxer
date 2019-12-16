@@ -47,13 +47,13 @@ protected:
 		return sps->getFPS();
 	};
 
-	virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData);
-	virtual int getFrameDepth() { return m_frameDepth; }
-	virtual int getStreamWidth() const;
-	virtual int getStreamHeight() const;
-	virtual int getStreamHDR() const { return 0; }
-	virtual bool getInterlaced();
-	virtual bool isIFrame() { return m_lastIFrame; }
+	int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override;
+	int getFrameDepth() override { return m_frameDepth; }
+	int getStreamWidth() const override;
+	int getStreamHeight() const override;
+	int getStreamHDR() const override { return 0; }
+	bool getInterlaced() override;
+	bool isIFrame() override { return m_lastIFrame; }
     //virtual bool isIFrame() { return m_lastSliceIDR; }
 
     virtual bool isPriorityData(AVPacket* packet) override;
