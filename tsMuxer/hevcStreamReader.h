@@ -23,7 +23,7 @@ protected:
     int getStreamHeight() const  override;
     int getStreamHDR() const  override;
     bool getInterlaced()  override {return false;}
-    bool isIFrame() {return m_lastIFrame;}
+    bool isIFrame() override {return m_lastIFrame;}
 
     virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     virtual int getFrameDepth() override { return m_frameDepth; }
