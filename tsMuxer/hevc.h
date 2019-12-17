@@ -85,7 +85,7 @@ protected:
 struct HevcVpsUnit: public HevcUnitWithProfile
 {
     HevcVpsUnit();
-    virtual int deserialize() override;
+    int deserialize() override;
     double getFPS() const;
     void setFPS(double value);
     std::string getDescription() const;
@@ -116,7 +116,7 @@ struct ShortTermRPS
 struct HevcSpsUnit: public HevcUnitWithProfile
 {
     HevcSpsUnit();
-    virtual int deserialize() override;
+    int deserialize() override;
 
     std::string getDescription() const;
 public:
@@ -163,7 +163,7 @@ private:
 struct HevcPpsUnit: public HevcUnit
 {
     HevcPpsUnit();
-    int deserialize();
+    int deserialize() override;
 public:
     int pps_id;
     int sps_id;

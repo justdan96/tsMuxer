@@ -14,18 +14,18 @@ class SRTStreamReader: public AbstractStreamReader
 {
 public:
 	SRTStreamReader();
-	~SRTStreamReader();
-	virtual int readPacket(AVPacket& avPacket);
-	virtual int flushPacket(AVPacket& avPacket) {return m_dstSubCodec->flushPacket(avPacket);}
-	virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false);
-	virtual uint64_t getProcessedSize() {return m_processedSize;}
+	~SRTStreamReader() override;
+	int readPacket(AVPacket& avPacket) override;
+	int flushPacket(AVPacket& avPacket) override {return m_dstSubCodec->flushPacket(avPacket);}
+	void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+	uint64_t getProcessedSize() override {return m_processedSize;}
 	CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType, int containerStreamIndex); 
-	virtual const CodecInfo& getCodecInfo() {return pgsCodecInfo;}
-	virtual void setStreamIndex(int index) {
+	const CodecInfo& getCodecInfo() override {return pgsCodecInfo;}
+	void setStreamIndex(int index) override {
 		m_streamIndex = index;
 		m_dstSubCodec->setStreamIndex(index);
 	}
-	virtual void setDemuxMode(bool value) 
+	void setDemuxMode(bool value) override 
 	{
 		m_demuxMode = value;
 		PGSStreamReader* pgsReader = dynamic_cast<PGSStreamReader*> (m_dstSubCodec);
@@ -44,7 +44,7 @@ public:
 	void setBottomOffset(int offset) {m_srtRender->setBottomOffset(offset);}
 
 protected:
-	virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) {
+	int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData) override {
 		return m_dstSubCodec->writeAdditionData(dstBuffer, dstEnd, avPacket, priorityData);
 	}
 private:

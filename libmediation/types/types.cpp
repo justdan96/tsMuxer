@@ -6,7 +6,7 @@
 #include <memory.h>
 #include <ostream>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -41,7 +41,7 @@ uint64_t my_htonll( const uint64_t& original )
 // Simple types conversion
 int64_t strToInt64( const char* const str )
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return _atoi64( str );
 #else
 	return strtoll( str, 0, 10 );
@@ -50,7 +50,7 @@ int64_t strToInt64( const char* const str )
 
 uint64_t strToInt64u( const char* const str )
 {
-#ifdef WIN32
+#ifdef _WIN32
 	return _atoi64( str );
 #else
 	return strtoull( str, 0, 10 );

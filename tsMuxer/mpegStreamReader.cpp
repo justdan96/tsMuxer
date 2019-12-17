@@ -1,5 +1,5 @@
 
-#ifndef WIN32
+#ifndef _WIN32
 #endif
 #include <iostream>
 #include "mpegStreamReader.h"

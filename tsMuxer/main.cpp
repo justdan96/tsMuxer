@@ -594,7 +594,7 @@ int main(int argc, char** argv)
 
                     LTRACE(LT_INFO, 2, "");
 
-#ifdef WIN32
+#ifdef _WIN32
 					char buffer[1024*16];
 					CharToOemA(itemName.c_str(), buffer);
 					LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i),5,'0') << " name=" << buffer);
@@ -752,7 +752,7 @@ int main(int argc, char** argv)
 	} catch(runtime_error& e) {
 		if (argc == 2)
 			LTRACE2(LT_ERROR, "Error: ");
-#ifdef WIN32
+#ifdef _WIN32
 		char buffer[1024*16];
 		CharToOemA(e.what(), buffer);
 		LTRACE(LT_ERROR, 2, buffer);
@@ -763,7 +763,7 @@ int main(int argc, char** argv)
 	} catch(VodCoreException& e) {
 		if (argc == 2)
 			LTRACE2(LT_ERROR, "Error: ");
-#ifdef WIN32
+#ifdef _WIN32
 		char buffer[1024*16];
 		CharToOemA(e.m_errStr.c_str(), buffer);
 		LTRACE(LT_ERROR, 2, buffer);

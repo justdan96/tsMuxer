@@ -1,5 +1,5 @@
 
-#ifndef WIN32
+#ifndef _WIN32
 #endif
 #include <memory.h>
 #include "mpegVideo.h"
@@ -537,7 +537,7 @@ uint8_t* MPEGPictureHeader::deserializeDisplayExtension(BitStreamReader& bitRead
 	horizontal_offset = bitReader.getBits(16);
 	vertical_offset = bitReader.getBits(16);
     //MpegEncContext *s= &s1->mpeg_enc_ctx;
-	/*
+
     int i,nofco;
     nofco = 1;
     if(s->progressive_sequence){

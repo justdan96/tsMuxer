@@ -9,7 +9,6 @@ add_executable (tsmuxer
   ac3Codec.cpp
   ac3StreamReader.cpp
   avCodecs.cpp
-  base64.cpp
   bitStream.cpp
   blurayHelper.cpp
   bufferedFileReader.cpp
@@ -18,7 +17,6 @@ add_executable (tsmuxer
   bufferedReaderManager.cpp
   combinedH264Demuxer.cpp
   convertUTF.cpp
-  crc.cpp
   dtsStreamReader.cpp
   dvbSubStreamReader.cpp
   h264StreamReader.cpp

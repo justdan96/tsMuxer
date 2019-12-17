@@ -20,9 +20,9 @@ public:
     };
 
 	H264StreamReader();
-    virtual ~H264StreamReader();
+    ~H264StreamReader() override;
 	void setForceLevel(uint8_t value) {m_forcedLevel = value;}
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 	void setH264SPSCont(bool val) {m_h264SPSCont = val;}
 	
@@ -36,13 +36,13 @@ public:
 
     // used for correction offset metadata
     virtual void setStartPTS(int64_t pts) {m_startPts = pts; }
-    virtual bool needSPSForSplit() const override { return true; }
+    bool needSPSForSplit() const override { return true; }
 protected:
-	virtual void onSplitEvent() { m_firstFileFrame = true; }
-	virtual const CodecInfo& getCodecInfo();
-	virtual int intDecodeNAL(uint8_t* buff);
-	virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen);
-	virtual double getStreamFPS(void* curNalUnit) {
+	void onSplitEvent() override { m_firstFileFrame = true; }
+	const CodecInfo& getCodecInfo() override;
+	int intDecodeNAL(uint8_t* buff) override;
+	void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
+	double getStreamFPS(void* curNalUnit) override {
 		SPSUnit* sps = (SPSUnit*) curNalUnit;
 		return sps->getFPS();
 	};
@@ -56,9 +56,9 @@ protected:
 	bool isIFrame() override { return m_lastIFrame; }
     //virtual bool isIFrame() { return m_lastSliceIDR; }
 
-    virtual bool isPriorityData(AVPacket* packet) override;
-    virtual void onShiftBuffer(int offset) override;
-    virtual bool skipNal(uint8_t* nal) override;
+    bool isPriorityData(AVPacket* packet) override;
+    void onShiftBuffer(int offset) override;
+    bool skipNal(uint8_t* nal) override;
 private:
     bool replaceToOwnSPS() const;
     int deserializeSliceHeader(SliceUnit& slice, uint8_t* buff, uint8_t* sliceEnd);

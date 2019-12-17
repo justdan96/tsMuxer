@@ -18,11 +18,11 @@ public:
 		m_longCodesAllowed = false;
 		m_nextFrameAddr = 0;
 	}
-	virtual ~VC1StreamReader() {}
-	virtual int getTSDescriptor(uint8_t* dstBuff);
+	~VC1StreamReader() override {}
+	int getTSDescriptor(uint8_t* dstBuff) override;
 	virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
-    virtual bool skipNal(uint8_t* nal) override;
-    virtual bool needSPSForSplit() const override { return true; }
+    bool skipNal(uint8_t* nal) override;
+    bool needSPSForSplit() const override { return true; }
 protected:
 	const CodecInfo& getCodecInfo() override {return vc1CodecInfo;};
 	int intDecodeNAL(uint8_t* buff) override;

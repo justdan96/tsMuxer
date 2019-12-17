@@ -9,17 +9,17 @@ class SingleFileMuxer: public AbstractMuxer
 {
 public:
 	SingleFileMuxer(MuxerManager* owner);
-	~SingleFileMuxer();
-	virtual bool muxPacket(AVPacket& avPacket);
-	virtual void intAddStream(const std::string& streamName,
+	~SingleFileMuxer() override;
+	bool muxPacket(AVPacket& avPacket) override;
+	void intAddStream(const std::string& streamName,
 		                      const std::string& codecName, int streamIndex, 
  		                      const std::map<std::string, std::string>& params,
 							  AbstractStreamReader* codecReader) override;
-	virtual bool doFlush() override;
-	virtual bool close();
-	virtual void openDstFile() override;
+	bool doFlush() override;
+	bool close() override;
+	void openDstFile() override;
 protected:
-    virtual void parseMuxOpt(const std::string& opts) override;
+    void parseMuxOpt(const std::string& opts) override;
 private:
 	const static int ADD_DATA_SIZE = 2048;
 	struct StreamInfo {
@@ -54,7 +54,7 @@ private:
 class SingleFileMuxerFactory: public AbstractMuxerFactory
 {
 public:
-    virtual AbstractMuxer* newInstance(MuxerManager* owner) const override { return new SingleFileMuxer(owner); }
+    AbstractMuxer* newInstance(MuxerManager* owner) const override { return new SingleFileMuxer(owner); }
 };
 
 #endif

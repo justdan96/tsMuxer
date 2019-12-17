@@ -212,8 +212,8 @@ struct CodecTags{
 class ParsedH264TrackData: public ParsedTrackPrivData {
 public:
 	ParsedH264TrackData(uint8_t* buff, int size);
-	virtual ~ParsedH264TrackData() {}
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
+	~ParsedH264TrackData() override {}
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 protected:
 	int m_nalSize;
 	bool m_firstExtract;
@@ -228,16 +228,16 @@ protected:
 class ParsedH265TrackData: public ParsedH264TrackData {
 public:
     ParsedH265TrackData(uint8_t* buff, int size);
-    virtual ~ParsedH265TrackData() {}
+    ~ParsedH265TrackData() override {}
 
-    virtual bool spsppsExists(uint8_t* buff, int size) override;
+    bool spsppsExists(uint8_t* buff, int size) override;
 };
 
 class ParsedAC3TrackData: public ParsedTrackPrivData {
 public:
 	ParsedAC3TrackData(uint8_t* buff, int size);
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
-	virtual ~ParsedAC3TrackData() {}
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
+	~ParsedAC3TrackData() override {}
 private:
 	bool m_firstPacket;
 	bool m_shortHeaderMode;
@@ -246,8 +246,8 @@ private:
 class ParsedAACTrackData: public ParsedTrackPrivData {
 public:
 	ParsedAACTrackData(uint8_t* buff, int size);
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
-	virtual ~ParsedAACTrackData() {}
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
+	~ParsedAACTrackData() override {}
 private:
 	AACCodec m_aacRaw;
 };
@@ -255,8 +255,8 @@ private:
 class ParsedLPCMTrackData: public ParsedTrackPrivData {
 public:
     ParsedLPCMTrackData(MatroskaTrack* track);
-    virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
-    virtual ~ParsedLPCMTrackData() {}
+    void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
+    ~ParsedLPCMTrackData() override {}
 private:
     bool m_convertBytes;
     int m_bitdepth;
@@ -267,8 +267,8 @@ private:
 class ParsedSRTTrackData: public ParsedTrackPrivData {
 public:
 	ParsedSRTTrackData(uint8_t* buff, int size);
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
-	virtual ~ParsedSRTTrackData() {}
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
+	~ParsedSRTTrackData() override {}
 private:
 	int m_packetCnt;
 };
@@ -276,8 +276,8 @@ private:
 class ParsedVC1TrackData: public ParsedTrackPrivData {
 public:
 	ParsedVC1TrackData(uint8_t* buff, int size);
-	virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
-	virtual ~ParsedVC1TrackData() {}
+	void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
+	~ParsedVC1TrackData() override {}
 private:
 	std::vector<uint8_t> m_seqHeader;
 	bool m_firstPacket;
@@ -286,8 +286,8 @@ private:
 class ParsedPGTrackData: public ParsedTrackPrivData {
 public:
     ParsedPGTrackData() {}
-    virtual ~ParsedPGTrackData() {}
-    virtual void extractData(AVPacket* pkt, uint8_t* buff, int size);
+    ~ParsedPGTrackData() override {}
+    void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 private:
 };
 

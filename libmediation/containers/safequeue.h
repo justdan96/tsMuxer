@@ -117,7 +117,7 @@ public:
 	{
 	}
 
-	virtual ~WaitableSafeQueue() {}
+	~WaitableSafeQueue() override {}
 
 	T pop()
 	{

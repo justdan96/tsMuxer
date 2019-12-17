@@ -53,11 +53,17 @@ This project was created by Roman Vasilenko, with the last public release 20th J
 
 All executable are created to be portable, so you can just save and extract the compressed package for your platform. 
 
-The workflow to automatically create pre-compiled binaries for Windows, Mac and Linux is not quite finished yet.
+Nightly builds are created in Bintray, use the link below to go directly to the latest nightly build:
+[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion)
 
-*However* on each push to the master branch on GitHub, executables are created with GitHub Actions. To download the pre-compiled binaries head over to the following URL (you must be logged in) https://github.com/justdan96/tsMuxer/actions and click on the latest action for your chosen platform (Windows, Mac or Linux). In the Artifacts section in the top-right you can download a ZIP file containing the executable for tsMuxer. 
+Or browse to the version you want via [this link](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly), clicking the link for the version you want.
+![bintray_version_list](https://user-images.githubusercontent.com/503722/70852149-f3f37300-1e95-11ea-8fb4-c9a82d698448.png)
 
-At the moment only the CLI is included, the GUI is not yet available.
+Then when you are on the page for your chosen version, click on the "Files" tab:
+![bintray_file_link](https://user-images.githubusercontent.com/503722/70852150-f48c0980-1e95-11ea-8bb8-76168fb0c2cb.png)
+
+Finally select the ZIP file for your platform - Linux, Mac, Windows 32-bit or Windows 64-bit:
+![bintray_file_list](https://user-images.githubusercontent.com/503722/70852151-f48c0980-1e95-11ea-8914-7d525b614bf3.png)
 
 ### Windows
 
@@ -65,12 +71,11 @@ The ZIP file for Windows can just be unzipped and the executables can be used st
 
 ### Linux
 
-The ZIP file for Linux can just be unzipped and the executables can be used straight away. The CLI doesn't have any dependencies. The GUI does have dependencies, but issues with these can be avoided with AppImage. 
+The ZIP file for Linux can just be unzipped and the executables can be used straight away - there are no dependencies.
 
 ### MacOS
 
 This ZIP file for MacOS can just be unzipped and the executables can be used after installing a couple of dependencies. To install those run the commands below in the Terminal:
-
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
 brew install freetype

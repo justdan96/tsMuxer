@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef MAC
+#if defined(__APPLE__) && defined(__MACH__)
 #define O_LARGEFILE 0
 #endif
 
@@ -159,7 +159,7 @@ uint64_t File::seek( int64_t offset, SeekMethod whence )
 		break;
 	}
     m_pos = offset;
-#ifdef MAC  
+#if defined(__APPLE__) && defined(__MACH__)
 	return lseek( (long)m_impl, offset, sWhence );
 #else
 	return lseek64( (long)m_impl, offset, sWhence );
@@ -168,7 +168,7 @@ uint64_t File::seek( int64_t offset, SeekMethod whence )
 
 bool File::truncate( uint64_t newFileSize )
 {
-#ifdef MAC  
+#if defined(__APPLE__) && defined(__MACH__)
 	return ftruncate( (long)m_impl, newFileSize ) == 0;
 #else
 	return ftruncate64( (long)m_impl, newFileSize ) == 0;

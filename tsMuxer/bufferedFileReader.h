@@ -15,9 +15,9 @@ class FileListIterator: public FileNameIterator
 public:
     FileListIterator(): m_index(0)
     {}
-	virtual ~FileListIterator() {}
+	~FileListIterator() override {}
 
-	virtual std::string getNextName() override
+	std::string getNextName() override
     {
         if (++m_index < m_files.size())
             return m_files[m_index];
@@ -53,10 +53,10 @@ public:
         m_fileHeaderSize(0)
     {}
 
-    virtual ~FileReaderData() 
+    ~FileReaderData() override 
     {}
 
-    virtual uint32_t readBlock(uint8_t* buffer, int max_size) 
+    uint32_t readBlock(uint8_t* buffer, int max_size) override 
     {
         int rez = 0;
         rez = m_file.read(buffer, max_size);
@@ -65,9 +65,9 @@ public:
     }
 	
 
-    virtual bool openStream();
-	virtual bool closeStream() { return m_file.close(); }
-	virtual bool incSeek ( int64_t offset ) { return m_file.seek(offset, File::smCurrent) != uint64_t(-1); }
+    bool openStream() override;
+	bool closeStream() override { return m_file.close(); }
+	bool incSeek ( int64_t offset ) override { return m_file.seek(offset, File::smCurrent) != uint64_t(-1); }
 
 public:
 	File     m_file;
@@ -79,10 +79,10 @@ class BufferedFileReader: public BufferedReader
 public:
 	BufferedFileReader (uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
 
-    virtual bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0);
-	virtual bool gotoByte(uint32_t readerID, uint64_t seekDist);
+    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
+	bool gotoByte(uint32_t readerID, uint64_t seekDist) override;
 protected:
-	ReaderData* intCreateReader() { return new FileReaderData(m_blockSize, m_allocSize); }
+	ReaderData* intCreateReader() override { return new FileReaderData(m_blockSize, m_allocSize); }
 };
 
 #endif
