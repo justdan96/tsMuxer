@@ -3,7 +3,7 @@
 # BINTRAY_API_KEY
 BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
-repo_commit=$(curl -s https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPO/:commit.txt)
+repo_commit=$(curl -s https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPO/commit.txt)
 local_commit=$(git rev-parse HEAD)
 version_date=$(date +%Y-%m-%d--%H-%M-%S)
 
