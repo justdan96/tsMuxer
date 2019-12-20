@@ -10,8 +10,6 @@
 #include <set>
 #include <chrono>
 #include <queue>
-#include <iomanip>
-#include <chrono>
 #include "vod_common.h"
 #include "vodCoreException.h"
 #include "bufferedReaderManager.h"
