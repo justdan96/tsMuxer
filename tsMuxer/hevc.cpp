@@ -820,13 +820,10 @@ int HevcSeiUnit::deserialize()
 		return rez;
 	try
 	{
-		int payloadType;
-		int payloadSize;
-		int nbyte;
 		do {
-			payloadType = 0;
-			payloadSize = 0;
-			nbyte = 0xFF;
+			int payloadType = 0;
+			int payloadSize = 0;
+			int nbyte = 0xFF;
 			while (nbyte == 0xFF) {
 				nbyte = m_reader.getBits(8);
 				payloadType += nbyte;
