@@ -179,7 +179,7 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
         memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
                              "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
                              "\x00\x00\x00\x08\x51\x00\x00\x00\x00\x00\x00\x00", 36); // HDR data extension
-        bdIndexData[0x96] = HDR10_metadata[0]; // HDR flags
+        bdIndexData[0x96] = (uint8_t)HDR10_metadata[0]; // HDR flags
 
     }
     else {
