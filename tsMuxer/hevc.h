@@ -175,7 +175,8 @@ public:
 struct HevcSeiUnit: public HevcUnit
 {
 	HevcSeiUnit();
-	int deserialize();
+	int deserialize() override;
+public:
     bool isHDR10;
     bool isHDR10plus;
     bool isDV;
