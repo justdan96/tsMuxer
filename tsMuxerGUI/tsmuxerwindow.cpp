@@ -563,18 +563,14 @@ TsMuxerWindow::TsMuxerWindow()
 
   ui.langComboBox->addItem("und (Undetermined)");
   ui.langComboBox->addItem("--------- common ---------");
-  for (int i = 0; i < sizeof(shortLangList) / 2 / sizeof(char *); ++i) {
-    const char *addr = shortLangList[i][0];
-    ui.langComboBox->addItem(QString(shortLangList[i][0]) + " (" +
-                                 shortLangList[i][1] + ")",
-                             (qlonglong)(void *)addr);
+  for (auto&& lang : shortLangList) {
+    ui.langComboBox->addItem(QString("%1 (%2)").arg(lang.code).arg(lang.lang),
+                             QString::fromUtf8(lang.code));
   }
   ui.langComboBox->addItem("---------- all ----------");
-  for (int i = 0; i < sizeof(fullLangList) / 2 / sizeof(char *); ++i) {
-    const char *addr = fullLangList[i][0];
-    ui.langComboBox->addItem(QString(fullLangList[i][0]) + " (" +
-                                 fullLangList[i][1] + ")",
-                             (qlonglong)(void *)addr);
+  for (auto&& lang : fullLangList) {
+      ui.langComboBox->addItem(QString("%1 (%2)").arg(lang.code).arg(lang.lang),
+                               QString::fromUtf8(lang.code));
   }
   trackLVItemSelectionChanged();
 
