@@ -24,6 +24,7 @@ public:
 
 	int getStreamWidth() const override {return m_sequence.width;}
 	int getStreamHeight()const override {return m_sequence.height;}
+	int getStreamHDR()const override { return 0; }
 	bool getInterlaced() override {return !m_sequence.progressive_sequence;}
 
 protected:

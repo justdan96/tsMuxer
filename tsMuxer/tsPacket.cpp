@@ -12,6 +12,7 @@
 #include <string>
 #include <fs/systemlog.h>
 #include "h264StreamReader.h"
+#include "hevc.h"
 
 using namespace std;
 
@@ -566,7 +567,12 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
 		writer.putBits(4, aspect_ratio_index);
 		writer.putBits(2,0); //reserved_for_future_use 2 bslbf
 		writer.putBit(0); // cc_flag
-	    writer.putBits(17,0); // reserved_for_future_use 17 bslbf
+		writer.putBit(0); // reserved
+		if (HDR & 18) writer.putBits(8, 0x12); // HDR10 or HDR10plus
+		else if (HDR == 4) writer.putBits(8, 0x22); // DV
+		else writer.putBits(8, 0);
+		if (HDR == 16) writer.putBits(8, 0x80); // HDR10plus
+		else writer.putBits(8, 0);
 		composeISRC(writer);
 		writer.putBits(32, 0); // reserved_for_future_use 32 bslbf
 	} else if (isAudioStreamType(stream_coding_type)) { 
@@ -574,7 +580,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
 		writer.putBits(4, sampling_frequency_index);
 		writeString(language_code, writer, 3);
 		composeISRC(writer);
-		writer.putBits(32,0);
+		writer.putBits(32,0); // reserved_for_future_use 32 bslbf
 	} else if (stream_coding_type==0x90) {
 		// Presentation Graphics stream
 		writeString(language_code, writer, 3);
@@ -1109,7 +1115,6 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
         writer.putBits(32, 0); // skip extent dataLen
     }
 
-
     while (writer.getBitsCount() % 32)
         writer.putBits(16, 0);
 
@@ -1136,11 +1141,8 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
         CPI_SS_StartPos[1] = my_htonl(writer.getBitsCount()/8 - beforeExtentCount);
     }
 
-
-
     *lengthPos = my_htonl(writer.getBitsCount()/8 - beforeCount - 4);
 }
-
 
 void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
 {
@@ -1234,7 +1236,7 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
     uint32_t* extentInfo_pos = (uint32_t*) (buffer + writer.getBitsCount()/8);
 	writer.putBits(32,0); // extent info
 	for (int i = 0; i < 3; i++) 
-		writer.putBits(32,0); //reserved_for_future_use 96 bslbf
+		writer.putBits(32,0); //reserved_for_future_use 32 bslbf
 
 	composeClipInfo(writer);
 	while (writer.getBitsCount()%32 != 0) writer.putBits(8,0);
@@ -1255,7 +1257,7 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
     while (writer.getBitsCount()%32 != 0) writer.putBits(8,0);
 
     *extentInfo_pos = my_htonl(writer.getBitsCount()/8);
-    composeExtentInfo(writer);
+	composeExtentInfo(writer);
     while (writer.getBitsCount()%32 != 0) writer.putBits(8,0);
 
 	writer.flushBits();
@@ -1280,6 +1282,7 @@ MPLSParser::MPLSParser():
     number_of_secondary_audio_stream_entries = 0;
     number_of_secondary_video_stream_entries = 0;
     number_of_PiP_PG_textST_stream_entries_plus = 0;
+	number_of_DolbyVision_video_stream_entries = 0;
 }
 
 
@@ -1415,6 +1418,25 @@ int MPLSParser::composeSTN_tableSS(uint8_t* buffer, int bufferSize)
     }
 };
 
+int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
+{
+	BitStreamWriter writer;
+	writer.setBuffer(buffer, buffer + bufferSize);
+	try {
+		writer.putBits(32, 0x20);
+		writer.putBits(32, 1 << 24);
+		writer.putBits(32, 1 << 28);
+		for (int i=1; i<7; i++)
+			writer.putBits(32, HDR10_metadata[i]);
+		writer.flushBits();
+		return writer.getBitsCount() / 8;
+	}
+	catch (...)
+	{
+		return 0;
+	}
+}
+
 int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 {
     for (int i = 0; i < m_streamInfo.size(); i++)
@@ -1434,8 +1456,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 	std::string version_number;
 	if (dt == DT_BLURAY)
 		version_number = "0200";
-	else if (dt == UHD_BLURAY)
-		version_number = "0300";
+	else if (dt == UHD_BLURAY) 
+		version_number = "0300"; 
 	else 
 		version_number = "0100";
 	CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
@@ -1463,7 +1485,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 	while (writer.getBitsCount() % 16 != 0)
 		writer.putBits(8,0);
 	
-	if (number_of_SubPaths > 0 || isDependStreamExist) 
+	if (number_of_SubPaths > 0 || isDependStreamExist || dt == UHD_BLURAY) 
 	{
 		*extDataStartAddr = my_htonl(writer.getBitsCount()/8);
 		uint8_t buffer[1024*4];
@@ -1490,6 +1512,14 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
             blockVector.push_back(extDataBlock2);
             
         }
+
+		if (dt == UHD_BLURAY)
+		{
+			int bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
+			ExtDataBlockInfo extDataBlock(buffer, bufferSize, 3, 5);
+			blockVector.push_back(extDataBlock);
+		}
+
 
 		composeExtensionData(writer, blockVector);
 		while (writer.getBitsCount() % 16 != 0)
@@ -2282,6 +2312,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 	number_of_primary_audio_stream_entries = 0;
     number_of_secondary_audio_stream_entries = 0;
 	number_of_PG_textST_stream_entries = 0;
+	number_of_DolbyVision_video_stream_entries = 0;
 
     std::vector<MPLSStreamInfo>& streamInfo = isSSEx ? m_streamInfoMVC : m_streamInfo;
 
@@ -2290,10 +2321,12 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 		int stream_coding_type = streamInfo[i].stream_coding_type;
 		if (isVideoStreamType(stream_coding_type))
 		{
-			if (!streamInfo[i].isSecondary)
-				number_of_primary_video_stream_entries++;
-			else
+			if (streamInfo[i].isSecondary)
 				number_of_secondary_video_stream_entries++;
+			else if (streamInfo[i].HDR == 4)
+				number_of_DolbyVision_video_stream_entries++;
+			else
+				number_of_primary_video_stream_entries++;
 		} else if (isAudioStreamType(stream_coding_type))
 		{
             if (!streamInfo[i].isSecondary)
@@ -2314,21 +2347,21 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 	    writer.putBits(8,0); //int number_of_IG_stream_entries = reader.getBits(8); //8 uimsbf
 	    writer.putBits(8,number_of_secondary_audio_stream_entries);
 	    writer.putBits(8, number_of_secondary_video_stream_entries);  //int number_of_secondary_video_stream_entries. Now subpath used for second video stream
-	    writer.putBits(8,0);//int number_of_PiP_PG_textST_stream_entries_plus = reader.getBits(8); //8 uimsbf
-	    writer.putBits(32,0); //reserved_for_future_use 40 bslbf
-	    writer.putBits(8,0);
+	    writer.putBits(8,0); // number_of_PiP_PG_textST_stream_entries_plus
+		writer.putBits(8, number_of_DolbyVision_video_stream_entries);
+	    writer.putBits(32,0); //reserved_for_future_use 32 bslbf
     }
 
 	//if (number_of_SubPaths == 0)
     
     // video
-	for (int i = 0; i < number_of_primary_video_stream_entries; i++) 
+	for (int i = 0; i < streamInfo.size(); i++)
     {
 		int stream_coding_type = streamInfo[i].stream_coding_type;
-		if (!streamInfo[i].isSecondary && isVideoStreamType(stream_coding_type)) {
+		if (isVideoStreamType(stream_coding_type) && !streamInfo[i].isSecondary && streamInfo[i].HDR != 4) {
 			streamInfo[i].composeStreamEntry(writer, PlayItem_id);
 			streamInfo[i].composeStreamAttributes(writer);
-            if (stream_coding_type == 0x20)
+            if (stream_coding_type == 0x20) // MVC
             {
                 writer.putBits(10, 0); //reserved_for_future_use
                 writer.putBits(6, FFMAX(1, streamInfo[i].number_of_offset_sequences));
@@ -2418,6 +2451,18 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 		}
 	}
 
+	// DV video
+	for (int i = 0; i < streamInfo.size(); i++)
+	{
+		int stream_coding_type = streamInfo[i].stream_coding_type;
+		if (isVideoStreamType(stream_coding_type) && streamInfo[i].HDR == 4) {
+			streamInfo[i].type = 4; 
+			streamInfo[i].composeStreamEntry(writer, PlayItem_id);
+			streamInfo[i].composeStreamAttributes(writer);
+		}
+	}
+
+
     if (isSSEx && writer.getBitsCount() % 32 != 0)
         writer.putBits(16, 0);
 
@@ -2429,7 +2474,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 	// NOTE: see https://github.com/lerks/BluRay/wiki/STNTable
 	int length = reader.getBits(16); //16 uimsbf
     int startBits = reader.getBitsLeft();
-	
+
 	reader.skipBits(16); //reserved_for_future_use 16 bslbf
 	number_of_primary_video_stream_entries = reader.getBits(8); //8 uimsbf
 	number_of_primary_audio_stream_entries = reader.getBits(8); //8 uimsbf
@@ -2438,8 +2483,8 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 	number_of_secondary_audio_stream_entries = reader.getBits(8); //8 uimsbf
 	number_of_secondary_video_stream_entries = reader.getBits(8); //8 uimsbf
 	number_of_PiP_PG_textST_stream_entries_plus = reader.getBits(8); //8 uimsbf
-	reader.skipBits(32); //reserved_for_future_use 40 bslbf
-	reader.skipBits(8);
+	number_of_DolbyVision_video_stream_entries = reader.getBits(8); //8 uimsbf
+	reader.skipBits(32); //reserved_for_future_use 32 bslbf
 
 	for (int primary_video_stream_id=0; primary_video_stream_id< number_of_primary_video_stream_entries; primary_video_stream_id++) 
 	{
@@ -2466,6 +2511,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         if (PlayItem_id == 0)
             m_streamInfo.push_back(streamInfo);
 	}
+
 	for (int IG_stream_id=0; IG_stream_id<number_of_IG_stream_entries; IG_stream_id++) 
 	{
 		MPLSStreamInfo streamInfo;
@@ -2529,6 +2575,14 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 		}
 		//}
 	}
+	for (int DV_video_stream_id = 0; DV_video_stream_id < number_of_DolbyVision_video_stream_entries; DV_video_stream_id++)
+	{
+		MPLSStreamInfo streamInfo;
+		streamInfo.parseStreamEntry(reader);
+		streamInfo.parseStreamAttributes(reader);
+		if (PlayItem_id == 0)
+			m_streamInfo.push_back(streamInfo);
+	}
 
     int endBits = reader.getBitsLeft();
     int toPassBits = length * 8 - (startBits - endBits);
@@ -2548,13 +2602,12 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
 
     bool isNtsc = width <= 854 && height <= 480 && (fabs(25-fps) >= 0.5 && fabs(50-fps) >= 0.5);
     bool isPal = width <= 1024 && height <= 576 && (fabs(25-fps) < 0.5 || fabs(50-fps) < 0.5);
-
     if (isNtsc)
         *video_format = interlaced ? 1 : 3;
     else if (isPal)
         *video_format = interlaced ? 2 : 7;
-    else if (width >= 2600)
-        *video_format = 8; // UHD
+	else if (width >= 2600)
+		*video_format = 8;
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6; // as 1920x1080
     else
@@ -2600,8 +2653,9 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
 		{
             width = vStream->getStreamWidth();
             height = vStream->getStreamHeight();
+			HDR = vStream->getStreamHDR();
             VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), vStream->getStreamWidth(), vStream->getStreamHeight(), ar,
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar,
                                &video_format, &frame_rate_index, &aspect_ratio_index);
             if (ar == AR_3_4)
                 width = height * 4 / 3;
@@ -2655,6 +2709,7 @@ M2TSStreamInfo::M2TSStreamInfo(const M2TSStreamInfo& other)
     number_of_offset_sequences = other.number_of_offset_sequences;
     width = other.width;
     height = other.height;
+	HDR = other.HDR;
     aspect_ratio_index = other.aspect_ratio_index;
     audio_presentation_type = other.audio_presentation_type;
     sampling_frequency_index = other.sampling_frequency_index;
@@ -2718,7 +2773,7 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 	// NOTE: see https://github.com/lerks/BluRay/wiki/StreamEntry
 	int length = reader.getBits(8); //8 uimsbf
     int startBits = reader.getBitsLeft();
-	
+ 
 	type = reader.getBits(8); //8 bslbf
 	if (type==1) {
 		streamPID = reader.getBits(16); //16 uimsbf
@@ -2735,7 +2790,12 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 		reader.skipBits(32); //reserved_for_future_use 40 bslbf
 		reader.skipBits(8);
 	}
-
+	else if (type == 4) {
+		reader.skipBits(8);
+		streamPID = reader.getBits(16); //16 uimsbf
+		reader.skipBits(32); //reserved_for_future_use 40 bslbf
+		reader.skipBits(8);
+	}
     int endBits = reader.getBitsLeft();
     int toPassBits = length * 8 - (startBits - endBits);
     if (toPassBits > 0) {
@@ -2779,9 +2839,15 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 	else if (type == 3) {
 		writer.putBits(8, subPathID); //ref_to_SubPath_id. constant subPathID == 0 
 		writer.putBits(16, streamPID); //16 uimsbf
-		writer.putBits(32, 0); //reserved_for_future_use 48 bslbf
+		writer.putBits(32, 0); //reserved_for_future_use 40 bslbf
 		writer.putBits(8,0);
-	} 
+	}
+	else if (type == 4) {
+		writer.putBits(8, 0);
+		writer.putBits(16, streamPID); //16 uimsbf
+		writer.putBits(32, 0); //reserved_for_future_use 40 bslbf
+		writer.putBits(8, 0);
+	}
 	else
 		THROW (ERR_COMMON, "Unsupported media type for AVCHD/Blu-ray muxing");
 	*lengthPos = writer.getBitsCount()/8 - initPos;
@@ -2792,7 +2858,7 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 	// NOTE: see https://github.com/lerks/BluRay/wiki/StreamAttributes
 	int length = reader.getBits(8); // 8 uimsbf
     int startBits = reader.getBitsLeft();
-	
+
 	stream_coding_type = reader.getBits(8); //8 bslbf
 	if (isVideoStreamType(stream_coding_type))
 	{
@@ -2837,7 +2903,12 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
 	{
 		writer.putBits(4, video_format); //4 bslbf
 		writer.putBits(4, frame_rate_index); // 4 bslbf
-		writer.putBits(24,0); //reserved_for_future_use 24 bslbf
+		if (HDR & 18) writer.putBits(8, 0x12); // HDR10 or HDR10plus
+		else if (HDR == 4) writer.putBits(8, 0x22); // DV
+		else writer.putBits(8, 0);
+		if (HDR == 16) writer.putBits(8, 0x40); // HDR10plus
+		else writer.putBits(8, 0);
+		writer.putBits(8, 0); //reserved_for_future_use 8 bslbf
 	} else if (isAudioStreamType(stream_coding_type))
 	{
 		writer.putBits(4, audio_presentation_type); //4 bslbf
@@ -2894,6 +2965,7 @@ void MovieObject::parse(uint8_t* buffer, int len)
 	//for (i=0; i<N2; i++) padding_word 16 bslbf
 }
 
+// Nota: not used, MovieObject.bdmv is actually composed by BlurayHelper::writeBluRayFiles
 int MovieObject::compose(uint8_t* buffer, int len, DiskType dt)
 {
 	BitStreamWriter writer;
@@ -2902,8 +2974,8 @@ int MovieObject::compose(uint8_t* buffer, int len, DiskType dt)
 	CLPIStreamInfo::writeString("MOBJ", writer, 4);
 	if (dt == DT_BLURAY)
 		CLPIStreamInfo::writeString("0200", writer, 4);
-	else if (dt == UHD_BLURAY)
-		CLPIStreamInfo::writeString("0300", writer, 4);
+	else if (dt == UHD_BLURAY) 
+		CLPIStreamInfo::writeString("0300", writer, 4); 
 	else
 		CLPIStreamInfo::writeString("0100", writer, 4);
 	writer.putBits(32,0); //uint32_t ExtensionData_start_address  

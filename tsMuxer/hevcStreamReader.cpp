@@ -2,16 +2,19 @@
 #include "nalUnits.h"
 #include <fs/systemlog.h>
 #include "vodCoreException.h"
+#include "hevc.h"
 
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
+int HDR10_metadata[7] = { 1,0,0,0,0,0,0 };
 
 HEVCStreamReader::HEVCStreamReader(): 
     MPEGStreamReader(),
     m_vps(0),
     m_sps(0),
     m_pps(0),
+	m_sei(0),
     m_firstFrame(true),
     m_frameNum(0),
     m_fullPicOrder(0),
@@ -32,6 +35,7 @@ HEVCStreamReader::~HEVCStreamReader()
     delete m_vps;
     delete m_sps;
     delete m_pps;
+    delete m_sei;
 }
 
 
@@ -74,6 +78,24 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                     return rez;
                 break;
             }
+            case NAL_SEI_PREFIX: {
+                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+                if (!m_sei)
+                    m_sei = new HevcSeiUnit();
+                m_sei->decodeBuffer(nal, nextNal);
+                if (m_sei->deserialize() != 0)
+                    return rez;
+                break;
+            }
+            case NAL_DV: {
+                if (!m_sei)
+                    m_sei = new HevcSeiUnit();
+                if (nal[1] == 1 && !m_sei->isDV) {
+                    m_sei->isDV = true;
+                    *HDR10_metadata |= 4; // Dolby Vision flag
+                }
+                break;
+            }
         }
     }
 
@@ -88,6 +110,10 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 
 int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff)
 {
+    if (m_firstFrame) {
+        checkStream(m_buffer, m_bufEnd - m_buffer);
+    }
+
     *dstBuff++ = 0x05; // registreation descriptor tag
     *dstBuff++ = 4;
     memcpy(dstBuff, "HEVC", 4);
@@ -126,6 +152,11 @@ int HEVCStreamReader::getStreamWidth() const
 int HEVCStreamReader::getStreamHeight() const  
 {
     return m_sps ? m_sps->pic_height_in_luma_samples : 0;
+}
+
+int HEVCStreamReader::getStreamHDR() const
+{
+    return m_sei->isDV ? 4 : (m_sei->isHDR10plus ? 16 : (m_sei->isHDR10 ? 2 : 1));
 }
 
 double HEVCStreamReader::getStreamFPS(void * curNalUnit)

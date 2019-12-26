@@ -221,10 +221,10 @@ public:
 	int aspect_ratio_info_present_flag;
 	int aspect_ratio_idc;
 
-    int hdrParamsBitPos;
+    int hrdParamsBitPos;
     HRDParams nalHrdParams;
     HRDParams vclHrdParams;
-    std::vector<int> mvcHdrParamsBitPos;
+    std::vector<int> mvcHrdParamsBitPos;
     std::vector<HRDParams> mvcNalHrdParams;
     std::vector<HRDParams> mvcVclHrdParams;
 	
@@ -237,8 +237,8 @@ public:
     std::vector<int> vui_mvc_nal_hrd_parameters_bit_pos;
     std::vector<int> vui_mvc_nal_hrd_len;
     std::vector<int> vui_mvc_vcl_hrd_len;
-    int nal_hdr_len;
-    int vcl_hdr_len;
+    int nal_hrd_len;
+    int vcl_hrd_len;
     */
 
 	//bool m_pulldown;
@@ -261,7 +261,7 @@ public:
 	}
 	bool isReady() {return m_ready;}
 	int deserialize();
-	void insertHdrParameters();
+	void insertHrdParameters();
     void updateTimingInfo();
 	int getMaxBitrate();
 	void hrd_parameters(HRDParams& params);
@@ -269,7 +269,7 @@ public:
 	int getCropY();
 	int getCropX();
 	void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
-	void serializeHDRParameters(BitStreamWriter& writer, const HRDParams& params);
+	void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
     int deserializeSubSPS();
     void seq_parameter_set_mvc_extension();
@@ -277,7 +277,7 @@ public:
     void svc_vui_parameters_extension();
     void mvc_vui_parameters_extension();
 private:
-    void insertHrdData(int bitPos, int nal_hdr_len, int vcl_hdr_len, bool addVuiHeader, const HRDParams& params);
+    void insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool addVuiHeader, const HRDParams& params);
 };
 
 const static char* sliceTypeStr[5] = {"P_TYPE", "B_TYPE", "I_TYPE", "SP_TYPE", "SI_TYPE"};

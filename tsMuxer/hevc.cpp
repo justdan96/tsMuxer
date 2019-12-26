@@ -697,11 +697,13 @@ int HevcSpsUnit::deserialize()
         int PicHeightInCtbsY = ceilDiv(pic_height_in_luma_samples, CtbSizeY);
         int PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
         PicSizeInCtbsY_bits = 0;
-        while (PicSizeInCtbsY) {
+		int count1bits = 0;
+		while (PicSizeInCtbsY) {
+			count1bits += PicSizeInCtbsY & 1;
             PicSizeInCtbsY_bits++;
             PicSizeInCtbsY >>= 1;
         }
-
+		if (count1bits == 1) PicSizeInCtbsY_bits -= 1; // in case PicSizeInCtbsY is power of 2
 
         bool scaling_list_enabled_flag = m_reader.getBit();
         if( scaling_list_enabled_flag ) 
@@ -805,6 +807,71 @@ int HevcPpsUnit::deserialize()
     {
         return NOT_ENOUGHT_BUFFER;
     }
+}
+
+// ----------------------- HevcSeiUnit ------------------------
+HevcSeiUnit::HevcSeiUnit():
+isHDR10(false), isHDR10plus(false), isDV(false) {}
+
+int HevcSeiUnit::deserialize()
+{
+	int rez = HevcUnit::deserialize();
+	if (rez)
+		return rez;
+	try
+	{
+		do {
+			int payloadType = 0;
+			int payloadSize = 0;
+			int nbyte = 0xFF;
+			while (nbyte == 0xFF) {
+				nbyte = m_reader.getBits(8);
+				payloadType += nbyte;
+			}
+			nbyte = 0xFF;
+			while (nbyte == 0xFF) {
+				nbyte = m_reader.getBits(8);
+				payloadSize += nbyte;
+			}
+			if (payloadType == 137 && !isHDR10) { // mastering_display_colour_volume
+                HDR10_metadata[1] = m_reader.getBits(32); // display_primaries Green
+                HDR10_metadata[2] = m_reader.getBits(32); // display_primaries Red
+                HDR10_metadata[3] = m_reader.getBits(32); // display_primaries Blue
+                HDR10_metadata[4] = m_reader.getBits(32); // White Point
+                HDR10_metadata[5] = ((m_reader.getBits(32) / 10000) << 16) + m_reader.getBits(32); // max & min display_mastering_luminance
+			}
+            else if (payloadType == 144 && !isHDR10) { // content_light_level_info
+                isHDR10 = true;
+                *HDR10_metadata |= 2; // HDR10 flag
+                 int maxCLL = m_reader.getBits(32); // maxCLL, maxFALL
+                 if (maxCLL != 0) HDR10_metadata[6] = maxCLL;
+            }
+			else if (payloadType == 4 && !isHDR10plus) { // HDR10Plus Metadata
+                m_reader.skipBits(8); // country_code
+				m_reader.skipBits(32); // terminal_provider
+				int application_identifier = m_reader.getBits(8);
+				int application_version = m_reader.getBits(8);
+				int num_windows = m_reader.getBits(2);
+				m_reader.skipBits(6);
+                if (application_identifier == 4 && application_version == 1 && num_windows == 1)
+                {
+                    isHDR10plus = true;
+                    *HDR10_metadata |= 16; // HDR10plus flag
+                }
+				payloadSize -= 8;
+				for (int i = 0; i < payloadSize; i++)
+					m_reader.skipBits(8);
+			}
+			else for (int i = 0; i < payloadSize; i++)
+				m_reader.skipBits(8);
+		} while (m_reader.showBits(8) != 0x80);
+
+		return 0;
+	}
+	catch (VodCoreException & e)
+	{
+		return NOT_ENOUGHT_BUFFER;
+	}
 }
 
 // -----------------------  HevcSliceHeader() -------------------------------------

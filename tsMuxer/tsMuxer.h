@@ -8,6 +8,7 @@
 #include "abstractMuxer.h"
 #include "avPacket.h"
 #include "vodCoreException.h"
+#include "hevc.h"
 
 const static int MAX_PES_HEADER_LEN = 512;
 
@@ -143,6 +144,7 @@ private:
 	bool m_beforePCRDataWrited;
 	std::map<int, int> m_extIndexToTSIndex;
 	int m_videoTrackCnt;
+    int m_DVvideoTrackCnt;
 	int m_videoSecondTrackCnt;
 	int m_audioTrackCnt;
     int m_secondaryAudioTrackCnt;

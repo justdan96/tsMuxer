@@ -39,7 +39,7 @@ static const uint8_t STREAM_TYPE_PRIVATE_DATA    = 0x06;
 static const uint8_t STREAM_TYPE_VIDEO_MPEG4     = 0x10;
 static const uint8_t STREAM_TYPE_VIDEO_H264      = 0x1b;
 static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x24;
-//static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x06;
+//static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x25; // changed from 0x06
 static const uint8_t STREAM_TYPE_VIDEO_MVC       = 0x20;
 static const uint8_t STREAM_TYPE_VIDEO_VC1       = 0xea;
 
@@ -197,7 +197,7 @@ typedef std::map<int64_t, PMTIndexData> PMTIndex;
 struct 	PMTStreamInfo
 {
 	PMTStreamInfo() {
-        m_streamType = 0; m_esInfoLen = 0; m_pid = 0; m_pmtPID = -1; isSecondary = false;
+		m_streamType = 0; m_esInfoLen = 0; m_pid = 0; m_pmtPID = -1; isSecondary = false;
     }
 	PMTStreamInfo(int streamType, int pid, uint8_t* esInfoData, int esInfoLen, AbstractStreamReader* codecReader, const std::string& lang, bool secondary) 
 	{
@@ -222,6 +222,7 @@ struct 	PMTStreamInfo
 	uint8_t m_esInfoData[128];
 	char m_lang[4];
 	bool isSecondary;
+
 	// ---------------------
 	std::vector<PMTIndex> m_index; // blu-ray seek index. key=number of tsFrame. value=information about key frame
 	AbstractStreamReader* m_codecReader;
@@ -290,7 +291,7 @@ struct PS_stream_map
 
 struct M2TSStreamInfo 
 {
-    M2TSStreamInfo(): streamPID(0), character_code(0), width(0), height(0), frame_rate_index(3), video_format(0), isSecondary(false) {}
+    M2TSStreamInfo(): streamPID(0), character_code(0), width(0), height(0), HDR(0), frame_rate_index(3), video_format(0), isSecondary(false) {}
 	M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
     M2TSStreamInfo(const M2TSStreamInfo& other);
 
@@ -301,6 +302,7 @@ struct M2TSStreamInfo
     int number_of_offset_sequences;
     int width;
 	int height;
+	int HDR;
 	int aspect_ratio_index;
 	int audio_presentation_type;
 	int sampling_frequency_index;
@@ -550,6 +552,7 @@ struct MPLSParser
     int number_of_secondary_audio_stream_entries;
     int number_of_secondary_video_stream_entries;
     int number_of_PiP_PG_textST_stream_entries_plus;
+	int number_of_DolbyVision_video_stream_entries;
 
     std::vector<std::string> m_mvcFiles;
 private:
@@ -577,6 +580,7 @@ private:
 	void composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool isSSEx);
     int composeSTN_tableSS(uint8_t* buffer, int bufferSize);
     int composeSubPathEntryExtension(uint8_t* buffer, int bufferSize);
+	int composeUHD_metadata(uint8_t* buffer, int bufferSize);
 	MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
 	int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);

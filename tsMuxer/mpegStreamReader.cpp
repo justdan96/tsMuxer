@@ -115,8 +115,8 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 		}
 		else 
 			m_curPos = m_bufEnd;
-		int bytesPocessed = m_curPos - prevPos;
-		m_processedBytes += bytesPocessed;
+		int bytesProcessed = m_curPos - prevPos;
+		m_processedBytes += bytesProcessed;
 		prevPos = m_curPos;
 		if (!m_syncToStream)
 			return NEED_MORE_DATA;
@@ -189,9 +189,9 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
 		}
 	}
 
-	int bytesPocessed = nal - prevPos;
+	int bytesProcessed = nal - prevPos;
 	avPacket.data = m_curPos;
-	avPacket.size = bytesPocessed;
+	avPacket.size = bytesProcessed;
 	avPacket.pts = m_curPts + m_timeOffset;
 	avPacket.dts = m_curDts + m_timeOffset - m_pcrIncPerFrame * getFrameDepth(); // shift dts back
 	if (isIFrame())

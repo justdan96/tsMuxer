@@ -519,7 +519,7 @@ SPSUnit::SPSUnit():
     profile_idc(0),
     num_views(0),
     vui_parameters_bit_pos(-1),
-    hdrParamsBitPos(-1)
+    hrdParamsBitPos(-1)
     //m_pulldown = false;
 {
 
@@ -724,7 +724,7 @@ void SPSUnit::deserializeVuiParameters()
 		time_scale = bitReader.getBits(32);
 		fixed_frame_rate_flag = bitReader.getBit();
 	}
-	hdrParamsBitPos = bitReader.getBitsCount() +  32;
+	hrdParamsBitPos = bitReader.getBitsCount() +  32;
 	
 	//orig_hrd_parameters_present_flag = 
 	nalHrdParams.isPresent = bitReader.getBit();
@@ -755,7 +755,7 @@ void SPSUnit::deserializeVuiParameters()
 	}
 }
 
-void SPSUnit::serializeHDRParameters(BitStreamWriter& writer, const HRDParams& params)
+void SPSUnit::serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params)
 {
 	writeUEGolombCode(writer, params.cpb_cnt_minus1);
 	writer.putBits(4, params.bit_rate_scale);
@@ -772,8 +772,8 @@ void SPSUnit::serializeHDRParameters(BitStreamWriter& writer, const HRDParams& p
 	//writer.flushBits();
 }
 
-// insert HDR parameters to bitstream.
-void SPSUnit::insertHdrParameters()
+// insert HRD parameters to bitstream.
+void SPSUnit::insertHrdParameters()
 {
     for (int i = mvcNalHrdParams.size()-1; i >= 0; --i)
     {
@@ -791,7 +791,7 @@ void SPSUnit::insertHdrParameters()
                 mvcVclHrdParams[i].resetDefault(true);
             }
 
-            insertHrdData(mvcHdrParamsBitPos[i], nalBitLen, vclBitLen, false, mvcNalHrdParams[i]);
+            insertHrdData(mvcHrdParamsBitPos[i], nalBitLen, vclBitLen, false, mvcNalHrdParams[i]);
             mvcNalHrdParams[i].isPresent = true;
             mvcVclHrdParams[i].isPresent = true;
         }
@@ -811,8 +811,8 @@ void SPSUnit::insertHdrParameters()
             vclHrdParams.resetDefault(false);
         }
 
-        if (hdrParamsBitPos != -1)
-            insertHrdData(hdrParamsBitPos, nalBitLen, vclBitLen, false, nalHrdParams);
+        if (hrdParamsBitPos != -1)
+            insertHrdData(hrdParamsBitPos, nalBitLen, vclBitLen, false, nalHrdParams);
         else
             insertHrdData(vui_parameters_bit_pos, 0, 0, true, nalHrdParams);
         nalHrdParams.isPresent = true;
@@ -828,7 +828,7 @@ void SPSUnit::insertHdrParameters()
 void SPSUnit::updateTimingInfo()
 {
     // replace hrd parameters not implemented. only insert
-    int bitPos = hdrParamsBitPos - 1;
+    int bitPos = hrdParamsBitPos - 1;
 
     const int EXTRA_SPACE = 64;
 
@@ -882,7 +882,7 @@ void SPSUnit::updateTimingInfo()
     m_nalBuffer = newNalBuffer;
 }
 
-void SPSUnit::insertHrdData(int bitPos, int nal_hdr_len, int vcl_hdr_len, bool addVuiHeader, const HRDParams& params)
+void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool addVuiHeader, const HRDParams& params)
 {
     // replace hrd parameters not implemented. only insert
     const int EXTRA_SPACE = 64;
@@ -915,11 +915,11 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hdr_len, int vcl_hdr_len, bool a
         writer.putBits(32, time_scale);
         writer.putBit(1); // fixed framerate flag
 
-        writer.putBit(1); // enable nal_hdr_params flags here
-        serializeHDRParameters(writer, nalHrdParams); 
+        writer.putBit(1); // enable nal_hrd_params flags here
+        serializeHRDParameters(writer, nalHrdParams); 
 
-        writer.putBit(1); // enable vcl_hdr_params flags here
-        serializeHDRParameters(writer, nalHrdParams); 
+        writer.putBit(1); // enable vcl_hrd_params flags here
+        serializeHRDParameters(writer, nalHrdParams); 
 
         writer.putBit(low_delay_hrd_flag);
         writer.putBit(0); // pic_struct_present_flag
@@ -927,29 +927,29 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hdr_len, int vcl_hdr_len, bool a
     }
     else 
     {
-        writer.putBit(1); // enable nal_hdr_params flags here
+        writer.putBit(1); // enable nal_hrd_params flags here
         if (reader.getBit()) { // source nal_hrd_parameters_present_flag
             // nal hrd already exists, copy from a source stream
-            for (int i = 0; i < nal_hdr_len/32; ++i)
+            for (int i = 0; i < nal_hrd_len/32; ++i)
                 writer.putBits(32, reader.getBits(32));
-            writer.putBits(nal_hdr_len % 32, reader.getBits(nal_hdr_len % 32));
+            writer.putBits(nal_hrd_len % 32, reader.getBits(nal_hrd_len % 32));
         }
         else {
-            serializeHDRParameters(writer, params);
+            serializeHRDParameters(writer, params);
         }
 
         writer.putBit(1); // enable nal_vcl_params flags here
         if (reader.getBit()) { // source vcl_hrd_parameters_present_flag
             // vcl hrd already exists, copy from a source stream
-            for (int i = 0; i < vcl_hdr_len/32; ++i)
+            for (int i = 0; i < vcl_hrd_len/32; ++i)
                 writer.putBits(32, reader.getBits(32));
-            writer.putBits(vcl_hdr_len % 32, reader.getBits(vcl_hdr_len % 32));
+            writer.putBits(vcl_hrd_len % 32, reader.getBits(vcl_hrd_len % 32));
         }
         else {
-            serializeHDRParameters(writer, params); 
+            serializeHRDParameters(writer, params); 
         }
 
-        if (nal_hdr_len == 0 && vcl_hdr_len == 0)
+        if (nal_hrd_len == 0 && vcl_hrd_len == 0)
             writer.putBit(low_delay_hrd_flag); // absent in the source stream, add
     }
 
@@ -1162,7 +1162,7 @@ void SPSUnit::mvc_vui_parameters_extension()
     int vui_mvc_num_ops = extractUEGolombCode() + 1;
     std::vector<int> vui_mvc_temporal_id;
     vui_mvc_temporal_id.resize(vui_mvc_num_ops);
-    mvcHdrParamsBitPos.resize(vui_mvc_num_ops);
+    mvcHrdParamsBitPos.resize(vui_mvc_num_ops);
     mvcNalHrdParams.resize(vui_mvc_num_ops);
     mvcVclHrdParams.resize(vui_mvc_num_ops);
 
@@ -1185,7 +1185,7 @@ void SPSUnit::mvc_vui_parameters_extension()
         }
 
         
-        mvcHdrParamsBitPos[i] = bitReader.getBitsCount() +  32;
+        mvcHrdParamsBitPos[i] = bitReader.getBitsCount() +  32;
         mvcNalHrdParams[i].isPresent = bitReader.getBit();
         if( mvcNalHrdParams[i].isPresent) {
             int beforeCount = bitReader.getBitsCount();

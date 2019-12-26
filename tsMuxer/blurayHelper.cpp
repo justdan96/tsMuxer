@@ -4,6 +4,7 @@
 #include "iso_writer.h"
 #include "psgStreamReader.h"
 #include "tsPacket.h"
+#include "hevc.h"
 
 using namespace std;
 
@@ -165,14 +166,21 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
         delete file;
         return false;
     }
-
+    uint8_t* emptyCommand;
     if (m_dt == DT_BLURAY) {
         bdMovieObjectData[5] = bdIndexData[5] = '2';
         fileSize = 0x78;
     }
     else if (m_dt == UHD_BLURAY) {
         bdMovieObjectData[5] = bdIndexData[5] = '3';
-        fileSize = 0x78;
+        fileSize = 0x9C; // add 36 bytes for HDR data extension
+        bdIndexData[15] = 0x78; // start address of HDR data extension
+        emptyCommand = bdIndexData + 0x78;
+        memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
+                             "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
+                             "\x00\x00\x00\x08\x51\x00\x00\x00\x00\x00\x00\x00", 36); // HDR data extension
+        bdIndexData[0x96] = (uint8_t)HDR10_metadata[0]; // HDR flags
+
     }
     else {
         bdMovieObjectData[5] = bdIndexData[5] = '1';
@@ -180,7 +188,7 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
     }
     bdIndexData[0x2c] = stereoMode ? 0x60 : 0; // set initial_output_mode_preference and SS_content_exist_flag
 
-    uint8_t* emptyCommand =  bdMovieObjectData + 78;
+    emptyCommand =  bdMovieObjectData + 78;
     if (usedBlackPL) {
         memcpy(emptyCommand,   "\x42\x82\x00\x00", 4);
         uint32_t blackPlNum = my_htonl(blankNum);
@@ -274,7 +282,9 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
             clpiParser.TS_recording_rate = MAX_SUBMUXER_RATE / 8;
         else
             clpiParser.TS_recording_rate = MAX_MAIN_MUXER_RATE / 8;
-
+        // max rate is 109 mbps for UHD BD 66/100 GB Default TR
+        if (m_dt == UHD_BLURAY)
+            clpiParser.TS_recording_rate = (clpiParser.TS_recording_rate * 109) / 48;
         //clpiParser.TS_recording_rate = 188.0 / (maxRates[i] / 27000000.0);
         clpiParser.number_of_source_packets = packetCount[i];
         clpiParser.presentation_start_time = firstPts[i] / 2;

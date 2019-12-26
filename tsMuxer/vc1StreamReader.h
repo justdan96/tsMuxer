@@ -32,6 +32,7 @@ protected:
 	double getStreamFPS(void * curNalUnit) override { return m_sequence.getFPS();};
 	int getStreamWidth() const override {return m_sequence.coded_width;}
 	int getStreamHeight() const override {return m_sequence.coded_height;}
+	int getStreamHDR() const override { return 0; }
 	bool getInterlaced() override {return m_sequence.interlace;}
 	bool isIFrame() override {return m_lastIFrame;}
 	void onSplitEvent() override {

@@ -3,6 +3,8 @@
 
 #include "nalUnits.h"
 
+extern int HDR10_metadata[7];
+
 enum HevcSliceTypes
 {
     HEVC_BFRAME_SLICE = 0,
@@ -39,6 +41,7 @@ enum HEVCUnitType {
     NAL_FD_NUT     = 38,
     NAL_SEI_PREFIX = 39,
     NAL_SEI_SUFFIX = 40,
+	NAL_DV         = 62,
 };
 
 struct HevcUnit
@@ -167,6 +170,16 @@ public:
     bool dependent_slice_segments_enabled_flag;
     bool output_flag_present_flag;
     int num_extra_slice_header_bits;
+};
+
+struct HevcSeiUnit: public HevcUnit
+{
+	HevcSeiUnit();
+	int deserialize() override;
+public:
+    bool isHDR10;
+    bool isHDR10plus;
+    bool isDV;
 };
 
 struct HevcSliceHeader: public HevcUnit

@@ -5,7 +5,6 @@
 #include "math.h"
 #include "vodCoreException.h"
 #include "tsPacket.h"
-#include <algorithm>
 
 using namespace std;
 
@@ -490,9 +489,9 @@ void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
 	delete [] tmpBuffer;
 }
 
-void H264StreamReader::updateHDRParam(SPSUnit* sps)
+void H264StreamReader::updateHRDParam(SPSUnit* sps)
 {
-	// correct HDR parameters here (this function is call for every SPS nal unit)
+	// correct HRD parameters here (this function is called for every SPS nal unit)
     if (!m_needSeiCorrection)
         return;
 
@@ -501,7 +500,7 @@ void H264StreamReader::updateHDRParam(SPSUnit* sps)
     //}
     if (!sps->vui_parameters_present_flag)
         sps->setFps(m_fps);
-    sps->insertHdrParameters();
+    sps->insertHrdParameters();
 }
 
 // All the remaining checks of the stream, executed at start
@@ -982,7 +981,7 @@ int H264StreamReader::processSEI(uint8_t* buff)
 	return 0;
 }
 
-int H264StreamReader::getNalHdrLen(uint8_t* nal)
+int H264StreamReader::getNalHrdLen(uint8_t* nal)
 {
 	if (m_bufEnd-nal >= 3) {
 		if (nal[0] == 0 && nal[1] == 0) 
@@ -1241,7 +1240,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
                     m_nextFrameIdr = slice.isIDR();
 					return 0; // next frame found
                 }
-				m_pict_type = std::max(m_pict_type, sliceTypeToPictType(slice.slice_type));
+				m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(slice.slice_type));
 				break;
             /*
             case nuDelimiter:
@@ -1359,7 +1358,7 @@ int H264StreamReader::processSPS(uint8_t* buff)
 	updateFPS(sps, buff, nextNal, oldSpsLen);
 	nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
 	oldSpsLen = nextNal - buff;
-	updateHDRParam(sps);
+	updateHRDParam(sps);
     if (sps->nalHrdParams.isPresent)
         updatedSPSList.insert(sps->seq_parameter_set_id);
 

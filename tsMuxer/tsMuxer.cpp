@@ -85,6 +85,7 @@ TSMuxer::TSMuxer(MuxerManager* owner): AbstractMuxer(owner)
 	m_sitCnt = 1;
 	m_needTruncate = false;
 	m_videoTrackCnt = 0;
+	m_DVvideoTrackCnt = 0;
 	m_videoSecondTrackCnt = 0;
 	m_audioTrackCnt = 0;
     m_secondaryAudioTrackCnt = 0;
@@ -163,7 +164,12 @@ void TSMuxer::intAddStream(const std::string& streamName,
 					       const std::string& codecName, int streamIndex, const map<string, string>& params,
 						   AbstractStreamReader* codecReader)
 {
-    if (codecName[0] == 'V')
+	int descriptorLen = 0;
+	uint8_t descrBuffer[1024];
+	if (codecReader != 0)
+		descriptorLen = codecReader->getTSDescriptor(descrBuffer);
+	
+	if (codecName[0] == 'V')
         m_mainStreamIndex = streamIndex;
     else if (codecName[0] == 'A' && m_mainStreamIndex == -1)
         m_mainStreamIndex = streamIndex;
@@ -180,13 +186,22 @@ void TSMuxer::intAddStream(const std::string& streamName,
 		if (!isSecondary) 
         {
             int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
-            tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
+			int HDR = codecReader->getStreamHDR();
+			if (HDR == 4) {
+				tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
+				m_DVvideoTrackCnt++;
+			}
+			else
+			{
+				tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
+				m_videoTrackCnt++;
+			}
             if (m_subMode)
                 tsStreamIndex++;
-            m_videoTrackCnt++;
+            
 		}
 		else {
-			tsStreamIndex = 6912 + m_videoSecondTrackCnt;
+			tsStreamIndex = 0x1B00 + m_videoSecondTrackCnt;
 			m_videoSecondTrackCnt++;
 		}
 	}
@@ -257,11 +272,11 @@ void TSMuxer::intAddStream(const std::string& streamName,
 			LTRACE(LT_DEBUG, 0, "Muxing fps: " << fps);
 		}
 	}
-	int descriptorLen = 0;
+/*	int descriptorLen = 0;
 	uint8_t descrBuffer[1024];
 	if (codecReader != 0) 
 		descriptorLen = codecReader->getTSDescriptor(descrBuffer);
-
+*/
 
 	if (codecName == "V_MPEG4/ISO/AVC") {
 		H264StreamReader* h264Reader = (H264StreamReader*) codecReader;
