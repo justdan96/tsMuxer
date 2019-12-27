@@ -173,6 +173,7 @@ public:
     int64_t totalSize() const { return m_totalSize; }
     std::string mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum);
     std::string mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum);
+	bool m_HevcFound;
 private:
 	std::vector<FileListIterator*> m_iterators;
 	int m_lastReadRez;
