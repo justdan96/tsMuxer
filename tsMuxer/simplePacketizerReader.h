@@ -8,7 +8,7 @@
 
 class SimplePacketizerReader: public AbstractStreamReader {
 public:
-	//static const int NOT_ENOUGHT_BUFFER = -10;
+	//static const int NOT_ENOUGH_BUFFER = -10;
 	SimplePacketizerReader();
 	~SimplePacketizerReader() override {
 		//delete [] m_tmpBuffer;

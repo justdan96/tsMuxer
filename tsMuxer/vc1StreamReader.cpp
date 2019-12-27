@@ -34,14 +34,14 @@ int VC1StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
 		if (m_seqBuffer.size() > 0) 
 		{
 			if (dstEnd - curPtr < m_seqBuffer.size())
-				THROW(ERR_COMMON, "VC1 stream error: Not enought buffer for write headers");
+				THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
 			memcpy(curPtr, &m_seqBuffer[0], m_seqBuffer.size());
 			curPtr += m_seqBuffer.size();
 		}
 		if (m_entryPointBuffer.size() > 0) 
 		{
 			if (dstEnd - curPtr < m_entryPointBuffer.size())
-				THROW(ERR_COMMON, "VC1 stream error: Not enought buffer for write headers");
+				THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
 			memcpy(curPtr, &m_entryPointBuffer[0], m_entryPointBuffer.size());
 			curPtr += m_entryPointBuffer.size();
 		}
@@ -171,7 +171,7 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
         case VC1_CODE_ENDOFSEQ:
             nextNal = VC1Unit::findNextMarker(buff, m_bufEnd)+3;
             if (!m_eof && nextNal >= m_bufEnd)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             break;
 		case VC1_CODE_SEQHDR:
             m_spsPpsFound = true;
@@ -181,7 +181,7 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
 			nextNal = VC1Unit::findNextMarker(buff, m_bufEnd)+3;
 			while (1) {
 				if (nextNal >= m_bufEnd)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				switch(*nextNal) 
 				{
 					case VC1_CODE_ENTRYPOINT:
@@ -216,7 +216,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
 {
 	uint8_t* nextNal = VC1Unit::findNextMarker(buff, m_bufEnd);
 	if (nextNal == m_bufEnd) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 	int oldSpsLen = nextNal - buff - 1;
 	m_sequence.vc1_unescape_buffer(buff+1, nextNal - buff-1);
@@ -259,7 +259,7 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
 	if (m_sequence.max_b_frames > 0 && (m_frame.pict_type == I_TYPE || m_frame.pict_type == P_TYPE)) {
 		nextBFrameCnt = getNextBFrames(buff, bTiming);
 		if (nextBFrameCnt == -1)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 	}
 
 	m_lastIFrame = m_frame.pict_type == I_TYPE;
@@ -321,7 +321,7 @@ int VC1StreamReader::decodeEntryPoint(uint8_t* buff)
 {
 	uint8_t* nextNal = VC1Unit::findNextMarker(buff, m_bufEnd);
 	if (nextNal == m_bufEnd) 
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	m_entryPointBuffer.clear();
 	m_entryPointBuffer.push_back(0);
 	m_entryPointBuffer.push_back(0);

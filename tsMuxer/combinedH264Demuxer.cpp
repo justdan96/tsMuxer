@@ -68,7 +68,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     else if (nalType == nuSubSPS) {
         SPSUnit sps;
         sps.decodeBuffer(data, dataEnd);
-        if (sps.deserialize() == NOT_ENOUGHT_BUFFER)
+        if (sps.deserialize() == NOT_ENOUGH_BUFFER)
             return ReadState_NeedMoreData;
         m_mvcSPS = sps.seq_parameter_set_id;
         return ReadState_Secondary;
@@ -77,7 +77,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     {
         PPSUnit pps;
         pps.decodeBuffer(data, dataEnd);
-        if (pps.deserialize() == NOT_ENOUGHT_BUFFER)
+        if (pps.deserialize() == NOT_ENOUGH_BUFFER)
             return ReadState_NeedMoreData;
         if (pps.seq_parameter_set_id == m_mvcSPS)
             return ReadState_Secondary;
@@ -88,7 +88,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
         SEIUnit sei;
         sei.decodeBuffer(data, dataEnd);
         int rez = sei.isMVCSEI();
-        if (rez ==  NOT_ENOUGHT_BUFFER)
+        if (rez ==  NOT_ENOUGH_BUFFER)
             return ReadState_NeedMoreData;
         else if (rez == 0)
             return ReadState_Primary;

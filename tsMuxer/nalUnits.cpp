@@ -257,7 +257,7 @@ int NALUnit::extractSEGolombCode()
 int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
 {
 	if (end == buffer)
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 
 
 	//assert((*buffer & 0x80) == 0);
@@ -330,7 +330,7 @@ int NALDelimiter::deserialize(uint8_t* buffer, uint8_t* end)
 	if (rez != 0)
 		return rez;
 	if (end - buffer < 2)
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	primary_pic_type = buffer[1] >> 5;
 	return 0;
 }
@@ -351,7 +351,7 @@ int PPSUnit::deserialize()
 	if (rez != 0)
 		return rez;
 	if (nalEnd - m_nalBuffer < 2)
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	try {
 		bitReader.setBuffer(m_nalBuffer + 1, nalEnd);
 		pic_parameter_set_id = extractUEGolombCode();
@@ -413,7 +413,7 @@ int PPSUnit::deserialize()
 		m_ready = true;
 		return 0;
 	} catch (BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -551,7 +551,7 @@ int SPSUnit::deserialize()
 	int m_decodedBuffSize = decodeNAL(buffer, nextNal, tmpBuff, bufSize);
 	*/
 	if (m_nalBufferLen < 4)
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	int rez = NALUnit::deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen);
 	if (rez != 0)
 		return rez;
@@ -658,7 +658,7 @@ int SPSUnit::deserialize()
 
 		return 0;
 	} catch (BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -1259,7 +1259,7 @@ bool SliceUnit::isIFrame() const
 int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
 {
     if (end - buffer < 2)
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
 
     int rez = NALUnit::deserialize(buffer, end);
     if (rez != 0)
@@ -1270,7 +1270,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
         if(nal_unit_type == nuSliceExt)
         {
             if (end - buffer < 5)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             offset += 3;
             if (buffer[1] == 0 && buffer[2] == 0 && buffer[3] == 03)
                 offset++; // inplace decode header
@@ -1286,7 +1286,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
 
         return 0;
     } catch(BitStreamException) {
-        return NOT_ENOUGHT_BUFFER;	
+        return NOT_ENOUGH_BUFFER;	
     }
 };
 
@@ -1295,7 +1295,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end,
 							const std::map<uint32_t, PPSUnit*>& ppsMap)
 {
 	if (end - buffer < 2)
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 
 	int rez = NALUnit::deserialize(buffer, end);
 	if (rez != 0)
@@ -1320,7 +1320,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end,
 		return rez;
 		//return deserializeSliceData();
     } catch(BitStreamException) {
-        return NOT_ENOUGHT_BUFFER;	
+        return NOT_ENOUGH_BUFFER;	
     }
 }
 
@@ -1769,7 +1769,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const std::map<u
 
 		return 0;
 	} catch(BitStreamException& e) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -1908,26 +1908,26 @@ int SEIUnit::isMVCSEI()
     try {
         int rez = NALUnit::deserialize(m_nalBuffer, nalEnd);
         if (rez != 0)
-            return NOT_ENOUGHT_BUFFER;
+            return NOT_ENOUGH_BUFFER;
         uint8_t* curBuff = m_nalBuffer + 1;
         while (curBuff < nalEnd-1) {
             int payloadType = 0;
             for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++) 
                 payloadType += 0xFF;
             if (curBuff >= nalEnd)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             payloadType += *curBuff++;
             if (curBuff >= nalEnd)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
 
             int payloadSize = 0;
             for(; *curBuff  ==  0xFF && curBuff < nalEnd; curBuff++) 
                 payloadSize += 0xFF;
             if (curBuff >= nalEnd)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             payloadSize += *curBuff++;
             if (curBuff >= nalEnd)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             if (payloadType == 37)
                 return 1; // mvc scalable nesting message
             curBuff += payloadSize;

@@ -23,7 +23,7 @@ void MPEGStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
 		m_eof = true;
 
 	if (m_tmpBufferLen + dataLen > TMP_BUFFER_SIZE)
-		THROW(ERR_COMMON_SMALL_BUFFER, "Not enought buffer for parse video stream. Current frame num " << m_totalFrameNum);
+		THROW(ERR_COMMON_SMALL_BUFFER, "Not enough buffer for parse video stream. Current frame num " << m_totalFrameNum);
 	memcpy(m_tmpBuffer + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
 	m_tmpBufferLen += dataLen;
 
@@ -143,14 +143,14 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
             m_processedBytes += nal - m_curPos;
             prevPos = m_curPos = nal;
             if (nal == m_bufEnd) {
-                rez = NOT_ENOUGHT_BUFFER;
+                rez = NOT_ENOUGH_BUFFER;
                 m_syncToStream = false;
                 break;
             }
             isNal = bufFromNAL();
         }
 
-        if (rez == NOT_ENOUGHT_BUFFER) 
+        if (rez == NOT_ENOUGH_BUFFER) 
 		{
             storeBufferRest();
 			m_lastDecodedPos = 0;

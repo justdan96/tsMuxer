@@ -781,7 +781,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
 	if (!m_demuxMode)
 		return 0;
 	if (dstEnd - dstBuffer < 10)
-		THROW(ERR_COMMON, "PGS stream error: Not enought buffer for write headers");
+		THROW(ERR_COMMON, "PGS stream error: Not enough buffer for write headers");
 	if (!m_needRescale) 
 	{
 		*dstBuffer++ = 'P';

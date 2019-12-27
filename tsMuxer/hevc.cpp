@@ -50,7 +50,7 @@ int HevcUnit::deserialize()
     }
     catch (BitStreamException& e)
     {
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -219,7 +219,7 @@ int HevcVpsUnit::deserialize()
 
         return rez;
     } catch(VodCoreException& e) {
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -763,7 +763,7 @@ int HevcSpsUnit::deserialize()
 
         return rez;
     } catch (VodCoreException& e) {
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -805,7 +805,7 @@ int HevcPpsUnit::deserialize()
         return 0;
     } catch(VodCoreException& e)
     {
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -870,7 +870,7 @@ int HevcSeiUnit::deserialize()
 	}
 	catch (VodCoreException & e)
 	{
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -921,7 +921,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
         return 0;
     } catch(VodCoreException& e)
     {
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     }
 }
 

@@ -217,7 +217,7 @@ int H264StreamReader::writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUn
     uint8_t* curPos = dstBuffer;
 
     if (dstEnd - curPos < 4)
-        THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+        THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 
     uint8_t tmpBuffer[256];
     BitStreamWriter writer;
@@ -269,7 +269,7 @@ int H264StreamReader::writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUn
 
         int sRez = sei.encodeNAL(tmpBuffer, tmpBuffer + writer.getBitsCount()/8, curPos, dstEnd - curPos);
         if (sRez == -1)
-            THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
         curPos += sRez;
     }
 
@@ -301,7 +301,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 			LTRACE(LT_INFO, 2, "H264 bitstream changed: insert nal unit delimiters");
 		}
 		if (dstEnd - curPos < 6)
-			THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+			THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 		curPos = writeNalPrefix(curPos);
         if (m_mvcSubStream && m_blurayMode) 
         {
@@ -346,11 +346,11 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 		}
 		SPSUnit* sps = m_spsMap.find(m_lastSliceSPS)->second;
 		if (dstEnd - curPos < 4)
-			THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+			THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 		curPos = writeNalPrefix(curPos);
 		int sRez = sps->serializeBuffer(curPos, dstEnd, false);
 		if (sRez == -1)
-			THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+			THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 		curPos += sRez;
 
 		//PPSUnit* pps = m_ppsMap.find(m_lastSlicePPS)->second;
@@ -359,11 +359,11 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 		for (map<uint32_t, PPSUnit*>::const_iterator itr = m_ppsMap.begin(); itr != m_ppsMap.end(); ++itr) {
 			PPSUnit* pps = itr->second;
 			if (dstEnd - curPos < 4)
-				THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+				THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 			curPos = writeNalPrefix(curPos);
 			int sRez = pps->serializeBuffer(curPos, dstEnd, false);
 			if (sRez == -1)
-				THROW(ERR_COMMON, "H264 stream error: Not enought buffer for write headers");
+				THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 			curPos += sRez;
 		}
 	}
@@ -475,12 +475,12 @@ void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
 	uint8_t* tmpBuffer = new uint8_t[oldSpsLen + 16];
 	long newSpsLen = sps->serializeBuffer(tmpBuffer, tmpBuffer + oldSpsLen + 16, false);
 	if (newSpsLen == -1) 
-		THROW(ERR_COMMON, "Not enought buffer");
+		THROW(ERR_COMMON, "Not enough buffer");
 	if (newSpsLen != oldSpsLen) 
 	{
 		int sizeDiff = newSpsLen - oldSpsLen;
 		if (m_bufEnd+sizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
-			THROW(ERR_COMMON, "Not enought buffer");
+			THROW(ERR_COMMON, "Not enough buffer");
 		memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
 		m_bufEnd += sizeDiff;
 		//m_dataLen += sizeDiff;
@@ -712,7 +712,7 @@ int64_t H264StreamReader::getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd)
 			case nuSliceC:
             case nuSliceExt:
                 deserializeRez = deserializeSliceHeader(slice, nal, bufEnd);
-                if (deserializeRez == NOT_ENOUGHT_BUFFER && !m_eof) 
+                if (deserializeRez == NOT_ENOUGH_BUFFER && !m_eof) 
                     return -1;
                 else if (deserializeRez != 0) 
 					return 0; 
@@ -784,7 +784,7 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
 		while (1) 
 		{
 			if (nextNal == m_bufEnd)
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 			switch(*nextNal & 0x1f) 
 			{
 				case nuSEI:
@@ -897,9 +897,9 @@ int H264StreamReader::processSEI(uint8_t* buff)
 		SEIUnit lastSEI;
 		uint8_t* nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
 		if (nextNal == m_bufEnd)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 		if (nextNal + 4 > m_bufEnd)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 		lastSEI.pic_struct = -1;
 		lastSEI.decodeBuffer(buff, nextNal);
 		lastSEI.deserialize(*(m_spsMap.begin()->second), orig_hrd_parameters_present_flag || orig_vcl_parameters_present_flag);
@@ -963,7 +963,7 @@ int H264StreamReader::processSEI(uint8_t* buff)
 			uint8_t tmpBuff[1024*3];
 			int newSize = lastSEI.serializeBuffer(tmpBuff, tmpBuff + sizeof(tmpBuff), false);
 			if (newSize == -1)
-				THROW(ERR_COMMON, "Not enought buffer");
+				THROW(ERR_COMMON, "Not enough buffer");
 
 			assert(newSize > 2);
 
@@ -971,7 +971,7 @@ int H264StreamReader::processSEI(uint8_t* buff)
 			if (sizeDiff != 0) 
 			{
 				if (m_bufEnd+sizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
-					THROW(ERR_COMMON, "Not enought buffer");
+					THROW(ERR_COMMON, "Not enough buffer");
 				memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
 				m_bufEnd += sizeDiff;
 			}
@@ -1035,9 +1035,9 @@ int H264StreamReader::deserializeSliceHeader(SliceUnit& slice, uint8_t* buff, ui
         toDecode = FFMIN(tmpBufferSize - 8, maxHeaderSize);
         int decodedLen = slice.decodeNAL(buff, buff + toDecode, tmpBuffer, tmpBufferSize);
         nalRez = slice.deserialize(tmpBuffer, tmpBuffer + decodedLen, m_spsMap, m_ppsMap);
-        if (nalRez == NOT_ENOUGHT_BUFFER && toDecode < maxHeaderSize)
+        if (nalRez == NOT_ENOUGH_BUFFER && toDecode < maxHeaderSize)
             m_decodedSliceHeader.resize(m_decodedSliceHeader.size()+1);
-    } while (nalRez == NOT_ENOUGHT_BUFFER && toDecode < maxHeaderSize);
+    } while (nalRez == NOT_ENOUGH_BUFFER && toDecode < maxHeaderSize);
 
     return nalRez;
 }
@@ -1069,7 +1069,7 @@ int H264StreamReader::processSliceNal(uint8_t* buff)
 	//if (!m_delimiterFound) 
     {
 		if (detectPrimaryPicType(slice, buff) != 0)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 	}
 
 	// forceLsbDiv check
@@ -1106,7 +1106,7 @@ int H264StreamReader::processSliceNal(uint8_t* buff)
 		else
 			m_iFramePtsOffset = 0;
 		if (m_iFramePtsOffset == -1)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 	}
 	else {
 		m_frameNum++;
@@ -1216,7 +1216,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
 		if (m_eof)
 			return 0;
 		else
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 	}
 	while (1) {
 		int nalUnitType = *nextSlice;
@@ -1232,7 +1232,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
                     if (m_eof)
                         return 0;
                     else
-                        return NOT_ENOUGHT_BUFFER;
+                        return NOT_ENOUGH_BUFFER;
                 }
 
                 if (slice.first_mb_in_slice == 0) {
@@ -1257,7 +1257,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
 			if (m_eof)
 				return 0;
 			else
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 		}
 	}
 }
@@ -1314,7 +1314,7 @@ int H264StreamReader::processSPS(uint8_t* buff)
         // do not updat SPS in stream because of we are going to insert own sps
         int seq_parameter_set_id = NALUnit::extractUEGolombCode(buff + 4, m_bufEnd);
         if (seq_parameter_set_id == -1)
-            return NOT_ENOUGHT_BUFFER;
+            return NOT_ENOUGH_BUFFER;
         if (updatedSPSList.find(seq_parameter_set_id) != updatedSPSList.end())
             return 0; // already processed
     }
@@ -1339,7 +1339,7 @@ int H264StreamReader::processSPS(uint8_t* buff)
     // long sps fields can cause 00 00 0x code and it is required decode slice header
 	if (nalRez != 0) {
 		delete sps;
-		return nalRez; // not enought buffer
+		return nalRez; // not enough buffer
 	}
 
 	if (m_spsMap.find(sps->seq_parameter_set_id) == m_spsMap.end()) 
@@ -1388,7 +1388,7 @@ int H264StreamReader::processPPS(uint8_t* buff)
 	int nalRez = pps->deserialize();
 	if (nalRez != 0) {
 		delete pps;
-		return nalRez; // not enought buffer
+		return nalRez; // not enough buffer
 	}
 	delete m_ppsMap[pps->pic_parameter_set_id];
 	m_ppsMap[pps->pic_parameter_set_id] = pps;

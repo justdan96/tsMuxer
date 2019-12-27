@@ -45,7 +45,7 @@ const static char* NALUnitDescr[30] =
 class NALUnit {
 public:
 	const static int SPS_OR_PPS_NOT_READY = 1;
-	//const static int NOT_ENOUGHT_BUFFER = 2;
+	//const static int NOT_ENOUGH_BUFFER = 2;
 	const static int UNSUPPORTED_PARAM = 3;
 	const static int NOT_FOUND = 4;
 
