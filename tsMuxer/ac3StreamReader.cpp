@@ -72,7 +72,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff)
 		AC3Codec::setTestMode(false);
 	}
 
-	*dstBuff++ = 0x05; // registreation descriptor tag
+	*dstBuff++ = 0x05; // registration descriptor tag
 	*dstBuff++ = 4;
 	memcpy(dstBuff, "AC-3", 4);
 	dstBuff += 4;

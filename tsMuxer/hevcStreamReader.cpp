@@ -3,6 +3,7 @@
 #include <fs/systemlog.h>
 #include "vodCoreException.h"
 #include "hevc.h"
+#include "tsPacket.h"
 
 using namespace std;
 
@@ -56,8 +57,9 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 if (!m_vps)
                     m_vps = new HevcVpsUnit();
                 m_vps->decodeBuffer(nal, nextNal);
-                if (m_vps->deserialize() != 0)
+                if (m_vps->deserialize())
                     return rez;
+                updateFPS(m_vps, nal, nextNal, 0);
                 break;
             }
             case NAL_SPS: {
@@ -114,10 +116,20 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff)
         checkStream(m_buffer, m_bufEnd - m_buffer);
     }
 
-    *dstBuff++ = 0x05; // registreation descriptor tag
-    *dstBuff++ = 4;
-    memcpy(dstBuff, "HEVC", 4);
-    return 6;
+    // put 'HDMV' registration descriptor
+    *dstBuff++ = 0x05; // registration descriptor tag
+    *dstBuff++ = 8; // descriptor length
+    memcpy(dstBuff, "HDMV\xff\x24", 6);
+    dstBuff += 6;
+
+    int video_format, frame_rate_index, aspect_ratio_index;
+    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
+        &video_format, &frame_rate_index, &aspect_ratio_index);
+
+    *dstBuff++ = (video_format << 4) + frame_rate_index;
+    *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+
+    return 10;
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int )

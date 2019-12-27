@@ -428,44 +428,21 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff)
 		m_firstDecodeNal = false;
 	}
 
-	for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4; nal = NALUnit::findNextNAL(nal, m_bufEnd))
-    {
-        uint8_t nalType = *nal & 0x1f;
-		if (nalType == nuSPS || nalType == nuSubSPS)  
-        {
-			processSPS(nal);
-			dstBuff[0] = H264_DESCRIPTOR_TAG;
-			dstBuff[1] = 4;
-			dstBuff[2] = nal[1]; // profile
-			dstBuff[3] = nal[2]; // flags
-			dstBuff[4] = m_forcedLevel == 0 ? nal[3] : m_forcedLevel; // level
-			dstBuff[5] = 0xbf; // still present + avc_24_hour flag
-            
-            if (m_blurayMode) {
-                // put 'HDMV' registration descriptor
-                dstBuff[6]  = 0x05;
-                dstBuff[7]  = 0x08;
-                dstBuff[8]  = 0x48;
-                dstBuff[9]  = 0x44;
-                dstBuff[10] = 0x4d;
-                dstBuff[11] = 0x56;
+	// put 'HDMV' registration descriptor
+	*dstBuff++ = 0x05; // registration descriptor tag
+	*dstBuff++ = 8; // descriptor length
+	memcpy(dstBuff, "HDMV\xff", 5);
+	dstBuff += 5;
 
-                int video_format, frame_rate_index, aspect_ratio_index;
-                M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                                   &video_format, &frame_rate_index, &aspect_ratio_index);
+	int video_format, frame_rate_index, aspect_ratio_index;
+	M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
+		&video_format, &frame_rate_index, &aspect_ratio_index);
 
-                dstBuff[12] = 0xff;
-                dstBuff[13] = !m_mvcSubStream ? 0x1b : 0x20;
-                dstBuff[14] = (video_format << 4) + frame_rate_index;
-                dstBuff[15] = (aspect_ratio_index << 4) + 0xf;
+	*dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
+	*dstBuff++ = (video_format << 4) + frame_rate_index;
+	*dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
-                return 16;
-            }
-
-			return 6;
-		}
-    }
-	return 0;
+	return 10;
 }
 
 void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)

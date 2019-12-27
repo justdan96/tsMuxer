@@ -98,7 +98,7 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff)
 
 	return 0;
 
-	*dstBuff++ = 0x05; // dts registreation descriptor tag
+	*dstBuff++ = 0x05; // dts registration descriptor tag
 	*dstBuff++ = 4;
 	*dstBuff++ = 'D';
 	*dstBuff++ = 'T';
