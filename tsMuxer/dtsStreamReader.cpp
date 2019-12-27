@@ -309,7 +309,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 		if (m_hdType == DTS_SUBTYPE_UNINITIALIZED) 
 		{
 			if (buff + headerSize + 4 > end)
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 			uint32_t* hdAudioData = (uint32_t*) (buff + headerSize);
 			switch(my_ntohl(*hdAudioData))
 			{
@@ -454,7 +454,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 		}
 		return hdFrameSize;
 	} catch(BitStreamException& e) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -629,7 +629,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 	    }
 	    afterFrameData = buff + i_frame_size;
 	    if (afterFrameData > end - 4)
-		    return NOT_ENOUGHT_BUFFER;
+		    return NOT_ENOUGH_BUFFER;
 
         if (m_testMode && m_dtsEsChannels == 0)
         {
@@ -653,12 +653,12 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 		m_dts_hd_mode = true;
 
 		int hdFrameSize = decodeHdInfo(afterFrameData, end);
-		if (hdFrameSize == NOT_ENOUGHT_BUFFER)
-			return NOT_ENOUGHT_BUFFER;
+		if (hdFrameSize == NOT_ENOUGH_BUFFER)
+			return NOT_ENOUGH_BUFFER;
 		
 		uint8_t* nextFrame = afterFrameData + hdFrameSize;
 		if (nextFrame >= end)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 		if (m_downconvertToDTS) {
 			skipBytes = nextFrame - buff - i_frame_size;
 			return i_frame_size;

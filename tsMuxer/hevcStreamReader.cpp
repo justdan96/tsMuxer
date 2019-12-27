@@ -129,13 +129,13 @@ void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
     uint8_t* tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
     long newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1) 
-        THROW(ERR_COMMON, "Not enought buffer");
+        THROW(ERR_COMMON, "Not enough buffer");
     
     if (newSpsLen != oldNalSize) 
     {
         m_vpsSizeDiff = newSpsLen - oldNalSize;
         if (m_bufEnd + m_vpsSizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
-            THROW(ERR_COMMON, "Not enought buffer");
+            THROW(ERR_COMMON, "Not enough buffer");
         memmove(nextNal + m_vpsSizeDiff, nextNal, m_bufEnd - nextNal);
         m_bufEnd += m_vpsSizeDiff;
     }
@@ -239,7 +239,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
         if (isSlice(nalType)) 
         {
             if (curPos >= m_bufEnd-2)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
 
             if (curPos[2] & 0x80) // slice.first_slice
             {
@@ -274,7 +274,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
             {
                 case NAL_VPS: 
                     if (nextNal == m_bufEnd)
-                        return NOT_ENOUGHT_BUFFER;
+                        return NOT_ENOUGH_BUFFER;
                     nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
 
                     if (!m_vps)
@@ -293,7 +293,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     break;
                 case NAL_SPS:
                     if (nextNal == m_bufEnd)
-                        return NOT_ENOUGHT_BUFFER;
+                        return NOT_ENOUGH_BUFFER;
                     nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
 
                     if (!m_sps)
@@ -307,7 +307,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     break;
                 case NAL_PPS:
                     if (nextNal == m_bufEnd)
-                        return NOT_ENOUGHT_BUFFER;
+                        return NOT_ENOUGH_BUFFER;
                     nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
 
                     if (!m_pps)

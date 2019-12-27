@@ -330,7 +330,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int& skipBytes)
 		int err;
 
 		if (end - buf < 2)
-			return NOT_ENOUGHT_BUFFER;
+			return NOT_ENOUGH_BUFFER;
 		if (m_state != stateDecodeAC3 && buf[0] == 0x0B && buf[1] == 0x77) {
 			if (testDecodeTestFrame(buf, end))
 				m_state = stateDecodeAC3; 
@@ -352,11 +352,11 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int& skipBytes)
         {
             uint8_t* trueHDData = buf + rez;
             if (end - trueHDData < 8)
-                return NOT_ENOUGHT_BUFFER;
+                return NOT_ENOUGH_BUFFER;
             if (!isSyncWorld(trueHDData) && isHDSyncWorld(trueHDData+4)) 
             {
                 if (end - trueHDData < 21)
-                    return NOT_ENOUGHT_BUFFER;
+                    return NOT_ENOUGH_BUFFER;
                 m_true_hd_mode = decodeDtsHdFrame(trueHDData, trueHDData  + 21);
             }
         }
@@ -365,7 +365,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int& skipBytes)
 		{
 			uint8_t* trueHDData = buf + rez;
 			if (end - trueHDData < 7)
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 			if (m_state == stateDecodeAC3) 
             {
                 // check if it is a real HD frame
@@ -383,7 +383,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int& skipBytes)
 			trueHDFrameLen += trueHDData[1];
 			trueHDFrameLen *= 2;
 			if (end - trueHDData < trueHDFrameLen+7)
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 			if (!m_true_hd_mode) 
 			{
 				//m_true_hd_mode |= findMajorSync(trueHDData, trueHDData + trueHDFrameLen);
@@ -412,7 +412,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int& skipBytes)
 			    return rez;
         }
 	} catch(BitStreamException&) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 } 
 

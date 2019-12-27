@@ -122,7 +122,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
 				nextNal = MPEGHeader::findNextMarker(buff, m_bufEnd)+3;
 				while (1) {
 					if (nextNal >= m_bufEnd)
-						return NOT_ENOUGHT_BUFFER;
+						return NOT_ENOUGH_BUFFER;
 					switch(*nextNal) 
 					{
 						case EXT_START_SHORT_CODE:
@@ -159,7 +159,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
 		}
 		return 0;
 	} catch(BitStreamException& e) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -167,14 +167,14 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
 {
 	uint8_t* nextNal = MPEGHeader::findNextMarker(buff, m_bufEnd);
 	if (nextNal == m_bufEnd) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 	try {
 		if (m_sequence.deserialize(buff+1, nextNal - buff - 1) == 0)
 			return NALUnit::UNSUPPORTED_PARAM;
 		m_streamAR  = (VideoAspectRatio) m_sequence.aspect_ratio_info;
 	} catch(BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 	int oldSpsLen = 0;
 	updateFPS(0, buff, nextNal, oldSpsLen);
@@ -195,7 +195,7 @@ int MPEG2StreamReader::processExtStartCode(uint8_t* buff)
 		}
 		return 0;
 	} catch(BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -214,12 +214,12 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
 		if (m_frame.deserialize(buff+1, m_bufEnd-buff-1) == 0)
 			return NALUnit::UNSUPPORTED_PARAM;
 	} catch(BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 
 	m_frame.picture_structure = 0;
 	int rez = findFrameExt(buff+1);
-	if (rez == NOT_ENOUGHT_BUFFER)
+	if (rez == NOT_ENOUGH_BUFFER)
 		return rez;
 
 	if (m_frame.pict_type == PCT_I_FRAME) {
@@ -291,13 +291,13 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
 					return 0;
 				}
 			} catch(BitStreamException) {
-				return NOT_ENOUGHT_BUFFER;
+				return NOT_ENOUGH_BUFFER;
 			}
 		}
 		else
 			return NALUnit::NOT_FOUND;
 	}
-	return NOT_ENOUGHT_BUFFER;
+	return NOT_ENOUGH_BUFFER;
 }
 
 

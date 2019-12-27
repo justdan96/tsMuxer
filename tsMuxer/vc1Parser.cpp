@@ -197,7 +197,7 @@ int VC1SequenceHeader::decode_sequence_header()
 		if(!res_fasttx) bitReader.skipBits(16);
 		return 0;
 	} catch (BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 
@@ -315,7 +315,7 @@ int VC1SequenceHeader::decode_entry_point()
 		}
 		return 0;
 	} catch(BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 } 
 
@@ -330,7 +330,7 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
 		else
 			return vc1_parse_frame_header_adv(sequenceHdr);
 	} catch(BitStreamException) {
-		return NOT_ENOUGHT_BUFFER;
+		return NOT_ENOUGH_BUFFER;
 	}
 }
 

@@ -51,7 +51,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 	int buf_size = end - buff;
 
     if (buf_size < 10)
-        return NOT_ENOUGHT_BUFFER;
+        return NOT_ENOUGH_BUFFER;
     m_start_display_time = 0;
     m_end_display_time = 0;
 
@@ -104,7 +104,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 			case 0x03:
 				// set colormap 
 				if ((buf_size - pos) < 2)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				colormap[3] = buff[pos] >> 4;
 				colormap[2] = buff[pos] & 0x0f;
 				colormap[1] = buff[pos + 1] >> 4;
@@ -114,7 +114,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 			case 0x04:
 				// set alpha 
 				if ((buf_size - pos) < 2)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				alpha[3] = buff[pos] >> 4;
 				alpha[2] = buff[pos] & 0x0f;
 				alpha[1] = buff[pos + 1] >> 4;
@@ -124,7 +124,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 			case 0x05:
 			case 0x85:
 				if ((buf_size - pos) < 6)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				x1 = (buff[pos] << 4) | (buff[pos + 1] >> 4);
 				x2 = ((buff[pos + 1] & 0x0f) << 8) | buff[pos + 2];
 				y1 = (buff[pos + 3] << 4) | (buff[pos + 4] >> 4);
@@ -135,14 +135,14 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 				break;
 			case 0x06:
 				if ((buf_size - pos) < 4)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				offset1 = AV_RB16(buff + pos);
 				offset2 = AV_RB16(buff + pos + 2);
 				pos += 4;
 				break;
 			case 0x86:
 				if ((buf_size - pos) < 8)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				offset1 = AV_RB32(buff + pos);
 				offset2 = AV_RB32(buff + pos + 4);
 				pos += 8;
@@ -151,14 +151,14 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 			case 0x83:
 				// HD set palette 
 				if ((buf_size - pos) < 768)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				yuv_palette = buff + pos;
 				pos += 768;
 				break;
 			case 0x84:
 				// HD set contrast (alpha) 
 				if ((buf_size - pos) < 256)
-					return NOT_ENOUGHT_BUFFER;
+					return NOT_ENOUGH_BUFFER;
 				for (i = 0; i < 256; i++)
 					alpha[i] = 0xFF - buff[pos+i];
 				pos += 256;
@@ -173,7 +173,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 			}
 		}
 	}
-	return NOT_ENOUGHT_BUFFER;
+	return NOT_ENOUGH_BUFFER;
 }
 
 double DVBSubStreamReader::getFrameDurationNano() {

@@ -71,7 +71,7 @@ const static int CANT_CREATE_ASSET_FILE     = -6;
 const static int ERR_ENCODING_ALREADY_STARTED = -7;
 const static int CANT_FIND_VIDEO_DECODER    = -8;
 const static int INVALID_TS_FRAME_SYNC_CODE = -9;
-const static int NOT_ENOUGHT_BUFFER         = -10;
+const static int NOT_ENOUGH_BUFFER         = -10;
 const static int INVALID_BITSTREAM_SYNTAX   = -11;
 const static int MAX_ERROR = -100;
 
