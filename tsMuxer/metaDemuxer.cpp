@@ -186,7 +186,7 @@ void METADemuxer::openFile(const string& streamName)
 		string codec = trimStr(params[0]);
 		string codecStreamName = trimStr(params[1]);
 		codec = strToUpperCase ( codec );
-		m_HevcFound = (codec.find("HEVC") == 12);
+		if (!m_HevcFound) m_HevcFound = (codec.find("HEVC") == 12);
 		addStream(codec, codecStreamName, addParams);
 		file.readLine(str);
 	}
