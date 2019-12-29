@@ -2383,7 +2383,6 @@ void TsMuxerWindow::startMuxing() {
   QFileInfo fi(ui.outFileName->text());
   metaName = QDir::toNativeSeparators(QDir::tempPath()) + QDir::separator() +
              "tsMuxeR_" + fi.completeBaseName() + ".meta";
-  metaName = metaName.replace(' ', '_');
   if (!saveMetaFile(metaName)) {
     metaName.clear();
     return;
