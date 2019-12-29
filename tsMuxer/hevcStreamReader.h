@@ -31,6 +31,7 @@ protected:
     void onSplitEvent() override { m_firstFileFrame = true; }
 private:
     bool isSlice(int nalType) const;
+    bool isSuffix(int nalType) const;
     void incTimings();
     int toFullPicOrder(HevcSliceHeader* slice, int pic_bits);
     void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);
