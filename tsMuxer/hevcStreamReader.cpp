@@ -170,6 +170,15 @@ bool HEVCStreamReader::isSlice(int nalType) const
     return (nalType >= NAL_TRAIL_N && nalType <= NAL_RASL_R) || (nalType >= NAL_BLA_W_LP && nalType <= NAL_RSV_IRAP_VCL23);
 }
 
+bool HEVCStreamReader::isSuffix(int nalType) const
+{
+    if (!m_sps || !m_vps || !m_pps)
+        return false;
+    return (nalType == NAL_FD_NUT || nalType == NAL_SEI_SUFFIX || nalType == NAL_RSV_NVCL45 ||
+           (nalType >= NAL_RSV_NVCL45 && nalType <= NAL_RSV_NVCL47) ||
+           (nalType >= NAL_UNSPEC56 && nalType <= NAL_UNSPEC63));
+}
+
 void HEVCStreamReader::incTimings()
 {
     if (m_totalFrameNum++ > 0)
@@ -260,7 +269,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
             }
             sliceFound = true;
         }
-        else { // first non-VCL NAL (AUD, SEI...) following current frame
+        else if (!isSuffix(nalType)) { // first non-VCL prefix NAL (AUD, SEI...) following current frame
             if (sliceFound) {
                 incTimings();
                 m_lastDecodedPos = prevPos;  // next frame started
