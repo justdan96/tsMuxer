@@ -49,10 +49,11 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         if (*nal & 0x80)
             return rez; // invalid nal
         int nalType = (*nal >> 1) & 0x3f;
+	uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+	
         switch (nalType)
         {
             case NAL_VPS: {
-                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 if (!m_vps)
                     m_vps = new HevcVpsUnit();
                 m_vps->decodeBuffer(nal, nextNal);
@@ -61,7 +62,6 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 break;
             }
             case NAL_SPS: {
-                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 if (!m_sps)
                     m_sps = new HevcSpsUnit();
                 m_sps->decodeBuffer(nal, nextNal);
@@ -70,7 +70,6 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 break;
             }
             case NAL_PPS: {
-                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 if (!m_pps)
                     m_pps = new HevcPpsUnit();
                 m_pps->decodeBuffer(nal, nextNal);
@@ -79,7 +78,6 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 break;
             }
             case NAL_SEI_PREFIX: {
-                uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 if (!m_sei)
                     m_sei = new HevcSeiUnit();
                 m_sei->decodeBuffer(nal, nextNal);
@@ -233,23 +231,22 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
     uint8_t* nextNalWithStartCode;
     long oldSpsLen  = 0;
 
+    if (!m_eof && nextNal == m_bufEnd)
+        return NOT_ENOUGH_BUFFER;
+
     while (curPos < m_bufEnd)
     {
         int nalType = (*curPos >> 1) & 0x3f;
         if (isSlice(nalType)) 
         {
-            if (curPos >= m_bufEnd-2)
-                return NOT_ENOUGH_BUFFER;
-
             if (curPos[2] & 0x80) // slice.first_slice
             {
-                if (sliceFound ) {
+                if (sliceFound ) { // first slice of next frame
                     m_lastDecodedPos = prevPos; // next frame started
                     incTimings();
                     return 0;
                 }
-                else 
-                {
+                else { // first slice of current frame
                     HevcSliceHeader slice;
                     slice.decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
                     rez = slice.deserialize(m_sps, m_pps);
@@ -263,23 +260,20 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
             }
             sliceFound = true;
         }
-        else {
+        else { // first non-VCL NAL (AUD, SEI...) following current frame
             if (sliceFound) {
                 incTimings();
                 m_lastDecodedPos = prevPos;  // next frame started
                 return 0;
             }
-
+            
+	    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
+		
             switch(nalType) 
             {
                 case NAL_VPS: 
-                    if (nextNal == m_bufEnd)
-                        return NOT_ENOUGH_BUFFER;
-                    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
-
                     if (!m_vps)
                         m_vps = new HevcVpsUnit();
-
                     m_vps->decodeBuffer(curPos, nextNalWithStartCode);
                     rez = m_vps->deserialize();
                     if (rez)
@@ -292,10 +286,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     storeBuffer(m_vpsBuffer, curPos, nextNalWithStartCode);
                     break;
                 case NAL_SPS:
-                    if (nextNal == m_bufEnd)
-                        return NOT_ENOUGH_BUFFER;
-                    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
-
                     if (!m_sps)
                         m_sps = new HevcSpsUnit();
                     m_sps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -306,10 +296,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     storeBuffer(m_spsBuffer, curPos, nextNalWithStartCode);
                     break;
                 case NAL_PPS:
-                    if (nextNal == m_bufEnd)
-                        return NOT_ENOUGH_BUFFER;
-                    nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
-
                     if (!m_pps)
                         m_pps = new HevcPpsUnit();
                     m_pps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -324,6 +310,9 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
         prevPos = curPos;
         curPos = nextNal;
         nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
+	
+	if (!m_eof && nextNal == m_bufEnd)
+            return NOT_ENOUGH_BUFFER;
     }
     if (m_eof) {
         m_lastDecodedPos = m_bufEnd;
