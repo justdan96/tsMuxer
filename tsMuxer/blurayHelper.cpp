@@ -178,7 +178,7 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
         emptyCommand = bdIndexData + 0x78;
         memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
                              "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
-                             "\x00\x00\x00\x08\x51\x00\x00\x00\x00\x00\x00\x00", 36); // HDR data extension
+                             "\x00\x00\x00\x08\x21\x00\x00\x00\x00\x00\x00\x00", 36); // HDR data extension
         bdIndexData[0x96] = (uint8_t)HDR10_metadata[0]; // HDR flags
 
     }
@@ -282,9 +282,6 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
             clpiParser.TS_recording_rate = MAX_SUBMUXER_RATE / 8;
         else
             clpiParser.TS_recording_rate = MAX_MAIN_MUXER_RATE / 8;
-        // max rate is 109 mbps for UHD BD 66/100 GB Default TR
-        if (m_dt == UHD_BLURAY)
-            clpiParser.TS_recording_rate = (clpiParser.TS_recording_rate * 109) / 48;
         //clpiParser.TS_recording_rate = 188.0 / (maxRates[i] / 27000000.0);
         clpiParser.number_of_source_packets = packetCount[i];
         clpiParser.presentation_start_time = firstPts[i] / 2;
