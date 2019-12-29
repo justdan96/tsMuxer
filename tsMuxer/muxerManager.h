@@ -45,7 +45,7 @@ public:
 
     void parseMuxOpt(const std::string& opts);
     int getTrackCnt() { return (int) m_metaDemuxer.getCodecInfo().size();}
-
+    bool getHevcFound() { return m_metaDemuxer.m_HevcFound; }
     AbstractMuxer* getMainMuxer();
     AbstractMuxer* getSubMuxer();
     bool isStereoMode() const;

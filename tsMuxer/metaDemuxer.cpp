@@ -42,6 +42,7 @@ METADemuxer::METADemuxer(const BufferedReaderManager& readManager):
     m_containerReader(*this, readManager), m_readManager(readManager)
 {
 	m_flushDataMode = false;
+	m_HevcFound = false;
 	m_totalSize = 0;
 	m_lastProgressY = 0;
 	m_lastReadRez = 0;
@@ -185,6 +186,7 @@ void METADemuxer::openFile(const string& streamName)
 		string codec = trimStr(params[0]);
 		string codecStreamName = trimStr(params[1]);
 		codec = strToUpperCase ( codec );
+		if (!m_HevcFound) m_HevcFound = (codec.find("HEVC") == 12);
 		addStream(codec, codecStreamName, addParams);
 		file.readLine(str);
 	}

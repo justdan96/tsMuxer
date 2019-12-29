@@ -140,7 +140,6 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
     bool avcFound = false;
     bool mvcFound = false;
     bool aacFound = false;
-    bool hevcFound = false;
 
     for (vector<StreamInfo>::const_iterator itr = ci.begin(); itr != ci.end(); ++itr) 
     {
@@ -151,14 +150,10 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
             mvcFound = true;
         else if (si.m_codec == aacCodecInfo.programName)
             aacFound = true;
-        else if (si.m_codec == hevcCodecInfo.programName)
-            hevcFound = true;
     }
 
     if (m_bluRayMode && aacFound)
         LTRACE(LT_ERROR, 2, "Warning! AAC codec is not standard for BD disks!");
-    if (m_bluRayMode && hevcFound)
-        LTRACE(LT_ERROR, 2, "Warning! HEVC codec is not standard for BD disks!");
 
     if (!avcFound && mvcFound)
         THROW(ERR_INVALID_STREAMS_SELECTED, "Fatal error: MVC depended view track can't be muxed without AVC base view track");
