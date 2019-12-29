@@ -41,7 +41,11 @@ enum HEVCUnitType {
     NAL_FD_NUT     = 38,
     NAL_SEI_PREFIX = 39,
     NAL_SEI_SUFFIX = 40,
-	NAL_DV         = 62,
+    NAL_RSV_NVCL45 = 45,
+    NAL_RSV_NVCL47 = 47,
+    NAL_UNSPEC56   = 56,
+    NAL_DV         = 62,
+    NAL_UNSPEC63   = 63
 };
 
 struct HevcUnit
