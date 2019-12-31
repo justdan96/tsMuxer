@@ -51,7 +51,6 @@ public:
     bool isInterleaveMode() const;
     std::vector<int32_t> getInterleaveInfo(int idx) const;
     bool isSubStream() const { return m_subMode; }
-    std::vector<double> getMaxRate() const { return m_maxRates; }
 
     void setPtsOffset(int64_t value);
 protected:
@@ -188,7 +187,7 @@ private:
     bool m_masterMode;
     bool m_subMode;
     PriorityDataInfo m_priorityData;
-    std::vector<double> m_maxRates;
+    int m_minPcrInc;
     int64_t m_timeOffset;
     int64_t m_lastSITPCR;
     bool m_canSwithBlock;

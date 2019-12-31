@@ -123,7 +123,7 @@ TSMuxer::TSMuxer(MuxerManager* owner): AbstractMuxer(owner)
     m_outBuf = 0;
     m_masterMode = false;
     m_subMode = false;
-    m_maxRates.push_back(1e12);
+    m_minPcrInc = 846; // min PCR between two TS packets for TS_Recording_Rate of 6 MB/s
     setPtsOffset(0);
     m_canSwithBlock = true;
     m_additionCLPISize = 0;
@@ -181,6 +181,9 @@ void TSMuxer::intAddStream(const std::string& streamName,
 
 	int tsStreamIndex = streamIndex + 16;
 	bool isSecondary = codecReader->isSecondary();
+	// 4K flag => change min PCR between two TS packets for TS_Recording_Rate of 13.6 MB/s
+	if (*HDR10_metadata & 0x20) m_minPcrInc = 373;
+
 	if (codecName[0] == 'V') 
     {
 		if (!isSecondary) 
@@ -469,20 +472,9 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
     int64_t hiResPCR = pcrVal*300 - pcrGAP;
 	uint64_t pcrValDif = hiResPCR - m_prevM2TSPCR; // m2ts pcr clock based on full 27Mhz counter
 	double pcrIncPerFrame = double (pcrValDif + 0.1) / (double) m2tsFrameCnt;
-    if (pcrIncPerFrame > 1.0) 
-    {
-        int val = FFMIN(pcrIncPerFrame, m_maxRates[m_maxRates.size()-1]);
-        m_maxRates[m_maxRates.size()-1] = val;
-		/*
-        int TS_recording_rate = 188.0 / (val / 27000000.0);
-        if (TS_recording_rate*8 > 40000000)
-        {
-            int gg = 4;
-        }
-		*/
+    // BD player cannot read faster than TS_Recording_Rate
+    if (pcrIncPerFrame < m_minPcrInc) pcrIncPerFrame = m_minPcrInc;
 
-    }
-    
 	double curM2TSPCR = m_prevM2TSPCR;
 	uint8_t* curPos;
 	if (m_m2tsDelayBlocks.size() > 0) {
@@ -517,7 +509,7 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
 	assert(curPos == end);
 	m_prevM2TSPCROffset = m_outBufLen;
 	//assert((int64_t) curM2TSPCR == hiResPCR);
-	m_prevM2TSPCR = hiResPCR;
+	m_prevM2TSPCR = curM2TSPCR;
 }
 
 void TSMuxer::writeEmptyPacketWithPCRTest(int64_t pcrVal)
@@ -537,7 +529,7 @@ void TSMuxer::writeEmptyPacketWithPCRTest(int64_t pcrVal)
 	tsPacket->afExists = 1;
 	tsPacket->adaptiveField.setPCR33(pcrVal);
 	//tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt++;
-	tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt; // do not increment counter becouse data_exists == 0
+	tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt; // do not increment counter because data_exists == 0
 
 	memset(curBuf + tsPacket->getHeaderSize(), 0xff, TS_FRAME_SIZE - tsPacket->getHeaderSize());
 	tsPacket->adaptiveField.length += TS_FRAME_SIZE - tsPacket->getHeaderSize();
@@ -726,7 +718,6 @@ void TSMuxer::gotoNextFile(uint64_t newPts)
 		if (pmtInfo.m_index.size() == 0)
 			continue;
 		pmtInfo.m_index.push_back(PMTIndex());
-        m_maxRates.push_back(1e12);
 
         /*
 		int spSize = pmtInfo.m_index.size();
