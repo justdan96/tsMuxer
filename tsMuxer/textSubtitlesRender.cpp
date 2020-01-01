@@ -191,7 +191,7 @@ wstring findFontArg(const wstring& text, int pos)
 		return L"";
 }
 
-int TextSubtitlesRender::findUnquotedStrW(const wstring& str, const wstring& substr)
+size_t TextSubtitlesRender::findUnquotedStrW(const wstring& str, const wstring& substr)
 {
 	if (substr.size() == 0)
 		return string::npos;
@@ -296,13 +296,13 @@ vector<pair<Font,wstring> > TextSubtitlesRender::processTxtLine(const std::wstri
 			}
 			else if (strStartWithW(ltagStr, L"font ")) 
 			{
-				int fontNamePos = findUnquotedStrW(ltagStr, L"name"); //ltagStr.find(L"name");
+				size_t fontNamePos = findUnquotedStrW(ltagStr, L"name"); //ltagStr.find(L"name");
 				if (fontNamePos == string::npos)
 					fontNamePos = findUnquotedStrW(ltagStr, L"face");
 				if (fontNamePos != string::npos) 
 					curFont.m_name = unquoteStrW(findFontArg(tagStr, fontNamePos/*, lastIndexPos*/));
 
-				int colorPos = findUnquotedStrW(ltagStr, L"color");
+				size_t colorPos = findUnquotedStrW(ltagStr, L"color");
 				if (colorPos != string::npos) 
 				{
 					wstring arg = unquoteStrW(findFontArg(ltagStr, colorPos));
@@ -325,7 +325,7 @@ vector<pair<Font,wstring> > TextSubtitlesRender::processTxtLine(const std::wstri
                     if ((curFont.m_color & 0xff000000u) == 0)
                         curFont.m_color |= 0xff000000u;
 				}
-				int fontSizePos = findUnquotedStrW(ltagStr, L"size");
+				size_t fontSizePos = findUnquotedStrW(ltagStr, L"size");
 				if (fontSizePos != string::npos) {
 					wstring arg = unquoteStrW(findFontArg(tagStr, fontSizePos));
 					if (arg.size() > 0) {
