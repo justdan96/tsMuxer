@@ -15,6 +15,7 @@ mv ./bin/tsMuxeR ./bin/lnx/tsMuxeR
 mkdir -p ./bin/lnx/AppDir/usr/share/applications
 mkdir -p ./bin/lnx/AppDir/usr/share/icons/hicolor/32x32/apps
 mkdir -p ./bin/lnx/AppDir/usr/bin
+cp ./bin/lnx/tsMuxeR ./bin/lnx/AppDir/usr/bin/
 
 mv ./bin/tsMuxerGUI ./bin/lnx/AppDir/usr/bin/tsMuxerGUI
 
