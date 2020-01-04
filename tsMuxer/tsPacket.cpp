@@ -832,7 +832,7 @@ void CLPIParser::composeCPI(BitStreamWriter& writer, bool isCPIExt) {
 	writer.putBits(32,0); // skip lengthField
 
     if (isDependStream && !isCPIExt || !isDependStream && isCPIExt)
-        return; // CPI_SS for MVC depend stream only and vice versa: standart CPI for standart video stream
+        return; // CPI_SS for MVC depend stream only and vice versa: standard CPI for standard video stream
 
 	int beforeCount = writer.getBitsCount() / 8;
 	//if (length != 0) 
@@ -2606,8 +2606,10 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
         *video_format = interlaced ? 1 : 3;
     else if (isPal)
         *video_format = interlaced ? 2 : 7;
-	else if (width >= 2600)
+	else if (width >= 2600) {
 		*video_format = 8;
+		*HDR10_metadata |= 0x20; // 4K flag
+	}
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6; // as 1920x1080
     else
