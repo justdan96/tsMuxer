@@ -1495,6 +1495,7 @@ bool TsMuxerWindow::isVideoCropped() {
 bool TsMuxerWindow::isDiskOutput() const {
   return ui.radioButtonAVCHD->isChecked() ||
          ui.radioButtonBluRay->isChecked() ||
+         ui.radioButtonBluRayUHD->isChecked() ||
          ui.radioButtonBluRayISO->isChecked() ||
          ui.radioButtonBluRayISOUHD->isChecked();
 }
