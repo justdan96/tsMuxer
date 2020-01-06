@@ -994,6 +994,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 					else
 						endCode = 7;
 				}
+			}
 			writer.putBits(3, endCode); //I_end_position_offset[EP_fine_id] 3 bslbf
 			writer.putBits(11, (itr->first >> 9) % 2048);  //PTS_EP_fine[EP_fine_id] 11 uimsbf
 			writer.putBits(17, indexData.m_pktCnt % (65536*2)); //SPN_EP_fine[EP_fine_id] 17 uimsbf
