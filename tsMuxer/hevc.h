@@ -121,7 +121,7 @@ struct HevcSpsUnit: public HevcUnitWithProfile
 {
     HevcSpsUnit();
     int deserialize() override;
-
+    double getFPS() const;
     std::string getDescription() const;
 public:
     int vps_id;

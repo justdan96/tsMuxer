@@ -237,10 +237,7 @@ void HevcVpsUnit::setFPS(double fps)
 
 double HevcVpsUnit::getFPS() const
 {
-    if (num_units_in_tick != 0)
-        return time_scale/(float)num_units_in_tick;
-    else
-        return 0;
+        return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0;
 }
 
 string HevcVpsUnit::getDescription() const
@@ -372,9 +369,9 @@ void HevcSpsUnit::vui_parameters()
         extractUEGolombCode(); // chroma_sample_loc_type_bottom_field ue(v)
     }
 
-    m_reader.skipBits(8); // neutral_chroma_indication_flag u(1)
-    m_reader.skipBits(8); // field_seq_flag u(1)
-    m_reader.skipBits(8); // frame_field_info_present_flag u(1)
+    m_reader.skipBit(); // neutral_chroma_indication_flag u(1)
+    m_reader.skipBit(); // field_seq_flag u(1)
+    m_reader.skipBit(); // frame_field_info_present_flag u(1)
     bool default_display_window_flag = m_reader.getBit();
     if( default_display_window_flag ) {
         extractUEGolombCode(); // def_disp_win_left_offset ue(v)
@@ -765,6 +762,11 @@ int HevcSpsUnit::deserialize()
     } catch (VodCoreException& e) {
         return NOT_ENOUGH_BUFFER;
     }
+}
+
+double HevcSpsUnit::getFPS() const
+{
+    return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0;
 }
 
 string HevcSpsUnit::getDescription() const
