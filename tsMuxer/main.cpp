@@ -92,8 +92,9 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
 			}
 
 			if (str.find("--blu-ray-v3") != string::npos)
-				result =  UHD_BLURAY;
-			else if (str.find("--blu-ray") != string::npos)
+				V3_flags |= 0x80; // flag "V3"
+
+			if (str.find("--blu-ray") != string::npos)
 				result =  DT_BLURAY;
 			else if (str.find("--avchd") != string::npos)
 				result =  DT_AVCHD;
@@ -667,9 +668,9 @@ int main(int argc, char** argv)
 			MuxerManager muxerManager(readManager, tsMuxerFactory);
             muxerManager.setAllowStereoMux(fileExt2 == "SSIF" || dt != DT_NONE);
 			muxerManager.openMetaFile(argv[1]);
-			if (dt == DT_BLURAY && muxerManager.getHevcFound()) {
+			if (!V3_flags && dt == DT_BLURAY && muxerManager.getHevcFound()) {
 				LTRACE(LT_WARN, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
-				dt = UHD_BLURAY;
+				V3_flags |= 0x80; // flag "V3"
 			}
 			string dstFile = unquoteStr(argv[2]);
 

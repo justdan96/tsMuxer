@@ -836,17 +836,17 @@ int HevcSeiUnit::deserialize()
 				payloadSize += nbyte;
 			}
 			if (payloadType == 137 && !isHDR10) { // mastering_display_colour_volume
-                HDR10_metadata[1] = m_reader.getBits(32); // display_primaries Green
-                HDR10_metadata[2] = m_reader.getBits(32); // display_primaries Red
-                HDR10_metadata[3] = m_reader.getBits(32); // display_primaries Blue
-                HDR10_metadata[4] = m_reader.getBits(32); // White Point
-                HDR10_metadata[5] = ((m_reader.getBits(32) / 10000) << 16) + m_reader.getBits(32); // max & min display_mastering_luminance
+                HDR10_metadata[0] = m_reader.getBits(32); // display_primaries Green
+                HDR10_metadata[1] = m_reader.getBits(32); // display_primaries Red
+                HDR10_metadata[2] = m_reader.getBits(32); // display_primaries Blue
+                HDR10_metadata[3] = m_reader.getBits(32); // White Point
+                HDR10_metadata[4] = ((m_reader.getBits(32) / 10000) << 16) + m_reader.getBits(32); // max & min display_mastering_luminance
 			}
             else if (payloadType == 144 && !isHDR10) { // content_light_level_info
                 isHDR10 = true;
-                *HDR10_metadata |= 2; // HDR10 flag
+                V3_flags |= 2; // HDR10 flag
                  int maxCLL = m_reader.getBits(32); // maxCLL, maxFALL
-                 if (maxCLL != 0) HDR10_metadata[6] = maxCLL;
+                 if (maxCLL != 0) HDR10_metadata[5] = maxCLL;
             }
 			else if (payloadType == 4 && !isHDR10plus) { // HDR10Plus Metadata
                 m_reader.skipBits(8); // country_code
@@ -858,7 +858,7 @@ int HevcSeiUnit::deserialize()
                 if (application_identifier == 4 && application_version == 1 && num_windows == 1)
                 {
                     isHDR10plus = true;
-                    *HDR10_metadata |= 16; // HDR10plus flag
+                    V3_flags |= 0x10; // HDR10plus flag
                 }
 				payloadSize -= 8;
 				for (int i = 0; i < payloadSize; i++)

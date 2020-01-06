@@ -1426,7 +1426,7 @@ int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
 		writer.putBits(32, 0x20);
 		writer.putBits(32, 1 << 24);
 		writer.putBits(32, 1 << 28);
-		for (int i=1; i<7; i++)
+		for (int i = 0; i < 6; i++)
 			writer.putBits(32, HDR10_metadata[i]);
 		writer.flushBits();
 		return writer.getBitsCount() / 8;
@@ -1442,11 +1442,16 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
     for (int i = 0; i < m_streamInfo.size(); i++)
 	{
 		int stream_coding_type = m_streamInfo[i].stream_coding_type;
-		if (m_streamInfo[i].isSecondary && isVideoStreamType(stream_coding_type))
-        {
-			number_of_SubPaths++;
-            subPath_type = 7; // PIP not fully implemented yet
-        }
+		if (isVideoStreamType(stream_coding_type)) {
+			if (m_streamInfo[i].isSecondary) {
+				number_of_SubPaths++;
+				subPath_type = 7; // PIP not fully implemented yet
+			}
+			else if (m_streamInfo[i].HDR & 4) {
+				number_of_SubPaths++;
+				subPath_type = 10;
+			}
+		}
 	}
 
 	BitStreamWriter writer;
@@ -1455,10 +1460,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 	std::string type_indicator = "MPLS";
 	std::string version_number;
 	if (dt == DT_BLURAY)
-		version_number = "0200";
-	else if (dt == UHD_BLURAY) 
-		version_number = "0300"; 
-	else 
+		version_number = (V3_flags ? "0300" : "0200");
+	else
 		version_number = "0100";
 	CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
 	CLPIStreamInfo::writeString(version_number.c_str(), writer, 4);
@@ -1485,7 +1488,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 	while (writer.getBitsCount() % 16 != 0)
 		writer.putBits(8,0);
 	
-	if (number_of_SubPaths > 0 || isDependStreamExist || dt == UHD_BLURAY) 
+	if (number_of_SubPaths > 0 || isDependStreamExist || V3_flags)
 	{
 		*extDataStartAddr = my_htonl(writer.getBitsCount()/8);
 		uint8_t buffer[1024*4];
@@ -1493,7 +1496,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 		vector<ExtDataBlockInfo> blockVector;
 
 		//for (int i = 0; i < number_of_SubPaths; ++i)
-        if (number_of_SubPaths > 0)
+        if (number_of_SubPaths > 0 && subPath_type == 7)
 		{
 			int bufferSize = composePip_metadata(buffer, sizeof(buffer), mainStreamInfo.m_index);
 			ExtDataBlockInfo extDataBlock(buffer, bufferSize, 1, 1);
@@ -1513,23 +1516,19 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
             
         }
 
-		if (dt == UHD_BLURAY)
-		{
+		if (V3_flags) { // V3
 			int bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
 			ExtDataBlockInfo extDataBlock(buffer, bufferSize, 3, 5);
 			blockVector.push_back(extDataBlock);
 		}
 
-
 		composeExtensionData(writer, blockVector);
 		while (writer.getBitsCount() % 16 != 0)
 			writer.putBits(8,0);
 	}
-	
 
 	writer.flushBits();
 	return writer.getBitsCount()/8;
-	
 }
 
 void MPLSParser::AppInfoPlayList(BitStreamReader& reader) 
@@ -1563,8 +1562,11 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
 	} else {
 		writer.putBits(16, 0); //reserved_for_future_use 16 bslbf
 	}
-	writer.putBits(32,0); //UO_mask_table;
-	writer.putBits(32,0); //UO_mask_table cont;
+	writer.putBits(28, 0); //UO_mask_table;
+	writer.putBits(4, (V3_flags ? 15 : 0)); //UO_mask_table;
+	writer.putBit(0); // reserved
+	writer.putBit(V3_flags ? 1 : 0); //UO_mask_table: SecondaryPGStreamNumberChange
+	writer.putBits(30, 0); //UO_mask_table cont;
 	writer.putBit(0); // PlayList_random_access_flag
 	writer.putBit(1); // audio_mix_app_flag. 0 == no secondary audio, 1- allow secondary audio if exist
 	writer.putBit(0); // lossless_may_bypass_mixer_flag
@@ -2204,8 +2206,11 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
 	else
 		writer.putBits(32, OUT_time); //32 uimsbf
 
-	writer.putBits(32,0); //UO_mask_table;
-	writer.putBits(32,0); //UO_mask_table cont;
+	writer.putBits(28, 0); //UO_mask_table;
+	writer.putBits(4, V3_flags ? 15 : 0); //UO_mask_table;
+	writer.putBit(0); // reserved
+	writer.putBit(V3_flags ? 1 : 0); //UO_mask_table: SecondaryPGStreamNumberChange
+	writer.putBits(30, 0); //UO_mask_table cont;
 
 	writer.putBit(PlayItem_random_access_flag); //1 bslbf
 	writer.putBits(7,0); //reserved_for_future_use 7 bslbf
@@ -2608,7 +2613,7 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
         *video_format = interlaced ? 2 : 7;
 	else if (width >= 2600) {
 		*video_format = 8;
-		*HDR10_metadata |= 0x20; // 4K flag
+		V3_flags |= 0x20; // 4K flag
 	}
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6; // as 1920x1080
@@ -2975,9 +2980,7 @@ int MovieObject::compose(uint8_t* buffer, int len, DiskType dt)
 	char type_indicator[5];
 	CLPIStreamInfo::writeString("MOBJ", writer, 4);
 	if (dt == DT_BLURAY)
-		CLPIStreamInfo::writeString("0200", writer, 4);
-	else if (dt == UHD_BLURAY) 
-		CLPIStreamInfo::writeString("0300", writer, 4); 
+		CLPIStreamInfo::writeString(V3_flags ? "0300" : "0200", writer, 4);
 	else
 		CLPIStreamInfo::writeString("0100", writer, 4);
 	writer.putBits(32,0); //uint32_t ExtensionData_start_address  
