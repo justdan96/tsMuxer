@@ -111,8 +111,7 @@ bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int ex
 
 bool BlurayHelper::createBluRayDirs()
 {
-    if (m_dt == DT_BLURAY || m_dt == UHD_BLURAY) 
-    {
+    if (m_dt == DT_BLURAY) {
         if (m_isoWriter) {
             m_isoWriter->createDir("BDMV/META");
             m_isoWriter->createDir("BDMV/BDJO");
@@ -168,20 +167,26 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
     }
     uint8_t* emptyCommand;
     if (m_dt == DT_BLURAY) {
-        bdMovieObjectData[5] = bdIndexData[5] = '2';
-        fileSize = 0x78;
-    }
-    else if (m_dt == UHD_BLURAY) {
-        bdMovieObjectData[5] = bdIndexData[5] = '3';
-        fileSize = 0x9C; // add 36 bytes for HDR data extension
-        bdIndexData[15] = 0x78; // start address of HDR data extension
-        emptyCommand = bdIndexData + 0x78;
-        memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
-                             "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
-                             "\x00\x00\x00\x08\x21\x00\x00\x00\x00\x00\x00\x00", 36); // HDR data extension
-        if (*HDR10_metadata & 0x20) bdIndexData[0x94] = 0x51; // 4K flag => 66/100 GB Disk, 109 MB/s Recording_Rate
-        bdIndexData[0x96] = (uint8_t)HDR10_metadata[0]; // HDR flags
-
+        if (V3_flags) {
+            bdMovieObjectData[5] = bdIndexData[5] = '3'; // V3
+            fileSize = 0x9C; // add 36 bytes for UHD data extension
+            bdIndexData[15] = 0x78; // start address of UHD data extension
+            emptyCommand = bdIndexData + 0x78;
+            // UHD data extension
+            memcpy(emptyCommand, "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
+                "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
+                "\x00\x00\x00\x08\x20\x00\x00\x00\x00\x00\x00\x00", 36);
+            // 4K flag => 66/100 GB Disk, 109 MB/s Recording_Rate
+            if (V3_flags & 0x20) bdIndexData[0x94] = 0x51;
+            // no HDR10 detected => SDR flag
+            if (!(V3_flags & 0x1e)) V3_flags |= 1;
+           // include HDR/SDR flags
+            bdIndexData[0x96] = (V3_flags & 0x1f);
+        }
+        else { // V2
+            bdMovieObjectData[5] = bdIndexData[5] = '2';
+            fileSize = 0x78;
+        }
     }
     else {
         bdMovieObjectData[5] = bdIndexData[5] = '1';
@@ -237,9 +242,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     CLPIParser clpiParser;
     string version_number;
     if (m_dt == DT_BLURAY)
-        memcpy(&clpiParser.version_number, "0200", 5);
-    else if (m_dt == UHD_BLURAY)
-        memcpy(&clpiParser.version_number, "0300", 5);
+        memcpy(&clpiParser.version_number, V3_flags ? "0300" : "0200", 5);
     else
         memcpy(&clpiParser.version_number, "0100", 5);
     clpiParser.clip_stream_type = 1; // AV stream
@@ -252,9 +255,6 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     if (doLog) {
         if (m_dt == DT_BLURAY) {
             LTRACE(LT_INFO, 2, "Creating Blu-ray stream info and seek index");
-        }
-        else if (m_dt == UHD_BLURAY) {
-            LTRACE(LT_INFO, 2, "Creating UHD Blu-ray stream info and seek index");
         }
         else {
             LTRACE(LT_INFO, 2, "Creating AVCHD stream info and seek index");
@@ -283,7 +283,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         else
             clpiParser.TS_recording_rate = MAX_MAIN_MUXER_RATE / 8;
         // max rate is 109 mbps for 4K
-        if (*HDR10_metadata & 0x20)
+        if (V3_flags & 0x20)
             clpiParser.TS_recording_rate = (clpiParser.TS_recording_rate * 109) / 48;
         clpiParser.number_of_source_packets = packetCount[i];
         clpiParser.presentation_start_time = firstPts[i] / 2;
@@ -427,9 +427,6 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer,
 
     if (dt == DT_BLURAY) {
         LTRACE(LT_INFO, 2, "Creating Blu-ray playlist");
-    }
-    else if (dt == UHD_BLURAY) {
-        LTRACE(LT_INFO, 2, "Creating UHD Blu-ray playlist");
     }
     else {
         LTRACE(LT_INFO, 2, "Creating AVCHD playlist");

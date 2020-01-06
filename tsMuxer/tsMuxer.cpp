@@ -182,7 +182,7 @@ void TSMuxer::intAddStream(const std::string& streamName,
 	int tsStreamIndex = streamIndex + 16;
 	bool isSecondary = codecReader->isSecondary();
 	// 4K flag => change min PCR between two TS packets for TS_Recording_Rate of 13.6 MB/s
-	if (*HDR10_metadata & 0x20) m_minPcrInc = 373;
+	if (V3_flags & 0x20) m_minPcrInc = 373;
 
 	if (codecName[0] == 'V') 
     {
@@ -652,6 +652,7 @@ void TSMuxer::writePATPMT(int64_t pcr, bool force)
         }
 	}
 }
+
 bool TSMuxer::isSplitPoint(const AVPacket& avPacket)
 {
     if (avPacket.stream_index != m_mainStreamIndex || !(avPacket.flags & AVPacket::IS_IFRAME))

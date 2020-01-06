@@ -3,7 +3,8 @@
 
 #include "nalUnits.h"
 
-extern int HDR10_metadata[7];
+extern int HDR10_metadata[6];
+extern int V3_flags;
 
 enum HevcSliceTypes
 {

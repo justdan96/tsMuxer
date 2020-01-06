@@ -8,7 +8,8 @@
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
-int HDR10_metadata[7] = { 1,0,0,0,0,0,0 };
+int V3_flags = 0; // flags : isV3, reserved, 4K, HDR10+, SL-HDR2, DV, HDR10, SDR
+int HDR10_metadata[6] = { 0,0,0,0,0,0 };
 
 HEVCStreamReader::HEVCStreamReader(): 
     MPEGStreamReader(),
@@ -92,7 +93,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                     m_sei = new HevcSeiUnit();
                 if (nal[1] == 1 && !m_sei->isDV) {
                     m_sei->isDV = true;
-                    *HDR10_metadata |= 4; // Dolby Vision flag
+                    V3_flags |= 4; // Dolby Vision flag
                 }
                 break;
             }
@@ -262,7 +263,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
         {
             if (curPos[2] & 0x80) // slice.first_slice
             {
-                if (sliceFound ) { // first slice of next frame
+                if (sliceFound ) { // first slice of next frame: case where there is no non-VCL NAL between the two frames
                     m_lastDecodedPos = prevPos; // next frame started
                     incTimings();
                     return 0;
