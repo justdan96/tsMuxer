@@ -962,23 +962,38 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 			writer.putBit(0); //is_angle_change_point[EP_fine_id] 1 bslbf
 			int endCode = 0;
 			if (indexData.m_frameLen > 0) {
-				if (indexData.m_frameLen < 131072)
-					endCode = 1;
-				else if (indexData.m_frameLen < 131072)
-					endCode = 1;
-				else if (indexData.m_frameLen < 262144)
-					endCode = 2;
-				else if (indexData.m_frameLen < 393216)
-					endCode = 3;
-				else if (indexData.m_frameLen < 589824)
-					endCode = 4;
-				else if (indexData.m_frameLen < 917504)
-					endCode = 5;
-				else if (indexData.m_frameLen < 1310720)
-					endCode = 6;
-				else
-					endCode = 7;
-			}
+				if (V3_flags) {
+					if (indexData.m_frameLen < 786432)
+						endCode = 1;
+					else if (indexData.m_frameLen < 1572864)
+						endCode = 2;
+					else if (indexData.m_frameLen < 2359296)
+						endCode = 3;
+					else if (indexData.m_frameLen < 3145728)
+						endCode = 4;
+					else if (indexData.m_frameLen < 3932160)
+						endCode = 5;
+					else if (indexData.m_frameLen < 4718592)
+						endCode = 6;
+					else
+						endCode = 7;
+				}
+				else {
+					if (indexData.m_frameLen < 131072)
+						endCode = 1;
+					else if (indexData.m_frameLen < 262144)
+						endCode = 2;
+					else if (indexData.m_frameLen < 393216)
+						endCode = 3;
+					else if (indexData.m_frameLen < 589824)
+						endCode = 4;
+					else if (indexData.m_frameLen < 917504)
+						endCode = 5;
+					else if (indexData.m_frameLen < 1310720)
+						endCode = 6;
+					else
+						endCode = 7;
+				}
 			writer.putBits(3, endCode); //I_end_position_offset[EP_fine_id] 3 bslbf
 			writer.putBits(11, (itr->first >> 9) % 2048);  //PTS_EP_fine[EP_fine_id] 11 uimsbf
 			writer.putBits(17, indexData.m_pktCnt % (65536*2)); //SPN_EP_fine[EP_fine_id] 17 uimsbf
