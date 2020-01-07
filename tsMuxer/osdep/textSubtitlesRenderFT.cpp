@@ -79,12 +79,13 @@ void TextSubtitlesRenderFT::loadFontMap()
 	vector<string> fileList;
 	//sort(fileList.begin(), fileList.end());
 	findFilesRecursive(FONT_ROOT, "*.ttf", &fileList);
-	FT_Face font;
 	for (int i = 0; i < fileList.size(); ++i)
 	{
 		//LTRACE(LT_INFO, 2, "before loading font " << fileList[i].c_str());
 		if (strEndWith(fileList[i], "AppleMyungjo.ttf"))
 		    continue;
+
+		FT_Face font;
 		int error = FT_New_Face( library, fileList[i].c_str(), 0, &font); 
 		if (error == 0)
 		{
@@ -96,8 +97,9 @@ void TextSubtitlesRenderFT::loadFontMap()
 				m_fontNameToFile[fontFamily] = fileList[i];
 			else if (fileList[i].length() < itr->second.length())
 				m_fontNameToFile[fontFamily] = fileList[i];
+
+			FT_Done_Face(font);
 		}
-		FT_Done_Face(font);
 		//LTRACE(LT_INFO, 2, "after loading font " << fileList[i].c_str());
 	}
 }
