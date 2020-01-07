@@ -620,7 +620,9 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
 			if (trackRez.codecInfo.programName == "V_MS/VFW/WVC1" ||
 				trackRez.codecInfo.programName == "V_MPEG-2" || 
 				trackRez.codecInfo.programName == "V_MPEG4/ISO/AVC" ||
-                trackRez.codecInfo.programName == "V_MPEG4/ISO/MVC")
+				trackRez.codecInfo.programName == "V_MPEG4/ISO/MVC" ||
+				trackRez.codecInfo.programName == "V_MPEGH/ISO/HEVC"
+				)
 			{
 				size_t frPos = trackRez.streamDescr.find("Frame rate: not found");
 				if (frPos != string::npos) 
