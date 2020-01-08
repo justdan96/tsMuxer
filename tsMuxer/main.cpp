@@ -669,7 +669,7 @@ int main(int argc, char** argv)
             muxerManager.setAllowStereoMux(fileExt2 == "SSIF" || dt != DT_NONE);
 			muxerManager.openMetaFile(argv[1]);
 			if (!V3_flags && dt == DT_BLURAY && muxerManager.getHevcFound()) {
-				LTRACE(LT_WARN, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
+				LTRACE(LT_INFO, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
 				V3_flags |= 0x80; // flag "V3"
 			}
 			string dstFile = unquoteStr(argv[2]);
