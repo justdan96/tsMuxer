@@ -1312,6 +1312,16 @@ p, li { white-space: pre-wrap; }
             </layout>
            </item>
            <item>
+             <widget class="QCheckBox" name="checkBoxV3">
+               <property name="text">
+                 <string>BD-ROM V3 format</string>
+               </property>
+               <property name="checked">
+                 <bool>false</bool>
+               </property>
+             </widget>
+           </item>
+           <item>
             <layout class="QGridLayout" name="gridLayout_10">
              <item row="0" column="0">
               <widget class="QLabel" name="label">
@@ -2663,26 +2673,6 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="text">
                <string>Blu-ray folder</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="radioButtonBluRayISOUHD">
-              <property name="text">
-               <string>UHD Blu-ray ISO</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="radioButtonBluRayUHD">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>UHD Blu-ray folder</string>
               </property>
              </widget>
             </item>

@@ -323,8 +323,6 @@ QString TsMuxerWindow::getDefaultOutputFileName() const {
     return prefix + QString("default.m2ts");
   else if (ui.radioButtonBluRayISO->isChecked())
     return prefix + QString("default.iso");
-  else if (ui.radioButtonBluRayISOUHD->isChecked())
-    return prefix + QString("default.iso");
   else
     return prefix;
 }
@@ -459,6 +457,8 @@ TsMuxerWindow::TsMuxerWindow()
           &TsMuxerWindow::onGeneralCheckboxClicked);
   connect(ui.checkBoxBlankPL, &QPushButton::clicked, this,
           &TsMuxerWindow::onSavedParamChanged);
+  connect(ui.checkBoxV3, &CheckBox::stateChanged, this,
+          &TsMuxerWindow::updateMetaLines);
   connect(ui.BlackplaylistCombo, spinBoxValueChanged, this,
           &TsMuxerWindow::onSavedParamChanged);
   connect(ui.checkBoxNewAudioPes, &QAbstractButton::clicked, this,
@@ -527,10 +527,6 @@ TsMuxerWindow::TsMuxerWindow()
   connect(ui.radioButtonBluRay, &QAbstractButton::clicked, this,
           &TsMuxerWindow::RadioButtonMuxClick);
   connect(ui.radioButtonBluRayISO, &QAbstractButton::clicked, this,
-          &TsMuxerWindow::RadioButtonMuxClick);
-  connect(ui.radioButtonBluRayUHD, &QAbstractButton::clicked, this,
-          &TsMuxerWindow::RadioButtonMuxClick);
-  connect(ui.radioButtonBluRayISOUHD, &QAbstractButton::clicked, this,
           &TsMuxerWindow::RadioButtonMuxClick);
   connect(ui.radioButtonAVCHD, &QAbstractButton::clicked, this,
           &TsMuxerWindow::RadioButtonMuxClick);
@@ -1073,8 +1069,6 @@ void TsMuxerWindow::modifyOutFileName(const QString fileName) {
       ui.outFileName->setText(dstPath + QDir::separator() + name + ".m2ts");
     else if (ui.radioButtonBluRayISO->isChecked())
       ui.outFileName->setText(dstPath + QDir::separator() + name + ".iso");
-    else if (ui.radioButtonBluRayISOUHD->isChecked())
-      ui.outFileName->setText(dstPath + QDir::separator() + name + ".iso");
     else
       ui.outFileName->setText(dstPath);
     if (ui.outFileName->text() == fileName)
@@ -1495,9 +1489,7 @@ bool TsMuxerWindow::isVideoCropped() {
 bool TsMuxerWindow::isDiskOutput() const {
   return ui.radioButtonAVCHD->isChecked() ||
          ui.radioButtonBluRay->isChecked() ||
-         ui.radioButtonBluRayUHD->isChecked() ||
-         ui.radioButtonBluRayISO->isChecked() ||
-         ui.radioButtonBluRayISOUHD->isChecked();
+         ui.radioButtonBluRayISO->isChecked();
 }
 
 QString TsMuxerWindow::getMuxOpts() {
@@ -1505,15 +1497,9 @@ QString TsMuxerWindow::getMuxOpts() {
   if (ui.checkBoxNewAudioPes->isChecked())
     rez += "--new-audio-pes ";
   if (ui.radioButtonBluRay->isChecked())
-    rez += "--blu-ray ";
+    rez += (ui.checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
   else if (ui.radioButtonBluRayISO->isChecked()) {
-    rez += "--blu-ray ";
-    if (!ui.DiskLabelEdit->text().isEmpty())
-      rez += QString("--label=\"%1\" ").arg(ui.DiskLabelEdit->text());
-  } else if (ui.radioButtonBluRayUHD->isChecked())
-    rez += "--blu-ray-v3 ";
-  else if (ui.radioButtonBluRayISOUHD->isChecked()) {
-    rez += "--blu-ray-v3 ";
+    rez += (ui.checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
     if (!ui.DiskLabelEdit->text().isEmpty())
       rez += QString("--label=\"%1\" ").arg(ui.DiskLabelEdit->text());
   } else if (ui.radioButtonAVCHD->isChecked())
@@ -2219,7 +2205,6 @@ void TsMuxerWindow::RadioButtonMuxClick() {
     ui.buttonMux->setText("Sta&rt muxing");
   outFileNameDisableChange = true;
   if (ui.radioButtonBluRay->isChecked() ||
-      ui.radioButtonBluRayUHD->isChecked() ||
       ui.radioButtonDemux->isChecked() || ui.radioButtonAVCHD->isChecked()) {
     QFileInfo fi(unquoteStr(ui.outFileName->text()));
     if (!fi.suffix().isEmpty()) {
@@ -2244,9 +2229,6 @@ void TsMuxerWindow::RadioButtonMuxClick() {
     } else if (ui.radioButtonBluRayISO->isChecked()) {
       ui.outFileName->setText(changeFileExt(ui.outFileName->text(), "iso"));
       saveDialogFilter = ISO_SAVE_DIALOG_FILTER;
-    } else if (ui.radioButtonBluRayISOUHD->isChecked()) {
-      ui.outFileName->setText(changeFileExt(ui.outFileName->text(), "iso"));
-      saveDialogFilter = ISO_SAVE_DIALOG_FILTER;
     } else {
       ui.outFileName->setText(changeFileExt(ui.outFileName->text(), "m2ts"));
       saveDialogFilter = M2TS_SAVE_DIALOG_FILTER;
@@ -2264,15 +2246,14 @@ void TsMuxerWindow::outFileNameChanged() {
   if (outFileNameDisableChange)
     return;
   if (ui.radioButtonDemux->isChecked() || ui.radioButtonBluRay->isChecked() ||
-      ui.radioButtonBluRayUHD->isChecked() || ui.radioButtonAVCHD->isChecked())
+      ui.radioButtonAVCHD->isChecked())
     return;
 
   outFileNameDisableChange = true;
   QFileInfo fi(unquoteStr(ui.outFileName->text().trimmed()));
   QString ext = fi.suffix().toUpper();
 
-  bool isISOMode = ui.radioButtonBluRayISO->isChecked() ||
-                   ui.radioButtonBluRayISOUHD->isChecked();
+  bool isISOMode = ui.radioButtonBluRayISO->isChecked();
 
   if (ext == "M2TS" || ext == "M2TS\"")
     ui.radioButtonM2TS->setChecked(true);
@@ -2281,8 +2262,7 @@ void TsMuxerWindow::outFileNameChanged() {
   } else
     ui.radioButtonTS->setChecked(true);
 
-  bool isISOModeNew = ui.radioButtonBluRayISO->isChecked() ||
-                      ui.radioButtonBluRayISOUHD->isChecked();
+  bool isISOModeNew = ui.radioButtonBluRayISO->isChecked();
 
   ui.DiskLabel->setVisible(ui.radioButtonBluRayISO->isChecked());
   ui.DiskLabelEdit->setVisible(ui.radioButtonBluRayISO->isChecked());
@@ -2293,7 +2273,7 @@ void TsMuxerWindow::outFileNameChanged() {
 
 void TsMuxerWindow::saveFileDialog() {
   if (ui.radioButtonDemux->isChecked() || ui.radioButtonBluRay->isChecked() ||
-      ui.radioButtonBluRayUHD->isChecked() || ui.radioButtonAVCHD->isChecked()) {
+      ui.radioButtonAVCHD->isChecked()) {
     QString folder = QDir::toNativeSeparators(
         QFileDialog::getExistingDirectory(this, getOutputDir()));
     if (!folder.isEmpty()) {
@@ -2349,25 +2329,11 @@ void TsMuxerWindow::startMuxing() {
       msgBox.exec();
       return;
     }
-  } else if (ui.radioButtonBluRayISOUHD->isChecked()) {
-    QFileInfo fi(ui.outFileName->text());
-    if (fi.suffix().toUpper() != "ISO") {
-      QMessageBox msgBox(this);
-      msgBox.setWindowTitle("Invalid file name");
-      msgBox.setText(QString("The output file \"") + ui.outFileName->text() +
-                     "\" has invalid extension. Please, change file extension "
-                     "to \".iso\"");
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setStandardButtons(QMessageBox::Ok);
-      msgBox.exec();
-      return;
-    }
   }
 
   bool isFile = ui.radioButtonM2TS->isChecked() ||
                 ui.radioButtonTS->isChecked() ||
-                ui.radioButtonBluRayISO->isChecked() ||
-                ui.radioButtonBluRayISOUHD->isChecked();
+                ui.radioButtonBluRayISO->isChecked();
   if (isFile && QFile::exists(ui.outFileName->text())) {
     QString fileOrDir = isFile ? "file" : "directory";
     QMessageBox msgBox(this);
