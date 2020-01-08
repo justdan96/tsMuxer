@@ -2942,7 +2942,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>radioButtonTS</tabstop>
   <tabstop>radioButtonM2TS</tabstop>
   <tabstop>radioButtonBluRay</tabstop>
-  <tabstop>radioButtonBluRayUHD</tabstop>
   <tabstop>radioButtonDemux</tabstop>
   <tabstop>outFileName</tabstop>
   <tabstop>btnBrowse</tabstop>
