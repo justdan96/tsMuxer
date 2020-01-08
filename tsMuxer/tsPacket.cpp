@@ -2636,6 +2636,11 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
     else
         *video_format = 5;  // as 1280x720
 
+    if (width < 1080 && V3_flags)
+        LTRACE(LT_WARN, 2, "Warning: video height < 1080 is not standard for V3 Blu-ray.");
+    if (interlaced && V3_flags)
+        LTRACE(LT_WARN, 2, "Warning: interlaced video is not standard for V3 Blu-ray.");
+
     if (fabs(fps-23.976) < 1e-4)
         *frame_rate_index = 1;
     else if (fabs(fps-24.0) < 1e-4)
