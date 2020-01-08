@@ -187,7 +187,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
 			curPos[2] = tmp;
 		}
 	}
-	// 2. Remap channels to Blu-ray standart
+	// 2. Remap channels to Blu-ray standard
 	if (m_channels == 6) {
 		uint8_t* tmpData = new uint8_t[ch1FullSize];
 		storeChannelData(start, end, 4, tmpData, m_channels); // copy channel 6(LFE) to tmpData
@@ -292,7 +292,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
 			    curPos[2] = tmp;
 		    }
 	    }
-	    // 2. Remap channels to WAV standart
+	    // 2. Remap channels to WAV standard
 	    if (m_channels == 1) {
 		    removeChannel(start, end, 2, mch);
 	    }
@@ -403,7 +403,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
 			if (!(waveFormatPCMEx->SubFormat == KSDATAFORMAT_SUBTYPE_PCM))
 				THROW (ERR_COMMON, "Unsupported WAVE format. Only PCM audio is supported.");
 		}
-		else if (waveFormatPCMEx->wFormatTag == 0x01) { // standart format
+		else if (waveFormatPCMEx->wFormatTag == 0x01) { // standard format
 			if (m_channels > 2) {
 				if (m_channels == 3) {
 					LTRACE(LT_WARN, 2, "Warning! Multi channels WAVE file for stream " << m_streamIndex << " do not contain channels configuration info. Applying default value: L R LFE");

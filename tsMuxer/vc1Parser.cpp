@@ -112,7 +112,7 @@ void VC1SequenceHeader::setFPS(double value)
 			time_base_num = num_units_in_tick;
 		}
 		else 
-			THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standart fps values not supported for VC-1 streams");
+			THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
 		if (time_scale == 24000)
 			nr = 1;
 		else if (time_scale == 25000)
@@ -131,7 +131,7 @@ void VC1SequenceHeader::setFPS(double value)
 		updateBits(m_fpsFieldBitVal + 8, 4, dr);
 	}
 	else
-		THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standart fps values not supported for VC-1 streams");
+		THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
 }
 
 int VC1SequenceHeader::decode_sequence_header()
