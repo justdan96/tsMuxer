@@ -123,7 +123,6 @@ TSMuxer::TSMuxer(MuxerManager* owner): AbstractMuxer(owner)
     m_outBuf = 0;
     m_masterMode = false;
     m_subMode = false;
-    m_minPcrInc = 846; // min PCR between two TS packets for TS_Recording_Rate of 6 MB/s
     setPtsOffset(0);
     m_canSwithBlock = true;
     m_additionCLPISize = 0;
@@ -181,8 +180,6 @@ void TSMuxer::intAddStream(const std::string& streamName,
 
 	int tsStreamIndex = streamIndex + 16;
 	bool isSecondary = codecReader->isSecondary();
-	// 4K flag => change min PCR between two TS packets for TS_Recording_Rate of 13.6 MB/s
-	if (V3_flags & 0x20) m_minPcrInc = 373;
 
 	if (codecName[0] == 'V') 
     {
@@ -472,8 +469,6 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
     int64_t hiResPCR = pcrVal*300 - pcrGAP;
 	uint64_t pcrValDif = hiResPCR - m_prevM2TSPCR; // m2ts pcr clock based on full 27Mhz counter
 	double pcrIncPerFrame = double (pcrValDif + 0.1) / (double) m2tsFrameCnt;
-    // BD player cannot read faster than TS_Recording_Rate
-    if (pcrIncPerFrame < m_minPcrInc) pcrIncPerFrame = m_minPcrInc;
 
 	double curM2TSPCR = m_prevM2TSPCR;
 	uint8_t* curPos;
@@ -509,7 +504,7 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
 	assert(curPos == end);
 	m_prevM2TSPCROffset = m_outBufLen;
 	//assert((int64_t) curM2TSPCR == hiResPCR);
-	m_prevM2TSPCR = curM2TSPCR;
+	m_prevM2TSPCR = hiResPCR;
 }
 
 void TSMuxer::writeEmptyPacketWithPCRTest(int64_t pcrVal)
