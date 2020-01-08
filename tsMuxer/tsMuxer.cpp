@@ -257,7 +257,7 @@ void TSMuxer::intAddStream(const std::string& streamName,
 			m_pesType[tsStreamIndex] = PES_VC1_ID;
 		}
 		else {
-			m_pesType[tsStreamIndex] = PES_VIDEO_ID; //m_videoCnt++;
+			m_pesType[tsStreamIndex] = (m_m2tsMode ? PES_VIDEO_ID : PES_VIDEO_ID - 1); //m_videoCnt++;
 		}
 	}
 	
