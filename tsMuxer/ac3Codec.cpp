@@ -212,7 +212,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
             if (gbc.getBit())
             {
                 int chanLayout = gbc.getBits(16);
-                if (chanLayout & 0x7fe0) // mask standart 5.1 channels
+                if (chanLayout & 0x7fe0) // mask standard 5.1 channels
                     m_extChannelsExists = true;
             }
         }
