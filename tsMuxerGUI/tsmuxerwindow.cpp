@@ -457,7 +457,7 @@ TsMuxerWindow::TsMuxerWindow()
           &TsMuxerWindow::onGeneralCheckboxClicked);
   connect(ui.checkBoxBlankPL, &QPushButton::clicked, this,
           &TsMuxerWindow::onSavedParamChanged);
-  connect(ui.checkBoxV3, &CheckBox::stateChanged, this,
+  connect(ui.checkBoxV3, &QCheckBox::stateChanged, this,
           &TsMuxerWindow::updateMetaLines);
   connect(ui.BlackplaylistCombo, spinBoxValueChanged, this,
           &TsMuxerWindow::onSavedParamChanged);
