@@ -2293,7 +2293,7 @@ void TsMuxerWindow::outFileNameChanged() {
 
 void TsMuxerWindow::saveFileDialog() {
   if (ui.radioButtonDemux->isChecked() || ui.radioButtonBluRay->isChecked() ||
-      ui.radioButtonAVCHD->isChecked()) {
+      ui.radioButtonBluRayUHD->isChecked() || ui.radioButtonAVCHD->isChecked()) {
     QString folder = QDir::toNativeSeparators(
         QFileDialog::getExistingDirectory(this, getOutputDir()));
     if (!folder.isEmpty()) {
