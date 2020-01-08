@@ -2557,7 +2557,7 @@ void TsMuxerWindow::writeSettings() {
   settings->setValue("fontLineSpacing", ui.lineSpacing->value());
   settings->setValue("offset", ui.spinEditOffset->value());
   settings->setValue("fadeTime", getRendererAnimationTime());
-  settings->setValue("famaly", ui.listViewFont->item(0, 1)->text());
+  settings->setValue("family", ui.listViewFont->item(0, 1)->text());
   settings->setValue("size", ui.listViewFont->item(1, 1)->text().toUInt());
   settings->setValue("color",
                      ui.listViewFont->item(2, 1)->text().mid(2).toUInt(0, 16));
@@ -2609,7 +2609,7 @@ bool TsMuxerWindow::readSettings() {
   ui.lineSpacing->setValue(settings->value("fontLineSpacing").toDouble());
   setRendererAnimationTime(settings->value("fadeTime").toDouble());
   ui.spinEditOffset->setValue(settings->value("offset").toInt());
-  QString fontName = settings->value("famaly").toString();
+  QString fontName = settings->value("family").toString();
   if (!fontName.isEmpty())
     ui.listViewFont->item(0, 1)->setText(fontName);
   int fontSize = settings->value("size").toInt();
