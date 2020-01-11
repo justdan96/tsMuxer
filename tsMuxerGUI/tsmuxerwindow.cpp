@@ -2177,7 +2177,7 @@ void TsMuxerWindow::outFileNameChanged() {
   QFileInfo fi(unquoteStr(ui->outFileName->text().trimmed()));
   QString ext = fi.suffix().toUpper();
 
-  bool isISOMode = ui.radioButtonBluRayISO->isChecked();
+  bool isISOMode = ui->radioButtonBluRayISO->isChecked();
 
   if (ext == "M2TS" || ext == "M2TS\"")
     ui->radioButtonM2TS->setChecked(true);
@@ -2186,7 +2186,7 @@ void TsMuxerWindow::outFileNameChanged() {
   } else
     ui->radioButtonTS->setChecked(true);
 
-  bool isISOModeNew = ui.radioButtonBluRayISO->isChecked();
+  bool isISOModeNew = ui->radioButtonBluRayISO->isChecked();
 
   ui->DiskLabel->setVisible(ui->radioButtonBluRayISO->isChecked());
   ui->DiskLabelEdit->setVisible(ui->radioButtonBluRayISO->isChecked());
@@ -2255,10 +2255,10 @@ void TsMuxerWindow::startMuxing() {
     }
   }
 
-  bool isFile = ui.radioButtonM2TS->isChecked() ||
-                ui.radioButtonTS->isChecked() ||
-                ui.radioButtonBluRayISO->isChecked();
-  if (isFile && QFile::exists(ui.outFileName->text())) {
+  bool isFile = ui->radioButtonM2TS->isChecked() ||
+                ui->radioButtonTS->isChecked() ||
+                ui->radioButtonBluRayISO->isChecked();
+  if (isFile && QFile::exists(ui->outFileName->text())) {
     QString fileOrDir = isFile ? "file" : "directory";
     QMessageBox msgBox(this);
     msgBox.setWindowTitle(QString("Overwrite existing ") + fileOrDir + "?");
