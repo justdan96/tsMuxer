@@ -106,7 +106,10 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
     {
         rez.codecInfo = hevcCodecInfo;
-        rez.streamDescr = m_sps->getDescription() + string(" ") + m_vps->getDescription();
+        rez.streamDescr = m_sps->getDescription();
+        size_t frSpsPos = rez.streamDescr.find("Frame rate: not found");
+        if (frSpsPos != string::npos)
+            rez.streamDescr = rez.streamDescr.substr(0, frSpsPos) + string(" ") + m_vps->getDescription();
     }
 
     return rez;

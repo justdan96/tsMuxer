@@ -773,10 +773,11 @@ string HevcSpsUnit::getDescription() const
 {
     string result = getProfileString();
     result += string(" Resolution: ") + int32ToStr(pic_width_in_luma_samples) + string(":") + int32ToStr(pic_height_in_luma_samples);
-    if (interlaced_source_flag)
-        result += string("i");
-    else
-        result += string("p");
+    result += (interlaced_source_flag ? string("i") : string("p"));
+
+    double fps = getFPS();
+    result += "  Frame rate: ";
+    result += (fps ? doubleToStr(fps) : string("not found"));
     return result;
 }
 
