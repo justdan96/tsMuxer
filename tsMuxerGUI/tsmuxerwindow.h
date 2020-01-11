@@ -167,6 +167,7 @@ protected:
 
     void writeSettings();
     bool readSettings();
+    bool readGeneralSettings(const QString& prefix);
     QString getOutputDir() const;
 private:
     struct MPLSFileInfo
