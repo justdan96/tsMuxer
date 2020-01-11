@@ -1,8 +1,9 @@
 #ifndef MUX_FORM_H_
 #define MUX_FORM_H_
 
-#include <QtGui>
-#include "ui_muxForm.h"
+#include <QDialog>
+class QProcess;
+class Ui_muxForm;
 
 class MuxForm: public QDialog//QWidget
 {
@@ -22,7 +23,7 @@ private slots:
   void onAbort();
 private:
   int errCnt;
-  Ui_muxForm ui;
+  Ui_muxForm* ui;
   QProcess* muxProcess;
 };
 

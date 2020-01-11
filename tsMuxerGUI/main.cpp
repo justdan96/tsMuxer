@@ -1,6 +1,7 @@
-#include <QtGui>
-
 #include "tsmuxerwindow.h"
+
+#include <QApplication>
+#include <QUrl>
 
 int main(int argc, char *argv[]) {
   Q_INIT_RESOURCE(images);

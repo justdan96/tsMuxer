@@ -1,13 +1,25 @@
 #ifndef TSMUXER_H_
 #define TSMUXER_H_
 
-#include <QtGui>
-#include <QFileDialog>
-#include <QProcess>
-#include <QSound>
+#include "codecinfo.h"
 
-#include "ui_tsmuxerwindow.h"
-#include "muxForm.h"
+#include <QWidget>
+#include <QHeaderView>
+#include <QProcess>
+#include <QTimer>
+
+class QFileDialog;
+class QTemporaryFile;
+class QSound;
+class QTableWidgetItem;
+class QComboBox;
+
+class MuxForm;
+namespace Ui {
+class TsMuxerWindow;
+}
+
+class QnCheckBoxedHeaderView;
 
 typedef QList<double> ChapterList;
 
@@ -15,93 +27,6 @@ enum MplsType {
     MPLS_NONE,
     MPLS_PRIMARY,
     MPLS_M2TS,
-};
-
-
-class QnCheckBoxedHeaderView: public QHeaderView {
-    Q_OBJECT
-        typedef QHeaderView base_type;
-public:
-    explicit QnCheckBoxedHeaderView(QWidget *parent = nullptr);
-
-    Qt::CheckState checkState() const;
-    void setCheckState(Qt::CheckState state);
-signals:
-    void checkStateChanged(Qt::CheckState state);
-protected:
-    void paintEvent(QPaintEvent *e) override;
-    void paintSection(QPainter *painter, const QRect &rect, int logicalIndex) const override;
-    QSize sectionSizeFromContents(int logicalIndex) const override;
-    private slots:
-        void at_sectionClicked(int logicalIndex);
-private:
-    Qt::CheckState m_checkState;
-    int m_checkColumnIndex;
-};
-
-struct QtvCodecInfo
-{
-  QtvCodecInfo():
-    trackID(0),
-    width(0),
-    height(0),
-    displayName(),
-    programName(),
-    descr(),
-    lang(),
-    delay(0),
-    subTrack(0),
-    dtsDownconvert(false),
-    isSecondary(false),
-    offsetId(-1),
-    maxPgOffsets(0),
-    fileList(),
-    checkFPS(false),
-    checkLevel(false),
-    addSEIMethod(1),
-    addSPS(true),
-    delPulldown(-1),
-    fpsText(),
-    fpsTextOrig(),
-    levelText(),
-    nested(0),
-    parent(nullptr),
-    child(nullptr),
-    bindFps(true),
-    mplsFiles(),
-    arText(),
-    enabledByDefault(true) {}
-
-  int trackID;
-  int width;
-  int height;
-  QString displayName;
-  QString programName;
-  QString descr;
-  QString lang;
-  int delay;
-  int subTrack;
-  bool dtsDownconvert;
-  bool isSecondary;
-  int offsetId;
-  int maxPgOffsets;
-  QList<QString> fileList;
-  bool checkFPS;
-  bool checkLevel;
-  int addSEIMethod;
-  bool addSPS;
-  int delPulldown;
-  QString fpsText;
-  QString fpsTextOrig;
-  QString levelText;
-  // for append
-  int nested;
-  QtvCodecInfo* parent;
-  QtvCodecInfo* child;
-  bool bindFps;
-  QStringList mplsFiles;
-  QString arText;
-  bool enabledByDefault;
 };
 
 class TsMuxerWindow: public QWidget
@@ -151,7 +76,7 @@ private slots:
   void saveMetaFileBtnClick();
   void continueAppendFile();
   void continueAddFile();
-  void getCodecInfo();
+  void onTsMuxerCodecInfoReceived();
   void addFile();
   void appendFile();
   void onOpacityTimer();
@@ -191,6 +116,7 @@ private:
     QString getSrtParams();
     int findLangByCode(const QString& code);
     void setComboBoxText(QComboBox* comboBox, const QString& text);
+    QtvCodecInfo* getCodecInfo(int idx);
     QtvCodecInfo* getCurrentCodec();
     void delTracksByFileName(const QString& fileName);
     void deleteTrack(int idx);
@@ -209,7 +135,7 @@ private:
     //QTemporaryFile* tempFile;
     //QString tempFileName;
     QString metaName;
-    Ui::TsMuxerWindow ui;
+    Ui::TsMuxerWindow* ui;
     QFileDialog* openFileDialog;
     int disableUpdatesCnt;
     bool processFinished;
@@ -224,7 +150,7 @@ private:
     QString oldFileName;
     bool outFileNameDisableChange;
     QString saveDialogFilter;
-    MuxForm muxForm;
+    MuxForm* muxForm;
     QString newFileName;
     QList<QtvCodecInfo> codecList;
     ChapterList chapters;
