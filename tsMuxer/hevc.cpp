@@ -776,7 +776,7 @@ string HevcSpsUnit::getDescription() const
     result += (interlaced_source_flag ? string("i") : string("p"));
 
     double fps = getFPS();
-    result += " Frame rate: ";
+    result += "  Frame rate: ";
     result += (fps ? doubleToStr(fps) : string("not found"));
     return result;
 }
