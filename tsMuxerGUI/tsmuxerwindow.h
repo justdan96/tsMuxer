@@ -76,7 +76,7 @@ private slots:
   void saveMetaFileBtnClick();
   void continueAppendFile();
   void continueAddFile();
-  void getCodecInfo();
+  void onTsMuxerCodecInfoReceived();
   void addFile();
   void appendFile();
   void onOpacityTimer();
@@ -115,6 +115,7 @@ private:
     QString getSrtParams();
     int findLangByCode(const QString& code);
     void setComboBoxText(QComboBox* comboBox, const QString& text);
+    QtvCodecInfo* getCodecInfo(int idx);
     QtvCodecInfo* getCurrentCodec();
     void delTracksByFileName(const QString& fileName);
     void deleteTrack(int idx);

@@ -505,7 +505,7 @@ TsMuxerWindow::~TsMuxerWindow() {
   delete tempSoundFile;
 }
 
-void TsMuxerWindow::getCodecInfo() {
+void TsMuxerWindow::onTsMuxerCodecInfoReceived() {
   m_updateMeta = false;
   codecList.clear();
   int p;
@@ -650,13 +650,19 @@ int TsMuxerWindow::findLangByCode(const QString &code) {
   return 0;
 }
 
+QtvCodecInfo *TsMuxerWindow::getCodecInfo(int idx)
+{
+    auto iCodec = ui->trackLV->item(idx, 0)
+                           ->data(Qt::UserRole)
+                           .toLongLong();
+    return reinterpret_cast<QtvCodecInfo *>(iCodec);
+}
+
 QtvCodecInfo *TsMuxerWindow::getCurrentCodec() {
-  if (ui->trackLV->currentRow() == -1)
+  auto row = ui->trackLV->currentRow();
+  if (row == -1)
     return nullptr;
-  long iCodec = long(ui->trackLV->item(ui->trackLV->currentRow(), 0)
-                         ->data(Qt::UserRole)
-                         .toLongLong());
-  return iCodec ? (QtvCodecInfo *)(void *)iCodec : nullptr;
+  return getCodecInfo(row);
 }
 
 void TsMuxerWindow::onVideoComboBoxChanged(int index) {
@@ -804,7 +810,7 @@ void TsMuxerWindow::addFile() {
   // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
   // disconnect(this, SIGNAL(codecListReady()));
   disconnect();
-  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::getCodecInfo);
+  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::onTsMuxerCodecInfoReceived);
   connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAddFile);
   connect(this, &TsMuxerWindow::fileAdded, this, &TsMuxerWindow::addFile);
   runInMuxMode = false;
@@ -1079,8 +1085,7 @@ void TsMuxerWindow::continueAddFile() {
     ui->trackLV->setRowHeight(ui->trackLV->rowCount() - 1, 18);
     QTableWidgetItem *item = new QTableWidgetItem("");
     item->setCheckState(info.enabledByDefault ? Qt::Checked : Qt::Unchecked);
-    auto __info = new QtvCodecInfo(info);
-    item->setData(Qt::UserRole, (qlonglong)(void *)__info);
+    item->setData(Qt::UserRole, reinterpret_cast<qlonglong>(new QtvCodecInfo(info)));
     ui->trackLV->setCurrentItem(item);
 
     ui->trackLV->setItem(ui->trackLV->rowCount() - 1, 0, item);
@@ -1373,10 +1378,9 @@ void TsMuxerWindow::doAppendInt(const QString &fileName,
   ui->inputFilesLV->setCurrentItem(item);
 
   for (int i = 0; i < ui->trackLV->rowCount(); ++i) {
-    long data = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (!data)
+    auto info = getCodecInfo(i);
+    if (!info)
       continue;
-    QtvCodecInfo *info = (QtvCodecInfo *)(void *)data;
     if (mplsRole == MPLS_PRIMARY) {
       for (int j = 0; j < info->mplsFiles.size(); ++j) {
         if (info->mplsFiles[j] == parentFileName) {
@@ -1397,10 +1401,10 @@ void TsMuxerWindow::doAppendInt(const QString &fileName,
 
 bool TsMuxerWindow::isVideoCropped() {
   for (int i = 0; i < ui->trackLV->rowCount(); ++i) {
-    long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (!iCodec)
+    auto codecInfo = getCodecInfo(i);
+    if (!codecInfo)
       continue;
-    QtvCodecInfo *codecInfo = (QtvCodecInfo *)(void *)iCodec;
+    
     if (isVideoCodec(codecInfo->displayName)) {
       if (codecInfo->height < 1080 && codecInfo->height != 720 &&
           codecInfo->height != 576 && codecInfo->height != 480)
@@ -1580,10 +1584,10 @@ QString TsMuxerWindow::getSrtParams() {
 
   for (int i = 0; i < ui->trackLV->rowCount(); ++i) {
     if (ui->trackLV->item(i, 0)->checkState() == Qt::Checked) {
-      long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-      if (!iCodec)
+      auto codecInfo = getCodecInfo(i);
+      if (!codecInfo)
         continue;
-      QtvCodecInfo *codecInfo = (QtvCodecInfo *)(void *)iCodec;
+      
       if (isVideoCodec(codecInfo->displayName)) {
         rez += QString(",video-width=") + QString::number(codecInfo->width);
         rez += QString(",video-height=") + QString::number(codecInfo->height);
@@ -1724,11 +1728,10 @@ void TsMuxerWindow::updateMetaLines() {
   ui->memoMeta->append(getMuxOpts());
   QString tmpFps;
   for (int i = 0; i < ui->trackLV->rowCount(); ++i) {
-    long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (!iCodec)
+    auto codecInfo = getCodecInfo(i);
+    if (!codecInfo)
       continue;
 
-    QtvCodecInfo *codecInfo = (QtvCodecInfo *)(void *)iCodec;
     if (isVideoCodec(codecInfo->displayName)) {
       if (codecInfo->checkFPS)
         tmpFps = fpsTextToFpsStr(codecInfo->fpsText);
@@ -1748,10 +1751,9 @@ void TsMuxerWindow::updateMetaLines() {
       prefix = "";
     else
       prefix = "#";
-    long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (!iCodec)
+    auto codecInfo = getCodecInfo(i);
+    if (!codecInfo)
       continue;
-    QtvCodecInfo *codecInfo = (QtvCodecInfo *)(void *)iCodec;
 
     postfix.clear();
     if (codecInfo->displayName == "PGS") {
@@ -1928,9 +1930,7 @@ void TsMuxerWindow::onRemoveBtnClick() {
 
 void TsMuxerWindow::delTracksByFileName(const QString &fileName) {
   for (int i = ui->trackLV->rowCount() - 1; i >= 0; --i) {
-    long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (iCodec) {
-      QtvCodecInfo *info = (QtvCodecInfo *)(void *)iCodec;
+    if (auto info = getCodecInfo(i)) {
       for (int j = info->fileList.count() - 1; j >= 0; --j) {
         if (info->fileList[j] == fileName) {
           info->fileList.removeAt(j);
@@ -1953,8 +1953,7 @@ void TsMuxerWindow::delTracksByFileName(const QString &fileName) {
 
 void TsMuxerWindow::deleteTrack(int idx) {
   disableUpdatesCnt++;
-  long iCodec = ui->trackLV->item(idx, 0)->data(Qt::UserRole).toLongLong();
-  delete (QtvCodecInfo *)(void *)iCodec;
+  delete getCodecInfo(idx);
   int lastItemIndex = idx; // trackLV.items[idx].index;
   ui->trackLV->removeRow(idx);
   if (ui->trackLV->rowCount() == 0) {
@@ -2021,7 +2020,7 @@ void TsMuxerWindow::appendFile() {
   // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
   // disconnect(this, SIGNAL(codecListReady()));
   disconnect();
-  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::getCodecInfo);
+  connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::onTsMuxerCodecInfoReceived);
   connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAppendFile);
   connect(this, &TsMuxerWindow::fileAppended, this, &TsMuxerWindow::appendFile);
   runInMuxMode = false;
@@ -2411,11 +2410,10 @@ void TsMuxerWindow::updateMaxOffsets() {
   m_3dMode = false;
 
   for (int i = 0; i < ui->trackLV->rowCount(); ++i) {
-    long iCodec = ui->trackLV->item(i, 0)->data(Qt::UserRole).toLongLong();
-    if (!iCodec)
+    auto codecInfo = getCodecInfo(i);
+    if (!codecInfo)
       continue;
 
-    QtvCodecInfo *codecInfo = (QtvCodecInfo *)(void *)iCodec;
     if (codecInfo->displayName == "MVC") {
       m_3dMode = true;
       maxPGOffsets = qMax(maxPGOffsets, codecInfo->maxPgOffsets);
