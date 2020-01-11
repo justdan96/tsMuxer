@@ -38,7 +38,6 @@ const char M2TS_SAVE_DIALOG_FILTER[] =
     "BDAV Transport Stream (*.m2ts);;all files (*.*)";
 const char ISO_SAVE_DIALOG_FILTER[] = "Disk image (*.iso);;all files (*.*)";
 
-QSettings *settingsIniFile = nullptr;
 QSettings *settings = nullptr;
 
 enum FileCustomData {
@@ -2534,7 +2533,7 @@ void TsMuxerWindow::writeSettings() {
 
   disableUpdatesCnt++;
 
-  settings->beginGroup("general");
+  settings->beginGroup("main");
   // settings->setValue("asyncIO", ui.checkBoxuseAsynIO->isChecked());
   settings->setValue("soundEnabled", ui.checkBoxSound->isChecked());
   settings->setValue("hdmvPES", ui.checkBoxNewAudioPes->isChecked());
@@ -2572,32 +2571,14 @@ void TsMuxerWindow::writeSettings() {
 }
 
 bool TsMuxerWindow::readSettings() {
-  settings->beginGroup("general");
-
-  QString outputDir = settings->value("outputDir").toString();
-  if (!outputDir.isEmpty())
-    lastOutputDir = outputDir;
-  else {
-    settings->endGroup();
+  // due to QTBUG-28893, the settings saved under "general" are not accessible
+  // when using .ini files for storage - those are used on Linux by default.
+  // newer GUI versions will save the settings under the "main" group to avoid
+  // that. the "general" group is still read in order to import the old settings
+  // on non-Linux systems where the bug doesn't occur.
+  if (!readGeneralSettings("main") && !readGeneralSettings("general")) {
     return false; // no settings still written
   }
-
-  // ui.checkBoxuseAsynIO->setChecked(settings->value("asyncIO").toBool());
-  ui.checkBoxSound->setChecked(settings->value("soundEnabled").toBool());
-  ui.checkBoxNewAudioPes->setChecked(settings->value("hdmvPES").toBool());
-  ui.checkBoxCrop->setChecked(settings->value("restoreCropEnabled").toBool());
-  ui.checkBoxBlankPL->setChecked(settings->value("useBlankPL").toBool());
-  int plNum = settings->value("blankPLNum").toInt();
-  if (plNum)
-    ui.BlackplaylistCombo->setValue(plNum);
-
-  ui.radioButtonOutoutInInput->setChecked(
-      settings->value("outputToInputFolder").toBool());
-  ui.radioButtonStoreOutput->setChecked(
-      !ui.radioButtonOutoutInInput->isChecked());
-
-  settings->endGroup();
-
   // checkBoxVBR checkBoxRVBR    editMaxBitrate  editMinBitrate  checkBoxCBR
   // editCBRBitrate  editVBVLen
 
@@ -2626,5 +2607,34 @@ bool TsMuxerWindow::readSettings() {
   ui.comboBoxPipSize->setCurrentIndex(settings->value("size").toInt());
   settings->endGroup();
 
+  return true;
+}
+
+bool TsMuxerWindow::readGeneralSettings(const QString &prefix) {
+  settings->beginGroup(prefix);
+
+  QString outputDir = settings->value("outputDir").toString();
+  if (!outputDir.isEmpty())
+    lastOutputDir = outputDir;
+  else {
+    settings->endGroup();
+    return false;
+  }
+
+  // ui.checkBoxuseAsynIO->setChecked(settings->value("asyncIO").toBool());
+  ui.checkBoxSound->setChecked(settings->value("soundEnabled").toBool());
+  ui.checkBoxNewAudioPes->setChecked(settings->value("hdmvPES").toBool());
+  ui.checkBoxCrop->setChecked(settings->value("restoreCropEnabled").toBool());
+  ui.checkBoxBlankPL->setChecked(settings->value("useBlankPL").toBool());
+  int plNum = settings->value("blankPLNum").toInt();
+  if (plNum)
+    ui.BlackplaylistCombo->setValue(plNum);
+
+  ui.radioButtonOutoutInInput->setChecked(
+      settings->value("outputToInputFolder").toBool());
+  ui.radioButtonStoreOutput->setChecked(
+      !ui.radioButtonOutoutInInput->isChecked());
+
+  settings->endGroup();
   return true;
 }
