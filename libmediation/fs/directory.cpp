@@ -252,7 +252,7 @@ bool findDirs(
             {
                 string dirName( namelist[ n ]->d_name );
 
-                //сохраняем только нормальные
+                // we save only normal ones
                 if( "." != dirName && ".." != dirName )
                     dirsList->push_back( path + dirName + "/" );
 
