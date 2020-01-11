@@ -7,6 +7,7 @@
 TEMPLATE = app
 TARGET = tsMuxerGUI
 QT = core gui widgets multimedia
+CONFIG += c++14 strict_c++
 
 HEADERS += tsmuxerwindow.h lang_codes.h muxForm.h checkboxedheaderview.h \
            codecinfo.h
@@ -16,5 +17,5 @@ FORMS += tsmuxerwindow.ui muxForm.ui
 RESOURCES += images.qrc
 TRANSLATIONS = 
 win32 {
-	RC_FILE += icon.rc
+  RC_FILE += icon.rc
 }
