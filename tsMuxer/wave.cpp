@@ -49,8 +49,8 @@ void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool
     waveFormatPCMEx->nChannels = channels;
     waveFormatPCMEx->nSamplesPerSec = samplerate;
     waveFormatPCMEx->nAvgBytesPerSec = channels * samplerate * ((bitdepth+4)>>3);
+    waveFormatPCMEx->nBlockAlign = channels * waveFormatPCMEx->wBitsPerSample / 8;
     waveFormatPCMEx->wBitsPerSample = bitdepth==20 ? 24 : bitdepth;
-    waveFormatPCMEx->nBlockAlign = channels * waveFormatPCMEx->wBitsPerSample/8; 
     waveFormatPCMEx->cbSize = 22; // After this to GUID 
     waveFormatPCMEx->Samples.wValidBitsPerSample = bitdepth;
     waveFormatPCMEx->dwChannelMask = getWaveChannelMask(channels, lfeExist); // Specify PCM
