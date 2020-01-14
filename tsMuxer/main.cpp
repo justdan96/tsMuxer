@@ -1,142 +1,153 @@
-#include <algorithm>
-#include <iostream>
-#include "metaDemuxer.h"
-#include "tsMuxer.h"
-#include "singleFileMuxer.h"
 #include <fs/directory.h>
 #include <fs/textfile.h>
+
+#include <algorithm>
+#include <iostream>
 #include <vector>
-#include "utf8Converter.h"
-#include "convertUTF.h"
-#include "textSubtitles.h"
-#include "mpegStreamReader.h"
-#include "math.h"
+
 #include "blank_patterns.h"
+#include "blurayHelper.h"
+#include "convertUTF.h"
+#include "iso_writer.h"
+#include "math.h"
+#include "metaDemuxer.h"
+#include "mpegStreamReader.h"
 #include "muxerManager.h"
 #include "psgStreamReader.h"
-#include "iso_writer.h"
-#include "blurayHelper.h"
+#include "singleFileMuxer.h"
+#include "textSubtitles.h"
+#include "tsMuxer.h"
+#include "utf8Converter.h"
 
 using namespace std;
 
-BufferedReaderManager readManager(2, DEFAULT_FILE_BLOCK_SIZE, DEFAULT_FILE_BLOCK_SIZE + MAX_AV_PACKET_SIZE, DEFAULT_FILE_BLOCK_SIZE / 2);
+BufferedReaderManager readManager(2, DEFAULT_FILE_BLOCK_SIZE, DEFAULT_FILE_BLOCK_SIZE + MAX_AV_PACKET_SIZE,
+                                  DEFAULT_FILE_BLOCK_SIZE / 2);
 TSMuxerFactory tsMuxerFactory;
 SingleFileMuxerFactory singleFileMuxerFactory;
 
-static const char EXCEPTION_ERR_MSG[] = ". It does not have to be! Please contact application support team for more information.";
+static const char EXCEPTION_ERR_MSG[] =
+    ". It does not have to be! Please contact application support team for more information.";
 
 const char* APP_VERSION = "2.6.15";
 
-//const static uint32_t BLACK_PL_NUM = 1900;
-//const static uint32_t BLACK_FILE_NUM = 1900;
+// const static uint32_t BLACK_PL_NUM = 1900;
+// const static uint32_t BLACK_FILE_NUM = 1900;
 
-#define LTRACE2(level, msg) \
-{\
-	{ \
-		if (level <= LT_WARN) cerr << msg;\
-		else if (level == LT_INFO) cout << msg;\
-        if (level <= LT_INFO)\
-        sLastMsg = true;\
-	}\
-}
-DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<double>& customChaptersList, 
-                        int& firstMplsOffset, int& firstM2tsOffset, bool& insertBlankPL, int& blankNum, bool& stereoMode,
-                        std::string& isoDiskLabel)
+#define LTRACE2(level, msg)            \
+    {                                  \
+        {                              \
+            if (level <= LT_WARN)      \
+                cerr << msg;           \
+            else if (level == LT_INFO) \
+                cout << msg;           \
+            if (level <= LT_INFO)      \
+                sLastMsg = true;       \
+        }                              \
+    }
+DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<double>& customChaptersList,
+                        int& firstMplsOffset, int& firstM2tsOffset, bool& insertBlankPL, int& blankNum,
+                        bool& stereoMode, std::string& isoDiskLabel)
 {
-	autoChapterLen = 0;
+    autoChapterLen = 0;
     stereoMode = false;
-	TextFile file(metaFileName, File::ofRead);
-	string str;
-	file.readLine(str);
+    TextFile file(metaFileName, File::ofRead);
+    string str;
+    file.readLine(str);
     DiskType result = DT_NONE;
-	while(str.length() > 0) 
-	{
-		if (strStartWith(str, "MUXOPT")) 
-		{
-			vector<string> params = splitQuotedStr(str.c_str(), ' ');
-			for (unsigned i = 0; i < params.size(); i++) {
-				vector<string> paramPair = splitStr(trimStr(params[i]).c_str(), '=');
-				if (paramPair.size() == 0)
-					continue;
-				if (paramPair[0] == "--auto-chapters")
-					autoChapterLen = strToInt32(paramPair[1].c_str())*60;
-				else if (paramPair[0] == "--custom-chapters" && paramPair.size() > 1) {
-					vector<string> chapList = splitStr(paramPair[1].c_str(),';');
-					for (unsigned k = 0; k < chapList.size(); k++)
-						customChaptersList.push_back(timeToFloat(chapList[k]));
-				}
-				else if (paramPair[0] == "--mplsOffset")
-				{
-					firstMplsOffset = strToInt32(paramPair[1].c_str());
-					if (firstMplsOffset > 1999) 
-						THROW(ERR_COMMON, "Too large m2ts offset " << firstMplsOffset);
-				}
-				else if (paramPair[0] == "--blankOffset")
-				{
-					blankNum = strToInt32(paramPair[1].c_str());
-					if (blankNum > 1999) 
-						THROW(ERR_COMMON, "Too large black playlist offset " << blankNum);
-				}
-				else if (paramPair[0] == "--m2tsOffset")
-				{
-					firstM2tsOffset = strToInt32(paramPair[1].c_str());
-					if (firstM2tsOffset > 99999) 
-						THROW(ERR_COMMON, "Too large m2ts offset " << firstM2tsOffset);
-				}
-				else if (paramPair[0] == "--insertBlankPL")
-					insertBlankPL = true;
+    while (str.length() > 0)
+    {
+        if (strStartWith(str, "MUXOPT"))
+        {
+            vector<string> params = splitQuotedStr(str.c_str(), ' ');
+            for (unsigned i = 0; i < params.size(); i++)
+            {
+                vector<string> paramPair = splitStr(trimStr(params[i]).c_str(), '=');
+                if (paramPair.size() == 0)
+                    continue;
+                if (paramPair[0] == "--auto-chapters")
+                    autoChapterLen = strToInt32(paramPair[1].c_str()) * 60;
+                else if (paramPair[0] == "--custom-chapters" && paramPair.size() > 1)
+                {
+                    vector<string> chapList = splitStr(paramPair[1].c_str(), ';');
+                    for (unsigned k = 0; k < chapList.size(); k++)
+                        customChaptersList.push_back(timeToFloat(chapList[k]));
+                }
+                else if (paramPair[0] == "--mplsOffset")
+                {
+                    firstMplsOffset = strToInt32(paramPair[1].c_str());
+                    if (firstMplsOffset > 1999)
+                        THROW(ERR_COMMON, "Too large m2ts offset " << firstMplsOffset);
+                }
+                else if (paramPair[0] == "--blankOffset")
+                {
+                    blankNum = strToInt32(paramPair[1].c_str());
+                    if (blankNum > 1999)
+                        THROW(ERR_COMMON, "Too large black playlist offset " << blankNum);
+                }
+                else if (paramPair[0] == "--m2tsOffset")
+                {
+                    firstM2tsOffset = strToInt32(paramPair[1].c_str());
+                    if (firstM2tsOffset > 99999)
+                        THROW(ERR_COMMON, "Too large m2ts offset " << firstM2tsOffset);
+                }
+                else if (paramPair[0] == "--insertBlankPL")
+                    insertBlankPL = true;
                 else if (paramPair[0] == "--label")
                 {
                     isoDiskLabel = paramPair[1];
                 }
-			}
+            }
 
-			if (str.find("--blu-ray-v3") != string::npos)
-				V3_flags |= 0x80; // flag "V3"
+            if (str.find("--blu-ray-v3") != string::npos)
+                V3_flags |= 0x80;  // flag "V3"
 
-			if (str.find("--blu-ray") != string::npos)
-				result =  DT_BLURAY;
-			else if (str.find("--avchd") != string::npos)
-				result =  DT_AVCHD;
-			else
-				result =  DT_NONE;
-		}
+            if (str.find("--blu-ray") != string::npos)
+                result = DT_BLURAY;
+            else if (str.find("--avchd") != string::npos)
+                result = DT_AVCHD;
+            else
+                result = DT_NONE;
+        }
         else if (strStartWith(str, "V_MPEG4/ISO/MVC"))
         {
             stereoMode = true;
         }
-            
-		file.readLine(str);
-	}
-	return result;
+
+        file.readLine(str);
+    }
+    return result;
 }
 
 void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSubMode)
 {
-	DetectStreamRez streamInfo = METADemuxer::DetectStreamReader(readManager, fileName, mplsParser == 0);
-	vector<CheckStreamRez>& streams = streamInfo.streams;
+    DetectStreamRez streamInfo = METADemuxer::DetectStreamReader(readManager, fileName, mplsParser == 0);
+    vector<CheckStreamRez>& streams = streamInfo.streams;
 
     std::vector<MPLSStreamInfo> pgStreams3D;
     if (mplsParser && mplsParser->isDependStreamExist)
         pgStreams3D = mplsParser->getPgStreams();
 
-	for (unsigned i = 0; i < streams.size(); i++)
-	{
-        if (streams[i].trackID != 0) {
+    for (unsigned i = 0; i < streams.size(); i++)
+    {
+        if (streams[i].trackID != 0)
+        {
             if (i > 0)
                 LTRACE(LT_INFO, 2, "");
-			LTRACE(LT_INFO, 2, "Track ID:    " << streams[i].trackID);
+            LTRACE(LT_INFO, 2, "Track ID:    " << streams[i].trackID);
         }
-		if (streams[i].codecInfo.codecID) 
+        if (streams[i].codecInfo.codecID)
         {
-            if (mplsParser) 
+            if (mplsParser)
             {
                 MPLSStreamInfo streamInfo = mplsParser->getStreamByPID(streams[i].trackID);
-                if (streamInfo.streamPID) {
+                if (streamInfo.streamPID)
+                {
                     if (streamInfo.isSecondary)
                         streams[i].isSecondary = true;
                 }
-                else {
+                else
+                {
                     if (!(streams[i].codecInfo.codecID == CODEC_V_MPEG4_H264_DEP && mplsParser->isDependStreamExist))
                         streams[i].unused = true;
                 }
@@ -144,29 +155,32 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
 
             string postfix;
             if (isSubMode && streams[i].codecInfo.codecID == CODEC_S_PGS)
-			    postfix = " (depended view)";
+                postfix = " (depended view)";
             LTRACE(LT_INFO, 2, "Stream type: " << streams[i].codecInfo.displayName << postfix);
             if (streams[i].isSecondary)
                 LTRACE(LT_INFO, 2, "Secondary: 1");
             if (streams[i].unused)
                 LTRACE(LT_INFO, 2, "Unselected: 1");
 
-			LTRACE(LT_INFO, 2, "Stream ID:   " << streams[i].codecInfo.programName);
+            LTRACE(LT_INFO, 2, "Stream ID:   " << streams[i].codecInfo.programName);
             std::string descr = streams[i].streamDescr;
             if (streams[i].codecInfo.codecID == CODEC_S_PGS)
             {
                 // PG stream
                 int pgTrackNum = streams[i].trackID - 0x1200;
-                if (pgTrackNum >= 0 && pgTrackNum < pgStreams3D.size()) 
+                if (pgTrackNum >= 0 && pgTrackNum < pgStreams3D.size())
                 {
-                    if (pgStreams3D[pgTrackNum].offsetId != 0xff) {
+                    if (pgStreams3D[pgTrackNum].offsetId != 0xff)
+                    {
                         descr += "   3d-plane: ";
                         descr += int32ToStr(pgStreams3D[pgTrackNum].offsetId);
                     }
-                    else {
+                    else
+                    {
                         descr += "   3d-plane: zero";
                     }
-                    if (pgStreams3D[pgTrackNum].isSSPG) {
+                    if (pgStreams3D[pgTrackNum].isSSPG)
+                    {
                         descr += "   (stereo, right=";
                         descr += (pgStreams3D[pgTrackNum].rightEye->type == 2 ? "dep-view " : "");
                         descr += int32ToStr(pgStreams3D[pgTrackNum].rightEye->streamPID);
@@ -177,121 +191,130 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
                     }
                 }
             }
-			LTRACE(LT_INFO, 2, "Stream info: " << descr);
-			LTRACE(LT_INFO, 2, "Stream lang: " << streams[i].lang);
-			if (streams[i].delay)
-				LTRACE(LT_INFO, 2, "Stream delay: " << streams[i].delay);
+            LTRACE(LT_INFO, 2, "Stream info: " << descr);
+            LTRACE(LT_INFO, 2, "Stream lang: " << streams[i].lang);
+            if (streams[i].delay)
+                LTRACE(LT_INFO, 2, "Stream delay: " << streams[i].delay);
             if (streams[i].multiSubStream)
                 LTRACE(LT_INFO, 2, "subTrack: " << (streams[i].codecInfo.codecID == CODEC_V_MPEG4_H264_DEP ? 1 : 2));
-		}
-		else
-			LTRACE(LT_INFO, 2, "Can't detect stream type");
-	}
+        }
+        else
+            LTRACE(LT_INFO, 2, "Can't detect stream type");
+    }
 
     AVChapters& chapters = streamInfo.chapters;
     if (chapters.size() > 0 || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
     if (streamInfo.fileDurationNano)
-        LTRACE(LT_INFO, 2, "Duration: " << floatToTime(streamInfo.fileDurationNano/1e9));
-	for (int j = 0; j < chapters.size(); j++) 
-	{
-		uint64_t time = chapters[j].start;
-		if (j % 5 == 0) {
-			LTRACE(LT_INFO, 2, "");
-			LTRACE2(LT_INFO, "Marks: ");
-		}
-		LTRACE2(LT_INFO, floatToTime(time/1e9) << " ");
-	}
+        LTRACE(LT_INFO, 2, "Duration: " << floatToTime(streamInfo.fileDurationNano / 1e9));
+    for (int j = 0; j < chapters.size(); j++)
+    {
+        uint64_t time = chapters[j].start;
+        if (j % 5 == 0)
+        {
+            LTRACE(LT_INFO, 2, "");
+            LTRACE2(LT_INFO, "Marks: ");
+        }
+        LTRACE2(LT_INFO, floatToTime(time / 1e9) << " ");
+    }
     if (chapters.size() > 0 || streamInfo.fileDurationNano > 0)
-		LTRACE(LT_INFO, 2, "");
+        LTRACE(LT_INFO, 2, "");
 }
 
 string getBlurayStreamDir(const string& mplsName)
 {
-	string dirName = extractFileDir(mplsName);
-	dirName = toNativeSeparators(dirName);
-	int tmp = dirName.substr(0,dirName.size()-1).find_last_of(getDirSeparator());
-	if (tmp != string::npos) {
-		dirName = dirName.substr(0, tmp+1);
-		if (strEndWith(dirName, string("BACKUP") + getDirSeparator()))
-		{
-			tmp = dirName.substr(0,dirName.size()-1).find_last_of(getDirSeparator());
-			if (tmp == string::npos)
-				return "";
-			dirName = dirName.substr(0, tmp+1);
-		}
-		return dirName + string("STREAM") + getDirSeparator();
-	}
-	else
-		return "";
+    string dirName = extractFileDir(mplsName);
+    dirName = toNativeSeparators(dirName);
+    int tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
+    if (tmp != string::npos)
+    {
+        dirName = dirName.substr(0, tmp + 1);
+        if (strEndWith(dirName, string("BACKUP") + getDirSeparator()))
+        {
+            tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
+            if (tmp == string::npos)
+                return "";
+            dirName = dirName.substr(0, tmp + 1);
+        }
+        return dirName + string("STREAM") + getDirSeparator();
+    }
+    else
+        return "";
 }
 
 void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListMap& pidList, DiskType dt, int blankNum)
 {
-	int videoWidth = 1920;
-	int videoHeight = 1080;
-	double fps = 23.976;
-	for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
-	{
-		const PMTStreamInfo& streamInfo = itr->second;
-		const MPEGStreamReader* streamReader = dynamic_cast<const MPEGStreamReader*> (streamInfo.m_codecReader);
-		if (streamReader) 
-		{
-			videoWidth = streamReader->getStreamWidth();
-			videoHeight = streamReader->getStreamHeight();
-			fps = streamReader->getFPS();
-			break;
-		}
-	}
-	uint8_t* pattern;
-	int patternSize;
-	bool isNtsc = videoWidth <= 854 && videoHeight <= 480 && (fabs(25-fps) >= 0.5 && fabs(50-fps) >= 0.5);
-	bool isPal = videoWidth <= 1024 && videoHeight <= 576 && (fabs(25-fps) < 0.5 || fabs(50-fps) < 0.5);
-	if (isNtsc) {
-		pattern = pattern_ntsc;
-		patternSize = sizeof(pattern_ntsc);
-	}
-	else if (isPal) {
-		pattern = pattern_pal;
-		patternSize = sizeof(pattern_pal);
-	}   
-	else if (videoWidth >= 1300) {
-		pattern = pattern_1920;
-		patternSize = sizeof(pattern_1920);
-	}
-	else {
-		pattern = pattern_1280;
-		patternSize = sizeof(pattern_1280);
-	}
-    auto fname_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-	string tmpFileName = appDir + string("blank_") + std::to_string(fname_time) + string(".264");
-	File file;
-	if (!file.open(tmpFileName.c_str(), File::ofWrite))
-		THROW(ERR_COMMON, "can't create file " << tmpFileName);
-	for (int i = 0; i < 3; ++i)
-	{
-		if (file.write(pattern, patternSize) != patternSize) {
-			deleteFile(tmpFileName);
-			THROW(ERR_COMMON, "can't write data to file " << tmpFileName);
-		}
-	}
-	file.close();
-	map<string, string> videoParams;
-	videoParams["insertSEI"];
-	videoParams["fps"] = "23.976";
-	{
-		MuxerManager muxerManager(readManager, tsMuxerFactory);
-		muxerManager.parseMuxOpt("MUXOPT --no-pcr-on-video-pid --vbr --avchd --vbv-len=500");
-		muxerManager.addStream("V_MPEG4/ISO/AVC", tmpFileName, videoParams);
-		string dstFile = blurayHelper.m2tsFileName(blankNum);
-		muxerManager.doMux(dstFile.c_str(), &blurayHelper);
+    int videoWidth = 1920;
+    int videoHeight = 1080;
+    double fps = 23.976;
+    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    {
+        const PMTStreamInfo& streamInfo = itr->second;
+        const MPEGStreamReader* streamReader = dynamic_cast<const MPEGStreamReader*>(streamInfo.m_codecReader);
+        if (streamReader)
+        {
+            videoWidth = streamReader->getStreamWidth();
+            videoHeight = streamReader->getStreamHeight();
+            fps = streamReader->getFPS();
+            break;
+        }
+    }
+    uint8_t* pattern;
+    int patternSize;
+    bool isNtsc = videoWidth <= 854 && videoHeight <= 480 && (fabs(25 - fps) >= 0.5 && fabs(50 - fps) >= 0.5);
+    bool isPal = videoWidth <= 1024 && videoHeight <= 576 && (fabs(25 - fps) < 0.5 || fabs(50 - fps) < 0.5);
+    if (isNtsc)
+    {
+        pattern = pattern_ntsc;
+        patternSize = sizeof(pattern_ntsc);
+    }
+    else if (isPal)
+    {
+        pattern = pattern_pal;
+        patternSize = sizeof(pattern_pal);
+    }
+    else if (videoWidth >= 1300)
+    {
+        pattern = pattern_1920;
+        patternSize = sizeof(pattern_1920);
+    }
+    else
+    {
+        pattern = pattern_1280;
+        patternSize = sizeof(pattern_1280);
+    }
+    auto fname_time = std::chrono::duration_cast<std::chrono::microseconds>(
+                          std::chrono::high_resolution_clock::now().time_since_epoch())
+                          .count();
+    string tmpFileName = appDir + string("blank_") + std::to_string(fname_time) + string(".264");
+    File file;
+    if (!file.open(tmpFileName.c_str(), File::ofWrite))
+        THROW(ERR_COMMON, "can't create file " << tmpFileName);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (file.write(pattern, patternSize) != patternSize)
+        {
+            deleteFile(tmpFileName);
+            THROW(ERR_COMMON, "can't write data to file " << tmpFileName);
+        }
+    }
+    file.close();
+    map<string, string> videoParams;
+    videoParams["insertSEI"];
+    videoParams["fps"] = "23.976";
+    {
+        MuxerManager muxerManager(readManager, tsMuxerFactory);
+        muxerManager.parseMuxOpt("MUXOPT --no-pcr-on-video-pid --vbr --avchd --vbv-len=500");
+        muxerManager.addStream("V_MPEG4/ISO/AVC", tmpFileName, videoParams);
+        string dstFile = blurayHelper.m2tsFileName(blankNum);
+        muxerManager.doMux(dstFile.c_str(), &blurayHelper);
 
-        TSMuxer* tsMuxer = dynamic_cast<TSMuxer*> (muxerManager.getMainMuxer());
+        TSMuxer* tsMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
 
         blurayHelper.createMPLSFile(tsMuxer, 0, 0, vector<double>(), dt, blankNum, false);
-		blurayHelper.createCLPIFile(tsMuxer, blankNum, true);
-	}
-	deleteFile(tmpFileName);
+        blurayHelper.createCLPIFile(tsMuxer, blankNum, true);
+    }
+    deleteFile(tmpFileName);
 }
 
 void doTrancatedFile(const char* fileName, int64_t offset)
@@ -303,7 +326,7 @@ void doTrancatedFile(const char* fileName, int64_t offset)
     std::string outName = std::string(fileName) + std::string(".back");
     outFile.open(outName.c_str(), File::ofWrite);
 
-    uint8_t buffer[1024*64];
+    uint8_t buffer[1024 * 64];
     f.seek(offset);
     int readed = f.read(buffer, sizeof(buffer));
     while (readed > 0)
@@ -315,7 +338,8 @@ void doTrancatedFile(const char* fileName, int64_t offset)
 
 void showHelp()
 {
-    const char help[] = "\n\
+    const char help[] =
+        "\n\
 tsMuxeR is  simple  program to  mux video to  TS/M2TS files or create BD disks.\n\
 tsMuxeR does not use external filters (codecs).\n\
 \n\
@@ -516,49 +540,49 @@ All parameters in this group started with two dashes:\n\
 }
 
 int main(int argc, char** argv)
-{	
-	LTRACE(LT_INFO, 2, "tsMuxeR version " << APP_VERSION << ". github.com/justdan96/tsMuxer");
-	int firstMplsOffset = 0;    
-	int firstM2tsOffset = 0;
-	int blankNum = 1900;
-	bool insertBlankPL = false;
-	//createBluRayDirs("c:/workshop/");
+{
+    LTRACE(LT_INFO, 2, "tsMuxeR version " << APP_VERSION << ". github.com/justdan96/tsMuxer");
+    int firstMplsOffset = 0;
+    int firstM2tsOffset = 0;
+    int blankNum = 1900;
+    bool insertBlankPL = false;
+    // createBluRayDirs("c:/workshop/");
 
-    //MPLSParser parser;
-    //parser.parse("d:/hdtv/SHERLOCK_HOLMES/BDMV/PLAYLIST/00100.mpls");
+    // MPLSParser parser;
+    // parser.parse("d:/hdtv/SHERLOCK_HOLMES/BDMV/PLAYLIST/00100.mpls");
 
-	//CLPIParser parser;
-	//parser.parse("h:/BDMV/CLIPINF/00000.clpi");
-    //parser.parse("d:/workshop/test_orig_disk2/BDMV/CLIPINF/00003.clpi");
+    // CLPIParser parser;
+    // parser.parse("h:/BDMV/CLIPINF/00000.clpi");
+    // parser.parse("d:/workshop/test_orig_disk2/BDMV/CLIPINF/00003.clpi");
 
-    //uint8_t moBuffer[1024];
-    //MovieObject mo;
-    //mo.parse("h:/BDMV/MovieObject.bdmv");
-    //int moLen = mo.compose(moBuffer, sizeof(moBuffer));
-    //file.write(moBuffer, moLen);
+    // uint8_t moBuffer[1024];
+    // MovieObject mo;
+    // mo.parse("h:/BDMV/MovieObject.bdmv");
+    // int moLen = mo.compose(moBuffer, sizeof(moBuffer));
+    // file.write(moBuffer, moLen);
 
-
-	try {
-		if (argc == 2) 
-		{
-			string str = argv[1];
-			string fileExt = extractFileExt(str);
-			fileExt = strToLowerCase(fileExt);
-			if (fileExt == "mpls" || fileExt == "mpl")
-			{
-				bool shortExt = fileExt == "mpl";
-				MPLSParser mplsParser;
-				mplsParser.parse(argv[1]);
-				string streamDir = getBlurayStreamDir(argv[1]);
+    try
+    {
+        if (argc == 2)
+        {
+            string str = argv[1];
+            string fileExt = extractFileExt(str);
+            fileExt = strToLowerCase(fileExt);
+            if (fileExt == "mpls" || fileExt == "mpl")
+            {
+                bool shortExt = fileExt == "mpl";
+                MPLSParser mplsParser;
+                mplsParser.parse(argv[1]);
+                string streamDir = getBlurayStreamDir(argv[1]);
                 std::string mediaExt = shortExt ? ".MTS" : ".m2ts";
                 std::string ssifExt = shortExt ? ".SIF" : ".ssif";
                 bool mode3D = mplsParser.isDependStreamExist;
                 bool switchToSsif = false;
-				if (mplsParser.m_playItems.size() > 0)
-				{
-					MPLSPlayItem& item = mplsParser.m_playItems[0];
+                if (mplsParser.m_playItems.size() > 0)
+                {
+                    MPLSPlayItem& item = mplsParser.m_playItems[0];
                     string itemName = streamDir + item.fileName + mediaExt;
-                    if (fileExists(itemName)) 
+                    if (fileExists(itemName))
                     {
                         if (mode3D && !mplsParser.m_mvcFiles.empty())
                         {
@@ -569,136 +593,151 @@ int main(int argc, char** argv)
                                 switchToSsif = true;
                         }
                     }
-                    else  {
+                    else
+                    {
                         switchToSsif = true;
                     }
                     if (switchToSsif)
                     {
                         string ssifName = streamDir + string("SSIF") + getDirSeparator() + item.fileName + ssifExt;
                         if (fileExists(ssifName))
-                            itemName = ssifName; // if m2ts file absent then swith to ssif
+                            itemName = ssifName;  // if m2ts file absent then swith to ssif
                     }
                     detectStreamReader(itemName.c_str(), &mplsParser, false);
-				}
-				
-				int markIndex = 0;
-				int64_t prevFileOffset = 0;
-				for (int i = 0; i < mplsParser.m_playItems.size(); i++) 
+                }
+
+                int markIndex = 0;
+                int64_t prevFileOffset = 0;
+                for (int i = 0; i < mplsParser.m_playItems.size(); i++)
                 {
-					MPLSPlayItem& item = mplsParser.m_playItems[i];
+                    MPLSPlayItem& item = mplsParser.m_playItems[i];
 
                     string itemName;
                     if (mode3D)
                         itemName = streamDir + string("SSIF") + getDirSeparator() + item.fileName + ".ssif";
                     else
-                        itemName = streamDir + item.fileName + mediaExt; // 2d mode
+                        itemName = streamDir + item.fileName + mediaExt;  // 2d mode
 
                     LTRACE(LT_INFO, 2, "");
 
 #ifdef _WIN32
-					char buffer[1024*16];
-					CharToOemA(itemName.c_str(), buffer);
-					LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i),5,'0') << " name=" << buffer);
+                    char buffer[1024 * 16];
+                    CharToOemA(itemName.c_str(), buffer);
+                    LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << buffer);
 #else
-					LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i),5,'0') << " name=" << itemName);
+                    LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << itemName);
 #endif
-					LTRACE(LT_INFO, 2, "Duration: " << floatToTime((mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time)/ (double) 45000.0));
-                    if (mplsParser.isDependStreamExist) {
-                        if (mplsParser.mvc_base_view_r) {
+                    LTRACE(LT_INFO, 2,
+                           "Duration: " << floatToTime(
+                               (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
+                               (double)45000.0));
+                    if (mplsParser.isDependStreamExist)
+                    {
+                        if (mplsParser.mvc_base_view_r)
+                        {
                             LTRACE(LT_INFO, 2, "Base view: right-eye");
                         }
-                        else {
+                        else
+                        {
                             LTRACE(LT_INFO, 2, "Base view: left-eye");
                         }
                     }
                     if (!mplsParser.m_playItems.empty())
                         LTRACE(LT_INFO, 2, "start-time: " << mplsParser.m_playItems[0].IN_time);
-					int marksPerFile = 0;
-					for (;markIndex < mplsParser.m_marks.size(); markIndex++) 
-					{
-						PlayListMark& curMark = mplsParser.m_marks[markIndex];
-						if (curMark.m_playItemID > i)
-							break;
-						uint64_t time = curMark.m_markTime - mplsParser.m_playItems[i].IN_time + prevFileOffset;
-						if (marksPerFile % 5 == 0) {
-							if (marksPerFile > 0)
-								LTRACE(LT_INFO, 2, "");
-							LTRACE2(LT_INFO, "Marks: ");
-						}
-						marksPerFile++;
-						LTRACE2(LT_INFO, floatToTime(time/45000.0) << " ");
-					}
-					if (marksPerFile > 0)
-						LTRACE(LT_INFO, 2, "");
-					prevFileOffset += mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time;
-				}
-			}
-			else
-				detectStreamReader(argv[1], 0, false);
-			cout << endl;
-			return 0;
-		}
-		if (argc != 3) {
+                    int marksPerFile = 0;
+                    for (; markIndex < mplsParser.m_marks.size(); markIndex++)
+                    {
+                        PlayListMark& curMark = mplsParser.m_marks[markIndex];
+                        if (curMark.m_playItemID > i)
+                            break;
+                        uint64_t time = curMark.m_markTime - mplsParser.m_playItems[i].IN_time + prevFileOffset;
+                        if (marksPerFile % 5 == 0)
+                        {
+                            if (marksPerFile > 0)
+                                LTRACE(LT_INFO, 2, "");
+                            LTRACE2(LT_INFO, "Marks: ");
+                        }
+                        marksPerFile++;
+                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << " ");
+                    }
+                    if (marksPerFile > 0)
+                        LTRACE(LT_INFO, 2, "");
+                    prevFileOffset += mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time;
+                }
+            }
+            else
+                detectStreamReader(argv[1], 0, false);
+            cout << endl;
+            return 0;
+        }
+        if (argc != 3)
+        {
             /*
-			LTRACE(LT_INFO, 2, "Usage: ");
-			LTRACE(LT_INFO, 2, "For start muxing: " << "tsMuxeR <meta file name> <out file/dir name>");
-			LTRACE(LT_INFO, 2, "For detect stream params: " << "tsMuxeR <media file name>");
-			LTRACE(LT_INFO, 2, "For more information about meta file see readme.txt");
-			cout << endl;
+                        LTRACE(LT_INFO, 2, "Usage: ");
+                        LTRACE(LT_INFO, 2, "For start muxing: " << "tsMuxeR <meta file name> <out file/dir name>");
+                        LTRACE(LT_INFO, 2, "For detect stream params: " << "tsMuxeR <media file name>");
+                        LTRACE(LT_INFO, 2, "For more information about meta file see readme.txt");
+                        cout << endl;
             */
             showHelp();
-			return -1;
-		}
-		string fileExt = extractFileExt(argv[2]);
-		fileExt = strToUpperCase(fileExt);
-		auto startTime = std::chrono::steady_clock::now();
+            return -1;
+        }
+        string fileExt = extractFileExt(argv[2]);
+        fileExt = strToUpperCase(fileExt);
+        auto startTime = std::chrono::steady_clock::now();
 
-		int autoChapterLen = 0;
-		vector<double> customChapterList;
+        int autoChapterLen = 0;
+        vector<double> customChapterList;
         bool stereoMode = false;
         string isoDiskLabel;
-		DiskType dt = checkBluRayMux(argv[1], autoChapterLen, customChapterList, firstMplsOffset, firstM2tsOffset, insertBlankPL, blankNum, stereoMode, isoDiskLabel);
+        DiskType dt = checkBluRayMux(argv[1], autoChapterLen, customChapterList, firstMplsOffset, firstM2tsOffset,
+                                     insertBlankPL, blankNum, stereoMode, isoDiskLabel);
         std::string fileExt2 = unquoteStr(fileExt);
-		bool muxMode = fileExt2 == "M2TS" || fileExt2 == "TS" || fileExt2 == "SSIF" || fileExt2 == "ISO" || dt != DT_NONE;
+        bool muxMode =
+            fileExt2 == "M2TS" || fileExt2 == "TS" || fileExt2 == "SSIF" || fileExt2 == "ISO" || dt != DT_NONE;
 
-		if (muxMode)
-		{
+        if (muxMode)
+        {
             BlurayHelper blurayHelper;
 
-			MuxerManager muxerManager(readManager, tsMuxerFactory);
+            MuxerManager muxerManager(readManager, tsMuxerFactory);
             muxerManager.setAllowStereoMux(fileExt2 == "SSIF" || dt != DT_NONE);
-			muxerManager.openMetaFile(argv[1]);
-			if (!V3_flags && dt == DT_BLURAY && muxerManager.getHevcFound()) {
-				LTRACE(LT_INFO, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
-				V3_flags |= 0x80; // flag "V3"
-			}
-			string dstFile = unquoteStr(argv[2]);
+            muxerManager.openMetaFile(argv[1]);
+            if (!V3_flags && dt == DT_BLURAY && muxerManager.getHevcFound())
+            {
+                LTRACE(LT_INFO, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
+                V3_flags |= 0x80;  // flag "V3"
+            }
+            string dstFile = unquoteStr(argv[2]);
 
-			if (dt != DT_NONE)
-			{
+            if (dt != DT_NONE)
+            {
                 if (!blurayHelper.open(dstFile, dt, muxerManager.totalSize(), muxerManager.getExtraISOBlocks()))
                     throw runtime_error(string("Can't create output file ") + dstFile);
                 blurayHelper.setVolumeLabel(isoDiskLabel);
-				blurayHelper.createBluRayDirs();
-				dstFile = blurayHelper.m2tsFileName(firstM2tsOffset);
-			}
-			if (muxerManager.getTrackCnt() == 0)
-				THROW(ERR_COMMON, "No tracks selected");
+                blurayHelper.createBluRayDirs();
+                dstFile = blurayHelper.m2tsFileName(firstM2tsOffset);
+            }
+            if (muxerManager.getTrackCnt() == 0)
+                THROW(ERR_COMMON, "No tracks selected");
             muxerManager.doMux(dstFile, dt != DT_NONE ? &blurayHelper : 0);
-			if (dt != DT_NONE) 
-			{
-				blurayHelper.writeBluRayFiles(insertBlankPL, firstMplsOffset, blankNum, stereoMode);
-                TSMuxer* mainMuxer = dynamic_cast<TSMuxer*> (muxerManager.getMainMuxer());
-                TSMuxer* subMuxer = dynamic_cast<TSMuxer*> (muxerManager.getSubMuxer());
+            if (dt != DT_NONE)
+            {
+                blurayHelper.writeBluRayFiles(insertBlankPL, firstMplsOffset, blankNum, stereoMode);
+                TSMuxer* mainMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
+                TSMuxer* subMuxer = dynamic_cast<TSMuxer*>(muxerManager.getSubMuxer());
 
                 if (mainMuxer)
-				    blurayHelper.createCLPIFile(mainMuxer, mainMuxer->getFirstFileNum(), true);
-                if (subMuxer) {
+                    blurayHelper.createCLPIFile(mainMuxer, mainMuxer->getFirstFileNum(), true);
+                if (subMuxer)
+                {
                     blurayHelper.createCLPIFile(subMuxer, subMuxer->getFirstFileNum(), false);
 
                     IsoWriter* IsoWriter = blurayHelper.isoWriter();
-                    if (IsoWriter) {
-                        for (int i = 0; i < mainMuxer->splitFileCnt(); ++i) {
+                    if (IsoWriter)
+                    {
+                        for (int i = 0; i < mainMuxer->splitFileCnt(); ++i)
+                        {
                             string file1 = mainMuxer->getFileNameByIdx(i);
                             string file2 = subMuxer->getFileNameByIdx(i);
                             int ssifNum = strToInt32(extractFileName(file1));
@@ -709,8 +748,9 @@ int main(int argc, char** argv)
                 }
 
                 for (int i = 0; i < customChapterList.size(); ++i)
-                    customChapterList[i] -= (double)muxerManager.getCutStart()/1e9;
-                //createMPLSFile(dstDir, mainMuxer->getPidList(), *(mainMuxer->getFirstPts().begin()), *(mainMuxer->getLastPts().rbegin()),
+                    customChapterList[i] -= (double)muxerManager.getCutStart() / 1e9;
+                // createMPLSFile(dstDir, mainMuxer->getPidList(), *(mainMuxer->getFirstPts().begin()),
+                // *(mainMuxer->getLastPts().rbegin()),
                 //    autoChapterLen, customChapterList, dt, firstMplsOffset, firstM2tsOffset);
 
                 // allign last PTS between main and sub muxers
@@ -718,75 +758,85 @@ int main(int argc, char** argv)
                 if (subMuxer)
                     mainMuxer->alignPTS(subMuxer);
 
-                blurayHelper.createMPLSFile(mainMuxer, subMuxer, autoChapterLen, customChapterList, dt, firstMplsOffset, muxerManager.isMvcBaseViewR());
+                blurayHelper.createMPLSFile(mainMuxer, subMuxer, autoChapterLen, customChapterList, dt, firstMplsOffset,
+                                            muxerManager.isMvcBaseViewR());
 
+                if (insertBlankPL && mainMuxer && !subMuxer)
+                {
+                    LTRACE(LT_INFO, 2, "Adding blank play list");
+                    muxBlankPL(extractFileDir(argv[0]), blurayHelper, mainMuxer->getPidList(), dt, blankNum);
+                }
+            }
 
-				if (insertBlankPL && mainMuxer && !subMuxer) {
-					LTRACE(LT_INFO, 2, "Adding blank play list");
-					muxBlankPL(extractFileDir(argv[0]), blurayHelper, mainMuxer->getPidList(), dt, blankNum);
-				}
-			}
-
-			LTRACE(LT_INFO, 2, "Mux successful complete");
-		}
-		else {
-			MuxerManager sMuxer(readManager, singleFileMuxerFactory);
-			sMuxer.openMetaFile(argv[1]);
-			if (sMuxer.getTrackCnt() == 0)
-				THROW(ERR_COMMON, "No tracks selected");
-      	    createDir(unquoteStr(argv[2]), true);
-			sMuxer.doMux(unquoteStr(argv[2]), 0);
-			LTRACE(LT_INFO, 2, "Demux complete.");
-		}
-		auto endTime = std::chrono::steady_clock::now();
+            LTRACE(LT_INFO, 2, "Mux successful complete");
+        }
+        else
+        {
+            MuxerManager sMuxer(readManager, singleFileMuxerFactory);
+            sMuxer.openMetaFile(argv[1]);
+            if (sMuxer.getTrackCnt() == 0)
+                THROW(ERR_COMMON, "No tracks selected");
+            createDir(unquoteStr(argv[2]), true);
+            sMuxer.doMux(unquoteStr(argv[2]), 0);
+            LTRACE(LT_INFO, 2, "Demux complete.");
+        }
+        auto endTime = std::chrono::steady_clock::now();
         auto totalTime = endTime - startTime;
-		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(totalTime);
-		auto minutes = std::chrono::duration_cast<std::chrono::minutes>(totalTime);
-		if (muxMode) {
-			LTRACE2(LT_INFO, "Muxing time: ");
-		}
-		else
-			LTRACE2(LT_INFO, "Demuxing time: ");
-		if (minutes.count() > 0) {
-			LTRACE2(LT_INFO, minutes.count() << " min ");
-			seconds -= minutes;
-		}
-		LTRACE(LT_INFO, 2, seconds.count() << " sec");
+        auto seconds = std::chrono::duration_cast<std::chrono::seconds>(totalTime);
+        auto minutes = std::chrono::duration_cast<std::chrono::minutes>(totalTime);
+        if (muxMode)
+        {
+            LTRACE2(LT_INFO, "Muxing time: ");
+        }
+        else
+            LTRACE2(LT_INFO, "Demuxing time: ");
+        if (minutes.count() > 0)
+        {
+            LTRACE2(LT_INFO, minutes.count() << " min ");
+            seconds -= minutes;
+        }
+        LTRACE(LT_INFO, 2, seconds.count() << " sec");
 
         return 0;
-	} catch(runtime_error& e) {
-		if (argc == 2)
-			LTRACE2(LT_ERROR, "Error: ");
+    }
+    catch (runtime_error& e)
+    {
+        if (argc == 2)
+            LTRACE2(LT_ERROR, "Error: ");
 #ifdef _WIN32
-		char buffer[1024*16];
-		CharToOemA(e.what(), buffer);
-		LTRACE(LT_ERROR, 2, buffer);
+        char buffer[1024 * 16];
+        CharToOemA(e.what(), buffer);
+        LTRACE(LT_ERROR, 2, buffer);
 #else
-		LTRACE2(LT_ERROR, e.what());
+        LTRACE2(LT_ERROR, e.what());
 #endif
-		return -1;
-	} catch(VodCoreException& e) {
-		if (argc == 2)
-			LTRACE2(LT_ERROR, "Error: ");
+        return -1;
+    }
+    catch (VodCoreException& e)
+    {
+        if (argc == 2)
+            LTRACE2(LT_ERROR, "Error: ");
 #ifdef _WIN32
-		char buffer[1024*16];
-		CharToOemA(e.m_errStr.c_str(), buffer);
-		LTRACE(LT_ERROR, 2, buffer);
+        char buffer[1024 * 16];
+        CharToOemA(e.m_errStr.c_str(), buffer);
+        LTRACE(LT_ERROR, 2, buffer);
 #else
-		LTRACE(LT_ERROR, 2, e.m_errStr.c_str());
+        LTRACE(LT_ERROR, 2, e.m_errStr.c_str());
 #endif
-		return -2;
-	} catch(BitStreamException& e) {
-		if (argc == 2)
-			LTRACE2(LT_ERROR, "Error: ");
-		LTRACE(LT_ERROR, 2, "Bitstream exception " << e.what() << EXCEPTION_ERR_MSG);
-		return -3;
-	}
-	catch (...) 
-	{
-		if (argc == 2)
-			LTRACE2(LT_ERROR, "Error: ");
-		LTRACE(LT_ERROR, 2, "Unknnown exception" << EXCEPTION_ERR_MSG);
-		return -4;
-	}
+        return -2;
+    }
+    catch (BitStreamException& e)
+    {
+        if (argc == 2)
+            LTRACE2(LT_ERROR, "Error: ");
+        LTRACE(LT_ERROR, 2, "Bitstream exception " << e.what() << EXCEPTION_ERR_MSG);
+        return -3;
+    }
+    catch (...)
+    {
+        if (argc == 2)
+            LTRACE2(LT_ERROR, "Error: ");
+        LTRACE(LT_ERROR, 2, "Unknnown exception" << EXCEPTION_ERR_MSG);
+        return -4;
+    }
 }

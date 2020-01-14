@@ -3,17 +3,18 @@
 
 #include <string>
 #include <vector>
-#include "vod_common.h"
+
 #include "fs/file.h"
+#include "vod_common.h"
 
 class IsoWriter;
 struct FileEntryInfo;
 class TSMuxer;
 class AbstractOutputStream;
 
-class BlurayHelper: public FileFactory
+class BlurayHelper : public FileFactory
 {
-public:
+   public:
     BlurayHelper();
     ~BlurayHelper() override;
 
@@ -23,7 +24,6 @@ public:
     bool createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog);
     bool createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen, std::vector<double> customChapters,
                         DiskType dt, int mplsOffset, bool isMvcBaseViewR);
-
 
     std::string m2tsFileName(int num);
     std::string ssifFileName(int num);
@@ -36,10 +36,11 @@ public:
     AbstractOutputStream* createFile() override;
     bool isVirtualFS() const override;
     void setVolumeLabel(const std::string& label);
-private:
+
+   private:
     std::string m_dstPath;
     DiskType m_dt;
     IsoWriter* m_isoWriter;
 };
 
-#endif // _BLURAY_HELPER_H__
+#endif  // _BLURAY_HELPER_H__
