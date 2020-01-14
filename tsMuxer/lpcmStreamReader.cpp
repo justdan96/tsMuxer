@@ -454,7 +454,8 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
 		if (curPos + sizeof(wave_format::GUID) + 8 >= end)
 			return NOT_ENOUGH_BUFFER;
 		curPos += sizeof(wave_format::GUID);
-		m_curChankLen = *((uint64_t*)curPos);
+		// For w64, data length includes data metadata (16 bytes) and size (8 bytes)
+		m_curChankLen = *((uint64_t*)curPos) - 24;
 		curPos += 8;
 	}
 	return curPos - buff;
@@ -504,6 +505,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
             if (m_bitsPerSample == 0)
                 return 0; // can't decode frame
 
+			 // 1s / 200 = 5 ms frame
 			int64_t reqFrameLen = (m_bitsPerSample==20 ? 3 : m_bitsPerSample/8) * m_channels * m_freq / 200;
 			int64_t frameLen = reqFrameLen;
             if (m_curChankLen)
@@ -587,8 +589,8 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 			waveFormatPCMEx->nChannels = m_channels;
 			waveFormatPCMEx->nSamplesPerSec = m_freq;
 			waveFormatPCMEx->nAvgBytesPerSec = m_channels * m_freq * ((m_bitsPerSample+4)>>3);
+			waveFormatPCMEx->nBlockAlign = m_channels * waveFormatPCMEx->wBitsPerSample / 8;
 			waveFormatPCMEx->wBitsPerSample = m_bitsPerSample==20 ? 24 : m_bitsPerSample;
-			waveFormatPCMEx->nBlockAlign = m_channels * waveFormatPCMEx->wBitsPerSample/8; 
 			waveFormatPCMEx->cbSize = 22; // After this to GUID 
 			waveFormatPCMEx->Samples.wValidBitsPerSample = m_bitsPerSample; 
 			waveFormatPCMEx->dwChannelMask = getWaveChannelMask(m_channels, m_lfeExists); // Specify PCM
