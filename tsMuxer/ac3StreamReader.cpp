@@ -1,11 +1,13 @@
-#include <sstream>
-#include "bitStream.h"
-#include "avCodecs.h"
-#include "vodCoreException.h"
 #include "ac3StreamReader.h"
-#include "vod_common.h"
+
 #include <fs/systemlog.h>
 
+#include <sstream>
+
+#include "avCodecs.h"
+#include "bitStream.h"
+#include "vodCoreException.h"
+#include "vod_common.h"
 
 const static int AC3_DESCRIPTOR_TAG = 0x6A;
 const static int EAC3_DESCRIPTOR_TAG = 0x7A;
@@ -14,113 +16,119 @@ static const int64_t THD_EPS = 100;
 
 bool AC3StreamReader::isPriorityData(AVPacket* packet)
 {
-    //return packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10 && m_state != stateDecodeTrueHD;
+    // return packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10 && m_state !=
+    // stateDecodeTrueHD;
     bool rez = packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10;
-    if (rez && m_state == stateDecodeTrueHD) {
+    if (rez && m_state == stateDecodeTrueHD)
+    {
         int gg = 4;
     }
     return rez;
 }
 
-void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) 
+void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket)
 {
-	if (m_useNewStyleAudioPES) {
-		// 0f 81 71 - from blu ray DTS-HD 
-		//0x01 0x81 0x71 - ordinal DTS == 0x71?
-		pesPacket->flagsLo |= 1; // enable PES extension for AC3 stream
-		uint8_t* data = (uint8_t*) (pesPacket) + pesPacket->getHeaderLength();
-		*data++ = 0x01; 
-		*data++ = 0x81;
-        if (!m_true_hd_mode || m_downconvertToAC3) {
+    if (m_useNewStyleAudioPES)
+    {
+        // 0f 81 71 - from blu ray DTS-HD
+        // 0x01 0x81 0x71 - ordinal DTS == 0x71?
+        pesPacket->flagsLo |= 1;  // enable PES extension for AC3 stream
+        uint8_t* data = (uint8_t*)(pesPacket) + pesPacket->getHeaderLength();
+        *data++ = 0x01;
+        *data++ = 0x81;
+        if (!m_true_hd_mode || m_downconvertToAC3)
+        {
             if (m_bsid > 10)
-			    *data++ = 0x72; // E-AC3 subtype
+                *data++ = 0x72;  // E-AC3 subtype
             else
-                *data++ = 0x71; // AC3 subtype
-        } else {
-
-            if (avPacket.flags & AVPacket::IS_CORE_PACKET) 
-				*data++ = 0x76; // AC3 at TRUE-HD
-			else 
-				*data++ = 0x72; // TRUE-HD data
-		}
-		pesPacket->m_pesHeaderLen += 3;
-	}
+                *data++ = 0x71;  // AC3 subtype
+        }
+        else
+        {
+            if (avPacket.flags & AVPacket::IS_CORE_PACKET)
+                *data++ = 0x76;  // AC3 at TRUE-HD
+            else
+                *data++ = 0x72;  // TRUE-HD data
+        }
+        pesPacket->m_pesHeaderLen += 3;
+    }
 }
 
-int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff) 
+int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff)
 {
-	{
-		AC3Codec::setTestMode(true);
-		uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-		if (frame == 0)
-			return 0;
-		for (int i = 0; i < 2 && frame < m_bufEnd;) {
-			int skipBytes = 0;
-			int skipBeforeBytes = 0;
-			int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
-			if (len < 1) {
-				//m_state = stateDecodeAC3;
-				//AC3Codec::setTestMode(false);
-				//return 0;
+    {
+        AC3Codec::setTestMode(true);
+        uint8_t* frame = findFrame(m_buffer, m_bufEnd);
+        if (frame == 0)
+            return 0;
+        for (int i = 0; i < 2 && frame < m_bufEnd;)
+        {
+            int skipBytes = 0;
+            int skipBeforeBytes = 0;
+            int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
+            if (len < 1)
+            {
+                // m_state = stateDecodeAC3;
+                // AC3Codec::setTestMode(false);
+                // return 0;
                 break;
-			}
-			frame += len + skipBytes;
-			if (getFrameDurationNano() > 0)
-				i++;
-		}
-		m_state = stateDecodeAC3;
-		AC3Codec::setTestMode(false);
-	}
+            }
+            frame += len + skipBytes;
+            if (getFrameDurationNano() > 0)
+                i++;
+        }
+        m_state = stateDecodeAC3;
+        AC3Codec::setTestMode(false);
+    }
 
-	*dstBuff++ = 0x05; // registration descriptor tag
-	*dstBuff++ = 4;
-	memcpy(dstBuff, "AC-3", 4);
-	dstBuff += 4;
+    *dstBuff++ = 0x05;  // registration descriptor tag
+    *dstBuff++ = 4;
+    memcpy(dstBuff, "AC-3", 4);
+    dstBuff += 4;
 
-	
-	*dstBuff++ = 0x81; //AC-3_audio_stream_descriptor( )
-	*dstBuff++ = 0x4; // descriptor len 
-	BitStreamWriter bitWriter;
-	bitWriter.setBuffer(dstBuff, dstBuff + 4);
-	
-	bitWriter.putBits(3, m_fscod); // bitrate code;
-	bitWriter.putBits(5, m_bsidBase);
+    *dstBuff++ = 0x81;  // AC-3_audio_stream_descriptor( )
+    *dstBuff++ = 0x4;   // descriptor len
+    BitStreamWriter bitWriter;
+    bitWriter.setBuffer(dstBuff, dstBuff + 4);
 
-	bitWriter.putBits(6, m_frmsizecod>>1); // // MSB == 0. bit rate is exact
-	bitWriter.putBits(2, m_dsurmod);
+    bitWriter.putBits(3, m_fscod);  // bitrate code;
+    bitWriter.putBits(5, m_bsidBase);
 
-	bitWriter.putBits(3, m_bsmod);
-	bitWriter.putBits(4, m_acmod); // when MSB == 0 then high (4-th) bit always 0
-	bitWriter.putBit(0); // full_svc
-	bitWriter.putBits(8, 0); // langcod
-	bitWriter.flushBits();
+    bitWriter.putBits(6, m_frmsizecod >> 1);  // // MSB == 0. bit rate is exact
+    bitWriter.putBits(2, m_dsurmod);
 
-	//memcpy(dstBuff, "\x81\x04\x06\x48\x0e\x00", 6);
-	//dstBuff += 6;
+    bitWriter.putBits(3, m_bsmod);
+    bitWriter.putBits(4, m_acmod);  // when MSB == 0 then high (4-th) bit always 0
+    bitWriter.putBit(0);            // full_svc
+    bitWriter.putBits(8, 0);        // langcod
+    bitWriter.flushBits();
 
-	return 6 + 6;
+    // memcpy(dstBuff, "\x81\x04\x06\x48\x0e\x00", 6);
+    // dstBuff += 6;
 
-	//BitStreamWriter bitWriter;
-	if (isEAC3())
-		dstBuff[0] = EAC3_DESCRIPTOR_TAG;
-	else
-		dstBuff[0] = AC3_DESCRIPTOR_TAG;
-	bitWriter.setBuffer(dstBuff + 2, dstBuff + 1024);
-	bitWriter.putBits(1, 1 ); // component_type_flag
-	bitWriter.putBits(1, 1 ); // bsid_flag
-	bitWriter.putBits(1, 0 ); // mainid_flag
-	bitWriter.putBits(1, 0 ); // asvc_flag
-	bitWriter.putBits(4, 0 ); // reserved
-	// put component type
-	bitWriter.putBits(1, isEAC3() ? 1 : 0); // AC-3/E-AC-3 audio
-	bitWriter.putBits(4, 8 ); // complete main audio (0b1000)
-	bitWriter.putBits(3, m_acmod);
-	// --------------------
-	bitWriter.putBits(8, m_bsid);
-	//bitWriter.putBits(8, m_profile ); // reserved
-	bitWriter.flushBits();
-	dstBuff[1] = bitWriter.getBitsCount() / 8;
-	return dstBuff[1] + 2 + 6;
+    return 6 + 6;
+
+    // BitStreamWriter bitWriter;
+    if (isEAC3())
+        dstBuff[0] = EAC3_DESCRIPTOR_TAG;
+    else
+        dstBuff[0] = AC3_DESCRIPTOR_TAG;
+    bitWriter.setBuffer(dstBuff + 2, dstBuff + 1024);
+    bitWriter.putBits(1, 1);  // component_type_flag
+    bitWriter.putBits(1, 1);  // bsid_flag
+    bitWriter.putBits(1, 0);  // mainid_flag
+    bitWriter.putBits(1, 0);  // asvc_flag
+    bitWriter.putBits(4, 0);  // reserved
+    // put component type
+    bitWriter.putBits(1, isEAC3() ? 1 : 0);  // AC-3/E-AC-3 audio
+    bitWriter.putBits(4, 8);                 // complete main audio (0b1000)
+    bitWriter.putBits(3, m_acmod);
+    // --------------------
+    bitWriter.putBits(8, m_bsid);
+    // bitWriter.putBits(8, m_profile ); // reserved
+    bitWriter.flushBits();
+    dstBuff[1] = bitWriter.getBitsCount() / 8;
+    return dstBuff[1] + 2 + 6;
 }
 
 int AC3StreamReader::readPacket(AVPacket& avPacket)
@@ -134,17 +142,16 @@ int AC3StreamReader::readPacket(AVPacket& avPacket)
 int AC3StreamReader::flushPacket(AVPacket& avPacket)
 {
     int rez = SimplePacketizerReader::flushPacket(avPacket);
-    if (rez > 0 && m_true_hd_mode && !m_downconvertToAC3) {
+    if (rez > 0 && m_true_hd_mode && !m_downconvertToAC3)
+    {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
-            avPacket.pts = avPacket.dts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate - m_thdFrameOffset; // replace time to a next HD packet
+            avPacket.pts = avPacket.dts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate -
+                                          m_thdFrameOffset;  // replace time to a next HD packet
     }
     return rez;
 }
 
-bool AC3StreamReader::needMPLSCorrection() const
-{
-    return !m_true_hd_mode || m_downconvertToAC3;
-}
+bool AC3StreamReader::needMPLSCorrection() const { return !m_true_hd_mode || m_downconvertToAC3; }
 
 int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
 {
@@ -167,31 +174,36 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
 
         bool isAc3Packet = (m_state == stateDecodeTrueHDFirst);
 
-        if (isAc3Packet) 
+        if (isAc3Packet)
         {
-            if (m_thdDemuxWaitAc3) {
+            if (m_thdDemuxWaitAc3)
+            {
                 m_thdDemuxWaitAc3 = false;
                 avPacket.dts = avPacket.pts = m_nextAc3Time;
                 avPacket.flags |= AVPacket::IS_CORE_PACKET;
                 m_nextAc3Time += m_frameDuration;
                 return 0;
             }
-            else {
-                if (!m_delayedAc3Buffer.isEmpty()) {
-                    LTRACE(LT_INFO, 2, getCodecInfo().displayName << " stream (track " << m_streamIndex <<
-                        "): overlapped frame detected at position " << floatToTime((avPacket.pts-PTS_CONST_OFFSET)/1e9, ',') << ". Remove frame.");
+            else
+            {
+                if (!m_delayedAc3Buffer.isEmpty())
+                {
+                    LTRACE(LT_INFO, 2,
+                           getCodecInfo().displayName
+                               << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
+                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / 1e9, ',') << ". Remove frame.");
                 }
-                
+
                 m_delayedAc3Packet = avPacket;
                 m_delayedAc3Buffer.clear();
                 m_delayedAc3Buffer.append(avPacket.data, avPacket.size);
                 m_delayedAc3Packet.data = m_delayedAc3Buffer.data();
             }
         }
-        else {
+        else
+        {
             // thg packet
             avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate - m_thdFrameOffset;
-
 
 #if 0
             if (m_curMplsIndex >= 0 && avPacket.pts >= m_lastMplsTime && m_curMplsIndex < m_mplsInfo.size()-1) 
@@ -216,7 +228,8 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
 
             m_totalTHDSamples += mh.access_unit_size;
             m_demuxedTHDSamples += mh.access_unit_size;
-            if (m_demuxedTHDSamples >= m_samples) {
+            if (m_demuxedTHDSamples >= m_samples)
+            {
                 m_demuxedTHDSamples -= m_samples;
                 m_thdDemuxWaitAc3 = true;
             }
@@ -224,4 +237,3 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         }
     }
 }
-

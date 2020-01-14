@@ -272,6 +272,8 @@ We’ll take care of tagging your issue with the appropriated labels and answer 
 
 If you’re not familiar with open-source workflows or our set of technologies, do not hesitate to ask for help! We can mentor you or propose good first bugs (as labeled in our issues). Also welcome to add your name to Credits section of this document.
 
+All pull requests must pass code style checks which are executed with `clang-format` version 9. Therefore, it is advised to install an appropriate commit hook (for example [this one](https://github.com/barisione/clang-format-hooks)) to your local repository in order to commit properly formatted code right away.
+
 ## Submitting Bugs
 
 You can report issues directly on Github, that would be a really useful contribution given that we lack some user testing on the project. Please document as much as possible the steps to reproduce your problem (even better with screenshots).

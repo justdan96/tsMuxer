@@ -1,0 +1,16 @@
+name: Code Style Check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  code-style:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: DoozyX/clang-format-lint-action@v0.5
+      with:
+        clangFormatVersion: 9

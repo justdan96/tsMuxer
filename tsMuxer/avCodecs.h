@@ -1,49 +1,51 @@
 #ifndef __AV_CODECS_H
 #define __AV_CODECS_H
 
-#include <string>
 #include <types/types.h>
+
+#include <string>
+
 #include "avPacket.h"
 
-const static int CODEC_ID_NONE      = 0;
+const static int CODEC_ID_NONE = 0;
 const static int CODEC_V_MPEG4_H264 = 1;
-const static int CODEC_A_AAC   = 2;
-const static int CODEC_A_AC3   = 3;
-const static int CODEC_A_EAC3  = 4;
-const static int CODEC_A_DTS   = 5;
-const static int CODEC_V_VC1   = 6;
+const static int CODEC_A_AAC = 2;
+const static int CODEC_A_AC3 = 3;
+const static int CODEC_A_EAC3 = 4;
+const static int CODEC_A_DTS = 5;
+const static int CODEC_V_VC1 = 6;
 const static int CODEC_V_MPEG2 = 7;
 const static int CODEC_A_HDAC3 = 8;
 const static int CODEC_A_MPEG_AUDIO = 9;
 const static int CODEC_A_LPCM = 10;
-const static int CODEC_S_SUP  = 11;
-const static int CODEC_S_PGS  = 12;
-const static int CODEC_S_SRT  = 13;
-const static int CODEC_V_MPEG4_H264_DEP=14;
+const static int CODEC_S_SUP = 11;
+const static int CODEC_S_PGS = 12;
+const static int CODEC_S_SRT = 13;
+const static int CODEC_V_MPEG4_H264_DEP = 14;
 const static int CODEC_V_MPEG4_H265 = 15;
 
-
-struct CodecInfo 
+struct CodecInfo
 {
-	CodecInfo(): codecID(0) {}
-	CodecInfo(int codecID, const std::string& displayName, const std::string& programName) {
-		this->codecID = codecID;
-		this->displayName = displayName;
-		this->programName = programName;
-	}
-	int codecID;
-	std::string displayName;
-	std::string programName;
+    CodecInfo() : codecID(0) {}
+    CodecInfo(int codecID, const std::string& displayName, const std::string& programName)
+    {
+        this->codecID = codecID;
+        this->displayName = displayName;
+        this->programName = programName;
+    }
+    int codecID;
+    std::string displayName;
+    std::string programName;
 };
 
-struct CheckStreamRez 
+struct CheckStreamRez
 {
-	CheckStreamRez(): trackID(0),delay(0), multiSubStream(false), isSecondary(false), unused(false) {}
-	CodecInfo codecInfo;
-	std::string streamDescr;
-	std::string lang;
-	uint32_t trackID;
-	int64_t delay; // auto delay for audio
+    CheckStreamRez() : trackID(0), delay(0), multiSubStream(false), isSecondary(false), unused(false) {}
+    CodecInfo codecInfo;
+    std::string streamDescr;
+    std::string lang;
+    uint32_t trackID;
+    int64_t delay;  // auto delay for audio
 
     bool multiSubStream;
     bool isSecondary;
@@ -52,7 +54,8 @@ struct CheckStreamRez
 
 const static CodecInfo hevcCodecInfo(CODEC_V_MPEG4_H265, "HEVC", "V_MPEGH/ISO/HEVC");
 const static CodecInfo h264CodecInfo(CODEC_V_MPEG4_H264, "H.264", "V_MPEG4/ISO/AVC");
-const static CodecInfo h264DepCodecInfo(CODEC_V_MPEG4_H264_DEP, "MVC", "V_MPEG4/ISO/MVC"); // H.264/MVC dependent stream
+const static CodecInfo h264DepCodecInfo(CODEC_V_MPEG4_H264_DEP, "MVC",
+                                        "V_MPEG4/ISO/MVC");  // H.264/MVC dependent stream
 const static CodecInfo aacCodecInfo(CODEC_A_AAC, "AAC", "A_AAC");
 const static CodecInfo dtsCodecInfo(CODEC_A_DTS, "DTS", "A_DTS");
 const static CodecInfo dtshdCodecInfo(CODEC_A_DTS, "DTS-HD", "A_DTS");
