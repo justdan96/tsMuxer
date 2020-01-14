@@ -1,14 +1,18 @@
 #include "muxForm.h"
+#include "ui_muxForm.h"
+#include <QCloseEvent>
+#include <QProcess>
 
 const static int MAX_ERRORS_CNT = 10000;
 
 MuxForm::MuxForm(QWidget *parent)
-    : QDialog(parent, Qt::WindowMaximizeButtonHint), muxProcess(0) {
-  ui.setupUi(this);
-  connect(ui.progressBar, &QProgressBar::valueChanged, this,
+    : QDialog(parent, Qt::WindowMaximizeButtonHint), ui(new Ui_muxForm),
+      muxProcess(0) {
+  ui->setupUi(this);
+  connect(ui->progressBar, &QProgressBar::valueChanged, this,
           &MuxForm::onProgressChanged);
-  connect(ui.abortBtn, &QPushButton::clicked, this, &MuxForm::onAbort);
-  connect(ui.okBtn, &QPushButton::clicked, this, &MuxForm::close);
+  connect(ui->abortBtn, &QPushButton::clicked, this, &MuxForm::onAbort);
+  connect(ui->okBtn, &QPushButton::clicked, this, &MuxForm::close);
 }
 
 void MuxForm::closeEvent(QCloseEvent *event) {
@@ -20,63 +24,62 @@ void MuxForm::prepare(const QString &label) {
   muxProcess = 0;
   errCnt = 0;
   setWindowTitle(label);
-  ui.muxLabel->setText(label + '.');
-  ui.progressBar->setValue(0);
-  ui.stdoutText->clear();
-  ui.stderrText->clear();
-  ui.abortBtn->setEnabled(true);
-  ui.okBtn->setEnabled(false);
+  ui->muxLabel->setText(label + '.');
+  ui->progressBar->setValue(0);
+  ui->stdoutText->clear();
+  ui->stderrText->clear();
+  ui->abortBtn->setEnabled(true);
+  ui->okBtn->setEnabled(false);
 }
 
 void MuxForm::onProgressChanged() {
-  ui.progressLabel->setText(
+  ui->progressLabel->setText(
       QString("Progress: ") +
-      QString::number(ui.progressBar->value() / 10.0, 'f', 1) + '%');
+      QString::number(ui->progressBar->value() / 10.0, 'f', 1) + '%');
 }
 
-void MuxForm::setProgress(int value) { ui.progressBar->setValue(value); }
+void MuxForm::setProgress(int value) { ui->progressBar->setValue(value); }
 
 void MuxForm::addStdOutLine(const QString &line) {
-  ui.stdoutText->append(line);
-  QTextCursor c = ui.stdoutText->textCursor();
+  ui->stdoutText->append(line);
+  QTextCursor c = ui->stdoutText->textCursor();
   c.movePosition(QTextCursor::End);
-  ui.stdoutText->setTextCursor(c);
+  ui->stdoutText->setTextCursor(c);
 }
 
 void MuxForm::addStdErrLine(const QString &line) {
   if (errCnt >= MAX_ERRORS_CNT)
     return;
-  ui.stderrText->append(line);
-  errCnt = ui.stderrText->document()->blockCount();
+  ui->stderrText->append(line);
+  errCnt = ui->stderrText->document()->blockCount();
   if (errCnt >= MAX_ERRORS_CNT) {
-    ui.stderrText->append("---------------------------------------");
-    ui.stderrText->append("Too many errors! tsMuxeR is terminated.");
+    ui->stderrText->append("---------------------------------------");
+    ui->stderrText->append("Too many errors! tsMuxeR is terminated.");
     onAbort();
   }
-  QTextCursor c = ui.stderrText->textCursor();
+  QTextCursor c = ui->stderrText->textCursor();
   c.movePosition(QTextCursor::End);
-  ui.stderrText->setTextCursor(c);
+  ui->stderrText->setTextCursor(c);
 }
 
-void MuxForm::muxFinished(int exitCode, const QString &prefix) {
-  Q_UNUSED(prefix);
-  if (muxProcess && ui.abortBtn->isEnabled()) {
+void MuxForm::muxFinished(int exitCode, const QString &) {
+  if (muxProcess && ui->abortBtn->isEnabled()) {
     if (exitCode == 0)
       setWindowTitle("tsMuxeR successfully finished");
     else
       setWindowTitle("tsMuxeR finished with error code " +
                      QString::number(exitCode));
-    ui.muxLabel->setText(windowTitle() + '.');
-    ui.abortBtn->setEnabled(false);
-    ui.okBtn->setEnabled(true);
+    ui->muxLabel->setText(windowTitle() + '.');
+    ui->abortBtn->setEnabled(false);
+    ui->okBtn->setEnabled(true);
   }
 }
 
 void MuxForm::onAbort() {
   if (muxProcess == nullptr)
     return;
-  ui.abortBtn->setEnabled(false);
-  ui.okBtn->setEnabled(true);
+  ui->abortBtn->setEnabled(false);
+  ui->okBtn->setEnabled(true);
   setWindowTitle("terminating tsMuxeR...");
   muxProcess->kill();
   muxProcess->waitForFinished();

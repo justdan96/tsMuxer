@@ -17,6 +17,7 @@ set(tsmuxer_gui_sources
   muxForm.cpp
   tsmuxerwindow.ui
   muxForm.ui
+  checkboxedheaderview.cpp
   images.qrc
 )
 

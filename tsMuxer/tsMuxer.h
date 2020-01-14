@@ -187,7 +187,6 @@ private:
     bool m_masterMode;
     bool m_subMode;
     PriorityDataInfo m_priorityData;
-    int m_minPcrInc;
     int64_t m_timeOffset;
     int64_t m_lastSITPCR;
     bool m_canSwithBlock;

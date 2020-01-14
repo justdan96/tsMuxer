@@ -283,7 +283,7 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
 			buff[3] = (buff[3] & 0xf0) + i;
 			return;
 		}
-	THROW(ERR_MPEG2_ERR_FPS, "Can't set fps to value " << fps << ". Only standart fps values allowed for mpeg2 streams.");
+	THROW(ERR_MPEG2_ERR_FPS, "Can't set fps to value " << fps << ". Only standard fps values allowed for mpeg2 streams.");
 }
 
 void MPEGSequenceHeader::setAspectRation(uint8_t* buff, VideoAspectRatio ar)
