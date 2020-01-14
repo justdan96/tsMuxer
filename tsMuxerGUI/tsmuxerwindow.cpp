@@ -2609,6 +2609,11 @@ bool TsMuxerWindow::readSettings() {
   ui.lineSpacing->setValue(settings->value("fontLineSpacing").toDouble());
   setRendererAnimationTime(settings->value("fadeTime").toDouble());
   ui.spinEditOffset->setValue(settings->value("offset").toInt());
+  // keep backward compatibility with versions < 2.6.15 which contain "famaly" key
+  if (settings->contains("famaly")) {
+    settings->setValue("family", settings->value("famaly"));
+    settings->remove("famaly");
+  }
   QString fontName = settings->value("family").toString();
   if (!fontName.isEmpty())
     ui.listViewFont->item(0, 1)->setText(fontName);
