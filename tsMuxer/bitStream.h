@@ -16,7 +16,7 @@ class BitStreamException : public std::exception
 };
 
 //#define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") +
-//std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
+// std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
 #define THROW_BITSTREAM_ERR throw BitStreamException()
 
 class BitStream

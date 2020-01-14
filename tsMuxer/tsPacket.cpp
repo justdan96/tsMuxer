@@ -425,8 +425,8 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(8, 0x04);
     bitWriter.putBits(8, 0x0f);
     bitWriter.putBits(8, 0xff);
-    bitWriter
-        .putBits(8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
+    bitWriter.putBits(
+        8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
     bitWriter.putBits(8, 0xfc);
 
     if (casPID)
@@ -2410,7 +2410,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
         writer.putBits(8, number_of_secondary_audio_stream_entries);
         writer.putBits(8, number_of_secondary_video_stream_entries);  // int number_of_secondary_video_stream_entries.
                                                                       // Now subpath used for second video stream
-        writer.putBits(8, 0);  // number_of_PiP_PG_textST_stream_entries_plus
+        writer.putBits(8, 0);                                         // number_of_PiP_PG_textST_stream_entries_plus
         writer.putBits(8, number_of_DolbyVision_video_stream_entries);
         writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
     }

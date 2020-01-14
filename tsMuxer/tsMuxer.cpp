@@ -843,7 +843,7 @@ void TSMuxer::writePESPacket()
             // else if (vCodec) {
             //	PMTIndex& curIndex = *streamInfo.m_index.rbegin();
             //	curIndex.insert(std::make_pair(curPts, PMTIndexData(m_muxedPacketCnt[m_muxedPacketCnt.size()-1],
-            //m_pesDataSize)));
+            // m_pesDataSize)));
             //}
             else if (aCodec)
             {
