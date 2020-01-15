@@ -6,6 +6,7 @@
 #include <fs/systemlog.h>
 #include <memory.h>
 #include <stdlib.h>
+#include <cmath>
 
 #include "vodCoreException.h"
 #include "vod_common.h"
