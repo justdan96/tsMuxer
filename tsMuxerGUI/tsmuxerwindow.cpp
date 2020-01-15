@@ -492,6 +492,8 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
                 codecInfo->addSEIMethod = 0;
                 codecInfo->addSPS = false;
             }
+            if (codecInfo->displayName == "HEVC" && !ui->checkBoxV3->isChecked())
+                ui->checkBoxV3->setChecked(true);
             lastTrackID = 0;
         }
         p = procStdOutput[i].indexOf("Stream ID:   ");
