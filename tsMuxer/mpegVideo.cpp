@@ -4,12 +4,9 @@
 #include "mpegVideo.h"
 
 #include <fs/systemlog.h>
-#include <cstring>
-#include <cmath>
 
-#ifndef _APPLE
 #include <cmath>
-#endif
+#include <cstring>
 
 #include "vodCoreException.h"
 #include "vod_common.h"
