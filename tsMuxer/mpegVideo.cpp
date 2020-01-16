@@ -4,8 +4,9 @@
 #include "mpegVideo.h"
 
 #include <fs/systemlog.h>
-#include <memory.h>
-#include <stdlib.h>
+
+#include <cmath>
+#include <cstring>
 
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -275,7 +276,7 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
 {
     // return; // todo delete this!!!
     for (int i = 1; i < sizeof(frame_rates) / sizeof(double); i++)
-        if (abs(frame_rates[i] - fps) < FRAME_RATE_EPS)
+        if (std::abs(frame_rates[i] - fps) < FRAME_RATE_EPS)
         {
             frame_rate_index = i;
             buff[3] = (buff[3] & 0xf0) + i;
