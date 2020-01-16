@@ -10,8 +10,6 @@
 #include <time.h>
 #endif
 
-extern const char* APP_VERSION;
-
 // ----------- routines --------------
 
 /*
@@ -515,7 +513,7 @@ int64_t ISOFile::size() const { return m_entry ? m_entry->m_fileSize : -1; }
 IsoWriter::IsoWriter()
 {
     m_volumeId = random32();
-    m_appId = std::string("*tsMuxeR ") + std::string(APP_VERSION);
+    m_appId = "*tsMuxeR " TSMUXER_VERSION;
     m_impId = std::string("*tsMuxeR ") + int32ToHex(random32());
 
     m_currentTime = time(0);

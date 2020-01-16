@@ -19,9 +19,6 @@
   <property name="acceptDrops">
    <bool>true</bool>
   </property>
-  <property name="windowTitle">
-   <string>tsMuxeR GUI 2.6.15</string>
-  </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
