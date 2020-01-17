@@ -26,9 +26,8 @@ equals(tsmuxer_release, 1) {
   tsmuxer_version = $${version_num}
 } else {
   system(git status >/dev/null 2>&1) {
-    git_rev_count = $$system(git rev-list --count HEAD)
     git_rev_short = $$system(git rev-parse --short HEAD)
-    tsmuxer_version = r$${git_rev_count}.$${git_rev_short}
+    tsmuxer_version = git-$${git_rev_short}
   } else {
     tsmuxer_version = $${version_num}-dev
   }
