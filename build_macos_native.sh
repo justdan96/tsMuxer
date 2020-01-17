@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -x
+set -e
+
 brew install pkg-config
 brew install freetype
 brew install zlib
