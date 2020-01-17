@@ -21,3 +21,8 @@ jobs:
     - run: ./build_macos_native.sh
       name: build-for-mac
 
+    - uses: actions/upload-artifact@master
+      with:
+         name: tsMuxer
+         path: bin
+      name: upload-artefact

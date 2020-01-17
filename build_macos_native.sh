@@ -9,9 +9,22 @@ brew install pkg-config
 brew install freetype
 brew install zlib
 
+builddir=$PWD
+
+mkdir bin/mac
 mkdir build
-cd build
+
+pushd build
 cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
 make
-cd tsMuxerGUI
+
+pushd tsMuxerGUI
 macdeployqt tsMuxerGUI.app -verbose=3
+popd
+
+mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
+mv tsMuxerGUI/tsMuxerGUI.app "${builddir}/bin/mac"
+popd
+
+zip -r ./bin/mac.zip ./bin/mac
+ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip
