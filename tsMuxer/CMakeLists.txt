@@ -108,6 +108,7 @@ else()
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
   target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES})
   target_include_directories(tsmuxer PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+  set_target_properties(tsmuxer PROPERTIES LINK_FLAGS ${FREETYPE2_LDFLAGS})
 endif()
 
 install (TARGETS tsmuxer DESTINATION bin)
