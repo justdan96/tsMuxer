@@ -164,10 +164,11 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
 
             LTRACE(LT_INFO, 2, "Stream ID:   " << streams[i].codecInfo.programName);
             std::string descr = streams[i].streamDescr;
-            if (streams[i].codecInfo.codecID == CODEC_S_PGS)
+            if (streams[i].codecInfo.codecID == CODEC_S_PGS && mplsParser)
             {
                 // PG stream
-                int pgTrackNum = streams[i].trackID - 0x1200;
+                MPLSStreamInfo streamInfo = mplsParser->getStreamByPID(streams[i].trackID);
+                int pgTrackNum = streamInfo.streamPID - 0x1200;
                 if (pgTrackNum >= 0 && pgTrackNum < pgStreams3D.size())
                 {
                     if (pgStreams3D[pgTrackNum].offsetId != 0xff)
