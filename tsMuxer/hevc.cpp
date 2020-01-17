@@ -865,7 +865,7 @@ int HevcSeiUnit::deserialize()
                 nbyte = m_reader.getBits(8);
                 payloadSize += nbyte;
             }
-            if (payloadType == 137 && !isHDR10)            // mastering_display_colour_volume
+            if (payloadType == 137 && !isHDR10)  // mastering_display_colour_volume
             {
                 isHDR10 = true;
                 V3_flags |= 2;                             // HDR10 flag
@@ -876,7 +876,7 @@ int HevcSeiUnit::deserialize()
                 HDR10_metadata[4] = ((m_reader.getBits(32) / 10000) << 16) +
                                     m_reader.getBits(32);  // max & min display_mastering_luminance
             }
-            else if (payloadType == 144)                   // content_light_level_info
+            else if (payloadType == 144)  // content_light_level_info
             {
                 int maxCLL = m_reader.getBits(16);
                 int maxFALL = m_reader.getBits(16);
