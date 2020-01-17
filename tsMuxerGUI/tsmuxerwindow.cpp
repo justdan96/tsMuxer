@@ -280,6 +280,7 @@ TsMuxerWindow::TsMuxerWindow()
       sound(0)
 {
     ui->setupUi(this);
+    setWindowTitle("tsMuxeR GUI " TSMUXER_VERSION);
     lastInputDir = QDir::homePath();
     lastOutputDir = QDir::homePath();
 
