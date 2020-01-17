@@ -14,4 +14,4 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
 make
 cd tsMuxerGUI
-macdeployqt -verbose=3 tsMuxerGUI.app
+macdeployqt tsMuxerGUI.app -verbose=3
