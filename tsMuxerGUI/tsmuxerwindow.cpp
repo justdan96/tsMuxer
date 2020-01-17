@@ -1070,6 +1070,8 @@ void TsMuxerWindow::continueAddFile()
             info.fpsText = "24000/1001";
         else if (qAbs(fps - 29.97) < EPS)
             info.fpsText = "30000/1001";
+        else if (qAbs(fps - 59.94) < EPS)
+            info.fpsText = "60000/1001";
         else
             info.fpsText = myFloatToStr(fps);
         info.fpsTextOrig = myFloatToStr(fps);

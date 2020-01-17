@@ -375,12 +375,27 @@
                 </item>
                 <item>
                  <property name="text">
+                  <string>50</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
                   <string>24000/1001</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
                   <string>30000/1001</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>60000/1001</string>
                  </property>
                 </item>
                </widget>
