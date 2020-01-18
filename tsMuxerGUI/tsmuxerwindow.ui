@@ -1534,7 +1534,7 @@ p, li { white-space: pre-wrap; }
                  <widget class="QComboBox" name="comboBoxPipSize">
                   <item>
                    <property name="text">
-                    <string>Not scale</string>
+                    <string>Not scaled</string>
                    </property>
                   </item>
                   <item>
@@ -1544,12 +1544,12 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <property name="text">
-                    <string>Quoter (x 1/4)</string>
+                    <string>Quarter (x 1/4)</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>One and Half (x 1.5)</string>
+                    <string>One and a Half (x 1.5)</string>
                    </property>
                   </item>
                   <item>
