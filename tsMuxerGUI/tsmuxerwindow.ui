@@ -1326,7 +1326,7 @@ p, li { white-space: pre-wrap; }
            <item>
              <widget class="QCheckBox" name="checkBoxV3">
                <property name="text">
-                 <string>BD-ROM V3 format</string>
+                 <string>Force BD-ROM V3 format</string>
                </property>
                <property name="checked">
                  <bool>false</bool>
