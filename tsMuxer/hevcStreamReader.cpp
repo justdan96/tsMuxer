@@ -350,6 +350,13 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 m_spsPpsFound = true;
                 storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
                 break;
+            case NAL_SEI_PREFIX:
+                if (!m_sei)
+                    m_sei = new HevcSeiUnit();
+                m_sei->decodeBuffer(curPos, nextNal);
+                if (m_sei->deserialize() != 0)
+                    return rez;
+                break;
             }
         }
         prevPos = curPos;

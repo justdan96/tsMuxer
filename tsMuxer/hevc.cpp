@@ -865,8 +865,10 @@ int HevcSeiUnit::deserialize()
                 nbyte = m_reader.getBits(8);
                 payloadSize += nbyte;
             }
-            if (payloadType == 137 && !isHDR10)
-            {                                              // mastering_display_colour_volume
+            if (payloadType == 137 && !isHDR10)  // mastering_display_colour_volume
+            {
+                isHDR10 = true;
+                V3_flags |= 2;                             // HDR10 flag
                 HDR10_metadata[0] = m_reader.getBits(32);  // display_primaries Green
                 HDR10_metadata[1] = m_reader.getBits(32);  // display_primaries Red
                 HDR10_metadata[2] = m_reader.getBits(32);  // display_primaries Blue
@@ -874,13 +876,12 @@ int HevcSeiUnit::deserialize()
                 HDR10_metadata[4] = ((m_reader.getBits(32) / 10000) << 16) +
                                     m_reader.getBits(32);  // max & min display_mastering_luminance
             }
-            else if (payloadType == 144 && !isHDR10)
-            {  // content_light_level_info
-                isHDR10 = true;
-                V3_flags |= 2;                      // HDR10 flag
-                int maxCLL = m_reader.getBits(32);  // maxCLL, maxFALL
-                if (maxCLL != 0)
-                    HDR10_metadata[5] = maxCLL;
+            else if (payloadType == 144)  // content_light_level_info
+            {
+                int maxCLL = m_reader.getBits(16);
+                int maxFALL = m_reader.getBits(16);
+                if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x00ff))
+                    HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
             }
             else if (payloadType == 4 && !isHDR10plus)
             {                           // HDR10Plus Metadata
