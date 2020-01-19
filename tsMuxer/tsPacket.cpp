@@ -2521,7 +2521,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
 void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 {
-    int length = reader.getBits(16);  // 16 uimsbf
+    int length = reader.getBits(16);                                  // 16 uimsbf
     reader.skipBits(16);                                              // reserved_for_future_use 16 bslbf
     number_of_primary_video_stream_entries = reader.getBits(8);       // 8 uimsbf
     number_of_primary_audio_stream_entries = reader.getBits(8);       // 8 uimsbf
@@ -2824,7 +2824,7 @@ MPLSStreamInfo::~MPLSStreamInfo()
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 {
     int length = reader.getBits(8);  // 8 uimsbf
-    type = reader.getBits(8);  // 8 bslbf
+    type = reader.getBits(8);        // 8 bslbf
     if (type == 1)
     {
         streamPID = reader.getBits(16);  // 16 uimsbf
