@@ -1674,6 +1674,9 @@ void MPLSParser::parsePlayList(uint8_t* buffer, int len)
     for (int SubPath_id = 0; SubPath_id < number_of_SubPaths; SubPath_id++)
     {
         // SubPath(); // not implemented now
+        uint32_t lengthSP = reader.getBits(32);
+        for (int i=0; i !=lengthSP; i++)
+            reader.getBits(8);
     }
 
     int endBits = reader.getBitsLeft();
