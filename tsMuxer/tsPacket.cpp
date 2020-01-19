@@ -2911,7 +2911,7 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 {
-    int length = reader.getBits(8);  // 8 uimsbf
+    int length = reader.getBits(8);          // 8 uimsbf
     stream_coding_type = reader.getBits(8);  // 8 bslbf
     if (isVideoStreamType(stream_coding_type))
     {
