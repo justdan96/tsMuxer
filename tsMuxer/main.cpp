@@ -189,6 +189,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
                         descr += ")";
                     }
                 }
+                else descr += "   (PID is not in mpls)";
             }
             LTRACE(LT_INFO, 2, "Stream info: " << descr);
             LTRACE(LT_INFO, 2, "Stream lang: " << streams[i].lang);
