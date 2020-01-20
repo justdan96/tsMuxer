@@ -42,7 +42,6 @@ RAW LPCM Stream (*.pcm);;\
 All files (*.*)";
 const char saveMetaFilter[] = "tsMuxeR project file (*.meta);;All files (*.*)";
 
-const double EPS = 1e-6;
 const char TI_DEFAULT_TAB_NAME[] = "General track options";
 const char TI_DEMUX_TAB_NAME[] = "Demux options";
 const char TS_SAVE_DIALOG_FILTER[] = "Transport stream (*.ts);;all files (*.*)";
@@ -62,8 +61,6 @@ enum FileCustomData
 static const QString FILE_JOIN_PREFIX(" ++ ");
 
 bool doubleCompare(double a, double b) { return qAbs(a - b) < 1e-6; }
-
-QLocale locale;
 
 QString closeDirPath(const QString &src)
 {
@@ -163,44 +160,17 @@ QString changeFileExt(const QString &value, const QString &newExt)
         return unquoteStr(value) + "." + newExt;
 }
 
-QString toFixedDecPoint(QString str)
-{
-    for (int i = 0; i < str.length(); ++i)
-        if (str[i] == ',')
-            str[i] = '.';
-    return str;
-}
-
-QString toNativeDecPoint(QString str)
-{
-    for (int i = 0; i < str.length(); ++i)
-        if (str[i] == ',' || str[i] == '.')
-            str[i] = locale.decimalPoint();
-    return str;
-}
-
-float myStrToFloat(QString str) { return str.toFloat(); }
-
-QString myFloatToStr(float val)
-{
-    QString str = QString::number(double(val));
-    for (int i = 0; i < str.length(); ++i)
-        if (str[i] == locale.decimalPoint())
-            str[i] = '.';
-    return str;
-}
-
 QString fpsTextToFpsStr(const QString &fpsText)
 {
     int p = fpsText.indexOf('/');
     if (p >= 0)
     {
-        QString leftStr = fpsText.mid(0, p);
-        QString rightStr = fpsText.mid(p + 1);
-        return toFixedDecPoint(QString::number(double(myStrToFloat(leftStr) / myStrToFloat(rightStr)), 'f', 3));
+        auto left = fpsText.mid(0, p).toFloat();
+        auto right = fpsText.mid(p + 1).toFloat();
+        return QString::number(left / right, 'f', 3);
     }
     else
-        return myFloatToStr(myStrToFloat(fpsText));
+        return fpsText;
 }
 
 float extractFloatFromDescr(const QString &str, const QString &pattern)
@@ -217,8 +187,7 @@ float extractFloatFromDescr(const QString &str, const QString &pattern)
             while (p2 < str.length() &&
                    ((str.at(p2) >= '0' && str.at(p2) <= '9') || str.at(p2) == '.' || str.at(p2) == '-'))
                 p2++;
-            QString tmp = str.mid(p, p2 - p);
-            return myStrToFloat(tmp);
+            return str.mid(p, p2 - p).toFloat();
         }
     }
     catch (...)
@@ -1067,17 +1036,17 @@ void TsMuxerWindow::continueAddFile()
             fps = extractFloatFromDescr(info.descr, "Frame rate: ");
         info.width = extractFloatFromDescr(info.descr, "Resolution: ") + 0.5;
         info.height = extractFloatFromDescr(info.descr, QString::number(info.width) + ":") + 0.5;
-        if (qAbs(fps - 23.976) < EPS)
+        if (doubleCompare(fps, 23.976))
             info.fpsText = "24000/1001";
-        else if (qAbs(fps - 29.97) < EPS)
+        else if (doubleCompare(fps, 29.97))
             info.fpsText = "30000/1001";
-        else if (qAbs(fps - 59.94) < EPS)
+        else if (doubleCompare(fps, 59.94))
             info.fpsText = "60000/1001";
         else
-            info.fpsText = myFloatToStr(fps);
-        info.fpsTextOrig = myFloatToStr(fps);
+            info.fpsText = QString::number(fps);
+        info.fpsTextOrig = QString::number(fps);
         level = extractFloatFromDescr(info.descr, "@");
-        info.levelText = myFloatToStr(level);
+        info.levelText = QString::number(level);
         if (info.descr.indexOf("pulldown") >= 0)
             info.delPulldown = 0;
 
@@ -1478,14 +1447,14 @@ QString TsMuxerWindow::getMuxOpts()
     else if (ui->radioButtonDemux->isChecked())
         rez += "--demux ";
     if (ui->checkBoxCBR->isChecked())
-        rez += "--cbr --bitrate=" + toFixedDecPoint(QString::number(ui->editCBRBitrate->value(), 'f', 3));
+        rez += "--cbr --bitrate=" + QString::number(ui->editCBRBitrate->value(), 'f', 3);
     else
     {
         rez += "--vbr ";
         if (ui->checkBoxRVBR->isChecked())
         {
-            rez += QString("--minbitrate=") + toFixedDecPoint(QString::number(ui->editMinBitrate->value(), 'f', 3));
-            rez += QString(" --maxbitrate=") + toFixedDecPoint(QString::number(ui->editMaxBitrate->value(), 'f', 3));
+            rez += QString("--minbitrate=") + QString::number(ui->editMinBitrate->value(), 'f', 3);
+            rez += QString(" --maxbitrate=") + QString::number(ui->editMaxBitrate->value(), 'f', 3);
         }
     }
     // if (!ui->checkBoxuseAsynIO->isChecked())
@@ -1528,7 +1497,7 @@ QString TsMuxerWindow::getMuxOpts()
     if (ui->splitByDuration->isChecked())
         rez += QString(" --split-duration=") + ui->spinEditSplitDuration->text();
     if (ui->splitBySize->isChecked())
-        rez += QString(" --split-size=") + myFloatToStr(myStrToFloat(ui->editSplitSize->text())) +
+        rez += QString(" --split-size=") + ui->editSplitSize->text() +
                ui->comboBoxMeasure->currentText();
 
     int startCut = qTimeToMsec(ui->cutStartTimeEdit->time());
