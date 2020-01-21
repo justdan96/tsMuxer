@@ -169,26 +169,28 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
                 int pgTrackNum = streamInfo.streamPID - 0x1200;
                 if (pgTrackNum >= 0 && pgTrackNum < pgStreams3D.size())
                 {
-                    if (pgStreams3D[pgTrackNum].offsetId != 0xff)
+                    if (streamInfo.offsetId != 0xff)
                     {
                         descr += "   3d-plane: ";
-                        descr += int32ToStr(pgStreams3D[pgTrackNum].offsetId);
+                        descr += int32ToStr(streamInfo.offsetId);
                     }
                     else
                     {
-                        descr += "   3d-plane: zero";
+                        descr += "   3d-plane: undefined";
                     }
-                    if (pgStreams3D[pgTrackNum].isSSPG)
+                    if (streamInfo.isSSPG)
                     {
                         descr += "   (stereo, right=";
-                        descr += (pgStreams3D[pgTrackNum].rightEye->type == 2 ? "dep-view " : "");
-                        descr += int32ToStr(pgStreams3D[pgTrackNum].rightEye->streamPID);
+                        descr += (streamInfo.rightEye->type == 2 ? "dep-view " : "");
+                        descr += int32ToStr(streamInfo.rightEye->streamPID);
                         descr += ", left=";
-                        descr += (pgStreams3D[pgTrackNum].leftEye->type == 2 ? "dep-view " : "");
-                        descr += int32ToStr(pgStreams3D[pgTrackNum].leftEye->streamPID);
+                        descr += (streamInfo.leftEye->type == 2 ? "dep-view " : "");
+                        descr += int32ToStr(streamInfo.leftEye->streamPID);
                         descr += ")";
                     }
                 }
+                else
+                    descr += "   (PID is not in mpls)";
             }
             LTRACE(LT_INFO, 2, "Stream info: " << descr);
             LTRACE(LT_INFO, 2, "Stream lang: " << streams[i].lang);
