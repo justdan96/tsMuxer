@@ -167,7 +167,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
                 // PG stream
                 MPLSStreamInfo streamInfo = mplsParser->getStreamByPID(streams[i].trackID);
                 int pgTrackNum = streamInfo.streamPID - 0x1200;
-                if (pgTrackNum >= 0 && pgTrackNum < pgStreams3D.size())
+                if (pgTrackNum >= 0)
                 {
                     if (streamInfo.offsetId != 0xff)
                     {
@@ -190,7 +190,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
                     }
                 }
                 else
-                    descr += "   (PID is not in mpls)";
+                    descr += "   (disabled)";
             }
             LTRACE(LT_INFO, 2, "Stream info: " << descr);
             LTRACE(LT_INFO, 2, "Stream lang: " << streams[i].lang);
