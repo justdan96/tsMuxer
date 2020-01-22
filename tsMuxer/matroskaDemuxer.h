@@ -18,6 +18,10 @@ class MatroskaDemuxer : public IOContextDemuxer
     std::vector<AVChapter> getChapters() override;
 
     bool isPidFilterSupported() const override { return true; }
+    int64_t getTrackDelay(uint32_t pid) override
+    {
+        return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
+    }
 
     int64_t getFileDurationNano() const override { return fileDuration; }
 
@@ -55,6 +59,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     char *writing_app;
     char *muxing_app;
     int time_scale;
+    std::map<int, int64_t> m_firstTimecode;
     bool index_parsed;
     bool metadata_parsed;
     int num_streams;
