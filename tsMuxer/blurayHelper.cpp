@@ -52,9 +52,122 @@ you need to use 8 instead of C
 before navigationcommand[3]
 */
 
+namespace
+{
+template <typename Container>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const Container& c, std::false_type)
+{
+    std::copy(std::begin(c), std::end(c), std::back_inserter(byteVector));
+}
+template <typename PODType>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const PODType& value, std::true_type)
+{
+    auto start = reinterpret_cast<const std::uint8_t*>(&value);
+    auto finish = start + sizeof(value);
+    std::copy(start, finish, std::back_inserter(byteVector));
+}
+template <typename T>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const T& value)
+{
+    push_back_raw(byteVector, value, std::is_pod<T>{});
+}
+using NavigationCommand = std::array<std::uint8_t, 12>;
+struct MovieObject
+{
+    bool resumeIntentionFlag = true;
+    bool menuCallMask = false;
+    bool titleSearchMask = false;
+    std::vector<NavigationCommand> navigationCommands;
+    std::vector<std::uint8_t> serialize() const
+    {
+        std::uint16_t flags = 0;
+        flags |= (resumeIntentionFlag << 15);
+        flags |= (menuCallMask << 14);
+        flags |= (titleSearchMask << 13);
+
+        const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
+
+        std::vector<std::uint8_t> rv;
+        rv.reserve(serializedSize());
+
+        push_back_raw(rv, my_htons(flags));
+        push_back_raw(rv, my_htons(numOfNavCommands));
+        for (auto&& navCmd : navigationCommands)
+        {
+            std::copy(std::begin(navCmd), std::end(navCmd), std::back_inserter(rv));
+        }
+        return rv;
+    }
+    size_t serializedSize() const
+    {
+        const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
+        return (2 * sizeof(std::uint16_t)) /* flags + numOfNavCommands */
+               + (numOfNavCommands * std::tuple_size<decltype(navigationCommands)::value_type>::value);
+    }
+};
+enum class BDMV_VersionNumber
+{
+    Version1,
+    Version2,
+    Version3
+};
+std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
+{
+    std::array<std::uint8_t, 4> rv = {0x30, 0x31, 0x30, 0x30};  // "0100"
+    switch (version)
+    {
+    case BDMV_VersionNumber::Version1:
+        return rv;
+    case BDMV_VersionNumber::Version2:
+        rv[1] = 0x32;
+        return rv;
+    case BDMV_VersionNumber::Version3:
+        rv[1] = 0x33;
+        return rv;
+    default:
+        assert(0);
+    }
+}
+std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
+                                                const std::vector<MovieObject>& movieObjects)
+{
+    const std::array<std::uint8_t, 4> type_indicator = {0x4D, 0x4F, 0x42, 0x4A};  // "MOBJ"
+    const auto version_number = getBDMV_VersionNumber(version);
+    const std::uint32_t extension_data_start_addr = 0;
+    const std::uint32_t reserved_after_length = 0;
+    const auto header_reserved_bytes = 28u;
+
+    std::vector<std::uint8_t> rv;
+    const auto num_movie_objects = static_cast<std::uint16_t>(movieObjects.size());
+    auto payload_length = static_cast<std::uint32_t>(sizeof(reserved_after_length) + sizeof(num_movie_objects));
+    const auto header_size = type_indicator.size() + version_number.size() + sizeof(extension_data_start_addr) +
+                             header_reserved_bytes + sizeof(payload_length);
+
+    for (auto&& movieObj : movieObjects)
+    {
+        payload_length += movieObj.serializedSize();
+    }
+
+    rv.reserve(header_size + payload_length);
+    push_back_raw(rv, type_indicator);
+    push_back_raw(rv, version_number);
+    push_back_raw(rv, my_htonl(extension_data_start_addr));
+    rv.resize(rv.size() + header_reserved_bytes, 0);
+    push_back_raw(rv, my_htonl(payload_length));
+    push_back_raw(rv, my_htonl(reserved_after_length));
+    push_back_raw(rv, my_htons(num_movie_objects));
+    for (auto&& movieObj : movieObjects)
+    {
+        push_back_raw(rv, movieObj.serialize());
+    }
+
+    return rv;
+}
+}  // namespace
+
 // clang-format off
 uint8_t bdMovieObjectData[] = {
-    0x4D, 0x4F, 0x42, 0x4A, // TypeIndicator
+    0x4D, 0x4F, 0x42, 0x4A, // TypeIndicator "MOBJ"
     0x30, 0x31, 0x30, 0x30, // VersionNumber / TypeIndicator2
     0x00, 0x00, 0x00, 0x00, // ExtensionDataStartAddress
     // 28 reserved bytes
@@ -71,11 +184,11 @@ uint8_t bdMovieObjectData[] = {
     0x80, 0x00,
     // NumberOfNavigationCommands
     0x00, 0x05,
-    // NavigationCommand[0]
+    // NavigationCommand[0] [offset from top : 54]
     0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00,
     // NavigationCommand[1]
     0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    // NavigationCommand[2]
+    // NavigationCommand[2] // "emptyCommand"
     0x50, 0x40,  // here 5040
     0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     // NavigationCommand[3]
