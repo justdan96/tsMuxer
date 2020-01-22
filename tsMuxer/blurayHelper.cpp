@@ -42,16 +42,6 @@ uint8_t bdIndexData[] = {
     0x00, 0x18, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x30, 0x30, 0x30,
     0x30, 0x30, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-/*
-51 C0 00 01 80 0x z0 0y 00 00 00 00
-where:
-x - number of default audio track
-y - number of default subtitle track
-z = C - all elements in selected PGS are shown. If you need to show only elements that marked with Forced="True" flag -
-you need to use 8 instead of C
-before navigationcommand[3]
-*/
-
 namespace
 {
 template <typename Container>
@@ -185,6 +175,31 @@ NavigationCommand makeNoBlackCommand()
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
 
+NavigationCommand makeDefaultTrackCommand(bool setDefaultAudioTrack, std::uint16_t audioTrackIdx,
+                                          bool setDefaultSubTrack, std::uint16_t subTrackIdx, bool subTrackForced)
+{
+    NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    if (setDefaultAudioTrack)
+    {
+        audioTrackIdx = my_ntohs(audioTrackIdx);
+        memcpy(cmd.data() + 4, &audioTrackIdx, sizeof(audioTrackIdx));
+        cmd[4] &= 0x0f;
+        cmd[4] |= 0x80;
+    }
+    if (setDefaultSubTrack)
+    {
+        subTrackIdx = my_ntohs(subTrackIdx);
+        memcpy(cmd.data() + 6, &subTrackIdx, sizeof(subTrackIdx));
+        cmd[6] &= 0x0f;
+        cmd[6] |= 0x80;
+    }
+    if (subTrackForced)
+    {
+        cmd[6] |= 0x40;
+    }
+    return cmd;
+}
+
 bool writeBdMovieObjectData(AbstractOutputStream* file, const std::string& prefix, DiskType diskType, bool usedBlackPL,
                             int mplsNum, int blankNum)
 {
@@ -216,6 +231,7 @@ bool writeBdMovieObjectData(AbstractOutputStream* file, const std::string& prefi
     {
         num = V3_flags ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
     }
+    // todo movieObjects[0].navigationCommands.insert(idx(2), makeDefaultTrackCommand());
     auto objectData = makeBdMovieObjectData(num, movieObjects);
     if (!file->open((prefix + "BDMV/MovieObject.bdmv").c_str(), File::ofWrite))
     {
