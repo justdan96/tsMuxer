@@ -20,7 +20,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     bool isPidFilterSupported() const override { return true; }
     int64_t getTrackDelay(uint32_t pid) override
     {
-        return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0 ;
+        return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }
 
     int64_t getFileDurationNano() const override { return fileDuration; }
