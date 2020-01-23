@@ -175,7 +175,7 @@ class METADemuxer : public AbstractDemuxer
     int addStream(const std::string codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
-    const std::vector<StreamInfo>& getStreamInfo() { return m_codecInfo; }
+    const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
     static DetectStreamRez DetectStreamReader(BufferedReaderManager& readManager, const std::string& fileName,
                                               bool calcDuration);
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }

@@ -12,6 +12,28 @@ using namespace std;
 // static const int SSIF_INTERLEAVE_BLOCKSIZE = 1024 * 1024 * 7;
 static const int MAX_FRAME_SIZE = 1200000;  // 1.2m
 
+namespace
+{
+template <typename TrackTypeFn>
+int seekDefaultTrack(const std::vector<StreamInfo>& tracks, TrackTypeFn f)
+{
+    int trackTypeIdx = 0;
+    for (auto&& track : tracks)
+    {
+        if (f(track))
+        {
+            auto&& params = track.m_addParams;
+            if (params.find("default") != std::end(params))
+            {
+                return trackTypeIdx;
+            }
+            ++trackTypeIdx;
+        }
+    }
+    return -1;
+}
+}  // namespace
+
 MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
     : m_metaDemuxer(readManager), m_factory(factory)
 {
@@ -113,7 +135,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr)
     {
         StreamInfo& si = *itr;
-        int rez = si.read();
+        si.read();
         if (si.m_isSubStream && m_allowStereoMux)
         {
             m_subStreamIndex.insert(si.m_streamReader->getStreamIndex());
@@ -369,3 +391,15 @@ AbstractMuxer* MuxerManager::getSubMuxer() { return m_subMuxer; }
 bool MuxerManager::isStereoMode() const { return m_subMuxer != 0; }
 
 void MuxerManager::setAllowStereoMux(bool value) { m_allowStereoMux = value; }
+
+int MuxerManager::getDefaultAudioTrackIdx() const
+{
+    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(),
+                            [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'A'; });
+}
+
+int MuxerManager::getDefaultSubTrackIdx() const
+{
+    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(),
+                            [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
+}
