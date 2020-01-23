@@ -4,6 +4,7 @@
 
 #include "hevc.h"
 #include "iso_writer.h"
+#include "muxerManager.h"
 #include "psgStreamReader.h"
 #include "tsMuxer.h"
 #include "tsPacket.h"
@@ -175,20 +176,21 @@ NavigationCommand makeNoBlackCommand()
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
 
-NavigationCommand makeDefaultTrackCommand(bool setDefaultAudioTrack, std::uint16_t audioTrackIdx,
-                                          bool setDefaultSubTrack, std::uint16_t subTrackIdx, bool subTrackForced)
+NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, bool subTrackForced)
 {
     NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-    if (setDefaultAudioTrack)
+    if (audioTrackIdx >= 0)
     {
-        audioTrackIdx = my_ntohs(audioTrackIdx);
+        ++audioTrackIdx;  // stream indices in this command are 1-based.
+        audioTrackIdx = my_ntohs(static_cast<std::uint16_t>(audioTrackIdx));
         memcpy(cmd.data() + 4, &audioTrackIdx, sizeof(audioTrackIdx));
         cmd[4] &= 0x0f;
         cmd[4] |= 0x80;
     }
-    if (setDefaultSubTrack)
+    if (subTrackIdx >= 0)
     {
-        subTrackIdx = my_ntohs(subTrackIdx);
+        ++subTrackIdx;
+        subTrackIdx = my_ntohs(static_cast<std::uint16_t>(subTrackIdx));
         memcpy(cmd.data() + 6, &subTrackIdx, sizeof(subTrackIdx));
         cmd[6] &= 0x0f;
         cmd[6] |= 0x80;
@@ -200,8 +202,8 @@ NavigationCommand makeDefaultTrackCommand(bool setDefaultAudioTrack, std::uint16
     return cmd;
 }
 
-bool writeBdMovieObjectData(AbstractOutputStream* file, const std::string& prefix, DiskType diskType, bool usedBlackPL,
-                            int mplsNum, int blankNum)
+bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* file, const std::string& prefix,
+                            DiskType diskType, bool usedBlackPL, int mplsNum, int blankNum)
 {
     std::vector<MovieObject> movieObjects = {
         {{
@@ -230,6 +232,14 @@ bool writeBdMovieObjectData(AbstractOutputStream* file, const std::string& prefi
     if (diskType == DT_BLURAY)
     {
         num = V3_flags ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
+    }
+    auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
+    auto defaultSubIdx = muxer.getDefaultSubTrackIdx();
+    if (defaultAudioIdx != -1 || defaultSubIdx != -1)
+    {
+        auto&& navCmds = movieObjects[0].navigationCommands;
+        movieObjects[0].navigationCommands.insert(std::begin(navCmds) + 2,
+                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, false));
     }
     // todo movieObjects[0].navigationCommands.insert(idx(2), makeDefaultTrackCommand());
     auto objectData = makeBdMovieObjectData(num, movieObjects);
@@ -335,7 +345,8 @@ bool BlurayHelper::createBluRayDirs()
     return true;
 }
 
-bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum, bool stereoMode)
+bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlackPL, int mplsNum, int blankNum,
+                                    bool stereoMode)
 {
     int fileSize = sizeof(bdIndexData);
     string prefix = m_isoWriter ? "" : m_dstPath;
@@ -398,7 +409,7 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
     file->write(bdIndexData, fileSize);
     file->close();
 
-    return writeBdMovieObjectData(file, prefix, m_dt, usedBlackPL, mplsNum, blankNum);
+    return writeBdMovieObjectData(muxer, file, prefix, m_dt, usedBlackPL, mplsNum, blankNum);
 }
 
 bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)

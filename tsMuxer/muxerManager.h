@@ -57,6 +57,9 @@ class MuxerManager
     int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
     int getExtraISOBlocks() const { return m_extraIsoBlocks; }
 
+    int getDefaultAudioTrackIdx() const;
+    int getDefaultSubTrackIdx() const;
+
    private:
     void preinitMux(const std::string& outFileName, FileFactory* fileFactory);
     AbstractMuxer* createMuxer();
