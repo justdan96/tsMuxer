@@ -239,7 +239,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
     {
         auto&& navCmds = movieObjects[0].navigationCommands;
         movieObjects[0].navigationCommands.insert(std::begin(navCmds) + 2,
-                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, false));
+                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, true));
     }
     // todo movieObjects[0].navigationCommands.insert(idx(2), makeDefaultTrackCommand());
     auto objectData = makeBdMovieObjectData(num, movieObjects);
