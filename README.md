@@ -155,6 +155,7 @@ timeshift         | Shift audio track by the given number of milliseconds. Can b
 down-to-dts       | Available only for DTS-HD tracks. Filter out HD part. 
 down-to-ac3       | Available only for TRUE-HD tracks. Filter out HD part. 
 secondary         | Mux as secondary audio.  Available for DD+ and DTS-Express. 
+default           | Mark this track as the default when muxing to Blu-ray.
 
 Additional parameters for video tracks:
 
@@ -181,9 +182,10 @@ pipScale          | PIP window scale factor. Allowed values: "1", "1/2", "1/4", 
 pipLumma          | Allow the PIP window to be transparent. Transparent colors are lumma colors in range [0..pipLumma].  Additional parameters for PG and SRT tracks:
 
 Parameter         | Description 
----               | --- 
+---               | ---
 video-width       | The width of the video in pixels. 
 video-height      | The height of the video in pixels. 
+default           | Mark this track as the default when muxing to Blu-ray.
 fps               | Video fps. It is recommended to define this parameter in order to enable more careful timing processing. 
 3d-plane          | Defines the number of the '3D offset track' which is placed inside the MVC track. Each message has an individual 3D offset. This information is stored inside 3D offset track. Additional parameters for SRT tracks:
 

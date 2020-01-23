@@ -406,6 +406,7 @@ Additional parameters for audio tracks:\n\
 - down-to-dts       Available only for DTS-HD tracks. Filter out HD part.\n\
 - down-to-ac3       Available only for TRUE-HD tracks. Filter out HD part.\n\
 - secondary         Mux as secondary audio. Available for DD+ and DTS-Express.\n\
+- default           Mark this track as the default when muxing to Blu-ray.\n\
 \n\
 Additional parameters for video tracks:\n\
 - fps               The number of frames per second. If not defined, the value\n\
@@ -446,6 +447,7 @@ Additional parameters for PG and SRT tracks:\n\
 \n\
 - video-width       The width of the video in pixels.\n\
 - video-height      The height of the video in pixels.\n\
+- default           Mark this track as the default when muxing to Blu-ray.\n\
 - fps               Video fps. It is recommended to define this parameter in\n\
                     order to enable more careful timing processing.\n\
 - 3d-plane          Defines the number of the '3D offset track' which is placed\n\
