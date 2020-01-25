@@ -638,8 +638,8 @@ int main(int argc, char** argv)
                     if (!mplsParser.m_playItems.empty())
                         LTRACE(LT_INFO, 2, "Start time: " << floatToTime(prevFileOffset / 45000.0));
                     LTRACE(LT_INFO, 2,
-                           "Duration:   " << floatToTime(
-                               (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
+                           "Duration:   "
+                               << floatToTime((mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
                                (double)45000.0));
                     if (mplsParser.isDependStreamExist)
                     {
