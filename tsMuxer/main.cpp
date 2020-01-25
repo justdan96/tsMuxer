@@ -635,6 +635,8 @@ int main(int argc, char** argv)
 #else
                     LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << itemName);
 #endif
+                    if (!mplsParser.m_playItems.empty())
+                        LTRACE(LT_INFO, 2, "Start time: " << floatToTime(prevFileOffset / 45000.0);
                     LTRACE(LT_INFO, 2,
                            "Duration: " << floatToTime(
                                (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
@@ -650,8 +652,6 @@ int main(int argc, char** argv)
                             LTRACE(LT_INFO, 2, "Base view: left-eye");
                         }
                     }
-                    if (!mplsParser.m_playItems.empty())
-                        LTRACE(LT_INFO, 2, "start-time: " << mplsParser.m_playItems[0].IN_time);
                     int marksPerFile = 0;
                     for (; markIndex < mplsParser.m_marks.size(); markIndex++)
                     {
@@ -666,7 +666,7 @@ int main(int argc, char** argv)
                             LTRACE2(LT_INFO, "Marks: ");
                         }
                         marksPerFile++;
-                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << " ");
+                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << "  ");
                     }
                     if (marksPerFile > 0)
                         LTRACE(LT_INFO, 2, "");
