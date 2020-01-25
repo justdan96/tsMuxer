@@ -636,7 +636,7 @@ int main(int argc, char** argv)
                     LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << itemName);
 #endif
                     if (!mplsParser.m_playItems.empty())
-                        LTRACE(LT_INFO, 2, "Start time: " << floatToTime(prevFileOffset / 45000.0);
+                        LTRACE(LT_INFO, 2, "Start time: " << floatToTime(prevFileOffset / 45000.0));
                     LTRACE(LT_INFO, 2,
                            "Duration:   " << floatToTime(
                                (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
