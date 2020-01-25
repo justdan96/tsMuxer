@@ -640,7 +640,7 @@ int main(int argc, char** argv)
                     LTRACE(LT_INFO, 2,
                            "Duration:   "
                                << floatToTime((mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
-                               (double)45000.0));
+                                              (double)45000.0));
                     if (mplsParser.isDependStreamExist)
                     {
                         if (mplsParser.mvc_base_view_r)
