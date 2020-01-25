@@ -638,7 +638,7 @@ int main(int argc, char** argv)
                     if (!mplsParser.m_playItems.empty())
                         LTRACE(LT_INFO, 2, "Start time: " << floatToTime(prevFileOffset / 45000.0);
                     LTRACE(LT_INFO, 2,
-                           "Duration: " << floatToTime(
+                           "Duration:   " << floatToTime(
                                (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
                                (double)45000.0));
                     if (mplsParser.isDependStreamExist)
@@ -663,7 +663,7 @@ int main(int argc, char** argv)
                         {
                             if (marksPerFile > 0)
                                 LTRACE(LT_INFO, 2, "");
-                            LTRACE2(LT_INFO, "Marks: ");
+                            LTRACE2(LT_INFO, "Marks:      ");
                         }
                         marksPerFile++;
                         LTRACE2(LT_INFO, floatToTime(time / 45000.0) << "  ");
