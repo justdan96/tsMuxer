@@ -300,9 +300,9 @@ TsMuxerWindow::TsMuxerWindow()
         ui->listViewFont->item(i, 0)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
         ui->listViewFont->item(i, 1)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
     }
-    const auto comboBoxIndexChanged = QOverload<int>::of(&QComboBox::currentIndexChanged);
-    const auto spinBoxValueChanged = QOverload<int>::of(&QSpinBox::valueChanged);
-    const auto doubleSpinBoxValueChanged = QOverload<double>::of(&QDoubleSpinBox::valueChanged);
+    void (QComboBox::*comboBoxIndexChanged)(int) = &QComboBox::currentIndexChanged;
+    void (QSpinBox::*spinBoxValueChanged)(int) = &QSpinBox::valueChanged;
+    void (QDoubleSpinBox::*doubleSpinBoxValueChanged)(double) = &QDoubleSpinBox::valueChanged;
     connect(&opacityTimer, &QTimer::timeout, this, &TsMuxerWindow::onOpacityTimer);
     connect(ui->trackLV, &QTableWidget::itemSelectionChanged, this, &TsMuxerWindow::trackLVItemSelectionChanged);
     connect(ui->trackLV, &QTableWidget::itemChanged, this, &TsMuxerWindow::trackLVItemChanged);
@@ -389,9 +389,10 @@ TsMuxerWindow::TsMuxerWindow()
 
     connect(&proc, &QProcess::readyReadStandardOutput, this, &TsMuxerWindow::readFromStdout);
     connect(&proc, &QProcess::readyReadStandardError, this, &TsMuxerWindow::readFromStderr);
-    connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this,
-            &TsMuxerWindow::onProcessFinished);
-    connect(&proc, QOverload<QProcess::ProcessError>::of(&QProcess::error), this, &TsMuxerWindow::onProcessError);
+    void (QProcess::*processFinished)(int, QProcess::ExitStatus) = &QProcess::finished;
+    connect(&proc, processFinished, this, &TsMuxerWindow::onProcessFinished);
+    void (QProcess::*processError)(QProcess::ProcessError) = &QProcess::error;
+    connect(&proc, processError, this, &TsMuxerWindow::onProcessError);
 
     ui->DiskLabel->setVisible(false);
     ui->DiskLabelEdit->setVisible(false);
