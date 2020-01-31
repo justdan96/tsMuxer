@@ -149,6 +149,8 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     }
     StreamInfo* streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
     streamInfo->m_fileName = fileName + fileExt;
+    if (streamInfo->m_fileName.size() > 254)
+        LTRACE(LT_ERROR, 2, "Error: File name too long.");
     streamInfo->m_codecReader = codecReader;
     m_streamInfo[streamIndex] = streamInfo;
 }
