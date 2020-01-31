@@ -121,7 +121,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 
     vector<string> fileList = extractFileList(streamName);
     string fileName;
-    if (fileList.size() < 2)
+    if (fileList.size() < 3)
         for (int i = 0; i < (int)fileList.size(); i++)
         {
             if (i > 0)
