@@ -121,12 +121,16 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 
     vector<string> fileList = extractFileList(streamName);
     string fileName;
-    for (int i = 0; i < (int)fileList.size(); i++)
-    {
-        if (i > 0)
-            fileName += '+';
-        fileName += extractFileName(fileList[i]);
-    }
+    if (fileList.size() < 2)
+        for (int i = 0; i < (int)fileList.size(); i++)
+        {
+            if (i > 0)
+                fileName += '+';
+            fileName += extractFileName(fileList[i]);
+        }
+    else
+        fileName = extractFileName(fileList[0]) + "+...+" + extractFileName(fileList[fileList.size() - 1]);
+    
     map<string, string>::const_iterator itr = params.find("track");
     if (itr != params.end())
     {
