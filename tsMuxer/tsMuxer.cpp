@@ -215,12 +215,12 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     }
     else if (codecName == "S_HDMV/PGS")
     {
-        tsStreamIndex = 0x1200 + m_pgsTrackCnt;
+        tsStreamIndex = (V3_flags & 1 ? 0x1200 : 0x12A0) + m_pgsTrackCnt;
         m_pgsTrackCnt++;
     }
     else if (codecName == "S_TEXT/UTF8")
     {
-        tsStreamIndex = 0x1200 + m_pgsTrackCnt;
+        tsStreamIndex = (V3_flags & 1 ? 0x1200 : 0x12A0) + m_pgsTrackCnt;
         m_pgsTrackCnt++;
     }
     m_extIndexToTSIndex[streamIndex] = tsStreamIndex;
