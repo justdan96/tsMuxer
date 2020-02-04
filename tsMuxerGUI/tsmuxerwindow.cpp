@@ -874,6 +874,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
             ui->dtsDwnConvert->setEnabled(codecInfo->displayName == "DTS-HD" || codecInfo->displayName == "TRUE-HD" ||
                                           codecInfo->displayName == "E-AC3 (DD+)");
             ui->secondaryCheckBox->setEnabled(codecInfo->descr.contains("(DTS Express)") ||
+                                              codecInfo->descr.contains("(DTS Express 24bit)") ||
                                               codecInfo->displayName == "E-AC3 (DD+)");
 
             if (!ui->secondaryCheckBox->isEnabled())
