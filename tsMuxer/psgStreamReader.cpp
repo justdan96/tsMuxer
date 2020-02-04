@@ -762,7 +762,8 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
         if (containerStreamIndex >= 0x1200)
-            rez.streamDescr += std::string(" #") + int32ToStr(containerStreamIndex - (V3_flags & 1 ? 0x1200 : 0x12A0));
+            rez.streamDescr +=
+                std::string(" #") + int32ToStr(containerStreamIndex - (V3_flags & 0x1e ? 0x12A0 : 0x1200));
     }
     else if (containerType == ctMKV && containerDataType == STREAM_TYPE_SUB_PGS)
     {
