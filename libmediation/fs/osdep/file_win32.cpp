@@ -59,7 +59,8 @@ File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFl
         else
             systemDependentFlags = FILE_FLAG_RANDOM_ACCESS;
     }
-    m_impl = CreateFile(fName, dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, systemDependentFlags, NULL);
+    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
+                        systemDependentFlags, NULL);
     if (m_impl == INVALID_HANDLE_VALUE)
     {
         throwFileError();
@@ -100,8 +101,8 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
     }
 
     createDir(extractFileDir(fName), true);
-
-    m_impl = CreateFile(fName, dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition, systemDependentFlags, NULL);
+    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
+                        systemDependentFlags, NULL);
     if (m_impl == INVALID_HANDLE_VALUE)
     {
         return false;
