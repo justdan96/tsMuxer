@@ -59,6 +59,9 @@ class AC3Codec
         setTestMode(false);
         m_frameDuration = false;
         m_bit_rateExt = 0;
+        m_bit_rate = 0;
+        m_channels = 0;
+        m_lfeon = 0;
         m_extChannelsExists = false;
         m_bsid = m_bsidBase = 0;
         m_dsurmod = 0;

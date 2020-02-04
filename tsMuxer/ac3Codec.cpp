@@ -147,17 +147,17 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
             numblkscod = gbc.getBits(2);
             m_sample_rate = ff_ac3_freqs[m_fscod];
         }
-        m_bsmod = 0;
-        m_acmod = gbc.getBits(3);
-        m_lfeon = gbc.getBit();
-        m_channels = ff_ac3_channels[m_acmod] + m_lfeon;
+        int acmodExt = gbc.getBits(3);
+        int lfeonExt = gbc.getBit();
+        if (m_lfeon == 0)
+            m_lfeon = lfeonExt;
+        if (m_channels == 0)  // no AC3 core
+            m_channels = ff_ac3_channels[acmodExt] + lfeonExt;
         m_samples = eac3_blocks[numblkscod] * 256;
         m_bit_rateExt = m_frame_size * (m_sample_rate)*8 / (m_samples);
-        m_bit_rate = 0;
 
         gbc.skipBits(5);  // skip bsid, already got it
-        m_bsidBase = m_bsid;
-        for (int i = 0; i < (m_acmod ? 1 : 2); i++)
+        for (int i = 0; i < (acmodExt ? 1 : 2); i++)
         {
             gbc.skipBits(5);  // skip dialog normalization
             if (gbc.getBit())
