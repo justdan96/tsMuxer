@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.1)
 project (tsmuxer LANGUAGES CXX)
 
-add_executable (tsmuxer
+add_executable (tsmuxer WIN32
   aac.cpp
   aacStreamReader.cpp
   AbstractDemuxer.cpp
@@ -104,6 +104,7 @@ target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
 if (WIN32)
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
   target_link_libraries(tsmuxer gdiplus)
+  target_compile_definitions(tsmuxer PRIVATE "-DUNICODE")
 else()
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
   target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES})

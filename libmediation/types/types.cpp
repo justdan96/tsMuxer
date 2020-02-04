@@ -488,3 +488,30 @@ uint32_t random32()
     static std::minstd_rand raand(dev());
     return static_cast<std::uint32_t>(raand());
 }
+
+#ifdef _WIN32
+#include <windows.h>
+
+std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.c_str(), utf8Str.size()); }
+
+std::vector<wchar_t> toWide(const char* utf8Str, int sz)
+{
+    auto requiredSiz = MultiByteToWideChar(CP_UTF8, 0, utf8Str, sz, nullptr, 0);
+    std::vector<wchar_t> multiByteBuf(static_cast<std::size_t>(requiredSiz));
+    MultiByteToWideChar(CP_UTF8, 0, utf8Str, sz, multiByteBuf.data(), requiredSiz);
+    if (multiByteBuf.empty() || multiByteBuf.back() != 0)
+    {
+        multiByteBuf.push_back(0);
+    }
+    return multiByteBuf;
+}
+
+std::string toUtf8(const wchar_t* wideStr)
+{
+    auto needed = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
+    needed--;  // includes terminating null byte, needless when returning a std::string.
+    std::string s(static_cast<std::size_t>(needed), 0);
+    WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, &s[0], needed, nullptr, nullptr);
+    return s;
+}
+#endif

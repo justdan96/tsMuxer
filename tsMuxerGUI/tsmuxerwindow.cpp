@@ -1176,7 +1176,7 @@ void splitLines(const QString &str, QList<QString> &strList)
 
 void TsMuxerWindow::addLines(const QByteArray &arr, QList<QString> &outList, bool isError)
 {
-    QString str = QString::fromLocal8Bit(arr);
+    QString str = QString::fromUtf8(arr);
     QList<QString> strList;
     splitLines(str, strList);
     QString text;
@@ -2398,7 +2398,7 @@ bool TsMuxerWindow::saveMetaFile(const QString &metaName)
         msgBox.exec();
         return false;
     }
-    QByteArray metaText = ui->memoMeta->toPlainText().toLocal8Bit();
+    QByteArray metaText = ui->memoMeta->toPlainText().toUtf8();
     file.write(metaText);
     file.close();
     return true;

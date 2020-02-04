@@ -8,6 +8,7 @@ add_library(mediation STATIC
 )
 
 IF(WIN32)
+    target_compile_definitions(mediation PRIVATE "-DUNICODE")
     target_sources(mediation PRIVATE fs/osdep/file_win32.cpp)
 ELSE()
     target_sources(mediation PRIVATE fs/osdep/file_unix.cpp)

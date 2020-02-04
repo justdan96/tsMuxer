@@ -547,8 +547,29 @@ All parameters in this group start with two dashes:\n\
     LTRACE(LT_INFO, 2, help);
 }
 
+#ifdef _WIN32
+#include <shellapi.h>
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+    int argc;
+    auto argvWide = CommandLineToArgvW(GetCommandLineW(), &argc);
+    std::vector<std::string> argv_utf8;
+    argv_utf8.reserve(static_cast<std::size_t>(argc));
+    for (int i = 0; i < argc; ++i)
+    {
+        argv_utf8.emplace_back(toUtf8(argvWide[i]));
+    }
+    LocalFree(argvWide);
+    std::vector<char*> argv;
+    argv.reserve(argv_utf8.size());
+    for (auto&& s : argv_utf8)
+    {
+        argv.push_back(&s[0]);
+    }
+#else
 int main(int argc, char** argv)
 {
+#endif
     LTRACE(LT_INFO, 2, "tsMuxeR version " TSMUXER_VERSION << ". github.com/justdan96/tsMuxer");
     int firstMplsOffset = 0;
     int firstM2tsOffset = 0;
