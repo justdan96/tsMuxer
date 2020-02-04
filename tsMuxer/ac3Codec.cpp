@@ -151,7 +151,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         int lfeonExt = gbc.getBit();
         if (m_lfeon == 0)
             m_lfeon = lfeonExt;
-        if (m_channels == 0) // no AC3 core
+        if (m_channels == 0)  // no AC3 core
             m_channels = ff_ac3_channels[acmodExt] + lfeonExt;
         m_samples = eac3_blocks[numblkscod] * 256;
         m_bit_rateExt = m_frame_size * (m_sample_rate)*8 / (m_samples);
