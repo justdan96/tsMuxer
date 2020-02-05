@@ -208,6 +208,7 @@ flex \
 zlib-devel
 ```
 
+Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit.
 ```
 pacman -Sy --needed $MINGW_PACKAGE_PREFIX-toolchain \
 $MINGW_PACKAGE_PREFIX-cmake \
@@ -215,6 +216,13 @@ $MINGW_PACKAGE_PREFIX-freetype \
 $MINGW_PACKAGE_PREFIX-zlib \
 $MINGW_PACKAGE_PREFIX-ninja
 ```
+Browse to the location of the tsMuxer repo and then run:
+
+```
+./rebuild_linux.sh
+```
+
+This will create statically compiled versions of tsMuxer - so no external DLL files are required.
 
 If you intend to build the GUI as well you need to also install these, depending on your platform (please note Qt5 takes up a LOT of disk space!):
 
@@ -222,17 +230,17 @@ If you intend to build the GUI as well you need to also install these, depending
 pacman -Sy --needed $MINGW_PACKAGE_PREFIX-qt5-static
 ```
 
-Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit. Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
+Before we compile anything we have to alter a file to work around [this bug](https://bugreports.qt.io/browse/QTBUG-76660). Run the following commands to fix that:
 
 ```
 echo 'load(win32/windows_vulkan_sdk)' > $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
 echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
 ```
 
-With that fixed, browse to the location of the tsMuxer repo and then run:
+With that fixed then run:
 
 ```
-./rebuild_linux.sh
+./rebuild_linux_with_gui.sh
 ```
 
 This will create statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
