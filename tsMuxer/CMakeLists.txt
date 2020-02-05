@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.1)
 project (tsmuxer LANGUAGES CXX)
 
-add_executable (tsmuxer WIN32
+add_executable (tsmuxer
   aac.cpp
   aacStreamReader.cpp
   AbstractDemuxer.cpp
