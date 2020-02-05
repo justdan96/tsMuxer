@@ -15,7 +15,7 @@ static const int MAX_FRAME_SIZE = 1200000;  // 1.2m
 namespace
 {
 template <typename TrackTypeFn>
-int seekDefaultTrack(const std::vector<StreamInfo>& tracks, TrackTypeFn f)
+int seekDefaultTrack(const std::vector<StreamInfo>& tracks, std::string& param, TrackTypeFn f)
 {
     int trackTypeIdx = 0;
     for (auto&& track : tracks)
@@ -23,8 +23,10 @@ int seekDefaultTrack(const std::vector<StreamInfo>& tracks, TrackTypeFn f)
         if (f(track))
         {
             auto&& params = track.m_addParams;
-            if (params.find("default") != std::end(params))
+            auto it = params.find("default");
+            if (it != std::end(params))
             {
+                param = it->second;
                 return trackTypeIdx;
             }
             ++trackTypeIdx;
@@ -394,12 +396,31 @@ void MuxerManager::setAllowStereoMux(bool value) { m_allowStereoMux = value; }
 
 int MuxerManager::getDefaultAudioTrackIdx() const
 {
-    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(),
+    std::string paramVal;
+    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
                             [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'A'; });
 }
 
-int MuxerManager::getDefaultSubTrackIdx() const
+int MuxerManager::getDefaultSubTrackIdx(SubTrackMode& mode) const
 {
-    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(),
-                            [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
+    std::string paramVal;
+    auto idx = seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
+                                [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
+    if (idx != -1)
+    {
+        if (paramVal == "all")
+        {
+            mode = SubTrackMode::All;
+        }
+        else if (paramVal == "forced")
+        {
+            mode = SubTrackMode::Forced;
+        }
+        else
+        {
+            LTRACE(LT_WARN, 2, "Invalid 'default' parameter value for subtitle track " << idx << ", ignoring");
+            return -1;
+        }
+    }
+    return idx;
 }
