@@ -1600,41 +1600,27 @@ p, li { white-space: pre-wrap; }
               <string>Default tracks</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_15">
-              <item row="0" column="0" alignment="Qt::AlignLeft">
-               <widget class="QLabel" name="audioTrackDefaultLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>35</width>
-                  <height>0</height>
-                 </size>
-                </property>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="defaultSubTrackCheckBox">
                 <property name="text">
-                 <string>Audio</string>
+                 <string>Subtitle</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" alignment="Qt::AlignLeft">
-               <widget class="QLabel" name="subTrackDefaultLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>47</width>
-                  <height>0</height>
-                 </size>
+              <item row="1" column="2" alignment="Qt::AlignRight">
+               <widget class="QCheckBox" name="defaultSubTrackForcedOnlyCheckBox">
+                <property name="enabled">
+                 <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>Subtitle</string>
+                 <string>Forced only</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="defaultAudioTrackCheckBox">
+                <property name="text">
+                 <string>Audio</string>
                 </property>
                </widget>
               </item>
@@ -1648,16 +1634,6 @@ p, li { white-space: pre-wrap; }
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" alignment="Qt::AlignRight">
-               <widget class="QCheckBox" name="defaultSubTrackForcedOnlyCheckBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>Forced only</string>
                 </property>
                </widget>
               </item>
@@ -3078,5 +3054,54 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>defaultSubTrackCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>defaultSubTrackComboBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>579</x>
+     <y>516</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>649</x>
+     <y>521</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>defaultSubTrackCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>defaultSubTrackForcedOnlyCheckBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>527</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>901</x>
+     <y>520</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>defaultAudioTrackCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>defaultAudioTrackComboBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>569</x>
+     <y>494</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>635</x>
+     <y>492</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
