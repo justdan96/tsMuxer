@@ -339,211 +339,215 @@ void doTrancatedFile(const char* fileName, int64_t offset)
 
 void showHelp()
 {
-    const char help[] =
-        "\n\
-tsMuxeR is a simple program to mux video to TS/M2TS files or create BD disks.\n\
-tsMuxeR does not use external filters (codecs).\n\
-\n\
-Examples:\n\
-    tsMuxeR <media file name>\n\
-    tsMuxeR <meta file name> <out file/dir name>\n\
-\n\
-tsMuxeR can be run in track detection mode or muxing mode. If tsMuxeR is run with\n\
-only one argument, then the program displays track information required to\n\
-construct a meta file. When running with two arguments, tsMuxeR starts the\n\
-muxing or demuxing process.\n\
-\n\
-Meta file format:\n\
-File MUST have the .meta extension. This file defines files you want to multiplex.\n\
-The first line of a meta file contains additional parameters that apply to all tracks.\n\
-In this case the first line should begin with the word MUXOPT.\n\
-\n\
-The following lines form a list of tracks and their parameters.  The format is\n\
-as follows:   <code name>,   <file name>,   <parameters>   Parameters are separated\n\
-with commas, with each parameter consisting of a name and a value, separated \n\
-with an equals sign.\n\
-Example of META file:\n\
-\n\
-MUXOPT --blu-ray\n\
-V_MPEG4/ISO/AVC, D:/media/test/stream.h264, fps=25\n\
-A_AC3, D:/media/test/stream.ac3, timeshift=-10000ms\n\
-\n\
-In this example one AC3 audio stream and one H264 video stream are multiplexed\n\
-into BD disc. The input file name can reference an elementary stream or a track\n\
-located inside a container.\n\
-\n\
-Supported input containers:\n\
-- TS/M2TS/MTS\n\
-- EVO/VOB/MPG/MPEG\n\
-- MKV\n\
-- MOV/MP4\n\
-- MPLS (Blu-ray media play list file)\n\
-\n\
-Names of codecs in the meta file:\n\
-- V_MPEGH/ISO/HEVC  H.265/HEVC\n\
-- V_MPEG4/ISO/AVC   H.264/AVC\n\
-- V_MPEG4/ISO/MVC   H.264/MVC\n\
-- V_MS/VFW/WVC1     VC1\n\
-- V_MPEG-2          MPEG2\n\
-- A_AC3             AC3/AC3+/TRUE-HD\n\
-- A_AAC             AAC\n\
-- A_DTS             DTS/DTS-Express/DTS-HD\n\
-- A_MP3             MPEG audio layer 1/2/3\n\
-- A_LPCM            raw pcm data or PCM WAV file\n\
-- S_HDMV/PGS        Presentation graphic stream (BD subtitle format)\n\
-- S_TEXT/UTF8       SRT subtitle format.  Encoding MUST be  UTF-8/UTF-16/UTF-32\n\
-\n\
-Each track may have additional parameters. Track parameters do not have dashes.\n\
-If a parameter's value consists of several words, it must be enclosed in quotes.\n\
-\n\
-Common additional parameters for any type of track:\n\
-- track             track number if input file is a container.\n\
-- lang              track language. MUST contain exactly 3 letters.\n\
-\n\
-Additional parameters for audio tracks:\n\
-- timeshift         Shift audio track by the given number of milliseconds.\n\
-                    Can be negative.\n\
-- down-to-dts       Available only for DTS-HD tracks. Filter out HD part.\n\
-- down-to-ac3       Available only for TRUE-HD tracks. Filter out HD part.\n\
-- secondary         Mux as secondary audio. Available for DD+ and DTS-Express.\n\
-\n\
-Additional parameters for video tracks:\n\
-- fps               The number of frames per second. If not defined, the value\n\
-                    is auto detected if available in the source stream. If not,\n\
-                    it defaults to 23.976.\n\
-- delPulldown       Remove pulldown from the track, if it exists. If the\n\
-                    pulldown is present, the FPS value is changed from 30 to 24.\n\
-- ar                Override video aspect ratio. 16:9, 4:3 e.t.c.\n\
-\n\
-Additional parameters for H.264 video tracks:\n\
-- level             Overwrite the level in the H264 stream. Do note that this\n\
-                    option only updates the headers and does not reencode the\n\
-                    stream, which may not meet the requirements for a lower \n\
-                    level.\n\
-- insertSEI         If the original stream does not contain SEI picture timing,\n\
-                    SEI buffering period or VUI parameters, add this data to\n\
-                    the stream. This option is recommended for BD muxing.\n\
-- forceSEI          Add SEI picture timing, buffering period and VUI parameters\n\
-                    to the stream and rebuild this data if it already exists.\n\
-- contSPS           If the original video doesn't contain repetitive SPS/PPS,\n\
-                    then SPS/PPS will be added to the stream before each key\n\
-                    frame. This option is recommended for BD muxing.\n\
-- subTrack          Used for combined AVC/MVC tracks only. TsMuxeR always\n\
-                    demultiplexes such tracks to separate AVC and MVC streams.\n\
-                    Setting this to 1 sets the reference to the AVC part, while\n\
-                    2 sets it to the MVC part.\n\
-- secondary         Mux as secondary video (PIP).\n\
-- pipCorner         Corner for PIP video. Allowed values: \"TopLeft\",\"TopRight\",\n\
-                    \"BottomRight\", \"BottomLeft\". \n\
-- pipHOffset        PIP window horizontal offset from the corner in pixels.\n\
-- pipVOffset        PIP window vertical offset from the corner in pixels.\n\
-- pipScale          PIP window scale factor. Allowed values: \"1\", \"1/2\", \"1/4\",\n\
-                    \"1.5\", \"fullScreen\".\n\
-- pipLumma          Allow the PIP window to be transparent. Transparent colors\n\
-                    are lumma colors in range [0..pipLumma]. \n\
-\n\
-Additional parameters for PG and SRT tracks:\n\
-\n\
-- video-width       The width of the video in pixels.\n\
-- video-height      The height of the video in pixels.\n\
-- fps               Video fps. It is recommended to define this parameter in\n\
-                    order to enable more careful timing processing.\n\
-- 3d-plane          Defines the number of the '3D offset track' which is placed\n\
-                    inside the MVC track. Each message has an individual 3D\n\
-                    offset. This information is stored inside 3D offset track.\n\
-\n\
-Additional parameters for SRT tracks:\n\
-\n\
-- font-name         Font name to render.\n\
-- font-color        Font color, defined as a hexadecimal or decimal number.\n\
-                    24-bit long numbers (for instance 0xFF00FF) define RGB\n\
-                    components, while 32-bit long ones (for instance\n\
-                    0x80FF00FF) define ARGB components.\n\
-- font-size         Font size in pixels.\n\
-- font-italic       Italic display text.\n\
-- font-bold         Bold display text.\n\
-- font-underline    Underlined text.\n\
-- font-strikeout    Strikethrough text.\n\
-- bottom-offset     Distance from the lower edge while displaying text.\n\
-- font-border       Outline width.\n\
-- fadein-time       Time in ms for smooth subtitle appearance.\n\
-- fadeout-time      Time in ms for smooth subtitle disappearance.\n\
-- line-spacing      Interval between subtitle lines. Default value is 1.0.\n\
-\n\
-tsMuxeR supports additional tags inside SRT tracks. The syntax and parameters\n\
-coincide with HTML: <b>, <i>, <u>, <strike>, <font>. Default relative font size\n\
-(used in these tags) is 3.  For example:\n\
-\n\
-<b><font size=5 color=\"deepskyblue\" name=\"Arial\"><u>Test</u>\n\
-<font size= 4 color=\"#806040\">colored</font>text</font>\n\
-</b>\n\
-\n\
-Global additional parameters are placed in the first line of the META file,\n\
-which must begin with the MUXOPT token.\n\
-All parameters in this group start with two dashes:\n\
-\n\
---pcr-on-video-pid  Do not allocate a separate PID for PCR and use the existing\n\
-                    video PID.\n\
---new-audio-pes     Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and\n\
-                    DTS-HD. Activated automatically for BD muxing.\n\
---vbr               Use variable bitrate.\n\
---minbitrate        Sets the lower limit of the VBR bitrate. If the stream has\n\
-                    a smaller bitrate, NULL packets will be inserted to\n\
-                    compensate.\n\
---maxbitrate        The upper limit of the vbr bitrate.\n\
---cbr               Muxing mode with a fixed bitrate. --vbr and --cbr must not\n\
-                    be used together.\n\
---vbv-len           The  length  of the  virtual  buffer  in milliseconds.  The\n\
-                    default value  is 500.  Typically, this  option  is used\n\
-                    together with --cbr. The parameter is similar to  the value\n\
-                    of  vbv-buffer-size  in  the  x264  codec,  but  defined in\n\
-                    milliseconds instead of kbit.\n\
---no-asyncio        Do not  create  a separate thread  for writing. This option\n\
-                    also disables the FILE_FLAG_NO_BUFFERING flag on Windows\n\
-                    when writing.\n\
-                    This option is deprecated.\n\
---auto-chapters     Insert a chapter every <n> minutes. Used only in BD/AVCHD\n\
-                    mode.\n\
---custom-chapters   A semicolon delimited list of hh:mm:ss.zzz strings,\n\
-                    representing the chapters' start times.\n\
---demux             Run in demux mode : the selected audio and video tracks are\n\
-                    stored as separate files. The output name must be a folder\n\
-                    name. All selected effects (such as changing the level of\n\
-                    a H264 stream) are processed. When demuxing, certain types\n\
-                    of tracks are always changed :\n\
-                    - Subtitles in a Presentation Graphic Stream are converted\n\
-                      into sup format.\n\
-                    - PCM audio is saved as WAV files.\n\
---blu-ray           Mux as a BD disc. If the output file name is a folder, a\n\
-                    Blu-Ray folder structure is created inside that folder.\n\
-                    SSIF files for BD3D discs are not created in this case. If\n\
-                    the output name has an .iso extension, then the disc is\n\
-                    created directly as an image file.\n\
---blu-ray-v3        As above - except mux to UHD BD discs.\n\
---avchd             Mux to AVCHD disc.\n\
---cut-start         Trim the beginning of the file. The value should be followed\n\
-                    by the time unit : \"ms\" (milliseconds), \"s\" (seconds) or\n\
-                    \"min\" (minutes).\n\
---cut-end           Trim the end of the file. Same rules as --cut-start apply.\n\
---split-duration    Split the output into several files, with each of them being\n\
-                    <n> seconds long.\n\
---split-size        Split the output into several files, with each of them\n\
-                    having a given maximum size. KB, KiB, MB, MiB, GB and GiB\n\
-                    are accepted as size units.\n\
---right-eye         Use base video stream for right eye. Used for 3DBD only.\n\
---start-time        Timestamp of the first video frame. May be defined as 45Khz\n\
-                    clock (just a number) or as time in hh:mm:ss.zzz format.\n\
---mplsOffset        The number of the first MPLS file.  Used for BD disc mode.\n\
---m2tsOffset        The number of the first M2TS file.  Used for BD disc mode.\n\
---insertBlankPL     Add an additional short playlist. Used for cropped video\n\
-                    muxed to BD disc.\n\
---blankOffset       Blank playlist number.\n\
---label             Disk label when muxing to ISO.\n\
---extra-iso-space   Allocate extra space in 64K units for ISO metadata (file\n\
-                    and directory names). Normally, tsMuxeR allocates this space\n\
-                    automatically, but if split condition generates a lot\n\
-                    of small files, it may be required to define extra space.\n\
-";
+    const char help[] = R"help(
+tsMuxeR is a simple program to mux video to TS/M2TS files or create BD disks.
+tsMuxeR does not use external filters (codecs).
+
+Examples:
+    tsMuxeR <media file name>
+    tsMuxeR <meta file name> <out file/dir name>
+
+tsMuxeR can be run in track detection mode or muxing mode. If tsMuxeR is run with
+only one argument, then the program displays track information required to
+construct a meta file. When running with two arguments, tsMuxeR starts the
+muxing or demuxing process.
+
+Meta file format:
+File MUST have the .meta extension. This file defines files you want to multiplex.
+The first line of a meta file contains additional parameters that apply to all tracks.
+In this case the first line should begin with the word MUXOPT.
+
+The following lines form a list of tracks and their parameters.  The format is
+as follows:   <code name>,   <file name>,   <parameters>   Parameters are separated
+with commas, with each parameter consisting of a name and a value, separated 
+with an equals sign.
+Example of META file:
+
+MUXOPT --blu-ray
+V_MPEG4/ISO/AVC, D:/media/test/stream.h264, fps=25
+A_AC3, D:/media/test/stream.ac3, timeshift=-10000ms
+
+In this example one AC3 audio stream and one H264 video stream are multiplexed
+into BD disc. The input file name can reference an elementary stream or a track
+located inside a container.
+
+Supported input containers:
+- TS/M2TS/MTS
+- EVO/VOB/MPG/MPEG
+- MKV
+- MOV/MP4
+- MPLS (Blu-ray media play list file)
+
+Names of codecs in the meta file:
+- V_MPEGH/ISO/HEVC  H.265/HEVC
+- V_MPEG4/ISO/AVC   H.264/AVC
+- V_MPEG4/ISO/MVC   H.264/MVC
+- V_MS/VFW/WVC1     VC1
+- V_MPEG-2          MPEG2
+- A_AC3             AC3/AC3+/TRUE-HD
+- A_AAC             AAC
+- A_DTS             DTS/DTS-Express/DTS-HD
+- A_MP3             MPEG audio layer 1/2/3
+- A_LPCM            raw pcm data or PCM WAV file
+- S_HDMV/PGS        Presentation graphic stream (BD subtitle format)
+- S_TEXT/UTF8       SRT subtitle format.  Encoding MUST be  UTF-8/UTF-16/UTF-32
+
+Each track may have additional parameters. Track parameters do not have dashes.
+If a parameter's value consists of several words, it must be enclosed in quotes.
+
+Common additional parameters for any type of track:
+- track             track number if input file is a container.
+- lang              track language. MUST contain exactly 3 letters.
+
+Additional parameters for audio tracks:
+- timeshift         Shift audio track by the given number of milliseconds.
+                    Can be negative.
+- down-to-dts       Available only for DTS-HD tracks. Filter out HD part.
+- down-to-ac3       Available only for TRUE-HD tracks. Filter out HD part.
+- secondary         Mux as secondary audio. Available for DD+ and DTS-Express.
+- default           Mark this track as the default when muxing to Blu-ray.
+
+Additional parameters for video tracks:
+- fps               The number of frames per second. If not defined, the value
+                    is auto detected if available in the source stream. If not,
+                    it defaults to 23.976.
+- delPulldown       Remove pulldown from the track, if it exists. If the
+                    pulldown is present, the FPS value is changed from 30 to 24.
+- ar                Override video aspect ratio. 16:9, 4:3 e.t.c.
+
+Additional parameters for H.264 video tracks:
+- level             Overwrite the level in the H264 stream. Do note that this
+                    option only updates the headers and does not reencode the
+                    stream, which may not meet the requirements for a lower 
+                    level.
+- insertSEI         If the original stream does not contain SEI picture timing,
+                    SEI buffering period or VUI parameters, add this data to
+                    the stream. This option is recommended for BD muxing.
+- forceSEI          Add SEI picture timing, buffering period and VUI parameters
+                    to the stream and rebuild this data if it already exists.
+- contSPS           If the original video doesn't contain repetitive SPS/PPS,
+                    then SPS/PPS will be added to the stream before each key
+                    frame. This option is recommended for BD muxing.
+- subTrack          Used for combined AVC/MVC tracks only. TsMuxeR always
+                    demultiplexes such tracks to separate AVC and MVC streams.
+                    Setting this to 1 sets the reference to the AVC part, while
+                    2 sets it to the MVC part.
+- secondary         Mux as secondary video (PIP).
+- pipCorner         Corner for PIP video. Allowed values: "TopLeft","TopRight",
+                    "BottomRight", "BottomLeft". 
+- pipHOffset        PIP window horizontal offset from the corner in pixels.
+- pipVOffset        PIP window vertical offset from the corner in pixels.
+- pipScale          PIP window scale factor. Allowed values: "1", "1/2", "1/4",
+                    "1.5", "fullScreen".
+- pipLumma          Allow the PIP window to be transparent. Transparent colors
+                    are lumma colors in range [0..pipLumma]. 
+
+Additional parameters for PG and SRT tracks:
+
+- video-width       The width of the video in pixels.
+- video-height      The height of the video in pixels.
+- default           Mark this track as the default when muxing to Blu-ray.
+                    Allowed values are "all" which causes all subtitles to be
+                    shown, and "forced" which shows only elements marked as
+                    "forced" in the subtitle stream.
+- fps               Video fps. It is recommended to define this parameter in
+                    order to enable more careful timing processing.
+- 3d-plane          Defines the number of the '3D offset track' which is placed
+                    inside the MVC track. Each message has an individual 3D
+                    offset. This information is stored inside 3D offset track.
+
+Additional parameters for SRT tracks:
+
+- font-name         Font name to render.
+- font-color        Font color, defined as a hexadecimal or decimal number.
+                    24-bit long numbers (for instance 0xFF00FF) define RGB
+                    components, while 32-bit long ones (for instance
+                    0x80FF00FF) define ARGB components.
+- font-size         Font size in pixels.
+- font-italic       Italic display text.
+- font-bold         Bold display text.
+- font-underline    Underlined text.
+- font-strikeout    Strikethrough text.
+- bottom-offset     Distance from the lower edge while displaying text.
+- font-border       Outline width.
+- fadein-time       Time in ms for smooth subtitle appearance.
+- fadeout-time      Time in ms for smooth subtitle disappearance.
+- line-spacing      Interval between subtitle lines. Default value is 1.0.
+
+tsMuxeR supports additional tags inside SRT tracks. The syntax and parameters
+coincide with HTML: <b>, <i>, <u>, <strike>, <font>. Default relative font size
+(used in these tags) is 3.  For example:
+
+<b><font size=5 color="deepskyblue" name="Arial"><u>Test</u>
+<font size= 4 color="#806040">colored</font>text</font>
+</b>
+
+Global additional parameters are placed in the first line of the META file,
+which must begin with the MUXOPT token.
+All parameters in this group start with two dashes:
+
+--pcr-on-video-pid  Do not allocate a separate PID for PCR and use the existing
+                    video PID.
+--new-audio-pes     Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and
+                    DTS-HD. Activated automatically for BD muxing.
+--vbr               Use variable bitrate.
+--minbitrate        Sets the lower limit of the VBR bitrate. If the stream has
+                    a smaller bitrate, NULL packets will be inserted to
+                    compensate.
+--maxbitrate        The upper limit of the vbr bitrate.
+--cbr               Muxing mode with a fixed bitrate. --vbr and --cbr must not
+                    be used together.
+--vbv-len           The  length  of the  virtual  buffer  in milliseconds.  The
+                    default value  is 500.  Typically, this  option  is used
+                    together with --cbr. The parameter is similar to  the value
+                    of  vbv-buffer-size  in  the  x264  codec,  but  defined in
+                    milliseconds instead of kbit.
+--no-asyncio        Do not  create  a separate thread  for writing. This option
+                    also disables the FILE_FLAG_NO_BUFFERING flag on Windows
+                    when writing.
+                    This option is deprecated.
+--auto-chapters     Insert a chapter every <n> minutes. Used only in BD/AVCHD
+                    mode.
+--custom-chapters   A semicolon delimited list of hh:mm:ss.zzz strings,
+                    representing the chapters' start times.
+--demux             Run in demux mode : the selected audio and video tracks are
+                    stored as separate files. The output name must be a folder
+                    name. All selected effects (such as changing the level of
+                    a H264 stream) are processed. When demuxing, certain types
+                    of tracks are always changed :
+                    - Subtitles in a Presentation Graphic Stream are converted
+                      into sup format.
+                    - PCM audio is saved as WAV files.
+--blu-ray           Mux as a BD disc. If the output file name is a folder, a
+                    Blu-Ray folder structure is created inside that folder.
+                    SSIF files for BD3D discs are not created in this case. If
+                    the output name has an .iso extension, then the disc is
+                    created directly as an image file.
+--blu-ray-v3        As above - except mux to UHD BD discs.
+--avchd             Mux to AVCHD disc.
+--cut-start         Trim the beginning of the file. The value should be followed
+                    by the time unit : "ms" (milliseconds), "s" (seconds) or
+                    "min" (minutes).
+--cut-end           Trim the end of the file. Same rules as --cut-start apply.
+--split-duration    Split the output into several files, with each of them being
+                    <n> seconds long.
+--split-size        Split the output into several files, with each of them
+                    having a given maximum size. KB, KiB, MB, MiB, GB and GiB
+                    are accepted as size units.
+--right-eye         Use base video stream for right eye. Used for 3DBD only.
+--start-time        Timestamp of the first video frame. May be defined as 45Khz
+                    clock (just a number) or as time in hh:mm:ss.zzz format.
+--mplsOffset        The number of the first MPLS file.  Used for BD disc mode.
+--m2tsOffset        The number of the first M2TS file.  Used for BD disc mode.
+--insertBlankPL     Add an additional short playlist. Used for cropped video
+                    muxed to BD disc.
+--blankOffset       Blank playlist number.
+--label             Disk label when muxing to ISO.
+--extra-iso-space   Allocate extra space in 64K units for ISO metadata (file
+                    and directory names). Normally, tsMuxeR allocates this space
+                    automatically, but if split condition generates a lot
+                    of small files, it may be required to define extra space.
+)help";
     LTRACE(LT_INFO, 2, help);
 }
 
@@ -752,7 +756,7 @@ int main(int argc, char** argv)
             muxerManager.doMux(dstFile, dt != DT_NONE ? &blurayHelper : 0);
             if (dt != DT_NONE)
             {
-                blurayHelper.writeBluRayFiles(insertBlankPL, firstMplsOffset, blankNum, stereoMode);
+                blurayHelper.writeBluRayFiles(muxerManager, insertBlankPL, firstMplsOffset, blankNum, stereoMode);
                 TSMuxer* mainMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
                 TSMuxer* subMuxer = dynamic_cast<TSMuxer*>(muxerManager.getSubMuxer());
 
