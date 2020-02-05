@@ -54,7 +54,7 @@ This project was created by Roman Vasilenko, with the last public release 20th J
 All executable are created to be portable, so you can just save and extract the compressed package for your platform. 
 
 Nightly builds are created in Bintray, use the link below to go directly to the latest nightly build:
-[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion#files)
 
 Or browse to the version you want via [this link](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly), clicking the link for the version you want.
 ![bintray_version_list](https://user-images.githubusercontent.com/503722/70852149-f3f37300-1e95-11ea-8fb4-c9a82d698448.png)
@@ -202,6 +202,8 @@ fadein-time       | Time in ms for smooth subtitle appearance.
 fadeout-time      | Time in ms for smooth subtitle disappearance. 
 line-spacing      | Interval between subtitle lines. Default value is 1.0.
 
+Currently tsMuxer only supports fonts in TTF format. It also will only load fonts from `/usr/share/fonts/` on Linux and `/Library/Fonts/` on Mac. As such our recommendation is to use font "FreeSans" on Linux and "OpenSans" on Mac.
+
 tsMuxeR supports additional tags inside SRT tracks.  The syntax  and parameters coincide with HTML: `<b>, <i>, <u>, <strike>, <font>`. Default relative font size (used in these tags) is 3.  For example:
 ```
 <b><font size=5 color="deepskyblue" name="Arial"><u>Test</u>
@@ -320,4 +322,18 @@ We’re using the Apache 2.0 license for simplicity and flexibility. You are fre
 
 ## Credits
 
-* Roman Vasilenko - for creating tsMuxer
+**Original Author**
+Roman Vasilenko
+
+**Contributors**
+* Daniel Bryant (justdan96)
+* Daniel Kozar (xavery)
+* Jean Christophe De Ryck (jcdr428)
+* Stephen Hutchinson (qyot27)
+* Koka Abakum (abakum)
+* Alexey Shidlovsky (alexls74)
+* Lonely Crane (lonecrane)
+* Markus Feist (markusfeist)
+
+<sub><sup>For sake of brevity I am including anyone who has merged a pull request!</sup></sub>
+
