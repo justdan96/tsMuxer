@@ -176,7 +176,7 @@ NavigationCommand makeNoBlackCommand()
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
 
-NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, bool subTrackForced)
+NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, MuxerManager::SubTrackMode subTrackMode)
 {
     NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     if (audioTrackIdx >= 0)
@@ -195,7 +195,7 @@ NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, bo
         cmd[6] &= 0x0f;
         cmd[6] |= 0x80;
     }
-    if (subTrackForced)
+    if (subTrackMode == MuxerManager::SubTrackMode::All)
     {
         cmd[6] |= 0x40;
     }
@@ -234,14 +234,14 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
         num = V3_flags ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
     }
     auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
-    auto defaultSubIdx = muxer.getDefaultSubTrackIdx();
+    MuxerManager::SubTrackMode mode;
+    auto defaultSubIdx = muxer.getDefaultSubTrackIdx(mode);
     if (defaultAudioIdx != -1 || defaultSubIdx != -1)
     {
         auto&& navCmds = movieObjects[0].navigationCommands;
         movieObjects[0].navigationCommands.insert(std::begin(navCmds) + 2,
-                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, true));
+                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, mode));
     }
-    // todo movieObjects[0].navigationCommands.insert(idx(2), makeDefaultTrackCommand());
     auto objectData = makeBdMovieObjectData(num, movieObjects);
     if (!file->open((prefix + "BDMV/MovieObject.bdmv").c_str(), File::ofWrite))
     {

@@ -57,8 +57,13 @@ class MuxerManager
     int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
     int getExtraISOBlocks() const { return m_extraIsoBlocks; }
 
+    enum class SubTrackMode
+    {
+        All,
+        Forced
+    };
     int getDefaultAudioTrackIdx() const;
-    int getDefaultSubTrackIdx() const;
+    int getDefaultSubTrackIdx(SubTrackMode& mode) const;
 
    private:
     void preinitMux(const std::string& outFileName, FileFactory* fileFactory);
