@@ -496,9 +496,22 @@ std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.
 
 std::vector<wchar_t> toWide(const char* utf8Str, int sz)
 {
-    auto requiredSiz = MultiByteToWideChar(CP_UTF8, 0, utf8Str, sz, nullptr, 0);
+    auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
+    UINT codePage;
+    if (requiredSiz != 0)
+    {
+        codePage = CP_UTF8;
+    }
+    else
+    {
+        /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
+         * to keep compatibility with meta files saved by older versions of the GUI which put the file name through
+         * QString::toLocal8Bit, which uses the ACP on Windows. */
+        codePage = CP_ACP;
+        requiredSiz = MultiByteToWideChar(codePage, 0, utf8Str, sz, nullptr, 0);
+    }
     std::vector<wchar_t> multiByteBuf(static_cast<std::size_t>(requiredSiz));
-    MultiByteToWideChar(CP_UTF8, 0, utf8Str, sz, multiByteBuf.data(), requiredSiz);
+    MultiByteToWideChar(codePage, 0, utf8Str, sz, multiByteBuf.data(), requiredSiz);
     if (multiByteBuf.empty() || multiByteBuf.back() != 0)
     {
         multiByteBuf.push_back(0);
