@@ -105,6 +105,11 @@ tsMuxeR can be run in track detection mode or muxing mode. If tsMuxeR is run wit
 ### Meta file format
 File MUST have the .meta extension. This file defines files you want to multiplex. The first line of a meta file contains additional parameters that apply to all tracks. In this case the first line should begin with the word MUXOPT.
 
+#### Encoding
+The file should be encoded with UTF-8. However, since older versions of the GUI saved the file in the "active code page" encoding on Windows, it is used as a fallback on this platform. In the very rare event of the program not being able to open some files referenced by a meta file saved with an older GUI version, please convert it to UTF-8 manually by opening it in Notepad and selecting `ANSI` as the encoding, and then saving it via "Save As", but this time selecting `UTF-8` as the encoding.
+
+#### Syntax
+
 The following lines form a list of tracks and their parameters.  The format is as follows: `<code name>,   <file name>,   <parameters>`. Parameters are separated with commas, with each parameter consisting of a name and a value, separated with an equals sign.
 Example of META file:
 ```
