@@ -354,7 +354,8 @@ construct a meta file. When running with two arguments, tsMuxeR starts the\n\
 muxing or demuxing process.\n\
 \n\
 Meta file format:\n\
-File MUST have the .meta extension. This file defines files you want to multiplex.\n\
+File MUST have the .meta extension and, since 2020-02-05, UTF8 encoding.\
+This file defines files you want to multiplex.\n\
 The first line of a meta file contains additional parameters that apply to all tracks.\n\
 In this case the first line should begin with the word MUXOPT.\n\
 \n\
