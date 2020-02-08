@@ -1,7 +1,8 @@
 #include "hevc.h"
 
-#include <algorithm>
 #include <fs/systemlog.h>
+
+#include <algorithm>
 
 #include "vodCoreException.h"
 #include "vod_common.h"
