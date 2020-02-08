@@ -143,6 +143,8 @@ class TsMuxerWindow : public QWidget
     void addTrackToDefaultComboBox(int trackRowIdx);
     void removeTrackFromDefaultComboBox(int trackRowIdx);
     void updateTracksComboBox(QComboBox*);
+    void moveTrackInDefaultComboBox(int oldIndex, int newIndex);
+    void postMoveComboBoxUpdate(QComboBox*, const QVariant& preMoveIndex, int oldIndex, int newIndex);
 
     // QTemporaryFile* tempFile;
     // QString tempFileName;

@@ -742,6 +742,44 @@ void TsMuxerWindow::updateTracksComboBox(QComboBox *comboBox)
     }
 }
 
+#include <QDebug>
+
+void TsMuxerWindow::moveTrackInDefaultComboBox(int oldTrackRowIdx, int newTrackRowIdx)
+{
+    qDebug() << oldTrackRowIdx << newTrackRowIdx;
+    auto currentSubTrack = ui->defaultSubTrackComboBox->currentData();
+    auto currentAudioTrack = ui->defaultAudioTrackComboBox->currentData();
+    ui->defaultSubTrackComboBox->clear();
+    ui->defaultAudioTrackComboBox->clear();
+    for (int i = 0; i < ui->trackLV->rowCount(); ++i)
+    {
+        addTrackToDefaultComboBox(i);
+    }
+    postMoveComboBoxUpdate(ui->defaultAudioTrackComboBox, currentAudioTrack, oldTrackRowIdx, newTrackRowIdx);
+    postMoveComboBoxUpdate(ui->defaultSubTrackComboBox, currentSubTrack, oldTrackRowIdx, newTrackRowIdx);
+}
+
+void TsMuxerWindow::postMoveComboBoxUpdate(QComboBox *comboBox, const QVariant &preMoveIndex, int oldIndex,
+                                           int newIndex)
+{
+    if (!preMoveIndex.isValid())
+    {
+        return;
+    }
+    auto curTrackIdx = preMoveIndex.toInt();
+    if (curTrackIdx == oldIndex)
+    {
+        curTrackIdx = newIndex;
+    }
+    else if (curTrackIdx == newIndex)
+    {
+        curTrackIdx = oldIndex;
+    }
+    auto idx = comboBox->findData(curTrackIdx);
+    Q_ASSERT(idx != -1);
+    comboBox->setCurrentIndex(idx);
+}
+
 void TsMuxerWindow::onAudioSubtitlesParamsChanged()
 {
     if (disableUpdatesCnt)
@@ -2226,7 +2264,9 @@ void TsMuxerWindow::onMoveUpButtonCLick()
     if (ui->trackLV->currentItem() == 0 || ui->trackLV->currentRow() < 1)
         return;
     disableUpdatesCnt++;
-    moveRow(ui->trackLV->currentRow(), ui->trackLV->currentRow() - 1);
+    auto preMoveRow = ui->trackLV->currentRow();
+    moveRow(preMoveRow, preMoveRow - 1);
+    moveTrackInDefaultComboBox(preMoveRow, preMoveRow - 1);
     updateMetaLines();
     updateNum();
     disableUpdatesCnt--;
@@ -2238,7 +2278,9 @@ void TsMuxerWindow::onMoveDownButtonCLick()
         ui->trackLV->currentRow() == ui->trackLV->rowCount() - 1)
         return;
     disableUpdatesCnt++;
-    moveRow(ui->trackLV->currentRow(), ui->trackLV->currentRow() + 2);
+    auto preMoveRow = ui->trackLV->currentRow();
+    moveRow(preMoveRow, preMoveRow + 2);
+    moveTrackInDefaultComboBox(preMoveRow, preMoveRow + 1);
     updateMetaLines();
     updateNum();
     disableUpdatesCnt--;
