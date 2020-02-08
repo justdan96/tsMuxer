@@ -360,9 +360,9 @@ void HevcSpsUnit::vui_parameters()
         bool colour_description_present_flag = m_reader.getBit();
         if (colour_description_present_flag)
         {
-            m_reader.skipBits(8);  // colour_primaries u(8)
-            m_reader.skipBits(8);  // transfer_characteristics u(8)
-            m_reader.skipBits(8);  // matrix_coeffs u(8)
+            colour_primaries = m_reader.getBits(8);
+            transfer_characteristics = m_reader.getBits(8);
+            matrix_coeffs = m_reader.getBits(8);
         }
     }
 
