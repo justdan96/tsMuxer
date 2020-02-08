@@ -141,6 +141,8 @@ extern "C"
 
     Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
 
+    Boolean isLegalUTF8String(const UTF8* string, int length);
+
 #ifdef __cplusplus
 }
 #endif

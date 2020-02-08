@@ -71,7 +71,7 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
 {
     if (widesize == 0)
         return L"";
-#if defined(_WIN32)
+#ifdef _WIN32
     else if (srcFormat == sfANSI)
     {
         wchar_t* widestringnative = new wchar_t[widesize + 1];
@@ -81,39 +81,6 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
         delete[] widestringnative;
         return resultstring;
     }
-#elif __linux__ == 1
-        /*
-        else if (srcFormat == sfDefault)
-        {
-                if (cd == 0)
-                {
-                        sourceEncoding = nl_langinfo(CODESET);
-                        LTRACE(LT_INFO, 2, "Default text encoding: " << sourceEncoding.c_str());
-                        if (sizeof(wchar_t) == 4)
-                                cd = iconv_open("UTF-32", sourceEncoding.c_str());
-                        else
-                                cd = iconv_open("UTF-16", sourceEncoding.c_str());
-                        if (cd == (iconv_t)-1)
-                                THROW(ERR_COMMON, "Can't initialize iconv library for source encoding " <<
-        sourceEncoding);
-                }
-
-                wchar_t* widestringnative = new wchar_t[widesize+1];
-                memset(widestringnative, 0, sizeof(wchar_t) * (widesize+1));
-                size_t outLen = (widesize+1) * sizeof(wchar_t);
-                size_t __widesize = widesize;
-                char* src = (char*) start;
-                char* dst = (char*) widestringnative;
-                size_t wlen = iconv(cd, &src, &__widesize, &dst, &outLen);
-                if (wlen == -1)
-                        THROW(ERR_COMMON, "Can't convert source string '" << start << "'to unicode");
-                widestringnative[widesize] = 0;
-
-            std::wstring resultstring(widestringnative);
-            delete [] widestringnative;
-            return resultstring;
-        }
-        */
 #endif
     else if (sizeof(wchar_t) == 2)
     {
