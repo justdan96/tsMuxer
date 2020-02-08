@@ -4,6 +4,7 @@
 
 #include "hevc.h"
 #include "iso_writer.h"
+#include "muxerManager.h"
 #include "psgStreamReader.h"
 #include "tsMuxer.h"
 #include "tsPacket.h"
@@ -42,24 +43,225 @@ uint8_t bdIndexData[] = {
     0x00, 0x18, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x30, 0x30, 0x30,
     0x30, 0x30, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-uint8_t bdMovieObjectData[] = {
-    0x4D, 0x4F, 0x42, 0x4A, 0x30, 0x31, 0x30, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xF6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x80, 0x00, 0x00, 0x05,
-    0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x50, 0x40, 0x00, 0x01, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x40,  // here 5040
-    0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x0A, 0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-    0x00, 0x09, 0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x03, 0x50, 0x40, 0x00, 0x01,
-    0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xFF, 0xFF, 0x48, 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00,
-    0xFF, 0xFF, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x01,
-    0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x04, 0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
-    0x00, 0x00, 0x48, 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-    0x00, 0x00, 0x80, 0x00, 0x00, 0x05, 0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x50, 0x40, 0x00, 0x01, 0x00, 0x00,
-    0x00, 0x03, 0x00, 0x00, 0xFF, 0xFF, 0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00,
-    0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+namespace
+{
+template <typename Container>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const Container& c, std::false_type)
+{
+    std::copy(std::begin(c), std::end(c), std::back_inserter(byteVector));
+}
+template <typename PODType>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const PODType& value, std::true_type)
+{
+    auto start = reinterpret_cast<const std::uint8_t*>(&value);
+    auto finish = start + sizeof(value);
+    std::copy(start, finish, std::back_inserter(byteVector));
+}
+template <typename T>
+void push_back_raw(std::vector<std::uint8_t>& byteVector, const T& value)
+{
+    push_back_raw(byteVector, value, std::is_pod<T>{});
+}
+using NavigationCommand = std::array<std::uint8_t, 12>;
+struct MovieObject
+{
+    std::vector<NavigationCommand> navigationCommands;
+    bool resumeIntentionFlag = true;
+    bool menuCallMask = false;
+    bool titleSearchMask = false;
+    std::vector<std::uint8_t> serialize() const
+    {
+        std::uint16_t flags = 0;
+        flags |= (resumeIntentionFlag << 15);
+        flags |= (menuCallMask << 14);
+        flags |= (titleSearchMask << 13);
+
+        const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
+
+        std::vector<std::uint8_t> rv;
+        rv.reserve(serializedSize());
+
+        push_back_raw(rv, my_htons(flags));
+        push_back_raw(rv, my_htons(numOfNavCommands));
+        for (auto&& navCmd : navigationCommands)
+        {
+            std::copy(std::begin(navCmd), std::end(navCmd), std::back_inserter(rv));
+        }
+        return rv;
+    }
+    size_t serializedSize() const
+    {
+        const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
+        return (2 * sizeof(std::uint16_t)) /* flags + numOfNavCommands */
+               + (numOfNavCommands * std::tuple_size<decltype(navigationCommands)::value_type>::value);
+    }
+};
+enum class BDMV_VersionNumber
+{
+    Version1,
+    Version2,
+    Version3
+};
+std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
+{
+    std::array<std::uint8_t, 4> rv = {0x30, 0x31, 0x30, 0x30};  // "0100"
+    switch (version)
+    {
+    case BDMV_VersionNumber::Version1:
+        return rv;
+    case BDMV_VersionNumber::Version2:
+        rv[1] = 0x32;
+        return rv;
+    case BDMV_VersionNumber::Version3:
+        rv[1] = 0x33;
+        return rv;
+    default:
+        assert(0);
+    }
+}
+std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
+                                                const std::vector<MovieObject>& movieObjects)
+{
+    const std::array<std::uint8_t, 4> type_indicator = {0x4D, 0x4F, 0x42, 0x4A};  // "MOBJ"
+    const auto version_number = getBDMV_VersionNumber(version);
+    const std::uint32_t extension_data_start_addr = 0;
+    const std::uint32_t reserved_after_length = 0;
+    const auto header_reserved_bytes = 28u;
+
+    std::vector<std::uint8_t> rv;
+    const auto num_movie_objects = static_cast<std::uint16_t>(movieObjects.size());
+    auto payload_length = static_cast<std::uint32_t>(sizeof(reserved_after_length) + sizeof(num_movie_objects));
+    const auto header_size = type_indicator.size() + version_number.size() + sizeof(extension_data_start_addr) +
+                             header_reserved_bytes + sizeof(payload_length);
+
+    for (auto&& movieObj : movieObjects)
+    {
+        payload_length += movieObj.serializedSize();
+    }
+
+    rv.reserve(header_size + payload_length);
+    push_back_raw(rv, type_indicator);
+    push_back_raw(rv, version_number);
+    push_back_raw(rv, my_htonl(extension_data_start_addr));
+    rv.resize(rv.size() + header_reserved_bytes, 0);
+    push_back_raw(rv, my_htonl(payload_length));
+    push_back_raw(rv, my_htonl(reserved_after_length));
+    push_back_raw(rv, my_htons(num_movie_objects));
+    for (auto&& movieObj : movieObjects)
+    {
+        push_back_raw(rv, movieObj.serialize());
+    }
+
+    return rv;
+}
+
+NavigationCommand makeBlackPLCommand(std::uint32_t blackPlNum)
+{
+    NavigationCommand cmd = {0x42, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a};
+    blackPlNum = my_htonl(blackPlNum);
+    memcpy(cmd.data() + 4, &blackPlNum, sizeof(blackPlNum));
+    return cmd;
+}
+
+NavigationCommand makeMplsCommand(std::uint32_t mplsNum)
+{
+    NavigationCommand cmd = {0x42, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A};
+    mplsNum = my_htonl(mplsNum);
+    memcpy(cmd.data() + 4, &mplsNum, sizeof(mplsNum));
+    return cmd;
+}
+
+NavigationCommand makeNoBlackCommand()
+{
+    return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+}
+
+NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, MuxerManager::SubTrackMode subTrackMode)
+{
+    NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+    if (audioTrackIdx >= 0)
+    {
+        ++audioTrackIdx;  // stream indices in this command are 1-based.
+        audioTrackIdx = my_ntohs(static_cast<std::uint16_t>(audioTrackIdx));
+        memcpy(cmd.data() + 4, &audioTrackIdx, sizeof(audioTrackIdx));
+        cmd[4] &= 0x0f;
+        cmd[4] |= 0x80;
+    }
+    if (subTrackIdx >= 0)
+    {
+        ++subTrackIdx;
+        subTrackIdx = my_ntohs(static_cast<std::uint16_t>(subTrackIdx));
+        memcpy(cmd.data() + 6, &subTrackIdx, sizeof(subTrackIdx));
+        cmd[6] &= 0x0f;
+        cmd[6] |= 0x80;
+    }
+    if (subTrackMode == MuxerManager::SubTrackMode::All)
+    {
+        cmd[6] |= 0x40;
+    }
+    return cmd;
+}
+
+bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* file, const std::string& prefix,
+                            DiskType diskType, bool usedBlackPL, int mplsNum, int blankNum)
+{
+    std::vector<MovieObject> movieObjects = {
+        {{
+            {0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
+            {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+            usedBlackPL ? makeBlackPLCommand(blankNum) : makeNoBlackCommand(),
+            makeMplsCommand(mplsNum),
+            {0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00},
+        }},
+        {{{0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x03},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xFF, 0xFF},
+          {0x48, 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0xFF, 0xFF},
+          {0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
+          {0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x04},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00},
+          {0x48, 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
+          {0x21, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
+          {0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00}}},
+        {{{0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xFF, 0xFF},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00},
+          {0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}}};
+
+    BDMV_VersionNumber num = BDMV_VersionNumber::Version1;
+    if (diskType == DT_BLURAY)
+    {
+        num = V3_flags ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
+    }
+    auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
+    MuxerManager::SubTrackMode mode;
+    auto defaultSubIdx = muxer.getDefaultSubTrackIdx(mode);
+    if (defaultAudioIdx != -1 || defaultSubIdx != -1)
+    {
+        auto&& navCmds = movieObjects[0].navigationCommands;
+        movieObjects[0].navigationCommands.insert(std::begin(navCmds) + 2,
+                                                  makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, mode));
+    }
+    auto objectData = makeBdMovieObjectData(num, movieObjects);
+    if (!file->open((prefix + "BDMV/MovieObject.bdmv").c_str(), File::ofWrite))
+    {
+        delete file;
+        return false;
+    }
+
+    file->write(objectData);
+    file->close();
+    if (!file->open((prefix + "BDMV/BACKUP/MovieObject.bdmv").c_str(), File::ofWrite))
+    {
+        delete file;
+        return false;
+    }
+    file->write(objectData);
+    file->close();
+    delete file;
+    return true;
+}
+}  // namespace
 
 // ------------------------- BlurayHelper ---------------------------
 
@@ -143,7 +345,8 @@ bool BlurayHelper::createBluRayDirs()
     return true;
 }
 
-bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum, bool stereoMode)
+bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlackPL, int mplsNum, int blankNum,
+                                    bool stereoMode)
 {
     int fileSize = sizeof(bdIndexData);
     string prefix = m_isoWriter ? "" : m_dstPath;
@@ -153,19 +356,14 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
     else
         file = new File();
 
-    if (!file->open((prefix + "BDMV/index.bdmv").c_str(), AbstractOutputStream::ofWrite))
-    {
-        delete file;
-        return false;
-    }
     uint8_t* emptyCommand;
     if (m_dt == DT_BLURAY)
     {
         if (V3_flags)
         {
-            bdMovieObjectData[5] = bdIndexData[5] = '3';  // V3
-            fileSize = 0x9C;                              // add 36 bytes for UHD data extension
-            bdIndexData[15] = 0x78;                       // start address of UHD data extension
+            bdIndexData[5] = '3';    // V3
+            fileSize = 0x9C;         // add 36 bytes for UHD data extension
+            bdIndexData[15] = 0x78;  // start address of UHD data extension
             emptyCommand = bdIndexData + 0x78;
             // UHD data extension
             memcpy(emptyCommand,
@@ -184,40 +382,23 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
         }
         else
         {  // V2
-            bdMovieObjectData[5] = bdIndexData[5] = '2';
+            bdIndexData[5] = '2';
             fileSize = 0x78;
         }
     }
     else
     {
-        bdMovieObjectData[5] = bdIndexData[5] = '1';
+        bdIndexData[5] = '1';
         bdIndexData[15] = 0x78;
     }
     bdIndexData[0x2c] = stereoMode ? 0x60 : 0;  // set initial_output_mode_preference and SS_content_exist_flag
 
-    emptyCommand = bdMovieObjectData + 78;
-    if (usedBlackPL)
-    {
-        memcpy(emptyCommand, "\x42\x82\x00\x00", 4);
-        uint32_t blackPlNum = my_htonl(blankNum);
-        memcpy(emptyCommand + 4, &blackPlNum, 4);
-        memcpy(emptyCommand + 8, "x00\x00\x00\x0a", 4);
-    }
-    else
-        memcpy(emptyCommand, "\x50\x40\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00", 12);
-    uint32_t* mplsOff = (uint32_t*)(bdMovieObjectData + 0x5e);
-    *mplsOff = my_htonl(mplsNum);
-    file->write(bdIndexData, fileSize);
-    file->close();
-
-    if (!file->open((prefix + "BDMV/MovieObject.bdmv").c_str(), File::ofWrite))
+    if (!file->open((prefix + "BDMV/index.bdmv").c_str(), AbstractOutputStream::ofWrite))
     {
         delete file;
         return false;
     }
-
-    int moLen = sizeof(bdMovieObjectData);
-    file->write(bdMovieObjectData, moLen);
+    file->write(bdIndexData, fileSize);
     file->close();
 
     if (!file->open((prefix + "BDMV/BACKUP/index.bdmv").c_str(), File::ofWrite))
@@ -228,16 +409,7 @@ bool BlurayHelper::writeBluRayFiles(bool usedBlackPL, int mplsNum, int blankNum,
     file->write(bdIndexData, fileSize);
     file->close();
 
-    if (!file->open((prefix + "BDMV/BACKUP/MovieObject.bdmv").c_str(), File::ofWrite))
-    {
-        delete file;
-        return false;
-    }
-    file->write(bdMovieObjectData, moLen);
-    file->close();
-
-    delete file;
-    return true;
+    return writeBdMovieObjectData(muxer, file, prefix, m_dt, usedBlackPL, mplsNum, blankNum);
 }
 
 bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)

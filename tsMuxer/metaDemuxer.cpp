@@ -36,7 +36,6 @@ using namespace std;
 
 const static int MAX_DEMUX_BUFFER_SIZE = 1024 * 1024 * 192;
 const static int MIN_READED_BLOCK = 16384;
-static int counter = 0;
 
 METADemuxer::METADemuxer(const BufferedReaderManager& readManager)
     : m_containerReader(*this, readManager), m_readManager(readManager)
