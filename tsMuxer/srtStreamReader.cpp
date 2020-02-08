@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "convertUTF.h"
 #include "matroskaParser.h"
 #include "memory.h"
 #include "vodCoreException.h"
@@ -54,7 +55,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     if (len < 4)
         return false;
     // detect UTF-8/UTF-16/UTF-32 format
-    if (dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF)
+    if ((dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF) || isLegalUTF8String(dataStart, len))
     {
         m_charSize = 1;
         m_srcFormat = UtfConverter::sfUTF8;
@@ -97,9 +98,10 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     else
     {
 #ifdef _WIN32
+        LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to the active code page");
         m_srcFormat = UtfConverter::sfANSI;  // default value for win32
 #else
-        // m_srcFormat = UtfConverter::sfDefault;
+        LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to UTF-8");
         m_srcFormat = UtfConverter::sfUTF8;
 #endif
     }
