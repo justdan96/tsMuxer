@@ -10,8 +10,7 @@ namespace UtfConverter
 enum SourceFormat
 {
     sfUnknown,
-    sfANSI,
-    sfDefault,
+    sfANSI,  // currently active code page (CP_ACP). used only on Windows.
     sfUTF8,
     sfUTF16le,
     sfUTF16be,

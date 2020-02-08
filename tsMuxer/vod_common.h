@@ -11,18 +11,21 @@
 
 #if 1
 extern bool sLastMsg;
-#define LTRACE(level, errIndex, msg)           \
-    {                                          \
-        if (errIndex & 2)                      \
-        {                                      \
-            if (level <= LT_WARN)              \
-                std::cerr << msg << std::endl; \
-            else if (level == LT_INFO)         \
-                std::cout << msg << std::endl; \
-            if (level <= LT_INFO)              \
-                sLastMsg = true;               \
-        }                                      \
-    }
+#define LTRACE(level, errIndex, msg)               \
+    do                                             \
+    {                                              \
+        {                                          \
+            if (errIndex & 2)                      \
+            {                                      \
+                if (level <= LT_WARN)              \
+                    std::cerr << msg << std::endl; \
+                else if (level == LT_INFO)         \
+                    std::cout << msg << std::endl; \
+                if (level <= LT_INFO)              \
+                    sLastMsg = true;               \
+            }                                      \
+        }                                          \
+    } while (0)
 class Process
 {
    public:

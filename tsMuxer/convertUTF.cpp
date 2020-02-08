@@ -402,6 +402,24 @@ Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
     return isLegalUTF8(source, length);
 }
 
+Boolean isLegalUTF8String(const UTF8* string, int length)
+{
+    /* same as above, but verify if the whole passed bytestream consists of valid UTF-8 sequences only. */
+    const auto stringEnd = string + length;
+    while (string < stringEnd)
+    {
+        const auto seqLength = trailingBytesForUTF8[*string] + 1;
+        const auto seqEnd = string + seqLength;
+        /* as the comment for the trailing bytes array notes, valid UTF-8 cannot contain 5- or 6-byte sequences. */
+        if (seqLength >= 5 || seqEnd > stringEnd || !isLegalUTF8(string, seqLength))
+        {
+            return false;
+        }
+        string = seqEnd;
+    }
+    return true;
+}
+
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart,
