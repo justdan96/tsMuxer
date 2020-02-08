@@ -205,7 +205,8 @@ Common:
 pacman -Syu
 pacman -Sy --needed base-devel \
 flex \
-zlib-devel
+zlib-devel \
+git
 ```
 
 Or just run:
@@ -233,7 +234,13 @@ echo 'load(win32/windows_vulkan_sdk)' > $MINGW_PREFIX/qt5-static/share/qt5/mkspe
 echo 'QMAKE_LIBS_VULKAN       =' >> $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
 ```
 
-Browse to the location of the tsMuxer repo and then run:
+Download tsMuxer repo and browse to the it location by run:
+```
+cd ~
+git clone https://github.com/justdan96/tsMuxer.git
+cd tsMuxer
+```
+Compile tsMuxer by run:
 ```
 ./rebuild_linux.sh
 ```
