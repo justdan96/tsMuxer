@@ -4,7 +4,8 @@ if [ "$MSYSTEM" == "MSYS" ] ; then
  pacman -Syu
  pacman -Sy --needed base-devel \
  flex \
- zlib-devel
+ zlib-devel \
+ git
 else
  if [ ! -d build ] ; then
   pacman -Sy --needed $MINGW_PACKAGE_PREFIX-toolchain \
@@ -21,6 +22,7 @@ else
   mkdir build
  fi
  cd build
+ git pull
  cmake .. -G Ninja
  ninja && cp -u tsMuxer/tsmuxer.exe ../bin/
  if [ -d $MINGW_PREFIX/qt5-static ] ; then
