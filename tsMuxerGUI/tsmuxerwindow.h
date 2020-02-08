@@ -13,6 +13,7 @@ class QTemporaryFile;
 class QSound;
 class QTableWidgetItem;
 class QComboBox;
+class QCheckBox;
 
 class MuxForm;
 namespace Ui
@@ -136,6 +137,12 @@ class TsMuxerWindow : public QWidget
     QString getDefaultOutputFileName() const;
     void updateCurrentColor(int dr, int dg, int db, int rowIndex);
     void colorizeCurrentRow(const QtvCodecInfo* codecInfo, int rowIndex = -1);
+
+    template <typename Fn>
+    void executeOnDefaultComboForTrack(int trackRowIdx, Fn&& f);
+    void addTrackToDefaultComboBox(int trackRowIdx);
+    void removeTrackFromDefaultComboBox(int trackRowIdx);
+    void updateTracksComboBox(QComboBox*);
 
     // QTemporaryFile* tempFile;
     // QString tempFileName;
