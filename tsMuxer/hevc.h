@@ -162,7 +162,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
 
     int colour_primaries;
     int transfer_characteristics;
-    int matrix_coeffs
+    int matrix_coeffs;
 
     int num_short_term_ref_pic_sets;
     int num_units_in_tick;
