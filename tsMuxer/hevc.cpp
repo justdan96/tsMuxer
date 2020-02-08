@@ -1,5 +1,6 @@
 #include "hevc.h"
 
+#include <algorithm>
 #include <fs/systemlog.h>
 
 #include "vodCoreException.h"
@@ -880,8 +881,9 @@ int HevcSeiUnit::deserialize()
             {
                 int maxCLL = m_reader.getBits(16);
                 int maxFALL = m_reader.getBits(16);
-                if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x00ff))
-                    HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
+                maxCLL = (std::max)(maxCLL, HDR10_metadata[5] >> 16);
+                maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0x0000ffff);
+                HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
             }
             else if (payloadType == 4 && !isHDR10plus)
             {                           // HDR10Plus Metadata
