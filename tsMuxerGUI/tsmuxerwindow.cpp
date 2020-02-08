@@ -403,6 +403,11 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->buttonMux, &QAbstractButton::clicked, this, &TsMuxerWindow::startMuxing);
     connect(ui->buttonSaveMeta, &QAbstractButton::clicked, this, &TsMuxerWindow::saveMetaFileBtnClick);
     connect(ui->radioButtonOutoutInInput, &QAbstractButton::clicked, this, &TsMuxerWindow::onSavedParamChanged);
+    connect(ui->defaultAudioTrackComboBox, comboBoxIndexChanged, this, &TsMuxerWindow::updateMetaLines);
+    connect(ui->defaultSubTrackComboBox, comboBoxIndexChanged, this, &TsMuxerWindow::updateMetaLines);
+    connect(ui->defaultAudioTrackCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
+    connect(ui->defaultSubTrackCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
+    connect(ui->defaultSubTrackForcedOnlyCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
 
     connect(&proc, &QProcess::readyReadStandardOutput, this, &TsMuxerWindow::readFromStdout);
     connect(&proc, &QProcess::readyReadStandardError, this, &TsMuxerWindow::readFromStderr);
@@ -1902,6 +1907,15 @@ void TsMuxerWindow::updateMetaLines()
             continue;
 
         postfix.clear();
+        if (codecInfo->programName.startsWith('S'))
+        {
+            if (isDiskOutput() && ui->defaultSubTrackCheckBox->isChecked() &&
+                ui->defaultSubTrackComboBox->currentData().toInt() == i)
+            {
+                postfix +=
+                    QString(", default=") + (ui->defaultSubTrackForcedOnlyCheckBox->isChecked() ? "forced" : "all");
+            }
+        }
         if (codecInfo->displayName == "PGS")
         {
             if (codecInfo->bindFps && !tmpFps.isEmpty())
@@ -1926,7 +1940,14 @@ void TsMuxerWindow::updateMetaLines()
         if (isVideoCodec(codecInfo->displayName))
             ui->memoMeta->append(prefix + getVideoMetaInfo(codecInfo) + postfix);
         else
+        {
+            if (isDiskOutput() && ui->defaultAudioTrackCheckBox->isChecked() &&
+                ui->defaultAudioTrackComboBox->currentData().toInt() == i && codecInfo->programName.startsWith('A'))
+            {
+                postfix += QString(", default");
+            }
             ui->memoMeta->append(prefix + getAudioMetaInfo(codecInfo) + postfix);
+        }
     }
 }
 
