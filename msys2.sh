@@ -21,8 +21,8 @@ else
   fi
   mkdir build
  fi
- cd build
  git pull
+ cd build
  cmake .. -G Ninja
  ninja && cp -u tsMuxer/tsmuxer.exe ../bin/
  if [ -d $MINGW_PREFIX/qt5-static ] ; then
