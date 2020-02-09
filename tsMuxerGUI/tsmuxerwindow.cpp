@@ -691,21 +691,6 @@ void TsMuxerWindow::colorizeCurrentRow(const QtvCodecInfo *codecInfo, int rowInd
         updateCurrentColor(0, 0, 0, rowIndex);
 }
 
-template <typename Fn>
-void TsMuxerWindow::executeOnDefaultComboForTrack(int trackRowIdx, Fn &&f)
-{
-    auto comboBoxIdx = ui->defaultAudioTrackComboBox->findData(trackRowIdx);
-    if (comboBoxIdx != -1)
-    {
-        f(comboBoxIdx, ui->defaultAudioTrackCheckBox, ui->defaultAudioTrackComboBox);
-    }
-    comboBoxIdx = ui->defaultSubTrackComboBox->findData(trackRowIdx);
-    if (comboBoxIdx != -1)
-    {
-        f(comboBoxIdx, ui->defaultSubTrackCheckBox, ui->defaultSubTrackComboBox);
-    }
-}
-
 void TsMuxerWindow::addTrackToDefaultComboBox(int trackRowIdx)
 {
     auto codecInfo = getCodecInfo(trackRowIdx);
@@ -720,21 +705,36 @@ void TsMuxerWindow::addTrackToDefaultComboBox(int trackRowIdx)
     }
 }
 
+void TsMuxerWindow::removeTrackFromDefaultComboBox(QComboBox *targetComboBox, QCheckBox *targetCheckBox,
+                                                   int comboBoxIdx, int trackRowIdx)
+{
+    if (targetComboBox->currentData().toInt() == trackRowIdx)
+    {
+        targetCheckBox->setChecked(false);
+    }
+    for (int i = comboBoxIdx + 1; i < targetComboBox->count(); ++i)
+    {
+        auto curTrackIdx = targetComboBox->itemData(i).toInt();
+        targetComboBox->setItemData(i, curTrackIdx - 1);
+    }
+    targetComboBox->removeItem(comboBoxIdx);
+    updateTracksComboBox(targetComboBox);
+}
+
 void TsMuxerWindow::removeTrackFromDefaultComboBox(int trackRowIdx)
 {
-    executeOnDefaultComboForTrack(trackRowIdx, [&](auto comboBoxIdx, auto targetCheckBox, auto targetComboBox) {
-        if (targetComboBox->currentData().toInt() == trackRowIdx)
-        {
-            targetCheckBox->setChecked(false);
-        }
-        for (int i = comboBoxIdx + 1; i < targetComboBox->count(); ++i)
-        {
-            auto curTrackIdx = targetComboBox->itemData(i).toInt();
-            targetComboBox->setItemData(i, curTrackIdx - 1);
-        }
-        targetComboBox->removeItem(comboBoxIdx);
-        updateTracksComboBox(targetComboBox);
-    });
+    auto comboBoxIdx = ui->defaultAudioTrackComboBox->findData(trackRowIdx);
+    if (comboBoxIdx != -1)
+    {
+        removeTrackFromDefaultComboBox(ui->defaultAudioTrackComboBox, ui->defaultAudioTrackCheckBox, comboBoxIdx,
+                                       trackRowIdx);
+    }
+    comboBoxIdx = ui->defaultSubTrackComboBox->findData(trackRowIdx);
+    if (comboBoxIdx != -1)
+    {
+        removeTrackFromDefaultComboBox(ui->defaultSubTrackComboBox, ui->defaultSubTrackCheckBox, comboBoxIdx,
+                                       trackRowIdx);
+    }
 }
 
 void TsMuxerWindow::updateTracksComboBox(QComboBox *comboBox)

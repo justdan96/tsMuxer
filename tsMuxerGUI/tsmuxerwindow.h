@@ -138,10 +138,9 @@ class TsMuxerWindow : public QWidget
     void updateCurrentColor(int dr, int dg, int db, int rowIndex);
     void colorizeCurrentRow(const QtvCodecInfo* codecInfo, int rowIndex = -1);
 
-    template <typename Fn>
-    void executeOnDefaultComboForTrack(int trackRowIdx, Fn&& f);
     void addTrackToDefaultComboBox(int trackRowIdx);
     void removeTrackFromDefaultComboBox(int trackRowIdx);
+    void removeTrackFromDefaultComboBox(QComboBox*, QCheckBox*, int comboBoxIdx, int trackRowIdx);
     void updateTracksComboBox(QComboBox*);
     void moveTrackInDefaultComboBox(int oldIndex, int newIndex);
     void postMoveComboBoxUpdate(QComboBox*, const QVariant& preMoveIndex, int oldIndex, int newIndex);
