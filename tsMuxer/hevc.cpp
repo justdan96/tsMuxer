@@ -882,9 +882,12 @@ int HevcSeiUnit::deserialize()
             {
                 int maxCLL = m_reader.getBits(16);
                 int maxFALL = m_reader.getBits(16);
-                maxCLL = (std::max)(maxCLL, HDR10_metadata[5] >> 16);
-                maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0x0000ffff);
-                HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
+                if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x0000ffff))
+                {
+                    maxCLL = (std::max)(maxCLL, HDR10_metadata[5] >> 16);
+                    maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0x0000ffff);
+                    HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
+                }
             }
             else if (payloadType == 4 && !isHDR10plus)
             {                           // HDR10Plus Metadata
