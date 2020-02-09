@@ -2,6 +2,8 @@
 
 #include <fs/systemlog.h>
 
+#include <algorithm>
+
 #include "vodCoreException.h"
 #include "vod_common.h"
 
@@ -268,6 +270,9 @@ HevcSpsUnit::HevcSpsUnit()
       vcl_hrd_parameters_present_flag(false),
       sub_pic_hrd_params_present_flag(false),
       num_short_term_ref_pic_sets(0),
+      colour_primaries(0),
+      transfer_characteristics(0),
+      matrix_coeffs(0),
       num_units_in_tick(0),
       time_scale(0),
       PicSizeInCtbsY_bits(0)
@@ -360,9 +365,9 @@ void HevcSpsUnit::vui_parameters()
         bool colour_description_present_flag = m_reader.getBit();
         if (colour_description_present_flag)
         {
-            m_reader.skipBits(8);  // colour_primaries u(8)
-            m_reader.skipBits(8);  // transfer_characteristics u(8)
-            m_reader.skipBits(8);  // matrix_coeffs u(8)
+            colour_primaries = m_reader.getBits(8);
+            transfer_characteristics = m_reader.getBits(8);
+            matrix_coeffs = m_reader.getBits(8);
         }
     }
 
@@ -880,8 +885,12 @@ int HevcSeiUnit::deserialize()
             {
                 int maxCLL = m_reader.getBits(16);
                 int maxFALL = m_reader.getBits(16);
-                if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x00ff))
+                if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x0000ffff))
+                {
+                    maxCLL = (std::max)(maxCLL, HDR10_metadata[5] >> 16);
+                    maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0x0000ffff);
                     HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
+                }
             }
             else if (payloadType == 4 && !isHDR10plus)
             {                           // HDR10Plus Metadata
