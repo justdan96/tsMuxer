@@ -463,13 +463,13 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
-        // video stream, non Blu-ray mode and Dolby Vision flag => write DoVi descriptors
         
         uint16_t* esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
         bitWriter.putBits(4, 15);  // reserved
         bitWriter.putBits(12, 0);  // es_info_len
         int beforeCount = bitWriter.getBitsCount() / 8;
-
+        
+        // video stream, non Blu-ray mode and Dolby Vision flag => write DoVi descriptors
         bool insertDoVi = (itr->second.m_pid >> 4 == 0x101) && !isM2ts && (V3_flags & 0x04);
         if (insertDoVi)
         {
