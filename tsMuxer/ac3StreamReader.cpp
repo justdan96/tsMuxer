@@ -54,7 +54,7 @@ void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
     }
 }
 
-int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff)
+int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
 {
     {
         AC3Codec::setTestMode(true);

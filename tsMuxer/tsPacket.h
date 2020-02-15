@@ -257,11 +257,12 @@ struct TS_program_map_section
     TS_program_map_section();
     bool deserialize(uint8_t* buffer, int buf_size);
     static bool isFullBuff(uint8_t* buffer, int buf_size);
-    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool addLang = true);
+    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool addLang, bool isM2ts);
 
    private:
     void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);
     void extractPMTDescriptors(uint8_t* curPos, int es_info_len);
+    void setDoViDescriptor(BitStreamWriter& bitWriter, int PID, bool isDV_EL);
     // uint32_t tmpAvCrc[257];
 };
 

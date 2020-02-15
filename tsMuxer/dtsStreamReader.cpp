@@ -66,7 +66,7 @@ const static int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;
 
-int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff)
+int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
     if (frame == 0)

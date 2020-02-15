@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-int MpegAudioStreamReader::getTSDescriptor(uint8_t* dstBuff)
+int MpegAudioStreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
     if (frame == 0)
