@@ -376,13 +376,10 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 {
     buffer[0] = 0;
     buffer++;
-    // PutBitContext pBitContext;
-    // init_bitWriter.putBits( buffer, max_buf_size*8);
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
-
-    // bitWriter.putBits( 8, 0);
     bitWriter.putBits(8, 2);  // table id
+    
     uint16_t* LengthPos1 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
     bitWriter.putBits(2, 2);   // indicator
     bitWriter.putBits(2, 3);   // reserved
@@ -396,7 +393,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(16, 0);        // section_number and last_section_number
     bitWriter.putBits(3, 7);         // reserved
     bitWriter.putBits(13, pcr_pid);  // reserved
-    bitWriter.putBits(4, 15);        // reserved
 
     uint16_t* LengthPos2 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
     bitWriter.putBits(4, 15);  // reserved
