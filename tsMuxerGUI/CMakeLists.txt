@@ -9,7 +9,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
 
 set(tsmuxer_gui_sources
   main.cpp
@@ -21,7 +21,9 @@ set(tsmuxer_gui_sources
   images.qrc
 )
 
-add_executable(tsMuxerGUI ${tsmuxer_gui_sources})
+qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} translations/tsmuxergui_en.ts)
+
+add_executable(tsMuxerGUI ${tsmuxer_gui_sources} ${QM_FILES})
 target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
 
 if (WIN32)

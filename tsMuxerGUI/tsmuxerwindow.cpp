@@ -304,7 +304,7 @@ TsMuxerWindow::TsMuxerWindow()
     /////////////////////////////////////////////////////////////
     for (int i = 0; i <= 3600; i += 5 * 60) ui->memoChapters->insertPlainText(floatToTime(i, '.') + '\n');
 
-    saveDialogFilter = TS_SAVE_DIALOG_FILTER;
+    saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
     const static int colWidths[] = {28, 200, 62, 38, 10};
     for (unsigned i = 0u; i < sizeof(colWidths) / sizeof(int); ++i)
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
@@ -528,7 +528,7 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
         {
             tmpStr = procStdOutput[i].mid(QString("Error: ").length());
             QMessageBox msgBox(this);
-            msgBox.setWindowTitle("Not supported");
+            msgBox.setWindowTitle(tr("Not supported"));
             msgBox.setText(tmpStr);
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setStandardButtons(QMessageBox::Ok);
@@ -594,8 +594,8 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
     if (codecList.isEmpty())
     {
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle("Unsupported format");
-        msgBox.setText(QString("Can't detect stream type. File name: \"") + newFileName + "\"");
+        msgBox.setWindowTitle(tr("Unsupported format"));
+        msgBox.setText(tr("Can't detect stream type. File name: \"%1\"").arg(newFileName));
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
@@ -902,8 +902,8 @@ bool TsMuxerWindow::checkFileDuplicate(const QString &fileName)
         if (myUnquoteStr(ui->inputFilesLV->item(i)->data(FileNameRole).toString()) == t)
         {
             QMessageBox msgBox(this);
-            msgBox.setWindowTitle("File already exist");
-            msgBox.setText("File \"" + fileName + "\" already exist");
+            msgBox.setWindowTitle(tr("File already exists"));
+            msgBox.setText(tr("File \"%1\" already exists").arg(fileName));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.exec();
@@ -933,7 +933,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
     if (ui->trackLV->currentRow() == -1)
     {
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME);
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
         return;
     }
     QtvCodecInfo *codecInfo = getCurrentCodec();
@@ -944,7 +944,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     {
         if (isVideoCodec(codecInfo->displayName))
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, TI_DEFAULT_TAB_NAME);
+            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, tr(TI_DEFAULT_TAB_NAME));
 
             ui->checkFPS->setChecked(codecInfo->checkFPS);
             ui->checkBoxLevel->setChecked(codecInfo->checkLevel);
@@ -975,9 +975,9 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
         }
         else
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, TI_DEFAULT_TAB_NAME);
+            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, tr(TI_DEFAULT_TAB_NAME));
             if (codecInfo->displayName == "LPCM")
-                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, TI_DEMUX_TAB_NAME);
+                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, tr(TI_DEMUX_TAB_NAME));
 
             if (codecInfo->displayName == "DTS-HD")
                 ui->dtsDwnConvert->setText("Downconvert DTS-HD to DTS");
@@ -1111,14 +1111,14 @@ void TsMuxerWindow::continueAddFile()
         if (info.displayName.isEmpty())
         {
             QMessageBox msgBox(this);
-            msgBox.setWindowTitle("Unsupported format");
+            msgBox.setWindowTitle(tr("Unsupported format"));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setStandardButtons(QMessageBox::Ok);
             if (codecList.size() == 0)
             {
-                msgBox.setText(QString("Unsupported format or all tracks are not "
-                                       "recognized. File name: \"") +
-                               newFileName + "\"");
+                msgBox.setText(tr("Unsupported format or all tracks are not "
+                                  "recognized. File name: \"%1\"")
+                                   .arg(newFileName));
                 msgBox.exec();
                 disableUpdatesCnt--;
                 return;
@@ -1127,9 +1127,9 @@ void TsMuxerWindow::continueAddFile()
             {
                 if (firstWarn)
                 {
-                    msgBox.setText(QString("Some tracks not recognized. This tracks was "
-                                           "ignored. File name: \"") +
-                                   newFileName + "\"");
+                    msgBox.setText(tr("Some tracks not recognized. This tracks was "
+                                      "ignored. File name: \"%1\"")
+                                       .arg(newFileName));
                     msgBox.exec();
                     firstWarn = false;
                 }
@@ -1397,7 +1397,7 @@ void TsMuxerWindow::onProcessFinished(int exitCode, QProcess::ExitStatus exitSta
     }
     processExitCode = exitCode;
     processExitStatus = exitStatus;
-    muxForm->muxFinished(processExitCode, ui->radioButtonDemux->isChecked() ? "Demux" : "Mux");
+    muxForm->muxFinished(processExitCode, ui->radioButtonDemux->isChecked() ? tr("Demux") : tr("Mux"));
     ui->buttonMux->setEnabled(true);
     ui->addBtn->setEnabled(true);
     inputFilesLVChanged();
@@ -1416,11 +1416,11 @@ void TsMuxerWindow::onProcessError(QProcess::ProcessError error)
     processFinished = true;
     QMessageBox msgBox(this);
     QString text;
-    msgBox.setWindowTitle("tsMuxeR error");
+    msgBox.setWindowTitle(tr("tsMuxeR error"));
     switch (error)
     {
     case QProcess::FailedToStart:
-        msgBox.setText("tsMuxeR not found!");
+        msgBox.setText(tr("tsMuxeR not found!"));
         ui->buttonMux->setEnabled(true);
         ui->addBtn->setEnabled(true);
         inputFilesLVChanged();
@@ -1438,7 +1438,7 @@ void TsMuxerWindow::onProcessError(QProcess::ProcessError error)
         msgBox.setText(text);
         break;
     default:
-        msgBox.setText("Can't execute tsMuxeR!");
+        msgBox.setText(tr("Can't execute tsMuxeR!"));
         break;
     }
     msgBox.setIcon(QMessageBox::Critical);
@@ -2146,7 +2146,7 @@ void TsMuxerWindow::deleteTrack(int idx)
     {
         lastSourceDir.clear();
         while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME);
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
         ui->outFileName->setText(getDefaultOutputFileName());
         outFileNameModified = false;
     }
@@ -2183,8 +2183,8 @@ void TsMuxerWindow::onAppendButtonClick()
     if (ui->inputFilesLV->currentItem() == 0)
     {
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle("No track selected");
-        msgBox.setText("No track selected");
+        msgBox.setWindowTitle(tr("No track selected"));
+        msgBox.setText(tr("No track selected"));
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
@@ -2228,8 +2228,8 @@ void TsMuxerWindow::continueAppendFile()
     if (newFi.suffix().toUpper() != oldFi.suffix().toUpper())
     {
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle("Invalid file extension");
-        msgBox.setText("Appended file must have same file extension.");
+        msgBox.setWindowTitle(tr("Invalid file extension"));
+        msgBox.setText(tr("Appended file must have same file extension."));
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
@@ -2327,9 +2327,9 @@ void TsMuxerWindow::RadioButtonMuxClick()
     if (outFileNameDisableChange)
         return;
     if (ui->radioButtonDemux->isChecked())
-        ui->buttonMux->setText("Sta&rt demuxing");
+        ui->buttonMux->setText(tr("Sta&rt demuxing"));
     else
-        ui->buttonMux->setText("Sta&rt muxing");
+        ui->buttonMux->setText(tr("Sta&rt muxing"));
     outFileNameDisableChange = true;
     if (ui->radioButtonBluRay->isChecked() || ui->radioButtonDemux->isChecked() || ui->radioButtonAVCHD->isChecked())
     {
@@ -2355,17 +2355,17 @@ void TsMuxerWindow::RadioButtonMuxClick()
         if (ui->radioButtonTS->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "ts"));
-            saveDialogFilter = TS_SAVE_DIALOG_FILTER;
+            saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
         }
         else if (ui->radioButtonBluRayISO->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "iso"));
-            saveDialogFilter = ISO_SAVE_DIALOG_FILTER;
+            saveDialogFilter = tr(ISO_SAVE_DIALOG_FILTER);
         }
         else
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "m2ts"));
-            saveDialogFilter = M2TS_SAVE_DIALOG_FILTER;
+            saveDialogFilter = tr(M2TS_SAVE_DIALOG_FILTER);
         }
     }
     ui->DiskLabel->setVisible(ui->radioButtonBluRayISO->isChecked());
@@ -2429,7 +2429,7 @@ void TsMuxerWindow::saveFileDialog()
             path = QFileInfo(fileName).absolutePath();
         }
         QString fileName = QDir::toNativeSeparators(
-            QFileDialog::getSaveFileName(this, "Select file for muxing", path, saveDialogFilter));
+            QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, saveDialogFilter));
         if (!fileName.isEmpty())
         {
             ui->outFileName->setText(fileName);
@@ -2451,10 +2451,10 @@ void TsMuxerWindow::startMuxing()
         if (fi.suffix().toUpper() != "M2TS")
         {
             QMessageBox msgBox(this);
-            msgBox.setWindowTitle("Invalid file name");
-            msgBox.setText(QString("The output file \"") + ui->outFileName->text() +
-                           "\" has invalid extension. Please, change file extension "
-                           "to \".m2ts\"");
+            msgBox.setWindowTitle(tr("Invalid file name"));
+            msgBox.setText(tr("The output file \"%1\" has invalid extension. Please, change file extension "
+                              "to \".m2ts\"")
+                               .arg(ui->outFileName->text()));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.exec();
@@ -2467,10 +2467,9 @@ void TsMuxerWindow::startMuxing()
         if (fi.suffix().toUpper() != "ISO")
         {
             QMessageBox msgBox(this);
-            msgBox.setWindowTitle("Invalid file name");
-            msgBox.setText(QString("The output file \"") + ui->outFileName->text() +
-                           "\" has invalid extension. Please, change file extension "
-                           "to \".iso\"");
+            msgBox.setWindowTitle(tr("Invalid file name"));
+            msgBox.setText(tr("The output file \"%1\" has invalid extension. Please, change file extension to \".iso\"")
+                               .arg(ui->outFileName->text()));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.exec();
@@ -2482,11 +2481,13 @@ void TsMuxerWindow::startMuxing()
         ui->radioButtonM2TS->isChecked() || ui->radioButtonTS->isChecked() || ui->radioButtonBluRayISO->isChecked();
     if (isFile && QFile::exists(ui->outFileName->text()))
     {
-        QString fileOrDir = isFile ? "file" : "directory";
+        //: Used in expressions "Overwrite existing %1" and "The output %1 already exists".
+        auto fileOrDir = isFile ? tr("file") : tr("directory");
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle(QString("Overwrite existing ") + fileOrDir + "?");
-        msgBox.setText(QString("The output ") + fileOrDir + " \"" + ui->outFileName->text() +
-                       "\" already exists. Do you want to overwrite it?\"");
+        msgBox.setWindowTitle(tr("Overwrite existing %1?").arg(fileOrDir));
+        msgBox.setText(tr("The output %1 \"%2\" already exists. Do you want to overwrite it?")
+                           .arg(fileOrDir)
+                           .arg(ui->outFileName->text()));
         msgBox.setIcon(QMessageBox::Question);
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         if (msgBox.exec() != QMessageBox::Yes)
@@ -2501,7 +2502,7 @@ void TsMuxerWindow::startMuxing()
         metaName.clear();
         return;
     }
-    muxForm->prepare(!ui->radioButtonDemux->isChecked() ? "Muxing in progress" : "Demuxing in progress");
+    muxForm->prepare(!ui->radioButtonDemux->isChecked() ? tr("Muxing in progress") : tr("Demuxing in progress"));
     ui->buttonMux->setEnabled(false);
     ui->addBtn->setEnabled(false);
     ui->btnAppend->setEnabled(false);
@@ -2515,7 +2516,7 @@ void TsMuxerWindow::startMuxing()
 void TsMuxerWindow::saveMetaFileBtnClick()
 {
     QString metaName =
-        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), saveMetaFilter);
+        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), tr(saveMetaFilter));
     if (metaName.isEmpty())
         return;
     QFileInfo fi(metaName);
@@ -2530,8 +2531,8 @@ bool TsMuxerWindow::saveMetaFile(const QString &metaName)
     if (!file.open(QIODevice::WriteOnly))
     {
         QMessageBox msgBox(this);
-        msgBox.setWindowTitle("Can't create temporary meta file");
-        msgBox.setText(QString("Can't create temporary meta file \"") + metaName + "\"");
+        msgBox.setWindowTitle(tr("Can't create temporary meta file"));
+        msgBox.setText(tr("Can't create temporary meta file \"%1\"").arg(metaName));
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
