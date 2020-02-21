@@ -160,6 +160,10 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     */
     std::vector<ShortTermRPS> st_rps;
 
+    int colour_primaries;
+    int transfer_characteristics;
+    int matrix_coeffs;
+
     int num_short_term_ref_pic_sets;
     int num_units_in_tick;
     int time_scale;

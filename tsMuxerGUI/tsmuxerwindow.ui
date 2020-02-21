@@ -1612,6 +1612,9 @@ p, li { white-space: pre-wrap; }
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="toolTip">
+                 <string>When checked, only subtitles marked as &quot;forced&quot; in the subtitle stream will appear.</string>
+                </property>
                 <property name="text">
                  <string>Forced only</string>
                 </property>

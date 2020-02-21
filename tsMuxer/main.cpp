@@ -347,20 +347,21 @@ Examples:
     tsMuxeR <media file name>
     tsMuxeR <meta file name> <out file/dir name>
 
-tsMuxeR can be run in track detection mode or muxing mode. If tsMuxeR is run with
-only one argument, then the program displays track information required to
+tsMuxeR can be run in track detection mode or muxing mode. If tsMuxeR is run
+with only one argument, then the program displays track information required to
 construct a meta file. When running with two arguments, tsMuxeR starts the
 muxing or demuxing process.
 
 Meta file format:
-File MUST have the .meta extension. This file defines files you want to multiplex.
-The first line of a meta file contains additional parameters that apply to all tracks.
-In this case the first line should begin with the word MUXOPT.
+File MUST have the .meta extension and be encoded in UTF-8 (but see README.md).
+This file defines the files you want to multiplex.
+The first line of a meta file contains additional parameters that apply to all
+tracks. In this case the first line should begin with the word MUXOPT.
 
 The following lines form a list of tracks and their parameters.  The format is
-as follows:   <code name>,   <file name>,   <parameters>   Parameters are separated
-with commas, with each parameter consisting of a name and a value, separated 
-with an equals sign.
+as follows:   <code name>,   <file name>,   <parameters>   Parameters are
+separated with commas, with each parameter consisting of a name and a value,
+separated with an equals sign.
 Example of META file:
 
 MUXOPT --blu-ray

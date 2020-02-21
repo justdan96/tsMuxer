@@ -176,6 +176,12 @@ int HEVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height
 
 int HEVCStreamReader::getStreamHDR() const
 {
+    if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
+        m_sps->matrix_coeffs == 9)  // BT.2100 colorspace
+    {
+        m_sei->isHDR10 = true;
+        V3_flags |= 2;
+    }
     return m_sei->isDV ? 4 : (m_sei->isHDR10plus ? 16 : (m_sei->isHDR10 ? 2 : 1));
 }
 

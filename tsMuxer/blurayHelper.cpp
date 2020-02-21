@@ -2,6 +2,8 @@
 
 #include <fs/directory.h>
 
+#include <array>
+
 #include "hevc.h"
 #include "iso_writer.h"
 #include "muxerManager.h"

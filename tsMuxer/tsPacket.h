@@ -615,16 +615,4 @@ struct MPLSParser
     void parseSubPathEntryExtension(uint8_t* data, int dataLen);
 };
 
-class MovieObject
-{
-   public:
-    bool parse(const char* fileName);
-    void parse(uint8_t* buffer, int len);
-    int compose(uint8_t* buffer, int len, DiskType dt);
-
-   private:
-    void parseMovieObjects(BitStreamReader& reader);
-    void parseNavigationCommand(BitStreamReader& reader);
-};
-
 #endif
