@@ -1274,11 +1274,16 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         switch (format)
         {
         case MKTAG('a', 'v', 'c', '1'):
+        case MKTAG('a', 'v', 'c', '3'):
+        case MKTAG('d', 'v', 'a', 'v'):
+        case MKTAG('d', 'v', 'a', '1'):
             st->type = TRACK_TYPE_VIDEO;
             st->parsed_priv_data = new MovParsedH264TrackData(this, st);
             break;
         case MKTAG('h', 'v', 'c', '1'):
         case MKTAG('h', 'e', 'v', '1'):
+        case MKTAG('d', 'v', 'h', 'e'):
+        case MKTAG('d', 'v', 'h', '1'):
             st->parsed_priv_data = new MovParsedH265TrackData(this, st);
             st->type = TRACK_TYPE_VIDEO;
             break;
