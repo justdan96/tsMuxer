@@ -211,7 +211,7 @@ git
 
 Or just run:
 ```
-./msys2.sh
+./rebuild_msys2.sh
 ```
 
 Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit.
@@ -249,7 +249,7 @@ This will create in tsMuxer/bin statically compiled versions of tsMuxer - so no 
 
 Or just run:
 ```
-./msys2.sh
+./rebuild_msys2.sh
 ```
 
 This will create in tsMuxer/bin statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
