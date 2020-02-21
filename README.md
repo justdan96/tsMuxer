@@ -334,7 +334,7 @@ We’re using the Apache 2.0 license for simplicity and flexibility. You are fre
 ## Credits
 
 **Original Author**
-Roman Vasilenko
+Roman Vasilenko (physic)
 
 **Contributors**
 * Daniel Bryant (justdan96)
