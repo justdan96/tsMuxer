@@ -160,7 +160,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     int descriptorLen = 0;
     uint8_t descrBuffer[1024];
     if (codecReader != 0)
-        descriptorLen = codecReader->getTSDescriptor(descrBuffer);
+        descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_m2tsMode);
 
     if (codecName[0] == 'V')
         m_mainStreamIndex = streamIndex;
@@ -680,16 +680,6 @@ void TSMuxer::writePATPMT(int64_t pcr, bool force)
 {
     if (pcr == -1 || pcr - m_lastPMTPCR >= m_patPmtDelta || force)
     {
-        if (!m_m2tsMode && m_lastPMTPCR == -1)
-        {
-            for (int k = 0; k < 15; k++)
-            {
-                writePAT();
-                writePMT();
-                writeSIT();
-            }
-        }
-
         m_lastPMTPCR = pcr != -1 ? pcr : m_fixed_pcr_offset;
         writePAT();
         writePMT();
@@ -1196,7 +1186,7 @@ void TSMuxer::buildPMT()
     tsPacket->setPID(DEFAULT_PMT_PID);
     tsPacket->dataExists = 1;
     tsPacket->payloadStart = 1;
-    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, !m_bluRayMode);
+    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, !m_bluRayMode, m_m2tsMode);
     uint8_t* pmtEnd = m_pmtBuffer + TSPacket::TS_HEADER_SIZE + size;
     uint8_t* curPos = m_pmtBuffer + TS_FRAME_SIZE;
     for (; curPos < pmtEnd; curPos += TS_FRAME_SIZE)
