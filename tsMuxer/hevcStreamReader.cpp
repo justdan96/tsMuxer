@@ -139,8 +139,8 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
         dstBuff += 6;
 
         int video_format, frame_rate_index, aspect_ratio_index;
-        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-            &video_format, &frame_rate_index, &aspect_ratio_index);
+        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
         *dstBuff++ = (video_format << 4) + frame_rate_index;
         *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
@@ -149,7 +149,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
     }
     else
         for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
-            nal = NALUnit::findNextNAL(nal, m_bufEnd))
+             nal = NALUnit::findNextNAL(nal, m_bufEnd))
         {
             uint8_t nalType = (*nal >> 1) & 0x3f;
             uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
