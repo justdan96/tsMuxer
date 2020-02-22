@@ -217,7 +217,7 @@ class METADemuxer : public AbstractDemuxer
 
     int addPGSubStream(const std::string& codec, const std::string& _codecStreamName,
                        const std::map<std::string, std::string>& addParams, MPLSStreamInfo* subStream);
-    static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez, bool insToBegin);
+    static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez);
     std::vector<MPLSPlayItem> mergePlayItems(const std::vector<MPLSParser>& mplsInfoList);
 };
 

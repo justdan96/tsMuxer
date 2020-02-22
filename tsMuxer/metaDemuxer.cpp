@@ -659,13 +659,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
                     trackRez.isSecondary = true;
             }
 
-            if (trackRez.codecInfo.programName == "V_MS/VFW/WVC1" || trackRez.codecInfo.programName == "V_MPEG-2" ||
-                trackRez.codecInfo.programName == "V_MPEG4/ISO/AVC" ||
-                trackRez.codecInfo.programName == "V_MPEG4/ISO/MVC" ||
-                trackRez.codecInfo.programName == "V_MPEGH/ISO/HEVC")
-                addTrack(streams, trackRez, true);
-            else
-                addTrack(streams, trackRez, false);
+            addTrack(streams, trackRez);
         }
         chapters = demuxer->getChapters();
         if (calcDuration)
@@ -689,7 +683,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             containerType = AbstractStreamReader::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
-        addTrack(streams, trackRez, false);
+        addTrack(streams, trackRez);
 
         delete[] tmpBuffer;
     }
@@ -700,32 +694,23 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     return rez;
 }
 
-void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez, bool insToBegin)
+void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez)
 {
     if (trackRez.codecInfo.codecID == h264DepCodecInfo.codecID && trackRez.multiSubStream)
     {
         // split combined MVC/AVC track to substreams
-        if (insToBegin)
-            rez.insert(rez.begin(), trackRez);
-        else
-            rez.push_back(trackRez);
+        rez.push_back(trackRez);
 
         trackRez.codecInfo = h264CodecInfo;
         int postfixPos = trackRez.streamDescr.find("3d-pg");
         if (postfixPos != string::npos)
             trackRez.streamDescr = trackRez.streamDescr.substr(0, postfixPos);
 
-        if (insToBegin)
-            rez.insert(rez.begin() + 1, trackRez);
-        else
-            rez.push_back(trackRez);
+        rez.push_back(trackRez);
     }
     else
     {
-        if (insToBegin)
-            rez.insert(rez.begin(), trackRez);
-        else
-            rez.push_back(trackRez);
+        rez.push_back(trackRez);
     }
 }
 
