@@ -379,7 +379,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
     bitWriter.putBits(8, 2);  // table id
-    
+
     uint16_t* LengthPos1 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
     bitWriter.putBits(2, 2);   // indicator
     bitWriter.putBits(2, 3);   // reserved
@@ -463,12 +463,12 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
-        
+
         uint16_t* esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
         bitWriter.putBits(4, 15);  // reserved
         bitWriter.putBits(12, 0);  // es_info_len
         int beforeCount = bitWriter.getBitsCount() / 8;
-        
+
         // video stream, non Blu-ray mode and Dolby Vision flag => write DoVi descriptors
         bool insertDoVi = (itr->second.m_pid >> 4 == 0x101) && !isM2ts && (V3_flags & 0x04);
         if (insertDoVi)
@@ -513,17 +513,17 @@ void TS_program_map_section::setDoViDescriptor(BitStreamWriter& bitWriter, int P
     bitWriter.putBits(8, 0x56);  // 'V'
     bitWriter.putBits(8, 0x49);  // 'I'
 
-    bitWriter.putBits(8, 0xb0);           // DoVi descriptor tag
+    bitWriter.putBits(8, 0xb0);             // DoVi descriptor tag
     bitWriter.putBits(8, isDV_EL ? 6 : 4);  // Length
-    bitWriter.putBits(8, 1);              // dv version major
-    bitWriter.putBits(8, 0);              // dv version minor
-    bitWriter.putBits(7, (HDR10 ? (PID == 0x1011 ? 7 : (isDV_EL ? 7 : 8)) :
-                                  (PID == 0x1011 ? 4 : (isDV_EL ? 4 : 5))));    // profile
-    bitWriter.putBits(6, 6);                                                    // dv level
-    bitWriter.putBits(1, PID == 0x1011 ? 0 : 1);                                // rpu_present_flag
-    bitWriter.putBits(1, PID == 0x1011 ? 0 : (isDV_EL ? 1 : 0));                // el_present_flag
-    bitWriter.putBits(1, PID == 0x1011 ? 1 : (isDV_EL ? 0 : 1));                // bl_present_flag
-    if (isDV_EL)                                                                // Enhancement Layer
+    bitWriter.putBits(8, 1);                // dv version major
+    bitWriter.putBits(8, 0);                // dv version minor
+    bitWriter.putBits(
+        7, (HDR10 ? (PID == 0x1011 ? 7 : (isDV_EL ? 7 : 8)) : (PID == 0x1011 ? 4 : (isDV_EL ? 4 : 5))));  // profile
+    bitWriter.putBits(6, 6);                                                                              // dv level
+    bitWriter.putBits(1, PID == 0x1011 ? 0 : 1);                  // rpu_present_flag
+    bitWriter.putBits(1, PID == 0x1011 ? 0 : (isDV_EL ? 1 : 0));  // el_present_flag
+    bitWriter.putBits(1, PID == 0x1011 ? 1 : (isDV_EL ? 0 : 1));  // bl_present_flag
+    if (isDV_EL)                                                  // Enhancement Layer
     {
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
