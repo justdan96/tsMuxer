@@ -58,8 +58,10 @@ class MovDemuxer : public IOContextDemuxer
     };
 
     int found_moov;  // when both 'moov' and 'mdat' sections has been found
+    bool found_moof;
     int64_t m_mdat_pos;
     int64_t m_mdat_size;
+    std::vector<std::pair<int64_t, uint64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;
     std::map<std::string, std::string> metaData;
