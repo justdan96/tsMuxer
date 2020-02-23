@@ -552,6 +552,7 @@ const MovDemuxer::MOVParseTableEntry MovDemuxer::mov_default_parse_table[] = {
 MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager) : IOContextDemuxer(readManager)
 {
     found_moov = 0;
+    found_moof = false;
     m_mdat_pos = 0;
     itunes_metadata = 0;
     moof_offset = 0;
@@ -569,6 +570,7 @@ void MovDemuxer::openFile(const std::string& streamName)
 {
     m_fileName = streamName;
     found_moov = 0;
+    found_moof = false;
     m_mdat_pos = 0;
     itunes_metadata = 0;
     moof_offset = 0;
@@ -611,8 +613,9 @@ void MovDemuxer::buildIndex()
             MOVStreamContext* st = (MOVStreamContext*)tracks[i];
             for (int j = 0; j < st->chunk_offsets.size(); ++j)
             {
-                if (st->chunk_offsets[j] < m_mdat_pos || st->chunk_offsets[j] > m_mdat_pos + m_mdat_size)
-                    THROW(ERR_MOV_PARSE, "Invalid chunk offset " << st->chunk_offsets[j]);
+                if (!found_moof)
+                    if (st->chunk_offsets[j] < m_mdat_pos || st->chunk_offsets[j] > m_mdat_pos + m_mdat_size)
+                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << st->chunk_offsets[j]);
                 chunks.push_back(make_pair(st->chunk_offsets[j] - m_mdat_pos, i));
             }
         }
@@ -672,7 +675,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             m_firstDemux = true;
             m_mdat_pos = 0;
         }
-        int64_t chunkSize = next - offset;
+        int64_t chunkSize = found_moof ? m_mdat_data[m_curChunk].second : next - offset;
         int trackId = chunks[m_curChunk].second;
         PIDFilters::iterator filterItr = m_pidFilters.find(trackId + 1);
         if (filterItr == m_pidFilters.end() && acceptedPIDs.find(trackId + 1) == acceptedPIDs.end())
@@ -745,6 +748,8 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 }
             }
         }
+        if (found_moof && m_curChunk < chunks.size() - 1)
+            skip_bytes(next - offset - m_mdat_data[m_curChunk].second);
         m_curChunk++;
     }
 
@@ -824,14 +829,13 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
                 break;
             }
         }
-        if (m_mdat_pos && found_moov)
-        {
-            return 0;
-        }
         skip_bytes(left);
 
         a.offset += a.size;
         total_size += a.size;
+
+        if (m_curPos == m_bufEnd)
+            m_isEOF = true;
     }
 
     if (!err && total_size < atom.size && atom.size < 0x7ffff)
@@ -939,8 +943,12 @@ int MovDemuxer::mov_read_mdat(MOVAtom atom)
 {
     if (atom.size == 0)  // wrong one (MP4)
         return 0;
-    m_mdat_pos = m_processedBytes;
-    m_mdat_size = atom.size;
+    if (m_mdat_pos == 0)
+    {
+        m_mdat_pos = m_processedBytes;
+        m_mdat_size = atom.size;
+    }
+    m_mdat_data.push_back(make_pair(m_processedBytes, atom.size));
     return 0;  // now go for moov
 }
 
@@ -969,6 +977,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (flags & 0x004)
         first_sample_flags = get_be32();
     offset = frag->base_data_offset + data_offset;
+    sc->chunk_offsets.push_back(offset);
     distance = 0;
     for (i = 0; i < entries; i++)
     {
@@ -1176,7 +1185,9 @@ int MovDemuxer::mov_read_moov(MOVAtom atom)
 
 int MovDemuxer::mov_read_moof(MOVAtom atom)
 {
-    moof_offset = m_processedBytes - 8;
+    MOVFragment* frag = &fragment;
+    found_moof = true;
+    frag->moof_offset = m_processedBytes - 8;
     return mov_read_default(atom);
 }
 
