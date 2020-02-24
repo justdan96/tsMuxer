@@ -51,10 +51,10 @@ This project was created by Roman Vasilenko, with the last public release 20th J
 
 ## Installation
 
-All executable are created to be portable, so you can just save and extract the compressed package for your platform. 
+The following executables are created to be portable, so you can just save and extract the compressed package for your platform. 
 
 Nightly builds are created in Bintray, use the link below to go directly to the latest nightly build:
-[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion#files)
 
 Or browse to the version you want via [this link](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly), clicking the link for the version you want.
 ![bintray_version_list](https://user-images.githubusercontent.com/503722/70852149-f3f37300-1e95-11ea-8fb4-c9a82d698448.png)
@@ -65,13 +65,38 @@ Then when you are on the page for your chosen version, click on the "Files" tab:
 Finally select the ZIP file for your platform - Linux, Mac, Windows 32-bit or Windows 64-bit:
 ![bintray_file_list](https://user-images.githubusercontent.com/503722/70852151-f48c0980-1e95-11ea-8914-7d525b614bf3.png)
 
+We also have versions available for various Linux distributions.
+
 ### Windows
 
 The ZIP file for Windows can just be unzipped and the executables can be used straight away - there are no dependencies.
 
 ### Linux
 
-The ZIP file for Linux can just be unzipped and the executables can be used straight away - there are no dependencies.
+The ZIP file for Linux from Bintray can just be unzipped and the executables can be used straight away - there are no dependencies.
+
+The following are packages created specifically for each distribution. To update, please uninstall the package and then install it again.
+
+#### Mageia Cauldron
+dnf config-manager --add-repo https://download.opensuse.org/repositories/home:/justdan96/Mageia_Cauldron/home:justdan96.repo
+
+#### openSUSE Leap 15.2
+zypper ar -r https://download.opensuse.org/repositories/home:/justdan96/openSUSE_Leap_15.2/home:justdan96.repo
+
+#### openSUSE Tumbleweed
+zypper ar -r https://download.opensuse.org/repositories/home:/justdan96/openSUSE_Tumbleweed/home:justdan96.repo
+
+#### Fedora 31
+dnf config-manager --add-repo https://download.opensuse.org/repositories/home:/justdan96/Fedora_31/home:justdan96.repo
+dnf config-manager --set-enabled home_justdan96
+
+#### Debian 10
+wget -qO - https://download.opensuse.org/repositories/home:/justdan96/Debian_debbuild_10/Release.key | sudo apt-key add -
+sudo echo "deb https://download.opensuse.org/repositories/home:/justdan96/Debian_debbuild_10  ./" >> /etc/apt/sources.list
+
+#### Ubuntu 18.03 - 19.10
+wget -qO - https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debbuild_$(lsb_release -r -s)/Release.key | sudo apt-key add -
+sudo echo "deb https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debbuild_$(lsb_release -r -s)  ./" >> /etc/apt/sources.list
 
 ### MacOS
 
@@ -213,6 +238,8 @@ fadein-time       | Time in ms for smooth subtitle appearance.
 fadeout-time      | Time in ms for smooth subtitle disappearance. 
 line-spacing      | Interval between subtitle lines. Default value is 1.0.
 
+Currently tsMuxer only supports fonts in TTF format. It also will only load fonts from `/usr/share/fonts/` on Linux and `/Library/Fonts/` on Mac. As such our recommendation is to use font "FreeSans" on Linux and "OpenSans" on Mac.
+
 tsMuxeR supports additional tags inside SRT tracks.  The syntax  and parameters coincide with HTML: `<b>, <i>, <u>, <strike>, <font>`. Default relative font size (used in these tags) is 3.  For example:
 ```
 <b><font size=5 color="deepskyblue" name="Arial"><u>Test</u>
@@ -331,4 +358,18 @@ We’re using the Apache 2.0 license for simplicity and flexibility. You are fre
 
 ## Credits
 
-* Roman Vasilenko - for creating tsMuxer
+**Original Author**
+Roman Vasilenko (physic)
+
+**Contributors**
+* Daniel Bryant (justdan96)
+* Daniel Kozar (xavery)
+* Jean Christophe De Ryck (jcdr428)
+* Stephen Hutchinson (qyot27)
+* Koka Abakum (abakum)
+* Alexey Shidlovsky (alexls74)
+* Lonely Crane (lonecrane)
+* Markus Feist (markusfeist)
+
+<sub><sup>For sake of brevity I am including anyone who has merged a pull request!</sup></sub>
+

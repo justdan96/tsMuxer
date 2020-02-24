@@ -1,3 +1,67 @@
+## tsMuxeR 2.6.16
+- Fixed bugs in the handling of non-ASCII characters in paths on Windows
+- Fixed bugs in subtitles PIDs for BD V3 M2TS with HDR
+- Fixed bug with the display of bitrate and channel numbers for EAC3 and AC3 tracks
+- Fixed bug with GUI not correctly allowing to select DTS Express 24-bit as a secondary track
+- Introduced an error message when an output file longer than 255 characters and reduced overall file length
+- Fixed bug where 3D plane information was showing for 2D BD-ROMs
+- Fixed a bug with uneven width between characters in subtitles on Mac and Linux
+- Introduced the ability to detect audio delays in MKV files
+- Fixed a bug where the 3D planes were not detected in specific cases
+- Fixed a bug with alignment of the subtitle tracks and 3D planes
+- Removed unnecessary floating point conversion code from the GUI source tree
+- Added support for frame rates of 50, 59.94 and 60
+- Fixed an issue with HDR10 HEVC streams where the maxCLL and maxFALL values were set incorrectly
+- Fixed typos and improved the clarity of certain wording in the GUI
+- Fixed typos and grammer issues with the readme and usage information
+- Introduced the git revision to the version string in the GUI and CLI
+- Introduced automatic selection of BD V3 for HEVC in GUI
+- Fixed an issue with compiling on Mac
+- Fixed an issue with the handling of wav64
+- Introduced a workaround for QTBUG-28893
+- Performed another round of GUI code cleanup
+- Introduced a uniform code formatting style
+- Fixed a bug with reading the FPS information from certain streams
+- Fixed a typo in the GUI settings for the font family setting
+- Introduced a warning when a V2 video format is used for a V3 Blu-ray
+- Fixed a bug with incorrect stream ID for TS stream
+- Fixed typos in the source files
+- Introduced UHD Blu-ray as an option in the GUI
+- Fixed a bug where invalid font files could crash tsMuxer
+- Fixed an issue with HEVC stream detection in the GUI
+- Introduced reading the FPS info from VPS or SPS, rather than VPS only
+- Fixed a bug with the CPI table I-frame thresholds with UHD
+- Introduced Dolby Vision support
+- Fixed compiler warnings on return value overflows
+- Fixed an issue with the stream ID being incorrectly set for BD V3
+- Fixed an issue when spaces where in the path to the temporary meta file in the GUI
+- Fixed an issue with buffer overflows on HEVC streams
+- Fixed an issue so that TS descriptors are the same as on commercial Blu-rays
+- Fixed an issue where numbers were shown instead of language codes in the GUI
+- Introduced nightly builds, hosted on Bintray
+- Fixed a bug where the tsMuxer executable could not be found on Windows in the GUI
+- Fixed a bug where muxing a SRT results in a segfault on Linux
+- Introduced support for UHD HDR10 and HDR10+
+- Introduced a migration from "override" to "virtual" keywords in the code to conform better to C++14
+- Introduced a migration from "QObject::connect" syntax to Qt5 equivalent in the GUI
+- Fixed an issue with the min and max functions when compiling on Windows
+- Fixed an issue calculating the AAC frame size
+- Introduced UHD (width >= 2600) support in the MPLS and CLPI
+- Introduced a clean up and reformatting of the documentation
+- Introduced UHD BD V3 support
+- Fixed an issue with EAC3 bitrate, sampling rate and channel information not being set correctly
+- Fixed a bug with parsing of AC3
+- Fixed an issue with the stream type not being set correctly for H265
+- Fixed an issue when parsing MP4 AAC 5.1 where the channel output is not read correctly
+- Fixed an issue with parsing the AAC frame length
+- Introduced an update of the C++ standard from 11 to 14
+- Introduced a cleanup of precompiled headers
+- Introduced using std::thread for the TerminatableThread in libmediation
+- Introduced cross-platform CMake build system
+- Introduced a cleanup of libmediation that removed condvar, mutex and time from the library
+- Introduced a translation of comments from Russian to English
+- Introduced a migration from Qt4 to Qt5
+
 ## tsMuxeR 2.6.15
 - Fixed mkv parser a bit. I've got unparsed file example
 
