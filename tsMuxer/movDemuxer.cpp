@@ -585,9 +585,16 @@ void MovDemuxer::openFile(const std::string& streamName)
     num_tracks = 0;
 
     readClose();
+
     BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
+
+    File tmpFile;
+    tmpFile.open(streamName.c_str(), File::ofRead);
+    tmpFile.size(&m_fileSize);
+    tmpFile.close();
+
     m_processedBytes = 0;
     m_isEOF = false;
     readHeaders();
@@ -829,13 +836,13 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
                 break;
             }
         }
+        if (m_processedBytes + left >= m_fileSize)
+            return 0;
+
         skip_bytes(left);
 
         a.offset += a.size;
         total_size += a.size;
-
-        if (m_curPos == m_bufEnd)
-            m_isEOF = true;
     }
 
     if (!err && total_size < atom.size && atom.size < 0x7ffff)
