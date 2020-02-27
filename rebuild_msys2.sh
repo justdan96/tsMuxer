@@ -23,7 +23,7 @@ else
  fi
  git pull
  cd build
- cmake .. -G Ninja
+ cmake ../ -G Ninja -DTSMUXER_STATIC_BUILD=true
  ninja && cp -u tsMuxer/tsmuxer.exe ../bin/
  if [ -d $MINGW_PREFIX/qt5-static ] ; then
   $MINGW_PREFIX/qt5-static/bin/qmake ../tsMuxerGUI
