@@ -61,6 +61,7 @@ class MovDemuxer : public IOContextDemuxer
     bool found_moof;
     int64_t m_mdat_pos;
     int64_t m_mdat_size;
+    uint64_t m_fileSize;
     std::vector<std::pair<int64_t, uint64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;
