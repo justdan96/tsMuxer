@@ -653,14 +653,7 @@ int main(int argc, char** argv)
                         itemName = streamDir + item.fileName + mediaExt;  // 2d mode
 
                     LTRACE(LT_INFO, 2, "");
-
-#ifdef _WIN32
-                    char buffer[1024 * 16];
-                    CharToOemA(itemName.c_str(), buffer);
-                    LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << buffer);
-#else
                     LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << itemName);
-#endif
                     LTRACE(LT_INFO, 2,
                            "Duration: " << floatToTime(
                                (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /
@@ -837,26 +830,14 @@ int main(int argc, char** argv)
     {
         if (argc == 2)
             LTRACE2(LT_ERROR, "Error: ");
-#ifdef _WIN32
-        char buffer[1024 * 16];
-        CharToOemA(e.what(), buffer);
-        LTRACE(LT_ERROR, 2, buffer);
-#else
         LTRACE2(LT_ERROR, e.what());
-#endif
         return -1;
     }
     catch (VodCoreException& e)
     {
         if (argc == 2)
             LTRACE2(LT_ERROR, "Error: ");
-#ifdef _WIN32
-        char buffer[1024 * 16];
-        CharToOemA(e.m_errStr.c_str(), buffer);
-        LTRACE(LT_ERROR, 2, buffer);
-#else
         LTRACE(LT_ERROR, 2, e.m_errStr.c_str());
-#endif
         return -2;
     }
     catch (BitStreamException& e)
