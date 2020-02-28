@@ -20,7 +20,7 @@
 #include "ui_tsmuxerwindow.h"
 
 const char fileDialogFilter[] =
-    "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
+    "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
 AC3/E-AC3 (*.ac3 *.ddp);;\
 AAC (advanced audio coding) (*.aac);;\
 AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;\
@@ -32,7 +32,7 @@ Transport Stream (*.ts);;\
 BDAV Transport Stream (*.m2ts *.mts *.ssif);;\
 Program Stream (*.mpg *.mpeg *.vob *.evo);;\
 Matroska audio/video files (*.mkv *.mka *.mks);;\
-MP4 audio/video files (*.mp4 *.m4a);;\
+MP4 audio/video files (*.mp4 *.m4a *.m4v);;\
 Quick time audio/video files (*.mov);;\
 Blu-ray play list (*.mpls *.mpl);;\
 Blu-ray PGS subtitles (*.sup);;\
