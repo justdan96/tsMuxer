@@ -146,7 +146,7 @@ void TextSubtitlesRenderWin32::getTextSize(const std::wstring& text, SIZE* mSize
     RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2);
     pen.SetLineJoin(LineJoinRound);
-    path.GetBounds(&rect, 0, 0);
+    path.GetBounds(&rect, 0, &pen);
     mSize->cx = rect.Width;
     mSize->cy = lineSpacingPixel;
 #endif
