@@ -475,7 +475,8 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ctMKV);
     }
-    else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4a"))
+    else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") ||
+             strEndWith(tmpname, ".m4a"))
     {
         if (pid)
             dataReader = &m_containerReader;
@@ -1427,7 +1428,7 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
             demuxer = m_demuxers[streamName].m_demuxer = new MatroskaDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;
         }
-        else if (ext == "MOV" || ext == "MP4" || ext == "M4A")
+        else if (ext == "MOV" || ext == "MP4" || ext == "M4V" || ext == "M4A")
         {
             demuxer = m_demuxers[streamName].m_demuxer = new MovDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;
