@@ -607,7 +607,8 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         demuxer = new MatroskaDemuxer(readManager);
         containerType = AbstractStreamReader::ctMKV;
     }
-    else if (strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4a") || strEndWith(tmpname, ".mov"))
+    else if (strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") || strEndWith(tmpname, ".m4a") ||
+             strEndWith(tmpname, ".mov"))
     {
         demuxer = new MovDemuxer(readManager);
         containerType = AbstractStreamReader::ctMOV;
