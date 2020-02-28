@@ -5,7 +5,7 @@
 const static uint64_t TS_FREQ_TO_INT_FREQ_COEFF = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
 static const int BAD_FRAME = -1;
 
-int DVBSubStreamReader::getTSDescriptor(uint8_t* dstBuff) { return 0; }
+int DVBSubStreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts) { return 0; }
 
 uint8_t* DVBSubStreamReader::findFrame(uint8_t* buff, uint8_t* end)
 {

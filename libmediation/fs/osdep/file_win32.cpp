@@ -100,7 +100,10 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
             systemDependentFlags = FILE_FLAG_RANDOM_ACCESS;
     }
 
-    createDir(extractFileDir(fName), true);
+    if ((oflag & File::ofOpenExisting) == 0)
+    {
+        createDir(extractFileDir(fName), true);
+    }
     m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
                         systemDependentFlags, NULL);
     if (m_impl == INVALID_HANDLE_VALUE)

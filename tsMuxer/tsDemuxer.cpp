@@ -243,6 +243,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
             m_prevFileLen += (m_lastPTS - m_firstPTS);
         m_firstPTS = -1;
         m_lastPTS = -1;
+        m_firstVideoPTS = -1;
         m_curFileNum++;
     }
 

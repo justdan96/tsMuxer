@@ -21,7 +21,7 @@ class MPEG2StreamReader : public MPEGStreamReader
         m_longCodesAllowed = false;
         m_prevFrameDelay = 0;
     }
-    int getTSDescriptor(uint8_t* dstBuff) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool isM2ts) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 
     int getStreamWidth() const override { return m_sequence.width; }

@@ -32,7 +32,7 @@ class LPCMStreamReader : public SimplePacketizerReader
         m_lastChannelRemapPos = 0;
     }
     void setNewStyleAudioPES(bool value) { m_useNewStyleAudioPES = value; }
-    int getTSDescriptor(uint8_t* dstBuff) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool isM2ts) override;
     int getFreq() override { return m_freq; }
     int getChannels() override { return m_channels; }
     // void setDemuxMode(bool value) {m_demuxMode = value;}

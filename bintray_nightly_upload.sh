@@ -40,4 +40,12 @@ else
     echo "error creating version $version_date !"
     exit 2
   fi
+  # try to trigger a new build in OBS
+  obs_trigger=$(curl -H "Authorization: Token $OBS_TOKEN" --write-out %{http_code} --silent --output /dev/null -X POST https://build.opensuse.org/trigger/runservice)
+  if [ $obs_trigger -eq 200 ] ; then
+    echo "build has been triggered in OBS!"
+  else
+    echo "error triggering build in OBS!"
+    exit 3
+  fi
 fi

@@ -372,33 +372,19 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, int es_info_len
     }
 }
 
-uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool addLang)
+uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool addLang, bool isM2ts)
 {
     buffer[0] = 0;
     buffer++;
-    // PutBitContext pBitContext;
-    // init_bitWriter.putBits( buffer, max_buf_size*8);
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
-
-    // bitWriter.putBits( 8, 0);
     bitWriter.putBits(8, 2);  // table id
-    bitWriter.putBits(2, 2);  // indicator
-    bitWriter.putBits(2, 3);  // reserved
 
-    int program_info_len = 12;
-    if (casPID)
-        program_info_len += 6;
-
-    int sectionLen =
-        9 + (video_pid ? 5 : 0) + (audio_pid ? 5 : 0) + (sub_pid ? 5 : 0) + (pidList.size() * 5) + 4 + program_info_len;
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
-    {
-        sectionLen += itr->second.m_esInfoLen;
-        if (*itr->second.m_lang && addLang)
-            sectionLen += 6;  // lang descriptor len
-    }
-    bitWriter.putBits(12, sectionLen);  // reserved
+    uint16_t* LengthPos1 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    bitWriter.putBits(2, 2);   // indicator
+    bitWriter.putBits(2, 3);   // reserved
+    bitWriter.putBits(12, 0);  // skip lengthField
+    int beforeCount1 = bitWriter.getBitsCount() / 8;
 
     bitWriter.putBits(16, program_number);
     bitWriter.putBits(2, 3);         // reserved
@@ -407,27 +393,31 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(16, 0);        // section_number and last_section_number
     bitWriter.putBits(3, 7);         // reserved
     bitWriter.putBits(13, pcr_pid);  // reserved
-    bitWriter.putBits(4, 15);        // reserved
 
-    bitWriter.putBits(12, program_info_len);  // program info len
-    // 88 04 0f ff 84 fc 05 04 48 44 4d 56
+    uint16_t* LengthPos2 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    bitWriter.putBits(4, 15);  // reserved
+    bitWriter.putBits(12, 0);  // program info len
+    int beforeCount2 = bitWriter.getBitsCount() / 8;
 
-    // put 'HDMV' registration descriptor
-    bitWriter.putBits(8, 0x05);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(8, 0x48);
-    bitWriter.putBits(8, 0x44);
-    bitWriter.putBits(8, 0x4d);
-    bitWriter.putBits(8, 0x56);
+    if (isM2ts)
+    {
+        // put 'HDMV' registration descriptor
+        bitWriter.putBits(8, 0x05);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(8, 0x48);
+        bitWriter.putBits(8, 0x44);
+        bitWriter.putBits(8, 0x4d);
+        bitWriter.putBits(8, 0x56);
 
-    // put DTCP descriptor
-    bitWriter.putBits(8, 0x88);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(8, 0x0f);
-    bitWriter.putBits(8, 0xff);
-    bitWriter.putBits(
-        8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
-    bitWriter.putBits(8, 0xfc);
+        // put DTCP descriptor
+        bitWriter.putBits(8, 0x88);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(8, 0x0f);
+        bitWriter.putBits(8, 0xff);
+        bitWriter.putBits(
+            8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
+        bitWriter.putBits(8, 0xfc);
+    }
 
     if (casPID)
     {
@@ -437,6 +427,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(16, casID);
         bitWriter.putBits(16, casPID);
     }
+    *LengthPos2 = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount2);
 
     if (video_pid)
     {
@@ -466,15 +457,30 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(12, 0);  // es_info_len
     }
 
+    int isDV_EL = false;  // DoVi Enhancement Layer
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
-        bitWriter.putBits(4, 15);                                                                   // reserved
-        bitWriter.putBits(12, itr->second.m_esInfoLen + (*itr->second.m_lang && addLang ? 6 : 0));  // es_info_len
+
+        uint16_t* esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+        bitWriter.putBits(4, 15);  // reserved
+        bitWriter.putBits(12, 0);  // es_info_len
+        int beforeCount = bitWriter.getBitsCount() / 8;
+
+        // video stream, non Blu-ray mode and Dolby Vision flag => write DoVi descriptors
+        bool insertDoVi = (itr->second.m_pid >> 4 == 0x101) && !isM2ts && (V3_flags & 0x04);
+        if (insertDoVi)
+        {
+            setDoViDescriptor(bitWriter, itr->second.m_pid, isDV_EL);
+            if (itr->second.m_pid == 0x1011)
+                isDV_EL = true;
+        }
+
         for (int j = 0; j < itr->second.m_esInfoLen; j++)
             bitWriter.putBits(8, itr->second.m_esInfoData[j]);  // es_info_len
+
         if (*itr->second.m_lang && addLang)
         {
             bitWriter.putBits(8, TS_LANG_DESCRIPTOR_TAG);                             // lang descriptor ID
@@ -482,8 +488,9 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
             for (int k = 0; k < 3; k++) bitWriter.putBits(8, itr->second.m_lang[k]);  // lang code[i]
             bitWriter.putBits(8, 0);
         }
+        *esInfoLen = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount);
     }
-
+    *LengthPos1 = my_htons(0xb000 + bitWriter.getBitsCount() / 8 - beforeCount1 + 4);
     bitWriter.flushBits();
 
     // uint32_t crc = av_crc(tmpAvCrc, 0xffffffff, buffer, bitWriter.getBitsCount()/8);
@@ -492,10 +499,35 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     uint32_t* crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
     *crcPtr = my_htonl(crc);
 
-    // bitWriter.putBits( 32, my_htonl(crc));
-    // flush_put_bits(&pBitContext);
-    // return put_bits_count(&pBitContext)/8 + 1;
     return bitWriter.getBitsCount() / 8 + 5;
+}
+
+void TS_program_map_section::setDoViDescriptor(BitStreamWriter& bitWriter, int PID, bool isDV_EL)
+{
+    int HDR10 = V3_flags & 0x02;
+
+    bitWriter.putBits(8, 5);     // Registration descriptor tag
+    bitWriter.putBits(8, 4);     // Length
+    bitWriter.putBits(8, 0x44);  // 'D'
+    bitWriter.putBits(8, 0x4f);  // 'O'
+    bitWriter.putBits(8, 0x56);  // 'V'
+    bitWriter.putBits(8, 0x49);  // 'I'
+
+    bitWriter.putBits(8, 0xb0);             // DoVi descriptor tag
+    bitWriter.putBits(8, isDV_EL ? 6 : 4);  // Length
+    bitWriter.putBits(8, 1);                // dv version major
+    bitWriter.putBits(8, 0);                // dv version minor
+    bitWriter.putBits(
+        7, (HDR10 ? (PID == 0x1011 ? 7 : (isDV_EL ? 7 : 8)) : (PID == 0x1011 ? 4 : (isDV_EL ? 4 : 5))));  // profile
+    bitWriter.putBits(6, 6);                                                                              // dv level
+    bitWriter.putBits(1, PID == 0x1011 ? 0 : 1);                  // rpu_present_flag
+    bitWriter.putBits(1, PID == 0x1011 ? 0 : (isDV_EL ? 1 : 0));  // el_present_flag
+    bitWriter.putBits(1, PID == 0x1011 ? 1 : (isDV_EL ? 0 : 1));  // bl_present_flag
+    if (isDV_EL)                                                  // Enhancement Layer
+    {
+        bitWriter.putBits(13, 0x1011);  // dependency_pid
+        bitWriter.putBits(3, 7);        // reserved
+    }
 }
 
 // --------------------- CLPIParser -----------------------------
