@@ -13,7 +13,7 @@
 - Added support for frame rates of 50, 59.94 and 60
 - Fixed an issue with HDR10 HEVC streams where the maxCLL and maxFALL values were set incorrectly
 - Fixed typos and improved the clarity of certain wording in the GUI
-- Fixed typos and grammer issues with the readme and usage information
+- Fixed typos and grammar issues with the readme and usage information
 - Introduced the git revision to the version string in the GUI and CLI
 - Introduced automatic selection of BD V3 for HEVC in GUI
 - Fixed an issue with compiling on Mac
