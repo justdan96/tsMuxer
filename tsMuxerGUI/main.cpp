@@ -1,6 +1,4 @@
 #include <QApplication>
-#include <QLibraryInfo>
-#include <QTranslator>
 #include <QUrl>
 
 #include "tsmuxerwindow.h"

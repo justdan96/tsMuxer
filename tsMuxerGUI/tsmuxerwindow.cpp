@@ -267,6 +267,8 @@ TsMuxerWindow::TsMuxerWindow()
       sound(0)
 {
     ui->setupUi(this);
+    qApp->installTranslator(&qtCoreTranslator);
+    qApp->installTranslator(&tsMuxerTranslator);
     setWindowTitle("tsMuxeR GUI " TSMUXER_VERSION);
     lastInputDir = QDir::homePath();
     lastOutputDir = QDir::homePath();
@@ -1872,14 +1874,10 @@ void TsMuxerWindow::updateMuxTime2()
 
 void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
 {
-    qApp->removeTranslator(&qtCoreTranslator);
-    qApp->removeTranslator(&tsMuxerTranslator);
     static const QString languages[] = {"en", "ru"};
     auto lang = languages[x];
     qtCoreTranslator.load(QString("qtbase_%1").arg(lang), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     tsMuxerTranslator.load(QString("tsmuxergui_%1").arg(lang), ":/i18n");
-    qApp->installTranslator(&qtCoreTranslator);
-    qApp->installTranslator(&tsMuxerTranslator);
 }
 
 void TsMuxerWindow::updateMetaLines()
