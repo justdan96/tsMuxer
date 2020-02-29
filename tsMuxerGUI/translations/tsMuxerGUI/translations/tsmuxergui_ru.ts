@@ -17,22 +17,22 @@
     <message>
         <location filename="../muxForm.cpp" line="75"/>
         <source>tsMuxeR successfully finished</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">муж успешно завершился</translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="77"/>
         <source>tsMuxeR finished with error code %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">муж завершился с кодом ошибки %1</translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="90"/>
         <source>terminating tsMuxeR...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">муж завершается ...</translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="93"/>
         <source>tsMuxeR is terminated</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">муж завершился</translation>
     </message>
 </context>
 <context>
@@ -40,22 +40,22 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="41"/>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Входные</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="54"/>
         <source>Input files:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Исходные файлы:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="99"/>
         <source>add</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">добавить</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="115"/>
         <source>join</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">объединить</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="147"/>
