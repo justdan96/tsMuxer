@@ -19,7 +19,7 @@ static std::string sourceEncoding;
 
 namespace UtfConverter
 {
-std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat)
+std::string toUtf8(const uint8_t* start, size_t numBytes, SourceFormat srcFormat)
 {
     switch (srcFormat)
     {
