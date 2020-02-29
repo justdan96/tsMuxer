@@ -138,22 +138,22 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="545"/>
         <source>1:1 (Square)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">1:1 (без растяжения)</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="568"/>
         <source>Change level:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Изменить level:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="581"/>
         <source>Continually insert SPS/PPS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вставлять SPS/PPS</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="608"/>
         <source>Do not change SEI and VUI data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не изменять значения SEI и VUI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="613"/>
