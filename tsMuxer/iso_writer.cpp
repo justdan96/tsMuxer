@@ -1,8 +1,9 @@
 #include "iso_writer.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 
 #include "vod_common.h"
 
@@ -12,6 +13,8 @@
 
 // ----------- routines --------------
 
+namespace
+{
 /*
   Name  : CRC-16 CCITT
   Poly  : 0x1021    x^16 + x^12 + x^5 + 1
@@ -63,12 +66,10 @@ void writeDescriptorTag(uint8_t* buffer, uint16_t tag, uint32_t tagLocation)
 
 std::string toIsoSeparator(const std::string& path)
 {
-    std::string result = path;
-    for (int i = 0; i < result.size(); ++i)
-    {
-        if (result[i] == '\\')
-            result[i] = '/';
-    }
+    std::string result;
+    result.reserve(path.size());
+    std::transform(std::begin(path), std::end(path), std::back_inserter(result),
+                   [](auto c) { return c == '\\' ? '/' : c; });
     return result;
 }
 
@@ -108,14 +109,14 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     buffer[11] = 0;
 }
 
-void writeDString(uint8_t* buffer, const char* value, int len)
+void writeDString(uint8_t* buffer, const char* value, int fieldLen)
 {
-    int realLen = FFMIN(strlen(value), len - 2);
-    buffer[len - 1] = realLen + 1;
+    int contentLen = FFMIN(strlen(value), fieldLen - 2);
+    buffer[fieldLen - 1] = contentLen + 1;
     buffer[0] = 8;  // 8 bit per character string
-    memcpy(buffer + 1, value, realLen + 1);
-    int restLen = len - realLen - 2;
-    memset(buffer + 1 + realLen, 0, restLen);
+    memcpy(buffer + 1, value, contentLen + 1);
+    int paddingLen = fieldLen - contentLen - 2;
+    memset(buffer + 1 + contentLen, 0, paddingLen);
 }
 
 void writeUDFString(uint8_t* buffer, const char* str, int len)
@@ -135,6 +136,8 @@ void writeLongAD(uint8_t* buffer, uint32_t lenBytes, uint32_t pos, uint16_t part
     buff16[4] = partition;  // location, partition number
     buff32[3] = id;
 }
+
+}  // namespace
 
 // --------------------- ByteFileWriter ---------------------
 
