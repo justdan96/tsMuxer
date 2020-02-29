@@ -61,79 +61,79 @@
         <location filename="../tsmuxerwindow.ui" line="147"/>
         <location filename="../tsmuxerwindow.ui" line="272"/>
         <source>remove</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">удалить</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="175"/>
         <source>Tracks:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Дорожки:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="203"/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">#</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="208"/>
         <source>source file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">исходный файл</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="213"/>
         <source>codec</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">кодек</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="218"/>
         <source>lang</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">язык</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="223"/>
         <source>track info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">о дорожке</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="236"/>
         <source>up</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">вверх</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="246"/>
         <source>down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">вниз</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="325"/>
         <location filename="../tsmuxerwindow.ui" line="629"/>
         <location filename="../tsmuxerwindow.ui" line="810"/>
         <source>General track options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Общие параметры</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="343"/>
         <source>Change fps:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Изменить fps:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="409"/>
         <source>Remove pulldown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Убрать pulldown</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="416"/>
         <source>Secondary (PIP)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Картинка в картинке</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="520"/>
         <source>AR</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Соотношение сторон</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="540"/>
         <source>As source</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Как в исходном</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="545"/>
