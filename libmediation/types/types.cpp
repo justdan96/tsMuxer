@@ -64,12 +64,6 @@ int32_t strToInt32(const std::string& str) { return strToInt32(str.c_str()); }
 
 int32_t strToInt32(const char* const str, int radix) { return strtol(str, 0, radix); }
 
-int32_t strWToInt32(const wchar_t* const str) { return wcstol(str, 0, 10); }
-
-int32_t strWToInt32(const wchar_t* const str, int radix) { return wcstol(str, 0, radix); }
-
-uint32_t strWToInt32u(const wchar_t* const str, int radix) { return static_cast<uint32_t>(wcstoul(str, 0, radix)); }
-
 uint32_t strToInt32u(const char* const str, int radix) { return static_cast<uint32_t>(strtoul(str, 0, radix)); }
 
 int16_t strToInt16(const char* const str) { return (int16_t)strtol(str, 0, 10); }
@@ -81,8 +75,6 @@ int8_t strToInt8(const char* const str) { return (int8_t)strtol(str, 0, 10); }
 uint8_t strToInt8u(const char* const str) { return (uint8_t)strtol(str, 0, 10); }
 
 double strToDouble(const char* const str) { return strtod(str, 0); }
-
-double strWToDouble(const wchar_t* const str) { return wcstod(str, 0); }
 
 bool strToBool(const char* const str)
 {
@@ -230,16 +222,6 @@ bool strStartWith(const string& str, const string& substr)
     return true;
 }
 
-bool strStartWithW(const wstring& str, const wstring& substr)
-{
-    if (str.size() < substr.size())
-        return false;
-    for (size_t i = 0; i < substr.size(); i++)
-        if (substr[i] != str[i])
-            return false;
-    return true;
-}
-
 vector<string> splitStr(const char* str, char splitter)
 {
     vector<string> rez;
@@ -296,24 +278,6 @@ void splitStr(vector<string>& rez, const char* str, char splitter)
     }
     if (buf > prevPos)
         rez.push_back(string(prevPos, buf - prevPos));
-}
-
-vector<wstring> splitStrW(const wchar_t* str, wchar_t splitter)
-{
-    vector<wstring> rez;
-    const wchar_t* prevPos = str;
-    const wchar_t* buf = str;
-    for (; *buf; buf++)
-    {
-        if (*buf == splitter)
-        {
-            rez.push_back(wstring(prevPos, buf - prevPos));
-            prevPos = buf + 1;
-        }
-    }
-    if (buf > prevPos)
-        rez.push_back(wstring(prevPos, buf - prevPos));
-    return rez;
 }
 
 string extractFileExt(const string& src)
@@ -401,17 +365,6 @@ string trimStr(const string& value)
     for (; chEnd >= chBeg && (*chEnd == '\n' || *chEnd == '\r' || *chEnd == ' '); chEnd--)
         ;
     return value.substr(chBeg - bufStart, chEnd - chBeg + 1);
-}
-
-wstring trimStrW(const wstring& value)
-{
-    int chBeg = 0;
-    int chEnd = value.length() - 1;
-    for (; chBeg < value.length() && (value[chBeg] == '\n' || value[chBeg] == '\r' || value[chBeg] == ' '); chBeg++)
-        ;
-    for (; chEnd >= chBeg && (value[chEnd] == '\n' || value[chEnd] == '\r' || value[chEnd] == ' '); chEnd--)
-        ;
-    return value.substr(chBeg, chEnd - chBeg + 1);
 }
 
 vector<string> splitQuotedStr(const char* str, char splitter)
