@@ -13,7 +13,7 @@ find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
 
 set(lang_qrc "translations.qrc")
 configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts)
+qt5_add_translation(QM_FILES translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts)
 
 set(tsmuxer_gui_sources
   main.cpp
