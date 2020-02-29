@@ -168,37 +168,37 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="660"/>
         <source>Delay (in ms):</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Задержка (в милисек)</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="693"/>
         <source>Downconvert HD audio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Упростить HD звук</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="700"/>
         <source>Secondary</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Дополнительный</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="707"/>
         <source>Bind to video FPS</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Задать FPS как у видео</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="714"/>
         <source>3d offset:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">3d глубина</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="751"/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Язык:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="767"/>
         <source>Demux options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Параметры расслоения</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="779"/>
