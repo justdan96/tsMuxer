@@ -11,6 +11,11 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
 
+set(lang_qrc "translations.qrc")
+configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
+qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts)
+qt5_add_resources(QM_COMPILED_FILES ${CMAKE_CURRENT_BINARY_DIR}/${lang_qrc})
+
 set(tsmuxer_gui_sources
   main.cpp
   tsmuxerwindow.cpp
@@ -19,11 +24,11 @@ set(tsmuxer_gui_sources
   muxForm.ui
   checkboxedheaderview.cpp
   images.qrc
+  ${QM_FILES}
+  ${QM_COMPILED_FILES}
 )
 
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts)
-
-add_executable(tsMuxerGUI ${tsmuxer_gui_sources} ${QM_FILES})
+add_executable(tsMuxerGUI ${tsmuxer_gui_sources})
 target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
 
 if (WIN32)
