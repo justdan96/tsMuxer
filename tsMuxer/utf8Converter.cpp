@@ -25,7 +25,7 @@ std::string toUtf8(const uint8_t* start, size_t numBytes, SourceFormat srcFormat
     {
     case sfUTF8:
         return std::string(start, start + numBytes);
-    default:
+    default:  // FIXME
         return std::string();
     }
 }
