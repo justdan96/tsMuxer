@@ -366,7 +366,7 @@ void RenderSpans(FT_Library& library, FT_Outline* const outline, Spans* spans)
     FT_Outline_Render(library, outline, &params);
 }
 
-void RenderGlyph(FT_Library& library, wchar_t ch, FT_Face& face, int size, const Pixel32& fontCol,
+void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, int size, const Pixel32& fontCol,
                  const Pixel32 outlineColOut, const Pixel32 outlineColIner, float outlineWidth, int left, int top,
                  int width, int height, uint32_t* dstData)
 {
@@ -527,6 +527,7 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
 
     uint8_t alpha = m_font.m_color >> 24;
     uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
+    // FIXME iterate unichars instead of bytes here
     for (int i = 0; i < text.length(); ++i)
     {
         RenderGlyph(library, text.at(i), face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
