@@ -258,16 +258,16 @@ bool SRTStreamReader::parseTime(const string& text)
     {
         if (text[i] == '-' && text[i + 1] == '-' && text[i + 2] == '>')
         {
-            string first = trimStrW(text.substr(0, i));
-            string second = trimStrW(text.substr(i + 3, text.length() - i - 3));
+            string first = trimStr(text.substr(0, i));
+            string second = trimStr(text.substr(i + 3, text.length() - i - 3));
             for (int j = 0; j < first.length(); j++)
                 if (first[j] == ',')
                     first[j] = '.';
             for (int j = 0; j < second.length(); j++)
                 if (second[j] == ',')
                     second[j] = '.';
-            m_inTime = timeToFloatW(first);
-            m_outTime = timeToFloatW(second);
+            m_inTime = timeToFloat(first);
+            m_outTime = timeToFloat(second);
             return true;
         }
     }

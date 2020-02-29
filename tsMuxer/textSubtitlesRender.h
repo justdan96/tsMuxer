@@ -121,7 +121,6 @@ class TextSubtitlesRender
     int getRepeatCnt(uint32_t* pos, uint32_t* end);
     std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack);
     int browserSizeToRealSize(int bSize, double rSize);
-    size_t findUnquotedStrW(const std::string& str, const std::string& substr);
 
    private:
     Font m_initFont;

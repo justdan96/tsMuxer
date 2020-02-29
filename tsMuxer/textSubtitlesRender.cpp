@@ -155,6 +155,33 @@ const static pair<const char*, uint32_t> defaultPallette[] = {make_pair("black",
                                                               make_pair("wheat", 0xf5deb3),
                                                               make_pair("whitesmoke", 0xf5f5f5),
                                                               make_pair("yellowgreen", 0x9acd32)};
+
+size_t findUnquotedStr(const string& str, const string& substr)
+{
+    if (substr.size() == 0)
+        return string::npos;
+    bool quote = false;
+    for (int i = 0; i < str.size(); i++)
+    {
+        if (str[i] == '\"' || str[i] == '\'')
+            quote = !quote;
+        else if (!quote && str[i] == substr[0])
+        {
+            bool found = true;
+            for (int j = 1; j < substr.size(); j++)
+            {
+                if (i + j >= str.size() || str[i + j] != substr[j])
+                {
+                    found = false;
+                    break;
+                }
+            }
+            if (found)
+                return i;
+        }
+    }
+    return string::npos;
+}
 }
 
 namespace text_subtitles
@@ -195,33 +222,6 @@ string findFontArg(const string& text, int pos)
         return "";
 }
 
-size_t TextSubtitlesRender::findUnquotedStrW(const string& str, const string& substr)
-{
-    if (substr.size() == 0)
-        return string::npos;
-    bool quote = false;
-    for (int i = 0; i < str.size(); i++)
-    {
-        if (str[i] == '\"' || str[i] == '\'')
-            quote = !quote;
-        else if (!quote && str[i] == substr[0])
-        {
-            bool found = true;
-            for (int j = 1; j < substr.size(); j++)
-            {
-                if (i + j >= str.size() || str[i + j] != substr[j])
-                {
-                    found = false;
-                    break;
-                }
-            }
-            if (found)
-                return i;
-        }
-    }
-    return string::npos;
-}
-
 uint32_t rgbSwap(uint32_t color)
 {
     uint8_t* rgb = (uint8_t*)&color;
@@ -260,7 +260,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
         {
             bool isTag = false;
             bool endTag = false;
-            string tagStr = trimStrW(line.substr(bStartPos + 1, i - bStartPos - 1));
+            string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
             string ltagStr = tagStr;
             for (int j = 0; j < ltagStr.size(); j++) ltagStr[j] = towlower(ltagStr[j]);
             if (ltagStr == "i" || ltagStr == "italic")
@@ -308,18 +308,18 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             {
                 endTag = true;
             }
-            else if (strStartWithW(ltagStr, "font "))
+            else if (strStartWith(ltagStr, "font "))
             {
-                size_t fontNamePos = findUnquotedStrW(ltagStr, "name");  // ltagStr.find("name");
+                size_t fontNamePos = findUnquotedStr(ltagStr, "name");  // ltagStr.find("name");
                 if (fontNamePos == string::npos)
-                    fontNamePos = findUnquotedStrW(ltagStr, "face");
+                    fontNamePos = findUnquotedStr(ltagStr, "face");
                 if (fontNamePos != string::npos)
-                    curFont.m_name = unquoteStrW(findFontArg(tagStr, fontNamePos /*, lastIndexPos*/));
+                    curFont.m_name = unquoteStr(findFontArg(tagStr, fontNamePos /*, lastIndexPos*/));
 
-                size_t colorPos = findUnquotedStrW(ltagStr, "color");
+                size_t colorPos = findUnquotedStr(ltagStr, "color");
                 if (colorPos != string::npos)
                 {
-                    string arg = unquoteStrW(findFontArg(ltagStr, colorPos));
+                    string arg = unquoteStr(findFontArg(ltagStr, colorPos));
                     bool defClrFound = false;
                     for (int j = 0; j < sizeof(defaultPallette) / sizeof(pair<const wchar_t*, uint32_t>); j++)
                     {
@@ -333,30 +333,30 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                     if (!defClrFound)
                     {
                         if (arg.size() > 0 && (arg[0] == '#' || arg[0] == 'x'))
-                            curFont.m_color = strWToInt32u(arg.substr(1, 16384).c_str(), 16);
+                            curFont.m_color = strToInt32u(arg.substr(1, 16384).c_str(), 16);
                         else if (arg.size() > 1 && (arg[0] == '0' || arg[1] == 'x'))
-                            curFont.m_color = strWToInt32u(arg.substr(2, 16384).c_str(), 16);
+                            curFont.m_color = strToInt32u(arg.substr(2, 16384).c_str(), 16);
                         else
-                            curFont.m_color = strWToInt32u(arg.c_str(), 10);
+                            curFont.m_color = strToInt32u(arg.c_str(), 10);
                     }
                     if ((curFont.m_color & 0xff000000u) == 0)
                         curFont.m_color |= 0xff000000u;
                 }
-                size_t fontSizePos = findUnquotedStrW(ltagStr, "size");
+                size_t fontSizePos = findUnquotedStr(ltagStr, "size");
                 if (fontSizePos != string::npos)
                 {
-                    string arg = unquoteStrW(findFontArg(tagStr, fontSizePos));
+                    string arg = unquoteStr(findFontArg(tagStr, fontSizePos));
                     if (arg.size() > 0)
                     {
                         if (arg[0] == '+' || arg[0] == '-')
-                            curFont.m_size += strWToInt32(arg.c_str(), 10);
+                            curFont.m_size += strToInt32(arg.c_str(), 10);
                         else
-                            curFont.m_size = strWToInt32u(arg.c_str(), 10);
+                            curFont.m_size = strToInt32u(arg.c_str(), 10);
                     }
                 }
                 isTag = true;
             }
-            else if (strStartWithW(tagStr, "/font"))
+            else if (strStartWith(tagStr, "/font"))
             {
                 endTag = true;
             }
@@ -391,7 +391,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     bool forced = false;
     memset(m_pData, 0, m_width * m_height * 4);
     vector<Font> fontStack;
-    vector<string> lines = splitStrW(text.c_str(), '\n');
+    vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
     for (int i = 0; i < lines.size(); ++i)

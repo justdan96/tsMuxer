@@ -209,7 +209,7 @@ void TextSubtitlesRenderFT::setFont(const Font& font)
     if (m_font != font)
     {
         m_font = font;
-        string fontName = UtfConverter::ToUtf8(font.m_name);
+        string fontName = font.m_name;
         if (!strEndWith(fontName, string(".ttf")))
         {
             std::string fontLower = strToLowerCase(fontName);
