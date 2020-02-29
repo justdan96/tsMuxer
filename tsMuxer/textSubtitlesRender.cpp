@@ -173,7 +173,7 @@ string findFontArg(const string& text, int pos)
     int firstPos = -1;
     for (int i = pos; i < text.size(); i++)
     {
-        if (text[i] == L'=')
+        if (text[i] == '=')
             delFound = true;
         else if (delFound)
         {
@@ -199,7 +199,7 @@ size_t TextSubtitlesRender::findUnquotedStrW(const string& str, const string& su
     bool quote = false;
     for (int i = 0; i < str.size(); i++)
     {
-        if (str[i] == L'\"' || str[i] == L'\'')
+        if (str[i] == '\"' || str[i] == '\'')
             quote = !quote;
         else if (!quote && str[i] == substr[0])
         {
@@ -329,9 +329,9 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                     }
                     if (!defClrFound)
                     {
-                        if (arg.size() > 0 && (arg[0] == L'#' || arg[0] == L'x'))
+                        if (arg.size() > 0 && (arg[0] == '#' || arg[0] == 'x'))
                             curFont.m_color = strWToInt32u(arg.substr(1, 16384).c_str(), 16);
-                        else if (arg.size() > 1 && (arg[0] == L'0' || arg[1] == L'x'))
+                        else if (arg.size() > 1 && (arg[0] == '0' || arg[1] == 'x'))
                             curFont.m_color = strWToInt32u(arg.substr(2, 16384).c_str(), 16);
                         else
                             curFont.m_color = strWToInt32u(arg.c_str(), 10);

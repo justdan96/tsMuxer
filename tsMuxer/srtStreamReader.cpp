@@ -149,7 +149,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
 bool SRTStreamReader::strOnlySpace(std::string& str)
 {
     for (std::string::iterator itr = str.begin(); itr != str.end(); ++itr)
-        if (*itr != L' ')
+        if (*itr != ' ')
             return false;
     return true;
 }
@@ -193,7 +193,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         {
             string& str = m_sourceText.front();
             for (int i = 0; i < str.length(); i++)
-                if (!(str[i] >= L'0' && str[i] <= L'9') && str[i] != L' ')
+                if (!(str[i] >= '0' && str[i] <= '9') && str[i] != ' ')
                 {
                     isNUmber = false;
                     break;
@@ -256,16 +256,16 @@ bool SRTStreamReader::parseTime(const string& text)
 {
     for (int i = 0; i < text.length() - 2; i++)
     {
-        if (text[i] == L'-' && text[i + 1] == L'-' && text[i + 2] == L'>')
+        if (text[i] == '-' && text[i + 1] == '-' && text[i + 2] == '>')
         {
             string first = trimStrW(text.substr(0, i));
             string second = trimStrW(text.substr(i + 3, text.length() - i - 3));
             for (int j = 0; j < first.length(); j++)
-                if (first[j] == L',')
-                    first[j] = L'.';
+                if (first[j] == ',')
+                    first[j] = '.';
             for (int j = 0; j < second.length(); j++)
-                if (second[j] == L',')
-                    second[j] = L'.';
+                if (second[j] == ',')
+                    second[j] = '.';
             m_inTime = timeToFloatW(first);
             m_outTime = timeToFloatW(second);
             return true;
