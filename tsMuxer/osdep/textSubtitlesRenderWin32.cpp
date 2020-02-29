@@ -97,7 +97,7 @@ void TextSubtitlesRenderWin32::setFont(const Font& font)
 #endif
 }
 
-void TextSubtitlesRenderWin32::drawText(const std::wstring& text, RECT* rect)
+void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 {
 #ifdef OLD_WIN32_RENDERER
     ::DrawText(m_dc, text.c_str(), text.length(), rect, DT_NOPREFIX);
@@ -128,7 +128,7 @@ void TextSubtitlesRenderWin32::drawText(const std::wstring& text, RECT* rect)
 #endif
 }
 
-void TextSubtitlesRenderWin32::getTextSize(const std::wstring& text, SIZE* mSize)
+void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 {
 #ifdef OLD_WIN32_RENDERER
     ::GetTextExtentPoint32(m_dc, text.c_str(), text.size(), mSize);

@@ -58,7 +58,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     if ((dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF) || isLegalUTF8String(dataStart, len))
     {
         m_charSize = 1;
-        m_srcFormat = UtfConverter::sfUTF8;
+        // m_srcFormat = UtfConverter::sfUTF8;
         prefixLen = 3;
     }
     else if (dataStart[0] == 0 && dataStart[1] == 0 && dataStart[2] == 0xFE && dataStart[3] == 0xFF)
@@ -102,7 +102,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
         m_srcFormat = UtfConverter::sfANSI;  // default value for win32
 #else
         LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to UTF-8");
-        m_srcFormat = UtfConverter::sfUTF8;
+        // m_srcFormat = UtfConverter::sfUTF8;
 #endif
     }
     return true;
@@ -133,7 +133,8 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
                     m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R)
                     x = m_charSize;
 
-            m_sourceText.push(UtfConverter::toWideString(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
+            // FIXME m_sourceText.push(UtfConverter::toWideString(lastProcessedLine, cur - lastProcessedLine - x,
+            // m_srcFormat));
             std::string& tmp = m_sourceText.back();
             if (strOnlySpace(tmp))
                 tmp.clear();
