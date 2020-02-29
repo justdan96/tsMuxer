@@ -109,6 +109,7 @@ static uint32_t FOUR_CC(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 }
 
 #ifdef _WIN32
+std::vector<wchar_t> fromAcp(const char*, int sz);
 std::vector<wchar_t> toWide(const char*, int sz = -1);
 std::vector<wchar_t> toWide(const std::string&);
 std::string toUtf8(const wchar_t*);

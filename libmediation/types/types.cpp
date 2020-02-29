@@ -445,6 +445,26 @@ uint32_t random32()
 #ifdef _WIN32
 #include <windows.h>
 
+namespace
+{
+std::vector<wchar_t> mbtwc_wrapper(int codePage, const char* inputStr, int inputSize, int outputSize)
+{
+    std::vector<wchar_t> multiByteBuf(static_cast<std::size_t>(outputSize));
+    MultiByteToWideChar(codePage, 0, inputStr, inputSize, multiByteBuf.data(), outputSize);
+    if (multiByteBuf.empty() || multiByteBuf.back() != 0)
+    {
+        multiByteBuf.push_back(0);
+    }
+    return multiByteBuf;
+}
+}  // namespace
+
+std::vector<wchar_t> fromAcp(const char* acpStr, int sz)
+{
+    auto requiredSiz = MultiByteToWideChar(CP_ACP, 0, acpStr, sz, nullptr, 0);
+    return mbtwc_wrapper(CP_ACP, acpStr, sz, requiredSiz);
+}
+
 std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.c_str(), utf8Str.size()); }
 
 std::vector<wchar_t> toWide(const char* utf8Str, int sz)
@@ -453,23 +473,15 @@ std::vector<wchar_t> toWide(const char* utf8Str, int sz)
     UINT codePage;
     if (requiredSiz != 0)
     {
-        codePage = CP_UTF8;
+        return mbtwc_wrapper(codePage, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
     }
     else
     {
         /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
          * to keep compatibility with meta files saved by older versions of the GUI which put the file name through
          * QString::toLocal8Bit, which uses the ACP on Windows. */
-        codePage = CP_ACP;
-        requiredSiz = MultiByteToWideChar(codePage, 0, utf8Str, sz, nullptr, 0);
+        return fromAcp(utf8Str, sz);
     }
-    std::vector<wchar_t> multiByteBuf(static_cast<std::size_t>(requiredSiz));
-    MultiByteToWideChar(codePage, 0, utf8Str, sz, multiByteBuf.data(), requiredSiz);
-    if (multiByteBuf.empty() || multiByteBuf.back() != 0)
-    {
-        multiByteBuf.push_back(0);
-    }
-    return multiByteBuf;
 }
 
 std::string toUtf8(const wchar_t* wideStr)
