@@ -574,23 +574,22 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
     else
         FT_Set_Transform(face, 0, &pen);
 
-    for (int i = 0; i < text.length(); ++i)
-    {
-        int glyph_index = FT_Get_Char_Index(face, text.at(i));
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        int glyph_index = FT_Get_Char_Index(face, c);
         int error = FT_Load_Glyph(face, glyph_index, 0);
         if (error)
-            THROW(ERR_COMMON, "Can't load symbol code '" << text.at(i) << "' from font");
+            THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font");
 
         error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         if (error)
-            THROW(ERR_COMMON, "Can't render symbol code '" << text.at(i) << "' from font");
+            THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font");
         pen.x += face->glyph->advance.x >> 6;
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         pen.x += m_font.m_borderWidth / 2;
         mSize->cy = face->size->metrics.height >> 6;
         mSize->cx = pen.x + face->glyph->bitmap_left;
-    }
+    });
 }
 
 int TextSubtitlesRenderFT::getLineSpacing() { return face->size->metrics.height >> 6; }
