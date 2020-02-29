@@ -78,8 +78,7 @@ std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat
 #ifdef _WIN32
     case sfANSI:
     {
-        auto wide = fromAcp(reinterpret_cast<const char *>(start), numBytes);
-        return ::toUtf8(wide.data());
+        return ::toUtf8(fromAcp(reinterpret_cast<const char *>(start), numBytes).data());
     }
 #endif
     default:
