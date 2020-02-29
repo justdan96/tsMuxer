@@ -170,7 +170,7 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
     while (it != std::end(utf8String))
     {
         UTF32 ch = 0;
-        unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned int>(*it)];
+        unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
         switch (extraBytesToRead)
         {
         case 5:

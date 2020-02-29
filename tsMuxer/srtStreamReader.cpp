@@ -55,7 +55,8 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     if (len < 4)
         return false;
     // detect UTF-8/UTF-16/UTF-32 format
-    if ((dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF) || isLegalUTF8String(dataStart, len))
+    if ((dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF) ||
+        convertUTF::isLegalUTF8String(dataStart, len))
     {
         m_charSize = 1;
         m_srcFormat = UtfConverter::sfUTF8;
