@@ -50,7 +50,7 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
     auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, convertUTF::strictConversion);
     if (result != convertUTF::conversionOK)
     {
-        THROW(ERR_COMMON, "Can't convert UTF-8 to UTF-32. Invalid source text");
+        THROW(ERR_COMMON, "Cannot convert string : invalid source text");
     }
     rv.resize(targetStart_out - targetStart);
     return rv;
@@ -81,7 +81,7 @@ std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat
     }
 #endif
     default:
-        THROW(ERR_COMMON, "Can't convert UTF-8 to UTF-16. Invalid source text");
+        THROW(ERR_COMMON, "Unknown parameter to UtfConverter::toUtf8");
     }
 }
 }  // namespace UtfConverter
