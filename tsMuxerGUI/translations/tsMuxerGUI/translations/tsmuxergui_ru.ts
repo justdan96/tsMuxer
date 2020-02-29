@@ -1,18 +1,18 @@
 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<TS version="2.1" language="ru_RU">
 <context>
     <name>QObject</name>
     <message>
         <location filename="../muxForm.cpp" line="39"/>
         <source>Progress: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выполняется:</translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="62"/>
         <source>Too many errors! tsMuxeR is terminated.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Слишком много ошибок. tsMuxeR остановлен.</translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="75"/>
