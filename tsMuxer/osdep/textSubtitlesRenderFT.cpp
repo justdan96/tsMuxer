@@ -6,7 +6,7 @@
 
 #include "textSubtitlesRenderFT.h"
 
-#include "../utf8Converter.h"
+#include "../convertUTF.h"
 #include "../vodCoreException.h"
 #include "../vod_common.h"
 // #include "../math.h"
@@ -527,10 +527,8 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
 
     uint8_t alpha = m_font.m_color >> 24;
     uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
-    // FIXME iterate unichars instead of bytes here
-    for (int i = 0; i < text.length(); ++i)
-    {
-        RenderGlyph(library, text.at(i), face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        RenderGlyph(library, c, face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
                     Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom,
                     (uint32_t*)m_pData);
 
@@ -539,7 +537,7 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         maxX = pen.x + face->glyph->bitmap_left;
-    }
+    });
     if ((m_font.m_opts & m_font.UNDERLINE) || (m_font.m_opts & m_font.STRIKE_OUT))
     {
         // SIZE size;
