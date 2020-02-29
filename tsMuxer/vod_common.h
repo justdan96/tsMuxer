@@ -83,7 +83,6 @@ const static int MAX_ERROR = -100;
 bool isFillerNullPacket(uint8_t* curBuf);
 
 std::string unquoteStr(const std::string& val);
-std::wstring unquoteStrW(const std::wstring& val);
 std::string quoteStr(const std::string& val);
 
 std::vector<std::string> extractFileList(const std::string& val);
@@ -118,7 +117,6 @@ void AV_WB32(uint8_t* buffer, uint32_t value);
 
 std::string floatToTime(double time, char msSeparator = '.');
 double timeToFloat(const std::string& chapterStr);
-double timeToFloatW(const std::wstring& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
 
 static int64_t nanoClockToPts(int64_t value)

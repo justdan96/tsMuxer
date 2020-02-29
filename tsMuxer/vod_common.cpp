@@ -40,16 +40,6 @@ std::string unquoteStr(const std::string& val)
     return tmp;
 }
 
-std::wstring unquoteStrW(const std::wstring& val)
-{
-    std::wstring tmp = val;
-    if (val.size() > 0 && val[0] == '\"')
-        tmp = tmp.substr(1, tmp.size());
-    if (val.size() > 0 && val[val.size() - 1] == '\"')
-        tmp = tmp.substr(0, tmp.size() - 1);
-    return tmp;
-}
-
 std::string quoteStr(const std::string& val) { return "\"" + val + "\""; }
 
 std::vector<std::string> extractFileList(const std::string& val)
@@ -131,22 +121,5 @@ double timeToFloat(const std::string& chapterStr)
     int hour = 0;
     if (timeParts.size() > 2)
         hour = strToInt32(timeParts[timeParts.size() - 3].c_str());
-    return hour * 3600 + min * 60 + sec;
-}
-
-double timeToFloatW(const std::wstring& chapterStr)
-{
-    if (chapterStr.size() == 0)
-        return 0;
-    std::vector<std::wstring> timeParts = splitStrW(chapterStr.c_str(), ':');
-    double sec = 0;
-    if (timeParts.size() > 0)
-        sec = strWToDouble(timeParts[timeParts.size() - 1].c_str());
-    int32_t min = 0;
-    if (timeParts.size() > 1)
-        min = strWToInt32(timeParts[timeParts.size() - 2].c_str());
-    int32_t hour = 0;
-    if (timeParts.size() > 2)
-        hour = strWToInt32(timeParts[timeParts.size() - 3].c_str());
     return hour * 3600 + min * 60 + sec;
 }
