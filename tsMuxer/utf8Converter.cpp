@@ -19,7 +19,10 @@ static std::string sourceEncoding;
 
 namespace UtfConverter
 {
-std::wstring FromUtf8(const std::string& utf8string)
+std::string toUtf8(uint8_t *start, size_t widesize, SourceFormat srcFormat) { return std::string(); }
+
+#if 0
+std::string FromUtf8(const std::string& utf8string)
 {
     size_t widesize = utf8string.length();
     if (sizeof(wchar_t) == 2)
@@ -37,7 +40,7 @@ std::wstring FromUtf8(const std::string& utf8string)
             THROW(ERR_COMMON, "Can't convert UTF-8 to UTF-16. Invalid source text");
         }
         *targetstart = 0;
-        std::wstring resultstring(widestringnative);
+        std::string resultstring(widestringnative);
         delete[] widestringnative;
         return resultstring;
     }
@@ -56,7 +59,7 @@ std::wstring FromUtf8(const std::string& utf8string)
             THROW(ERR_COMMON, "Can't convert UTF-8 to UTF-32. Invalid source text");
         }
         *targetstart = 0;
-        std::wstring resultstring(widestringnative);
+        std::string resultstring(widestringnative);
         delete[] widestringnative;
         return resultstring;
     }
@@ -67,7 +70,7 @@ std::wstring FromUtf8(const std::string& utf8string)
     return L"";
 }
 
-std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcFormat)
+std::string toWideString(uint8_t* start, size_t widesize, SourceFormat srcFormat)
 {
     if (widesize == 0)
         return L"";
@@ -77,7 +80,7 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
         wchar_t* widestringnative = new wchar_t[widesize + 1];
         int wlen = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (LPCSTR)start, widesize, widestringnative, widesize);
         widestringnative[wlen] = 0;
-        std::wstring resultstring(widestringnative);
+        std::string resultstring(widestringnative);
         delete[] widestringnative;
         return resultstring;
     }
@@ -118,7 +121,7 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
             std::string msg((const char*)sourcestart, widesize);
             THROW(ERR_COMMON, "Can't convert source text to UTF-16. Invalid chars sequence: " << msg);
         }
-        std::wstring resultstring(widestringnative);
+        std::string resultstring(widestringnative);
         delete[] widestringnative;
         return resultstring;
     }
@@ -159,7 +162,7 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
             delete[] widestringnative;
             THROW(ERR_COMMON, "Can't convert source text to UTF-32. Invalid chars sequence.");
         }
-        std::wstring resultstring(widestringnative);
+        std::string resultstring(widestringnative);
         delete[] widestringnative;
         return resultstring;
     }
@@ -170,7 +173,7 @@ std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcForma
     return L"";
 }
 
-std::string ToUtf8(const std::wstring& widestring)
+std::string ToUtf8(const std::string& widestring)
 {
     size_t widesize = widestring.length();
 
@@ -218,4 +221,5 @@ std::string ToUtf8(const std::wstring& widestring)
     }
     return "";
 }
+#endif
 }  // namespace UtfConverter

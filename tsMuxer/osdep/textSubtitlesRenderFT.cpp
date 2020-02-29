@@ -502,7 +502,7 @@ void RenderGlyph(FT_Library& library, wchar_t ch, FT_Face& face, int size, const
     }
 }
 
-void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
+void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
 {
     FT_Vector pen;
     pen.x = rect->left;
@@ -558,7 +558,7 @@ void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
     }
 }
 
-void TextSubtitlesRenderFT::getTextSize(const wstring& text, SIZE* mSize)
+void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
 {
     FT_Vector pen;
     pen.x = 0;

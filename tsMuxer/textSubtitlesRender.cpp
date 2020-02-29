@@ -167,7 +167,7 @@ TextSubtitlesRender::~TextSubtitlesRender()
     // delete [] m_renderedData;
 }
 
-wstring findFontArg(const wstring& text, int pos)
+string findFontArg(const string& text, int pos)
 {
     bool delFound = false;
     int firstPos = -1;
@@ -192,7 +192,7 @@ wstring findFontArg(const wstring& text, int pos)
         return L"";
 }
 
-size_t TextSubtitlesRender::findUnquotedStrW(const wstring& str, const wstring& substr)
+size_t TextSubtitlesRender::findUnquotedStrW(const string& str, const string& substr)
 {
     if (substr.size() == 0)
         return string::npos;
@@ -237,7 +237,7 @@ int TextSubtitlesRender::browserSizeToRealSize(int bSize, double rSize)
     return rSize;
 }
 
-vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstring& line, vector<Font>& fontStack)
+vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack)
 {
     if (fontStack.size() == 0)
     {
@@ -246,7 +246,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
     }
     Font curFont = fontStack[fontStack.size() - 1];
 
-    vector<pair<Font, wstring>> rez;
+    vector<pair<Font, string>> rez;
     int prevTextPos = 0;
     int bStartPos = -1;
     for (int i = 0; i < line.size(); i++)
@@ -257,8 +257,8 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
         {
             bool isTag = false;
             bool endTag = false;
-            wstring tagStr = trimStrW(line.substr(bStartPos + 1, i - bStartPos - 1));
-            wstring ltagStr = tagStr;
+            string tagStr = trimStrW(line.substr(bStartPos + 1, i - bStartPos - 1));
+            string ltagStr = tagStr;
             for (int j = 0; j < ltagStr.size(); j++) ltagStr[j] = towlower(ltagStr[j]);
             if (ltagStr == L"i" || ltagStr == L"italic")
             {
@@ -316,7 +316,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
                 size_t colorPos = findUnquotedStrW(ltagStr, L"color");
                 if (colorPos != string::npos)
                 {
-                    wstring arg = unquoteStrW(findFontArg(ltagStr, colorPos));
+                    string arg = unquoteStrW(findFontArg(ltagStr, colorPos));
                     bool defClrFound = false;
                     for (int j = 0; j < sizeof(defaultPallette) / sizeof(pair<const wchar_t*, uint32_t>); j++)
                     {
@@ -342,7 +342,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
                 size_t fontSizePos = findUnquotedStrW(ltagStr, L"size");
                 if (fontSizePos != string::npos)
                 {
-                    wstring arg = unquoteStrW(findFontArg(tagStr, fontSizePos));
+                    string arg = unquoteStrW(findFontArg(tagStr, fontSizePos));
                     if (arg.size() > 0)
                     {
                         if (arg[0] == '+' || arg[0] == '-')
@@ -361,7 +361,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
             {
                 if (bStartPos > prevTextPos)
                 {
-                    wstring msg = line.substr(prevTextPos, bStartPos - prevTextPos);
+                    string msg = line.substr(prevTextPos, bStartPos - prevTextPos);
                     rez.push_back(make_pair(fontStack[fontStack.size() - 1], msg));
                 }
                 if (isTag)
@@ -383,17 +383,17 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
     return rez;
 }
 
-bool TextSubtitlesRender::rasterText(const std::wstring& text)
+bool TextSubtitlesRender::rasterText(const std::string& text)
 {
     bool forced = false;
     memset(m_pData, 0, m_width * m_height * 4);
     vector<Font> fontStack;
-    vector<wstring> lines = splitStrW(text.c_str(), '\n');
+    vector<string> lines = splitStrW(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
     for (int i = 0; i < lines.size(); ++i)
     {
-        vector<pair<Font, wstring>> txtParts = processTxtLine(lines[i], fontStack);
+        vector<pair<Font, string>> txtParts = processTxtLine(lines[i], fontStack);
         for (int i = 0; i < txtParts.size(); ++i)
         {
             if (txtParts[i].first.m_opts & Font::FORCED)

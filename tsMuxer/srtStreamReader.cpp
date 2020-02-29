@@ -120,7 +120,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
     int roundLen = len & (~(m_charSize - 1));
     uint8_t* end = cur + roundLen;
     uint8_t* lastProcessedLine = cur;
-    vector<wstring> rez;
+    vector<string> rez;
     for (; cur < end; cur += m_charSize)
     {
         // if (cur[m_splitterOfs] == '\n')
@@ -134,7 +134,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
                     x = m_charSize;
 
             m_sourceText.push(UtfConverter::toWideString(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
-            std::wstring& tmp = m_sourceText.back();
+            std::string& tmp = m_sourceText.back();
             if (strOnlySpace(tmp))
                 tmp.clear();
 
@@ -146,9 +146,9 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
     return lastProcessedLine - dataStart;
 }
 
-bool SRTStreamReader::strOnlySpace(std::wstring& str)
+bool SRTStreamReader::strOnlySpace(std::string& str)
 {
-    for (std::wstring::iterator itr = str.begin(); itr != str.end(); ++itr)
+    for (std::string::iterator itr = str.begin(); itr != str.end(); ++itr)
         if (*itr != L' ')
             return false;
     return true;
@@ -191,7 +191,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_state = PARSE_TIME;
         bool isNUmber = true;
         {
-            wstring& str = m_sourceText.front();
+            string& str = m_sourceText.front();
             for (int i = 0; i < str.length(); i++)
                 if (!(str[i] >= L'0' && str[i] <= L'9') && str[i] != L' ')
                 {
@@ -252,14 +252,14 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
     return rez;
 }
 
-bool SRTStreamReader::parseTime(const wstring& text)
+bool SRTStreamReader::parseTime(const string& text)
 {
     for (int i = 0; i < text.length() - 2; i++)
     {
         if (text[i] == L'-' && text[i + 1] == L'-' && text[i + 2] == L'>')
         {
-            wstring first = trimStrW(text.substr(0, i));
-            wstring second = trimStrW(text.substr(i + 3, text.length() - i - 3));
+            string first = trimStrW(text.substr(0, i));
+            string second = trimStrW(text.substr(i + 3, text.length() - i - 3));
             for (int j = 0; j < first.length(); j++)
                 if (first[j] == L',')
                     first[j] = L'.';
