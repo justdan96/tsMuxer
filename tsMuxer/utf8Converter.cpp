@@ -25,13 +25,14 @@ template <typename F>
 auto make_vector(const uint8_t *start, size_t numBytes, F func) -> std::vector<decltype(get_fn_ret_type(func))>
 {
     std::vector<decltype(get_fn_ret_type(func))> rv;
-    const auto elem_size = sizeof(typename decltype(rv)::size_type);
+    const auto elem_size = sizeof(typename decltype(rv)::value_type);
     if (numBytes % elem_size)
     {
         THROW(ERR_COMMON, "Cannot convert string : size " << numBytes << " should be divisible by " << elem_size);
     }
     rv.reserve(numBytes);
-    while (start != (start + numBytes))
+    const auto end = (start + numBytes);
+    while (start != end)
     {
         rv.emplace_back(func(start));
         start += elem_size;

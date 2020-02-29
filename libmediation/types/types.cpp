@@ -470,10 +470,9 @@ std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.
 std::vector<wchar_t> toWide(const char* utf8Str, int sz)
 {
     auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
-    UINT codePage;
     if (requiredSiz != 0)
     {
-        return mbtwc_wrapper(codePage, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
+        return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
     }
     else
     {
