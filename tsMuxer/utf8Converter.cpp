@@ -9,6 +9,8 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
+using namespace convertUTF;
+
 namespace
 {
 uint16_t read_be16(const uint8_t *p) { return (p[0] << 8) | p[1]; }
@@ -44,11 +46,11 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
     rv.resize(vec.size() * 4);
     const InputType *sourceStart = vec.data();
     auto sourceEnd = sourceStart + vec.size();
-    auto targetStart = reinterpret_cast<convertUTF::UTF8 *>(&rv[0]);
+    auto targetStart = reinterpret_cast<UTF8 *>(&rv[0]);
     auto targetStart_out = targetStart;
     auto targetEnd = targetStart + rv.size();
-    auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, convertUTF::strictConversion);
-    if (result != convertUTF::conversionOK)
+    auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, strictConversion);
+    if (result != conversionOK)
     {
         THROW(ERR_COMMON, "Cannot convert string : invalid source text");
     }
@@ -61,7 +63,6 @@ namespace UtfConverter
 {
 std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat)
 {
-    using namespace convertUTF;
     switch (srcFormat)
     {
     case sfUTF8:
