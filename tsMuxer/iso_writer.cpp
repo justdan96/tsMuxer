@@ -4,12 +4,11 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 
+#include "utf8Converter.h"
+#include "vodCoreException.h"
 #include "vod_common.h"
-
-#ifdef _WIN32
-#include <time.h>
-#endif
 
 // ----------- routines --------------
 
@@ -107,6 +106,51 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
+}
+
+bool canUse8BitUnicode(const std::wstring& str)
+{
+    for (auto c : str)
+    {
+        if (static_cast<std::uint16_t>(c) >= 0x100)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<std::uint8_t> serializeDString(const std::string& str)
+{
+    std::vector<std::uint8_t> rv;
+    std::wstring wideStr;
+    auto utf8Str = reinterpret_cast<const uint8_t*>(str.c_str());
+    try
+    {
+        wideStr = UtfConverter::toWideString(utf8Str, str.size(), UtfConverter::sfUTF8);
+    }
+    catch (const VodCoreException&)
+    {
+#ifdef _WIN32
+        wideStr = UtfConverter::toWideString(utf8Str, str.size(), UtfConverter::sfANSI);
+        if (wideStr.empty())
+        {
+            throw;
+        }
+#else
+        throw;
+#endif
+    }
+    if (canUse8BitUnicode(wideStr))
+    {
+        rv.reserve(wideStr.length());
+        rv.push_back(8);
+    }
+    else
+    {
+        rv.push_back(16);
+    }
+    return rv;
 }
 
 void writeDString(uint8_t* buffer, const char* value, int fieldLen)
