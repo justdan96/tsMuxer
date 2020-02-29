@@ -158,12 +158,12 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="613"/>
         <source>Insert SEI and VUI data if absent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вставлять отсутствующие значения VUI и SEI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="618"/>
         <source>Always rebuild  SEI and VUI data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Пересоздавать значения VUI и SEI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="660"/>
