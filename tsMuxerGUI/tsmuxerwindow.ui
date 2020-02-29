@@ -2997,9 +2997,6 @@ p, li { white-space: pre-wrap; }
        <property name="textInteractionFlags">
         <set>Qt::NoTextInteraction</set>
        </property>
-       <property name="buddy">
-        <cstring></cstring>
-       </property>
       </widget>
      </item>
     </layout>
