@@ -1,36 +1,35 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../muxForm.cpp" line="39"/>
+        <location filename="../muxForm.cpp" line="48"/>
         <source>Progress: </source>
         <translation>Выполняется: </translation>
     </message>
     <message>
-        <location filename="../muxForm.cpp" line="62"/>
+        <location filename="../muxForm.cpp" line="71"/>
         <source>Too many errors! tsMuxeR is terminated.</source>
         <translation>Слишком много ошибок. tsMuxeR остановлен.</translation>
     </message>
     <message>
-        <location filename="../muxForm.cpp" line="75"/>
+        <location filename="../muxForm.cpp" line="84"/>
         <source>tsMuxeR successfully finished</source>
         <translation>tsMuxeR успешно завершился</translation>
     </message>
     <message>
-        <location filename="../muxForm.cpp" line="77"/>
+        <location filename="../muxForm.cpp" line="86"/>
         <source>tsMuxeR finished with error code %1</source>
         <translation>tsMuxeR завершился с кодом ошибки %1</translation>
     </message>
     <message>
-        <location filename="../muxForm.cpp" line="90"/>
+        <location filename="../muxForm.cpp" line="99"/>
         <source>terminating tsMuxeR...</source>
         <translation>tsMuxeR завершается...</translation>
     </message>
     <message>
-        <location filename="../muxForm.cpp" line="93"/>
+        <location filename="../muxForm.cpp" line="102"/>
         <source>tsMuxeR is terminated</source>
         <translation>tsMuxeR завершился</translation>
     </message>
@@ -168,7 +167,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="660"/>
         <source>Delay (in ms):</source>
-        <translation>Задержка (в мс)</translation>
+        <translation>Задержка (в мс):</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="693"/>
@@ -188,7 +187,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="714"/>
         <source>3d offset:</source>
-        <translation>3d глубина</translation>
+        <translation>3d глубина:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="751"/>
@@ -224,7 +223,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="827"/>
         <source>Bitrate</source>
-        <translation>Битрейт/translation>
+        <translation>Битрейт</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="840"/>
@@ -343,8 +342,8 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1329"/>
-        <source>Задать 3 версию формата BD-ROM</source>
-        <translation></translation>
+        <source>Force BD-ROM V3 format</source>
+        <translation>Задать 3 версию формата BD-ROM</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1341"/>
@@ -559,7 +558,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1952"/>
         <source> Default text based subtitles font: </source>
-        <translation>Шрифт текстовых субтитров по умолчанию</translation>
+        <translation> Шрифт текстовых субтитров по умолчанию: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1976"/>
@@ -629,7 +628,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2103"/>
         <source>Additional border, pixels:</source>
-        <translation>Дополнительная рамка, пикселей</translation>
+        <translation>Дополнительная рамка, пикселей:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2129"/>
@@ -639,7 +638,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2155"/>
         <source>Fade in/out animation:</source>
-        <translation>Постепенное появление/исчезание</translation>
+        <translation>Постепенное появление/исчезание:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2166"/>
@@ -669,7 +668,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2222"/>
         <source> Vertical position: </source>
-        <translation>Вертикальная позиция:</translation>
+        <translation> Вертикальная позиция: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2233"/>
@@ -700,7 +699,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2394"/>
         <source> Horizontal position: </source>
-        <translation>Позиция по горизонтали</translation>
+        <translation> Позиция по горизонтали: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2405"/>
@@ -759,7 +758,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2763"/>
-        <location filename="../tsmuxerwindow.cpp" line="1400"/>
+        <location filename="../tsmuxerwindow.cpp" line="1403"/>
         <source>Demux</source>
         <translation>Демукс</translation>
     </message>
@@ -770,7 +769,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2797"/>
-        <location filename="../tsmuxerwindow.cpp" line="2346"/>
+        <location filename="../tsmuxerwindow.cpp" line="2364"/>
         <source>File name</source>
         <translation>Имя Файла</translation>
     </message>
@@ -785,167 +784,168 @@
         <translation>Файл метаданных</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2909"/>
-        <location filename="../tsmuxerwindow.cpp" line="2332"/>
+        <location filename="../tsmuxerwindow.ui" line="2929"/>
+        <location filename="../tsmuxerwindow.cpp" line="2350"/>
         <source>Sta&amp;rt muxing</source>
-        <translation>Ста&amp;rт муксинга</translation>
+        <translation>Ста&amp;рт муксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2928"/>
+        <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
         <translation>Сохранить файл метаданных</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="531"/>
+        <location filename="../tsmuxerwindow.cpp" line="534"/>
         <source>Not supported</source>
         <translation>Не поддерживается</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="597"/>
-        <location filename="../tsmuxerwindow.cpp" line="1114"/>
+        <location filename="../tsmuxerwindow.cpp" line="600"/>
+        <location filename="../tsmuxerwindow.cpp" line="1117"/>
         <source>Unsupported format</source>
         <translation>Неподдерживаемый формат</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="598"/>
+        <location filename="../tsmuxerwindow.cpp" line="601"/>
         <source>Can&apos;t detect stream type. File name: &quot;%1&quot;</source>
-        <translation>Не определён тип потока</translation>
+        <translation>Не определён тип потока. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="868"/>
+        <location filename="../tsmuxerwindow.cpp" line="871"/>
         <source>Add media file</source>
         <translation>Добавить медиафайл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="905"/>
+        <location filename="../tsmuxerwindow.cpp" line="908"/>
         <source>File already exists</source>
         <translation>Файл уже есть</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="906"/>
+        <location filename="../tsmuxerwindow.cpp" line="909"/>
         <source>File &quot;%1&quot; already exists</source>
         <translation>Файл &quot;%1&quot; уже есть</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1119"/>
+        <location filename="../tsmuxerwindow.cpp" line="1122"/>
         <source>Unsupported format or all tracks are not recognized. File name: &quot;%1&quot;</source>
         <translation>Неподдерживаемый формат или все дорожки не распознаны. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1130"/>
+        <location filename="../tsmuxerwindow.cpp" line="1133"/>
         <source>Some tracks not recognized. This tracks was ignored. File name: &quot;%1&quot;</source>
         <translation>Некоторые дорожки не распознаны. Эта дорожка была проигнорирована. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1400"/>
+        <location filename="../tsmuxerwindow.cpp" line="1403"/>
         <source>Mux</source>
         <translation>Создать</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1419"/>
+        <location filename="../tsmuxerwindow.cpp" line="1422"/>
         <source>tsMuxeR error</source>
         <translation>Ошибка tsMuxeR</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1423"/>
+        <location filename="../tsmuxerwindow.cpp" line="1426"/>
         <source>tsMuxeR not found!</source>
         <translation>tsMuxeR не найден!</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1441"/>
+        <location filename="../tsmuxerwindow.cpp" line="1444"/>
         <source>Can&apos;t execute tsMuxeR!</source>
         <translation>Не возможно запустить tsMuxeR!</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2186"/>
-        <location filename="../tsmuxerwindow.cpp" line="2187"/>
+        <location filename="../tsmuxerwindow.cpp" line="2204"/>
+        <location filename="../tsmuxerwindow.cpp" line="2205"/>
         <source>No track selected</source>
         <translation>Не выбрана дорожка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2194"/>
+        <location filename="../tsmuxerwindow.cpp" line="2212"/>
         <source>Append media file</source>
         <translation>Присоединить медиафайл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2231"/>
+        <location filename="../tsmuxerwindow.cpp" line="2249"/>
         <source>Invalid file extension</source>
         <translation>Неверное расширение файла</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2232"/>
+        <location filename="../tsmuxerwindow.cpp" line="2250"/>
         <source>Appended file must have same file extension.</source>
-        <translation>Присоединяемый файл должен иметь тоже самое расширение файла</translation>
+        <translation>Присоединяемый файл должен иметь тоже самое расширение файла.</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2330"/>
+        <location filename="../tsmuxerwindow.cpp" line="2348"/>
         <source>Sta&amp;rt demuxing</source>
         <translation>Ста&amp;rт демуксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2342"/>
+        <location filename="../tsmuxerwindow.cpp" line="2360"/>
         <source>Folder</source>
         <translation>Папка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2432"/>
+        <location filename="../tsmuxerwindow.cpp" line="2450"/>
         <source>Select file for muxing</source>
         <translation>Выберите файл для муксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2454"/>
-        <location filename="../tsmuxerwindow.cpp" line="2470"/>
+        <location filename="../tsmuxerwindow.cpp" line="2472"/>
+        <location filename="../tsmuxerwindow.cpp" line="2488"/>
         <source>Invalid file name</source>
         <translation>Неверное имя файла</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2455"/>
+        <location filename="../tsmuxerwindow.cpp" line="2473"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.m2ts&quot;</source>
         <translation>Выходной файл &quot;%1&quot; имеет недопустимое расширение. Пожалуйста, измените расширение файла на &quot;.m2ts&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2471"/>
+        <location filename="../tsmuxerwindow.cpp" line="2489"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.iso&quot;</source>
         <translation>Выходной файл &quot;%1&quot; имеет недопустимое расширение. Пожалуйста, измените расширение файла на &quot;.iso&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2485"/>
+        <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
-        <translation>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</translation>
+        <translatorcomment>Используется в фразах &quot;%1 уже есть&quot; и &quot;Перезаписать %1?&quot;</translatorcomment>
+        <translation>файл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2485"/>
+        <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>directory</source>
         <translation>каталог</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2487"/>
+        <location filename="../tsmuxerwindow.cpp" line="2505"/>
         <source>Overwrite existing %1?</source>
         <translation>Переписать существующий %1?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2488"/>
+        <location filename="../tsmuxerwindow.cpp" line="2506"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
-        <translation>Результат %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
+        <translation>%1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2505"/>
+        <location filename="../tsmuxerwindow.cpp" line="2523"/>
         <source>Muxing in progress</source>
         <translation>Выполняется муксинг</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2505"/>
+        <location filename="../tsmuxerwindow.cpp" line="2523"/>
         <source>Demuxing in progress</source>
         <translation>Выполняется демуксинг</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2534"/>
+        <location filename="../tsmuxerwindow.cpp" line="2552"/>
         <source>Can&apos;t create temporary meta file</source>
         <translation>Не возможно создать временный файл метаданных</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2535"/>
+        <location filename="../tsmuxerwindow.cpp" line="2553"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
         <translation>Не возможно создать временный файл метаданных &quot;%1&quot;</translation>
     </message>

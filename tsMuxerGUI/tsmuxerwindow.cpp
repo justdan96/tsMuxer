@@ -6,6 +6,7 @@
 #include <QDropEvent>
 #include <QFileDialog>
 #include <QFontDialog>
+#include <QLibraryInfo>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QSettings>
@@ -266,9 +267,14 @@ TsMuxerWindow::TsMuxerWindow()
       sound(0)
 {
     ui->setupUi(this);
+    qApp->installTranslator(&qtCoreTranslator);
+    qApp->installTranslator(&tsMuxerTranslator);
     setWindowTitle("tsMuxeR GUI " TSMUXER_VERSION);
     lastInputDir = QDir::homePath();
     lastOutputDir = QDir::homePath();
+
+    void (QComboBox::*comboBoxIndexChanged)(int) = &QComboBox::currentIndexChanged;
+    connect(ui->languageSelectComboBox, comboBoxIndexChanged, this, &TsMuxerWindow::onLanguageComboBoxIndexChanged);
 
     QString path = QFileInfo(QApplication::arguments()[0]).absolutePath();
     QString iniName = QDir::toNativeSeparators(path) + QDir::separator() + QString("tsMuxerGUI.ini");
@@ -317,7 +323,6 @@ TsMuxerWindow::TsMuxerWindow()
         ui->listViewFont->item(i, 0)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
         ui->listViewFont->item(i, 1)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
     }
-    void (QComboBox::*comboBoxIndexChanged)(int) = &QComboBox::currentIndexChanged;
     void (QSpinBox::*spinBoxValueChanged)(int) = &QSpinBox::valueChanged;
     void (QDoubleSpinBox::*doubleSpinBoxValueChanged)(double) = &QDoubleSpinBox::valueChanged;
     connect(&opacityTimer, &QTimer::timeout, this, &TsMuxerWindow::onOpacityTimer);
@@ -1867,6 +1872,14 @@ void TsMuxerWindow::updateMuxTime2()
     updateMetaLines();
 }
 
+void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
+{
+    static const QString languages[] = {"en", "ru"};
+    auto lang = languages[x];
+    qtCoreTranslator.load(QString("qtbase_%1").arg(lang), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    tsMuxerTranslator.load(QString("tsmuxergui_%1").arg(lang), ":/i18n");
+}
+
 void TsMuxerWindow::updateMetaLines()
 {
     if (!m_updateMeta || disableUpdatesCnt > 0)
@@ -2555,6 +2568,15 @@ void TsMuxerWindow::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void TsMuxerWindow::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+    {
+        ui->retranslateUi(this);
+    }
+    QWidget::changeEvent(event);
+}
+
 void TsMuxerWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasFormat("text/plain") || event->mimeData()->hasFormat("text/uri-list"))
@@ -2714,6 +2736,7 @@ void TsMuxerWindow::writeSettings()
     settings->setValue("blankPLNum", ui->BlackplaylistCombo->value());
 
     settings->setValue("outputToInputFolder", ui->radioButtonOutoutInInput->isChecked());
+    settings->setValue("language", ui->languageSelectComboBox->currentText());
 
     settings->endGroup();
 
@@ -2811,6 +2834,8 @@ bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 
     ui->radioButtonOutoutInInput->setChecked(settings->value("outputToInputFolder").toBool());
     ui->radioButtonStoreOutput->setChecked(!ui->radioButtonOutoutInInput->isChecked());
+
+    ui->languageSelectComboBox->setCurrentText(settings->value("language").toString());
 
     settings->endGroup();
     return true;

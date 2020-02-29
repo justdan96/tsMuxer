@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QProcess>
 #include <QTimer>
+#include <QTranslator>
 #include <QWidget>
 
 #include "codecinfo.h"
@@ -45,7 +46,8 @@ class TsMuxerWindow : public QWidget
     void codecListReady();
     void fileAdded();
     void fileAppended();
-   private slots:
+
+   private:
     void onAddBtnClick();
     void readFromStdout();
     void readFromStderr();
@@ -87,9 +89,11 @@ class TsMuxerWindow : public QWidget
     void at_sectionCheckstateChanged(Qt::CheckState state);
     void updateMuxTime1();
     void updateMuxTime2();
+    void onLanguageComboBoxIndexChanged(int);
 
    protected:
     void closeEvent(QCloseEvent* event) override;
+    void changeEvent(QEvent* event) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
     void updateMaxOffsets();
     void updateCustomChapters();
@@ -177,6 +181,9 @@ class TsMuxerWindow : public QWidget
     bool m_3dMode;
     QnCheckBoxedHeaderView* m_header;
     QString lastSourceDir;
+
+    QTranslator qtCoreTranslator;
+    QTranslator tsMuxerTranslator;
 
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;

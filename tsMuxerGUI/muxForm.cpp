@@ -21,6 +21,15 @@ void MuxForm::closeEvent(QCloseEvent *event)
     event->accept();
 }
 
+void MuxForm::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+    {
+        ui->retranslateUi(this);
+    }
+    QDialog::changeEvent(event);
+}
+
 void MuxForm::prepare(const QString &label)
 {
     muxProcess = 0;
