@@ -203,17 +203,17 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="779"/>
         <source>Demux to multi channels WAVE file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Записать как многоканальный WAVE файл</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="792"/>
         <source>Demux to several mono WAVE files</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Записать как несколько одноканальных WAVE файлов</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="802"/>
         <source>Demux to RAW PCM stream</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Записать как RAW PCM поток</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="819"/>
