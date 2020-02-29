@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
@@ -168,7 +167,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="660"/>
         <source>Delay (in ms):</source>
-        <translation>Задержка (в мс)</translation>
+        <translation>Задержка (в мс):</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="693"/>
@@ -188,7 +187,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="714"/>
         <source>3d offset:</source>
-        <translation>3d глубина</translation>
+        <translation>3d глубина:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="751"/>
@@ -224,7 +223,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="827"/>
         <source>Bitrate</source>
-        <translation>Битрейт/translation>
+        <translation>Битрейт</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="840"/>
@@ -559,7 +558,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1952"/>
         <source> Default text based subtitles font: </source>
-        <translation>Шрифт текстовых субтитров по умолчанию</translation>
+        <translation> Шрифт текстовых субтитров по умолчанию: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1976"/>
@@ -629,7 +628,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2103"/>
         <source>Additional border, pixels:</source>
-        <translation>Дополнительная рамка, пикселей</translation>
+        <translation>Дополнительная рамка, пикселей:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2129"/>
@@ -639,7 +638,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2155"/>
         <source>Fade in/out animation:</source>
-        <translation>Постепенное появление/исчезание</translation>
+        <translation>Постепенное появление/исчезание:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2166"/>
@@ -669,7 +668,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2222"/>
         <source> Vertical position: </source>
-        <translation>Вертикальная позиция:</translation>
+        <translation> Вертикальная позиция: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2233"/>
@@ -700,7 +699,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2394"/>
         <source> Horizontal position: </source>
-        <translation>Позиция по горизонтали</translation>
+        <translation> Позиция по горизонтали: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2405"/>
@@ -809,7 +808,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="598"/>
         <source>Can&apos;t detect stream type. File name: &quot;%1&quot;</source>
-        <translation>Не определён тип потока</translation>
+        <translation>Не определён тип потока. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="868"/>
@@ -875,7 +874,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2232"/>
         <source>Appended file must have same file extension.</source>
-        <translation>Присоединяемый файл должен иметь тоже самое расширение файла</translation>
+        <translation>Присоединяемый файл должен иметь тоже самое расширение файла.</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2330"/>
@@ -912,7 +911,8 @@
         <location filename="../tsmuxerwindow.cpp" line="2485"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
-        <translation>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</translation>
+        <translatorcomment>Используется в фразах &quot;%1 уже есть&quot; и &quot;Перезаписать %1?&quot;</translatorcomment>
+        <translation>файл</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2485"/>
@@ -927,7 +927,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2488"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
-        <translation>Результат %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
+        <translation>%1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2505"/>
