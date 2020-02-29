@@ -342,8 +342,8 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1329"/>
-        <source>Задать 3 версию формата BD-ROM</source>
-        <translation></translation>
+        <source>Force BD-ROM V3 format</source>
+        <translation>Задать 3 версию формата BD-ROM</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1341"/>
