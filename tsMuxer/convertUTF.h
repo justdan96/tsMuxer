@@ -171,25 +171,26 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
     {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
+        auto get_as_uchar = [&]() mutable { return static_cast<unsigned char>(*it++); };
         switch (extraBytesToRead)
         {
         case 5:
-            ch += *it++;
+            ch += get_as_uchar();
             ch <<= 6;
         case 4:
-            ch += *it++;
+            ch += get_as_uchar();
             ch <<= 6;
         case 3:
-            ch += *it++;
+            ch += get_as_uchar();
             ch <<= 6;
         case 2:
-            ch += *it++;
+            ch += get_as_uchar();
             ch <<= 6;
         case 1:
-            ch += *it++;
+            ch += get_as_uchar();
             ch <<= 6;
         case 0:
-            ch += *it++;
+            ch += get_as_uchar();
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
         f(ch);
