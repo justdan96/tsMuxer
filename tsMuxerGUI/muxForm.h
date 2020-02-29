@@ -19,6 +19,7 @@ class MuxForm : public QDialog  // QWidget
 
    protected:
     void closeEvent(QCloseEvent* event) override;
+    void changeEvent(QEvent* event) override;
    private slots:
     void onProgressChanged();
     void onAbort();

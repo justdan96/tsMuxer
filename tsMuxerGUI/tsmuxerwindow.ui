@@ -2873,11 +2873,31 @@ p, li { white-space: pre-wrap; }
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <property name="leftMargin">
-      <number>80</number>
+      <number>0</number>
      </property>
      <property name="rightMargin">
       <number>0</number>
      </property>
+     <item>
+      <widget class="QComboBox" name="languageSelectComboBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string notr="true">English</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">Русский</string>
+        </property>
+       </item>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -2976,9 +2996,6 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="textInteractionFlags">
         <set>Qt::NoTextInteraction</set>
-       </property>
-       <property name="buddy">
-        <cstring></cstring>
        </property>
       </widget>
      </item>
