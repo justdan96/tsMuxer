@@ -78,7 +78,7 @@ std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat
     case sfANSI:
     {
         auto wide = fromAcp(start, numBytes);
-        return toUtf8(wide.data());
+        return ::toUtf8(wide.data());
     }
 #endif
     default:
