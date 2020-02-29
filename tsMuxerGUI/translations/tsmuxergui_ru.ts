@@ -787,7 +787,7 @@
         <location filename="../tsmuxerwindow.ui" line="2909"/>
         <location filename="../tsmuxerwindow.cpp" line="2332"/>
         <source>Sta&amp;rt muxing</source>
-        <translation>Ста&amp;rт муксинга</translation>
+        <translation>Ста&amp;рт муксинга</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2928"/>
