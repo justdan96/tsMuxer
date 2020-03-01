@@ -309,11 +309,6 @@ TsMuxerWindow::TsMuxerWindow()
 
     ui->outFileName->setText(getDefaultOutputFileName());
 
-    // next properties supported by Designer in version 4.5 only.
-    ui->listViewFont->horizontalHeader()->setVisible(false);
-    ui->listViewFont->verticalHeader()->setVisible(false);
-    ui->listViewFont->horizontalHeader()->setStretchLastSection(true);
-
     m_header = new QnCheckBoxedHeaderView(this);
     ui->trackLV->setHorizontalHeader(m_header);
     ui->trackLV->horizontalHeader()->setStretchLastSection(true);

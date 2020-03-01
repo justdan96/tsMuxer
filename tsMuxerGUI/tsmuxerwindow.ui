@@ -1961,6 +1961,15 @@
                  <height>84</height>
                 </size>
                </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
                <row>
                 <property name="text">
                  <string>New Row</string>
