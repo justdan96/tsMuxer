@@ -792,7 +792,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
-        <translation>Сохранить как .meta</translation>
+        <translation>Сохранить файл метаданных</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="534"/>
@@ -927,7 +927,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2506"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
-        <translation>Файл %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
+        <translation>Результат %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2523"/>
