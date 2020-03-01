@@ -6,7 +6,7 @@
     <message>
         <location filename="../muxForm.cpp" line="48"/>
         <source>Progress: </source>
-        <translation>Выполняется: </translation>
+        <translation>Завершился на: </translation>
     </message>
     <message>
         <location filename="../muxForm.cpp" line="71"/>
@@ -54,7 +54,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="115"/>
         <source>join</source>
-        <translation>объединить</translation>
+        <translation>присоединить</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="147"/>
@@ -152,17 +152,17 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="608"/>
         <source>Do not change SEI and VUI data</source>
-        <translation>Не изменять значения SEI и VUI</translation>
+        <translation>Не изменять SEI и VUI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="613"/>
         <source>Insert SEI and VUI data if absent</source>
-        <translation>Вставлять отсутствующие значения VUI и SEI</translation>
+        <translation>Вставлять отсутствующие VUI и SEI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="618"/>
         <source>Always rebuild  SEI and VUI data</source>
-        <translation>Пересоздавать значения VUI и SEI</translation>
+        <translation>Пересоздавать VUI и SEI</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="660"/>
@@ -187,7 +187,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="714"/>
         <source>3d offset:</source>
-        <translation>3d глубина:</translation>
+        <translation>глубина 3D:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="751"/>
@@ -318,7 +318,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1217"/>
         <source>Custom chapters list</source>
-        <translation>Пользовательский список глав</translation>
+        <translation>Использовать этот список</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1224"/>
@@ -398,12 +398,12 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1496"/>
         <source>Bottom Right</source>
-        <translation></translation>
+        <translation>Нижний Правый</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1501"/>
         <source>Bottom Left</source>
-        <translation>Нижний Правый</translation>
+        <translation>Нижний Левый</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1509"/>
@@ -638,7 +638,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2155"/>
         <source>Fade in/out animation:</source>
-        <translation>Постепенное появление/исчезание:</translation>
+        <translation>Анимация появления/исчезания:</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2166"/>
@@ -668,7 +668,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2222"/>
         <source> Vertical position: </source>
-        <translation> Вертикальная позиция: </translation>
+        <translation> Позиция по вертикали: </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2233"/>
@@ -684,7 +684,7 @@
         <location filename="../tsmuxerwindow.ui" line="2301"/>
         <location filename="../tsmuxerwindow.ui" line="2473"/>
         <source>Screen center</source>
-        <translation>Цвет экрана</translation>
+        <translation>Центр экрана</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2308"/>
@@ -724,7 +724,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2588"/>
         <source>About</source>
-        <translation>Об</translation>
+        <translation>О программе</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2693"/>
@@ -781,7 +781,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2847"/>
         <source>Meta file</source>
-        <translation>Файл метаданных</translation>
+        <translation>Файл проекта tsMuxeR</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2929"/>
@@ -792,7 +792,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
-        <translation>Сохранить файл метаданных</translation>
+        <translation>Сохранить проект</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="534"/>
@@ -911,7 +911,7 @@
         <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
-        <translatorcomment>Используется в фразах &quot;%1 уже есть&quot; и &quot;Перезаписать %1?&quot;</translatorcomment>
+        <translatorcomment>Используется в фразах &quot;Переписать существующий %1&quot; и &quot;Файл %1 уже существует&quot;.</translatorcomment>
         <translation>файл</translation>
     </message>
     <message>
@@ -927,7 +927,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2506"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
-        <translation>%1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
+        <translation>Результат %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2523"/>
@@ -942,12 +942,12 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2552"/>
         <source>Can&apos;t create temporary meta file</source>
-        <translation>Не возможно создать временный файл метаданных</translation>
+        <translation>Не возможно создать временный файл проекта</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2553"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
-        <translation>Не возможно создать временный файл метаданных &quot;%1&quot;</translation>
+        <translation>Не возможно создать временный файл проекта &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -960,7 +960,7 @@
     <message>
         <location filename="../muxForm.ui" line="32"/>
         <source>Status and progress</source>
-        <translation></translation>
+        <translation>Состояние выполнения</translation>
     </message>
     <message>
         <location filename="../muxForm.ui" line="43"/>
@@ -980,7 +980,7 @@
     <message>
         <location filename="../muxForm.ui" line="114"/>
         <source>tsMuxeR output:</source>
-        <translation>tsMuxeR результат:</translation>
+        <translation>Что выдал tsMuxeR:</translation>
     </message>
     <message>
         <location filename="../muxForm.ui" line="144"/>
@@ -990,7 +990,7 @@
     <message>
         <location filename="../muxForm.ui" line="198"/>
         <source>OK</source>
-        <translation>Да</translation>
+        <translation>Понятно</translation>
     </message>
     <message>
         <location filename="../muxForm.ui" line="211"/>
