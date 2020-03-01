@@ -1226,7 +1226,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="memoChapters">
+            <widget class="QPlainTextEdit" name="memoChapters">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1235,9 +1235,6 @@
              </property>
              <property name="tabStopWidth">
               <number>20</number>
-             </property>
-             <property name="acceptRichText">
-              <bool>false</bool>
              </property>
             </widget>
            </item>

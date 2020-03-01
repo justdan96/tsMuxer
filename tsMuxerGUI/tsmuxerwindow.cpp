@@ -382,7 +382,7 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->radioButtonNoChapters, &QAbstractButton::clicked, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->radioButtonCustomChapters, &QAbstractButton::clicked, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->spinEditChapterLen, spinBoxValueChanged, this, &TsMuxerWindow::onChapterParamsChanged);
-    connect(ui->memoChapters, &QTextEdit::textChanged, this, &TsMuxerWindow::onChapterParamsChanged);
+    connect(ui->memoChapters, &QPlainTextEdit::textChanged, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->noSplit, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
     connect(ui->splitByDuration, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
     connect(ui->splitBySize, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
