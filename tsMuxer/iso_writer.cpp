@@ -143,7 +143,15 @@ std::vector<std::uint8_t> serializeDString(const std::string& str)
         rv.reserve(numChars * 3);
         rv.push_back(16);
         IterateUTF8Chars(utf8Str, [&](auto c) {
-
+            UTF16 high_surrogate, low_surrogate;
+            std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
+            rv.push_back(high_surrogate >> 8);
+            rv.push_back(high_surrogate);
+            if (low_surrogate)
+            {
+                rv.push_back(low_surrogate >> 8);
+                rv.push_back(low_surrogate);
+            }
         });
     }
     return rv;
