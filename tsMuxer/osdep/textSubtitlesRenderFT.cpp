@@ -6,7 +6,7 @@
 
 #include "textSubtitlesRenderFT.h"
 
-#include "../utf8Converter.h"
+#include "../convertUTF.h"
 #include "../vodCoreException.h"
 #include "../vod_common.h"
 // #include "../math.h"
@@ -209,7 +209,7 @@ void TextSubtitlesRenderFT::setFont(const Font& font)
     if (m_font != font)
     {
         m_font = font;
-        string fontName = UtfConverter::ToUtf8(font.m_name);
+        string fontName = font.m_name;
         if (!strEndWith(fontName, string(".ttf")))
         {
             std::string fontLower = strToLowerCase(fontName);
@@ -366,7 +366,7 @@ void RenderSpans(FT_Library& library, FT_Outline* const outline, Spans* spans)
     FT_Outline_Render(library, outline, &params);
 }
 
-void RenderGlyph(FT_Library& library, wchar_t ch, FT_Face& face, int size, const Pixel32& fontCol,
+void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, int size, const Pixel32& fontCol,
                  const Pixel32 outlineColOut, const Pixel32 outlineColIner, float outlineWidth, int left, int top,
                  int width, int height, uint32_t* dstData)
 {
@@ -502,7 +502,7 @@ void RenderGlyph(FT_Library& library, wchar_t ch, FT_Face& face, int size, const
     }
 }
 
-void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
+void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
 {
     FT_Vector pen;
     pen.x = rect->left;
@@ -527,9 +527,8 @@ void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
 
     uint8_t alpha = m_font.m_color >> 24;
     uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
-    for (int i = 0; i < text.length(); ++i)
-    {
-        RenderGlyph(library, text.at(i), face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        RenderGlyph(library, c, face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
                     Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom,
                     (uint32_t*)m_pData);
 
@@ -538,7 +537,7 @@ void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         maxX = pen.x + face->glyph->bitmap_left;
-    }
+    });
     if ((m_font.m_opts & m_font.UNDERLINE) || (m_font.m_opts & m_font.STRIKE_OUT))
     {
         // SIZE size;
@@ -558,7 +557,7 @@ void TextSubtitlesRenderFT::drawText(const wstring& text, RECT* rect)
     }
 }
 
-void TextSubtitlesRenderFT::getTextSize(const wstring& text, SIZE* mSize)
+void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
 {
     FT_Vector pen;
     pen.x = 0;
@@ -575,23 +574,22 @@ void TextSubtitlesRenderFT::getTextSize(const wstring& text, SIZE* mSize)
     else
         FT_Set_Transform(face, 0, &pen);
 
-    for (int i = 0; i < text.length(); ++i)
-    {
-        int glyph_index = FT_Get_Char_Index(face, text.at(i));
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        int glyph_index = FT_Get_Char_Index(face, c);
         int error = FT_Load_Glyph(face, glyph_index, 0);
         if (error)
-            THROW(ERR_COMMON, "Can't load symbol code '" << text.at(i) << "' from font");
+            THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font");
 
         error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         if (error)
-            THROW(ERR_COMMON, "Can't render symbol code '" << text.at(i) << "' from font");
+            THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font");
         pen.x += face->glyph->advance.x >> 6;
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         pen.x += m_font.m_borderWidth / 2;
         mSize->cy = face->size->metrics.height >> 6;
         mSize->cx = pen.x + face->glyph->bitmap_left;
-    }
+    });
 }
 
 int TextSubtitlesRenderFT::getLineSpacing() { return face->size->metrics.height >> 6; }

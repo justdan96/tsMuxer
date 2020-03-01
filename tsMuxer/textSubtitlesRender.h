@@ -82,7 +82,7 @@ struct Font
                m_lineSpacing != other.m_lineSpacing;
     }
 
-    std::wstring m_name;
+    std::string m_name;
     int m_size;
     int m_opts;
     int m_borderWidth;
@@ -96,14 +96,14 @@ class TextSubtitlesRender
    public:
     TextSubtitlesRender();
     virtual ~TextSubtitlesRender();
-    bool rasterText(const std::wstring& text);  // return true if text was forced
+    bool rasterText(const std::string& text);  // return true if text was forced
 
     virtual void setFont(const Font& font) = 0;
     virtual void setRenderSize(int width, int height) = 0;
-    virtual void getTextSize(const std::wstring& text, SIZE* mSize) = 0;
+    virtual void getTextSize(const std::string& text, SIZE* mSize) = 0;
     virtual int getLineSpacing() = 0;
     virtual int getBaseline() = 0;
-    virtual void drawText(const std::wstring& text, RECT* rect) = 0;
+    virtual void drawText(const std::string& text, RECT* rect) = 0;
     virtual void flushRasterBuffer() = 0;
     // void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
     static void addBorder(int borderWidth, uint8_t* data, int width, int height);
@@ -119,9 +119,8 @@ class TextSubtitlesRender
     YUVQuad RGBAToYUVA(RGBQUAD* rgba);
     int m_borderWidth;
     int getRepeatCnt(uint32_t* pos, uint32_t* end);
-    std::vector<std::pair<Font, std::wstring>> processTxtLine(const std::wstring& line, std::vector<Font>& fontStack);
+    std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack);
     int browserSizeToRealSize(int bSize, double rSize);
-    size_t findUnquotedStrW(const std::wstring& str, const std::wstring& substr);
 
    private:
     Font m_initFont;

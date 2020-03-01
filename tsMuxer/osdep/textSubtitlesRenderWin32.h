@@ -14,9 +14,9 @@ class TextSubtitlesRenderWin32 : public TextSubtitlesRender
     TextSubtitlesRenderWin32();
     ~TextSubtitlesRenderWin32() override;
     void setRenderSize(int width, int height) override;
-    void drawText(const std::wstring& text, RECT* rect) override;
+    void drawText(const std::string& text, RECT* rect) override;
     void setFont(const Font& font) override;
-    void getTextSize(const std::wstring& text, SIZE* mSize) override;
+    void getTextSize(const std::string& text, SIZE* mSize) override;
     int getLineSpacing() override;
     int getBaseline() override;
     void flushRasterBuffer() override;

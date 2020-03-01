@@ -333,8 +333,8 @@ float toCurve(float value)
     return result;
 }
 
-uint8_t* TextToPGSConverter::doConvert(std::wstring& text, const TextAnimation& animation, double inTime,
-                                       double outTime, uint32_t& dstBufSize)
+uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& animation, double inTime, double outTime,
+                                       uint32_t& dstBufSize)
 {
     bool forced = m_textRender->rasterText(text);
     inTime = alignToGrid(inTime);

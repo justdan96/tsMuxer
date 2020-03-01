@@ -4,6 +4,7 @@
 
 #include "../vodCoreException.h"
 #include "../vod_common.h"
+#include "types/types.h"
 
 using namespace std;
 using namespace Gdiplus;
@@ -97,7 +98,7 @@ void TextSubtitlesRenderWin32::setFont(const Font& font)
 #endif
 }
 
-void TextSubtitlesRenderWin32::drawText(const std::wstring& text, RECT* rect)
+void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 {
 #ifdef OLD_WIN32_RENDERER
     ::DrawText(m_dc, text.c_str(), text.length(), rect, DT_NOPREFIX);
@@ -106,11 +107,12 @@ void TextSubtitlesRenderWin32::drawText(const std::wstring& text, RECT* rect)
     graphics.SetSmoothingMode(SmoothingModeHighQuality);
     graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
 
-    FontFamily fontFamily(m_font.m_name.c_str());
+    FontFamily fontFamily(toWide(m_font.m_name).data());
     StringFormat strformat;
     GraphicsPath path;
 
-    path.AddString(text.c_str(), text.length(), &fontFamily, m_font.m_opts & 0xf, m_font.m_size,
+    auto text_wide = toWide(text);
+    path.AddString(text_wide.data(), text_wide.size(), &fontFamily, m_font.m_opts & 0xf, m_font.m_size,
                    Gdiplus::Point(rect->left, rect->top), &strformat);
 
     uint8_t alpha = m_font.m_color >> 24;
@@ -128,13 +130,13 @@ void TextSubtitlesRenderWin32::drawText(const std::wstring& text, RECT* rect)
 #endif
 }
 
-void TextSubtitlesRenderWin32::getTextSize(const std::wstring& text, SIZE* mSize)
+void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 {
 #ifdef OLD_WIN32_RENDERER
     ::GetTextExtentPoint32(m_dc, text.c_str(), text.size(), mSize);
 #else
     int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(m_font.m_name.c_str());
+    FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
 
     int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
@@ -142,7 +144,9 @@ void TextSubtitlesRenderWin32::getTextSize(const std::wstring& text, SIZE* mSize
 
     StringFormat strformat;
     GraphicsPath path;
-    path.AddString(text.c_str(), text.length(), &fontFamily, opts, m_font.m_size, Gdiplus::Point(0, 0), &strformat);
+    auto text_wide = toWide(text);
+    path.AddString(text_wide.data(), text_wide.size(), &fontFamily, opts, m_font.m_size, Gdiplus::Point(0, 0),
+                   &strformat);
     RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2);
     pen.SetLineJoin(LineJoinRound);
@@ -160,7 +164,7 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     return tm.tmAscent;
 #else
     int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(m_font.m_name.c_str());
+    FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
 
     int lineSpacing = fontFamily.GetLineSpacing(opts);
@@ -181,7 +185,7 @@ int TextSubtitlesRenderWin32::getBaseline()
     return tm.tmAscent;
 #else
     int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(m_font.m_name.c_str());
+    FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
 
     int descentOffset = fontFamily.GetCellDescent(opts);

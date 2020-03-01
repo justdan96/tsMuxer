@@ -88,7 +88,10 @@
 ------------------------------------------------------------------------ */
 
 #include <cstdint>
+#include <string>
 
+namespace convertUTF
+{
 typedef std::uint32_t UTF32; /* at least 32 bits */
 typedef std::uint16_t UTF16; /* at least 16 bits */
 typedef std::uint8_t UTF8;   /* typically 8 bits */
@@ -115,36 +118,85 @@ typedef enum
     lenientConversion
 } ConversionFlags;
 
-/* This is for C++ and does no harm in C */
-#ifdef __cplusplus
-extern "C"
+ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart,
+                                    UTF16* targetEnd, ConversionFlags flags);
+
+ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sourceEnd, UTF8** targetStart,
+                                    UTF8* targetEnd, ConversionFlags flags);
+
+ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* sourceEnd, UTF32** targetStart,
+                                    UTF32* targetEnd, ConversionFlags flags);
+
+ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sourceEnd, UTF8** targetStart,
+                                    UTF8* targetEnd, ConversionFlags flags);
+
+ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,
+                                     UTF32* targetEnd, ConversionFlags flags);
+
+ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
+                                     UTF16* targetEnd, ConversionFlags flags);
+
+Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
+
+Boolean isLegalUTF8String(const UTF8* string, int length);
+
+/*
+ * Index into the table below with the first byte of a UTF-8 sequence to
+ * get the number of trailing bytes that are supposed to follow it.
+ * Note that *legal* UTF-8 values can't have 4 or 5-bytes. The table is
+ * left as-is for anyone who may want to do such conversion, which was
+ * allowed in earlier algorithms.
+ */
+const char trailingBytesForUTF8[256] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
+
+/*
+ * Magic values subtracted from a buffer value during UTF8 conversion.
+ * This table contains as many values as there might be trailing bytes
+ * in a UTF-8 sequence.
+ */
+const UTF32 offsetsFromUTF8[6] = {0x00000000UL, 0x00003080UL, 0x000E2080UL, 0x03C82080UL, 0xFA082080UL, 0x82082080UL};
+
+template <typename Fn>
+void IterateUTF8Chars(const std::string& utf8String, Fn f)
 {
-#endif
-
-    ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart,
-                                        UTF16* targetEnd, ConversionFlags flags);
-
-    ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sourceEnd, UTF8** targetStart,
-                                        UTF8* targetEnd, ConversionFlags flags);
-
-    ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* sourceEnd, UTF32** targetStart,
-                                        UTF32* targetEnd, ConversionFlags flags);
-
-    ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sourceEnd, UTF8** targetStart,
-                                        UTF8* targetEnd, ConversionFlags flags);
-
-    ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,
-                                         UTF32* targetEnd, ConversionFlags flags);
-
-    ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
-                                         UTF16* targetEnd, ConversionFlags flags);
-
-    Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
-
-    Boolean isLegalUTF8String(const UTF8* string, int length);
-
-#ifdef __cplusplus
+    auto it = std::begin(utf8String);
+    while (it != std::end(utf8String))
+    {
+        UTF32 ch = 0;
+        unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
+        auto get_as_uchar = [&]() mutable { return static_cast<unsigned char>(*it++); };
+        switch (extraBytesToRead)
+        {
+        case 5:
+            ch += get_as_uchar();
+            ch <<= 6;
+        case 4:
+            ch += get_as_uchar();
+            ch <<= 6;
+        case 3:
+            ch += get_as_uchar();
+            ch <<= 6;
+        case 2:
+            ch += get_as_uchar();
+            ch <<= 6;
+        case 1:
+            ch += get_as_uchar();
+            ch <<= 6;
+        case 0:
+            ch += get_as_uchar();
+        }
+        ch -= offsetsFromUTF8[extraBytesToRead];
+        f(ch);
+    }
 }
-#endif
+
+}  // namespace convertUTF
 
 /* --------------------------------------------------------------------- */

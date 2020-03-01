@@ -10,7 +10,9 @@ namespace UtfConverter
 enum SourceFormat
 {
     sfUnknown,
-    sfANSI,  // currently active code page (CP_ACP). used only on Windows.
+#ifdef _WIN32
+    sfANSI,  // currently active code page (CP_ACP)
+#endif
     sfUTF8,
     sfUTF16le,
     sfUTF16be,
@@ -18,9 +20,7 @@ enum SourceFormat
     sfUTF32be
 };
 
-std::wstring toWideString(uint8_t* start, size_t widesize, SourceFormat srcFormat);
-std::wstring FromUtf8(const std::string& utf8string);
-std::string ToUtf8(const std::wstring& widestring);
+std::string toUtf8(const uint8_t* start, size_t widesize, SourceFormat srcFormat);
 }  // namespace UtfConverter
 
 #endif

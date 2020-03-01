@@ -69,7 +69,7 @@ QString closeDirPath(const QString &src)
 {
     if (src.isEmpty())
         return src;
-    if (src[src.length() - 1] == L'/' || src[src.length() - 1] == L'\\')
+    if (src[src.length() - 1] == '/' || src[src.length() - 1] == '\\')
         return src;
     return src + QDir::separator();
 }

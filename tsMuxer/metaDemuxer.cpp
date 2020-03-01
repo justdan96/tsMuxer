@@ -1028,7 +1028,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             if (itr->first == "font-name")
             {
-                font.m_name = UtfConverter::FromUtf8(unquoteStr(itr->second));
+                font.m_name = unquoteStr(itr->second);
             }
             else if (itr->first == "font-size")
                 font.m_size = strToInt32(itr->second.c_str());
