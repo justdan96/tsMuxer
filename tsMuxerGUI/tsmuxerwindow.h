@@ -166,7 +166,7 @@ class TsMuxerWindow : public QWidget
     bool outFileNameModified;
     QString oldFileName;
     bool outFileNameDisableChange;
-    QString saveDialogFilter;
+    QString mSaveDialogFilter;
     MuxForm* muxForm;
     QString newFileName;
     QList<QtvCodecInfo> codecList;

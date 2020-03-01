@@ -20,8 +20,10 @@
 #include "muxForm.h"
 #include "ui_tsmuxerwindow.h"
 
-const char fileDialogFilter[] =
-    "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
+QString fileDialogFilter()
+{
+    return TsMuxerWindow::tr(
+        "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
 AC3/E-AC3 (*.ac3 *.ddp);;\
 AAC (advanced audio coding) (*.aac);;\
 AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;\
@@ -40,14 +42,20 @@ Blu-ray PGS subtitles (*.sup);;\
 Text subtitles (*.srt);;\
 WAVE - Uncompressed PCM audio (*.wav *.w64);;\
 RAW LPCM Stream (*.pcm);;\
-All files (*.*)";
-const char saveMetaFilter[] = "tsMuxeR project file (*.meta);;All files (*.*)";
+All files (*.*)");
+}
 
-const char TI_DEFAULT_TAB_NAME[] = "General track options";
-const char TI_DEMUX_TAB_NAME[] = "Demux options";
-const char TS_SAVE_DIALOG_FILTER[] = "Transport stream (*.ts);;all files (*.*)";
-const char M2TS_SAVE_DIALOG_FILTER[] = "BDAV Transport Stream (*.m2ts);;all files (*.*)";
-const char ISO_SAVE_DIALOG_FILTER[] = "Disk image (*.iso);;all files (*.*)";
+QString saveMetaFilter() { return TsMuxerWindow::tr("tsMuxeR project file (*.meta);;All files (*.*)"); }
+
+QString TI_DEFAULT_TAB_NAME() { return TsMuxerWindow::tr("General track options"); }
+
+QString TI_DEMUX_TAB_NAME() { return TsMuxerWindow::tr("Demux options"); }
+
+QString TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Transport stream (*.ts);;all files (*.*)"); }
+
+QString M2TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("BDAV Transport Stream (*.m2ts);;all files (*.*)"); }
+
+QString ISO_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Disk image (*.iso);;all files (*.*)"); }
 
 QSettings *settings = nullptr;
 
@@ -318,7 +326,7 @@ TsMuxerWindow::TsMuxerWindow()
     /////////////////////////////////////////////////////////////
     for (int i = 0; i <= 3600; i += 5 * 60) ui->memoChapters->insertPlainText(floatToTime(i, '.') + '\n');
 
-    saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
+    mSaveDialogFilter = TS_SAVE_DIALOG_FILTER();
     const static int colWidths[] = {28, 200, 62, 38, 10};
     for (unsigned i = 0u; i < sizeof(colWidths) / sizeof(int); ++i)
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
@@ -876,7 +884,7 @@ void TsMuxerWindow::addFiles(const QList<QUrl> &files)
 void TsMuxerWindow::onAddBtnClick()
 {
     QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Add media file"), lastInputDir, tr(fileDialogFilter)));
+        QFileDialog::getOpenFileName(this, tr("Add media file"), lastInputDir, fileDialogFilter()));
     if (fileName.isEmpty())
         return;
     lastInputDir = fileName;
@@ -944,7 +952,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
     if (ui->trackLV->currentRow() == -1)
     {
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME());
         return;
     }
     QtvCodecInfo *codecInfo = getCurrentCodec();
@@ -955,7 +963,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     {
         if (isVideoCodec(codecInfo->displayName))
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, tr(TI_DEFAULT_TAB_NAME));
+            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, TI_DEFAULT_TAB_NAME());
 
             ui->checkFPS->setChecked(codecInfo->checkFPS);
             ui->checkBoxLevel->setChecked(codecInfo->checkLevel);
@@ -986,9 +994,9 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
         }
         else
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, tr(TI_DEFAULT_TAB_NAME));
+            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, TI_DEFAULT_TAB_NAME());
             if (codecInfo->displayName == "LPCM")
-                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, tr(TI_DEMUX_TAB_NAME));
+                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, TI_DEMUX_TAB_NAME());
 
             if (codecInfo->displayName == "DTS-HD")
                 ui->dtsDwnConvert->setText("Downconvert DTS-HD to DTS");
@@ -2176,7 +2184,7 @@ void TsMuxerWindow::deleteTrack(int idx)
     {
         lastSourceDir.clear();
         while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME());
         ui->outFileName->setText(getDefaultOutputFileName());
         outFileNameModified = false;
     }
@@ -2221,7 +2229,7 @@ void TsMuxerWindow::onAppendButtonClick()
         return;
     }
     QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, tr(fileDialogFilter)));
+        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, fileDialogFilter()));
     if (fileName.isEmpty())
         return;
     lastInputDir = fileName;
@@ -2385,17 +2393,17 @@ void TsMuxerWindow::RadioButtonMuxClick()
         if (ui->radioButtonTS->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "ts"));
-            saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = TS_SAVE_DIALOG_FILTER();
         }
         else if (ui->radioButtonBluRayISO->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "iso"));
-            saveDialogFilter = tr(ISO_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = ISO_SAVE_DIALOG_FILTER();
         }
         else
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "m2ts"));
-            saveDialogFilter = tr(M2TS_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = M2TS_SAVE_DIALOG_FILTER();
         }
     }
     ui->DiskLabel->setVisible(ui->radioButtonBluRayISO->isChecked());
@@ -2459,7 +2467,7 @@ void TsMuxerWindow::saveFileDialog()
             path = QFileInfo(fileName).absolutePath();
         }
         QString fileName = QDir::toNativeSeparators(
-            QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, saveDialogFilter));
+            QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, mSaveDialogFilter));
         if (!fileName.isEmpty())
         {
             ui->outFileName->setText(fileName);
@@ -2546,7 +2554,7 @@ void TsMuxerWindow::startMuxing()
 void TsMuxerWindow::saveMetaFileBtnClick()
 {
     QString metaName =
-        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), tr(saveMetaFilter));
+        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), mSaveDialogFilter);
     if (metaName.isEmpty())
         return;
     QFileInfo fi(metaName);
