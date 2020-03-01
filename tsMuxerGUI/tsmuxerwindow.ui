@@ -1226,25 +1226,15 @@
             </widget>
            </item>
            <item>
-            <widget class="QTextEdit" name="memoChapters">
+            <widget class="QPlainTextEdit" name="memoChapters">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="tabChangesFocus">
               <bool>true</bool>
              </property>
-             <property name="html">
-              <string notr="true">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
              <property name="tabStopWidth">
               <number>20</number>
-             </property>
-             <property name="acceptRichText">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -1971,6 +1961,15 @@ p, li { white-space: pre-wrap; }
                  <height>84</height>
                 </size>
                </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="horizontalHeaderStretchLastSection">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
                <row>
                 <property name="text">
                  <string>New Row</string>
@@ -2593,68 +2592,15 @@ p, li { white-space: pre-wrap; }
         </property>
         <item>
          <widget class="QTextEdit" name="textEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
           <property name="html">
            <string notr="true">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;title&gt;tsMuxeR&lt;/title&gt;&lt;style type=&quot;text/css&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/justdan96/tsMuxer&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;tsMuxeR&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; – the software utility to create TS and M2TS files for IP broadcasting as well as for viewing at hardware video players (i.e., Dune HD Ultra, Sony Playstation3, Samsung Smart TV and others). &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;tsMuxeR is open source. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Supported incoming formats: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;TS; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;M2TS; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SIFF;&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MOV;&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MP4;&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MKV;&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Blu-ray; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Demux option. &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Supported videocodecs: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;H.264/MVC &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;H.265/HEVC; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Microsoft VC-1; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MPEG-2. &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Supported audiocodecs: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;AAC; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;AC3 / E-AC3(DD+); &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dolby True HD (for streams with AC3 core only); &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;DTS/ DTS-HD; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;LPCM. &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Supported subtitle types: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;M2TS Presentation graphic stream. &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SRT text subtitles &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Supported containers and formats: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Elementary stream; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Transport stream TS and M2TS; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Program stream EVO/VOB/MPG; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Matroska MKV/MKA. &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;MP4/MOV. &lt;/li&gt;&lt;/ul&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Main features: &lt;/span&gt;&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3D Blu-ray support;&lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;UHD, HDR10, HDR10+ and Dolby Vision support; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Automatic or manual fps adjustment while mixing; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Level changing as well as SEI, SPS/PPS elements and NAL unit delimiter cycle insertion while mixing H.264; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Audio tracks and subtitles time shifting; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to extract DTS core from DTS-HD; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to extract AC3 core from True-HD; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to join files; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to adjust fps for subtitles; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to convert LPCM streams into WAVE and vice versa; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Track language information injection into blu-ray structure and TS header; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to cut source files; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to split output file; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to detect audio delay for TS/M2TS/MPG/VOB/EVO sources; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to remove pulldown info from stream; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to open Blu-ray playlist (MPLS) files; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ability to convert SRT subtitles to PGS; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tags for SRT subtitles support - tags for changing font, color, size, etc.; tag's syntax is similar to HTML; &lt;/li&gt;
-&lt;li style=&quot; font-size:8pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;United cross-platform GUI - Windows, Linux, MacOS. &lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -2848,15 +2794,12 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QTextEdit" name="memoMeta">
+           <widget class="QPlainTextEdit" name="memoMeta">
             <property name="undoRedoEnabled">
              <bool>false</bool>
             </property>
             <property name="readOnly">
              <bool>true</bool>
-            </property>
-            <property name="acceptRichText">
-             <bool>false</bool>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -2886,16 +2829,6 @@ p, li { white-space: pre-wrap; }
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <item>
-        <property name="text">
-         <string notr="true">English</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string notr="true">Русский</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item>
@@ -2932,6 +2865,12 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QPushButton" name="buttonSaveMeta">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>128</width>
@@ -2940,7 +2879,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>128</width>
+         <width>256</width>
          <height>16777215</height>
         </size>
        </property>

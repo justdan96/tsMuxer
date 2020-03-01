@@ -20,8 +20,10 @@
 #include "muxForm.h"
 #include "ui_tsmuxerwindow.h"
 
-const char fileDialogFilter[] =
-    "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
+QString fileDialogFilter()
+{
+    return TsMuxerWindow::tr(
+        "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
 AC3/E-AC3 (*.ac3 *.ddp);;\
 AAC (advanced audio coding) (*.aac);;\
 AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;\
@@ -40,14 +42,20 @@ Blu-ray PGS subtitles (*.sup);;\
 Text subtitles (*.srt);;\
 WAVE - Uncompressed PCM audio (*.wav *.w64);;\
 RAW LPCM Stream (*.pcm);;\
-All files (*.*)";
-const char saveMetaFilter[] = "tsMuxeR project file (*.meta);;All files (*.*)";
+All files (*.*)");
+}
 
-const char TI_DEFAULT_TAB_NAME[] = "General track options";
-const char TI_DEMUX_TAB_NAME[] = "Demux options";
-const char TS_SAVE_DIALOG_FILTER[] = "Transport stream (*.ts);;all files (*.*)";
-const char M2TS_SAVE_DIALOG_FILTER[] = "BDAV Transport Stream (*.m2ts);;all files (*.*)";
-const char ISO_SAVE_DIALOG_FILTER[] = "Disk image (*.iso);;all files (*.*)";
+QString saveMetaFilter() { return TsMuxerWindow::tr("tsMuxeR project file (*.meta);;All files (*.*)"); }
+
+QString TI_DEFAULT_TAB_NAME() { return TsMuxerWindow::tr("General track options"); }
+
+QString TI_DEMUX_TAB_NAME() { return TsMuxerWindow::tr("Demux options"); }
+
+QString TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Transport stream (*.ts);;all files (*.*)"); }
+
+QString M2TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("BDAV Transport Stream (*.m2ts);;all files (*.*)"); }
+
+QString ISO_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Disk image (*.iso);;all files (*.*)"); }
 
 QSettings *settings = nullptr;
 
@@ -229,6 +237,13 @@ QString getComboBoxTrackText(int idx, const QtvCodecInfo &codecInfo)
     return text;
 }
 
+void initLanguageComboBox(QComboBox *comboBox)
+{
+    comboBox->addItem("English", "en");
+    comboBox->addItem(QString::fromUtf8("Русский"), "ru");
+    comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
+}
+
 }  // namespace
 
 // ----------------------- TsMuxerWindow -------------------------------------
@@ -269,6 +284,7 @@ TsMuxerWindow::TsMuxerWindow()
     ui->setupUi(this);
     qApp->installTranslator(&qtCoreTranslator);
     qApp->installTranslator(&tsMuxerTranslator);
+    initLanguageComboBox(ui->languageSelectComboBox);
     setWindowTitle("tsMuxeR GUI " TSMUXER_VERSION);
     lastInputDir = QDir::homePath();
     lastOutputDir = QDir::homePath();
@@ -293,11 +309,6 @@ TsMuxerWindow::TsMuxerWindow()
 
     ui->outFileName->setText(getDefaultOutputFileName());
 
-    // next properties supported by Designer in version 4.5 only.
-    ui->listViewFont->horizontalHeader()->setVisible(false);
-    ui->listViewFont->verticalHeader()->setVisible(false);
-    ui->listViewFont->horizontalHeader()->setStretchLastSection(true);
-
     m_header = new QnCheckBoxedHeaderView(this);
     ui->trackLV->setHorizontalHeader(m_header);
     ui->trackLV->horizontalHeader()->setStretchLastSection(true);
@@ -310,7 +321,7 @@ TsMuxerWindow::TsMuxerWindow()
     /////////////////////////////////////////////////////////////
     for (int i = 0; i <= 3600; i += 5 * 60) ui->memoChapters->insertPlainText(floatToTime(i, '.') + '\n');
 
-    saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
+    mSaveDialogFilter = TS_SAVE_DIALOG_FILTER();
     const static int colWidths[] = {28, 200, 62, 38, 10};
     for (unsigned i = 0u; i < sizeof(colWidths) / sizeof(int); ++i)
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
@@ -369,8 +380,6 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->checkBoxCrop, &QCheckBox::stateChanged, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->checkBoxRVBR, &QAbstractButton::clicked, this, &TsMuxerWindow::onGeneralCheckboxClicked);
     connect(ui->checkBoxCBR, &QAbstractButton::clicked, this, &TsMuxerWindow::onGeneralCheckboxClicked);
-    // connect(ui->checkBoxuseAsynIO,	   SIGNAL(stateChanged(int)), this,
-    // SLOT(onSavedParamChanged()));
     connect(ui->radioButtonStoreOutput, &QAbstractButton::clicked, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->radioButtonOutoutInInput, &QAbstractButton::clicked, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->editVBVLen, spinBoxValueChanged, this, &TsMuxerWindow::onGeneralSpinboxValueChanged);
@@ -382,7 +391,7 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->radioButtonNoChapters, &QAbstractButton::clicked, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->radioButtonCustomChapters, &QAbstractButton::clicked, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->spinEditChapterLen, spinBoxValueChanged, this, &TsMuxerWindow::onChapterParamsChanged);
-    connect(ui->memoChapters, &QTextEdit::textChanged, this, &TsMuxerWindow::onChapterParamsChanged);
+    connect(ui->memoChapters, &QPlainTextEdit::textChanged, this, &TsMuxerWindow::onChapterParamsChanged);
     connect(ui->noSplit, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
     connect(ui->splitByDuration, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
     connect(ui->splitBySize, &QAbstractButton::clicked, this, &TsMuxerWindow::onSplitCutParamsChanged);
@@ -870,7 +879,7 @@ void TsMuxerWindow::addFiles(const QList<QUrl> &files)
 void TsMuxerWindow::onAddBtnClick()
 {
     QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Add media file"), lastInputDir, tr(fileDialogFilter)));
+        QFileDialog::getOpenFileName(this, tr("Add media file"), lastInputDir, fileDialogFilter()));
     if (fileName.isEmpty())
         return;
     lastInputDir = fileName;
@@ -938,7 +947,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
     if (ui->trackLV->currentRow() == -1)
     {
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME());
         return;
     }
     QtvCodecInfo *codecInfo = getCurrentCodec();
@@ -949,7 +958,7 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     {
         if (isVideoCodec(codecInfo->displayName))
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, tr(TI_DEFAULT_TAB_NAME));
+            ui->tabWidgetTracks->addTab(ui->tabSheetVideo, TI_DEFAULT_TAB_NAME());
 
             ui->checkFPS->setChecked(codecInfo->checkFPS);
             ui->checkBoxLevel->setChecked(codecInfo->checkLevel);
@@ -980,9 +989,9 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
         }
         else
         {
-            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, tr(TI_DEFAULT_TAB_NAME));
+            ui->tabWidgetTracks->addTab(ui->tabSheetAudio, TI_DEFAULT_TAB_NAME());
             if (codecInfo->displayName == "LPCM")
-                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, tr(TI_DEMUX_TAB_NAME));
+                ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, TI_DEMUX_TAB_NAME());
 
             if (codecInfo->displayName == "DTS-HD")
                 ui->dtsDwnConvert->setText("Downconvert DTS-HD to DTS");
@@ -1872,12 +1881,21 @@ void TsMuxerWindow::updateMuxTime2()
     updateMetaLines();
 }
 
-void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
+void TsMuxerWindow::onLanguageComboBoxIndexChanged(int idx)
 {
-    static const QString languages[] = {"en", "ru"};
-    auto lang = languages[x];
+    auto lang = ui->languageSelectComboBox->itemData(idx).toString();
     qtCoreTranslator.load(QString("qtbase_%1").arg(lang), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     tsMuxerTranslator.load(QString("tsmuxergui_%1").arg(lang), ":/i18n");
+    QFile aboutContent(QString(":/about_%1.html").arg(lang));
+    if (aboutContent.open(QIODevice::ReadOnly))
+    {
+        ui->textEdit->setHtml(QString::fromUtf8(aboutContent.readAll()));
+    }
+    else
+    {
+        qWarning() << "Failed to open about.html for language" << lang << aboutContent.errorString();
+        ui->textEdit->clear();
+    }
 }
 
 void TsMuxerWindow::updateMetaLines()
@@ -1886,7 +1904,8 @@ void TsMuxerWindow::updateMetaLines()
         return;
 
     ui->memoMeta->clear();
-    ui->memoMeta->append(getMuxOpts());
+    QString metaContent;
+    metaContent.append(getMuxOpts() + '\n');
     QString tmpFps;
     for (int i = 0; i < ui->trackLV->rowCount(); ++i)
     {
@@ -1951,7 +1970,7 @@ void TsMuxerWindow::updateMetaLines()
         if (codecInfo->subTrack != 0)
             postfix += QString(", subTrack=") + QString::number(codecInfo->subTrack);
         if (isVideoCodec(codecInfo->displayName))
-            ui->memoMeta->append(prefix + getVideoMetaInfo(codecInfo) + postfix);
+            metaContent.append(prefix + getVideoMetaInfo(codecInfo) + postfix + '\n');
         else
         {
             if (isDiskOutput() && ui->defaultAudioTrackCheckBox->isChecked() &&
@@ -1959,9 +1978,10 @@ void TsMuxerWindow::updateMetaLines()
             {
                 postfix += QString(", default");
             }
-            ui->memoMeta->append(prefix + getAudioMetaInfo(codecInfo) + postfix);
+            metaContent.append(prefix + getAudioMetaInfo(codecInfo) + postfix + '\n');
         }
     }
+    ui->memoMeta->setPlainText(metaContent);
 }
 
 void TsMuxerWindow::onFontBtnClicked()
@@ -2159,7 +2179,7 @@ void TsMuxerWindow::deleteTrack(int idx)
     {
         lastSourceDir.clear();
         while (ui->tabWidgetTracks->count()) ui->tabWidgetTracks->removeTab(0);
-        ui->tabWidgetTracks->addTab(ui->tabSheetFake, tr(TI_DEFAULT_TAB_NAME));
+        ui->tabWidgetTracks->addTab(ui->tabSheetFake, TI_DEFAULT_TAB_NAME());
         ui->outFileName->setText(getDefaultOutputFileName());
         outFileNameModified = false;
     }
@@ -2204,7 +2224,7 @@ void TsMuxerWindow::onAppendButtonClick()
         return;
     }
     QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, tr(fileDialogFilter)));
+        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, fileDialogFilter()));
     if (fileName.isEmpty())
         return;
     lastInputDir = fileName;
@@ -2368,17 +2388,17 @@ void TsMuxerWindow::RadioButtonMuxClick()
         if (ui->radioButtonTS->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "ts"));
-            saveDialogFilter = tr(TS_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = TS_SAVE_DIALOG_FILTER();
         }
         else if (ui->radioButtonBluRayISO->isChecked())
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "iso"));
-            saveDialogFilter = tr(ISO_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = ISO_SAVE_DIALOG_FILTER();
         }
         else
         {
             ui->outFileName->setText(changeFileExt(ui->outFileName->text(), "m2ts"));
-            saveDialogFilter = tr(M2TS_SAVE_DIALOG_FILTER);
+            mSaveDialogFilter = M2TS_SAVE_DIALOG_FILTER();
         }
     }
     ui->DiskLabel->setVisible(ui->radioButtonBluRayISO->isChecked());
@@ -2442,7 +2462,7 @@ void TsMuxerWindow::saveFileDialog()
             path = QFileInfo(fileName).absolutePath();
         }
         QString fileName = QDir::toNativeSeparators(
-            QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, saveDialogFilter));
+            QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, mSaveDialogFilter));
         if (!fileName.isEmpty())
         {
             ui->outFileName->setText(fileName);
@@ -2529,7 +2549,7 @@ void TsMuxerWindow::startMuxing()
 void TsMuxerWindow::saveMetaFileBtnClick()
 {
     QString metaName =
-        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), tr(saveMetaFilter));
+        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), mSaveDialogFilter);
     if (metaName.isEmpty())
         return;
     QFileInfo fi(metaName);

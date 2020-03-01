@@ -106,6 +106,7 @@
         <location filename="../tsmuxerwindow.ui" line="325"/>
         <location filename="../tsmuxerwindow.ui" line="629"/>
         <location filename="../tsmuxerwindow.ui" line="810"/>
+        <location filename="../tsmuxerwindow.cpp" line="50"/>
         <source>General track options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -196,6 +197,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="767"/>
+        <location filename="../tsmuxerwindow.cpp" line="52"/>
         <source>Demux options</source>
         <translation type="unfinished"></translation>
     </message>
@@ -326,625 +328,650 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1257"/>
+        <location filename="../tsmuxerwindow.ui" line="1247"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1263"/>
+        <location filename="../tsmuxerwindow.ui" line="1253"/>
         <source>Add blank playlist for cropped video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1291"/>
+        <location filename="../tsmuxerwindow.ui" line="1281"/>
         <source>Blank playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1329"/>
+        <location filename="../tsmuxerwindow.ui" line="1319"/>
         <source>Force BD-ROM V3 format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1341"/>
+        <location filename="../tsmuxerwindow.ui" line="1331"/>
         <source>First MPLS file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1364"/>
+        <location filename="../tsmuxerwindow.ui" line="1354"/>
         <source>First M2TS file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1394"/>
+        <location filename="../tsmuxerwindow.ui" line="1384"/>
         <source>Start mux time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1420"/>
+        <location filename="../tsmuxerwindow.ui" line="1410"/>
         <source>45 Khz clock:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1445"/>
+        <location filename="../tsmuxerwindow.ui" line="1435"/>
         <source>3D settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1451"/>
+        <location filename="../tsmuxerwindow.ui" line="1441"/>
         <source>Use base video stream for right eye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1467"/>
+        <location filename="../tsmuxerwindow.ui" line="1457"/>
         <source>PIP settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1475"/>
+        <location filename="../tsmuxerwindow.ui" line="1465"/>
         <source>Corner</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1486"/>
+        <location filename="../tsmuxerwindow.ui" line="1476"/>
         <source>Top Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1491"/>
+        <location filename="../tsmuxerwindow.ui" line="1481"/>
         <source>Top Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1496"/>
+        <location filename="../tsmuxerwindow.ui" line="1486"/>
         <source>Bottom Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1501"/>
+        <location filename="../tsmuxerwindow.ui" line="1491"/>
         <source>Bottom Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1509"/>
+        <location filename="../tsmuxerwindow.ui" line="1499"/>
         <source>Horizontal offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1526"/>
+        <location filename="../tsmuxerwindow.ui" line="1516"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1537"/>
+        <location filename="../tsmuxerwindow.ui" line="1527"/>
         <source>Not scaled</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1542"/>
+        <location filename="../tsmuxerwindow.ui" line="1532"/>
         <source>Half (x 1/2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1547"/>
+        <location filename="../tsmuxerwindow.ui" line="1537"/>
         <source>Quarter (x 1/4)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1552"/>
+        <location filename="../tsmuxerwindow.ui" line="1542"/>
         <source>One and a Half (x 1.5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1557"/>
+        <location filename="../tsmuxerwindow.ui" line="1547"/>
         <source>Full Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1578"/>
+        <location filename="../tsmuxerwindow.ui" line="1568"/>
         <source>Vertical offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1600"/>
+        <location filename="../tsmuxerwindow.ui" line="1590"/>
         <source>Default tracks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1606"/>
+        <location filename="../tsmuxerwindow.ui" line="1596"/>
         <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1616"/>
+        <location filename="../tsmuxerwindow.ui" line="1606"/>
         <source>When checked, only subtitles marked as &quot;forced&quot; in the subtitle stream will appear.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1619"/>
+        <location filename="../tsmuxerwindow.ui" line="1609"/>
         <source>Forced only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1626"/>
+        <location filename="../tsmuxerwindow.ui" line="1616"/>
         <source>Audio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1666"/>
+        <location filename="../tsmuxerwindow.ui" line="1656"/>
         <source>Split &amp;&amp; cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1681"/>
+        <location filename="../tsmuxerwindow.ui" line="1671"/>
         <source>Splitting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1692"/>
+        <location filename="../tsmuxerwindow.ui" line="1682"/>
         <source>No split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1702"/>
+        <location filename="../tsmuxerwindow.ui" line="1692"/>
         <source>Split by duration every</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1728"/>
+        <location filename="../tsmuxerwindow.ui" line="1718"/>
         <source>sec</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1735"/>
+        <location filename="../tsmuxerwindow.ui" line="1725"/>
         <source>Split by size every</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1768"/>
+        <location filename="../tsmuxerwindow.ui" line="1758"/>
         <source>KB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1773"/>
+        <location filename="../tsmuxerwindow.ui" line="1763"/>
         <source>KiB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1778"/>
+        <location filename="../tsmuxerwindow.ui" line="1768"/>
         <source>MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1783"/>
+        <location filename="../tsmuxerwindow.ui" line="1773"/>
         <source>MiB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1788"/>
+        <location filename="../tsmuxerwindow.ui" line="1778"/>
         <source>GB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1793"/>
+        <location filename="../tsmuxerwindow.ui" line="1783"/>
         <source>GiB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1825"/>
+        <location filename="../tsmuxerwindow.ui" line="1815"/>
         <source>Cutting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1836"/>
+        <location filename="../tsmuxerwindow.ui" line="1826"/>
         <source>Enable cutting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1847"/>
+        <location filename="../tsmuxerwindow.ui" line="1837"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1857"/>
+        <location filename="../tsmuxerwindow.ui" line="1847"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1937"/>
+        <location filename="../tsmuxerwindow.ui" line="1927"/>
         <source>Subtitles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1952"/>
+        <location filename="../tsmuxerwindow.ui" line="1942"/>
         <source> Default text based subtitles font: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1976"/>
-        <location filename="../tsmuxerwindow.ui" line="1981"/>
-        <location filename="../tsmuxerwindow.ui" line="1986"/>
-        <location filename="../tsmuxerwindow.ui" line="1991"/>
-        <location filename="../tsmuxerwindow.ui" line="1996"/>
+        <location filename="../tsmuxerwindow.ui" line="1975"/>
+        <location filename="../tsmuxerwindow.ui" line="1980"/>
+        <location filename="../tsmuxerwindow.ui" line="1985"/>
+        <location filename="../tsmuxerwindow.ui" line="1990"/>
+        <location filename="../tsmuxerwindow.ui" line="1995"/>
         <source>New Row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2001"/>
-        <location filename="../tsmuxerwindow.ui" line="2006"/>
+        <location filename="../tsmuxerwindow.ui" line="2000"/>
+        <location filename="../tsmuxerwindow.ui" line="2005"/>
         <source>New Column</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2011"/>
+        <location filename="../tsmuxerwindow.ui" line="2010"/>
         <source>Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2021"/>
+        <location filename="../tsmuxerwindow.ui" line="2020"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2026"/>
+        <location filename="../tsmuxerwindow.ui" line="2025"/>
         <source>65</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2031"/>
+        <location filename="../tsmuxerwindow.ui" line="2030"/>
         <source>Color:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2036"/>
+        <location filename="../tsmuxerwindow.ui" line="2035"/>
         <source>0xffffffff</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2041"/>
+        <location filename="../tsmuxerwindow.ui" line="2040"/>
         <source>Charset:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2046"/>
+        <location filename="../tsmuxerwindow.ui" line="2045"/>
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2051"/>
+        <location filename="../tsmuxerwindow.ui" line="2050"/>
         <source>Options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2072"/>
+        <location filename="../tsmuxerwindow.ui" line="2071"/>
         <source>Font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2079"/>
+        <location filename="../tsmuxerwindow.ui" line="2078"/>
         <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2103"/>
+        <location filename="../tsmuxerwindow.ui" line="2102"/>
         <source>Additional border, pixels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2129"/>
+        <location filename="../tsmuxerwindow.ui" line="2128"/>
         <source>line spacing:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2155"/>
+        <location filename="../tsmuxerwindow.ui" line="2154"/>
         <source>Fade in/out animation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2166"/>
+        <location filename="../tsmuxerwindow.ui" line="2165"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2171"/>
+        <location filename="../tsmuxerwindow.ui" line="2170"/>
         <source>Fast</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2176"/>
+        <location filename="../tsmuxerwindow.ui" line="2175"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2181"/>
+        <location filename="../tsmuxerwindow.ui" line="2180"/>
         <source>Slow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2186"/>
+        <location filename="../tsmuxerwindow.ui" line="2185"/>
         <source>Very slow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2222"/>
+        <location filename="../tsmuxerwindow.ui" line="2221"/>
         <source> Vertical position: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2233"/>
+        <location filename="../tsmuxerwindow.ui" line="2232"/>
         <source>Top of screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2267"/>
+        <location filename="../tsmuxerwindow.ui" line="2266"/>
         <source>top offset, pixels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2301"/>
-        <location filename="../tsmuxerwindow.ui" line="2473"/>
+        <location filename="../tsmuxerwindow.ui" line="2300"/>
+        <location filename="../tsmuxerwindow.ui" line="2472"/>
         <source>Screen center</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2308"/>
+        <location filename="../tsmuxerwindow.ui" line="2307"/>
         <source>Bottom of screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2342"/>
+        <location filename="../tsmuxerwindow.ui" line="2341"/>
         <source>bottom offset, pixels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2394"/>
+        <location filename="../tsmuxerwindow.ui" line="2393"/>
         <source> Horizontal position: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2405"/>
+        <location filename="../tsmuxerwindow.ui" line="2404"/>
         <source>Left of screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2439"/>
+        <location filename="../tsmuxerwindow.ui" line="2438"/>
         <source>left offset, pixels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2486"/>
+        <location filename="../tsmuxerwindow.ui" line="2485"/>
         <source>Right of screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2523"/>
+        <location filename="../tsmuxerwindow.ui" line="2522"/>
         <source>right offset, pixels:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2588"/>
+        <location filename="../tsmuxerwindow.ui" line="2587"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2693"/>
+        <location filename="../tsmuxerwindow.ui" line="2639"/>
         <source>Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2707"/>
+        <location filename="../tsmuxerwindow.ui" line="2653"/>
         <source>TS muxing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2723"/>
+        <location filename="../tsmuxerwindow.ui" line="2669"/>
         <source>M2TS muxing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2730"/>
+        <location filename="../tsmuxerwindow.ui" line="2676"/>
         <source>Blu-ray ISO</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2743"/>
+        <location filename="../tsmuxerwindow.ui" line="2689"/>
         <source>Blu-ray folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2750"/>
+        <location filename="../tsmuxerwindow.ui" line="2696"/>
         <source>AVCHD folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2763"/>
-        <location filename="../tsmuxerwindow.cpp" line="1403"/>
+        <location filename="../tsmuxerwindow.ui" line="2709"/>
+        <location filename="../tsmuxerwindow.cpp" line="1414"/>
         <source>Demux</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2787"/>
+        <location filename="../tsmuxerwindow.ui" line="2733"/>
         <source>Disk label</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2797"/>
-        <location filename="../tsmuxerwindow.cpp" line="2364"/>
+        <location filename="../tsmuxerwindow.ui" line="2743"/>
+        <location filename="../tsmuxerwindow.cpp" line="2379"/>
         <source>File name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2823"/>
+        <location filename="../tsmuxerwindow.ui" line="2769"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2847"/>
+        <location filename="../tsmuxerwindow.ui" line="2793"/>
         <source>Meta file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2929"/>
-        <location filename="../tsmuxerwindow.cpp" line="2350"/>
+        <location filename="../tsmuxerwindow.ui" line="2862"/>
+        <location filename="../tsmuxerwindow.cpp" line="2365"/>
         <source>Sta&amp;rt muxing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2948"/>
+        <location filename="../tsmuxerwindow.ui" line="2887"/>
         <source>Save meta file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="534"/>
+        <location filename="../tsmuxerwindow.cpp" line="25"/>
+        <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tsmuxerwindow.cpp" line="48"/>
+        <source>tsMuxeR project file (*.meta);;All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tsmuxerwindow.cpp" line="54"/>
+        <source>Transport stream (*.ts);;all files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tsmuxerwindow.cpp" line="56"/>
+        <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tsmuxerwindow.cpp" line="58"/>
+        <source>Disk image (*.iso);;all files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../tsmuxerwindow.cpp" line="545"/>
         <source>Not supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="600"/>
-        <location filename="../tsmuxerwindow.cpp" line="1117"/>
+        <location filename="../tsmuxerwindow.cpp" line="611"/>
+        <location filename="../tsmuxerwindow.cpp" line="1128"/>
         <source>Unsupported format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="601"/>
+        <location filename="../tsmuxerwindow.cpp" line="612"/>
         <source>Can&apos;t detect stream type. File name: &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="871"/>
+        <location filename="../tsmuxerwindow.cpp" line="882"/>
         <source>Add media file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="908"/>
+        <location filename="../tsmuxerwindow.cpp" line="919"/>
         <source>File already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="909"/>
+        <location filename="../tsmuxerwindow.cpp" line="920"/>
         <source>File &quot;%1&quot; already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1122"/>
+        <location filename="../tsmuxerwindow.cpp" line="1133"/>
         <source>Unsupported format or all tracks are not recognized. File name: &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1133"/>
+        <location filename="../tsmuxerwindow.cpp" line="1144"/>
         <source>Some tracks not recognized. This tracks was ignored. File name: &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1403"/>
+        <location filename="../tsmuxerwindow.cpp" line="1414"/>
         <source>Mux</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1422"/>
+        <location filename="../tsmuxerwindow.cpp" line="1433"/>
         <source>tsMuxeR error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1426"/>
+        <location filename="../tsmuxerwindow.cpp" line="1437"/>
         <source>tsMuxeR not found!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1444"/>
+        <location filename="../tsmuxerwindow.cpp" line="1455"/>
         <source>Can&apos;t execute tsMuxeR!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2204"/>
-        <location filename="../tsmuxerwindow.cpp" line="2205"/>
+        <location filename="../tsmuxerwindow.cpp" line="2219"/>
+        <location filename="../tsmuxerwindow.cpp" line="2220"/>
         <source>No track selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2212"/>
+        <location filename="../tsmuxerwindow.cpp" line="2227"/>
         <source>Append media file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2249"/>
+        <location filename="../tsmuxerwindow.cpp" line="2264"/>
         <source>Invalid file extension</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2250"/>
+        <location filename="../tsmuxerwindow.cpp" line="2265"/>
         <source>Appended file must have same file extension.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2348"/>
+        <location filename="../tsmuxerwindow.cpp" line="2363"/>
         <source>Sta&amp;rt demuxing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2360"/>
+        <location filename="../tsmuxerwindow.cpp" line="2375"/>
         <source>Folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2450"/>
+        <location filename="../tsmuxerwindow.cpp" line="2465"/>
         <source>Select file for muxing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2472"/>
-        <location filename="../tsmuxerwindow.cpp" line="2488"/>
+        <location filename="../tsmuxerwindow.cpp" line="2487"/>
+        <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>Invalid file name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2473"/>
+        <location filename="../tsmuxerwindow.cpp" line="2488"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.m2ts&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2489"/>
+        <location filename="../tsmuxerwindow.cpp" line="2504"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.iso&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2503"/>
+        <location filename="../tsmuxerwindow.cpp" line="2518"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2503"/>
+        <location filename="../tsmuxerwindow.cpp" line="2518"/>
         <source>directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2505"/>
+        <location filename="../tsmuxerwindow.cpp" line="2520"/>
         <source>Overwrite existing %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2506"/>
+        <location filename="../tsmuxerwindow.cpp" line="2521"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2523"/>
+        <location filename="../tsmuxerwindow.cpp" line="2538"/>
         <source>Muxing in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2523"/>
+        <location filename="../tsmuxerwindow.cpp" line="2538"/>
         <source>Demuxing in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2552"/>
+        <location filename="../tsmuxerwindow.cpp" line="2567"/>
         <source>Can&apos;t create temporary meta file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2553"/>
+        <location filename="../tsmuxerwindow.cpp" line="2568"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
