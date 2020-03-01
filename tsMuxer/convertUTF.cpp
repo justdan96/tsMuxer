@@ -103,6 +103,20 @@ ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sou
     return result;
 }
 
+std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32 ch)
+{
+    if (ch <= UNI_MAX_BMP)
+    {
+        return std::make_tuple(static_cast<UTF16>(ch), 0);
+    }
+    else
+    {
+        ch -= halfBase;
+        return std::make_tuple((UTF16)((ch >> halfShift) + UNI_SUR_HIGH_START),
+                               (UTF16)((ch & halfMask) + UNI_SUR_LOW_START));
+    }
+}
+
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,

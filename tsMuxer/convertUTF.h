@@ -89,6 +89,7 @@
 
 #include <cstdint>
 #include <string>
+#include <tuple>
 
 namespace convertUTF
 {
@@ -135,6 +136,8 @@ ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sou
 
 ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
                                      UTF16* targetEnd, ConversionFlags flags);
+
+std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32);
 
 Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
 

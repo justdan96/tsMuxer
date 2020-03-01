@@ -6,6 +6,7 @@
 #include <cstring>
 #include <ctime>
 
+#include "convertUTF.h"
 #include "utf8Converter.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -108,47 +109,42 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     buffer[11] = 0;
 }
 
-bool canUse8BitUnicode(const std::wstring& str)
+bool canUse8BitUnicode(const std::string& utf8Str, unsigned int& numChars)
 {
-    for (auto c : str)
-    {
-        if (static_cast<std::uint16_t>(c) >= 0x100)
-        {
-            return false;
-        }
-    }
-    return true;
+    bool rv = true;
+    numChars = 0;
+    convertUTF::IterateUTF8Chars(utf8Str, [&](auto c) {
+        rv &= (c >= 0x100);
+        ++numChars;
+    });
+    return rv;
 }
 
 std::vector<std::uint8_t> serializeDString(const std::string& str)
 {
     std::vector<std::uint8_t> rv;
-    std::wstring wideStr;
-    auto utf8Str = reinterpret_cast<const uint8_t*>(str.c_str());
-    try
-    {
-        wideStr = UtfConverter::toWideString(utf8Str, str.size(), UtfConverter::sfUTF8);
-    }
-    catch (const VodCoreException&)
-    {
 #ifdef _WIN32
-        wideStr = UtfConverter::toWideString(utf8Str, str.size(), UtfConverter::sfANSI);
-        if (wideStr.empty())
-        {
-            throw;
-        }
+    auto utf8Str = convertUTF::isLegalUTF8String(utf8Str.c_str(), utf8Str.length())
+                       ? str
+                       : UtfConverter::toUtf8(utf8Str.c_str(), utf8Str.length(), UtfConverter::sfANSI);
 #else
-        throw;
+    auto& utf8Str = str;
 #endif
-    }
-    if (canUse8BitUnicode(wideStr))
+    unsigned int numChars;
+    using namespace convertUTF;
+    if (canUse8BitUnicode(utf8Str, numChars))
     {
-        rv.reserve(wideStr.length());
+        rv.reserve(numChars);
         rv.push_back(8);
+        IterateUTF8Chars(utf8Str, [&](auto c) { rv.push_back(c & 0xff); });
     }
     else
     {
+        rv.reserve(numChars * 3);
         rv.push_back(16);
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+
+        });
     }
     return rv;
 }
