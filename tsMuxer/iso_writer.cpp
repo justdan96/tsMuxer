@@ -124,9 +124,10 @@ std::vector<std::uint8_t> serializeDString(const std::string& str)
 {
     std::vector<std::uint8_t> rv;
 #ifdef _WIN32
-    auto utf8Str = convertUTF::isLegalUTF8String(utf8Str.c_str(), utf8Str.length())
+    auto str_u8 = reinterpret_cast<const std::uint8_t*>(str.c_str());
+    auto utf8Str = convertUTF::isLegalUTF8String(str_u8, str.length())
                        ? str
-                       : UtfConverter::toUtf8(utf8Str.c_str(), utf8Str.length(), UtfConverter::sfANSI);
+                       : UtfConverter::toUtf8(str_u8, str.length(), UtfConverter::sfANSI);
 #else
     auto& utf8Str = str;
 #endif
@@ -136,7 +137,7 @@ std::vector<std::uint8_t> serializeDString(const std::string& str)
     {
         rv.reserve(numChars);
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str, [&](auto c) { rv.push_back(c & 0xff); });
+        IterateUTF8Chars(utf8Str, [&](auto c) { rv.push_back(c); });
     }
     else
     {
