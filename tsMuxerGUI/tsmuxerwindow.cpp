@@ -229,6 +229,13 @@ QString getComboBoxTrackText(int idx, const QtvCodecInfo &codecInfo)
     return text;
 }
 
+void initLanguageComboBox(QComboBox *comboBox)
+{
+    comboBox->addItem("English", "en");
+    comboBox->addItem(QString::fromUtf8("Русский"), "ru");
+    comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
+}
+
 }  // namespace
 
 // ----------------------- TsMuxerWindow -------------------------------------
@@ -269,6 +276,7 @@ TsMuxerWindow::TsMuxerWindow()
     ui->setupUi(this);
     qApp->installTranslator(&qtCoreTranslator);
     qApp->installTranslator(&tsMuxerTranslator);
+    initLanguageComboBox(ui->languageSelectComboBox);
     setWindowTitle("tsMuxeR GUI " TSMUXER_VERSION);
     lastInputDir = QDir::homePath();
     lastOutputDir = QDir::homePath();
@@ -369,8 +377,6 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->checkBoxCrop, &QCheckBox::stateChanged, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->checkBoxRVBR, &QAbstractButton::clicked, this, &TsMuxerWindow::onGeneralCheckboxClicked);
     connect(ui->checkBoxCBR, &QAbstractButton::clicked, this, &TsMuxerWindow::onGeneralCheckboxClicked);
-    // connect(ui->checkBoxuseAsynIO,	   SIGNAL(stateChanged(int)), this,
-    // SLOT(onSavedParamChanged()));
     connect(ui->radioButtonStoreOutput, &QAbstractButton::clicked, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->radioButtonOutoutInInput, &QAbstractButton::clicked, this, &TsMuxerWindow::onSavedParamChanged);
     connect(ui->editVBVLen, spinBoxValueChanged, this, &TsMuxerWindow::onGeneralSpinboxValueChanged);
@@ -1872,10 +1878,9 @@ void TsMuxerWindow::updateMuxTime2()
     updateMetaLines();
 }
 
-void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
+void TsMuxerWindow::onLanguageComboBoxIndexChanged(int idx)
 {
-    static const QString languages[] = {"en", "ru"};
-    auto lang = languages[x];
+    auto lang = ui->languageSelectComboBox->itemData(idx).toString();
     qtCoreTranslator.load(QString("qtbase_%1").arg(lang), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     tsMuxerTranslator.load(QString("tsmuxergui_%1").arg(lang), ":/i18n");
     QFile aboutContent(QString(":/about_%1.html").arg(lang));
@@ -1886,6 +1891,7 @@ void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
     else
     {
         qWarning() << "Failed to open about.html for language" << lang << aboutContent.errorString();
+        ui->textEdit->clear();
     }
 }
 
