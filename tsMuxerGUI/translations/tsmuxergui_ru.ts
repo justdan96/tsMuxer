@@ -106,7 +106,6 @@
         <location filename="../tsmuxerwindow.ui" line="325"/>
         <location filename="../tsmuxerwindow.ui" line="629"/>
         <location filename="../tsmuxerwindow.ui" line="810"/>
-        <location filename="../tsmuxerwindow.cpp" line="50"/>
         <source>General track options</source>
         <translation>Общие параметры дорожки</translation>
     </message>
@@ -197,7 +196,6 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="767"/>
-        <location filename="../tsmuxerwindow.cpp" line="52"/>
         <source>Demux options</source>
         <translation>Параметры записи дорожек</translation>
     </message>
@@ -328,651 +326,626 @@
         <translation>Главы:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1247"/>
+        <location filename="../tsmuxerwindow.ui" line="1257"/>
         <source>Options</source>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1253"/>
+        <location filename="../tsmuxerwindow.ui" line="1263"/>
         <source>Add blank playlist for cropped video</source>
         <translation>Добавить пустой плэйлист</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1281"/>
+        <location filename="../tsmuxerwindow.ui" line="1291"/>
         <source>Blank playlist</source>
         <translation>Пустой плэйлист</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1319"/>
+        <location filename="../tsmuxerwindow.ui" line="1329"/>
         <source>Force BD-ROM V3 format</source>
         <translation>Задать 3 версию формата BD-ROM</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1331"/>
+        <location filename="../tsmuxerwindow.ui" line="1341"/>
         <source>First MPLS file</source>
         <translation>Первый файл MPLS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1354"/>
+        <location filename="../tsmuxerwindow.ui" line="1364"/>
         <source>First M2TS file</source>
         <translation>Первый файл M2TS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1384"/>
+        <location filename="../tsmuxerwindow.ui" line="1394"/>
         <source>Start mux time</source>
         <translation>Время начала записи</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1410"/>
+        <location filename="../tsmuxerwindow.ui" line="1420"/>
         <source>45 Khz clock:</source>
         <translation>1/45 милисекунды:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1435"/>
+        <location filename="../tsmuxerwindow.ui" line="1445"/>
         <source>3D settings</source>
         <translation>Настройки 3D</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1441"/>
+        <location filename="../tsmuxerwindow.ui" line="1451"/>
         <source>Use base video stream for right eye</source>
         <translation>Использовать основной видеопоток для правого глаза</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1457"/>
+        <location filename="../tsmuxerwindow.ui" line="1467"/>
         <source>PIP settings</source>
         <translation>Настройки PIP</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1465"/>
+        <location filename="../tsmuxerwindow.ui" line="1475"/>
         <source>Corner</source>
         <translation>Угол</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1476"/>
+        <location filename="../tsmuxerwindow.ui" line="1486"/>
         <source>Top Left</source>
         <translation>Верхний Левый</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1481"/>
+        <location filename="../tsmuxerwindow.ui" line="1491"/>
         <source>Top Right</source>
         <translation>Верхний Правый</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1486"/>
+        <location filename="../tsmuxerwindow.ui" line="1496"/>
         <source>Bottom Right</source>
         <translation>Нижний Правый</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1491"/>
+        <location filename="../tsmuxerwindow.ui" line="1501"/>
         <source>Bottom Left</source>
         <translation>Нижний Левый</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1499"/>
+        <location filename="../tsmuxerwindow.ui" line="1509"/>
         <source>Horizontal offset</source>
         <translation>Смещение по горизонтали</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1516"/>
+        <location filename="../tsmuxerwindow.ui" line="1526"/>
         <source>Size</source>
         <translation>Размер</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1527"/>
+        <location filename="../tsmuxerwindow.ui" line="1537"/>
         <source>Not scaled</source>
         <translation>Не маштабировать</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1532"/>
+        <location filename="../tsmuxerwindow.ui" line="1542"/>
         <source>Half (x 1/2)</source>
         <translation>Половина (x 1/2)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1537"/>
+        <location filename="../tsmuxerwindow.ui" line="1547"/>
         <source>Quarter (x 1/4)</source>
         <translation>Четверть (x 1/4)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1542"/>
+        <location filename="../tsmuxerwindow.ui" line="1552"/>
         <source>One and a Half (x 1.5)</source>
         <translation>Полтора (x 1.5)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1547"/>
+        <location filename="../tsmuxerwindow.ui" line="1557"/>
         <source>Full Screen</source>
         <translation>На весь экран</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1568"/>
+        <location filename="../tsmuxerwindow.ui" line="1578"/>
         <source>Vertical offset</source>
         <translation>Смещение по вертикали</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1590"/>
+        <location filename="../tsmuxerwindow.ui" line="1600"/>
         <source>Default tracks</source>
         <translation>Дорожки по умолчанию</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1596"/>
+        <location filename="../tsmuxerwindow.ui" line="1606"/>
         <source>Subtitle</source>
         <translation>Субтитры</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1606"/>
+        <location filename="../tsmuxerwindow.ui" line="1616"/>
         <source>When checked, only subtitles marked as &quot;forced&quot; in the subtitle stream will appear.</source>
         <translation>Если установлен будут отображаться только субтитры, помеченные как &quot;принудительные&quot;.</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1609"/>
+        <location filename="../tsmuxerwindow.ui" line="1619"/>
         <source>Forced only</source>
         <translation>Только принудительные</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1616"/>
+        <location filename="../tsmuxerwindow.ui" line="1626"/>
         <source>Audio</source>
         <translation>Звук</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1656"/>
+        <location filename="../tsmuxerwindow.ui" line="1666"/>
         <source>Split &amp;&amp; cut</source>
         <translation>Нарезка &amp;&amp; обрезка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1671"/>
+        <location filename="../tsmuxerwindow.ui" line="1681"/>
         <source>Splitting</source>
         <translation>Нарезка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1682"/>
+        <location filename="../tsmuxerwindow.ui" line="1692"/>
         <source>No split</source>
         <translation>Не нарезать</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1692"/>
+        <location filename="../tsmuxerwindow.ui" line="1702"/>
         <source>Split by duration every</source>
         <translation>Нарезать через каждые</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1718"/>
+        <location filename="../tsmuxerwindow.ui" line="1728"/>
         <source>sec</source>
         <translation>сек</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1725"/>
+        <location filename="../tsmuxerwindow.ui" line="1735"/>
         <source>Split by size every</source>
         <translation>Нарезать по размеру каждые</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1758"/>
+        <location filename="../tsmuxerwindow.ui" line="1768"/>
         <source>KB</source>
         <translation>Килобайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1763"/>
+        <location filename="../tsmuxerwindow.ui" line="1773"/>
         <source>KiB</source>
         <translation>Кибибайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1768"/>
+        <location filename="../tsmuxerwindow.ui" line="1778"/>
         <source>MB</source>
         <translation>Мегабайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1773"/>
+        <location filename="../tsmuxerwindow.ui" line="1783"/>
         <source>MiB</source>
         <translation>Мебибайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1778"/>
+        <location filename="../tsmuxerwindow.ui" line="1788"/>
         <source>GB</source>
         <translation>Гигабайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1783"/>
+        <location filename="../tsmuxerwindow.ui" line="1793"/>
         <source>GiB</source>
         <translation>Гибибайт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1815"/>
+        <location filename="../tsmuxerwindow.ui" line="1825"/>
         <source>Cutting</source>
         <translation>Обрезка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1826"/>
+        <location filename="../tsmuxerwindow.ui" line="1836"/>
         <source>Enable cutting</source>
         <translation>Разрешить обрезку</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1837"/>
+        <location filename="../tsmuxerwindow.ui" line="1847"/>
         <source>Start</source>
         <translation>Начало</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1847"/>
+        <location filename="../tsmuxerwindow.ui" line="1857"/>
         <source>End</source>
         <translation>Конец</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1927"/>
+        <location filename="../tsmuxerwindow.ui" line="1937"/>
         <source>Subtitles</source>
         <translation>Субтитры</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1942"/>
+        <location filename="../tsmuxerwindow.ui" line="1952"/>
         <source> Default text based subtitles font: </source>
         <translation> Шрифт текстовых субтитров по умолчанию: </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1975"/>
-        <location filename="../tsmuxerwindow.ui" line="1980"/>
-        <location filename="../tsmuxerwindow.ui" line="1985"/>
-        <location filename="../tsmuxerwindow.ui" line="1990"/>
-        <location filename="../tsmuxerwindow.ui" line="1995"/>
+        <location filename="../tsmuxerwindow.ui" line="1976"/>
+        <location filename="../tsmuxerwindow.ui" line="1981"/>
+        <location filename="../tsmuxerwindow.ui" line="1986"/>
+        <location filename="../tsmuxerwindow.ui" line="1991"/>
+        <location filename="../tsmuxerwindow.ui" line="1996"/>
         <source>New Row</source>
         <translation>Новая Строка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2000"/>
-        <location filename="../tsmuxerwindow.ui" line="2005"/>
+        <location filename="../tsmuxerwindow.ui" line="2001"/>
+        <location filename="../tsmuxerwindow.ui" line="2006"/>
         <source>New Column</source>
         <translation>Новый Столбец</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2010"/>
+        <location filename="../tsmuxerwindow.ui" line="2011"/>
         <source>Name:</source>
         <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2020"/>
+        <location filename="../tsmuxerwindow.ui" line="2021"/>
         <source>Size:</source>
         <translation>Размер:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2025"/>
+        <location filename="../tsmuxerwindow.ui" line="2026"/>
         <source>65</source>
         <translation>65</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2030"/>
+        <location filename="../tsmuxerwindow.ui" line="2031"/>
         <source>Color:</source>
         <translation>Цвет:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2035"/>
+        <location filename="../tsmuxerwindow.ui" line="2036"/>
         <source>0xffffffff</source>
         <translation>0xffffffff</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2040"/>
+        <location filename="../tsmuxerwindow.ui" line="2041"/>
         <source>Charset:</source>
         <translation>Набор символов:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2045"/>
+        <location filename="../tsmuxerwindow.ui" line="2046"/>
         <source>Default</source>
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2050"/>
+        <location filename="../tsmuxerwindow.ui" line="2051"/>
         <source>Options:</source>
         <translation>Параметры:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2071"/>
+        <location filename="../tsmuxerwindow.ui" line="2072"/>
         <source>Font</source>
         <translation>Шрифт</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2078"/>
+        <location filename="../tsmuxerwindow.ui" line="2079"/>
         <source>Color</source>
         <translation>Цвет</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2102"/>
+        <location filename="../tsmuxerwindow.ui" line="2103"/>
         <source>Additional border, pixels:</source>
         <translation>Дополнительная рамка, пикселей:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2128"/>
+        <location filename="../tsmuxerwindow.ui" line="2129"/>
         <source>line spacing:</source>
         <translation>Междустрочное расстояние:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2154"/>
+        <location filename="../tsmuxerwindow.ui" line="2155"/>
         <source>Fade in/out animation:</source>
         <translation>Анимация появления/исчезания:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2165"/>
+        <location filename="../tsmuxerwindow.ui" line="2166"/>
         <source>None</source>
         <translation>Отсутствует</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2170"/>
+        <location filename="../tsmuxerwindow.ui" line="2171"/>
         <source>Fast</source>
         <translation>Быстрое</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2175"/>
+        <location filename="../tsmuxerwindow.ui" line="2176"/>
         <source>Medium</source>
         <translation>Среднее</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2180"/>
+        <location filename="../tsmuxerwindow.ui" line="2181"/>
         <source>Slow</source>
         <translation>Медленное</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2185"/>
+        <location filename="../tsmuxerwindow.ui" line="2186"/>
         <source>Very slow</source>
         <translation>Очень медленное</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2221"/>
+        <location filename="../tsmuxerwindow.ui" line="2222"/>
         <source> Vertical position: </source>
         <translation> Позиция по вертикали: </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2232"/>
+        <location filename="../tsmuxerwindow.ui" line="2233"/>
         <source>Top of screen</source>
         <translation>Верх экрана</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2266"/>
+        <location filename="../tsmuxerwindow.ui" line="2267"/>
         <source>top offset, pixels:</source>
         <translation>отступ от верха, пикселей:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2300"/>
-        <location filename="../tsmuxerwindow.ui" line="2472"/>
+        <location filename="../tsmuxerwindow.ui" line="2301"/>
+        <location filename="../tsmuxerwindow.ui" line="2473"/>
         <source>Screen center</source>
         <translation>Центр экрана</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2307"/>
+        <location filename="../tsmuxerwindow.ui" line="2308"/>
         <source>Bottom of screen</source>
         <translation>Низ экрана</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2341"/>
+        <location filename="../tsmuxerwindow.ui" line="2342"/>
         <source>bottom offset, pixels:</source>
         <translation>отступ от низа, пикселей:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2393"/>
+        <location filename="../tsmuxerwindow.ui" line="2394"/>
         <source> Horizontal position: </source>
         <translation> Позиция по горизонтали: </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2404"/>
+        <location filename="../tsmuxerwindow.ui" line="2405"/>
         <source>Left of screen</source>
         <translation>слева экрана</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2438"/>
+        <location filename="../tsmuxerwindow.ui" line="2439"/>
         <source>left offset, pixels:</source>
         <translation>отступ слева, пикселей:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2485"/>
+        <location filename="../tsmuxerwindow.ui" line="2486"/>
         <source>Right of screen</source>
         <translation>справа экрана</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2522"/>
+        <location filename="../tsmuxerwindow.ui" line="2523"/>
         <source>right offset, pixels:</source>
         <translation>отступ справа, пикселей:</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2587"/>
+        <location filename="../tsmuxerwindow.ui" line="2588"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2639"/>
+        <location filename="../tsmuxerwindow.ui" line="2693"/>
         <source>Output</source>
         <translation>Результат</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2653"/>
+        <location filename="../tsmuxerwindow.ui" line="2707"/>
         <source>TS muxing</source>
         <translation>Запись в TS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2669"/>
+        <location filename="../tsmuxerwindow.ui" line="2723"/>
         <source>M2TS muxing</source>
         <translation>Запись в M2TS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2676"/>
+        <location filename="../tsmuxerwindow.ui" line="2730"/>
         <source>Blu-ray ISO</source>
         <translation>Запись блюрея в файл ISO</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2689"/>
+        <location filename="../tsmuxerwindow.ui" line="2743"/>
         <source>Blu-ray folder</source>
         <translation>Запись блюрея в папку</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2696"/>
+        <location filename="../tsmuxerwindow.ui" line="2750"/>
         <source>AVCHD folder</source>
         <translation>Запись AVCHD в папку</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2709"/>
-        <location filename="../tsmuxerwindow.cpp" line="1414"/>
+        <location filename="../tsmuxerwindow.ui" line="2763"/>
+        <location filename="../tsmuxerwindow.cpp" line="1403"/>
         <source>Demux</source>
         <translation>Демукс</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2733"/>
+        <location filename="../tsmuxerwindow.ui" line="2787"/>
         <source>Disk label</source>
         <translation>Имя диска</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2743"/>
-        <location filename="../tsmuxerwindow.cpp" line="2379"/>
+        <location filename="../tsmuxerwindow.ui" line="2797"/>
+        <location filename="../tsmuxerwindow.cpp" line="2364"/>
         <source>File name</source>
         <translation>Имя Файла</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2769"/>
+        <location filename="../tsmuxerwindow.ui" line="2823"/>
         <source>Browse</source>
         <translation>Выбрать</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2793"/>
+        <location filename="../tsmuxerwindow.ui" line="2847"/>
         <source>Meta file</source>
         <translation>Файл проекта tsMuxeR</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2862"/>
-        <location filename="../tsmuxerwindow.cpp" line="2365"/>
+        <location filename="../tsmuxerwindow.ui" line="2929"/>
+        <location filename="../tsmuxerwindow.cpp" line="2350"/>
         <source>Sta&amp;rt muxing</source>
         <translation>Ста&amp;рт муксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2887"/>
+        <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="25"/>
-        <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.cpp" line="48"/>
-        <source>tsMuxeR project file (*.meta);;All files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.cpp" line="54"/>
-        <source>Transport stream (*.ts);;all files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.cpp" line="56"/>
-        <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.cpp" line="58"/>
-        <source>Disk image (*.iso);;all files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.cpp" line="545"/>
+        <location filename="../tsmuxerwindow.cpp" line="534"/>
         <source>Not supported</source>
         <translation>Не поддерживается</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="611"/>
-        <location filename="../tsmuxerwindow.cpp" line="1128"/>
+        <location filename="../tsmuxerwindow.cpp" line="600"/>
+        <location filename="../tsmuxerwindow.cpp" line="1117"/>
         <source>Unsupported format</source>
         <translation>Неподдерживаемый формат</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="612"/>
+        <location filename="../tsmuxerwindow.cpp" line="601"/>
         <source>Can&apos;t detect stream type. File name: &quot;%1&quot;</source>
         <translation>Не определён тип потока. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="882"/>
+        <location filename="../tsmuxerwindow.cpp" line="871"/>
         <source>Add media file</source>
         <translation>Добавить медиафайл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="919"/>
+        <location filename="../tsmuxerwindow.cpp" line="908"/>
         <source>File already exists</source>
         <translation>Файл уже есть</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="920"/>
+        <location filename="../tsmuxerwindow.cpp" line="909"/>
         <source>File &quot;%1&quot; already exists</source>
         <translation>Файл &quot;%1&quot; уже есть</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1133"/>
+        <location filename="../tsmuxerwindow.cpp" line="1122"/>
         <source>Unsupported format or all tracks are not recognized. File name: &quot;%1&quot;</source>
         <translation>Неподдерживаемый формат или все дорожки не распознаны. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1144"/>
+        <location filename="../tsmuxerwindow.cpp" line="1133"/>
         <source>Some tracks not recognized. This tracks was ignored. File name: &quot;%1&quot;</source>
         <translation>Некоторые дорожки не распознаны. Эта дорожка была проигнорирована. Имя файла: &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1414"/>
+        <location filename="../tsmuxerwindow.cpp" line="1403"/>
         <source>Mux</source>
         <translation>Создать</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1433"/>
+        <location filename="../tsmuxerwindow.cpp" line="1422"/>
         <source>tsMuxeR error</source>
         <translation>Ошибка tsMuxeR</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1437"/>
+        <location filename="../tsmuxerwindow.cpp" line="1426"/>
         <source>tsMuxeR not found!</source>
         <translation>tsMuxeR не найден!</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1455"/>
+        <location filename="../tsmuxerwindow.cpp" line="1444"/>
         <source>Can&apos;t execute tsMuxeR!</source>
         <translation>Не возможно запустить tsMuxeR!</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2219"/>
-        <location filename="../tsmuxerwindow.cpp" line="2220"/>
+        <location filename="../tsmuxerwindow.cpp" line="2204"/>
+        <location filename="../tsmuxerwindow.cpp" line="2205"/>
         <source>No track selected</source>
         <translation>Не выбрана дорожка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2227"/>
+        <location filename="../tsmuxerwindow.cpp" line="2212"/>
         <source>Append media file</source>
         <translation>Присоединить медиафайл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2264"/>
+        <location filename="../tsmuxerwindow.cpp" line="2249"/>
         <source>Invalid file extension</source>
         <translation>Неверное расширение файла</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2265"/>
+        <location filename="../tsmuxerwindow.cpp" line="2250"/>
         <source>Appended file must have same file extension.</source>
         <translation>Присоединяемый файл должен иметь тоже самое расширение файла.</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2363"/>
+        <location filename="../tsmuxerwindow.cpp" line="2348"/>
         <source>Sta&amp;rt demuxing</source>
         <translation>Ста&amp;rт демуксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2375"/>
+        <location filename="../tsmuxerwindow.cpp" line="2360"/>
         <source>Folder</source>
         <translation>Папка</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2465"/>
+        <location filename="../tsmuxerwindow.cpp" line="2450"/>
         <source>Select file for muxing</source>
         <translation>Выберите файл для муксинга</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2487"/>
-        <location filename="../tsmuxerwindow.cpp" line="2503"/>
+        <location filename="../tsmuxerwindow.cpp" line="2472"/>
+        <location filename="../tsmuxerwindow.cpp" line="2488"/>
         <source>Invalid file name</source>
         <translation>Неверное имя файла</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2488"/>
+        <location filename="../tsmuxerwindow.cpp" line="2473"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.m2ts&quot;</source>
         <translation>Выходной файл &quot;%1&quot; имеет недопустимое расширение. Пожалуйста, измените расширение файла на &quot;.m2ts&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2504"/>
+        <location filename="../tsmuxerwindow.cpp" line="2489"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.iso&quot;</source>
         <translation>Выходной файл &quot;%1&quot; имеет недопустимое расширение. Пожалуйста, измените расширение файла на &quot;.iso&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2518"/>
+        <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
         <translatorcomment>Используется в фразах &quot;Переписать существующий %1&quot; и &quot;Файл %1 уже существует&quot;.</translatorcomment>
         <translation>файл</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2518"/>
+        <location filename="../tsmuxerwindow.cpp" line="2503"/>
         <source>directory</source>
         <translation>каталог</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2520"/>
+        <location filename="../tsmuxerwindow.cpp" line="2505"/>
         <source>Overwrite existing %1?</source>
         <translation>Переписать существующий %1?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2521"/>
+        <location filename="../tsmuxerwindow.cpp" line="2506"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
         <translation>Результат %1 &quot;%2&quot; уже есть. Хотите его перезаписать?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2538"/>
+        <location filename="../tsmuxerwindow.cpp" line="2523"/>
         <source>Muxing in progress</source>
         <translation>Выполняется муксинг</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2538"/>
+        <location filename="../tsmuxerwindow.cpp" line="2523"/>
         <source>Demuxing in progress</source>
         <translation>Выполняется демуксинг</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2567"/>
+        <location filename="../tsmuxerwindow.cpp" line="2552"/>
         <source>Can&apos;t create temporary meta file</source>
         <translation>Не возможно создать временный файл проекта</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2568"/>
+        <location filename="../tsmuxerwindow.cpp" line="2553"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
         <translation>Не возможно создать временный файл проекта &quot;%1&quot;</translation>
     </message>
