@@ -781,7 +781,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2847"/>
         <source>Meta file</source>
-        <translation>Файл метаданных</translation>
+        <translation>Файл проекта tsMuxeR</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2929"/>
@@ -792,7 +792,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
-        <translation>Сохранить метаданные</translation>
+        <translation>Сохранить проект</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="534"/>
@@ -942,12 +942,12 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2552"/>
         <source>Can&apos;t create temporary meta file</source>
-        <translation>Не возможно создать временный файл метаданных</translation>
+        <translation>Не возможно создать временный файл проекта</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2553"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
-        <translation>Не возможно создать временный файл метаданных &quot;%1&quot;</translation>
+        <translation>Не возможно создать временный файл проекта &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
