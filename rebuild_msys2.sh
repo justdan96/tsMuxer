@@ -6,6 +6,9 @@ if [ "$MSYSTEM" == "MSYS" ] ; then
  flex \
  zlib-devel \
  git
+ if [ ! -d tsmuxer ] ; then
+  git clone https://github.com/justdan96/tsMuxer.git
+ fi
 else
  if [ ! -d build ] ; then
   pacman -Sy --needed $MINGW_PACKAGE_PREFIX-toolchain \
@@ -13,8 +16,10 @@ else
   $MINGW_PACKAGE_PREFIX-freetype \
   $MINGW_PACKAGE_PREFIX-zlib \
   $MINGW_PACKAGE_PREFIX-ninja
-  echo If you intend to build the tsMuxerGUI enter Y
-  pacman -S --needed $MINGW_PACKAGE_PREFIX-qt5-static
+  if [ ! -d $MINGW_PREFIX/qt5-static ] ; then
+   echo If you intend to build the tsMuxerGUI enter Y
+   pacman -S --needed $MINGW_PACKAGE_PREFIX-qt5-static
+  fi
   if [ -d $MINGW_PREFIX/qt5-static ] ; then
    echo 'load(win32/windows_vulkan_sdk)' > $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
    echo 'QMAKE_LIBS_VULKAN       =' >>     $MINGW_PREFIX/qt5-static/share/qt5/mkspecs/common/windows-vulkan.conf
