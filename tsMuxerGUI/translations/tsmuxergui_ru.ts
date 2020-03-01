@@ -792,7 +792,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2948"/>
         <source>Save meta file</source>
-        <translation>Сохранить файл метаданных</translation>
+        <translation>Сохранить метаданные</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="534"/>
