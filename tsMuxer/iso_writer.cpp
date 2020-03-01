@@ -135,7 +135,7 @@ std::vector<std::uint8_t> serializeDString(const std::string& str)
     using namespace convertUTF;
     if (canUse8BitUnicode(utf8Str, numChars))
     {
-        rv.reserve(numChars);
+        rv.reserve(numChars + 1);
         rv.push_back(8);
         IterateUTF8Chars(utf8Str, [&](auto c) { rv.push_back(c); });
     }
