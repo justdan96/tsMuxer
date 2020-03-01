@@ -1878,6 +1878,15 @@ void TsMuxerWindow::onLanguageComboBoxIndexChanged(int x)
     auto lang = languages[x];
     qtCoreTranslator.load(QString("qtbase_%1").arg(lang), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     tsMuxerTranslator.load(QString("tsmuxergui_%1").arg(lang), ":/i18n");
+    QFile aboutContent(QString(":/about_%1.html").arg(lang));
+    if (aboutContent.open(QIODevice::ReadOnly))
+    {
+        ui->textEdit->setHtml(QString::fromUtf8(aboutContent.readAll()));
+    }
+    else
+    {
+        qWarning() << "Failed to open about.html for language" << lang << aboutContent.errorString();
+    }
 }
 
 void TsMuxerWindow::updateMetaLines()
