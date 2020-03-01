@@ -2785,15 +2785,12 @@ p, li { white-space: pre-wrap; }
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QTextEdit" name="memoMeta">
+           <widget class="QPlainTextEdit" name="memoMeta">
             <property name="undoRedoEnabled">
              <bool>false</bool>
             </property>
             <property name="readOnly">
              <bool>true</bool>
-            </property>
-            <property name="acceptRichText">
-             <bool>false</bool>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>

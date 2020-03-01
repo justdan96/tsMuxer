@@ -1895,7 +1895,8 @@ void TsMuxerWindow::updateMetaLines()
         return;
 
     ui->memoMeta->clear();
-    ui->memoMeta->append(getMuxOpts());
+    QString metaContent;
+    metaContent.append(getMuxOpts() + '\n');
     QString tmpFps;
     for (int i = 0; i < ui->trackLV->rowCount(); ++i)
     {
@@ -1960,7 +1961,7 @@ void TsMuxerWindow::updateMetaLines()
         if (codecInfo->subTrack != 0)
             postfix += QString(", subTrack=") + QString::number(codecInfo->subTrack);
         if (isVideoCodec(codecInfo->displayName))
-            ui->memoMeta->append(prefix + getVideoMetaInfo(codecInfo) + postfix);
+            metaContent.append(prefix + getVideoMetaInfo(codecInfo) + postfix + '\n');
         else
         {
             if (isDiskOutput() && ui->defaultAudioTrackCheckBox->isChecked() &&
@@ -1968,9 +1969,10 @@ void TsMuxerWindow::updateMetaLines()
             {
                 postfix += QString(", default");
             }
-            ui->memoMeta->append(prefix + getAudioMetaInfo(codecInfo) + postfix);
+            metaContent.append(prefix + getAudioMetaInfo(codecInfo) + postfix + '\n');
         }
     }
+    ui->memoMeta->setPlainText(metaContent);
 }
 
 void TsMuxerWindow::onFontBtnClicked()
