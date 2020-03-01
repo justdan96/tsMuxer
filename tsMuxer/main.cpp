@@ -7,7 +7,6 @@
 
 #include "blank_patterns.h"
 #include "blurayHelper.h"
-#include "convertUTF.h"
 #include "iso_writer.h"
 #include "math.h"
 #include "metaDemuxer.h"
@@ -17,7 +16,6 @@
 #include "singleFileMuxer.h"
 #include "textSubtitles.h"
 #include "tsMuxer.h"
-#include "utf8Converter.h"
 
 using namespace std;
 
