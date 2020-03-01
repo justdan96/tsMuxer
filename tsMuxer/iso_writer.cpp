@@ -8,7 +8,6 @@
 
 #include "convertUTF.h"
 #include "utf8Converter.h"
-#include "vodCoreException.h"
 #include "vod_common.h"
 
 // ----------- routines --------------
@@ -66,10 +65,12 @@ void writeDescriptorTag(uint8_t* buffer, uint16_t tag, uint32_t tagLocation)
 
 std::string toIsoSeparator(const std::string& path)
 {
-    std::string result;
-    result.reserve(path.size());
-    std::transform(std::begin(path), std::end(path), std::back_inserter(result),
-                   [](auto c) { return c == '\\' ? '/' : c; });
+    std::string result = path;
+    for (int i = 0; i < result.size(); ++i)
+    {
+        if (result[i] == '\\')
+            result[i] = '/';
+    }
     return result;
 }
 
