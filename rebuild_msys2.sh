@@ -1,5 +1,6 @@
 #!/usr/bin/bash
 
+cd ~
 if [ "$MSYSTEM" == "MSYS" ] ; then
  pacman -Syu
  pacman -Sy --needed base-devel \
@@ -10,6 +11,7 @@ if [ "$MSYSTEM" == "MSYS" ] ; then
   git clone https://github.com/justdan96/tsMuxer.git
  fi
 else
+ cd tsmuxer
  if [ ! -d build ] ; then
   pacman -Sy --needed $MINGW_PACKAGE_PREFIX-toolchain \
   $MINGW_PACKAGE_PREFIX-cmake \
@@ -32,7 +34,7 @@ else
  ninja && cp -u tsMuxer/tsmuxer.exe ../bin/
  if [ -d $MINGW_PREFIX/qt5-static ] ; then
   $MINGW_PREFIX/qt5-static/bin/qmake ../tsMuxerGUI
-  make && cp -u debug/tsMuxerGUI.exe ../bin/
+  make && cp -u tsMuxerGUI.exe ../bin/
  fi
  cd ..
 fi
