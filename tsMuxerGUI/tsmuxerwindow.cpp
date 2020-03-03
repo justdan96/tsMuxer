@@ -277,9 +277,7 @@ TsMuxerWindow::TsMuxerWindow()
       outFileNameDisableChange(false),
       muxForm(new MuxForm(this)),
       m_updateMeta(true),
-      m_3dMode(false),
-      tempSoundFile(0),
-      sound(0)
+      m_3dMode(false)
 {
     ui->setupUi(this);
     qApp->installTranslator(&qtCoreTranslator);
@@ -452,12 +450,6 @@ TsMuxerWindow::TsMuxerWindow()
     ui->trackSplitter->setStretchFactor(1, 100);
 
     writeSettings();
-}
-
-TsMuxerWindow::~TsMuxerWindow()
-{
-    delete sound;
-    delete tempSoundFile;
 }
 
 void TsMuxerWindow::onTsMuxerCodecInfoReceived()
@@ -1364,34 +1356,8 @@ void TsMuxerWindow::readFromStderr()
 
 void TsMuxerWindow::myPlaySound(const QString &fileName)
 {
-    // FIXME this can be replaced with a simple QSound::play in Qt >= 5.11.0
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return;
-    qint64 fSize = file.size();
-    char *data = new char[fSize];
-    qint64 readed = file.read(data, fSize);
-    QFileInfo fi(fileName);
-    QString outFileName = QDir::toNativeSeparators(QDir::tempPath()) + QDir::separator() + "tsMuxeR_" + fi.fileName();
-    delete sound;
-    delete tempSoundFile;
-    tempSoundFile = new QTemporaryFile(outFileName);
-
-    if (!tempSoundFile->open())
-    {
-        delete[] data;
-        delete tempSoundFile;
-        tempSoundFile = 0;
-        return;
-    }
-
-    tempSoundFile->write(data, readed);
-    QString tmpFileName = tempSoundFile->fileName();
-    tempSoundFile->close();
-    sound = new QSound(tmpFileName);
-    sound->play();
-    file.close();
-    delete[] data;
+    sound.setSource(QUrl(QString("qrc%1").arg(fileName)));
+    sound.play();
 }
 
 void TsMuxerWindow::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)

@@ -3,6 +3,7 @@
 
 #include <QHeaderView>
 #include <QProcess>
+#include <QSoundEffect>
 #include <QTimer>
 #include <QTranslator>
 #include <QWidget>
@@ -10,8 +11,6 @@
 #include "codecinfo.h"
 
 class QFileDialog;
-class QTemporaryFile;
-class QSound;
 class QTableWidgetItem;
 class QComboBox;
 class QCheckBox;
@@ -38,7 +37,6 @@ class TsMuxerWindow : public QWidget
     Q_OBJECT
    public:
     TsMuxerWindow();
-    ~TsMuxerWindow() override;
 
     void addFiles(const QList<QUrl>& files);
    signals:
@@ -190,8 +188,7 @@ class TsMuxerWindow : public QWidget
     void dragMoveEvent(QDragMoveEvent* event) override;
     void dragLeaveEvent(QDragLeaveEvent* event) override;
 
-    QTemporaryFile* tempSoundFile;
-    QSound* sound;
+    QSoundEffect sound;
     void myPlaySound(const QString& fileName);
     bool isVideoCropped();
 };
