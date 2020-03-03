@@ -1,3 +1,4 @@
+
 mkdir C:\Qt\
 powershell -Command "Invoke-WebRequest https://files.catbox.moe/y5f5be.7z -O qt-xp-static.7z"
 7z x -oC:\Qt\ qt-xp-static.7z
@@ -12,3 +13,6 @@ mkdir build
 cd build
 "C:\Qt\5.6.3-Static-XP\bin\qmake.exe" ..
 nmake release
+
+cd release
+7z a -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on -sse tsMuxerGUI.7z tsMuxerGUI.exe

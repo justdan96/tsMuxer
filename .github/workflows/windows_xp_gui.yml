@@ -17,3 +17,9 @@ jobs:
 
     - run: ./build_gui_winxp.bat
       name: build-xp-gui
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: tsMuxerGUI
+        path: tsMuxerGUI/build/release/tsMuxerGUI.7z
+      name: upload-artefact
