@@ -7,6 +7,7 @@ set INCLUDE=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Include;%INCLUDE%
 set PATH=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Bin;%PATH%
 set LIB=%ProgramFiles(x86)%\Microsoft SDKs\Windows\7.1A\Lib;%LIB%
 
+cd tsMuxerGUI
 mkdir build
 cd build
 "C:\Qt\5.6.3-Static-XP\bin\qmake.exe" ..
