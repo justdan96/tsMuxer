@@ -1,17 +1,19 @@
 #include "iso_writer.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
+#include "convertUTF.h"
+#include "utf8Converter.h"
 #include "vod_common.h"
-
-#ifdef _WIN32
-#include <time.h>
-#endif
 
 // ----------- routines --------------
 
+namespace
+{
 /*
   Name  : CRC-16 CCITT
   Poly  : 0x1021    x^16 + x^12 + x^5 + 1
@@ -108,14 +110,75 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     buffer[11] = 0;
 }
 
-void writeDString(uint8_t* buffer, const char* value, int len)
+bool canUse8BitUnicode(const std::string& utf8Str)
 {
-    int realLen = FFMIN(strlen(value), len - 2);
-    buffer[len - 1] = realLen + 1;
-    buffer[0] = 8;  // 8 bit per character string
-    memcpy(buffer + 1, value, realLen + 1);
-    int restLen = len - realLen - 2;
-    memset(buffer + 1 + realLen, 0, restLen);
+    bool rv = true;
+    convertUTF::IterateUTF8Chars(utf8Str, [&](auto c) {
+        rv = (c < 0x100);
+        return rv;
+    });
+    return rv;
+}
+
+std::vector<std::uint8_t> serializeDString(const std::string& str, int fieldLen)
+{
+    if (str.empty())
+    {
+        return std::vector<std::uint8_t>(fieldLen, 0);
+    }
+    std::vector<std::uint8_t> rv;
+#ifdef _WIN32
+    auto str_u8 = reinterpret_cast<const std::uint8_t*>(str.c_str());
+    auto utf8Str = convertUTF::isLegalUTF8String(str_u8, str.length())
+                       ? str
+                       : UtfConverter::toUtf8(str_u8, str.length(), UtfConverter::sfANSI);
+#else
+    auto& utf8Str = str;
+#endif
+    using namespace convertUTF;
+    const auto maxHeaderAndContentLength = fieldLen - 1;
+    rv.reserve(fieldLen);
+    if (canUse8BitUnicode(utf8Str))
+    {
+        rv.push_back(8);
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            rv.push_back(c);
+            return rv.size() < maxHeaderAndContentLength;
+        });
+    }
+    else
+    {
+        rv.push_back(16);
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            UTF16 high_surrogate, low_surrogate;
+            std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
+            auto spaceLeft = maxHeaderAndContentLength - rv.size();
+            if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
+            {
+                return false;
+            }
+            rv.push_back(high_surrogate >> 8);
+            rv.push_back(high_surrogate);
+            if (low_surrogate)
+            {
+                rv.push_back(low_surrogate >> 8);
+                rv.push_back(low_surrogate);
+            }
+            return true;
+        });
+    }
+    auto contentLength = rv.size();
+    auto paddingSize = maxHeaderAndContentLength - rv.size();
+    std::fill_n(std::back_inserter(rv), paddingSize, 0);
+    rv.push_back(contentLength);
+    return rv;
+}
+
+void writeDString(uint8_t* buffer, const char* value, int fieldLen)
+{
+    auto content = serializeDString(value, fieldLen);
+    assert(content.size() == fieldLen);
+    std::copy(std::begin(content), std::end(content), buffer);
 }
 
 void writeUDFString(uint8_t* buffer, const char* str, int len)
@@ -135,6 +198,8 @@ void writeLongAD(uint8_t* buffer, uint32_t lenBytes, uint32_t pos, uint16_t part
     buff16[4] = partition;  // location, partition number
     buff32[3] = id;
 }
+
+}  // namespace
 
 // --------------------- ByteFileWriter ---------------------
 

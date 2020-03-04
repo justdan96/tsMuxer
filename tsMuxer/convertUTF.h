@@ -89,6 +89,7 @@
 
 #include <cstdint>
 #include <string>
+#include <tuple>
 
 namespace convertUTF
 {
@@ -136,6 +137,8 @@ ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sou
 ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
                                      UTF16* targetEnd, ConversionFlags flags);
 
+std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32);
+
 Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
 
 Boolean isLegalUTF8String(const UTF8* string, int length);
@@ -167,7 +170,8 @@ template <typename Fn>
 void IterateUTF8Chars(const std::string& utf8String, Fn f)
 {
     auto it = std::begin(utf8String);
-    while (it != std::end(utf8String))
+    bool keep_going = true;
+    while (keep_going && it != std::end(utf8String))
     {
         UTF32 ch = 0;
         unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
@@ -193,7 +197,7 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
             ch += get_as_uchar();
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
-        f(ch);
+        keep_going = f(ch);
     }
 }
 

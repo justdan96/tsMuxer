@@ -537,6 +537,7 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         maxX = pen.x + face->glyph->bitmap_left;
+        return true;
     });
     if ((m_font.m_opts & m_font.UNDERLINE) || (m_font.m_opts & m_font.STRIKE_OUT))
     {
@@ -589,6 +590,7 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
         pen.x += m_font.m_borderWidth / 2;
         mSize->cy = face->size->metrics.height >> 6;
         mSize->cx = pen.x + face->glyph->bitmap_left;
+        return true;
     });
 }
 
