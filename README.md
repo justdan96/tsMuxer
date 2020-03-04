@@ -338,7 +338,7 @@ a239a724cba1381a5956b50cb8b46754  bbb-2mins.mkv
 62342b056d37e44fae4e48161d6208bf  bbb-2mins-from-linux-meta.m2ts
 ```
 
-We will have also done the same with the test file [Life Untouched](https://uhdsample.com/6-life-untouched-4k-demo-60fps-hdr10.html). Results of the MD5 sums for the original and output file are below:
+We will have also done the same with the test file [Life Untouched](https://4kmedia.org/life-untouched-hdr-uhd-4k-demo). Results of the MD5 sums for the original and output file are below:
 ```
 f2db8f6647f4f2a0b2417aed296fee73  Life Untouched 4K Demo.mp4
 aba9ee3a3211cd09ba4833a610faff22  Life Untouched 4K Demo.m2ts
