@@ -84,6 +84,8 @@ if (PkgConfig_FOUND)
   if (NOT WIN32)
     pkg_check_modules_with_static (FREETYPE2 REQUIRED freetype2)
   endif()
+else()
+  find_package(ZLIB REQUIRED)
 endif()
 
 target_include_directories(tsmuxer PRIVATE

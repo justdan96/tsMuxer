@@ -2717,6 +2717,7 @@ void TsMuxerWindow::writeSettings()
     settings->setValue("hdmvPES", ui->checkBoxNewAudioPes->isChecked());
     if (ui->checkBoxCrop->isEnabled())
         settings->setValue("restoreCropEnabled", ui->checkBoxCrop->isChecked());
+    settings->setValue("inputDir", lastInputDir);
     settings->setValue("outputDir", lastOutputDir);
     settings->setValue("useBlankPL", ui->checkBoxBlankPL->isChecked());
     settings->setValue("blankPLNum", ui->BlackplaylistCombo->value());
@@ -2799,15 +2800,14 @@ bool TsMuxerWindow::readSettings()
 bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 {
     settings->beginGroup(prefix);
-
-    QString outputDir = settings->value("outputDir").toString();
-    if (!outputDir.isEmpty())
-        lastOutputDir = outputDir;
-    else
+    if (!settings->contains("outputDir"))
     {
         settings->endGroup();
         return false;
     }
+
+    lastInputDir = settings->value("inputDir").toString();
+    lastOutputDir = settings->value("outputDir").toString();
 
     // ui->checkBoxuseAsynIO->setChecked(settings->value("asyncIO").toBool());
     ui->checkBoxSound->setChecked(settings->value("soundEnabled").toBool());
