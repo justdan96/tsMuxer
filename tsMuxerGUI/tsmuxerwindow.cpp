@@ -20,6 +20,8 @@
 #include "muxForm.h"
 #include "ui_tsmuxerwindow.h"
 
+namespace
+{
 QString fileDialogFilter()
 {
     return TsMuxerWindow::tr(
@@ -45,8 +47,6 @@ RAW LPCM Stream (*.pcm);;\
 All files (*.*)");
 }
 
-QString saveMetaFilter() { return TsMuxerWindow::tr("tsMuxeR project file (*.meta);;All files (*.*)"); }
-
 QString TI_DEFAULT_TAB_NAME() { return TsMuxerWindow::tr("General track options"); }
 
 QString TI_DEMUX_TAB_NAME() { return TsMuxerWindow::tr("Demux options"); }
@@ -69,8 +69,6 @@ enum FileCustomData
 
 static const QString FILE_JOIN_PREFIX(" ++ ");
 
-namespace
-{
 bool doubleCompare(double a, double b) { return qAbs(a - b) < 1e-6; }
 
 QString closeDirPath(const QString &src)
@@ -280,6 +278,7 @@ TsMuxerWindow::TsMuxerWindow()
       m_3dMode(false)
 {
     ui->setupUi(this);
+    setUiMetaItemsData();
     qApp->installTranslator(&qtCoreTranslator);
     qApp->installTranslator(&tsMuxerTranslator);
     initLanguageComboBox(ui->languageSelectComboBox);
@@ -639,9 +638,8 @@ QtvCodecInfo *TsMuxerWindow::getCurrentCodec()
     return getCodecInfo(row);
 }
 
-void TsMuxerWindow::onVideoComboBoxChanged(int index)
+void TsMuxerWindow::onVideoComboBoxChanged(int)
 {
-    Q_UNUSED(index);
     if (disableUpdatesCnt)
         return;
     QtvCodecInfo *codecInfo = getCurrentCodec();
@@ -649,7 +647,7 @@ void TsMuxerWindow::onVideoComboBoxChanged(int index)
         return;
     codecInfo->fpsText = ui->comboBoxFPS->itemText(ui->comboBoxFPS->currentIndex());
     codecInfo->levelText = ui->comboBoxLevel->itemText(ui->comboBoxLevel->currentIndex());
-    codecInfo->arText = ui->comboBoxAR->itemText(ui->comboBoxAR->currentIndex());
+    codecInfo->arText = ui->comboBoxAR->currentData().toString();
     updateMetaLines();
 }
 
@@ -789,6 +787,27 @@ void TsMuxerWindow::postMoveComboBoxUpdate(QComboBox *comboBox, const QVariant &
     auto idx = comboBox->findData(curTrackIdx);
     Q_ASSERT(idx != -1);
     comboBox->setCurrentIndex(idx);
+}
+
+void TsMuxerWindow::setUiMetaItemsData()
+{
+    // unfortunately, the .ui files don't allow the user to specify "item data" for combo boxes, which is the most
+    // convenient way to associate some extra data that's not displayed in the UI in a combo box item without having
+    // to resort to some kind of external containers which need to be kept synchronised.
+    // as some of the combo boxes are taken as input for the meta file, it would end up having translated strings in it
+    // if a non-English translation is active, and thus being invalid. item data for these UI items should always
+    // contain the valid metafile tokens, as they are the actual things incorporated into the metafile content.
+    ui->comboBoxAR->setItemData(0, QString());
+    ui->comboBoxAR->setItemData(1, "1:1");
+    ui->comboBoxAR->setItemData(2, "4:3");
+    ui->comboBoxAR->setItemData(3, "16:9");
+    ui->comboBoxAR->setItemData(4, "2.21:1");
+    ui->comboBoxMeasure->setItemData(0, "KB");
+    ui->comboBoxMeasure->setItemData(1, "KiB");
+    ui->comboBoxMeasure->setItemData(2, "MB");
+    ui->comboBoxMeasure->setItemData(3, "MiB");
+    ui->comboBoxMeasure->setItemData(4, "GB");
+    ui->comboBoxMeasure->setItemData(5, "GiB");
 }
 
 void TsMuxerWindow::onAudioSubtitlesParamsChanged()
@@ -986,13 +1005,13 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
                 ui->tabWidgetTracks->addTab(ui->demuxLpcmOptions, TI_DEMUX_TAB_NAME());
 
             if (codecInfo->displayName == "DTS-HD")
-                ui->dtsDwnConvert->setText("Downconvert DTS-HD to DTS");
+                ui->dtsDwnConvert->setText(tr("Downconvert DTS-HD to DTS"));
             else if (codecInfo->displayName == "TRUE-HD")
-                ui->dtsDwnConvert->setText("Downconvert TRUE-HD to AC3");
+                ui->dtsDwnConvert->setText(tr("Downconvert TRUE-HD to AC3"));
             else if (codecInfo->displayName == "E-AC3 (DD+)")
-                ui->dtsDwnConvert->setText("Downconvert E-AC3 to AC3");
+                ui->dtsDwnConvert->setText(tr("Downconvert E-AC3 to AC3"));
             else
-                ui->dtsDwnConvert->setText("Downconvert HD audio");
+                ui->dtsDwnConvert->setText(tr("Downconvert HD audio"));
             ui->dtsDwnConvert->setEnabled(codecInfo->displayName == "DTS-HD" || codecInfo->displayName == "TRUE-HD" ||
                                           codecInfo->displayName == "E-AC3 (DD+)");
             ui->secondaryCheckBox->setEnabled(codecInfo->descr.contains("(DTS Express)") ||
@@ -1122,9 +1141,8 @@ void TsMuxerWindow::continueAddFile()
             msgBox.setStandardButtons(QMessageBox::Ok);
             if (codecList.size() == 0)
             {
-                msgBox.setText(tr("Unsupported format or all tracks are not "
-                                  "recognized. File name: \"%1\"")
-                                   .arg(newFileName));
+                msgBox.setText(
+                    tr("Unsupported format or all tracks are not recognized. File name: \"%1\"").arg(newFileName));
                 msgBox.exec();
                 disableUpdatesCnt--;
                 return;
@@ -1133,9 +1151,8 @@ void TsMuxerWindow::continueAddFile()
             {
                 if (firstWarn)
                 {
-                    msgBox.setText(tr("Some tracks not recognized. This tracks was "
-                                      "ignored. File name: \"%1\"")
-                                       .arg(newFileName));
+                    msgBox.setText(
+                        tr("Track %1 was not recognized and ignored. File name: \"%2\"").arg(i).arg(newFileName));
                     msgBox.exec();
                     firstWarn = false;
                 }
@@ -1597,7 +1614,7 @@ QString TsMuxerWindow::getMuxOpts()
     if (ui->splitByDuration->isChecked())
         rez += QString(" --split-duration=") + ui->spinEditSplitDuration->text();
     if (ui->splitBySize->isChecked())
-        rez += QString(" --split-size=") + ui->editSplitSize->text() + ui->comboBoxMeasure->currentText();
+        rez += QString(" --split-size=") + ui->editSplitSize->text() + ui->comboBoxMeasure->currentData().toString();
 
     int startCut = qTimeToMsec(ui->cutStartTimeEdit->time());
     int endCut = qTimeToMsec(ui->cutEndTimeEdit->time());
@@ -1797,7 +1814,7 @@ QString TsMuxerWindow::getVideoMetaInfo(QtvCodecInfo *codecInfo)
         rezStr += QString(", ") + "contSPS";
     if (codecInfo->delPulldown == 1)
         rezStr += QString(", ") + "delPulldown";
-    if (codecInfo->arText != "Not change" && !codecInfo->arText.isEmpty())
+    if (!codecInfo->arText.isEmpty())
         rezStr += QString(", ") + "ar=" + codecInfo->arText;
 
     if (codecInfo->isSecondary)
