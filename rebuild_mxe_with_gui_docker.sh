@@ -10,7 +10,7 @@ cp tsMuxer/tsmuxer.exe ../bin/tsMuxeR.exe
 
 x86_64-w64-mingw32.static-qmake-qt5 ../tsMuxerGUI
 make
-cp ./release/tsMuxerGUI.exe ../bin/
+cp ./tsMuxerGUI.exe ../bin/
 cd ..
 rm -rf build
 
