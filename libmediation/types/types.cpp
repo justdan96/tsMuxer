@@ -300,7 +300,8 @@ string extractFileName(const string& src)
     for (int i = src.size() - 1; i >= 0; i--)
         if (src[i] == '.')
         {
-            endPos = i;
+            if (endPos == src.size())
+                endPos = i;
         }
         else if (src[i] == '/' || src[i] == '\\')
         {
