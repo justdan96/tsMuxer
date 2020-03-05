@@ -146,9 +146,8 @@ class TsMuxerWindow : public QWidget
     void updateTracksComboBox(QComboBox*);
     void moveTrackInDefaultComboBox(int oldIndex, int newIndex);
     void postMoveComboBoxUpdate(QComboBox*, const QVariant& preMoveIndex, int oldIndex, int newIndex);
+    void setUiMetaItemsData();
 
-    // QTemporaryFile* tempFile;
-    // QString tempFileName;
     QString metaName;
     Ui::TsMuxerWindow* ui;
     QFileDialog* openFileDialog;
