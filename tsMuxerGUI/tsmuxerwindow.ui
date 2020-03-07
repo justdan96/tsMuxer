@@ -1469,6 +1469,23 @@
                   </property>
                  </widget>
                 </item>
+                <item row="1" column="3">
+                 <widget class="QSpinBox" name="spinBoxPipOffsetV">
+                  <property name="maximum">
+                   <number>9999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="label_27">
+                  <property name="text">
+                   <string>Vertical offset</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="1">
                  <widget class="QComboBox" name="comboBoxPipCorner">
                   <item>
@@ -1491,23 +1508,6 @@
                     <string>Bottom Left</string>
                    </property>
                   </item>
-                 </widget>
-                </item>
-                <item row="0" column="2">
-                 <widget class="QLabel" name="label_25">
-                  <property name="text">
-                   <string>Horizontal offset</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="3">
-                 <widget class="QSpinBox" name="spinBoxPipOffsetH">
-                  <property name="maximum">
-                   <number>9999</number>
-                  </property>
                  </widget>
                 </item>
                 <item row="1" column="0">
@@ -1549,33 +1549,37 @@
                   </item>
                  </widget>
                 </item>
-                <item row="0" column="4">
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item row="1" column="2">
-                 <widget class="QLabel" name="label_27">
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_25">
                   <property name="text">
-                   <string>Vertical offset</string>
+                   <string>Horizontal offset</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="3">
-                 <widget class="QSpinBox" name="spinBoxPipOffsetV">
+                <item row="0" column="3">
+                 <widget class="QSpinBox" name="spinBoxPipOffsetH">
                   <property name="maximum">
                    <number>9999</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="4">
+                 <widget class="QLabel" name="label_30">
+                  <property name="text">
+                   <string>Transparency</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="5">
+                 <widget class="QSpinBox" name="pipTransparencySpinBox">
+                  <property name="maximum">
+                   <number>255</number>
+                  </property>
+                  <property name="value">
+                   <number>3</number>
                   </property>
                  </widget>
                 </item>
