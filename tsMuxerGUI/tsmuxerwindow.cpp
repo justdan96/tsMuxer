@@ -419,6 +419,7 @@ TsMuxerWindow::TsMuxerWindow()
     connect(ui->defaultAudioTrackCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
     connect(ui->defaultSubTrackCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
     connect(ui->defaultSubTrackForcedOnlyCheckBox, &QCheckBox::stateChanged, this, &TsMuxerWindow::updateMetaLines);
+    connect(ui->pipTransparencySpinBox, spinBoxValueChanged, this, &TsMuxerWindow::updateMetaLines);
 
     connect(&proc, &QProcess::readyReadStandardOutput, this, &TsMuxerWindow::readFromStdout);
     connect(&proc, &QProcess::readyReadStandardError, this, &TsMuxerWindow::readFromStderr);
@@ -1824,7 +1825,7 @@ QString TsMuxerWindow::getVideoMetaInfo(QtvCodecInfo *codecInfo)
         rezStr += QString(" ,pipHOffset=%1").arg(ui->spinBoxPipOffsetH->value());
         rezStr += QString(" ,pipVOffset=%1").arg(ui->spinBoxPipOffsetV->value());
         rezStr += QString(", pipScale=%1").arg(toPipScaleStr(ui->comboBoxPipSize->currentIndex()));
-        rezStr += QString(", pipLumma=3");
+        rezStr += QString(", pipLumma=%1").arg(ui->pipTransparencySpinBox->value());
     }
 
     return rezStr;
