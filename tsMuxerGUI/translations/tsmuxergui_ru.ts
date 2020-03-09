@@ -451,7 +451,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1572"/>
         <source>Transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>Прозрачность</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1594"/>
@@ -856,17 +856,17 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="1009"/>
         <source>Downconvert DTS-HD to DTS</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать из DTS-HD в DTS</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="1011"/>
         <source>Downconvert TRUE-HD to AC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать из TRUE-HD в AC3</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="1013"/>
         <source>Downconvert E-AC3 to AC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать из E-AC3 в AC3</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="1146"/>
