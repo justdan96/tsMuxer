@@ -574,7 +574,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
 {
     AVChapters chapters;
     int64_t fileDuration = 0;
-    vector<CheckStreamRez> streams;
+    vector<CheckStreamRez> streams, Vstreams;
     AbstractDemuxer* demuxer = 0;
     string tmpname = strToLowerCase(unquoteStr(fileName));
     AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ctNone;
@@ -661,7 +661,10 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
                     trackRez.isSecondary = true;
             }
 
-            addTrack(streams, trackRez);
+            if (strStartWith(trackRez.codecInfo.programName, "V_"))
+                addTrack(Vstreams, trackRez);
+            else
+                addTrack(streams, trackRez);
         }
         chapters = demuxer->getChapters();
         if (calcDuration)
@@ -685,14 +688,19 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             containerType = AbstractStreamReader::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
-        addTrack(streams, trackRez);
+        if (strStartWith(trackRez.codecInfo.programName, "V_"))
+            addTrack(Vstreams, trackRez);
+        else
+            addTrack(streams, trackRez);
 
         delete[] tmpBuffer;
     }
+    Vstreams.insert(Vstreams.end(), streams.begin(), streams.end());
+    
     DetectStreamRez rez;
     rez.chapters = chapters;
     rez.fileDurationNano = fileDuration;
-    rez.streams = streams;
+    rez.streams = Vstreams;
     return rez;
 }
 
