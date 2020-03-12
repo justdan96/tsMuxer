@@ -696,7 +696,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         delete[] tmpBuffer;
     }
     Vstreams.insert(Vstreams.end(), streams.begin(), streams.end());
-    
+
     DetectStreamRez rez;
     rez.chapters = chapters;
     rez.fileDurationNano = fileDuration;
