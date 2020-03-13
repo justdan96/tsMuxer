@@ -25,6 +25,11 @@
 
 using namespace std;
 
+int V3_flags = 0;
+int HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
+bool isV3() { return V3_flags & HDMV_V3; }
+bool is4K() { return V3_flags & FOUR_K; }
+
 const static uint64_t M_PCR_DELTA = 7000;
 const static uint64_t SIT_INTERVAL = 76900;
 // const static uint64_t M_CBR_PCR_DELTA = 2250;
@@ -160,7 +165,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     int descriptorLen = 0;
     uint8_t descrBuffer[1024];
     if (codecReader != 0)
-        descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_m2tsMode);
+        descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_bluRayMode);
 
     if (codecName[0] == 'V')
         m_mainStreamIndex = streamIndex;
@@ -180,8 +185,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         if (!isSecondary)
         {
             int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
-            int HDR = codecReader->getStreamHDR();
-            if (HDR == 4)
+            if (codecReader->getStreamHDR() == 4)
             {
                 tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
                 m_DVvideoTrackCnt++;
@@ -190,6 +194,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             {
                 tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
                 m_videoTrackCnt++;
+                V3_flags |= BASE_LAYER;
             }
             if (m_subMode)
                 tsStreamIndex++;
@@ -278,11 +283,6 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             LTRACE(LT_DEBUG, 0, "Muxing fps: " << fps);
         }
     }
-    /*	int descriptorLen = 0;
-            uint8_t descrBuffer[1024];
-            if (codecReader != 0)
-                    descriptorLen = codecReader->getTSDescriptor(descrBuffer);
-    */
 
     if (codecName == "V_MPEG4/ISO/AVC")
     {
@@ -300,39 +300,33 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MPEGH/ISO/HEVC")
-    {
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_H265, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
-    }
     else if (codecName == "V_MS/VFW/WVC1")
-    {
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_VC1, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
-    }
     else if (codecName == "V_MPEG-2")
-    {
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_MPEG2, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
-    }
     else if (codecName == "A_AAC")
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_AAC, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "S_SUP")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
-                                                        codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
+                                                        descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "S_HDMV/PGS")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
-                                                        codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
+                                                        descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "S_TEXT/UTF8")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
-                                                        codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
+                                                        descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "A_AC3")
     {
         AC3StreamReader* ac3Reader = (AC3StreamReader*)codecReader;
@@ -1186,9 +1180,7 @@ void TSMuxer::buildPMT()
     tsPacket->setPID(DEFAULT_PMT_PID);
     tsPacket->dataExists = 1;
     tsPacket->payloadStart = 1;
-    // TODO: option to force HDMV/Bluray descriptors in TS files
-    // uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, !m_bluRayMode, m_m2tsMode);
-    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, !m_bluRayMode, true);
+    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, m_bluRayMode);
     uint8_t* pmtEnd = m_pmtBuffer + TSPacket::TS_HEADER_SIZE + size;
     uint8_t* curPos = m_pmtBuffer + TS_FRAME_SIZE;
     for (; curPos < pmtEnd; curPos += TS_FRAME_SIZE)

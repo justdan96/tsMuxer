@@ -9,7 +9,6 @@
 #include "muxerManager.h"
 #include "psgStreamReader.h"
 #include "tsMuxer.h"
-#include "tsPacket.h"
 
 using namespace std;
 
@@ -233,7 +232,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
     BDMV_VersionNumber num = BDMV_VersionNumber::Version1;
     if (diskType == DT_BLURAY)
     {
-        num = V3_flags ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
+        num = isV3() ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
     }
     auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
     MuxerManager::SubTrackMode mode;
@@ -358,32 +357,32 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlackPL,
     else
         file = new File();
 
-    uint8_t* emptyCommand;
+    uint8_t* V3metaData;
     if (m_dt == DT_BLURAY)
     {
-        if (V3_flags)
+        if (isV3())
         {
-            bdIndexData[5] = '3';    // V3
+            bdIndexData[5] = '3';
             fileSize = 0x9C;         // add 36 bytes for UHD data extension
             bdIndexData[15] = 0x78;  // start address of UHD data extension
-            emptyCommand = bdIndexData + 0x78;
+            V3metaData = bdIndexData + 0x78;
             // UHD data extension
-            memcpy(emptyCommand,
+            memcpy(V3metaData,
                    "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
                    "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
                    "\x00\x00\x00\x08\x20\x00\x00\x00\x00\x00\x00\x00",
                    36);
-            // 4K flag => 66/100 GB Disk, 109 MB/s Recording_Rate
-            if (V3_flags & 0x20)
+            // 4K => 66/100 GB Disk, 109 MB/s Recording_Rate
+            if (is4K())
                 bdIndexData[0x94] = 0x51;
             // no HDR10 detected => SDR flag
             if (!(V3_flags & 0x1e))
-                V3_flags |= 1;
-            // include HDR/SDR flags
+                V3_flags |= SDR;
+            // include V3 flags
             bdIndexData[0x96] = (V3_flags & 0x1f);
         }
-        else
-        {  // V2
+        else  // V2
+        {
             bdIndexData[5] = '2';
             fileSize = 0x78;
         }
@@ -421,7 +420,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     CLPIParser clpiParser;
     string version_number;
     if (m_dt == DT_BLURAY)
-        memcpy(&clpiParser.version_number, V3_flags ? "0300" : "0200", 5);
+        memcpy(&clpiParser.version_number, isV3() ? "0300" : "0200", 5);
     else
         memcpy(&clpiParser.version_number, "0100", 5);
     clpiParser.clip_stream_type = 1;  // AV stream
@@ -464,10 +463,13 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         if (muxer->isSubStream())
             clpiParser.TS_recording_rate = MAX_SUBMUXER_RATE / 8;
         else
-            clpiParser.TS_recording_rate = MAX_MAIN_MUXER_RATE / 8;
-        // max rate is 109 mbps for 4K
-        if (V3_flags & 0x20)
-            clpiParser.TS_recording_rate = (clpiParser.TS_recording_rate * 109) / 48;
+        {
+            if (is4K())
+                clpiParser.TS_recording_rate = MAX_4K_MUXER_RATE / 8;
+            else
+                clpiParser.TS_recording_rate = MAX_MAIN_MUXER_RATE / 8;
+        }
+
         clpiParser.number_of_source_packets = packetCount[i];
         clpiParser.presentation_start_time = firstPts[i] / 2;
         clpiParser.presentation_end_time = lastPts[i] / 2;

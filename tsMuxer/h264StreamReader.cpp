@@ -437,7 +437,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     return curPos - dstBuffer;
 }
 
-int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
+int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 {
     SliceUnit slice;
     if (m_firstDecodeNal)
@@ -445,42 +445,41 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
         additionalStreamCheck(m_buffer, m_bufEnd);
         m_firstDecodeNal = false;
     }
-    if (isM2ts)
+
+    // put 'HDMV' registration descriptor
+    *dstBuff++ = 0x05;  // registration descriptor tag
+    *dstBuff++ = 8;     // descriptor length
+    memcpy(dstBuff, "HDMV\xff", 5);
+    dstBuff += 5;
+
+    int video_format, frame_rate_index, aspect_ratio_index;
+    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                        getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+
+    *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
+    *dstBuff++ = (video_format << 4) + frame_rate_index;
+    *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+
+    return 10;
+
+    // For future use: ATSC desciptor
+    for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
+            nal = NALUnit::findNextNAL(nal, m_bufEnd))
     {
-        // put 'HDMV' registration descriptor
-        *dstBuff++ = 0x05;  // registration descriptor tag
-        *dstBuff++ = 8;     // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);
-        dstBuff += 5;
-
-        int video_format, frame_rate_index, aspect_ratio_index;
-        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
-
-        *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
-        *dstBuff++ = (video_format << 4) + frame_rate_index;
-        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
-
-        return 10;
-    }
-    else
-        for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
-             nal = NALUnit::findNextNAL(nal, m_bufEnd))
+        uint8_t nalType = *nal & 0x1f;
+        if (nalType == nuSPS || nalType == nuSubSPS)
         {
-            uint8_t nalType = *nal & 0x1f;
-            if (nalType == nuSPS || nalType == nuSubSPS)
-            {
-                processSPS(nal);
-                dstBuff[0] = H264_DESCRIPTOR_TAG;
-                dstBuff[1] = 4;
-                dstBuff[2] = nal[1];                                       // profile
-                dstBuff[3] = nal[2];                                       // flags
-                dstBuff[4] = m_forcedLevel == 0 ? nal[3] : m_forcedLevel;  // level
-                dstBuff[5] = 0xbf;  // still present, avc_24_hour flag, Frame_Packing_SEI_not_present_flag
+            processSPS(nal);
+            dstBuff[0] = H264_DESCRIPTOR_TAG;
+            dstBuff[1] = 4;
+            dstBuff[2] = nal[1];                                       // profile
+            dstBuff[3] = nal[2];                                       // flags
+            dstBuff[4] = m_forcedLevel == 0 ? nal[3] : m_forcedLevel;  // level
+            dstBuff[5] = 0xbf;  // still present, avc_24_hour flag, Frame_Packing_SEI_not_present_flag
 
-                return 6;
-            }
+            return 6;
         }
+    }
 }
 
 void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)

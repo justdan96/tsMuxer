@@ -15,6 +15,7 @@
 #include "math.h"
 #include "mpegStreamReader.h"
 #include "simplePacketizerReader.h"
+#include "tsMuxer.h"
 #include "vodCoreException.h"
 
 using namespace std;
@@ -49,10 +50,10 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, int buf_size)
     bitReader.setBuffer(buffer, buffer + buf_size);
     if (bitReader.getBits(2) != 1)
         return false;  // 0b01 required
-    m_pts = bitReader.getBits(3) << 30;
+    m_pts = (bitReader.getBits(3) << 30);
     if (bitReader.getBit() != 1)
         return false;
-    m_pts += bitReader.getBits(15) << 15;
+    m_pts += (bitReader.getBits(15) << 15);
     if (bitReader.getBit() != 1)
         return false;
     m_pts += bitReader.getBits(15);
@@ -372,7 +373,7 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, int es_info_len
     }
 }
 
-uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool addLang, bool isM2ts)
+uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool blurayMode)
 {
     buffer[0] = 0;
     buffer++;
@@ -399,25 +400,15 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(12, 0);  // program info len
     int beforeCount2 = bitWriter.getBitsCount() / 8;
 
-    if (isM2ts)
-    {
-        // put 'HDMV' registration descriptor
-        bitWriter.putBits(8, 0x05);
-        bitWriter.putBits(8, 0x04);
-        bitWriter.putBits(8, 0x48);
-        bitWriter.putBits(8, 0x44);
-        bitWriter.putBits(8, 0x4d);
-        bitWriter.putBits(8, 0x56);
+    // put 'HDMV' registration descriptor
+    bitWriter.putBits(8, 0x05);
+    bitWriter.putBits(8, 0x04);
+    bitWriter.putBits(32, 0x48444d56);
 
-        // put DTCP descriptor
-        bitWriter.putBits(8, 0x88);
-        bitWriter.putBits(8, 0x04);
-        bitWriter.putBits(8, 0x0f);
-        bitWriter.putBits(8, 0xff);
-        bitWriter.putBits(
-            8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
-        bitWriter.putBits(8, 0xfc);
-    }
+    // put DTCP descriptor
+    bitWriter.putBits(8, 0x88);
+    bitWriter.putBits(8, 0x04);
+    bitWriter.putBits(32, 0x0ffffcfc);
 
     if (casPID)
     {
@@ -457,7 +448,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(12, 0);  // es_info_len
     }
 
-    int isDV_EL = false;  // DoVi Enhancement Layer
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
         bitWriter.putBits(8, itr->second.m_streamType);
@@ -469,19 +459,10 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(12, 0);  // es_info_len
         int beforeCount = bitWriter.getBitsCount() / 8;
 
-        // video stream, non Blu-ray mode and Dolby Vision flag => write DoVi descriptors
-        bool insertDoVi = (itr->second.m_pid >> 4 == 0x101) && !isM2ts && (V3_flags & 0x04);
-        if (insertDoVi)
-        {
-            setDoViDescriptor(bitWriter, itr->second.m_pid, isDV_EL);
-            if (itr->second.m_pid == 0x1011)
-                isDV_EL = true;
-        }
-
         for (int j = 0; j < itr->second.m_esInfoLen; j++)
             bitWriter.putBits(8, itr->second.m_esInfoData[j]);  // es_info_len
 
-        if (*itr->second.m_lang && addLang)
+        if (*itr->second.m_lang && !blurayMode)
         {
             bitWriter.putBits(8, TS_LANG_DESCRIPTOR_TAG);                             // lang descriptor ID
             bitWriter.putBits(8, 4);                                                  // lang descriptor len
@@ -500,34 +481,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     *crcPtr = my_htonl(crc);
 
     return bitWriter.getBitsCount() / 8 + 5;
-}
-
-void TS_program_map_section::setDoViDescriptor(BitStreamWriter& bitWriter, int PID, bool isDV_EL)
-{
-    int HDR10 = V3_flags & 0x02;
-
-    bitWriter.putBits(8, 5);     // Registration descriptor tag
-    bitWriter.putBits(8, 4);     // Length
-    bitWriter.putBits(8, 0x44);  // 'D'
-    bitWriter.putBits(8, 0x4f);  // 'O'
-    bitWriter.putBits(8, 0x56);  // 'V'
-    bitWriter.putBits(8, 0x49);  // 'I'
-
-    bitWriter.putBits(8, 0xb0);             // DoVi descriptor tag
-    bitWriter.putBits(8, isDV_EL ? 6 : 4);  // Length
-    bitWriter.putBits(8, 1);                // dv version major
-    bitWriter.putBits(8, 0);                // dv version minor
-    bitWriter.putBits(
-        7, (HDR10 ? (PID == 0x1011 ? 7 : (isDV_EL ? 7 : 8)) : (PID == 0x1011 ? 4 : (isDV_EL ? 4 : 5))));  // profile
-    bitWriter.putBits(6, 6);                                                                              // dv level
-    bitWriter.putBits(1, PID == 0x1011 ? 0 : 1);                  // rpu_present_flag
-    bitWriter.putBits(1, PID == 0x1011 ? 0 : (isDV_EL ? 1 : 0));  // el_present_flag
-    bitWriter.putBits(1, PID == 0x1011 ? 1 : (isDV_EL ? 0 : 1));  // bl_present_flag
-    if (isDV_EL)                                                  // Enhancement Layer
-    {
-        bitWriter.putBits(13, 0x1011);  // dependency_pid
-        bitWriter.putBits(3, 7);        // reserved
-    }
 }
 
 // --------------------- CLPIParser -----------------------------
@@ -1019,7 +972,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
             int endCode = 0;
             if (indexData.m_frameLen > 0)
             {
-                if (V3_flags)
+                if (is4K())
                 {
                     if (indexData.m_frameLen < 786432)
                         endCode = 1;
@@ -1535,7 +1488,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
     std::string type_indicator = "MPLS";
     std::string version_number;
     if (dt == DT_BLURAY)
-        version_number = (V3_flags ? "0300" : "0200");
+        version_number = (isV3() ? "0300" : "0200");
     else
         version_number = "0100";
     CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
@@ -1558,7 +1511,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
     while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
 
-    if (number_of_SubPaths > 0 || isDependStreamExist || V3_flags)
+    if (number_of_SubPaths > 0 || isDependStreamExist || isV3())
     {
         *extDataStartAddr = my_htonl(writer.getBitsCount() / 8);
         uint8_t buffer[1024 * 4];
@@ -1584,8 +1537,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
             blockVector.push_back(extDataBlock2);
         }
 
-        if (V3_flags)
-        {  // V3
+        if (isV3())
+        {
             int bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
             ExtDataBlockInfo extDataBlock(buffer, bufferSize, 3, 5);
             blockVector.push_back(extDataBlock);
@@ -1637,9 +1590,9 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
         writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
     }
     writer.putBits(28, 0);                   // UO_mask_table;
-    writer.putBits(4, (V3_flags ? 15 : 0));  // UO_mask_table;
+    writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
     writer.putBit(0);                        // reserved
-    writer.putBit(V3_flags ? 1 : 0);         // UO_mask_table: SecondaryPGStreamNumberChange
+    writer.putBit(isV3() ? 1 : 0);  // UO_mask_table: SecondaryPGStreamNumberChange
     writer.putBits(30, 0);                   // UO_mask_table cont;
     writer.putBit(0);                        // PlayList_random_access_flag
     writer.putBit(1);  // audio_mix_app_flag. 0 == no secondary audio, 1- allow secondary audio if exist
@@ -2272,9 +2225,9 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
         writer.putBits(32, OUT_time);  // 32 uimsbf
 
     writer.putBits(28, 0);                 // UO_mask_table;
-    writer.putBits(4, V3_flags ? 15 : 0);  // UO_mask_table;
+    writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
     writer.putBit(0);                      // reserved
-    writer.putBit(V3_flags ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
+    writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
     writer.putBits(30, 0);                 // UO_mask_table cont;
 
     writer.putBit(PlayItem_random_access_flag);  // 1 bslbf
@@ -2691,16 +2644,16 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
     else if (width >= 2600)
     {
         *video_format = 8;
-        V3_flags |= 0x20;  // 4K flag
+        V3_flags |= FOUR_K;
     }
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6;  // as 1920x1080
     else
         *video_format = 5;  // as 1280x720
 
-    if (width < 1080 && V3_flags)
+    if (width < 1080 && isV3())
         LTRACE(LT_WARN, 2, "Warning: video height < 1080 is not standard for V3 Blu-ray.");
-    if (interlaced && V3_flags)
+    if (interlaced && isV3())
         LTRACE(LT_WARN, 2, "Warning: interlaced video is not standard for V3 Blu-ray.");
 
     if (fabs(fps - 23.976) < 1e-4)

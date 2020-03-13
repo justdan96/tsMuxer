@@ -8,7 +8,7 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
+int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 {
     try
     {

@@ -22,6 +22,7 @@ static const int MAIN_INTERLEAVE_BLOCKSIZE = 6144 * 3168;
 static const int SUB_INTERLEAVE_BLOCKSIZE = 6144 * 1312;
 
 static const int MAX_MAIN_MUXER_RATE = 48000000;
+static const int MAX_4K_MUXER_RATE = 109000000;
 static const int MAX_SUBMUXER_RATE = 35000000;
 
 enum DescriptorTag

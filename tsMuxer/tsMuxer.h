@@ -12,6 +12,23 @@
 #include "limits.h"
 #include "vodCoreException.h"
 
+enum V3Flags
+{
+    SDR = 1,
+    HDR10 = 2,
+    DV = 4,
+    SL_HDR2 = 8,
+    HDR10PLUS = 16,
+    FOUR_K = 32,
+    BASE_LAYER = 64,
+    HDMV_V3 = 128
+};
+
+extern int V3_flags;
+extern int HDR10_metadata[6];
+extern bool isV3();
+extern bool is4K();
+
 const static int MAX_PES_HEADER_LEN = 512;
 
 class TSMuxer : public AbstractMuxer
@@ -76,7 +93,6 @@ class TSMuxer : public AbstractMuxer
     void buildSIT();
     void addData(int pesStreamID, int pid, AVPacket& avPacket);
     void buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid);
-    void flushPESFrame(int tsIndex);
     void writePESPacket();
     void processM2TSPCR(int64_t pcrVal, int64_t pcrGAP);
     inline int calcM2tsFrameCnt();

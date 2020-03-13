@@ -711,9 +711,7 @@ void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez)
         rez.push_back(trackRez);
     }
     else
-    {
         rez.push_back(trackRez);
-    }
 }
 
 CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,

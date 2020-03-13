@@ -12,12 +12,13 @@ class HEVCStreamReader : public MPEGStreamReader
    public:
     HEVCStreamReader();
     ~HEVCStreamReader() override;
-    int getTSDescriptor(uint8_t* dstBuff, bool isM2ts) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int setDoViDescriptor(uint8_t* dstBuff);
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool needSPSForSplit() const override { return false; }
 
    protected:
-    const CodecInfo& getCodecInfo() override { return hevcCodecInfo; };
+    const CodecInfo& getCodecInfo() override { return hevcCodecInfo; }
     virtual int intDecodeNAL(uint8_t* buff) override;
 
     double getStreamFPS(void* curNalUnit) override;
@@ -48,7 +49,7 @@ class HEVCStreamReader : public MPEGStreamReader
     HevcVpsUnit* m_vps;
     HevcSpsUnit* m_sps;
     HevcPpsUnit* m_pps;
-    HevcSeiUnit* m_sei;
+    HevcHdrUnit* m_hdr;
     bool m_firstFrame;
 
     int m_frameNum;
@@ -63,7 +64,7 @@ class HEVCStreamReader : public MPEGStreamReader
     MemoryBlock m_vpsBuffer;
     MemoryBlock m_spsBuffer;
     MemoryBlock m_ppsBuffer;
-    MemoryBlock m_seiBuffer;
+    MemoryBlock m_hdrBuffer;
     bool m_firstFileFrame;
     int m_vpsCounter;
     int m_vpsSizeDiff;

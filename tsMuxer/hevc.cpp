@@ -3,7 +3,7 @@
 #include <fs/systemlog.h>
 
 #include <algorithm>
-
+#include "tsMuxer.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 
@@ -259,7 +259,7 @@ HevcSpsUnit::HevcSpsUnit()
       vps_id(0),
       max_sub_layers(0),
       sps_id(0),
-      crhomaFormat(0),
+      chromaFormat(0),
       separate_colour_plane_flag(false),
       pic_width_in_luma_samples(0),
       pic_height_in_luma_samples(0),
@@ -273,6 +273,8 @@ HevcSpsUnit::HevcSpsUnit()
       colour_primaries(0),
       transfer_characteristics(0),
       matrix_coeffs(0),
+      chroma_sample_loc_type_top_field(0),
+      chroma_sample_loc_type_bottom_field(0),
       num_units_in_tick(0),
       time_scale(0),
       PicSizeInCtbsY_bits(0)
@@ -374,8 +376,8 @@ void HevcSpsUnit::vui_parameters()
     bool chroma_loc_info_present_flag = m_reader.getBit();
     if (chroma_loc_info_present_flag)
     {
-        extractUEGolombCode();  // chroma_sample_loc_type_top_field ue(v)
-        extractUEGolombCode();  // chroma_sample_loc_type_bottom_field ue(v)
+        chroma_sample_loc_type_top_field = extractUEGolombCode();
+        chroma_sample_loc_type_bottom_field = extractUEGolombCode();
     }
 
     m_reader.skipBit();  // neutral_chroma_indication_flag u(1)
@@ -681,8 +683,8 @@ int HevcSpsUnit::deserialize()
         int temporal_id_nesting_flag = m_reader.getBit();
         profile_tier_level(max_sub_layers);
         sps_id = extractUEGolombCode();
-        crhomaFormat = extractUEGolombCode();
-        if (crhomaFormat == 3)
+        chromaFormat = extractUEGolombCode();
+        if (chromaFormat == 3)
             separate_colour_plane_flag = m_reader.getBit();
         pic_width_in_luma_samples = extractUEGolombCode();
         pic_height_in_luma_samples = extractUEGolombCode();
@@ -844,10 +846,17 @@ int HevcPpsUnit::deserialize()
     }
 }
 
-// ----------------------- HevcSeiUnit ------------------------
-HevcSeiUnit::HevcSeiUnit() : isHDR10(false), isHDR10plus(false), isDV(false) {}
+// ----------------------- HevcHdrUnit ------------------------
+HevcHdrUnit::HevcHdrUnit()
+  : isHDR10(false),
+    isHDR10plus(false),
+    isDVRPU(false),
+    isDVEL(false),
+    DVCompatibility(0)
+{
+}
 
-int HevcSeiUnit::deserialize()
+int HevcHdrUnit::deserialize()
 {
     int rez = HevcUnit::deserialize();
     if (rez)
@@ -873,7 +882,7 @@ int HevcSeiUnit::deserialize()
             if (payloadType == 137 && !isHDR10)  // mastering_display_colour_volume
             {
                 isHDR10 = true;
-                V3_flags |= 2;                             // HDR10 flag
+                V3_flags |= HDR10;
                 HDR10_metadata[0] = m_reader.getBits(32);  // display_primaries Green
                 HDR10_metadata[1] = m_reader.getBits(32);  // display_primaries Red
                 HDR10_metadata[2] = m_reader.getBits(32);  // display_primaries Blue
@@ -903,7 +912,7 @@ int HevcSeiUnit::deserialize()
                 if (application_identifier == 4 && application_version == 1 && num_windows == 1)
                 {
                     isHDR10plus = true;
-                    V3_flags |= 0x10;  // HDR10plus flag
+                    V3_flags |= HDR10PLUS;
                 }
                 payloadSize -= 8;
                 for (int i = 0; i < payloadSize; i++) m_reader.skipBits(8);
