@@ -150,9 +150,9 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
 
     rc_buffer_size += bitReader.getBits(8) * 1024 * 16 << 10;
 
-    low_delay = bitReader.getBit(); // disable b-frame if true
-    frame_rate_ext.num = bitReader.getBits(2)+1;
-    frame_rate_ext.den = bitReader.getBits(5)+1;
+    low_delay = bitReader.getBit();  // disable b-frame if true
+    frame_rate_ext.num = bitReader.getBits(2) + 1;
+    frame_rate_ext.den = bitReader.getBits(5) + 1;
 
     /*
 s->codec_id= s->avctx->codec_id= CODEC_ID_MPEG2VIDEO;
