@@ -157,11 +157,11 @@ std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
     return rv;
 }
 
-NavigationCommand makeBlackPLCommand(std::uint32_t blackPlNum)
+NavigationCommand makeBlankPLCommand(std::uint32_t blankPlNum)
 {
     NavigationCommand cmd = {0x42, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a};
-    blackPlNum = my_htonl(blackPlNum);
-    memcpy(cmd.data() + 4, &blackPlNum, sizeof(blackPlNum));
+    blankPlNum = my_htonl(blankPlNum);
+    memcpy(cmd.data() + 4, &blankPlNum, sizeof(blankPlNum));
     return cmd;
 }
 
@@ -173,7 +173,7 @@ NavigationCommand makeMplsCommand(std::uint32_t mplsNum)
     return cmd;
 }
 
-NavigationCommand makeNoBlackCommand()
+NavigationCommand makeNoBlankCommand()
 {
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
@@ -205,16 +205,14 @@ NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, Mu
 }
 
 bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* file, const std::string& prefix,
-                            DiskType diskType, bool usedBlackPL, int mplsNum, int blankNum)
+                            DiskType diskType, bool usedBlankPL, int mplsNum, int blankNum)
 {
     std::vector<MovieObject> movieObjects = {
-        {{
-            {0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
-            {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-            usedBlackPL ? makeBlackPLCommand(blankNum) : makeNoBlackCommand(),
-            makeMplsCommand(mplsNum),
-            {0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00},
-        }},
+        {{{0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
+          {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+          usedBlankPL ? makeBlankPLCommand(blankNum) : makeNoBlankCommand(),
+          makeMplsCommand(mplsNum),
+          {0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}},
         {{{0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x03},
           {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xFF, 0xFF},
           {0x48, 0x40, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0xFF, 0xFF},
@@ -347,7 +345,7 @@ bool BlurayHelper::createBluRayDirs()
     return true;
 }
 
-bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlackPL, int mplsNum, int blankNum,
+bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum,
                                     bool stereoMode)
 {
     int fileSize = sizeof(bdIndexData);
@@ -411,7 +409,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlackPL,
     file->write(bdIndexData, fileSize);
     file->close();
 
-    return writeBdMovieObjectData(muxer, file, prefix, m_dt, usedBlackPL, mplsNum, blankNum);
+    return writeBdMovieObjectData(muxer, file, prefix, m_dt, usedBlankPL, mplsNum, blankNum);
 }
 
 bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
