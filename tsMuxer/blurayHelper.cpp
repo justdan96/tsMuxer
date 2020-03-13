@@ -9,6 +9,7 @@
 #include "muxerManager.h"
 #include "psgStreamReader.h"
 #include "tsMuxer.h"
+#include "tsPacket.h"
 
 using namespace std;
 
