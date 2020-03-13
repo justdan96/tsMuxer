@@ -304,20 +304,20 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(8, 0);               // dv version minor
     // DV profile
     if (DualLayers)
-        bitWriter.putBits(7,m_hdr->isHDR10 ? 7 : 4);
+        bitWriter.putBits(7, m_hdr->isHDR10 ? 7 : 4);
     else
         bitWriter.putBits(7, m_hdr->DVCompatibility ? 8 : 5);
-    bitWriter.putBits(6, level);        // dv level
+    bitWriter.putBits(6, level);           // dv level
     bitWriter.putBits(1, m_hdr->isDVRPU);  // rpu_present_flag
     bitWriter.putBits(1, m_hdr->isDVEL);   // el_present_flag
-    bitWriter.putBits(1, isDVBL);       // bl_present_flag
+    bitWriter.putBits(1, isDVBL);          // bl_present_flag
     if (!isDVBL)
     {
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
     bitWriter.putBits(4, m_hdr->DVCompatibility);  // dv_bl_signal_compatibility_id
-    bitWriter.putBits(4, 15);                   // reserved
+    bitWriter.putBits(4, 15);                      // reserved
 
     bitWriter.flushBits();
     return 8 + (isDVBL ? 5 : 7);

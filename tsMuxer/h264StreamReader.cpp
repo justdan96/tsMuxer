@@ -453,8 +453,8 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
     dstBuff += 5;
 
     int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                        getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
+                                       &video_format, &frame_rate_index, &aspect_ratio_index);
 
     *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
     *dstBuff++ = (video_format << 4) + frame_rate_index;
@@ -464,7 +464,7 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 
     // For future use: ATSC desciptor
     for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
-            nal = NALUnit::findNextNAL(nal, m_bufEnd))
+         nal = NALUnit::findNextNAL(nal, m_bufEnd))
     {
         uint8_t nalType = *nal & 0x1f;
         if (nalType == nuSPS || nalType == nuSubSPS)

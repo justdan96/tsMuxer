@@ -1589,12 +1589,12 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
     {
         writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
     }
-    writer.putBits(28, 0);                   // UO_mask_table;
+    writer.putBits(28, 0);               // UO_mask_table;
     writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
-    writer.putBit(0);                        // reserved
-    writer.putBit(isV3() ? 1 : 0);  // UO_mask_table: SecondaryPGStreamNumberChange
-    writer.putBits(30, 0);                   // UO_mask_table cont;
-    writer.putBit(0);                        // PlayList_random_access_flag
+    writer.putBit(0);                    // reserved
+    writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
+    writer.putBits(30, 0);               // UO_mask_table cont;
+    writer.putBit(0);                    // PlayList_random_access_flag
     writer.putBit(1);  // audio_mix_app_flag. 0 == no secondary audio, 1- allow secondary audio if exist
     writer.putBit(0);  // lossless_may_bypass_mixer_flag
     writer.putBit(mvc_base_view_r);
@@ -2224,11 +2224,11 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
     else
         writer.putBits(32, OUT_time);  // 32 uimsbf
 
-    writer.putBits(28, 0);                 // UO_mask_table;
+    writer.putBits(28, 0);               // UO_mask_table;
     writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
-    writer.putBit(0);                      // reserved
+    writer.putBit(0);                    // reserved
     writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
-    writer.putBits(30, 0);                 // UO_mask_table cont;
+    writer.putBits(30, 0);               // UO_mask_table cont;
 
     writer.putBit(PlayItem_random_access_flag);  // 1 bslbf
     writer.putBits(7, 0);                        // reserved_for_future_use 7 bslbf

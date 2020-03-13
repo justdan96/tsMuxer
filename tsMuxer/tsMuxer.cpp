@@ -317,16 +317,16 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
                                                         descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "S_SUP")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+                                                        codecReader, lang, isSecondary)));
     else if (codecName == "S_HDMV/PGS")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+                                                        codecReader, lang, isSecondary)));
     else if (codecName == "S_TEXT/UTF8")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary)));
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+                                                        codecReader, lang, isSecondary)));
     else if (codecName == "A_AC3")
     {
         AC3StreamReader* ac3Reader = (AC3StreamReader*)codecReader;

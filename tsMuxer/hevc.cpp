@@ -3,6 +3,7 @@
 #include <fs/systemlog.h>
 
 #include <algorithm>
+
 #include "tsMuxer.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -847,14 +848,7 @@ int HevcPpsUnit::deserialize()
 }
 
 // ----------------------- HevcHdrUnit ------------------------
-HevcHdrUnit::HevcHdrUnit()
-  : isHDR10(false),
-    isHDR10plus(false),
-    isDVRPU(false),
-    isDVEL(false),
-    DVCompatibility(0)
-{
-}
+HevcHdrUnit::HevcHdrUnit() : isHDR10(false), isHDR10plus(false), isDVRPU(false), isDVEL(false), DVCompatibility(0) {}
 
 int HevcHdrUnit::deserialize()
 {
