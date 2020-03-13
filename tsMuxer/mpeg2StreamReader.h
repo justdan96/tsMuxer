@@ -48,8 +48,9 @@ class MPEG2StreamReader : public MPEGStreamReader
     bool m_lastIFrame;
     int64_t m_prevFrameDelay;
     MPEGSequenceHeader m_sequence;
+    MPEGGOPHeader m_gop;
     MPEGPictureHeader m_frame;
-    int getNextBFrames(uint8_t* buffer);
+    // int getNextBFrames(uint8_t* buffer);
     int findFrameExt(uint8_t* buffer);
     int decodePicture(uint8_t* buff);
     int processExtStartCode(uint8_t* buff);

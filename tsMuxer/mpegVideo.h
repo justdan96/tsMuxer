@@ -34,6 +34,7 @@ const static unsigned USER_START_SHORT_CODE = 0xb2;
 
 const static unsigned PICTURE_CODING_EXT = 0x08;
 const static unsigned SEQUENCE_EXT = 0x01;
+const static unsigned SEQUENCE_DISPLAY_EXT = 0x02;
 
 static const unsigned MAX_PICTURE_SIZE = 256 * 1024;
 static const unsigned MAX_HEADER_SIZE = 1024 * 4;
@@ -119,8 +120,8 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     int horiz_size_ext;
     int vert_size_ext;
     int bit_rate_ext;
-    // int low_delay;
-    // AVRational frame_rate_ext;
+    int low_delay;
+    AVRational frame_rate_ext;
 
     // sequence display extension
     int video_format;
@@ -140,7 +141,7 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
     double getFrameRate();
     void setFrameRate(uint8_t* buff, double fps);
-    void setAspectRation(uint8_t* buff, VideoAspectRatio ar);
+    void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
     std::string getStreamDescr();
 };
 

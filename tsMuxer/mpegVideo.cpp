@@ -108,6 +108,20 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
         }
     }
 
+    load_non_intra_matrix = bitReader.getBit() != 0;
+    if (load_non_intra_matrix)
+    {
+        for (int i = 0; i < 64; i++)
+        {
+            non_intra_matrix[i] = bitReader.getBits(8);
+            if (non_intra_matrix[i] == 0)
+            {
+                LTRACE(LT_ERROR, 1, "mpeg sequence header: non-intra matrix damaged");
+                return 0;
+            }
+        }
+    }
+
     return skipProcessedBytes(bitReader);
 }
 
@@ -132,14 +146,13 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
     bit_rate_ext = bitReader.getBits(12); /* XXX: handle it */
     bit_rate += (bit_rate_ext << 18) * 400;
 
-    // bitReader.skipBit(); /* marker */
-    bitReader.skipBit();
+    bitReader.skipBit();  // marker
 
     rc_buffer_size += bitReader.getBits(8) * 1024 * 16 << 10;
 
-    // low_delay = bitReader.getBit(); // disable b-frame if true
-    // frame_rate_ext.num = bitReader.getBits(2)+1;
-    // frame_rate_ext.den = bitReader.getBits(5)+1;
+    low_delay = bitReader.getBit(); // disable b-frame if true
+    frame_rate_ext.num = bitReader.getBits(2)+1;
+    frame_rate_ext.den = bitReader.getBits(5)+1;
 
     /*
 s->codec_id= s->avctx->codec_id= CODEC_ID_MPEG2VIDEO;
@@ -286,7 +299,7 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
           "Can't set fps to value " << fps << ". Only standard fps values allowed for mpeg2 streams.");
 }
 
-void MPEGSequenceHeader::setAspectRation(uint8_t* buff, VideoAspectRatio ar)
+void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 {
     // return; // todo delete this!!!
     buff[3] = (buff[3] & 0x0f) + (ar << 4);
@@ -295,13 +308,6 @@ void MPEGSequenceHeader::setAspectRation(uint8_t* buff, VideoAspectRatio ar)
 // --------------- gop header ------------------
 uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int buf_size)
 {
-    /*
-int drop_frame_flag;
-int time_code_hours, time_code_minutes;
-int time_code_seconds, time_code_pictures;
-int broken_link;
-    */
-
     BitStreamReader bitReader;
     bitReader.setBuffer(buf, buf + buf_size);
 
