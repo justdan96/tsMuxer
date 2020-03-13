@@ -64,7 +64,6 @@ class HEVCStreamReader : public MPEGStreamReader
     MemoryBlock m_vpsBuffer;
     MemoryBlock m_spsBuffer;
     MemoryBlock m_ppsBuffer;
-    MemoryBlock m_hdrBuffer;
     bool m_firstFileFrame;
     int m_vpsCounter;
     int m_vpsSizeDiff;
