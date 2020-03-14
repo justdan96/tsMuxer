@@ -54,6 +54,7 @@ static const uint8_t STREAM_TYPE_AUDIO_DTS = 0x82;  // 0x8a
 static const uint8_t STREAM_TYPE_AUDIO_LPCM = 0x80;
 static const uint8_t STREAM_TYPE_AUDIO_AC3 = 0x81;
 static const uint8_t STREAM_TYPE_AUDIO_EAC3 = 0x84;
+static const uint8_t STREAM_TYPE_AUDIO_EAC3_ATSC = 0x87;
 static const uint8_t STREAM_TYPE_AUDIO_EAC3_TRUE_HD = 0x83;
 static const uint8_t STREAM_TYPE_AUDIO_DTS_HD = 0x85;
 static const uint8_t STREAM_TYPE_AUDIO_DTS_HD_MASTER_AUDIO = 0x86;

@@ -318,6 +318,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
             case STREAM_TYPE_AUDIO_AAC:
             case STREAM_TYPE_AUDIO_AC3:
             case STREAM_TYPE_AUDIO_EAC3:
+            case STREAM_TYPE_AUDIO_EAC3_ATSC:
             case STREAM_TYPE_AUDIO_DTS:
                 audio_pid = elementary_pid;
                 audio_type = stream_type;

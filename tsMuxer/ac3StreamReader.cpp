@@ -56,79 +56,86 @@ void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
 
 int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
 {
+    AC3Codec::setTestMode(true);
+    uint8_t* frame = findFrame(m_buffer, m_bufEnd);
+    if (frame == 0)
+        return 0;
+    for (int i = 0; i < 2 && frame < m_bufEnd;)
     {
-        AC3Codec::setTestMode(true);
-        uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-        if (frame == 0)
-            return 0;
-        for (int i = 0; i < 2 && frame < m_bufEnd;)
+        int skipBytes = 0;
+        int skipBeforeBytes = 0;
+        int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
+        if (len < 1)
         {
-            int skipBytes = 0;
-            int skipBeforeBytes = 0;
-            int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
-            if (len < 1)
-            {
-                // m_state = stateDecodeAC3;
-                // AC3Codec::setTestMode(false);
-                // return 0;
-                break;
-            }
-            frame += len + skipBytes;
-            if (getFrameDurationNano() > 0)
-                i++;
+            // m_state = stateDecodeAC3;
+            // AC3Codec::setTestMode(false);
+            // return 0;
+            break;
         }
-        m_state = stateDecodeAC3;
-        AC3Codec::setTestMode(false);
+        frame += len + skipBytes;
+        if (getFrameDurationNano() > 0)
+            i++;
+    }
+    m_state = stateDecodeAC3;
+    AC3Codec::setTestMode(false);
+
+    if (isAC3())
+    {
+        *dstBuff++ = 0x05;  // registration descriptor tag
+        *dstBuff++ = 4;
+        memcpy(dstBuff, "AC-3", 4);
+        dstBuff += 4;
+
+        *dstBuff++ = 0x81;  // AC-3_audio_stream_descriptor( )
+        *dstBuff++ = 4;     // descriptor len
+        BitStreamWriter bitWriter;
+        bitWriter.setBuffer(dstBuff, dstBuff + 4);
+
+        bitWriter.putBits(3, m_fscod);  // bitrate code;
+        bitWriter.putBits(5, m_bsidBase);
+
+        bitWriter.putBits(6, m_frmsizecod >> 1);  // // MSB == 0. bit rate is exact
+        bitWriter.putBits(2, m_dsurmod);
+
+        bitWriter.putBits(3, m_bsmod);
+        bitWriter.putBits(4, m_acmod);  // when MSB == 0 then high (4-th) bit always 0
+        bitWriter.putBit(0);            // full_svc
+
+        bitWriter.putBits(8, 0);        // langcod
+        bitWriter.flushBits();
+
+        return 12;
     }
 
     *dstBuff++ = 0x05;  // registration descriptor tag
     *dstBuff++ = 4;
-    memcpy(dstBuff, "AC-3", 4);
+    memcpy(dstBuff, "EAC3", 4);
     dstBuff += 4;
 
-    *dstBuff++ = 0x81;  // AC-3_audio_stream_descriptor( )
-    *dstBuff++ = 0x4;   // descriptor len
+    // ATSC Standard : Digital Audio Compression (AC-3, EAC3) Table G.1
+    *dstBuff++ = 0xCC;  // EAC3_audio_stream_descriptor
+    *dstBuff++ = 4;     // descriptor len
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(dstBuff, dstBuff + 4);
 
-    bitWriter.putBits(3, m_fscod);  // bitrate code;
-    bitWriter.putBits(5, m_bsidBase);
+    bitWriter.putBits(4, 12);
+    bitWriter.putBits(1, m_mixinfoexists);
+    bitWriter.putBits(3, 0);  // independant substreams not supported
 
-    bitWriter.putBits(6, m_frmsizecod >> 1);  // // MSB == 0. bit rate is exact
-    bitWriter.putBits(2, m_dsurmod);
+    bitWriter.putBits(5, 24);
+    int number_of_channels = (m_acmod == 0 ? 1 : (m_acmod == 1 ? 0 : (m_acmod == 2 ? (m_dsurmod ? 3 : 2) : 4)));
+    if (m_extChannelsExists)
+        number_of_channels = 5;
+    bitWriter.putBits(3, number_of_channels);
 
-    bitWriter.putBits(3, m_bsmod);
-    bitWriter.putBits(4, m_acmod);  // when MSB == 0 then high (4-th) bit always 0
-    bitWriter.putBit(0);            // full_svc
-    bitWriter.putBits(8, 0);        // langcod
+
+    bitWriter.putBits(3, 1);
+    bitWriter.putBits(5, m_bsid);
+
+    bitWriter.putBits(8, 0x80);
     bitWriter.flushBits();
 
-    // memcpy(dstBuff, "\x81\x04\x06\x48\x0e\x00", 6);
-    // dstBuff += 6;
-
-    return 6 + 6;
-
-    // BitStreamWriter bitWriter;
-    if (isEAC3())
-        dstBuff[0] = EAC3_DESCRIPTOR_TAG;
-    else
-        dstBuff[0] = AC3_DESCRIPTOR_TAG;
-    bitWriter.setBuffer(dstBuff + 2, dstBuff + 1024);
-    bitWriter.putBits(1, 1);  // component_type_flag
-    bitWriter.putBits(1, 1);  // bsid_flag
-    bitWriter.putBits(1, 0);  // mainid_flag
-    bitWriter.putBits(1, 0);  // asvc_flag
-    bitWriter.putBits(4, 0);  // reserved
-    // put component type
-    bitWriter.putBits(1, isEAC3() ? 1 : 0);  // AC-3/E-AC-3 audio
-    bitWriter.putBits(4, 8);                 // complete main audio (0b1000)
-    bitWriter.putBits(3, m_acmod);
-    // --------------------
-    bitWriter.putBits(8, m_bsid);
-    // bitWriter.putBits(8, m_profile ); // reserved
-    bitWriter.flushBits();
-    dstBuff[1] = bitWriter.getBitsCount() / 8;
-    return dstBuff[1] + 2 + 6;
+    return 12;
 }
 
 int AC3StreamReader::readPacket(AVPacket& avPacket)
