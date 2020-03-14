@@ -101,7 +101,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
         bitWriter.putBits(4, m_acmod);  // when MSB == 0 then high (4-th) bit always 0
         bitWriter.putBit(0);            // full_svc
 
-        bitWriter.putBits(8, 0);        // langcod
+        bitWriter.putBits(8, 0);  // langcod
         bitWriter.flushBits();
 
         return 12;
@@ -127,7 +127,6 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
     if (m_extChannelsExists)
         number_of_channels = 5;
     bitWriter.putBits(3, number_of_channels);
-
 
     bitWriter.putBits(3, 1);
     bitWriter.putBits(5, m_bsid);
