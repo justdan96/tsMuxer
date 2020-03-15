@@ -119,7 +119,9 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
     {
-        unsigned int numblkscod, strmtyp, substreamid;
+        unsigned int numblkscod, strmtyp, substreamid, number_of_blocks_per_syncframe;
+        uint8_t acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
+        bsmod = fscod = dsurmod = pgmscle = extpgmscle = mixdef = paninfoe = 0;
 
         strmtyp = gbc.getBits(2);
         if (strmtyp == 3)
@@ -131,9 +133,9 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         if (m_frame_size < AC3_HEADER_SIZE)
             return 0;  // invalid header size
 
-        m_fscod = gbc.getBits(2);
+        fscod = gbc.getBits(2);
 
-        if (m_fscod == 3)
+        if (fscod == 3)
         {
             m_fscod2 = gbc.getBits(2);
             numblkscod = 3;
@@ -145,35 +147,138 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         else
         {
             numblkscod = gbc.getBits(2);
-            m_sample_rate = ff_ac3_freqs[m_fscod];
+            m_sample_rate = ff_ac3_freqs[fscod];
         }
-        int acmodExt = gbc.getBits(3);
-        int lfeonExt = gbc.getBit();
-        if (m_lfeon == 0)
-            m_lfeon = lfeonExt;
-        if (m_channels == 0)  // no AC3 core
-            m_channels = ff_ac3_channels[acmodExt] + lfeonExt;
+        number_of_blocks_per_syncframe = numblkscod == 0 ? 1 : (numblkscod == 1 ? 2 : (numblkscod == 2 ? 3 : 6));
+        acmod = gbc.getBits(3);
+        lfeon = gbc.getBit();
+
         m_samples = eac3_blocks[numblkscod] * 256;
         m_bit_rateExt = m_frame_size * (m_sample_rate)*8 / (m_samples);
 
         gbc.skipBits(5);  // skip bsid, already got it
-        for (int i = 0; i < (acmodExt ? 1 : 2); i++)
+        for (int i = 0; i < (acmod ? 1 : 2); i++)
         {
             gbc.skipBits(5);  // skip dialog normalization
             if (gbc.getBit())
-            {
                 gbc.skipBits(8);  // skip Compression gain word
-            }
         }
 
         if (strmtyp == 1)
         {
             if (gbc.getBit())
             {
-                int chanLayout = gbc.getBits(16);
-                if (chanLayout & 0x7fe0)  // mask standard 5.1 channels
+                int chanmap = gbc.getBits(16);
+                if (chanmap & 0x7fe0)  // mask standard 5.1 channels
                     m_extChannelsExists = true;
             }
+        }
+        if (gbc.getBit())  // mixing metadata
+        {
+            if (acmod > 2)
+                gbc.skipBits(2);  // dmixmod
+            if ((acmod & 1) && (acmod > 0x2))
+                gbc.skipBits(6);  // ltrtcmixlev, lorocmixlev
+            if (acmod & 4)
+                gbc.skipBits(6);  // ltrtsurmixlev, lorosurmixlev
+            if (lfeon && gbc.getBit())
+                gbc.skipBits(5);  // lfemixlevcod
+            if (strmtyp == 0)
+            {
+                pgmscle = gbc.getBit();
+                if (pgmscle)
+                    gbc.skipBits(6);  // pgmscl
+                if (acmod == 0 && gbc.getBit())
+                    gbc.skipBits(6);  // pgmscl2
+                extpgmscle = gbc.getBit();
+                if (extpgmscle)
+                    gbc.skipBits(6);  // extpgmscl
+                mixdef = gbc.getBits(2);
+                if (mixdef == 1)
+                    gbc.skipBits(5);  // premixcmpsel, drcsrc, premixcmpscl
+                else if (mixdef == 2)
+                    gbc.skipBits(12);  // mixdata
+                else if (mixdef == 3)
+                {
+                    int mixdeflen = gbc.getBits(5);  //
+                    if (gbc.getBit())                // mixdata2e
+                    {
+                        gbc.skipBits(5);  // premixcmpsel, drcsrc, premixcmpscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmlscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmcscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmrscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmlscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmrsscl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // extpgmlfescl
+                        if (gbc.getBit())
+                            gbc.skipBits(4);  // dmixscl
+                        if (gbc.getBit())
+                        {
+                            if (gbc.getBit())
+                                gbc.skipBits(4);  // extpgmaux1scl
+                            if (gbc.getBit())
+                                gbc.skipBits(4);  // extpgmaux2scl
+                        }
+                    }
+                    if (gbc.getBit())  // mixdata3e
+                    {
+                        gbc.skipBits(5);  // spchdat
+                        if (gbc.getBit())
+                        {
+                            gbc.skipBits(7);  // spchdat1, spchan1att
+                            if (gbc.getBit())
+                                gbc.skipBits(7);  // spchdat2, spchan2att
+                        }
+                    }
+                    for (int i = 0; i < mixdeflen; i++) gbc.skipBits(8);  // mixdata
+                    for (int i = 0; i < 7; i++)                           // mixdatafill
+                        if (!gbc.showBits(1))
+                            gbc.skipBit();
+                        else
+                            break;
+                }
+                if (acmod < 2)
+                {
+                    paninfoe = gbc.getBit();
+                    if (paninfoe)
+                        gbc.skipBits(14);  // panmean, paninfo
+                    if (acmod == 0x0 && gbc.getBit())
+                        gbc.skipBits(14);  // panmean2, paninfo2
+                }
+                if (gbc.getBit())
+                {
+                    if (numblkscod == 0)
+                        gbc.skipBits(5);  // blkmixcfginfo[0]
+                    else
+                        for (int blk = 0; blk < number_of_blocks_per_syncframe; blk++)
+                            if (gbc.getBit())
+                                gbc.skipBits(5);  // blkmixcfginfo[blk]
+                }
+            }
+        }
+        if (gbc.getBit())
+        {
+            bsmod = gbc.getBits(3);
+            gbc.skipBits(2);  // copyrightb, origbs
+            if (acmod == 2)
+                dsurmod = gbc.getBits(2);
+        }
+        m_mixinfoexists = pgmscle || extpgmscle || mixdef || paninfoe;
+
+        if (m_channels == 0)  // no AC3 interleave
+        {
+            m_acmod = acmod;
+            m_lfeon = lfeon;
+            m_bsmod = bsmod;
+            m_fscod = fscod;
+            m_dsurmod = dsurmod;
+            m_channels = ff_ac3_channels[acmod] + lfeon;
         }
     }
     else  // AC-3
@@ -194,17 +299,11 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_bsmod = gbc.getBits(3);
         m_acmod = gbc.getBits(3);
         if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)
-        {
             m_cmixlev = gbc.getBits(2);
-        }
         if (m_acmod & 4)
-        {
             m_surmixlev = gbc.getBits(2);
-        }
         if (m_acmod == AC3_ACMOD_STEREO)
-        {
             m_dsurmod = gbc.getBits(2);
-        }
         m_lfeon = gbc.getBit();
 
         m_halfratecod = max(m_bsid, 8) - 8;
