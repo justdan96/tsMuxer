@@ -23,7 +23,7 @@ class H264StreamReader : public MPEGStreamReader
     H264StreamReader();
     ~H264StreamReader() override;
     void setForceLevel(uint8_t value) { m_forcedLevel = value; }
-    int getTSDescriptor(uint8_t* dstBuff, bool isM2ts) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
     void setH264SPSCont(bool val) { m_h264SPSCont = val; }
 

@@ -50,7 +50,7 @@ int VC1StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     return (int)(curPtr - dstBuffer);  // afterPesData;
 }
 
-int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool isM2ts)
+int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 {
     for (uint8_t* nal = VC1Unit::findNextMarker(m_buffer, m_bufEnd); nal <= m_bufEnd - 32;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))

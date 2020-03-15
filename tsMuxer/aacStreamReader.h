@@ -10,7 +10,7 @@ class AACStreamReader : public SimplePacketizerReader, public AACCodec
    public:
    public:
     AACStreamReader() : SimplePacketizerReader(){};
-    int getTSDescriptor(uint8_t* dstBuff, bool isM2ts) override { return 0; }
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override { return 0; }
     int getFreq() override { return m_sample_rate; }
     int getChannels() override { return m_channels; }
 

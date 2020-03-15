@@ -40,9 +40,8 @@ static const uint8_t STREAM_TYPE_PRIVATE_SECTION = 0x05;
 static const uint8_t STREAM_TYPE_PRIVATE_DATA = 0x06;
 static const uint8_t STREAM_TYPE_VIDEO_MPEG4 = 0x10;
 static const uint8_t STREAM_TYPE_VIDEO_H264 = 0x1b;
-static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
-// static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x25; // changed from 0x06
 static const uint8_t STREAM_TYPE_VIDEO_MVC = 0x20;
+static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
 static const uint8_t STREAM_TYPE_VIDEO_VC1 = 0xea;
 
 static const uint8_t STREAM_TYPE_AUDIO_MPEG1 = 0x03;
@@ -257,12 +256,11 @@ struct TS_program_map_section
     TS_program_map_section();
     bool deserialize(uint8_t* buffer, int buf_size);
     static bool isFullBuff(uint8_t* buffer, int buf_size);
-    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool addLang, bool isM2ts);
+    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool blurayMode);
 
    private:
     void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);
     void extractPMTDescriptors(uint8_t* curPos, int es_info_len);
-    void setDoViDescriptor(BitStreamWriter& bitWriter, int PID, bool isDV_EL);
     // uint32_t tmpAvCrc[257];
 };
 

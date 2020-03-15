@@ -101,15 +101,6 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
             TSPacket* tsPacket = (TSPacket*)curPos;
             int pid = tsPacket->getPID();
 
-            /*
-            LTRACE(LT_WARN, 2, pid);
-            if (pid == 0)
-            {
-                LTRACE(LT_WARN, 2, "offset=" << curPos - 4 - data);
-                int gg = 4;
-            }
-            */
-
             if (pid == 0)
             {  // PAT
                 pat.deserialize(curPos + tsPacket->getHeaderSize(), TS_FRAME_SIZE - tsPacket->getHeaderSize());
