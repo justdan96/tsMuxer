@@ -10,6 +10,7 @@
 
 int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 {
+    m_sequence.video_format = 5;  // Unspecified video format
     try
     {
         for (uint8_t* nal = MPEGHeader::findNextMarker(m_buffer, m_bufEnd); nal <= m_bufEnd - 32;
@@ -31,13 +32,33 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
                 {
                     m_sequence.deserializeExtension(bitReader);
                 }
+                else if (extType == SEQUENCE_DISPLAY_EXT)
+                {
+                    m_sequence.deserializeDisplayExtension(bitReader);
+                }
+            }
+            else if (nal[3] == GOP_START_SHORT_CODE)
+            {
+                uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
+                m_gop.deserialize(nal + 4, nextNal - nal - 4);
             }
         }
     }
     catch (BitStreamException)
     {
     }
-    return 0;
+
+    // put 'HDMV' registration descriptor
+    *dstBuff++ = 0x05;  // registration descriptor tag
+    *dstBuff++ = 8;     // descriptor length
+    memcpy(dstBuff, "HDMV\xff", 5);
+    dstBuff += 5;
+
+    *dstBuff++ = 0x02;
+    *dstBuff++ = (m_sequence.video_format << 4) + m_sequence.frame_rate_index;
+    *dstBuff++ = (m_sequence.aspect_ratio_info << 4) + 0xf;
+
+    return 10;
 }
 
 CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
@@ -341,5 +362,5 @@ void MPEG2StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* n
 void MPEG2StreamReader::updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
     if (m_ar != AR_KEEP_DEFAULT)
-        m_sequence.setAspectRation(buff + 1, m_ar);  // todo: delete this line! debug only
+        m_sequence.setAspectRatio(buff + 1, m_ar);  // todo: delete this line! debug only
 }
