@@ -115,37 +115,40 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         }
     }
 
-    int cp = m_sps->colour_primaries;
-    int tc = m_sps->transfer_characteristics;
-    int mc = m_sps->matrix_coeffs;
-    int cslt = m_sps->chroma_sample_loc_type_top_field;
-
-    // cf. "DolbyVisionProfilesLevels_v1_3_2_2019_09_16.pdf"
-    if (cp == 9 && tc == 16 && mc == 9)  // BT.2100 colorspace
-    {
-        m_hdr->isHDR10 = true;
-        if (cslt == 2)
-            m_hdr->DVCompatibility = 6;
-        else if (cslt == 0)
-            m_hdr->DVCompatibility = 1;
-        V3_flags |= HDR10;
-    }
-    else if (cp == 9 && tc == 18 && mc == 9 && cslt == 2)  // ARIB HLG
-        m_hdr->DVCompatibility = 4;
-    else if (cp == 9 && tc == 14 && mc == 9 && cslt == 0)  // DVB HLG
-        m_hdr->DVCompatibility = 4;
-    else if (cp == 1 && tc == 1 && mc == 1 && cslt == 0)  // SDR
-        m_hdr->DVCompatibility = 2;
-    else if (cp == 2 && tc == 2 && mc == 2 && cslt == 0)  // Undefined
-    {
-        if (V3_flags & BASE_LAYER)
-            m_hdr->DVCompatibility = 2;
-        else
-            m_hdr->DVCompatibility = 0;
-    }
-
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
     {
+        int cp = m_sps->colour_primaries;
+        int tc = m_sps->transfer_characteristics;
+        int mc = m_sps->matrix_coeffs;
+        int cslt = m_sps->chroma_sample_loc_type_top_field;
+
+        if (!m_hdr)
+            m_hdr = new HevcHdrUnit();
+
+        // cf. "DolbyVisionProfilesLevels_v1_3_2_2019_09_16.pdf"
+        if (cp == 9 && tc == 16 && mc == 9)  // BT.2100 colorspace
+        {
+            m_hdr->isHDR10 = true;
+            if (cslt == 2)
+                m_hdr->DVCompatibility = 6;
+            else if (cslt == 0)
+                m_hdr->DVCompatibility = 1;
+            V3_flags |= HDR10;
+        }
+        else if (cp == 9 && tc == 18 && mc == 9 && cslt == 2)  // ARIB HLG
+            m_hdr->DVCompatibility = 4;
+        else if (cp == 9 && tc == 14 && mc == 9 && cslt == 0)  // DVB HLG
+            m_hdr->DVCompatibility = 4;
+        else if (cp == 1 && tc == 1 && mc == 1 && cslt == 0)  // SDR
+            m_hdr->DVCompatibility = 2;
+        else if (cp == 2 && tc == 2 && mc == 2 && cslt == 0)  // Undefined
+        {
+            if (V3_flags & BASE_LAYER)
+                m_hdr->DVCompatibility = 2;
+            else
+                m_hdr->DVCompatibility = 0;
+        }
+
         rez.codecInfo = hevcCodecInfo;
         rez.streamDescr = m_sps->getDescription();
         size_t frSpsPos = rez.streamDescr.find("Frame rate: not found");
