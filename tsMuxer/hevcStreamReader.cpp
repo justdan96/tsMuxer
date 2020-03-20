@@ -143,7 +143,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             m_hdr->DVCompatibility = 2;
         else if (cp == 2 && tc == 2 && mc == 2 && cslt == 0)  // Undefined
         {
-            if (V3_flags & BASE_LAYER)
+            if (m_hdr->isDVEL)
                 m_hdr->DVCompatibility = 2;
             else
                 m_hdr->DVCompatibility = 0;
@@ -247,23 +247,15 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 {
-    int isDVBL = true;
-    bool DualLayers = V3_flags & BASE_LAYER;
-    // For Dual Layer, both RPU and EL substreams are multiplexed in the RPU stream
-    if (DualLayers && m_hdr->isDVRPU)
-    {
+    int isDVBL = !(V3_flags & NON_DV_TRACK);
+    if (!isDVBL)
         m_hdr->isDVEL = true;
-        isDVBL = false;
-    }
 
     int width = getStreamWidth();
-    int pixelRate = width * getStreamHeight() * getFPS();
-    // BL has twice the width and height of EL
-    if (DualLayers)
-    {
+    if (!isDVBL && V3_flags & FOUR_K)
         width *= 2;
-        pixelRate *= 4;
-    }
+
+    int pixelRate = width * getStreamHeight() * getFPS();
 
     int level = 0;
     if (width <= 1280 && pixelRate <= 22118400)
@@ -306,8 +298,8 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(8, 1);               // dv version major
     bitWriter.putBits(8, 0);               // dv version minor
     // DV profile
-    if (DualLayers)
-        bitWriter.putBits(7, m_hdr->isHDR10 ? 7 : 4);
+    if (m_hdr->isDVEL)
+        bitWriter.putBits(7, isDVBL ? 4 : 7);
     else
         bitWriter.putBits(7, m_hdr->DVCompatibility ? 8 : 5);
     bitWriter.putBits(6, level);           // dv level

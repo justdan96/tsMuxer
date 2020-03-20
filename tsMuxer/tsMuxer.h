@@ -20,7 +20,7 @@ enum V3Flags
     SL_HDR2 = 8,
     HDR10PLUS = 16,
     FOUR_K = 32,
-    BASE_LAYER = 64,
+    NON_DV_TRACK = 64,
     HDMV_V3 = 128
 };
 

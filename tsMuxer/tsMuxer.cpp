@@ -152,7 +152,7 @@ TSMuxer::~TSMuxer()
 
 void TSMuxer::setVBVBufferLen(int value)
 {
-    m_vbvLen = value * 90;
+    m_vbvLen = (int64_t)value * 90;
     m_fixed_pcr_offset = m_timeOffset - m_vbvLen;
     if (m_fixed_pcr_offset < 0)
         m_fixed_pcr_offset = 0;
@@ -194,7 +194,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             {
                 tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
                 m_videoTrackCnt++;
-                V3_flags |= BASE_LAYER;
+                V3_flags |= NON_DV_TRACK;
             }
             if (m_subMode)
                 tsStreamIndex++;
