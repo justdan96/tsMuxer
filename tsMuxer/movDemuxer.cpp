@@ -836,8 +836,7 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
                 break;
             }
         }
-        if ((!found_moof && m_mdat_pos && found_moov) ||
-            (found_moof && m_processedBytes + left >= m_fileSize))
+        if ((!found_moof && m_mdat_pos && found_moov) || (found_moof && m_processedBytes + left >= m_fileSize))
             return 0;
 
         skip_bytes(left);
