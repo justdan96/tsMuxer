@@ -895,7 +895,7 @@ int HevcHdrUnit::deserialize()
                     HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
                 }
             }
-            else if (payloadType == 4 && !isHDR10plus)
+            else if (payloadType == 4 && payloadSize >= 8 && !isHDR10plus)
             {                           // HDR10Plus Metadata
                 m_reader.skipBits(8);   // country_code
                 m_reader.skipBits(32);  // terminal_provider
