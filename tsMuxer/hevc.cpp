@@ -913,7 +913,7 @@ int HevcHdrUnit::deserialize()
             }
             else
                 for (int i = 0; i < payloadSize; i++) m_reader.skipBits(8);
-        } while (m_reader.showBits(8) != 0x80);
+        } while (m_reader.getBitsLeft() > 16);
 
         return 0;
     }
