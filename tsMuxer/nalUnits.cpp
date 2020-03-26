@@ -1144,15 +1144,12 @@ void SPSUnit::seq_parameter_set_mvc_extension()
     std::vector<int> num_anchor_refs_l0;
     std::vector<int> num_anchor_refs_l1;
     std::vector<int> num_non_anchor_refs_l0;
-    std::vector<int> non_anchor_ref_l1;
     std::vector<int> num_applicable_ops_minus1;
     std::vector<int> num_non_anchor_refs_l1;
 
     num_anchor_refs_l0.resize(num_views);
     num_anchor_refs_l1.resize(num_views);
     num_non_anchor_refs_l0.resize(num_views);
-    non_anchor_ref_l1.resize(num_views);
-    num_applicable_ops_minus1.resize(num_views);
     num_non_anchor_refs_l1.resize(num_views);
 
     for (int i = 1; i < num_views; i++)
@@ -1172,6 +1169,7 @@ void SPSUnit::seq_parameter_set_mvc_extension()
     }
 
     int num_level_values_signalled_minus1 = extractUEGolombCode();
+    num_applicable_ops_minus1.resize(num_level_values_signalled_minus1 + 1);
     level_idc_ext.resize(num_level_values_signalled_minus1 + 1);
     for (int i = 0; i <= num_level_values_signalled_minus1; i++)
     {
