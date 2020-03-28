@@ -301,7 +301,8 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     if (m_hdr->isDVEL)
         bitWriter.putBits(7, isDVBL ? 4 : 7);
     else
-        bitWriter.putBits(7, m_hdr->DVCompatibility ? 8 : 5);
+        bitWriter.putBits(
+            7, (m_hdr->DVCompatibility == 1 || m_hdr->DVCompatibility == 2 || m_hdr->DVCompatibility == 4) ? 8 : 5);
     bitWriter.putBits(6, level);           // dv level
     bitWriter.putBits(1, m_hdr->isDVRPU);  // rpu_present_flag
     bitWriter.putBits(1, m_hdr->isDVEL);   // el_present_flag
