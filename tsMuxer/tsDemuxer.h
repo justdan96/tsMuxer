@@ -72,6 +72,9 @@ class TSDemuxer : public AbstractDemuxer
     int64_t m_prevFileLen;
     int m_curFileNum;
     int64_t m_firstVideoPTS;
+    int64_t m_lastVideoPTS;
+    int64_t m_lastVideoDTS;
+    int64_t m_videoDtsGap;
     std::vector<MPLSPlayItem> m_mplsInfo;
     int64_t m_lastPCRVal;
     bool m_nonMVCVideoFound;
