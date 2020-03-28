@@ -34,7 +34,7 @@ else
  ninja && cp -u tsMuxer/tsmuxer.exe ../bin/
  if [ -d $MINGW_PREFIX/qt5-static ] ; then
   $MINGW_PREFIX/qt5-static/bin/qmake ../tsMuxerGUI
-  make && cp -u tsMuxerGUI.exe ../bin/
+  make release && cp -u release/tsMuxerGUI.exe ../bin/
  fi
  cd ..
 fi
