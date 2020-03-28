@@ -165,7 +165,8 @@ bool TSDemuxer::isVideoPID(uint32_t streamType)
 {
     return streamType == STREAM_TYPE_VIDEO_MPEG1 || streamType == STREAM_TYPE_VIDEO_MPEG2 ||
            streamType == STREAM_TYPE_VIDEO_MPEG4 || streamType == STREAM_TYPE_VIDEO_H264 ||
-           streamType == STREAM_TYPE_VIDEO_MVC || streamType == STREAM_TYPE_VIDEO_VC1;
+           streamType == STREAM_TYPE_VIDEO_MVC || streamType == STREAM_TYPE_VIDEO_VC1 ||
+           streamType == STREAM_TYPE_VIDEO_H265;
 }
 
 // static uint64_t prevDts = 0;
