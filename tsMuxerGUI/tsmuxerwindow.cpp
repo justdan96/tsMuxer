@@ -322,6 +322,7 @@ TsMuxerWindow::TsMuxerWindow()
     const static int colWidths[] = {28, 200, 62, 38, 10};
     for (unsigned i = 0u; i < sizeof(colWidths) / sizeof(int); ++i)
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
+    ui->trackLV->setWordWrap(false);
 
     ui->listViewFont->horizontalHeader()->resizeSection(0, 65);
     ui->listViewFont->horizontalHeader()->resizeSection(1, 185);
