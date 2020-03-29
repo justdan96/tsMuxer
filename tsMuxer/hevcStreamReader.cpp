@@ -199,6 +199,14 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
             }
         } */
 
+    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU))
+    {
+        int lenDoviDesc = 0;
+        lenDoviDesc = setDoViDescriptor(dstBuff);
+        dstBuff += lenDoviDesc;
+        return lenDoviDesc;
+    }
+
     // 'HDMV' registration descriptor
     *dstBuff++ = 0x05;
     *dstBuff++ = 8;
@@ -212,14 +220,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
     *dstBuff++ = (video_format << 4) + frame_rate_index;
     *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
-    int lenDoviDesc = 0;
-    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU))
-    {
-        lenDoviDesc = setDoViDescriptor(dstBuff);
-        dstBuff += lenDoviDesc;
-    }
-
-    return 10 + lenDoviDesc;
+    return 10;
 }
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
@@ -282,6 +283,11 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(8, 4);
     bitWriter.putBits(32, 0x444f5649);
 
+    // 'HEVC' registration descriptor
+    bitWriter.putBits(8, 5);
+    bitWriter.putBits(8, 4);
+    bitWriter.putBits(32, 0x48455643);
+
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
     bitWriter.putBits(8, isDVBL ? 4 : 6);  // descriptor length
     bitWriter.putBits(8, 1);               // dv version major
@@ -298,7 +304,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     }
 
     bitWriter.flushBits();
-    return 8 + (isDVBL ? 4 : 6);
+    return 14 + (isDVBL ? 4 : 6);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
