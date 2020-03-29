@@ -1,4 +1,44 @@
 ## tsMuxeR 2.6.16
+- Fixed a an issue so that Dolby Vision EL stream type is now correct 
+- Fixed a bug with HEVC streams when an HDR10+ SEI payload is too short
+- Fixed a bug where the first 2 frames of the first video track are muxed before anything else
+- Introduced an improvement so Single Track Double Layer files now can properly handled
+- Fixed a bug so that if no MOOF atom is met we stop atom parsing at the next MDAT atom
+- Fixed an issue with HDR flags, so we only set them if an HEVC stream is detected
+- Introduced correct ATSC descriptor for pure EAC3 tracks
+- Introduced correct HDMV TS descriptors for MPEG-2 streams
+- Fixed an issue where Blu-Ray movies will loop rather than stopping after reading
+- Introduced being able to include Dolby Vision descriptors in TS or M2TS mode
+- Fixed the order of streams so that video streams always come first
+- Introduced a GUI option for adjusting PIP transparency
+- Fixed an issue where translated strings appeared in the meta file
+- Fixed a bug in the output paths of the MXE build scripts
+- Ensured we keep M2TS descriptors in TS files (temporary until a long-term solution can be found)
+- Fixed a bug where filenames were being truncated prematurely if there were dots in the filename
+- Introduced putting overnight builds into OBS, to build for various Linux platforms
+- Improved the documentation to fix a broken URL for the test files
+- Introduced a simplification of the method used to play sounds in the GUI
+- Fixed an issue with broken ISO labels when using non-ASCII characters
+- Introduced a refactoring that moved the About page into an external HTML file for the GUI
+- Introduced a code cleanup that removed all usages of std::wstring
+- Fixed an issue with incorrect subtitle spacing on Windows
+- Introduced support for M4V files
+- Fixed issue with subtitle timestamps when joining multiple M2TS files together
+- Fixed incorrect usage of POSIX APIs in Windows builds
+- Fixed a bug with encoding errors when dealing with SSIF files
+- Fixed a bug where we could read over the end of an MP4 file
+- Introduced keeping the track order when multiple video tracks are added
+- Introduced support for reading fragmented MP4 files
+- Introduced support for specific AVC and HEVC descriptors in TS files
+- Introduced support for Dolby Vision atoms in AVC or HEVC streams
+- Introduced a changelog and improved general documentation
+- Fixed an issue with garbled subtitles being displayed
+- Introduced translation support, as well as a full Russian translation of the GUI
+- Introduced getting the HDR10 information from the SPS VUI in HEVC
+- Introduced detection of UTF8 in subtitle files
+- Fixed usage of WinMain, which lead to issues with console output on Windows
+- Introduced converting meta files using active code page if UTF8 fails
+- Improved the documentation for building with Msys2
 - Fixed bugs in the handling of non-ASCII characters in paths on Windows
 - Fixed bugs in subtitles PIDs for BD V3 M2TS with HDR
 - Fixed bug with the display of bitrate and channel numbers for EAC3 and AC3 tracks
