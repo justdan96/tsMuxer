@@ -117,36 +117,13 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
     {
-        int cp = m_sps->colour_primaries;
-        int tc = m_sps->transfer_characteristics;
-        int mc = m_sps->matrix_coeffs;
-        int cslt = m_sps->chroma_sample_loc_type_top_field;
-
-        if (!m_hdr)
-            m_hdr = new HevcHdrUnit();
-
-        // cf. "DolbyVisionProfilesLevels_v1_3_2_2019_09_16.pdf"
-        if (cp == 9 && tc == 16 && mc == 9)  // BT.2100 colorspace
+        if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
+            m_sps->matrix_coeffs == 9)  // BT.2100
         {
+            if (!m_hdr)
+                m_hdr = new HevcHdrUnit();
             m_hdr->isHDR10 = true;
-            if (cslt == 2)
-                m_hdr->DVCompatibility = 6;
-            else if (cslt == 0)
-                m_hdr->DVCompatibility = 1;
             V3_flags |= HDR10;
-        }
-        else if (cp == 9 && tc == 18 && mc == 9 && cslt == 2)  // ARIB HLG
-            m_hdr->DVCompatibility = 4;
-        else if (cp == 9 && tc == 14 && mc == 9 && cslt == 0)  // DVB HLG
-            m_hdr->DVCompatibility = 4;
-        else if (cp == 1 && tc == 1 && mc == 1 && cslt == 0)  // SDR
-            m_hdr->DVCompatibility = 2;
-        else if (cp == 2 && tc == 2 && mc == 2 && cslt == 0)  // Undefined
-        {
-            if (m_hdr->isDVEL)
-                m_hdr->DVCompatibility = 2;
-            else
-                m_hdr->DVCompatibility = 0;
         }
 
         rez.codecInfo = hevcCodecInfo;
@@ -257,6 +234,18 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 
     int pixelRate = width * getStreamHeight() * getFPS();
 
+    // cf. "DolbyVisionProfilesLevels_v1_3_2_2019_09_16.pdf"
+    int profile = 0;
+    if (!isDVBL)  // dual HEVC track
+        profile = 7;
+    else if (m_hdr->isDVEL)
+        profile = 4;
+    else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
+             m_sps->matrix_coeffs == 2)  // DV IPT color space
+        profile = 5;
+    else
+        profile = 8;
+
     int level = 0;
     if (width <= 1280 && pixelRate <= 22118400)
         level = 1;
@@ -294,15 +283,10 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(32, 0x444f5649);
 
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
-    bitWriter.putBits(8, isDVBL ? 5 : 7);  // Length
+    bitWriter.putBits(8, isDVBL ? 4 : 6);  // descriptor length
     bitWriter.putBits(8, 1);               // dv version major
     bitWriter.putBits(8, 0);               // dv version minor
-    // DV profile
-    if (m_hdr->isDVEL)
-        bitWriter.putBits(7, isDVBL ? 4 : 7);
-    else
-        bitWriter.putBits(
-            7, (m_hdr->DVCompatibility == 1 || m_hdr->DVCompatibility == 2 || m_hdr->DVCompatibility == 4) ? 8 : 5);
+    bitWriter.putBits(7, profile);         // dv profile
     bitWriter.putBits(6, level);           // dv level
     bitWriter.putBits(1, m_hdr->isDVRPU);  // rpu_present_flag
     bitWriter.putBits(1, m_hdr->isDVEL);   // el_present_flag
@@ -312,11 +296,9 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
-    bitWriter.putBits(4, m_hdr->DVCompatibility);  // dv_bl_signal_compatibility_id
-    bitWriter.putBits(4, 15);                      // reserved
 
     bitWriter.flushBits();
-    return 8 + (isDVBL ? 5 : 7);
+    return 8 + (isDVBL ? 4 : 6);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
