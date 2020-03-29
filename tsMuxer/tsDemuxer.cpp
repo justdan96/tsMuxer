@@ -36,6 +36,9 @@ TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* strea
     m_firstPTS = -1;
     m_lastPTS = -1;
     m_firstVideoPTS = -1;
+    m_lastVideoPTS = -1;
+    m_lastVideoDTS = -1;
+    m_videoDtsGap = -1;
     m_firstCall = true;
     m_prevFileLen = 0;
     m_curFileNum = 0;
@@ -162,7 +165,8 @@ bool TSDemuxer::isVideoPID(uint32_t streamType)
 {
     return streamType == STREAM_TYPE_VIDEO_MPEG1 || streamType == STREAM_TYPE_VIDEO_MPEG2 ||
            streamType == STREAM_TYPE_VIDEO_MPEG4 || streamType == STREAM_TYPE_VIDEO_H264 ||
-           streamType == STREAM_TYPE_VIDEO_MVC || streamType == STREAM_TYPE_VIDEO_VC1;
+           streamType == STREAM_TYPE_VIDEO_MVC || streamType == STREAM_TYPE_VIDEO_VC1 ||
+           streamType == STREAM_TYPE_VIDEO_H265;
 }
 
 // static uint64_t prevDts = 0;
@@ -229,12 +233,19 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     {
         if (m_curFileNum < m_mplsInfo.size())
             m_prevFileLen +=
-                (m_mplsInfo[m_curFileNum].OUT_time - m_mplsInfo[m_curFileNum].IN_time) * 2;  // in 90Khz clock
+                (int64_t)(m_mplsInfo[m_curFileNum].OUT_time - m_mplsInfo[m_curFileNum].IN_time) * 2;  // in 90Khz clock
         else
-            m_prevFileLen += (m_lastPTS - m_firstPTS);
+        {
+            if (m_firstVideoPTS != -1 && m_lastVideoPTS != -1)
+                m_prevFileLen += (m_lastVideoPTS - m_firstVideoPTS + m_videoDtsGap);
+            else  // no video file
+                m_prevFileLen += (m_lastPTS - m_firstPTS);
+            ;
+        }
         m_firstPTS = -1;
         m_lastPTS = -1;
         m_firstVideoPTS = -1;
+        m_lastVideoPTS = -1;
         m_curFileNum++;
     }
 
@@ -375,11 +386,21 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 if (m_firstPTS == -1 || curPts < m_firstPTS)
                     m_firstPTS = curPts;
 
-                if (streamInfo != m_pmt.pidList.end() && isVideoPID(streamInfo->second.m_streamType) &&
-                    (m_firstVideoPTS == -1 || curPts < m_firstVideoPTS))
-                    m_firstVideoPTS = curPts;
+                if (streamInfo != m_pmt.pidList.end() && isVideoPID(streamInfo->second.m_streamType))
+                {
+                    if (m_firstVideoPTS == -1 || curPts < m_firstVideoPTS)
+                        m_firstVideoPTS = curPts;
+                    if (curPts > m_lastVideoPTS)
+                        m_lastVideoPTS = curPts;
+                    if (m_lastVideoDTS == -1)
+                        m_lastVideoDTS = curDts;
+                    if (m_videoDtsGap == -1 && curDts > m_lastVideoDTS)
+                        m_videoDtsGap = curDts - m_lastVideoDTS;
+                }
+
                 if (m_firstPtsTime.find(pid) == m_firstPtsTime.end())
                     m_firstPtsTime[pid] = curPts;
+
                 else if (m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
                     m_firstPtsTime[pid] = curPts;
             }
