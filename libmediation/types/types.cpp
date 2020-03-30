@@ -21,6 +21,17 @@
 
 using namespace std;
 
+bool isInvalidChar(const char& ch) 
+{
+#ifndef _WIN32
+	// NULL and /
+    return (int(ch) == 0 || ch == getDirSeparator()); 
+#else
+	// <>:"/|?* and ASCII 0 to 31
+    return (ch == '<' || ch == '>' || ch == ':' || ch == '"' || ch == '/' || ch == '|' || ch == '?' || ch == '*' || ch == getDirSeparator() || int(ch) <= 31); 
+#endif
+}
+
 uint64_t my_ntohll(const uint64_t& original)
 {
 #ifdef SPARC_V9  // big endian
@@ -303,7 +314,7 @@ string extractFileName(const string& src)
             if (endPos == src.size())
                 endPos = i;
         }
-        else if (src[i] == '/' || src[i] == '\\')
+        else if (src[i] == getDirSeparator())
         {
             string rez = src.substr(i + 1, endPos - i - 1);
             if (rez.size() > 0 && rez[rez.size() - 1] == '\"')
@@ -319,10 +330,7 @@ string extractFileName2(const string& src, bool withExt)
     string fileName = src;
 
     size_t extSep = fileName.find_last_of('.');
-    size_t dirSep = fileName.find_last_of('/');
-
-    if (dirSep == string::npos)
-        dirSep = fileName.find_last_of('\\');
+    size_t dirSep = fileName.find_last_of(getDirSeparator());
 
     if (extSep != string::npos && !withExt)
         fileName = fileName.substr(0, extSep);
@@ -336,7 +344,7 @@ string extractFileName2(const string& src, bool withExt)
 string extractFilePath(const string& src)
 {
     for (int i = src.size() - 1; i >= 0; i--)
-        if (src[i] == '/' || src[i] == '\\')
+        if (src[i] == getDirSeparator())
         {
             string rez = src.substr(0, i);
             return rez;
@@ -350,9 +358,25 @@ string closeDirPath(const string& src, char delimiter)
         delimiter = getDirSeparator();
     if (src.length() == 0)
         return src;
-    if (src[src.length() - 1] == '/' || src[src.length() - 1] == '\\')
+    if (src[src.length() - 1] == getDirSeparator())
         return src;
     return src + delimiter;
+}
+
+// extract the filename from a path, check for invalid characters
+bool isValidFileName(const string& src)
+{
+    string filename = extractFileName(src);
+    // isValidChar defined in file_win32.cpp and file_unix.cpp
+    string::iterator it = find_if(filename.begin(), filename.end(), isInvalidChar);
+    if (it != filename.end())
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 string trimStr(const string& value)
