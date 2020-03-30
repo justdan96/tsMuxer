@@ -235,17 +235,30 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 
     int pixelRate = width * getStreamHeight() * getFPS();
 
-    // cf. "DolbyVisionProfilesLevels_v1_3_2_2019_09_16.pdf"
-    int profile = 0;
-    if (!isDVBL)  // dual HEVC track
-        profile = 7;
-    else if (m_hdr->isDVEL)
-        profile = 4;
-    else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
-             m_sps->matrix_coeffs == 2)  // DV IPT color space
-        profile = 5;
-    else
-        profile = 8;
+    // cf. "http://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-profiles-levels.pdf"
+    int profile;
+    if (m_sps->bit_depth_luma_minus8 == 2)
+    {
+        if (!isDVBL)  // dual HEVC track
+            profile = 7;
+        else if (m_hdr->isDVEL && (V3_flags & HDR10))
+            profile = 6;
+        else if (m_hdr->isDVEL)
+            profile = 4;
+        else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
+                 m_sps->matrix_coeffs == 2)  // DV IPT color space
+            profile = 5;
+        else
+            profile = 8;
+    }
+    else  // 8-bit
+    {
+        if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
+            m_sps->matrix_coeffs == 2)  // DV IPT color space
+            profile = 3;
+        else
+            profile = 2;
+    }
 
     int level = 0;
     if (width <= 1280 && pixelRate <= 22118400)
