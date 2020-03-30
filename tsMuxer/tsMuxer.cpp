@@ -305,9 +305,9 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         // For non-bluray, Dolby Vision track must be stream_type 06 = private data
         if (!m_bluRayMode && tsStreamIndex == 0x1015)
             stream_type = STREAM_TYPE_PRIVATE_DATA;
-        m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary)));
+        m_pmt.pidList.insert(std::make_pair(
+            tsStreamIndex,
+            PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MS/VFW/WVC1")
         m_pmt.pidList.insert(
