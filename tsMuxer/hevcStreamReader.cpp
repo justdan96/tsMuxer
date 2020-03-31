@@ -230,7 +230,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    int pixelRate = width *getStreamHeight() * getFPS();
+    int pixelRate = width * getStreamHeight() * getFPS();
 
     if (!isDVBL && V3_flags & FOUR_K)
         pixelRate *= 4;
