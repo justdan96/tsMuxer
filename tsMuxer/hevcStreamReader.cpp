@@ -237,27 +237,55 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 
     // cf. "http://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-profiles-levels.pdf"
     int profile;
+    int compatibility;
     if (m_sps->bit_depth_luma_minus8 == 2)
     {
         if (!isDVBL)  // dual HEVC track
+        {
             profile = 7;
+            compatibility = 6;
+        }
         else if (m_hdr->isDVEL && (V3_flags & HDR10))
+        {
             profile = 6;
+            compatibility = 1;
+        }
         else if (m_hdr->isDVEL)
+        {
             profile = 4;
+            compatibility = 2;
+        }
         else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
                  m_sps->matrix_coeffs == 2)  // DV IPT color space
+        {
             profile = 5;
-        else
+            compatibility = 0;
+        }
+        else if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
+                 m_sps->matrix_coeffs == 9)  // DV BT.2100
+        {
             profile = 8;
+            compatibility = 1;
+        }
+        else  // DV SDR
+        {
+            profile = 8;
+            compatibility = 2;
+        }
     }
     else  // 8-bit
     {
         if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
             m_sps->matrix_coeffs == 2)  // DV IPT color space
+        {
             profile = 3;
+            compatibility = 0;
+        }
         else
+        {
             profile = 2;
+            compatibility = 2;
+        }
     }
 
     int level = 0;
@@ -302,7 +330,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(32, 0x48455643);
 
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
-    bitWriter.putBits(8, isDVBL ? 4 : 6);  // descriptor length
+    bitWriter.putBits(8, isDVBL ? 5 : 7);  // descriptor length
     bitWriter.putBits(8, 1);               // dv version major
     bitWriter.putBits(8, 0);               // dv version minor
     bitWriter.putBits(7, profile);         // dv profile
@@ -315,9 +343,11 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
+    bitWriter.putBits(4, compatibility);  // dv_bl_signal_compatibility_id
+    bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
-    return 14 + (isDVBL ? 4 : 6);
+    return 14 + (isDVBL ? 5 : 7);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
