@@ -271,11 +271,9 @@ HevcSpsUnit::HevcSpsUnit()
       vcl_hrd_parameters_present_flag(false),
       sub_pic_hrd_params_present_flag(false),
       num_short_term_ref_pic_sets(0),
-      colour_primaries(0),
-      transfer_characteristics(0),
-      matrix_coeffs(0),
-      chroma_sample_loc_type_top_field(0),
-      chroma_sample_loc_type_bottom_field(0),
+      colour_primaries(2),
+      transfer_characteristics(2),
+      matrix_coeffs(2),
       num_units_in_tick(0),
       time_scale(0),
       PicSizeInCtbsY_bits(0)
@@ -377,8 +375,8 @@ void HevcSpsUnit::vui_parameters()
     bool chroma_loc_info_present_flag = m_reader.getBit();
     if (chroma_loc_info_present_flag)
     {
-        chroma_sample_loc_type_top_field = extractUEGolombCode();
-        chroma_sample_loc_type_bottom_field = extractUEGolombCode();
+        extractUEGolombCode();  // chroma_sample_loc_type_top_field
+        extractUEGolombCode();  // chroma_sample_loc_type_bottom_field
     }
 
     m_reader.skipBit();  // neutral_chroma_indication_flag u(1)
@@ -848,7 +846,7 @@ int HevcPpsUnit::deserialize()
 }
 
 // ----------------------- HevcHdrUnit ------------------------
-HevcHdrUnit::HevcHdrUnit() : isHDR10(false), isHDR10plus(false), isDVRPU(false), isDVEL(false), DVCompatibility(0) {}
+HevcHdrUnit::HevcHdrUnit() : isHDR10(false), isHDR10plus(false), isDVRPU(false), isDVEL(false) {}
 
 int HevcHdrUnit::deserialize()
 {

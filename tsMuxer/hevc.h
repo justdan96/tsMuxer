@@ -160,8 +160,6 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     int colour_primaries;
     int transfer_characteristics;
     int matrix_coeffs;
-    int chroma_sample_loc_type_top_field;
-    int chroma_sample_loc_type_bottom_field;
 
     int num_short_term_ref_pic_sets;
     int num_units_in_tick;
@@ -199,7 +197,6 @@ struct HevcHdrUnit : public HevcUnit
     bool isHDR10plus;
     bool isDVRPU;
     bool isDVEL;
-    int DVCompatibility;
 };
 
 struct HevcSliceHeader : public HevcUnit
