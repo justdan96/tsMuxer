@@ -199,14 +199,6 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
             }
         } */
 
-    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU))
-    {
-        int lenDoviDesc = 0;
-        lenDoviDesc = setDoViDescriptor(dstBuff);
-        dstBuff += lenDoviDesc;
-        return lenDoviDesc;
-    }
-
     // 'HDMV' registration descriptor
     *dstBuff++ = 0x05;
     *dstBuff++ = 8;
@@ -214,13 +206,20 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
     dstBuff += 6;
 
     int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                       &video_format, &frame_rate_index, &aspect_ratio_index);
+    M2TSStreamInfo::blurayStreamParams(
+        getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+        getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
     *dstBuff++ = (video_format << 4) + frame_rate_index;
     *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
-    return 10;
+    int lenDoviDesc = 0;
+    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU)) {
+      lenDoviDesc = setDoViDescriptor(dstBuff);
+      dstBuff += lenDoviDesc;
+    }
+
+    return 10 + lenDoviDesc;
 }
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
@@ -324,11 +323,6 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(8, 4);
     bitWriter.putBits(32, 0x444f5649);
 
-    // 'HEVC' registration descriptor
-    bitWriter.putBits(8, 5);
-    bitWriter.putBits(8, 4);
-    bitWriter.putBits(32, 0x48455643);
-
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
     bitWriter.putBits(8, isDVBL ? 5 : 7);  // descriptor length
     bitWriter.putBits(8, 1);               // dv version major
@@ -347,7 +341,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
-    return 14 + (isDVBL ? 5 : 7);
+    return 8 + (isDVBL ? 5 : 7);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
