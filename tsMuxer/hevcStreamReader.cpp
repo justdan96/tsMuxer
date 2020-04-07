@@ -206,17 +206,17 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
     dstBuff += 6;
 
     int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(
-        getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-        getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
+                                       &video_format, &frame_rate_index, &aspect_ratio_index);
 
     *dstBuff++ = (video_format << 4) + frame_rate_index;
     *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
     int lenDoviDesc = 0;
-    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU)) {
-      lenDoviDesc = setDoViDescriptor(dstBuff);
-      dstBuff += lenDoviDesc;
+    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU))
+    {
+        lenDoviDesc = setDoViDescriptor(dstBuff);
+        dstBuff += lenDoviDesc;
     }
 
     return 10 + lenDoviDesc;
