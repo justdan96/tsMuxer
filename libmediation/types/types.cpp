@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iomanip>
 #include <ostream>
+#include <regex>
 #include <sstream>
 
 #ifndef _WIN32
@@ -21,15 +22,16 @@
 
 using namespace std;
 
-bool isInvalidChar(const char& ch) 
+regex invalidChars()
 {
 #ifndef _WIN32
-	// NULL and /
-    return (int(ch) == 0 || ch == getDirSeparator()); 
+    // NULL and /
+    regex invalid("[\\/\\x00]");
 #else
-	// <>:"/|?* and ASCII 0 to 31
-    return (ch == '<' || ch == '>' || ch == ':' || ch == '"' || ch == '/' || ch == '|' || ch == '?' || ch == '*' || ch == getDirSeparator() || int(ch) <= 31); 
+    // <>:"/|?* and ASCII 0 to 31
+    regex invalid("[:<>I\"\\/|?\\*\\x00-\\x1F]");
 #endif
+    return invalid;
 }
 
 uint64_t my_ntohll(const uint64_t& original)
@@ -367,16 +369,11 @@ string closeDirPath(const string& src, char delimiter)
 bool isValidFileName(const string& src)
 {
     string filename = extractFileName(src);
-    // isValidChar defined in file_win32.cpp and file_unix.cpp
-    string::iterator it = find_if(filename.begin(), filename.end(), isInvalidChar);
-    if (it != filename.end())
-    {
-        return false;
-    }
-    else
-    {
-        return true;
-    }
+
+    // invalidChars() returns a different regex pattern for Windows or Unix
+    regex ourInvalidChars = invalidChars();
+    bool isvalid = !(std::regex_search(filename, ourInvalidChars));
+    return isvalid;
 }
 
 string trimStr(const string& value)

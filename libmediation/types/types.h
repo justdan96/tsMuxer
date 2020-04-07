@@ -2,6 +2,7 @@
 #define __T_TYPES_H
 
 #include <cstdint>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -9,6 +10,8 @@
 #define strcasecmp stricmp
 #endif
 char* strnstr(const char* s1, const char* s2, size_t len);
+
+std::regex invalidChars();
 
 uint64_t my_ntohll(const uint64_t& original);
 uint64_t my_htonll(const uint64_t& original);
@@ -45,7 +48,6 @@ std::string extractFileName(const std::string& src);
 std::string extractFileName2(const std::string& src, bool withExt = true);
 std::string extractFilePath(const std::string& src);
 std::string closeDirPath(const std::string& src, char delimiter = ' ');
-bool isInvalidChar(const char& ch);
 bool isValidFileName(const std::string& src);
 
 std::vector<std::string> splitQuotedStr(const char* str, char splitter);
