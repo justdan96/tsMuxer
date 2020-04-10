@@ -204,6 +204,8 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_file.close();
         streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofAppend);
         streamInfo->m_file.write(streamInfo->m_buffer, streamInfo->m_bufLen);
+        streamInfo->m_file.close();
+        streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate);
         lpcmReader->beforeFileCloseEvent(streamInfo->m_file);
         streamInfo->m_file.close();
         std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
@@ -292,9 +294,15 @@ bool SingleFileMuxer::close()
                 return false;
             if (!streamInfo->m_file.write(streamInfo->m_buffer, streamInfo->m_bufLen))
                 return false;
+            if (!streamInfo->m_file.close())
+                return false;
             if (streamInfo->m_codecReader)
+            {
+                if (streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate))
+                    return false;
                 if (!streamInfo->m_codecReader->beforeFileCloseEvent(streamInfo->m_file))
                     return false;
+            }
             if (!streamInfo->m_file.close())
                 return false;
 
