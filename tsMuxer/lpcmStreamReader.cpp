@@ -645,8 +645,9 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             waveFormatPCMEx->nChannels = m_channels;
             waveFormatPCMEx->nSamplesPerSec = m_freq;
             waveFormatPCMEx->nAvgBytesPerSec = m_channels * m_freq * ((m_bitsPerSample + 4) >> 3);
-            waveFormatPCMEx->nBlockAlign = m_channels * waveFormatPCMEx->wBitsPerSample / 8;
-            waveFormatPCMEx->wBitsPerSample = m_bitsPerSample == 20 ? 24 : m_bitsPerSample;
+            int bitsPerSample = m_bitsPerSample == 20 ? 24 : m_bitsPerSample;
+            waveFormatPCMEx->nBlockAlign = m_channels * bitsPerSample / 8;
+            waveFormatPCMEx->wBitsPerSample = bitsPerSample;
             waveFormatPCMEx->cbSize = 22;  // After this to GUID
             waveFormatPCMEx->Samples.wValidBitsPerSample = m_bitsPerSample;
             waveFormatPCMEx->dwChannelMask = getWaveChannelMask(m_channels, m_lfeExists);  // Specify PCM
