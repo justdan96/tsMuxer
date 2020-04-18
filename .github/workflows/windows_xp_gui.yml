@@ -1,0 +1,29 @@
+name: Build GUI for Windows XP
+
+on:
+  push:
+    branches: [master]
+    paths:
+    - 'tsMuxerGUI/**'
+  pull_request:
+    branches: [master]
+    paths:
+    - 'tsMuxerGUI/**'
+
+jobs:
+  build-winxp-gui:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+      name: checkout
+
+    - run: ./build_gui_winxp.bat
+      name: build-xp-gui
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: tsMuxerGUI
+        path: tsMuxerGUI/build/release/tsMuxerGUI.7z
+      name: upload-artefact
