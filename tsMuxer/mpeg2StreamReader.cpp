@@ -8,7 +8,7 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     m_sequence.video_format = 5;  // Unspecified video format
     try

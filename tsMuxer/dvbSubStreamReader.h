@@ -9,7 +9,7 @@ class DVBSubStreamReader : public SimplePacketizerReader
 {
    public:
     DVBSubStreamReader() : SimplePacketizerReader(), m_big_offsets(0), m_frameDuration(0), m_firstFrame(true) {}
-    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
 
    protected:
     unsigned getHeaderLen() override { return 10; }

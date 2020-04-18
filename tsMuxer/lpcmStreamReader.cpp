@@ -19,7 +19,7 @@ static const uint32_t FMT_FOURCC = FOUR_CC('f', 'm', 't', ' ');
 
 using namespace wave_format;
 
-int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     if (m_headerType == htNone)
         if (!detectLPCMType(m_buffer, m_bufEnd - m_buffer))

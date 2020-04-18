@@ -66,7 +66,7 @@ const static int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;
 
-int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
     if (frame == 0)

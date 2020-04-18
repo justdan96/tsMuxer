@@ -55,7 +55,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual int getTmpBufferSize() { return MAX_AV_PACKET_SIZE; }
     virtual int readPacket(AVPacket& avPacket) = 0;
     virtual int flushPacket(AVPacket& avPacket) = 0;
-    virtual int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) { return 0; }
+    virtual int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) { return 0; }
     virtual int getStreamHDR() const { return 0; }
     virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) {}
     virtual void setStreamIndex(int index) { m_streamIndex = index; }

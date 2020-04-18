@@ -45,7 +45,7 @@ class DTSStreamReader : public SimplePacketizerReader
         m_dtsEsChannels = 0;
         m_testMode = false;
     };
-    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     void setDownconvertToDTS(bool value) { m_downconvertToDTS = value; }
     bool getDownconvertToDTS() { return m_downconvertToDTS; }
     DTSHD_SUBTYPE getDTSHDMode() { return m_hdType; }

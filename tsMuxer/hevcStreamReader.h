@@ -12,7 +12,7 @@ class HEVCStreamReader : public MPEGStreamReader
    public:
     HEVCStreamReader();
     ~HEVCStreamReader() override;
-    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     int setDoViDescriptor(uint8_t* dstBuff);
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool needSPSForSplit() const override { return false; }

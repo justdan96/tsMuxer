@@ -136,13 +136,39 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
     return rez;
 }
 
-int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     if (m_firstFrame)
         CheckStreamRez rez = checkStream(m_buffer, m_bufEnd - m_buffer);
 
-    /* non-HDMV descriptor, for future use
-    if (!blurayMode && (V3_flags & DV))
+    int lenDoviDesc = 0;
+    if (!blurayMode && m_hdr->isDVRPU)
+    {
+        // 'DOVI' registration descriptor
+        memcpy(dstBuff, "\x05\x04\x44\x4f\x56\x49", 6);
+        dstBuff += 6;
+        lenDoviDesc += 6;
+    }
+
+    if (hdmvDescriptors)
+    {
+        // 'HDMV' registration descriptor
+        *dstBuff++ = 0x05;
+        *dstBuff++ = 8;
+        memcpy(dstBuff, "HDMV\xff\x24", 6);
+        dstBuff += 6;
+
+        int video_format, frame_rate_index, aspect_ratio_index;
+        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+
+        *dstBuff++ = (video_format << 4) + frame_rate_index;
+        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+    }
+    else
+    {
+        uint8_t tmpBuffer[512];
+
         for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
              nal = NALUnit::findNextNAL(nal, m_bufEnd))
         {
@@ -151,75 +177,53 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
 
             if (nalType == NAL_SPS)
             {
-                uint8_t tmpBuffer[512];
                 int toDecode = FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
                 int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
-
-                int lenDoviDesc = 0;
-                if (m_hdr->isDVEL || m_hdr->isDVRPU)
-                {
-                    lenDoviDesc = setDoViDescriptor(dstBuff);
-                    dstBuff += lenDoviDesc;
-                }
-
-                *dstBuff++ = HEVC_DESCRIPTOR_TAG;
-                *dstBuff++ = 13;  // descriptor length
-                memcpy(dstBuff, tmpBuffer + 3, 12);
-                dstBuff += 12;
-                // temporal_layer_subset, HEVC_still_present, HEVC_24hr_picture_present, HDR_WCG unspecified
-                *dstBuff = 0x0f;
-
-                if (!m_sps->sub_pic_hrd_params_present_flag)
-                    *dstBuff |= 0x10;
-                dstBuff++;
-
-                // HEVC_timing_and_HRD_descriptor
-                memcpy(dstBuff, "\x3f\x0f\x03\x7f\x7f", 5);
-                dstBuff += 5;
-
-                uint32_t N = 1001 * getFPS();
-                uint32_t K = 27000000;
-                uint32_t num_units_in_tick = 1001;
-                if (N % 1000)
-                {
-                    N = 1000 * getFPS();
-                    num_units_in_tick = 1000;
-                }
-                N = my_htonl(N);
-                K = my_htonl(K);
-                num_units_in_tick = my_htonl(num_units_in_tick);
-                memcpy(dstBuff, &N, 4);
-                dstBuff += 4;
-                memcpy(dstBuff, &K, 4);
-                dstBuff += 4;
-                memcpy(dstBuff, &num_units_in_tick, 4);
-                dstBuff += 4;
-
-                return 32 + lenDoviDesc;
+                break;
             }
-        } */
+        }
 
-    // 'HDMV' registration descriptor
-    *dstBuff++ = 0x05;
-    *dstBuff++ = 8;
-    memcpy(dstBuff, "HDMV\xff\x24", 6);
-    dstBuff += 6;
+        *dstBuff++ = HEVC_DESCRIPTOR_TAG;
+        *dstBuff++ = 13;  // descriptor length
+        memcpy(dstBuff, tmpBuffer + 3, 12);
+        dstBuff += 12;
+        // flags temporal_layer_subset, HEVC_still_present,
+        // HEVC_24hr_picture_present, HDR_WCG unspecified
+        *dstBuff = 0x0f;
 
-    int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                       &video_format, &frame_rate_index, &aspect_ratio_index);
+        if (!m_sps->sub_pic_hrd_params_present_flag)
+            *dstBuff |= 0x10;
+        dstBuff++;
 
-    *dstBuff++ = (video_format << 4) + frame_rate_index;
-    *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+        /* HEVC_timing_and_HRD_descriptor
+        // mandatory for interlaced video only
+        memcpy(dstBuff, "\x3f\x0f\x03\x7f\x7f", 5);
+        dstBuff += 5;
 
-    int lenDoviDesc = 0;
-    if (!blurayMode && (m_hdr->isDVEL || m_hdr->isDVRPU))
-    {
-        lenDoviDesc = setDoViDescriptor(dstBuff);
-        dstBuff += lenDoviDesc;
+        uint32_t N = 1001 * getFPS();
+        uint32_t K = 27000000;
+        uint32_t num_units_in_tick = 1001;
+        if (N % 1000)
+        {
+            N = 1000 * getFPS();
+            num_units_in_tick = 1000;
+        }
+        N = my_htonl(N);
+        K = my_htonl(K);
+        num_units_in_tick = my_htonl(num_units_in_tick);
+        memcpy(dstBuff, &N, 4);
+        dstBuff += 4;
+        memcpy(dstBuff, &K, 4);
+        dstBuff += 4;
+        memcpy(dstBuff, &num_units_in_tick, 4);
+        dstBuff += 4;
+        */
     }
 
-    return 10 + lenDoviDesc;
+    if (!blurayMode && m_hdr->isDVRPU)
+        lenDoviDesc += setDoViDescriptor(dstBuff);
+
+    return (hdmvDescriptors ? 10 : 15) + lenDoviDesc;
 }
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
@@ -318,11 +322,6 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(dstBuff, dstBuff + 128);
 
-    // 'DOVI' registration descriptor
-    bitWriter.putBits(8, 5);
-    bitWriter.putBits(8, 4);
-    bitWriter.putBits(32, 0x444f5649);
-
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
     bitWriter.putBits(8, isDVBL ? 5 : 7);  // descriptor length
     bitWriter.putBits(8, 1);               // dv version major
@@ -341,7 +340,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
-    return 8 + (isDVBL ? 5 : 7);
+    return 2 + (isDVBL ? 5 : 7);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
