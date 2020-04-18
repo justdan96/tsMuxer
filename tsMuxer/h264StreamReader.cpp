@@ -455,8 +455,8 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         dstBuff += 5;
 
         int video_format, frame_rate_index, aspect_ratio_index;
-        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                           &video_format, &frame_rate_index, &aspect_ratio_index);
+        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
         *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
         *dstBuff++ = (video_format << 4) + frame_rate_index;
