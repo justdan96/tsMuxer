@@ -237,7 +237,7 @@ QString getComboBoxTrackText(int idx, const QtvCodecInfo &codecInfo)
 
 void initLanguageComboBox(QComboBox *comboBox)
 {
-    comboBox->addItem("English", "en");
+    comboBox->addItem("English", "en");  // 0th index is also used as default if the language isn't set in the settings.
     comboBox->addItem(QString::fromUtf8("Русский"), "ru");
     comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
 }
@@ -1881,6 +1881,7 @@ void TsMuxerWindow::onLanguageComboBoxIndexChanged(int idx)
         qWarning() << "Failed to open about.html for language" << lang << aboutContent.errorString();
         ui->textEdit->clear();
     }
+    writeSettings();
 }
 
 void TsMuxerWindow::updateMetaLines()
@@ -2819,6 +2820,17 @@ bool TsMuxerWindow::readSettings()
 bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 {
     settings->beginGroup(prefix);
+
+    auto lang = settings->value("language");
+    if (lang.isValid())
+    {
+        ui->languageSelectComboBox->setCurrentText(lang.toString());
+    }
+    else
+    {
+        ui->languageSelectComboBox->setCurrentIndex(0);
+    }
+
     if (!settings->contains("outputDir"))
     {
         settings->endGroup();
@@ -2839,8 +2851,6 @@ bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 
     ui->radioButtonOutoutInInput->setChecked(settings->value("outputToInputFolder").toBool());
     ui->radioButtonStoreOutput->setChecked(!ui->radioButtonOutoutInInput->isChecked());
-
-    ui->languageSelectComboBox->setCurrentText(settings->value("language").toString());
 
     settings->endGroup();
     return true;
