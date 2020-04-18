@@ -454,6 +454,9 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
+        if (itr->second.m_streamType == 0x90 && !hdmvDescriptors)
+            LTRACE(LT_WARN, 0, "Warning: PGS might not work without HDMV descriptors.");
+
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
