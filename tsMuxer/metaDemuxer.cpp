@@ -561,10 +561,10 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
 
 void METADemuxer::readClose()
 {
-    for (int i = 0; i < m_codecInfo.size(); i++)
+    for (auto& codecInfo : m_codecInfo)
     {
-        m_codecInfo[i].m_dataReader->deleteReader(m_codecInfo[i].m_readerID);
-        delete m_codecInfo[i].m_streamReader;
+        codecInfo.m_dataReader->deleteReader(codecInfo.m_readerID);
+        delete codecInfo.m_streamReader;
     }
     m_codecInfo.clear();
 }
@@ -576,40 +576,41 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     int64_t fileDuration = 0;
     vector<CheckStreamRez> streams, Vstreams;
     AbstractDemuxer* demuxer = 0;
-    string tmpname = strToLowerCase(unquoteStr(fileName));
+    auto unquoted = unquoteStr(fileName);
+    string fileExt = strToLowerCase(extractFileExt(unquoted));
     AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ctNone;
     CLPIParser clpi;
     bool clpiParsed = false;
-    if (strEndWith(tmpname, ".m2ts") || strEndWith(tmpname, ".mts") || strEndWith(tmpname, ".ssif"))
+    if (strEndWith(fileExt, "m2ts") || strEndWith(fileExt, "mts") || strEndWith(fileExt, "ssif"))
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctM2TS;
-        string clpiFileName = findBluRayFile(extractFileDir(tmpname), "CLIPINF", extractFileName(tmpname) + ".clpi");
-        if (clpiFileName.size() > 0)
+        string clpiFileName = findBluRayFile(extractFileDir(unquoted), "CLIPINF", extractFileName(unquoted) + ".clpi");
+        if (!clpiFileName.empty())
             clpiParsed = clpi.parse(clpiFileName.c_str());
     }
-    else if (strEndWith(tmpname, ".ts"))
+    else if (strEndWith(fileExt, "ts"))
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctTS;
     }
-    else if (strEndWith(tmpname, ".vob") || strEndWith(tmpname, ".mpg"))
+    else if (strEndWith(fileExt, "vob") || strEndWith(fileExt, "mpg"))
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctVOB;
     }
-    else if (strEndWith(tmpname, ".evo"))
+    else if (strEndWith(fileExt, "evo"))
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctEVOB;
     }
-    else if (strEndWith(tmpname, ".mkv") || strEndWith(tmpname, ".mka"))
+    else if (strEndWith(fileExt, "mkv") || strEndWith(fileExt, "mka"))
     {
         demuxer = new MatroskaDemuxer(readManager);
         containerType = AbstractStreamReader::ctMKV;
     }
-    else if (strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") || strEndWith(tmpname, ".m4a") ||
-             strEndWith(tmpname, ".mov"))
+    else if (strEndWith(fileExt, "mp4") || strEndWith(fileExt, "m4v") || strEndWith(fileExt, "m4a") ||
+             strEndWith(fileExt, "mov"))
     {
         demuxer = new MovDemuxer(readManager);
         containerType = AbstractStreamReader::ctMOV;
@@ -679,12 +680,12 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             return DetectStreamRez();
         uint8_t* tmpBuffer = new uint8_t[DETECT_STREAM_BUFFER_SIZE];
         int len = file.read(tmpBuffer, DETECT_STREAM_BUFFER_SIZE);
-        if (strEndWith(tmpname, ".sup") || strEndWith(tmpname, ".sup\""))
+        if (strEndWith(fileExt, "sup") || strEndWith(fileExt, "sup\""))
             containerType = AbstractStreamReader::ctSUP;
-        else if (strEndWith(tmpname, ".pcm") || strEndWith(tmpname, ".lpcm") || strEndWith(tmpname, ".wav") ||
-                 strEndWith(tmpname, ".w64"))
+        else if (strEndWith(fileExt, "pcm") || strEndWith(fileExt, "lpcm") || strEndWith(fileExt, "wav") ||
+                 strEndWith(fileExt, "w64"))
             containerType = AbstractStreamReader::ctLPCM;
-        else if (strEndWith(tmpname, ".srt") || strEndWith(tmpname, ".srt\""))
+        else if (strEndWith(fileExt, "srt") || strEndWith(fileExt, "srt\""))
             containerType = AbstractStreamReader::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
