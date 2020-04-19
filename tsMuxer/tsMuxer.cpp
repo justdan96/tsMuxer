@@ -1374,11 +1374,10 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             continue;
         if (paramPair[0] == "--pcr-on-video-pid")
             setPCROnVideoPID(true);
-        else if (paramPair[0] == "--hdmv-descriptors")
-        {
+        else if (paramPair[0] == "--new-audio-pes")
             setNewStyleAudioPES(true);
+        else if (paramPair[0] == "--hdmv-descriptors")
             m_hdmvDescriptors = true;
-        }
         else if (paramPair[0] == "--bitrate" && paramPair.size() > 1)
         {
             setMaxBitrate(strToDouble(paramPair[1].c_str()) * 1000.0);

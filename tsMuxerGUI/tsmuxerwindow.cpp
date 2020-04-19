@@ -1552,7 +1552,7 @@ QString TsMuxerWindow::getMuxOpts()
 {
     QString rez = "MUXOPT --no-pcr-on-video-pid ";
     if (ui->checkBoxNewAudioPes->isChecked())
-        rez += "--hdmv-descriptors ";
+        rez += "--new-audio-pes --hdmv-descriptors ";
     if (ui->radioButtonBluRay->isChecked())
         rez += (ui->checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
     else if (ui->radioButtonBluRayISO->isChecked())
