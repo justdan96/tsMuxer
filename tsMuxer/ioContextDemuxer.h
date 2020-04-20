@@ -106,7 +106,7 @@ class IOContextDemuxer : public AbstractDemuxer
     uint64_t m_processedBytes;
     uint64_t m_lastProcessedBytes;
 
-    void skip_bytes(int size);
+    void skip_bytes(uint64_t size);
     uint32_t get_buffer(uint8_t* binary, int size);
     bool url_fseek(int64_t offset);
     uint64_t get_be64();
