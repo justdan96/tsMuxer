@@ -15,6 +15,7 @@
 #include "math.h"
 #include "mpegStreamReader.h"
 #include "simplePacketizerReader.h"
+#include "tsMuxer.h"
 #include "vodCoreException.h"
 
 using namespace std;
@@ -49,10 +50,10 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, int buf_size)
     bitReader.setBuffer(buffer, buffer + buf_size);
     if (bitReader.getBits(2) != 1)
         return false;  // 0b01 required
-    m_pts = bitReader.getBits(3) << 30;
+    m_pts = (bitReader.getBits(3) << 30);
     if (bitReader.getBit() != 1)
         return false;
-    m_pts += bitReader.getBits(15) << 15;
+    m_pts += (bitReader.getBits(15) << 15);
     if (bitReader.getBit() != 1)
         return false;
     m_pts += bitReader.getBits(15);
@@ -318,6 +319,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
             case STREAM_TYPE_AUDIO_AAC:
             case STREAM_TYPE_AUDIO_AC3:
             case STREAM_TYPE_AUDIO_EAC3:
+            case STREAM_TYPE_AUDIO_EAC3_ATSC:
             case STREAM_TYPE_AUDIO_DTS:
                 audio_pid = elementary_pid;
                 audio_type = stream_type;
@@ -372,33 +374,19 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, int es_info_len
     }
 }
 
-uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool addLang)
+uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool blurayMode, bool hdmvDescriptors)
 {
     buffer[0] = 0;
     buffer++;
-    // PutBitContext pBitContext;
-    // init_bitWriter.putBits( buffer, max_buf_size*8);
     BitStreamWriter bitWriter;
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
-
-    // bitWriter.putBits( 8, 0);
     bitWriter.putBits(8, 2);  // table id
-    bitWriter.putBits(2, 2);  // indicator
-    bitWriter.putBits(2, 3);  // reserved
 
-    int program_info_len = 12;
-    if (casPID)
-        program_info_len += 6;
-
-    int sectionLen =
-        9 + (video_pid ? 5 : 0) + (audio_pid ? 5 : 0) + (sub_pid ? 5 : 0) + (pidList.size() * 5) + 4 + program_info_len;
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
-    {
-        sectionLen += itr->second.m_esInfoLen;
-        if (*itr->second.m_lang && addLang)
-            sectionLen += 6;  // lang descriptor len
-    }
-    bitWriter.putBits(12, sectionLen);  // reserved
+    uint16_t* LengthPos1 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    bitWriter.putBits(2, 2);   // indicator
+    bitWriter.putBits(2, 3);   // reserved
+    bitWriter.putBits(12, 0);  // skip lengthField
+    int beforeCount1 = bitWriter.getBitsCount() / 8;
 
     bitWriter.putBits(16, program_number);
     bitWriter.putBits(2, 3);         // reserved
@@ -407,27 +395,24 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(16, 0);        // section_number and last_section_number
     bitWriter.putBits(3, 7);         // reserved
     bitWriter.putBits(13, pcr_pid);  // reserved
-    bitWriter.putBits(4, 15);        // reserved
 
-    bitWriter.putBits(12, program_info_len);  // program info len
-    // 88 04 0f ff 84 fc 05 04 48 44 4d 56
+    uint16_t* LengthPos2 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    bitWriter.putBits(4, 15);  // reserved
+    bitWriter.putBits(12, 0);  // program info len
+    int beforeCount2 = bitWriter.getBitsCount() / 8;
 
-    // put 'HDMV' registration descriptor
-    bitWriter.putBits(8, 0x05);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(8, 0x48);
-    bitWriter.putBits(8, 0x44);
-    bitWriter.putBits(8, 0x4d);
-    bitWriter.putBits(8, 0x56);
+    if (hdmvDescriptors)
+    {
+        // put 'HDMV' registration descriptor
+        bitWriter.putBits(8, 0x05);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(32, 0x48444d56);
 
-    // put DTCP descriptor
-    bitWriter.putBits(8, 0x88);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(8, 0x0f);
-    bitWriter.putBits(8, 0xff);
-    bitWriter.putBits(
-        8, 0xfc);  // scenarist: 0xfc, prev example: 0x84          here               1 0 000 1 00 1 1 111 1 00
-    bitWriter.putBits(8, 0xfc);
+        // put DTCP descriptor
+        bitWriter.putBits(8, 0x88);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(32, 0x0ffffcfc);
+    }
 
     if (casPID)
     {
@@ -437,6 +422,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(16, casID);
         bitWriter.putBits(16, casPID);
     }
+    *LengthPos2 = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount2);
 
     if (video_pid)
     {
@@ -468,22 +454,31 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
+        if (itr->second.m_streamType == 0x90 && !hdmvDescriptors)
+            LTRACE(LT_WARN, 2, "Warning: PGS might not work without HDMV descriptors.");
+
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
-        bitWriter.putBits(4, 15);                                                                   // reserved
-        bitWriter.putBits(12, itr->second.m_esInfoLen + (*itr->second.m_lang && addLang ? 6 : 0));  // es_info_len
+
+        uint16_t* esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+        bitWriter.putBits(4, 15);  // reserved
+        bitWriter.putBits(12, 0);  // es_info_len
+        int beforeCount = bitWriter.getBitsCount() / 8;
+
         for (int j = 0; j < itr->second.m_esInfoLen; j++)
             bitWriter.putBits(8, itr->second.m_esInfoData[j]);  // es_info_len
-        if (*itr->second.m_lang && addLang)
+
+        if (*itr->second.m_lang && !blurayMode)
         {
             bitWriter.putBits(8, TS_LANG_DESCRIPTOR_TAG);                             // lang descriptor ID
             bitWriter.putBits(8, 4);                                                  // lang descriptor len
             for (int k = 0; k < 3; k++) bitWriter.putBits(8, itr->second.m_lang[k]);  // lang code[i]
             bitWriter.putBits(8, 0);
         }
+        *esInfoLen = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount);
     }
-
+    *LengthPos1 = my_htons(0xb000 + bitWriter.getBitsCount() / 8 - beforeCount1 + 4);
     bitWriter.flushBits();
 
     // uint32_t crc = av_crc(tmpAvCrc, 0xffffffff, buffer, bitWriter.getBitsCount()/8);
@@ -492,9 +487,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     uint32_t* crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
     *crcPtr = my_htonl(crc);
 
-    // bitWriter.putBits( 32, my_htonl(crc));
-    // flush_put_bits(&pBitContext);
-    // return put_bits_count(&pBitContext)/8 + 1;
     return bitWriter.getBitsCount() / 8 + 5;
 }
 
@@ -987,7 +979,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
             int endCode = 0;
             if (indexData.m_frameLen > 0)
             {
-                if (V3_flags)
+                if (is4K())
                 {
                     if (indexData.m_frameLen < 786432)
                         endCode = 1;
@@ -1503,7 +1495,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
     std::string type_indicator = "MPLS";
     std::string version_number;
     if (dt == DT_BLURAY)
-        version_number = (V3_flags ? "0300" : "0200");
+        version_number = (isV3() ? "0300" : "0200");
     else
         version_number = "0100";
     CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
@@ -1526,7 +1518,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
     while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
 
-    if (number_of_SubPaths > 0 || isDependStreamExist || V3_flags)
+    if (number_of_SubPaths > 0 || isDependStreamExist || isV3())
     {
         *extDataStartAddr = my_htonl(writer.getBitsCount() / 8);
         uint8_t buffer[1024 * 4];
@@ -1552,8 +1544,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
             blockVector.push_back(extDataBlock2);
         }
 
-        if (V3_flags)
-        {  // V3
+        if (isV3())
+        {
             int bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
             ExtDataBlockInfo extDataBlock(buffer, bufferSize, 3, 5);
             blockVector.push_back(extDataBlock);
@@ -1604,12 +1596,12 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
     {
         writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
     }
-    writer.putBits(28, 0);                   // UO_mask_table;
-    writer.putBits(4, (V3_flags ? 15 : 0));  // UO_mask_table;
-    writer.putBit(0);                        // reserved
-    writer.putBit(V3_flags ? 1 : 0);         // UO_mask_table: SecondaryPGStreamNumberChange
-    writer.putBits(30, 0);                   // UO_mask_table cont;
-    writer.putBit(0);                        // PlayList_random_access_flag
+    writer.putBits(28, 0);               // UO_mask_table;
+    writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
+    writer.putBit(0);                    // reserved
+    writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
+    writer.putBits(30, 0);               // UO_mask_table cont;
+    writer.putBit(0);                    // PlayList_random_access_flag
     writer.putBit(1);  // audio_mix_app_flag. 0 == no secondary audio, 1- allow secondary audio if exist
     writer.putBit(0);  // lossless_may_bypass_mixer_flag
     writer.putBit(mvc_base_view_r);
@@ -1658,12 +1650,9 @@ void MPLSParser::UO_mask_table(BitStreamReader& reader)
 
 void MPLSParser::parsePlayList(uint8_t* buffer, int len)
 {
-    // NOTE: see https://github.com/lerks/BluRay/wiki/MPLS
     BitStreamReader reader;
     reader.setBuffer(buffer, buffer + len);
     uint32_t length = reader.getBits(32);
-    int startBits = reader.getBitsLeft();
-
     reader.skipBits(16);                           // reserved_for_future_use 16 bslbf
     int number_of_PlayItems = reader.getBits(16);  // 16 uimsbf
     number_of_SubPaths = reader.getBits(16);       // 16 uimsbf
@@ -1674,13 +1663,6 @@ void MPLSParser::parsePlayList(uint8_t* buffer, int len)
     for (int SubPath_id = 0; SubPath_id < number_of_SubPaths; SubPath_id++)
     {
         // SubPath(); // not implemented now
-    }
-
-    int endBits = reader.getBitsLeft();
-    int toPassBits = length * 8 - (startBits - endBits);
-    if (toPassBits > 0)
-    {
-        reader.skipBits(toPassBits);
     }
 }
 
@@ -2173,11 +2155,8 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
 
 void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
 {
-    // NOTE: see https://github.com/lerks/BluRay/wiki/PlayItem
     MPLSPlayItem newItem;
     int length = reader.getBits(16);
-    int startBits = reader.getBitsLeft();
-
     char clip_Information_file_name[6];
     char clip_codec_identifier[5];
     CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
@@ -2219,13 +2198,6 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
         }
     }
     STN_table(reader, PlayItem_id);
-
-    int endBits = reader.getBitsLeft();
-    int toPassBits = length * 8 - (startBits - endBits);
-    if (toPassBits > 0)
-    {
-        reader.skipBits(toPassBits);
-    }
 }
 
 void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::vector<PMTIndex>& pmtIndexList)
@@ -2259,11 +2231,11 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
     else
         writer.putBits(32, OUT_time);  // 32 uimsbf
 
-    writer.putBits(28, 0);                 // UO_mask_table;
-    writer.putBits(4, V3_flags ? 15 : 0);  // UO_mask_table;
-    writer.putBit(0);                      // reserved
-    writer.putBit(V3_flags ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
-    writer.putBits(30, 0);                 // UO_mask_table cont;
+    writer.putBits(28, 0);               // UO_mask_table;
+    writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
+    writer.putBit(0);                    // reserved
+    writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
+    writer.putBits(30, 0);               // UO_mask_table cont;
 
     writer.putBit(PlayItem_random_access_flag);  // 1 bslbf
     writer.putBits(7, 0);                        // reserved_for_future_use 7 bslbf
@@ -2541,10 +2513,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
 void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 {
-    // NOTE: see https://github.com/lerks/BluRay/wiki/STNTable
-    int length = reader.getBits(16);  // 16 uimsbf
-    int startBits = reader.getBitsLeft();
-
+    int length = reader.getBits(16);                                  // 16 uimsbf
     reader.skipBits(16);                                              // reserved_for_future_use 16 bslbf
     number_of_primary_video_stream_entries = reader.getBits(8);       // 8 uimsbf
     number_of_primary_audio_stream_entries = reader.getBits(8);       // 8 uimsbf
@@ -2662,13 +2631,6 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         if (PlayItem_id == 0)
             m_streamInfo.push_back(streamInfo);
     }
-
-    int endBits = reader.getBitsLeft();
-    int toPassBits = length * 8 - (startBits - endBits);
-    if (toPassBits > 0)
-    {
-        reader.skipBits(toPassBits);
-    }
 }
 
 // ------------- M2TSStreamInfo -----------------------
@@ -2689,16 +2651,16 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
     else if (width >= 2600)
     {
         *video_format = 8;
-        V3_flags |= 0x20;  // 4K flag
+        V3_flags |= FOUR_K;
     }
     else if (width >= 1300)
         *video_format = interlaced ? 4 : 6;  // as 1920x1080
     else
         *video_format = 5;  // as 1280x720
 
-    if (width < 1080 && V3_flags)
+    if (width < 1080 && isV3())
         LTRACE(LT_WARN, 2, "Warning: video height < 1080 is not standard for V3 Blu-ray.");
-    if (interlaced && V3_flags)
+    if (interlaced && isV3())
         LTRACE(LT_WARN, 2, "Warning: interlaced video is not standard for V3 Blu-ray.");
 
     if (fabs(fps - 23.976) < 1e-4)
@@ -2853,11 +2815,8 @@ MPLSStreamInfo::~MPLSStreamInfo()
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 {
-    // NOTE: see https://github.com/lerks/BluRay/wiki/StreamEntry
     int length = reader.getBits(8);  // 8 uimsbf
-    int startBits = reader.getBitsLeft();
-
-    type = reader.getBits(8);  // 8 bslbf
+    type = reader.getBits(8);        // 8 bslbf
     if (type == 1)
     {
         streamPID = reader.getBits(16);  // 16 uimsbf
@@ -2884,12 +2843,6 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
         streamPID = reader.getBits(16);  // 16 uimsbf
         reader.skipBits(32);             // reserved_for_future_use 40 bslbf
         reader.skipBits(8);
-    }
-    int endBits = reader.getBitsLeft();
-    int toPassBits = length * 8 - (startBits - endBits);
-    if (toPassBits > 0)
-    {
-        reader.skipBits(toPassBits);
     }
 }
 
@@ -2950,10 +2903,7 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 {
-    // NOTE: see https://github.com/lerks/BluRay/wiki/StreamAttributes
-    int length = reader.getBits(8);  // 8 uimsbf
-    int startBits = reader.getBitsLeft();
-
+    int length = reader.getBits(8);          // 8 uimsbf
     stream_coding_type = reader.getBits(8);  // 8 bslbf
     if (isVideoStreamType(stream_coding_type))
     {
@@ -2984,13 +2934,6 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
         // Text subtitle stream
         character_code = reader.getBits(8);  // 8 bslbf
         CLPIStreamInfo::readString(language_code, reader, 3);
-    }
-
-    int endBits = reader.getBitsLeft();
-    int toPassBits = length * 8 - (startBits - endBits);
-    if (toPassBits > 0)
-    {
-        reader.skipBits(toPassBits);
     }
 }
 
@@ -3032,164 +2975,4 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
     else
         THROW(ERR_COMMON, "Unsupported media type for AVCHD/Blu-ray muxing");
     *lengthPos = writer.getBitsCount() / 8 - initPos;
-}
-
-bool MovieObject::parse(const char* fileName)
-{
-    File file;
-    if (!file.open(fileName, File::ofRead))
-        return false;
-    uint64_t fileSize;
-    if (!file.size(&fileSize))
-        return false;
-    uint8_t* buffer = new uint8_t[fileSize];
-    if (!file.read(buffer, fileSize))
-    {
-        delete[] buffer;
-        return false;
-    }
-    try
-    {
-        parse(buffer, fileSize);
-        delete[] buffer;
-        return true;
-    }
-    catch (...)
-    {
-        delete[] buffer;
-        return false;
-    }
-}
-
-void MovieObject::parse(uint8_t* buffer, int len)
-{
-    BitStreamReader reader;
-    reader.setBuffer(buffer, buffer + len);
-    char type_indicator[5];
-    char version_number[5];
-    CLPIStreamInfo::readString(type_indicator, reader, 4);
-    CLPIStreamInfo::readString(version_number, reader, 4);
-    uint32_t ExtensionData_start_address = reader.getBits(32);  // 32 uimsbf
-    for (int i = 0; i < 7; i++) reader.skipBits(32);            // reserved_for_future_use 224 bslbf
-    parseMovieObjects(reader);
-    // for (int i=0; i<N1; i++) padding_word 16 bslbf
-    // parseExtensionData(buffer + ExtensionData_start_address, buffer+len);
-    // for (i=0; i<N2; i++) padding_word 16 bslbf
-}
-
-// Nota: not used, MovieObject.bdmv is actually composed by BlurayHelper::writeBluRayFiles
-int MovieObject::compose(uint8_t* buffer, int len, DiskType dt)
-{
-    BitStreamWriter writer;
-    writer.setBuffer(buffer, buffer + len);
-    char type_indicator[5];
-    CLPIStreamInfo::writeString("MOBJ", writer, 4);
-    if (dt == DT_BLURAY)
-        CLPIStreamInfo::writeString(V3_flags ? "0300" : "0200", writer, 4);
-    else
-        CLPIStreamInfo::writeString("0100", writer, 4);
-    writer.putBits(32, 0);                              // uint32_t ExtensionData_start_address
-    for (int i = 0; i < 7; i++) writer.putBits(32, 0);  // reserved_for_future_use 224 bslbf
-    // composeMovieObjects
-    uint32_t* moLen = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
-    writer.putBits(32, 0);  // skip length field
-    int beforeCount = writer.getBitsCount() / 8;
-    writer.putBits(32, 0);  // reserved
-    writer.putBits(16, 1);  // number of movie objects
-    // compose commands
-    writer.putBit(1);       // resume_intention_flag
-    writer.putBit(1);       // menu_call_mask
-    writer.putBit(1);       // title_search_mask
-    writer.putBits(13, 0);  // reserved
-
-    writer.putBits(16, 1);  // number_of_navigation_commands
-
-    writer.putBits(32, 0x22800000);  // navigation command: play playlist
-    writer.putBits(32, 0);           // play list number 0
-    writer.putBits(32, 0);           // second argument is not used
-
-    *moLen = my_htonl(writer.getBitsCount() / 8 - beforeCount);
-    writer.flushBits();
-    return writer.getBitsCount() / 8;
-}
-
-void MovieObject::parseMovieObjects(BitStreamReader& reader)
-{
-    uint32_t length = reader.getBits(32);           // 32 uimsbf
-    reader.skipBits(32);                            // reserved_for_future_use 32 bslbf
-    uint16_t number_of_mobjs = reader.getBits(16);  // 16 uimsbf
-    for (int mobj_id = 0; mobj_id < number_of_mobjs; mobj_id++)
-    {
-        bool resume_intention_flag = reader.getBit();  // 1 bslbf
-        bool menu_call_mask = reader.getBit();         // 1 bslbf
-        bool title_search_mask = reader.getBit();      // 1 bslbf
-        reader.skipBits(13);                           // reserved_for_word_align 13 bslbf
-
-        int number_of_navigation_commands = reader.getBits(16);  //[mobj_id] 16 uimsbf
-        for (int command_id = 0; command_id < number_of_navigation_commands; command_id++)
-        {
-            parseNavigationCommand(reader);  // navigation_command[mobj_id][command_id] 96 bslbf
-        }
-    }
-}
-
-void MovieObject::parseNavigationCommand(BitStreamReader& reader)
-{
-    // operation code 32 bits
-    /*
-    int Operand_Count = reader.getBits(3);
-    int command_group = reader.getBits(2); // 0x2 = set
-    int command_subGroup = reader.getBits(3); // 0x00 for set = set
-    bool iFlag1 = reader.getBit();
-    bool iFlag2 = reader.getBit(); // both false
-    reader.skipBits(2); // reserved
-    int Branch_Option = reader.getBits(4);
-    reader.skipBits(4); // reserved
-    int Compare_Option = reader.getBits(4);
-    reader.skipBits(3); // reserved
-    int set_options = reader.getBits(5);
-    */
-
-    uint32_t command = reader.getBits(32);
-    switch (command)
-    {
-    case 0x20010000:
-        LTRACE(LT_DEBUG, 0, "BDMO command: Goto (register arg)");
-        break;
-    case 0x20810000:
-        LTRACE(LT_DEBUG, 0, "BDMO command: Goto (const arg)");
-        break;
-    }
-
-    // operand destination 32 bits
-    // next syntax only if iFlag for operand == 0
-    bool iFlag1 = false;
-    bool iFlag2 = false;
-    if (iFlag1 == 0)
-    {
-        bool reg_flag1 = reader.getBit();  // 0: General Purpose Register, 1: Player Status Registers
-        reader.skipBits(19);
-        int regigsterNumber1 = reader.getBits(12);
-        regigsterNumber1 = regigsterNumber1;
-    }
-    else
-    {
-        int immediateValue = reader.getBits(32);
-        immediateValue = immediateValue;
-    }
-
-    // operand source 32 bits
-    // next syntax only if iFlag for operand == 0
-    if (iFlag2 == 0)
-    {
-        bool reg_flag1 = reader.getBit();  // 0: General Purpose Register, 1: Player Status Registers
-        reader.skipBits(19);
-        int regigsterNumber1 = reader.getBits(12);
-        regigsterNumber1 = regigsterNumber1;
-    }
-    else
-    {
-        int immediateValue = reader.getBits(32);
-        immediateValue = immediateValue;
-    }
 }

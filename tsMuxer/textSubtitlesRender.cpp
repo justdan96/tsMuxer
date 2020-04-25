@@ -1,8 +1,8 @@
 #include "textSubtitlesRender.h"
 
-#include <assert.h>
-
+#include <cassert>
 #include <string>
+#include <unordered_map>
 
 #include "math.h"
 #include "memory.h"
@@ -13,193 +13,157 @@
 
 using namespace std;
 
-namespace text_subtitles
+namespace
 {
-const static pair<const wchar_t*, uint32_t> defaultPallette[] = {make_pair(L"black", 0x000000),
-                                                                 make_pair(L"aqua", 0x00ffff),
-                                                                 make_pair(L"red", 0xff0000),
-                                                                 make_pair(L"green", 0x008000),
-                                                                 make_pair(L"blue", 0x0000ff),
-                                                                 make_pair(L"fuchsia", 0xff00ff),
-                                                                 make_pair(L"gray", 0x808080),
-                                                                 make_pair(L"lime", 0x00ff00),
-                                                                 make_pair(L"maroon", 0x800000),
-                                                                 make_pair(L"navy", 0x000080),
-                                                                 make_pair(L"olive", 0x808000),
-                                                                 make_pair(L"purple", 0x800080),
-                                                                 make_pair(L"silver", 0xc0c0c0),
-                                                                 make_pair(L"teal", 0x008080),
-                                                                 make_pair(L"white", 0xffffff),
-                                                                 make_pair(L"yellow", 0xffff00),
-                                                                 make_pair(L"orange", 0xffa500),
-                                                                 make_pair(L"violet", 0xEE82EE),
+const std::unordered_map<std::string, uint32_t> defaultPallette = {make_pair("black", 0x000000),
+                                                                   make_pair("aqua", 0x00ffff),
+                                                                   make_pair("red", 0xff0000),
+                                                                   make_pair("green", 0x008000),
+                                                                   make_pair("blue", 0x0000ff),
+                                                                   make_pair("fuchsia", 0xff00ff),
+                                                                   make_pair("gray", 0x808080),
+                                                                   make_pair("lime", 0x00ff00),
+                                                                   make_pair("maroon", 0x800000),
+                                                                   make_pair("navy", 0x000080),
+                                                                   make_pair("olive", 0x808000),
+                                                                   make_pair("purple", 0x800080),
+                                                                   make_pair("silver", 0xc0c0c0),
+                                                                   make_pair("tea", 0x008080),
+                                                                   make_pair("white", 0xffffff),
+                                                                   make_pair("yellow", 0xffff00),
+                                                                   make_pair("orange", 0xffa500),
+                                                                   make_pair("violet", 0xEE82EE),
 
-                                                                 make_pair(L"aliceblue", 0xf0f8ff),
-                                                                 make_pair(L"antiquewhite", 0xfaebd7),
-                                                                 make_pair(L"aquamarine", 0x7fffd4),
-                                                                 make_pair(L"azure", 0xf0ffff),
-                                                                 make_pair(L"beige", 0xf5f5dc),
-                                                                 make_pair(L"bisque", 0xffe4c4),
-                                                                 make_pair(L"blanchedalmond", 0xffebcd),
-                                                                 make_pair(L"blueviolet", 0x8a2be2),
-                                                                 make_pair(L"brown", 0xa52a2a),
-                                                                 make_pair(L"burlywood", 0xdeb887),
-                                                                 make_pair(L"cadetblue", 0x5f9ea0),
-                                                                 make_pair(L"chartreuse", 0x7fff00),
-                                                                 make_pair(L"chocolate", 0xd2691e),
-                                                                 make_pair(L"coral", 0xff7f50),
-                                                                 make_pair(L"cornflowerblue", 0x6495ed),
-                                                                 make_pair(L"cornsilk", 0xfff8dc),
-                                                                 make_pair(L"crimson", 0xdc143c),
-                                                                 make_pair(L"darkblue", 0x00008b),
-                                                                 make_pair(L"darkcyan", 0x008b8b),
-                                                                 make_pair(L"darkgoldenrod", 0xb8860b),
-                                                                 make_pair(L"darkgray", 0xa9a9a9),
-                                                                 make_pair(L"darkgreen", 0x006400),
-                                                                 make_pair(L"darkkhaki", 0xbdb76b),
-                                                                 make_pair(L"darkmagenta", 0x8b008b),
-                                                                 make_pair(L"darkolivegreen", 0x556b2f),
-                                                                 make_pair(L"darkorange", 0xff8c00),
-                                                                 make_pair(L"darkorchid", 0x9932cc),
-                                                                 make_pair(L"darkred", 0x8b0000),
-                                                                 make_pair(L"darksalmon", 0xe9967a),
-                                                                 make_pair(L"darkseagreen", 0x8fbc8f),
-                                                                 make_pair(L"darkslateblue", 0x483d8b),
-                                                                 make_pair(L"darkslategray", 0x2f4f4f),
-                                                                 make_pair(L"darkturquoise", 0x00ced1),
-                                                                 make_pair(L"darkviolet", 0x9400d3),
-                                                                 make_pair(L"deeppink", 0xff1493),
-                                                                 make_pair(L"deepskyblue", 0x00bfff),
-                                                                 make_pair(L"dimgray", 0x696969),
-                                                                 make_pair(L"dodgerblue", 0x1e90ff),
-                                                                 make_pair(L"firebrick", 0xb22222),
-                                                                 make_pair(L"floralwhite", 0xfffaf0),
-                                                                 make_pair(L"forestgreen", 0x228b22),
-                                                                 make_pair(L"gainsboro", 0xdcdcdc),
-                                                                 make_pair(L"ghostwhite", 0xf8f8ff),
-                                                                 make_pair(L"gold", 0xffd700),
-                                                                 make_pair(L"goldenrod", 0xdaa520),
-                                                                 make_pair(L"greenyellow", 0xadff2f),
-                                                                 make_pair(L"honeydew", 0xf0fff0),
-                                                                 make_pair(L"hotpink", 0xff69b4),
-                                                                 make_pair(L"indianred", 0xcd5c5c),
-                                                                 make_pair(L"indigo", 0x4b0082),
-                                                                 make_pair(L"ivory", 0xfffff0),
-                                                                 make_pair(L"khaki", 0xf0e68c),
-                                                                 make_pair(L"lavender", 0xe6e6fa),
-                                                                 make_pair(L"lavenderblush", 0xfff0f5),
-                                                                 make_pair(L"lawngreen", 0x7cfc00),
-                                                                 make_pair(L"lemonchiffon", 0xfffacd),
-                                                                 make_pair(L"lightblue", 0xadd8e6),
-                                                                 make_pair(L"lightcoral", 0xf08080),
-                                                                 make_pair(L"lightcyan", 0xe0ffff),
-                                                                 make_pair(L"lightgoldenrodyellow", 0xfafad2),
-                                                                 make_pair(L"lightgreen", 0x90ee90),
-                                                                 make_pair(L"lightgrey", 0xd3d3d3),
-                                                                 make_pair(L"lightpink", 0xffb6c1),
-                                                                 make_pair(L"lightsalmon", 0xffa07a),
-                                                                 make_pair(L"lightseagreen", 0x20b2aa),
-                                                                 make_pair(L"lightskyblue", 0x87cefa),
-                                                                 make_pair(L"lightslategray", 0x778899),
-                                                                 make_pair(L"lightsteelblue", 0xb0c4de),
-                                                                 make_pair(L"lightyellow", 0xffffe0),
-                                                                 make_pair(L"limegreen", 0x32cd32),
-                                                                 make_pair(L"linen", 0xfaf0e6),
-                                                                 make_pair(L"magenta", 0xff00ff),
-                                                                 make_pair(L"mediumauqamarine", 0x66cdaa),
-                                                                 make_pair(L"mediumblue", 0x0000cd),
-                                                                 make_pair(L"mediumorchid", 0xba55d3),
-                                                                 make_pair(L"mediumpurple", 0x9370d8),
-                                                                 make_pair(L"mediumseagreen", 0x3cb371),
-                                                                 make_pair(L"mediumslateblue", 0x7b68ee),
-                                                                 make_pair(L"mediumspringgreen", 0x00fa9a),
-                                                                 make_pair(L"mediumturquoise", 0x48d1cc),
-                                                                 make_pair(L"mediumvioletred", 0xc71585),
-                                                                 make_pair(L"midnightblue", 0x191970),
-                                                                 make_pair(L"mintcream", 0xf5fffa),
-                                                                 make_pair(L"mistyrose", 0xffe4e1),
-                                                                 make_pair(L"moccasin", 0xffe4b5),
-                                                                 make_pair(L"navajowhite", 0xffdead),
-                                                                 make_pair(L"oldlace", 0xfdf5e6),
-                                                                 make_pair(L"olivedrab", 0x688e23),
-                                                                 make_pair(L"orangered", 0xff4500),
-                                                                 make_pair(L"orchid", 0xda70d6),
-                                                                 make_pair(L"palegoldenrod", 0xeee8aa),
-                                                                 make_pair(L"palegreen", 0x98fb98),
-                                                                 make_pair(L"paleturquoise", 0xafeeee),
-                                                                 make_pair(L"palevioletred", 0xd87093),
-                                                                 make_pair(L"papayawhip", 0xffefd5),
-                                                                 make_pair(L"peachpuff", 0xffdab9),
-                                                                 make_pair(L"peru", 0xcd853f),
-                                                                 make_pair(L"pink", 0xffc0cb),
-                                                                 make_pair(L"plum", 0xdda0dd),
-                                                                 make_pair(L"powderblue", 0xb0e0e6),
-                                                                 make_pair(L"rosybrown", 0xbc8f8f),
-                                                                 make_pair(L"royalblue", 0x4169e1),
-                                                                 make_pair(L"saddlebrown", 0x8b4513),
-                                                                 make_pair(L"salmon", 0xfa8072),
-                                                                 make_pair(L"sandybrown", 0xf4a460),
-                                                                 make_pair(L"seagreen", 0x2e8b57),
-                                                                 make_pair(L"seashell", 0xfff5ee),
-                                                                 make_pair(L"sienna", 0xa0522d),
-                                                                 make_pair(L"skyblue", 0x87ceeb),
-                                                                 make_pair(L"slateblue", 0x6a5acd),
-                                                                 make_pair(L"slategray", 0x708090),
-                                                                 make_pair(L"snow", 0xfffafa),
-                                                                 make_pair(L"springgreen", 0x00ff7f),
-                                                                 make_pair(L"steelblue", 0x4682b4),
-                                                                 make_pair(L"tan", 0xd2b48c),
-                                                                 make_pair(L"thistle", 0xd8bfd8),
-                                                                 make_pair(L"tomato", 0xff6347),
-                                                                 make_pair(L"turquoise", 0x40e0d0),
-                                                                 make_pair(L"wheat", 0xf5deb3),
-                                                                 make_pair(L"whitesmoke", 0xf5f5f5),
-                                                                 make_pair(L"yellowgreen", 0x9acd32)};
+                                                                   make_pair("aliceblue", 0xf0f8ff),
+                                                                   make_pair("antiquewhite", 0xfaebd7),
+                                                                   make_pair("aquamarine", 0x7fffd4),
+                                                                   make_pair("azure", 0xf0ffff),
+                                                                   make_pair("beige", 0xf5f5dc),
+                                                                   make_pair("bisque", 0xffe4c4),
+                                                                   make_pair("blanchedalmond", 0xffebcd),
+                                                                   make_pair("blueviolet", 0x8a2be2),
+                                                                   make_pair("brown", 0xa52a2a),
+                                                                   make_pair("burlywood", 0xdeb887),
+                                                                   make_pair("cadetblue", 0x5f9ea0),
+                                                                   make_pair("chartreuse", 0x7fff00),
+                                                                   make_pair("chocolate", 0xd2691e),
+                                                                   make_pair("cora", 0xff7f50),
+                                                                   make_pair("cornflowerblue", 0x6495ed),
+                                                                   make_pair("cornsilk", 0xfff8dc),
+                                                                   make_pair("crimson", 0xdc143c),
+                                                                   make_pair("darkblue", 0x00008b),
+                                                                   make_pair("darkcyan", 0x008b8b),
+                                                                   make_pair("darkgoldenrod", 0xb8860b),
+                                                                   make_pair("darkgray", 0xa9a9a9),
+                                                                   make_pair("darkgreen", 0x006400),
+                                                                   make_pair("darkkhaki", 0xbdb76b),
+                                                                   make_pair("darkmagenta", 0x8b008b),
+                                                                   make_pair("darkolivegreen", 0x556b2f),
+                                                                   make_pair("darkorange", 0xff8c00),
+                                                                   make_pair("darkorchid", 0x9932cc),
+                                                                   make_pair("darkred", 0x8b0000),
+                                                                   make_pair("darksalmon", 0xe9967a),
+                                                                   make_pair("darkseagreen", 0x8fbc8f),
+                                                                   make_pair("darkslateblue", 0x483d8b),
+                                                                   make_pair("darkslategray", 0x2f4f4f),
+                                                                   make_pair("darkturquoise", 0x00ced1),
+                                                                   make_pair("darkviolet", 0x9400d3),
+                                                                   make_pair("deeppink", 0xff1493),
+                                                                   make_pair("deepskyblue", 0x00bfff),
+                                                                   make_pair("dimgray", 0x696969),
+                                                                   make_pair("dodgerblue", 0x1e90ff),
+                                                                   make_pair("firebrick", 0xb22222),
+                                                                   make_pair("floralwhite", 0xfffaf0),
+                                                                   make_pair("forestgreen", 0x228b22),
+                                                                   make_pair("gainsboro", 0xdcdcdc),
+                                                                   make_pair("ghostwhite", 0xf8f8ff),
+                                                                   make_pair("gold", 0xffd700),
+                                                                   make_pair("goldenrod", 0xdaa520),
+                                                                   make_pair("greenyellow", 0xadff2f),
+                                                                   make_pair("honeydew", 0xf0fff0),
+                                                                   make_pair("hotpink", 0xff69b4),
+                                                                   make_pair("indianred", 0xcd5c5c),
+                                                                   make_pair("indigo", 0x4b0082),
+                                                                   make_pair("ivory", 0xfffff0),
+                                                                   make_pair("khaki", 0xf0e68c),
+                                                                   make_pair("lavender", 0xe6e6fa),
+                                                                   make_pair("lavenderblush", 0xfff0f5),
+                                                                   make_pair("lawngreen", 0x7cfc00),
+                                                                   make_pair("lemonchiffon", 0xfffacd),
+                                                                   make_pair("lightblue", 0xadd8e6),
+                                                                   make_pair("lightcora", 0xf08080),
+                                                                   make_pair("lightcyan", 0xe0ffff),
+                                                                   make_pair("lightgoldenrodyellow", 0xfafad2),
+                                                                   make_pair("lightgreen", 0x90ee90),
+                                                                   make_pair("lightgrey", 0xd3d3d3),
+                                                                   make_pair("lightpink", 0xffb6c1),
+                                                                   make_pair("lightsalmon", 0xffa07a),
+                                                                   make_pair("lightseagreen", 0x20b2aa),
+                                                                   make_pair("lightskyblue", 0x87cefa),
+                                                                   make_pair("lightslategray", 0x778899),
+                                                                   make_pair("lightsteelblue", 0xb0c4de),
+                                                                   make_pair("lightyellow", 0xffffe0),
+                                                                   make_pair("limegreen", 0x32cd32),
+                                                                   make_pair("linen", 0xfaf0e6),
+                                                                   make_pair("magenta", 0xff00ff),
+                                                                   make_pair("mediumauqamarine", 0x66cdaa),
+                                                                   make_pair("mediumblue", 0x0000cd),
+                                                                   make_pair("mediumorchid", 0xba55d3),
+                                                                   make_pair("mediumpurple", 0x9370d8),
+                                                                   make_pair("mediumseagreen", 0x3cb371),
+                                                                   make_pair("mediumslateblue", 0x7b68ee),
+                                                                   make_pair("mediumspringgreen", 0x00fa9a),
+                                                                   make_pair("mediumturquoise", 0x48d1cc),
+                                                                   make_pair("mediumvioletred", 0xc71585),
+                                                                   make_pair("midnightblue", 0x191970),
+                                                                   make_pair("mintcream", 0xf5fffa),
+                                                                   make_pair("mistyrose", 0xffe4e1),
+                                                                   make_pair("moccasin", 0xffe4b5),
+                                                                   make_pair("navajowhite", 0xffdead),
+                                                                   make_pair("oldlace", 0xfdf5e6),
+                                                                   make_pair("olivedrab", 0x688e23),
+                                                                   make_pair("orangered", 0xff4500),
+                                                                   make_pair("orchid", 0xda70d6),
+                                                                   make_pair("palegoldenrod", 0xeee8aa),
+                                                                   make_pair("palegreen", 0x98fb98),
+                                                                   make_pair("paleturquoise", 0xafeeee),
+                                                                   make_pair("palevioletred", 0xd87093),
+                                                                   make_pair("papayawhip", 0xffefd5),
+                                                                   make_pair("peachpuff", 0xffdab9),
+                                                                   make_pair("peru", 0xcd853f),
+                                                                   make_pair("pink", 0xffc0cb),
+                                                                   make_pair("plum", 0xdda0dd),
+                                                                   make_pair("powderblue", 0xb0e0e6),
+                                                                   make_pair("rosybrown", 0xbc8f8f),
+                                                                   make_pair("royalblue", 0x4169e1),
+                                                                   make_pair("saddlebrown", 0x8b4513),
+                                                                   make_pair("salmon", 0xfa8072),
+                                                                   make_pair("sandybrown", 0xf4a460),
+                                                                   make_pair("seagreen", 0x2e8b57),
+                                                                   make_pair("seashel", 0xfff5ee),
+                                                                   make_pair("sienna", 0xa0522d),
+                                                                   make_pair("skyblue", 0x87ceeb),
+                                                                   make_pair("slateblue", 0x6a5acd),
+                                                                   make_pair("slategray", 0x708090),
+                                                                   make_pair("snow", 0xfffafa),
+                                                                   make_pair("springgreen", 0x00ff7f),
+                                                                   make_pair("steelblue", 0x4682b4),
+                                                                   make_pair("tan", 0xd2b48c),
+                                                                   make_pair("thistle", 0xd8bfd8),
+                                                                   make_pair("tomato", 0xff6347),
+                                                                   make_pair("turquoise", 0x40e0d0),
+                                                                   make_pair("wheat", 0xf5deb3),
+                                                                   make_pair("whitesmoke", 0xf5f5f5),
+                                                                   make_pair("yellowgreen", 0x9acd32)};
 
-TextSubtitlesRender::TextSubtitlesRender() : m_width(0), m_height(0)
-{
-    m_pData = 0;
-    // m_renderedData = 0;
-}
-
-TextSubtitlesRender::~TextSubtitlesRender()
-{
-    // delete [] m_renderedData;
-}
-
-wstring findFontArg(const wstring& text, int pos)
-{
-    bool delFound = false;
-    int firstPos = -1;
-    for (int i = pos; i < text.size(); i++)
-    {
-        if (text[i] == L'=')
-            delFound = true;
-        else if (delFound)
-        {
-            if (text[i] == ' ')
-            {
-                if (firstPos != -1)
-                    return text.substr(firstPos, i - firstPos);
-            }
-            else if (firstPos == -1)
-                firstPos = i;
-        }
-    }
-    if (firstPos != -1)
-        return text.substr(firstPos, text.size() - firstPos);
-    else
-        return L"";
-}
-
-size_t TextSubtitlesRender::findUnquotedStrW(const wstring& str, const wstring& substr)
+size_t findUnquotedStr(const string& str, const string& substr)
 {
     if (substr.size() == 0)
         return string::npos;
     bool quote = false;
     for (int i = 0; i < str.size(); i++)
     {
-        if (str[i] == L'\"' || str[i] == L'\'')
+        if (str[i] == '\"' || str[i] == '\'')
             quote = !quote;
         else if (!quote && str[i] == substr[0])
         {
@@ -217,6 +181,45 @@ size_t TextSubtitlesRender::findUnquotedStrW(const wstring& str, const wstring& 
         }
     }
     return string::npos;
+}
+}  // namespace
+
+namespace text_subtitles
+{
+TextSubtitlesRender::TextSubtitlesRender() : m_width(0), m_height(0)
+{
+    m_pData = 0;
+    // m_renderedData = 0;
+}
+
+TextSubtitlesRender::~TextSubtitlesRender()
+{
+    // delete [] m_renderedData;
+}
+
+string findFontArg(const string& text, int pos)
+{
+    bool delFound = false;
+    int firstPos = -1;
+    for (int i = pos; i < text.size(); i++)
+    {
+        if (text[i] == '=')
+            delFound = true;
+        else if (delFound)
+        {
+            if (text[i] == ' ')
+            {
+                if (firstPos != -1)
+                    return text.substr(firstPos, i - firstPos);
+            }
+            else if (firstPos == -1)
+                firstPos = i;
+        }
+    }
+    if (firstPos != -1)
+        return text.substr(firstPos, text.size() - firstPos);
+    else
+        return "";
 }
 
 uint32_t rgbSwap(uint32_t color)
@@ -237,7 +240,7 @@ int TextSubtitlesRender::browserSizeToRealSize(int bSize, double rSize)
     return rSize;
 }
 
-vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstring& line, vector<Font>& fontStack)
+vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack)
 {
     if (fontStack.size() == 0)
     {
@@ -246,7 +249,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
     }
     Font curFont = fontStack[fontStack.size() - 1];
 
-    vector<pair<Font, wstring>> rez;
+    vector<pair<Font, string>> rez;
     int prevTextPos = 0;
     int bStartPos = -1;
     for (int i = 0; i < line.size(); i++)
@@ -257,103 +260,95 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
         {
             bool isTag = false;
             bool endTag = false;
-            wstring tagStr = trimStrW(line.substr(bStartPos + 1, i - bStartPos - 1));
-            wstring ltagStr = tagStr;
+            string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
+            string ltagStr = tagStr;
             for (int j = 0; j < ltagStr.size(); j++) ltagStr[j] = towlower(ltagStr[j]);
-            if (ltagStr == L"i" || ltagStr == L"italic")
+            if (ltagStr == "i" || ltagStr == "italic")
             {
                 curFont.m_opts |= Font::ITALIC;
                 isTag = true;
             }
-            else if (ltagStr == L"/i" || ltagStr == L"/italic")
+            else if (ltagStr == "/i" || ltagStr == "/italic")
             {
                 endTag = true;
             }
-            else if (ltagStr == L"b" || ltagStr == L"bold")
+            else if (ltagStr == "b" || ltagStr == "bold")
             {
                 curFont.m_opts |= Font::BOLD;
                 isTag = true;
             }
-            else if (ltagStr == L"/b" || ltagStr == L"/bold")
+            else if (ltagStr == "/b" || ltagStr == "/bold")
             {
                 endTag = true;
             }
-            else if (ltagStr == L"u" || ltagStr == L"underline")
+            else if (ltagStr == "u" || ltagStr == "underline")
             {
                 curFont.m_opts |= Font::UNDERLINE;
                 isTag = true;
             }
-            else if (ltagStr == L"/u" || ltagStr == L"underline")
+            else if (ltagStr == "/u" || ltagStr == "underline")
             {
                 endTag = true;
             }
-            else if (ltagStr == L"f" || ltagStr == L"force")
+            else if (ltagStr == "f" || ltagStr == "force")
             {
                 curFont.m_opts |= Font::FORCED;
                 isTag = true;
             }
-            else if (ltagStr == L"/f" || ltagStr == L"/force")
+            else if (ltagStr == "/f" || ltagStr == "/force")
             {
                 endTag = true;
             }
-            else if (ltagStr == L"strike")
+            else if (ltagStr == "strike")
             {
                 curFont.m_opts |= Font::STRIKE_OUT;
                 isTag = true;
             }
-            else if (ltagStr == L"/strike")
+            else if (ltagStr == "/strike")
             {
                 endTag = true;
             }
-            else if (strStartWithW(ltagStr, L"font "))
+            else if (strStartWith(ltagStr, "font "))
             {
-                size_t fontNamePos = findUnquotedStrW(ltagStr, L"name");  // ltagStr.find(L"name");
+                size_t fontNamePos = findUnquotedStr(ltagStr, "name");  // ltagStr.find("name");
                 if (fontNamePos == string::npos)
-                    fontNamePos = findUnquotedStrW(ltagStr, L"face");
+                    fontNamePos = findUnquotedStr(ltagStr, "face");
                 if (fontNamePos != string::npos)
-                    curFont.m_name = unquoteStrW(findFontArg(tagStr, fontNamePos /*, lastIndexPos*/));
+                    curFont.m_name = unquoteStr(findFontArg(tagStr, fontNamePos /*, lastIndexPos*/));
 
-                size_t colorPos = findUnquotedStrW(ltagStr, L"color");
+                size_t colorPos = findUnquotedStr(ltagStr, "color");
                 if (colorPos != string::npos)
                 {
-                    wstring arg = unquoteStrW(findFontArg(ltagStr, colorPos));
-                    bool defClrFound = false;
-                    for (int j = 0; j < sizeof(defaultPallette) / sizeof(pair<const wchar_t*, uint32_t>); j++)
+                    auto arg = unquoteStr(findFontArg(ltagStr, colorPos));
+                    auto it = defaultPallette.find(arg);
+                    if (it != std::end(defaultPallette))
                     {
-                        if (defaultPallette[j].first == arg)
-                        {
-                            curFont.m_color = defaultPallette[j].second;
-                            defClrFound = true;
-                            break;
-                        }
-                    }
-                    if (!defClrFound)
-                    {
-                        if (arg.size() > 0 && (arg[0] == L'#' || arg[0] == L'x'))
-                            curFont.m_color = strWToInt32u(arg.substr(1, 16384).c_str(), 16);
-                        else if (arg.size() > 1 && (arg[0] == L'0' || arg[1] == L'x'))
-                            curFont.m_color = strWToInt32u(arg.substr(2, 16384).c_str(), 16);
+                        curFont.m_color = it->second;
+                        if (arg.size() > 0 && (arg[0] == '#' || arg[0] == 'x'))
+                            curFont.m_color = strToInt32u(arg.substr(1, 16384).c_str(), 16);
+                        else if (arg.size() > 1 && (arg[0] == '0' || arg[1] == 'x'))
+                            curFont.m_color = strToInt32u(arg.substr(2, 16384).c_str(), 16);
                         else
-                            curFont.m_color = strWToInt32u(arg.c_str(), 10);
+                            curFont.m_color = strToInt32u(arg.c_str(), 10);
                     }
                     if ((curFont.m_color & 0xff000000u) == 0)
                         curFont.m_color |= 0xff000000u;
                 }
-                size_t fontSizePos = findUnquotedStrW(ltagStr, L"size");
+                size_t fontSizePos = findUnquotedStr(ltagStr, "size");
                 if (fontSizePos != string::npos)
                 {
-                    wstring arg = unquoteStrW(findFontArg(tagStr, fontSizePos));
+                    string arg = unquoteStr(findFontArg(tagStr, fontSizePos));
                     if (arg.size() > 0)
                     {
                         if (arg[0] == '+' || arg[0] == '-')
-                            curFont.m_size += strWToInt32(arg.c_str(), 10);
+                            curFont.m_size += strToInt32(arg.c_str(), 10);
                         else
-                            curFont.m_size = strWToInt32u(arg.c_str(), 10);
+                            curFont.m_size = strToInt32u(arg.c_str(), 10);
                     }
                 }
                 isTag = true;
             }
-            else if (strStartWithW(tagStr, L"/font"))
+            else if (strStartWith(tagStr, "/font"))
             {
                 endTag = true;
             }
@@ -361,7 +356,7 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
             {
                 if (bStartPos > prevTextPos)
                 {
-                    wstring msg = line.substr(prevTextPos, bStartPos - prevTextPos);
+                    string msg = line.substr(prevTextPos, bStartPos - prevTextPos);
                     rez.push_back(make_pair(fontStack[fontStack.size() - 1], msg));
                 }
                 if (isTag)
@@ -383,17 +378,17 @@ vector<pair<Font, wstring>> TextSubtitlesRender::processTxtLine(const std::wstri
     return rez;
 }
 
-bool TextSubtitlesRender::rasterText(const std::wstring& text)
+bool TextSubtitlesRender::rasterText(const std::string& text)
 {
     bool forced = false;
     memset(m_pData, 0, m_width * m_height * 4);
     vector<Font> fontStack;
-    vector<wstring> lines = splitStrW(text.c_str(), '\n');
+    vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
     for (int i = 0; i < lines.size(); ++i)
     {
-        vector<pair<Font, wstring>> txtParts = processTxtLine(lines[i], fontStack);
+        vector<pair<Font, string>> txtParts = processTxtLine(lines[i], fontStack);
         for (int i = 0; i < txtParts.size(); ++i)
         {
             if (txtParts[i].first.m_opts & Font::FORCED)

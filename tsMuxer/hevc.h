@@ -3,9 +3,6 @@
 
 #include "nalUnits.h"
 
-extern int HDR10_metadata[6];
-extern int V3_flags;
-
 enum HevcSliceTypes
 {
     HEVC_BFRAME_SLICE = 0,
@@ -46,8 +43,8 @@ enum HEVCUnitType
     NAL_RSV_NVCL45 = 45,
     NAL_RSV_NVCL47 = 47,
     NAL_UNSPEC56 = 56,
-    NAL_DV = 62,
-    NAL_UNSPEC63 = 63
+    NAL_DVRPU = 62,
+    NAL_DVEL = 63,
 };
 
 struct HevcUnit
@@ -136,7 +133,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     int vps_id;
     int max_sub_layers;
     int sps_id;
-    int crhomaFormat;
+    int chromaFormat;
     bool separate_colour_plane_flag;
     int pic_width_in_luma_samples;
     int pic_height_in_luma_samples;
@@ -159,6 +156,10 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     std::vector<int> use_delta_flag;
     */
     std::vector<ShortTermRPS> st_rps;
+
+    int colour_primaries;
+    int transfer_characteristics;
+    int matrix_coeffs;
 
     int num_short_term_ref_pic_sets;
     int num_units_in_tick;
@@ -186,15 +187,16 @@ struct HevcPpsUnit : public HevcUnit
     int num_extra_slice_header_bits;
 };
 
-struct HevcSeiUnit : public HevcUnit
+struct HevcHdrUnit : public HevcUnit
 {
-    HevcSeiUnit();
+    HevcHdrUnit();
     int deserialize() override;
 
    public:
     bool isHDR10;
     bool isHDR10plus;
-    bool isDV;
+    bool isDVRPU;
+    bool isDVEL;
 };
 
 struct HevcSliceHeader : public HevcUnit

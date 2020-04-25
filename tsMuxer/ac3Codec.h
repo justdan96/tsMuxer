@@ -59,12 +59,17 @@ class AC3Codec
         setTestMode(false);
         m_frameDuration = false;
         m_bit_rateExt = 0;
+        m_bit_rate = 0;
+        m_channels = 0;
+        m_lfeon = 0;
         m_extChannelsExists = false;
         m_bsid = m_bsidBase = 0;
         m_dsurmod = 0;
+        m_mixinfoexists = false;
     };
     unsigned getHeaderLen() { return AC3_HEADER_SIZE; }
     inline bool isEAC3() { return m_bsid > 10; }
+    inline bool isAC3() { return m_bsidBase > 0; }
     void setDownconvertToAC3(bool value) { m_downconvertToAC3 = value; }
     bool getDownconvertToAC3() { return m_downconvertToAC3; }
     bool isTrueHD() { return m_true_hd_mode; }
@@ -103,6 +108,7 @@ class AC3Codec
     uint32_t m_bit_rate;
     uint8_t m_channels;
     uint16_t m_frame_size;
+    bool m_mixinfoexists;
 
     MLPHeaderInfo mh;
 

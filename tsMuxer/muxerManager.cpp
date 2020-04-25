@@ -12,6 +12,30 @@ using namespace std;
 // static const int SSIF_INTERLEAVE_BLOCKSIZE = 1024 * 1024 * 7;
 static const int MAX_FRAME_SIZE = 1200000;  // 1.2m
 
+namespace
+{
+template <typename TrackTypeFn>
+int seekDefaultTrack(const std::vector<StreamInfo>& tracks, std::string& param, TrackTypeFn f)
+{
+    int trackTypeIdx = 0;
+    for (auto&& track : tracks)
+    {
+        if (f(track))
+        {
+            auto&& params = track.m_addParams;
+            auto it = params.find("default");
+            if (it != std::end(params))
+            {
+                param = it->second;
+                return trackTypeIdx;
+            }
+            ++trackTypeIdx;
+        }
+    }
+    return -1;
+}
+}  // namespace
+
 MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
     : m_metaDemuxer(readManager), m_factory(factory)
 {
@@ -113,7 +137,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr)
     {
         StreamInfo& si = *itr;
-        int rez = si.read();
+        si.read();
         if (si.m_isSubStream && m_allowStereoMux)
         {
             m_subStreamIndex.insert(si.m_streamReader->getStreamIndex());
@@ -369,3 +393,34 @@ AbstractMuxer* MuxerManager::getSubMuxer() { return m_subMuxer; }
 bool MuxerManager::isStereoMode() const { return m_subMuxer != 0; }
 
 void MuxerManager::setAllowStereoMux(bool value) { m_allowStereoMux = value; }
+
+int MuxerManager::getDefaultAudioTrackIdx() const
+{
+    std::string paramVal;
+    return seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
+                            [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'A'; });
+}
+
+int MuxerManager::getDefaultSubTrackIdx(SubTrackMode& mode) const
+{
+    std::string paramVal;
+    auto idx = seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
+                                [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
+    if (idx != -1)
+    {
+        if (paramVal == "all")
+        {
+            mode = SubTrackMode::All;
+        }
+        else if (paramVal == "forced")
+        {
+            mode = SubTrackMode::Forced;
+        }
+        else
+        {
+            LTRACE(LT_WARN, 2, "Invalid 'default' parameter value for subtitle track " << idx << ", ignoring");
+            return -1;
+        }
+    }
+    return idx;
+}

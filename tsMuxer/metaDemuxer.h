@@ -34,7 +34,7 @@ struct StreamInfo
         m_pid = pid;
         m_readCnt = 0;
         m_lastAVRez = AbstractStreamReader::NEED_MORE_DATA;
-        m_lastDTS = 0;
+        m_lastDTS = -1000000000;
         lastReadRez = 0;
         m_flushed = false;
         m_timeShift = 0;
@@ -175,7 +175,7 @@ class METADemuxer : public AbstractDemuxer
     int addStream(const std::string codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
-    const std::vector<StreamInfo>& getStreamInfo() { return m_codecInfo; }
+    const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
     static DetectStreamRez DetectStreamReader(BufferedReaderManager& readManager, const std::string& fileName,
                                               bool calcDuration);
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
@@ -217,7 +217,7 @@ class METADemuxer : public AbstractDemuxer
 
     int addPGSubStream(const std::string& codec, const std::string& _codecStreamName,
                        const std::map<std::string, std::string>& addParams, MPLSStreamInfo* subStream);
-    static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez, bool insToBegin);
+    static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez);
     std::vector<MPLSPlayItem> mergePlayItems(const std::vector<MPLSParser>& mplsInfoList);
 };
 

@@ -21,6 +21,8 @@
 #include <stdio.h>
 #endif
 
+namespace convertUTF
+{
 static const int halfShift = 10; /* used for shifting by 10 bits */
 
 static const UTF32 halfBase = 0x0010000UL;
@@ -101,6 +103,20 @@ ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sou
     return result;
 }
 
+std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32 ch)
+{
+    if (ch <= UNI_MAX_BMP)
+    {
+        return std::make_tuple(static_cast<UTF16>(ch), 0);
+    }
+    else
+    {
+        ch -= halfBase;
+        return std::make_tuple((UTF16)((ch >> halfShift) + UNI_SUR_HIGH_START),
+                               (UTF16)((ch & halfMask) + UNI_SUR_LOW_START));
+    }
+}
+
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,
@@ -172,30 +188,6 @@ ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sou
 }
 
 /* --------------------------------------------------------------------- */
-
-/*
- * Index into the table below with the first byte of a UTF-8 sequence to
- * get the number of trailing bytes that are supposed to follow it.
- * Note that *legal* UTF-8 values can't have 4 or 5-bytes. The table is
- * left as-is for anyone who may want to do such conversion, which was
- * allowed in earlier algorithms.
- */
-static const char trailingBytesForUTF8[256] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5};
-
-/*
- * Magic values subtracted from a buffer value during UTF8 conversion.
- * This table contains as many values as there might be trailing bytes
- * in a UTF-8 sequence.
- */
-static const UTF32 offsetsFromUTF8[6] = {0x00000000UL, 0x00003080UL, 0x000E2080UL,
-                                         0x03C82080UL, 0xFA082080UL, 0x82082080UL};
 
 /*
  * Once the bits are split out into bytes of UTF-8, this is a mask OR-ed
@@ -400,6 +392,24 @@ Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
         return false;
     }
     return isLegalUTF8(source, length);
+}
+
+Boolean isLegalUTF8String(const UTF8* string, int length)
+{
+    /* same as above, but verify if the whole passed bytestream consists of valid UTF-8 sequences only. */
+    const auto stringEnd = string + length;
+    while (string < stringEnd)
+    {
+        const auto seqLength = trailingBytesForUTF8[*string] + 1;
+        const auto seqEnd = string + seqLength;
+        /* as the comment for the trailing bytes array notes, valid UTF-8 cannot contain 5- or 6-byte sequences. */
+        if (seqLength >= 5 || seqEnd > stringEnd || !isLegalUTF8(string, seqLength))
+        {
+            return false;
+        }
+        string = seqEnd;
+    }
+    return true;
 }
 
 /* --------------------------------------------------------------------- */
@@ -697,3 +707,5 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
     similarly unrolled loops.
 
    --------------------------------------------------------------------- */
+
+}  // namespace convertUTF

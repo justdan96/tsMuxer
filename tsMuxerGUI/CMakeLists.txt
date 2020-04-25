@@ -9,7 +9,12 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets Multimedia REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
+
+set(lang_qrc "translations.qrc")
+configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
+# create_translation is not used due to QTBUG-41736
+qt5_add_translation(QM_FILES translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts)
 
 set(tsmuxer_gui_sources
   main.cpp
@@ -19,6 +24,8 @@ set(tsmuxer_gui_sources
   muxForm.ui
   checkboxedheaderview.cpp
   images.qrc
+  ${QM_FILES}
+  ${CMAKE_CURRENT_BINARY_DIR}/${lang_qrc}
 )
 
 add_executable(tsMuxerGUI ${tsmuxer_gui_sources})

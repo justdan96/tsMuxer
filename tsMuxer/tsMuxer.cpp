@@ -25,6 +25,11 @@
 
 using namespace std;
 
+int V3_flags = 0;
+int HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
+bool isV3() { return V3_flags & HDMV_V3; }
+bool is4K() { return V3_flags & FOUR_K; }
+
 const static uint64_t M_PCR_DELTA = 7000;
 const static uint64_t SIT_INTERVAL = 76900;
 // const static uint64_t M_CBR_PCR_DELTA = 2250;
@@ -105,6 +110,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_splitSize = m_splitDuration = 0;
     m_curFileNum = 0;
     m_bluRayMode = false;
+    m_hdmvDescriptors = false;
     m_lastGopNullCnt = 0;
     m_outBufLen = 0;
     m_pesData.reserve(1024 * 128);
@@ -147,7 +153,7 @@ TSMuxer::~TSMuxer()
 
 void TSMuxer::setVBVBufferLen(int value)
 {
-    m_vbvLen = value * 90;
+    m_vbvLen = (int64_t)value * 90;
     m_fixed_pcr_offset = m_timeOffset - m_vbvLen;
     if (m_fixed_pcr_offset < 0)
         m_fixed_pcr_offset = 0;
@@ -160,7 +166,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     int descriptorLen = 0;
     uint8_t descrBuffer[1024];
     if (codecReader != 0)
-        descriptorLen = codecReader->getTSDescriptor(descrBuffer);
+        descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_bluRayMode, m_hdmvDescriptors);
 
     if (codecName[0] == 'V')
         m_mainStreamIndex = streamIndex;
@@ -180,8 +186,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         if (!isSecondary)
         {
             int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
-            int HDR = codecReader->getStreamHDR();
-            if (HDR == 4)
+            if (codecReader->getStreamHDR() == 4)
             {
                 tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
                 m_DVvideoTrackCnt++;
@@ -190,6 +195,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             {
                 tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
                 m_videoTrackCnt++;
+                V3_flags |= NON_DV_TRACK;
             }
             if (m_subMode)
                 tsStreamIndex++;
@@ -215,12 +221,12 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     }
     else if (codecName == "S_HDMV/PGS")
     {
-        tsStreamIndex = 0x1200 + m_pgsTrackCnt;
+        tsStreamIndex = (V3_flags & 0x1e ? 0x12A0 : 0x1200) + m_pgsTrackCnt;
         m_pgsTrackCnt++;
     }
     else if (codecName == "S_TEXT/UTF8")
     {
-        tsStreamIndex = 0x1200 + m_pgsTrackCnt;
+        tsStreamIndex = (V3_flags & 0x1e ? 0x12A0 : 0x1200) + m_pgsTrackCnt;
         m_pgsTrackCnt++;
     }
     m_extIndexToTSIndex[streamIndex] = tsStreamIndex;
@@ -278,11 +284,6 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             LTRACE(LT_DEBUG, 0, "Muxing fps: " << fps);
         }
     }
-    /*	int descriptorLen = 0;
-            uint8_t descrBuffer[1024];
-            if (codecReader != 0)
-                    descriptorLen = codecReader->getTSDescriptor(descrBuffer);
-    */
 
     if (codecName == "V_MPEG4/ISO/AVC")
     {
@@ -301,22 +302,22 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     }
     else if (codecName == "V_MPEGH/ISO/HEVC")
     {
-        m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_H265, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary)));
+        int stream_type = STREAM_TYPE_VIDEO_H265;
+        // For non-bluray, Dolby Vision track must be stream_type 06 = private data
+        if (!m_bluRayMode && tsStreamIndex == 0x1015)
+            stream_type = STREAM_TYPE_PRIVATE_DATA;
+        m_pmt.pidList.insert(std::make_pair(
+            tsStreamIndex,
+            PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MS/VFW/WVC1")
-    {
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_VC1, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
-    }
     else if (codecName == "V_MPEG-2")
-    {
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_MPEG2, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
-    }
     else if (codecName == "A_AAC")
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_AAC, tsStreamIndex, descrBuffer,
@@ -346,8 +347,10 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         {
             if (ac3Reader->isSecondary())
                 streamType = STREAM_TYPE_AUDIO_EAC3_SECONDARY;
-            else
+            else if (ac3Reader->isAC3())
                 streamType = STREAM_TYPE_AUDIO_EAC3;
+            else
+                streamType = STREAM_TYPE_AUDIO_EAC3_ATSC;
         }
         else
             streamType = STREAM_TYPE_AUDIO_AC3;
@@ -680,16 +683,6 @@ void TSMuxer::writePATPMT(int64_t pcr, bool force)
 {
     if (pcr == -1 || pcr - m_lastPMTPCR >= m_patPmtDelta || force)
     {
-        if (!m_m2tsMode && m_lastPMTPCR == -1)
-        {
-            for (int k = 0; k < 15; k++)
-            {
-                writePAT();
-                writePMT();
-                writeSIT();
-            }
-        }
-
         m_lastPMTPCR = pcr != -1 ? pcr : m_fixed_pcr_offset;
         writePAT();
         writePMT();
@@ -1196,7 +1189,7 @@ void TSMuxer::buildPMT()
     tsPacket->setPID(DEFAULT_PMT_PID);
     tsPacket->dataExists = 1;
     tsPacket->payloadStart = 1;
-    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, !m_bluRayMode);
+    uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, m_bluRayMode, m_hdmvDescriptors);
     uint8_t* pmtEnd = m_pmtBuffer + TSPacket::TS_HEADER_SIZE + size;
     uint8_t* curPos = m_pmtBuffer + TS_FRAME_SIZE;
     for (; curPos < pmtEnd; curPos += TS_FRAME_SIZE)
@@ -1383,6 +1376,8 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             setPCROnVideoPID(true);
         else if (paramPair[0] == "--new-audio-pes")
             setNewStyleAudioPES(true);
+        else if (paramPair[0] == "--hdmv-descriptors")
+            m_hdmvDescriptors = true;
         else if (paramPair[0] == "--bitrate" && paramPair.size() > 1)
         {
             setMaxBitrate(strToDouble(paramPair[1].c_str()) * 1000.0);

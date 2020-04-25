@@ -21,7 +21,7 @@ class MPEG2StreamReader : public MPEGStreamReader
         m_longCodesAllowed = false;
         m_prevFrameDelay = 0;
     }
-    int getTSDescriptor(uint8_t* dstBuff) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
 
     int getStreamWidth() const override { return m_sequence.width; }
@@ -48,8 +48,9 @@ class MPEG2StreamReader : public MPEGStreamReader
     bool m_lastIFrame;
     int64_t m_prevFrameDelay;
     MPEGSequenceHeader m_sequence;
+    MPEGGOPHeader m_gop;
     MPEGPictureHeader m_frame;
-    int getNextBFrames(uint8_t* buffer);
+    // int getNextBFrames(uint8_t* buffer);
     int findFrameExt(uint8_t* buffer);
     int decodePicture(uint8_t* buff);
     int processExtStartCode(uint8_t* buff);

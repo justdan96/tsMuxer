@@ -40,4 +40,13 @@ else
     echo "error creating version $version_date !"
     exit 2
   fi
+  # try to trigger a new build in OBS
+  obs_trigger=$(curl --anyauth --user $OBS_USER:$OBS_SECRET --write-out %{http_code} --silent --output /dev/null -X POST https://api.opensuse.org/build/home:justdan96?cmd=rebuild)
+  echo $obs_trigger
+  #if [ $obs_trigger -eq 200 ] ; then
+  #  echo "build has been triggered in OBS!"
+  #else
+  #  echo "error triggering build in OBS!"
+  #  exit 3
+  #fi
 fi

@@ -8,6 +8,7 @@
 
 #include "avCodecs.h"
 #include "math.h"
+#include "tsMuxer.h"
 #include "tsPacket.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -18,7 +19,7 @@ using namespace std;
 #define fabs(a) ((a) >= 0 ? (a) : -(a))
 
 double pgs_frame_rates[16] = {
-    0, 23.97602397602397, 24, 25, 29.97002997002997, 0, 50, 59.94005994005994, 0, 0, 0, 0, 0, 0, 0, 0};
+    0, 23.97602397602397, 24, 25, 29.97002997002997, 30, 50, 59.94005994005994, 60, 0, 0, 0, 0, 0, 0, 0};
 
 PGSStreamReader::PGSStreamReader()
 {
@@ -761,7 +762,8 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
         if (containerStreamIndex >= 0x1200)
-            rez.streamDescr += std::string(" #") + int32ToStr(containerStreamIndex - 0x1200);
+            rez.streamDescr +=
+                std::string(" #") + int32ToStr(containerStreamIndex - (V3_flags & 0x1e ? 0x12A0 : 0x1200));
     }
     else if (containerType == ctMKV && containerDataType == STREAM_TYPE_SUB_PGS)
     {

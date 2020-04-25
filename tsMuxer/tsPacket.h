@@ -40,9 +40,8 @@ static const uint8_t STREAM_TYPE_PRIVATE_SECTION = 0x05;
 static const uint8_t STREAM_TYPE_PRIVATE_DATA = 0x06;
 static const uint8_t STREAM_TYPE_VIDEO_MPEG4 = 0x10;
 static const uint8_t STREAM_TYPE_VIDEO_H264 = 0x1b;
-static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
-// static const uint8_t STREAM_TYPE_VIDEO_H265      = 0x25; // changed from 0x06
 static const uint8_t STREAM_TYPE_VIDEO_MVC = 0x20;
+static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
 static const uint8_t STREAM_TYPE_VIDEO_VC1 = 0xea;
 
 static const uint8_t STREAM_TYPE_AUDIO_MPEG1 = 0x03;
@@ -54,6 +53,7 @@ static const uint8_t STREAM_TYPE_AUDIO_DTS = 0x82;  // 0x8a
 static const uint8_t STREAM_TYPE_AUDIO_LPCM = 0x80;
 static const uint8_t STREAM_TYPE_AUDIO_AC3 = 0x81;
 static const uint8_t STREAM_TYPE_AUDIO_EAC3 = 0x84;
+static const uint8_t STREAM_TYPE_AUDIO_EAC3_ATSC = 0x87;
 static const uint8_t STREAM_TYPE_AUDIO_EAC3_TRUE_HD = 0x83;
 static const uint8_t STREAM_TYPE_AUDIO_DTS_HD = 0x85;
 static const uint8_t STREAM_TYPE_AUDIO_DTS_HD_MASTER_AUDIO = 0x86;
@@ -257,7 +257,7 @@ struct TS_program_map_section
     TS_program_map_section();
     bool deserialize(uint8_t* buffer, int buf_size);
     static bool isFullBuff(uint8_t* buffer, int buf_size);
-    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool addLang = true);
+    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool blurayMode, bool hdmvDescriptors);
 
    private:
     void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);
@@ -613,18 +613,6 @@ struct MPLSParser
     int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);
     int pgIndexToFullIndex(int value);
     void parseSubPathEntryExtension(uint8_t* data, int dataLen);
-};
-
-class MovieObject
-{
-   public:
-    bool parse(const char* fileName);
-    void parse(uint8_t* buffer, int len);
-    int compose(uint8_t* buffer, int len, DiskType dt);
-
-   private:
-    void parseMovieObjects(BitStreamReader& reader);
-    void parseNavigationCommand(BitStreamReader& reader);
 };
 
 #endif

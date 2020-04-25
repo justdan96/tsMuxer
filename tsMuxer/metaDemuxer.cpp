@@ -36,7 +36,6 @@ using namespace std;
 
 const static int MAX_DEMUX_BUFFER_SIZE = 1024 * 1024 * 192;
 const static int MIN_READED_BLOCK = 16384;
-static int counter = 0;
 
 METADemuxer::METADemuxer(const BufferedReaderManager& readManager)
     : m_containerReader(*this, readManager), m_readManager(readManager)
@@ -476,7 +475,8 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ctMKV);
     }
-    else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4a"))
+    else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") ||
+             strEndWith(tmpname, ".m4a"))
     {
         if (pid)
             dataReader = &m_containerReader;
@@ -561,10 +561,10 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
 
 void METADemuxer::readClose()
 {
-    for (int i = 0; i < m_codecInfo.size(); i++)
+    for (auto& codecInfo : m_codecInfo)
     {
-        m_codecInfo[i].m_dataReader->deleteReader(m_codecInfo[i].m_readerID);
-        delete m_codecInfo[i].m_streamReader;
+        codecInfo.m_dataReader->deleteReader(codecInfo.m_readerID);
+        delete codecInfo.m_streamReader;
     }
     m_codecInfo.clear();
 }
@@ -574,41 +574,43 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
 {
     AVChapters chapters;
     int64_t fileDuration = 0;
-    vector<CheckStreamRez> streams;
+    vector<CheckStreamRez> streams, Vstreams;
     AbstractDemuxer* demuxer = 0;
-    string tmpname = strToLowerCase(unquoteStr(fileName));
+    auto unquoted = unquoteStr(fileName);
+    string fileExt = strToLowerCase(extractFileExt(unquoted));
     AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ctNone;
     CLPIParser clpi;
     bool clpiParsed = false;
-    if (strEndWith(tmpname, ".m2ts") || strEndWith(tmpname, ".mts") || strEndWith(tmpname, ".ssif"))
+    if (strEndWith(fileExt, "m2ts") || strEndWith(fileExt, "mts") || strEndWith(fileExt, "ssif"))
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctM2TS;
-        string clpiFileName = findBluRayFile(extractFileDir(tmpname), "CLIPINF", extractFileName(tmpname) + ".clpi");
-        if (clpiFileName.size() > 0)
+        string clpiFileName = findBluRayFile(extractFileDir(unquoted), "CLIPINF", extractFileName(unquoted) + ".clpi");
+        if (!clpiFileName.empty())
             clpiParsed = clpi.parse(clpiFileName.c_str());
     }
-    else if (strEndWith(tmpname, ".ts"))
+    else if (strEndWith(fileExt, "ts"))
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctTS;
     }
-    else if (strEndWith(tmpname, ".vob") || strEndWith(tmpname, ".mpg"))
+    else if (strEndWith(fileExt, "vob") || strEndWith(fileExt, "mpg"))
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctVOB;
     }
-    else if (strEndWith(tmpname, ".evo"))
+    else if (strEndWith(fileExt, "evo"))
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctEVOB;
     }
-    else if (strEndWith(tmpname, ".mkv") || strEndWith(tmpname, ".mka"))
+    else if (strEndWith(fileExt, "mkv") || strEndWith(fileExt, "mka"))
     {
         demuxer = new MatroskaDemuxer(readManager);
         containerType = AbstractStreamReader::ctMKV;
     }
-    else if (strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4a") || strEndWith(tmpname, ".mov"))
+    else if (strEndWith(fileExt, "mp4") || strEndWith(fileExt, "m4v") || strEndWith(fileExt, "m4a") ||
+             strEndWith(fileExt, "mov"))
     {
         demuxer = new MovDemuxer(readManager);
         containerType = AbstractStreamReader::ctMOV;
@@ -660,13 +662,10 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
                     trackRez.isSecondary = true;
             }
 
-            if (trackRez.codecInfo.programName == "V_MS/VFW/WVC1" || trackRez.codecInfo.programName == "V_MPEG-2" ||
-                trackRez.codecInfo.programName == "V_MPEG4/ISO/AVC" ||
-                trackRez.codecInfo.programName == "V_MPEG4/ISO/MVC" ||
-                trackRez.codecInfo.programName == "V_MPEGH/ISO/HEVC")
-                addTrack(streams, trackRez, true);
+            if (strStartWith(trackRez.codecInfo.programName, "V_"))
+                addTrack(Vstreams, trackRez);
             else
-                addTrack(streams, trackRez, false);
+                addTrack(streams, trackRez);
         }
         chapters = demuxer->getChapters();
         if (calcDuration)
@@ -681,53 +680,47 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             return DetectStreamRez();
         uint8_t* tmpBuffer = new uint8_t[DETECT_STREAM_BUFFER_SIZE];
         int len = file.read(tmpBuffer, DETECT_STREAM_BUFFER_SIZE);
-        if (strEndWith(tmpname, ".sup") || strEndWith(tmpname, ".sup\""))
+        if (strEndWith(fileExt, "sup") || strEndWith(fileExt, "sup\""))
             containerType = AbstractStreamReader::ctSUP;
-        else if (strEndWith(tmpname, ".pcm") || strEndWith(tmpname, ".lpcm") || strEndWith(tmpname, ".wav") ||
-                 strEndWith(tmpname, ".w64"))
+        else if (strEndWith(fileExt, "pcm") || strEndWith(fileExt, "lpcm") || strEndWith(fileExt, "wav") ||
+                 strEndWith(fileExt, "w64"))
             containerType = AbstractStreamReader::ctLPCM;
-        else if (strEndWith(tmpname, ".srt") || strEndWith(tmpname, ".srt\""))
+        else if (strEndWith(fileExt, "srt") || strEndWith(fileExt, "srt\""))
             containerType = AbstractStreamReader::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
-        addTrack(streams, trackRez, false);
+        if (strStartWith(trackRez.codecInfo.programName, "V_"))
+            addTrack(Vstreams, trackRez);
+        else
+            addTrack(streams, trackRez);
 
         delete[] tmpBuffer;
     }
+    Vstreams.insert(Vstreams.end(), streams.begin(), streams.end());
+
     DetectStreamRez rez;
     rez.chapters = chapters;
     rez.fileDurationNano = fileDuration;
-    rez.streams = streams;
+    rez.streams = Vstreams;
     return rez;
 }
 
-void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez, bool insToBegin)
+void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez)
 {
     if (trackRez.codecInfo.codecID == h264DepCodecInfo.codecID && trackRez.multiSubStream)
     {
         // split combined MVC/AVC track to substreams
-        if (insToBegin)
-            rez.insert(rez.begin(), trackRez);
-        else
-            rez.push_back(trackRez);
+        rez.push_back(trackRez);
 
         trackRez.codecInfo = h264CodecInfo;
         int postfixPos = trackRez.streamDescr.find("3d-pg");
         if (postfixPos != string::npos)
             trackRez.streamDescr = trackRez.streamDescr.substr(0, postfixPos);
 
-        if (insToBegin)
-            rez.insert(rez.begin() + 1, trackRez);
-        else
-            rez.push_back(trackRez);
+        rez.push_back(trackRez);
     }
     else
-    {
-        if (insToBegin)
-            rez.insert(rez.begin(), trackRez);
-        else
-            rez.push_back(trackRez);
-    }
+        rez.push_back(trackRez);
 }
 
 CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,
@@ -1027,7 +1020,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             if (itr->first == "font-name")
             {
-                font.m_name = UtfConverter::FromUtf8(unquoteStr(itr->second));
+                font.m_name = unquoteStr(itr->second);
             }
             else if (itr->first == "font-size")
                 font.m_size = strToInt32(itr->second.c_str());
@@ -1427,7 +1420,7 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
             demuxer = m_demuxers[streamName].m_demuxer = new MatroskaDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;
         }
-        else if (ext == "MOV" || ext == "MP4" || ext == "M4A")
+        else if (ext == "MOV" || ext == "MP4" || ext == "M4V" || ext == "M4A")
         {
             demuxer = m_demuxers[streamName].m_demuxer = new MovDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;

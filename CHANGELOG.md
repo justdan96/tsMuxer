@@ -1,3 +1,107 @@
+## tsMuxeR 2.6.16
+- Fixed a an issue so that Dolby Vision EL stream type is now correct 
+- Fixed a bug with HEVC streams when an HDR10+ SEI payload is too short
+- Fixed a bug where the first 2 frames of the first video track are muxed before anything else
+- Introduced an improvement so Single Track Double Layer files now can properly handled
+- Fixed a bug so that if no MOOF atom is met we stop atom parsing at the next MDAT atom
+- Fixed an issue with HDR flags, so we only set them if an HEVC stream is detected
+- Introduced correct ATSC descriptor for pure EAC3 tracks
+- Introduced correct HDMV TS descriptors for MPEG-2 streams
+- Fixed an issue where Blu-Ray movies will loop rather than stopping after reading
+- Introduced being able to include Dolby Vision descriptors in TS or M2TS mode
+- Fixed the order of streams so that video streams always come first
+- Introduced a GUI option for adjusting PIP transparency
+- Fixed an issue where translated strings appeared in the meta file
+- Fixed a bug in the output paths of the MXE build scripts
+- Ensured we keep M2TS descriptors in TS files (temporary until a long-term solution can be found)
+- Fixed a bug where filenames were being truncated prematurely if there were dots in the filename
+- Introduced putting overnight builds into OBS, to build for various Linux platforms
+- Improved the documentation to fix a broken URL for the test files
+- Introduced a simplification of the method used to play sounds in the GUI
+- Fixed an issue with broken ISO labels when using non-ASCII characters
+- Introduced a refactoring that moved the About page into an external HTML file for the GUI
+- Introduced a code cleanup that removed all usages of std::wstring
+- Fixed an issue with incorrect subtitle spacing on Windows
+- Introduced support for M4V files
+- Fixed issue with subtitle timestamps when joining multiple M2TS files together
+- Fixed incorrect usage of POSIX APIs in Windows builds
+- Fixed a bug with encoding errors when dealing with SSIF files
+- Fixed a bug where we could read over the end of an MP4 file
+- Introduced keeping the track order when multiple video tracks are added
+- Introduced support for reading fragmented MP4 files
+- Introduced support for specific AVC and HEVC descriptors in TS files
+- Introduced support for Dolby Vision atoms in AVC or HEVC streams
+- Introduced a changelog and improved general documentation
+- Fixed an issue with garbled subtitles being displayed
+- Introduced translation support, as well as a full Russian translation of the GUI
+- Introduced getting the HDR10 information from the SPS VUI in HEVC
+- Introduced detection of UTF8 in subtitle files
+- Fixed usage of WinMain, which lead to issues with console output on Windows
+- Introduced converting meta files using active code page if UTF8 fails
+- Improved the documentation for building with Msys2
+- Fixed bugs in the handling of non-ASCII characters in paths on Windows
+- Fixed bugs in subtitles PIDs for BD V3 M2TS with HDR
+- Fixed bug with the display of bitrate and channel numbers for EAC3 and AC3 tracks
+- Fixed bug with GUI not correctly allowing to select DTS Express 24-bit as a secondary track
+- Introduced an error message when an output file longer than 255 characters and reduced overall file length
+- Fixed bug where 3D plane information was showing for 2D BD-ROMs
+- Fixed a bug with uneven width between characters in subtitles on Mac and Linux
+- Introduced the ability to detect audio delays in MKV files
+- Fixed a bug where the 3D planes were not detected in specific cases
+- Fixed a bug with alignment of the subtitle tracks and 3D planes
+- Removed unnecessary floating point conversion code from the GUI source tree
+- Added support for frame rates of 50, 59.94 and 60
+- Fixed an issue with HDR10 HEVC streams where the maxCLL and maxFALL values were set incorrectly
+- Fixed typos and improved the clarity of certain wording in the GUI
+- Fixed typos and grammar issues with the readme and usage information
+- Introduced the git revision to the version string in the GUI and CLI
+- Introduced automatic selection of BD V3 for HEVC in GUI
+- Fixed an issue with compiling on Mac
+- Fixed an issue with the handling of wav64
+- Introduced a workaround for QTBUG-28893
+- Performed another round of GUI code cleanup
+- Introduced a uniform code formatting style
+- Fixed a bug with reading the FPS information from certain streams
+- Fixed a typo in the GUI settings for the font family setting
+- Introduced a warning when a V2 video format is used for a V3 Blu-ray
+- Fixed a bug with incorrect stream ID for TS stream
+- Fixed typos in the source files
+- Introduced UHD Blu-ray as an option in the GUI
+- Fixed a bug where invalid font files could crash tsMuxer
+- Fixed an issue with HEVC stream detection in the GUI
+- Introduced reading the FPS info from VPS or SPS, rather than VPS only
+- Fixed a bug with the CPI table I-frame thresholds with UHD
+- Introduced Dolby Vision support
+- Fixed compiler warnings on return value overflows
+- Fixed an issue with the stream ID being incorrectly set for BD V3
+- Fixed an issue when spaces where in the path to the temporary meta file in the GUI
+- Fixed an issue with buffer overflows on HEVC streams
+- Fixed an issue so that TS descriptors are the same as on commercial Blu-rays
+- Fixed an issue where numbers were shown instead of language codes in the GUI
+- Introduced nightly builds, hosted on Bintray
+- Fixed a bug where the tsMuxer executable could not be found on Windows in the GUI
+- Fixed a bug where muxing a SRT results in a segfault on Linux
+- Introduced support for UHD HDR10 and HDR10+
+- Introduced a migration from "override" to "virtual" keywords in the code to conform better to C++14
+- Introduced a migration from "QObject::connect" syntax to Qt5 equivalent in the GUI
+- Fixed an issue with the min and max functions when compiling on Windows
+- Fixed an issue calculating the AAC frame size
+- Introduced UHD (width >= 2600) support in the MPLS and CLPI
+- Introduced a clean up and reformatting of the documentation
+- Introduced UHD BD V3 support
+- Fixed an issue with EAC3 bitrate, sampling rate and channel information not being set correctly
+- Fixed a bug with parsing of AC3
+- Fixed an issue with the stream type not being set correctly for H265
+- Fixed an issue when parsing MP4 AAC 5.1 where the channel output is not read correctly
+- Fixed an issue with parsing the AAC frame length
+- Introduced an update of the C++ standard from 11 to 14
+- Introduced a cleanup of precompiled headers
+- Introduced using std::thread for the TerminatableThread in libmediation
+- Introduced cross-platform CMake build system
+- Introduced a cleanup of libmediation that removed condvar, mutex and time from the library
+- Introduced a translation of comments from Russian to English
+- Introduced a migration from Qt4 to Qt5
+
 ## tsMuxeR 2.6.15
 - Fixed mkv parser a bit. I've got unparsed file example
 

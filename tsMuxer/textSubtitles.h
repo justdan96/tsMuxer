@@ -52,7 +52,7 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     void setVideoInfo(int width, int height, double fps);
     void enlargeCrop(int width, int height, int* newWidth, int* newHeight);
     void setBottomOffset(int offset) { m_bottomOffset = offset; }
-    uint8_t* doConvert(std::wstring& text, const TextAnimation& animation, double inTime, double outTime,
+    uint8_t* doConvert(std::string& text, const TextAnimation& animation, double inTime, double outTime,
                        uint32_t& dstBufSize);
     TextSubtitlesRender* m_textRender;
     static YUVQuad RGBAToYUVA(uint32_t rgba);

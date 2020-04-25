@@ -63,9 +63,9 @@ class SRTStreamReader : public AbstractStreamReader
     bool m_lastBlock;
     int parseText(uint8_t* dataStart, int len);
     std::vector<uint8_t> m_tmpBuffer;
-    std::queue<std::wstring> m_sourceText;
+    std::queue<std::string> m_sourceText;
     std::queue<uint32_t> m_origSize;
-    std::wstring m_renderedText;
+    std::string m_renderedText;
     long m_splitterOfs;
     uint16_t m_short_R;
     uint16_t m_short_N;
@@ -80,10 +80,10 @@ class SRTStreamReader : public AbstractStreamReader
         PARSE_TEXT
     } m_state;
     uint8_t* renderNextMessage(uint32_t& renderedLen);
-    bool parseTime(const std::wstring& text);
+    bool parseTime(const std::string& text);
     std::string detectUTF8Lang(uint8_t* buffer, int len);
     bool detectSrcFormat(uint8_t* dataStart, int len, int& prefixLen);
-    bool strOnlySpace(std::wstring& str);
+    bool strOnlySpace(std::string& str);
 };
 
 #endif

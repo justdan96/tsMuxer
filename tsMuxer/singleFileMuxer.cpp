@@ -40,7 +40,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 {
     codecReader->setDemuxMode(true);
     uint8_t descrBuffer[188];
-    int descriptorLen = codecReader->getTSDescriptor(descrBuffer);
+    int descriptorLen = codecReader->getTSDescriptor(descrBuffer, true, true);
     string fileExt = "track";
     if (codecName == "A_AC3")
         fileExt = ".ac3";
@@ -121,12 +121,16 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 
     vector<string> fileList = extractFileList(streamName);
     string fileName;
-    for (int i = 0; i < (int)fileList.size(); i++)
-    {
-        if (i > 0)
-            fileName += '+';
-        fileName += extractFileName(fileList[i]);
-    }
+    if (fileList.size() < 3)
+        for (int i = 0; i < (int)fileList.size(); i++)
+        {
+            if (i > 0)
+                fileName += '+';
+            fileName += extractFileName(fileList[i]);
+        }
+    else
+        fileName = extractFileName(fileList[0]) + "+___+" + extractFileName(fileList[fileList.size() - 1]);
+
     map<string, string>::const_iterator itr = params.find("track");
     if (itr != params.end())
     {
@@ -145,6 +149,8 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     }
     StreamInfo* streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
     streamInfo->m_fileName = fileName + fileExt;
+    if (streamInfo->m_fileName.size() > 254)
+        LTRACE(LT_ERROR, 2, "Error: File name too long.");
     streamInfo->m_codecReader = codecReader;
     m_streamInfo[streamIndex] = streamInfo;
 }
@@ -198,6 +204,8 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_file.close();
         streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofAppend);
         streamInfo->m_file.write(streamInfo->m_buffer, streamInfo->m_bufLen);
+        streamInfo->m_file.close();
+        streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate);
         lpcmReader->beforeFileCloseEvent(streamInfo->m_file);
         streamInfo->m_file.close();
         std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
@@ -287,8 +295,14 @@ bool SingleFileMuxer::close()
             if (!streamInfo->m_file.write(streamInfo->m_buffer, streamInfo->m_bufLen))
                 return false;
             if (streamInfo->m_codecReader)
+            {
+                if (!streamInfo->m_file.close())
+                    return false;
+                if (streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate))
+                    return false;
                 if (!streamInfo->m_codecReader->beforeFileCloseEvent(streamInfo->m_file))
                     return false;
+            }
             if (!streamInfo->m_file.close())
                 return false;
 

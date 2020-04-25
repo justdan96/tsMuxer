@@ -4,21 +4,21 @@
 
 #include "hevc.h"
 #include "nalUnits.h"
+#include "tsMuxer.h"
 #include "tsPacket.h"
 #include "vodCoreException.h"
 
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
-int V3_flags = 0;  // flags : isV3, reserved, 4K, HDR10+, SL-HDR2, DV, HDR10, SDR
-int HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
+static const int HEVC_DESCRIPTOR_TAG = 0x38;
 
 HEVCStreamReader::HEVCStreamReader()
     : MPEGStreamReader(),
       m_vps(0),
       m_sps(0),
       m_pps(0),
-      m_sei(0),
+      m_hdr(0),
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
@@ -39,7 +39,7 @@ HEVCStreamReader::~HEVCStreamReader()
     delete m_vps;
     delete m_sps;
     delete m_pps;
-    delete m_sei;
+    delete m_hdr;
 }
 
 CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
@@ -90,21 +90,25 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         }
         case NAL_SEI_PREFIX:
         {
-            if (!m_sei)
-                m_sei = new HevcSeiUnit();
-            m_sei->decodeBuffer(nal, nextNal);
-            if (m_sei->deserialize() != 0)
+            if (!m_hdr)
+                m_hdr = new HevcHdrUnit();
+            m_hdr->decodeBuffer(nal, nextNal);
+            if (m_hdr->deserialize() != 0)
                 return rez;
             break;
         }
-        case NAL_DV:
+        case NAL_DVRPU:
+        case NAL_DVEL:
         {
-            if (!m_sei)
-                m_sei = new HevcSeiUnit();
-            if (nal[1] == 1 && !m_sei->isDV)
+            if (!m_hdr)
+                m_hdr = new HevcHdrUnit();
+            if (nal[1] == 1)
             {
-                m_sei->isDV = true;
-                V3_flags |= 4;  // Dolby Vision flag
+                if (nalType == NAL_DVEL)
+                    m_hdr->isDVEL = true;
+                else
+                    m_hdr->isDVRPU = true;
+                V3_flags |= DV;
             }
             break;
         }
@@ -113,6 +117,15 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
     {
+        if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
+            m_sps->matrix_coeffs == 9)  // BT.2100
+        {
+            if (!m_hdr)
+                m_hdr = new HevcHdrUnit();
+            m_hdr->isHDR10 = true;
+            V3_flags |= HDR10;
+        }
+
         rez.codecInfo = hevcCodecInfo;
         rez.streamDescr = m_sps->getDescription();
         size_t frSpsPos = rez.streamDescr.find("Frame rate: not found");
@@ -123,27 +136,211 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
     return rez;
 }
 
-int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff)
+int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     if (m_firstFrame)
+        CheckStreamRez rez = checkStream(m_buffer, m_bufEnd - m_buffer);
+
+    int lenDoviDesc = 0;
+    if (!blurayMode && m_hdr->isDVRPU)
     {
-        checkStream(m_buffer, m_bufEnd - m_buffer);
+        // 'DOVI' registration descriptor
+        memcpy(dstBuff, "\x05\x04\x44\x4f\x56\x49", 6);
+        dstBuff += 6;
+        lenDoviDesc += 6;
     }
 
-    // put 'HDMV' registration descriptor
-    *dstBuff++ = 0x05;  // registration descriptor tag
-    *dstBuff++ = 8;     // descriptor length
-    memcpy(dstBuff, "HDMV\xff\x24", 6);
-    dstBuff += 6;
+    if (hdmvDescriptors)
+    {
+        // 'HDMV' registration descriptor
+        *dstBuff++ = 0x05;
+        *dstBuff++ = 8;
+        memcpy(dstBuff, "HDMV\xff\x24", 6);
+        dstBuff += 6;
 
-    int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                       &video_format, &frame_rate_index, &aspect_ratio_index);
+        int video_format, frame_rate_index, aspect_ratio_index;
+        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
-    *dstBuff++ = (video_format << 4) + frame_rate_index;
-    *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+        *dstBuff++ = (video_format << 4) + frame_rate_index;
+        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+    }
+    else
+    {
+        uint8_t tmpBuffer[512];
 
-    return 10;
+        for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
+             nal = NALUnit::findNextNAL(nal, m_bufEnd))
+        {
+            uint8_t nalType = (*nal >> 1) & 0x3f;
+            uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
+
+            if (nalType == NAL_SPS)
+            {
+                int toDecode = FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
+                int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
+                break;
+            }
+        }
+
+        *dstBuff++ = HEVC_DESCRIPTOR_TAG;
+        *dstBuff++ = 13;  // descriptor length
+        memcpy(dstBuff, tmpBuffer + 3, 12);
+        dstBuff += 12;
+        // flags temporal_layer_subset, HEVC_still_present,
+        // HEVC_24hr_picture_present, HDR_WCG unspecified
+        *dstBuff = 0x0f;
+
+        if (!m_sps->sub_pic_hrd_params_present_flag)
+            *dstBuff |= 0x10;
+        dstBuff++;
+
+        /* HEVC_timing_and_HRD_descriptor
+        // mandatory for interlaced video only
+        memcpy(dstBuff, "\x3f\x0f\x03\x7f\x7f", 5);
+        dstBuff += 5;
+
+        uint32_t N = 1001 * getFPS();
+        uint32_t K = 27000000;
+        uint32_t num_units_in_tick = 1001;
+        if (N % 1000)
+        {
+            N = 1000 * getFPS();
+            num_units_in_tick = 1000;
+        }
+        N = my_htonl(N);
+        K = my_htonl(K);
+        num_units_in_tick = my_htonl(num_units_in_tick);
+        memcpy(dstBuff, &N, 4);
+        dstBuff += 4;
+        memcpy(dstBuff, &K, 4);
+        dstBuff += 4;
+        memcpy(dstBuff, &num_units_in_tick, 4);
+        dstBuff += 4;
+        */
+    }
+
+    if (!blurayMode && m_hdr->isDVRPU)
+        lenDoviDesc += setDoViDescriptor(dstBuff);
+
+    return (hdmvDescriptors ? 10 : 15) + lenDoviDesc;
+}
+
+int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
+{
+    int isDVBL = !(V3_flags & NON_DV_TRACK);
+    if (!isDVBL)
+        m_hdr->isDVEL = true;
+
+    int width = getStreamWidth();
+    int pixelRate = width * getStreamHeight() * getFPS();
+
+    if (!isDVBL && V3_flags & FOUR_K)
+        pixelRate *= 4;
+
+    // cf. "http://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-profiles-levels.pdf"
+    int profile;
+    int compatibility;
+    if (m_sps->bit_depth_luma_minus8 == 2)
+    {
+        if (!isDVBL)  // dual HEVC track
+        {
+            profile = 7;
+            compatibility = 6;
+        }
+        else if (m_hdr->isDVEL && (V3_flags & HDR10))
+        {
+            profile = 6;
+            compatibility = 1;
+        }
+        else if (m_hdr->isDVEL)
+        {
+            profile = 4;
+            compatibility = 2;
+        }
+        else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
+                 m_sps->matrix_coeffs == 2)  // DV IPT color space
+        {
+            profile = 5;
+            compatibility = 0;
+        }
+        else if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
+                 m_sps->matrix_coeffs == 9)  // DV BT.2100
+        {
+            profile = 8;
+            compatibility = 1;
+        }
+        else  // DV SDR
+        {
+            profile = 8;
+            compatibility = 2;
+        }
+    }
+    else  // 8-bit
+    {
+        if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
+            m_sps->matrix_coeffs == 2)  // DV IPT color space
+        {
+            profile = 3;
+            compatibility = 0;
+        }
+        else
+        {
+            profile = 2;
+            compatibility = 2;
+        }
+    }
+
+    int level = 0;
+    if (width <= 1280 && pixelRate <= 22118400)
+        level = 1;
+    else if (width <= 1280 && pixelRate <= 27648000)
+        level = 2;
+    else if (width <= 1920 && pixelRate <= 49766400)
+        level = 3;
+    else if (width <= 2560 && pixelRate <= 62208000)
+        level = 4;
+    else if (width <= 3840 && pixelRate <= 124416000)
+        level = 5;
+    else if (width <= 3840 && pixelRate <= 199065600)
+        level = 6;
+    else if (width <= 3840 && pixelRate <= 248832000)
+        level = 7;
+    else if (width <= 3840 && pixelRate <= 398131200)
+        level = 8;
+    else if (width <= 3840 && pixelRate <= 497664000)
+        level = 9;
+    else if (width <= 3840 && pixelRate <= 995328000)
+        level = 10;
+    else if (width <= 7680 && pixelRate <= 995328000)
+        level = 11;
+    else if (width <= 7680 && pixelRate <= 1990656000)
+        level = 12;
+    else if (width <= 7680 && pixelRate <= 3981312000)
+        level = 13;
+
+    BitStreamWriter bitWriter;
+    bitWriter.setBuffer(dstBuff, dstBuff + 128);
+
+    bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
+    bitWriter.putBits(8, isDVBL ? 5 : 7);  // descriptor length
+    bitWriter.putBits(8, 1);               // dv version major
+    bitWriter.putBits(8, 0);               // dv version minor
+    bitWriter.putBits(7, profile);         // dv profile
+    bitWriter.putBits(6, level);           // dv level
+    bitWriter.putBits(1, m_hdr->isDVRPU);  // rpu_present_flag
+    bitWriter.putBits(1, m_hdr->isDVEL);   // el_present_flag
+    bitWriter.putBits(1, isDVBL);          // bl_present_flag
+    if (!isDVBL)
+    {
+        bitWriter.putBits(13, 0x1011);  // dependency_pid
+        bitWriter.putBits(3, 7);        // reserved
+    }
+    bitWriter.putBits(4, compatibility);  // dv_bl_signal_compatibility_id
+    bitWriter.putBits(4, 15);             // reserved
+
+    bitWriter.flushBits();
+    return 2 + (isDVBL ? 5 : 7);
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
@@ -176,7 +373,7 @@ int HEVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height
 
 int HEVCStreamReader::getStreamHDR() const
 {
-    return m_sei->isDV ? 4 : (m_sei->isHDR10plus ? 16 : (m_sei->isHDR10 ? 2 : 1));
+    return (m_hdr->isDVRPU || m_hdr->isDVEL) ? 4 : (m_hdr->isHDR10plus ? 16 : (m_hdr->isHDR10 ? 2 : 1));
 }
 
 double HEVCStreamReader::getStreamFPS(void* curNalUnit)
@@ -203,7 +400,7 @@ bool HEVCStreamReader::isSuffix(int nalType) const
         return false;
     return (nalType == NAL_FD_NUT || nalType == NAL_SEI_SUFFIX || nalType == NAL_RSV_NVCL45 ||
             (nalType >= NAL_RSV_NVCL45 && nalType <= NAL_RSV_NVCL47) ||
-            (nalType >= NAL_UNSPEC56 && nalType <= NAL_UNSPEC63));
+            (nalType >= NAL_UNSPEC56 && nalType <= NAL_DVEL));
 }
 
 void HEVCStreamReader::incTimings()
@@ -349,6 +546,13 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     return rez;
                 m_spsPpsFound = true;
                 storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
+                break;
+            case NAL_SEI_PREFIX:
+                if (!m_hdr)
+                    m_hdr = new HevcHdrUnit();
+                m_hdr->decodeBuffer(curPos, nextNal);
+                if (m_hdr->deserialize() != 0)
+                    return rez;
                 break;
             }
         }

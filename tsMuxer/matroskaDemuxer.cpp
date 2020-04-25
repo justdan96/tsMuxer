@@ -221,6 +221,7 @@ MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager) : IOC
     num_streams = 0;
     segment_start = 0;
     time_scale = 0;
+    m_firstTimecode.clear();
     index_parsed = false;
     metadata_parsed = false;
     writing_app = 0;
@@ -665,7 +666,11 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
         uint64_t timecode = AV_NOPTS_VALUE;
 
         if (cluster_time != (uint64_t)-1 && (block_time >= 0 || cluster_time >= -block_time))
+        {
             timecode = cluster_time + block_time;
+            if (m_firstTimecode.find(tracks[track]->num) == m_firstTimecode.end())
+                m_firstTimecode[tracks[track]->num] = timecode;
+        }
 
         for (n = 0; n < laces; n++)
         {
@@ -1080,6 +1085,7 @@ void MatroskaDemuxer::openFile(const std::string &streamName)
 
     segment_start = 0;
     time_scale = 0;
+    m_firstTimecode.clear();
     index_parsed = false;
     metadata_parsed = false;
 

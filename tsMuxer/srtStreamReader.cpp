@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "convertUTF.h"
 #include "matroskaParser.h"
 #include "memory.h"
 #include "vodCoreException.h"
@@ -54,7 +55,8 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     if (len < 4)
         return false;
     // detect UTF-8/UTF-16/UTF-32 format
-    if (dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF)
+    if ((dataStart[0] == 0xEF && dataStart[1] == 0xBB && dataStart[2] == 0xBF) ||
+        convertUTF::isLegalUTF8String(dataStart, len))
     {
         m_charSize = 1;
         m_srcFormat = UtfConverter::sfUTF8;
@@ -97,9 +99,10 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     else
     {
 #ifdef _WIN32
+        LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to the active code page");
         m_srcFormat = UtfConverter::sfANSI;  // default value for win32
 #else
-        // m_srcFormat = UtfConverter::sfDefault;
+        LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to UTF-8");
         m_srcFormat = UtfConverter::sfUTF8;
 #endif
     }
@@ -118,7 +121,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
     int roundLen = len & (~(m_charSize - 1));
     uint8_t* end = cur + roundLen;
     uint8_t* lastProcessedLine = cur;
-    vector<wstring> rez;
+    vector<string> rez;
     for (; cur < end; cur += m_charSize)
     {
         // if (cur[m_splitterOfs] == '\n')
@@ -131,8 +134,8 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
                     m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R)
                     x = m_charSize;
 
-            m_sourceText.push(UtfConverter::toWideString(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
-            std::wstring& tmp = m_sourceText.back();
+            m_sourceText.emplace(UtfConverter::toUtf8(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
+            std::string& tmp = m_sourceText.back();
             if (strOnlySpace(tmp))
                 tmp.clear();
 
@@ -144,10 +147,10 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
     return lastProcessedLine - dataStart;
 }
 
-bool SRTStreamReader::strOnlySpace(std::wstring& str)
+bool SRTStreamReader::strOnlySpace(std::string& str)
 {
-    for (std::wstring::iterator itr = str.begin(); itr != str.end(); ++itr)
-        if (*itr != L' ')
+    for (std::string::iterator itr = str.begin(); itr != str.end(); ++itr)
+        if (*itr != ' ')
             return false;
     return true;
 }
@@ -189,9 +192,8 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_state = PARSE_TIME;
         bool isNUmber = true;
         {
-            wstring& str = m_sourceText.front();
-            for (int i = 0; i < str.length(); i++)
-                if (!(str[i] >= L'0' && str[i] <= L'9') && str[i] != L' ')
+            for (auto c : m_sourceText.front())
+                if (!(c >= '0' && c <= '9') && c != ' ')
                 {
                     isNUmber = false;
                     break;
@@ -250,22 +252,22 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
     return rez;
 }
 
-bool SRTStreamReader::parseTime(const wstring& text)
+bool SRTStreamReader::parseTime(const string& text)
 {
     for (int i = 0; i < text.length() - 2; i++)
     {
-        if (text[i] == L'-' && text[i + 1] == L'-' && text[i + 2] == L'>')
+        if (text[i] == '-' && text[i + 1] == '-' && text[i + 2] == '>')
         {
-            wstring first = trimStrW(text.substr(0, i));
-            wstring second = trimStrW(text.substr(i + 3, text.length() - i - 3));
+            string first = trimStr(text.substr(0, i));
+            string second = trimStr(text.substr(i + 3, text.length() - i - 3));
             for (int j = 0; j < first.length(); j++)
-                if (first[j] == L',')
-                    first[j] = L'.';
+                if (first[j] == ',')
+                    first[j] = '.';
             for (int j = 0; j < second.length(); j++)
-                if (second[j] == L',')
-                    second[j] = L'.';
-            m_inTime = timeToFloatW(first);
-            m_outTime = timeToFloatW(second);
+                if (second[j] == ',')
+                    second[j] = '.';
+            m_inTime = timeToFloat(first);
+            m_outTime = timeToFloat(second);
             return true;
         }
     }
