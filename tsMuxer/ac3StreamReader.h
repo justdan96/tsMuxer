@@ -24,7 +24,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         m_nextAc3Time = 0;
         m_thdFrameOffset = 0;
     };
-    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     void setNewStyleAudioPES(bool value) { m_useNewStyleAudioPES = value; }
     void setTestMode(bool value) override { AC3Codec::setTestMode(value); }
     int getFreq() override { return AC3Codec::m_sample_rate; }

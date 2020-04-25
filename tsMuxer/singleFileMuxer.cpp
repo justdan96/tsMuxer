@@ -40,7 +40,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 {
     codecReader->setDemuxMode(true);
     uint8_t descrBuffer[188];
-    int descriptorLen = codecReader->getTSDescriptor(descrBuffer, true);
+    int descriptorLen = codecReader->getTSDescriptor(descrBuffer, true, true);
     string fileExt = "track";
     if (codecName == "A_AC3")
         fileExt = ".ac3";

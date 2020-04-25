@@ -54,7 +54,7 @@ void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
     }
 }
 
-int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     AC3Codec::setTestMode(true);
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);

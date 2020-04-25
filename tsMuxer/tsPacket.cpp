@@ -374,7 +374,7 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, int es_info_len
     }
 }
 
-uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool blurayMode)
+uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bool blurayMode, bool hdmvDescriptors)
 {
     buffer[0] = 0;
     buffer++;
@@ -401,15 +401,18 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     bitWriter.putBits(12, 0);  // program info len
     int beforeCount2 = bitWriter.getBitsCount() / 8;
 
-    // put 'HDMV' registration descriptor
-    bitWriter.putBits(8, 0x05);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(32, 0x48444d56);
+    if (hdmvDescriptors)
+    {
+        // put 'HDMV' registration descriptor
+        bitWriter.putBits(8, 0x05);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(32, 0x48444d56);
 
-    // put DTCP descriptor
-    bitWriter.putBits(8, 0x88);
-    bitWriter.putBits(8, 0x04);
-    bitWriter.putBits(32, 0x0ffffcfc);
+        // put DTCP descriptor
+        bitWriter.putBits(8, 0x88);
+        bitWriter.putBits(8, 0x04);
+        bitWriter.putBits(32, 0x0ffffcfc);
+    }
 
     if (casPID)
     {
@@ -451,6 +454,9 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
+        if (itr->second.m_streamType == 0x90 && !hdmvDescriptors)
+            LTRACE(LT_WARN, 2, "Warning: PGS might not work without HDMV descriptors.");
+
         bitWriter.putBits(8, itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);

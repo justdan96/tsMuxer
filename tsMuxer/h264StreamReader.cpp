@@ -437,7 +437,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     return curPos - dstBuffer;
 }
 
-int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
+int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     SliceUnit slice;
     if (m_firstDecodeNal)
@@ -446,23 +446,25 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode)
         m_firstDecodeNal = false;
     }
 
-    // put 'HDMV' registration descriptor
-    *dstBuff++ = 0x05;  // registration descriptor tag
-    *dstBuff++ = 8;     // descriptor length
-    memcpy(dstBuff, "HDMV\xff", 5);
-    dstBuff += 5;
+    if (hdmvDescriptors)
+    {
+        // put 'HDMV' registration descriptor
+        *dstBuff++ = 0x05;  // registration descriptor tag
+        *dstBuff++ = 8;     // descriptor length
+        memcpy(dstBuff, "HDMV\xff", 5);
+        dstBuff += 5;
 
-    int video_format, frame_rate_index, aspect_ratio_index;
-    M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(), getStreamAR(),
-                                       &video_format, &frame_rate_index, &aspect_ratio_index);
+        int video_format, frame_rate_index, aspect_ratio_index;
+        M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
-    *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
-    *dstBuff++ = (video_format << 4) + frame_rate_index;
-    *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+        *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
+        *dstBuff++ = (video_format << 4) + frame_rate_index;
+        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
-    return 10;
+        return 10;
+    }
 
-    // For future use: ATSC desciptor
     for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = NALUnit::findNextNAL(nal, m_bufEnd))
     {

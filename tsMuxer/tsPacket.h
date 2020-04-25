@@ -257,7 +257,7 @@ struct TS_program_map_section
     TS_program_map_section();
     bool deserialize(uint8_t* buffer, int buf_size);
     static bool isFullBuff(uint8_t* buffer, int buf_size);
-    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool blurayMode);
+    uint32_t serialize(uint8_t* buffer, int max_buf_size, bool blurayMode, bool hdmvDescriptors);
 
    private:
     void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);

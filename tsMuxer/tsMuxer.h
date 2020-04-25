@@ -132,6 +132,7 @@ class TSMuxer : public AbstractMuxer
     bool m_m2tsMode;
     int m_curFileNum;
     bool m_bluRayMode;
+    bool m_hdmvDescriptors;
     uint64_t m_splitSize;
     uint64_t m_splitDuration;
 

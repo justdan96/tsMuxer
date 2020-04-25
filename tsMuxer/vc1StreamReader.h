@@ -21,7 +21,7 @@ class VC1StreamReader : public MPEGStreamReader
         m_nextFrameAddr = 0;
     }
     ~VC1StreamReader() override {}
-    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode) override;
+    int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool skipNal(uint8_t* nal) override;
     bool needSPSForSplit() const override { return true; }

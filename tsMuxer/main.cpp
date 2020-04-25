@@ -489,6 +489,8 @@ All parameters in this group start with two dashes:
                     video PID.
 --new-audio-pes     Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and
                     DTS-HD. Activated automatically for BD muxing.
+--hdmv-descriptors  Use HDMV descriptors instead of ITU-T H.222.0 | ISO/IEC 13818-1
+                    descriptors. Activated automatically for BD muxing.
 --vbr               Use variable bitrate.
 --minbitrate        Sets the lower limit of the VBR bitrate. If the stream has
                     a smaller bitrate, NULL packets will be inserted to
