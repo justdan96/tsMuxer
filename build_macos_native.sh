@@ -26,5 +26,4 @@ mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
 mv tsMuxerGUI/tsMuxerGUI.app "${builddir}/bin/mac"
 popd
 
-zip -r ./bin/mac.zip ./bin/mac
 ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip
