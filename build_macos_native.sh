@@ -11,8 +11,8 @@ brew install zlib
 
 builddir=$PWD
 
-mkdir bin/mac
-mkdir build
+mkdir -p bin/mac
+mkdir -p build
 
 pushd build
 cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
@@ -25,5 +25,3 @@ popd
 mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
 mv tsMuxerGUI/tsMuxerGUI.app "${builddir}/bin/mac"
 popd
-
-ls ./bin/mac/tsMuxeR && ls ./bin/mac/tsMuxerGUI.app/Contents/MacOS/tsMuxerGUI && ls ./bin/mac.zip
