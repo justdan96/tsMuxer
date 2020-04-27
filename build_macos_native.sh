@@ -20,8 +20,11 @@ make
 
 pushd tsMuxerGUI
 macdeployqt tsMuxerGUI.app
-defaults write "$PWD/tsMuxerGUI.app/Contents/Info.plist" NSPrincipalClass -string NSApplication
-defaults write "$PWD/tsMuxerGUI.app/Contents/Info.plist" NSHighResolutionCapable -string True
+pushd tsMuxerGUI.app/Contents
+defaults write "$PWD/Info.plist" NSPrincipalClass -string NSApplication
+defaults write "$PWD/Info.plist" NSHighResolutionCapable -string True
+plutil -convert xml1 Info.plist
+popd
 popd
 
 mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
