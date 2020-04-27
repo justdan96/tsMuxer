@@ -27,3 +27,4 @@ popd
 mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
 mv tsMuxerGUI/tsMuxerGUI.app "${builddir}/bin/mac"
 popd
+
