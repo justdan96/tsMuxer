@@ -581,7 +581,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ctNone;
     CLPIParser clpi;
     bool clpiParsed = false;
-    if (strEndWith(fileExt, "m2ts") || strEndWith(fileExt, "mts") || strEndWith(fileExt, "ssif"))
+    if (fileExt == "m2ts" || fileExt == "mts" || fileExt == "ssif")
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctM2TS;
@@ -589,28 +589,27 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         if (!clpiFileName.empty())
             clpiParsed = clpi.parse(clpiFileName.c_str());
     }
-    else if (strEndWith(fileExt, "ts"))
+    else if (fileExt == "ts")
     {
         demuxer = new TSDemuxer(readManager, "");
         containerType = AbstractStreamReader::ctTS;
     }
-    else if (strEndWith(fileExt, "vob") || strEndWith(fileExt, "mpg"))
+    else if (fileExt == "vob" || fileExt == "mpg")
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctVOB;
     }
-    else if (strEndWith(fileExt, "evo"))
+    else if (fileExt == "evo")
     {
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ctEVOB;
     }
-    else if (strEndWith(fileExt, "mkv") || strEndWith(fileExt, "mka"))
+    else if (fileExt == "mkv" || fileExt == "mka")
     {
         demuxer = new MatroskaDemuxer(readManager);
         containerType = AbstractStreamReader::ctMKV;
     }
-    else if (strEndWith(fileExt, "mp4") || strEndWith(fileExt, "m4v") || strEndWith(fileExt, "m4a") ||
-             strEndWith(fileExt, "mov"))
+    else if (fileExt == "mp4" || fileExt == "m4v" || fileExt == "m4a" || fileExt == "mov")
     {
         demuxer = new MovDemuxer(readManager);
         containerType = AbstractStreamReader::ctMOV;
@@ -680,12 +679,11 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             return DetectStreamRez();
         uint8_t* tmpBuffer = new uint8_t[DETECT_STREAM_BUFFER_SIZE];
         int len = file.read(tmpBuffer, DETECT_STREAM_BUFFER_SIZE);
-        if (strEndWith(fileExt, "sup") || strEndWith(fileExt, "sup\""))
+        if (fileExt == "sup")
             containerType = AbstractStreamReader::ctSUP;
-        else if (strEndWith(fileExt, "pcm") || strEndWith(fileExt, "lpcm") || strEndWith(fileExt, "wav") ||
-                 strEndWith(fileExt, "w64"))
+        else if (fileExt == "pcm" || fileExt == "lpcm" || fileExt == "wav" || fileExt == "w64")
             containerType = AbstractStreamReader::ctLPCM;
-        else if (strEndWith(fileExt, "srt") || strEndWith(fileExt, "srt\""))
+        else if (fileExt == "srt")
             containerType = AbstractStreamReader::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
