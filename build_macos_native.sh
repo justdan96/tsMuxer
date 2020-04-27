@@ -19,7 +19,9 @@ cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
 make
 
 pushd tsMuxerGUI
-macdeployqt tsMuxerGUI.app -verbose=3
+macdeployqt tsMuxerGUI.app
+defaults write tsMuxerGUI.app/Contents/Info.plist NSPrincipalClass -string NSApplication
+defaults write tsMuxerGUI.app/Contents/Info.plist NSHighResolutionCapable -string True
 popd
 
 mv tsMuxer/tsmuxer "${builddir}/bin/mac/tsMuxeR"
