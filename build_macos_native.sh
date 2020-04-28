@@ -26,7 +26,10 @@ popd
 macdeployqt tsMuxerGUI.app
 popd
 
-mv tsMuxer/tsmuxer "$PWD/tsMuxeR"
-mv tsMuxerGUI/tsMuxerGUI.app "$PWD"
+mkdir bin
+pushd bin
+mv ../tsMuxer/tsmuxer tsMuxeR
+mv ../tsMuxerGUI/tsMuxerGUI.app .
 BZIP2=-9 tar cjf mac.tar.bz2 tsMuxeR tsMuxerGUI.app
+popd
 popd
