@@ -25,11 +25,11 @@ using namespace std;
 regex invalidChars()
 {
 #ifndef _WIN32
-    // NULL and /
-    regex invalid("[\\/\\x00]");
+    // / and ASCII 0 to 31
+    regex invalid("[/\x00-\x1F]");
 #else
-    // <>:"/|?* and ASCII 0 to 31
-    regex invalid("[:<>I\"\\/|?\\*\\x00-\\x1F]");
+    // <>:"/|?\* and ASCII 0 to 31
+    regex invalid("[:<>\"/|?\\*\x00-\x1F]");
 #endif
     return invalid;
 }
