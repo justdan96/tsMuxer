@@ -233,10 +233,13 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    int pixelRate = width * getStreamHeight() * getFPS();
+    uint32_t pixelRate = width * getStreamHeight() * getFPS();
 
     if (!isDVBL && V3_flags & FOUR_K)
+    {
+        width *= 2;
         pixelRate *= 4;
+    }
 
     // cf. "http://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-profiles-levels.pdf"
     int profile;
