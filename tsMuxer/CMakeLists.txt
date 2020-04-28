@@ -109,7 +109,7 @@ if (WIN32)
   target_compile_definitions(tsmuxer PRIVATE "-DUNICODE")
 else()
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
-  target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES})
+  target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES} ${FREETYPE2_LDFLAGS})
   target_include_directories(tsmuxer PRIVATE ${FREETYPE2_INCLUDE_DIRS})
 endif()
 

@@ -1,0 +1,28 @@
+name: Build for Mac
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-mac-native:
+
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@master
+      name: checkout
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      
+    - run: ./build_macos_native.sh
+      name: build-for-mac
+
+    - uses: actions/upload-artifact@master
+      with:
+         name: tsMuxer
+         path: build/bin/mac.tar.bz2
+      name: upload-artefact
