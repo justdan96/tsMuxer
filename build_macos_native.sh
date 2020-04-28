@@ -17,13 +17,12 @@ pushd build
 cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
 make -j$(sysctl -n hw.logicalcpu)
 
+pushd tsMuxerGUI
 pushd tsMuxerGUI.app/Contents
 defaults write "$PWD/Info.plist" NSPrincipalClass -string NSApplication
 defaults write "$PWD/Info.plist" NSHighResolutionCapable -string True
 plutil -convert xml1 Info.plist
 popd
-
-pushd tsMuxerGUI
 macdeployqt tsMuxerGUI.app
 popd
 
