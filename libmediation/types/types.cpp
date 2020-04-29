@@ -28,8 +28,9 @@ regex invalidChars()
     // / and ASCII 0 to 31
     regex invalid("[/\x00-\x1F]");
 #else
-    // <>:"/|?\* and ASCII 0 to 31
-    regex invalid("[:<>\"/|?\\*\x00-\x1F]");
+    // <>:"/|?\*, ASCII 0 to 31 and all reserved names such as CON or LPT1
+    // see here: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+    regex invalid("[:<>\"/|?\\*\x00-\x1F]|^CON$|^PRN$|^AUX$|^NUL$|^COM\d$|^LPT\d$");
 #endif
     return invalid;
 }
