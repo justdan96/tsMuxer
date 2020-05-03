@@ -295,14 +295,8 @@ bool SingleFileMuxer::close()
             if (!streamInfo->m_file.write(streamInfo->m_buffer, streamInfo->m_bufLen))
                 return false;
             if (streamInfo->m_codecReader)
-            {
-                if (!streamInfo->m_file.close())
-                    return false;
-                if (streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate))
-                    return false;
                 if (!streamInfo->m_codecReader->beforeFileCloseEvent(streamInfo->m_file))
                     return false;
-            }
             if (!streamInfo->m_file.close())
                 return false;
 
