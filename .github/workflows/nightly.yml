@@ -38,4 +38,6 @@ jobs:
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        OBS_USER: ${{ secrets.OBS_USER }}
+        OBS_SECRET: ${{ secrets.OBS_SECRET }}
       
