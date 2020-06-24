@@ -2536,8 +2536,8 @@ void TsMuxerWindow::startMuxing()
 
 void TsMuxerWindow::saveMetaFileBtnClick()
 {
-    QString metaName =
-        QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"), mSaveDialogFilter);
+    QString metaName = QFileDialog::getSaveFileName(this, "", changeFileExt(ui->outFileName->text(), "meta"),
+                                                    tr("tsMuxeR project file (*.meta);;All files (*.*)"));
     if (metaName.isEmpty())
         return;
     QFileInfo fi(metaName);
