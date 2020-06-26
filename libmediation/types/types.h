@@ -11,8 +11,6 @@
 #endif
 char* strnstr(const char* s1, const char* s2, size_t len);
 
-std::regex invalidChars();
-
 uint64_t my_ntohll(const uint64_t& original);
 uint64_t my_htonll(const uint64_t& original);
 uint32_t my_ntohl(const uint32_t val);

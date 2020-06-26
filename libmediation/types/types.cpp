@@ -20,20 +20,26 @@
 
 #include "fs/directory.h"
 
-using namespace std;
-
-regex invalidChars()
+namespace
 {
+const std::regex& invalidChars()
+{
+    static const std::regex invalid(
 #ifndef _WIN32
-    // / and ASCII 0 to 31
-    regex invalid("[/\x00-\x1F]");
+        // / and ASCII 0 to 31
+        "[/\\x00-\\x1F]"
 #else
-    // <>:"/|?\*, ASCII 0 to 31 and all reserved names such as CON or LPT1
-    // see here: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
-    regex invalid("[:<>\"/|?\\*\x00-\x1F]|^CON$|^PRN$|^AUX$|^NUL$|^COM\d$|^LPT\d$");
+        // <>:"/|?\*, ASCII 0 to 31 and all reserved names such as CON or LPT1
+        // see here: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
+        "[:<>\"/|?\\*\\x00-\\x1F]|^CON$|^PRN$|^AUX$|^NUL$|^COM\d$|^LPT\d$"
 #endif
+        ,
+        std::regex_constants::ECMAScript | std::regex_constants::optimize);
     return invalid;
 }
+}  // namespace
+
+using namespace std;
 
 uint64_t my_ntohll(const uint64_t& original)
 {
@@ -372,8 +378,7 @@ bool isValidFileName(const string& src)
     string filename = extractFileName(src);
 
     // invalidChars() returns a different regex pattern for Windows or Unix
-    regex ourInvalidChars = invalidChars();
-    bool isvalid = !(std::regex_search(filename, ourInvalidChars));
+    bool isvalid = !(std::regex_search(filename, invalidChars()));
     return isvalid;
 }
 
