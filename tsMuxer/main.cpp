@@ -735,7 +735,12 @@ int main(int argc, char** argv)
                 LTRACE(LT_INFO, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
                 V3_flags |= HDMV_V3;
             }
+
+            // output path - is checked for invalid characters on our platform
             string dstFile = unquoteStr(argv[2]);
+
+            if (!isValidFileName(dstFile))
+                throw runtime_error(string("Output filename is invalid: ") + dstFile);
 
             if (dt != DT_NONE)
             {
@@ -803,8 +808,15 @@ int main(int argc, char** argv)
             sMuxer.openMetaFile(argv[1]);
             if (sMuxer.getTrackCnt() == 0)
                 THROW(ERR_COMMON, "No tracks selected");
-            createDir(unquoteStr(argv[2]), true);
-            sMuxer.doMux(unquoteStr(argv[2]), 0);
+
+            // output path - is checked for invalid characters on our platform
+            string dstFile = unquoteStr(argv[2]);
+
+            if (!isValidFileName(dstFile))
+                throw runtime_error(string("Output filename is invalid: ") + dstFile);
+
+            createDir(dstFile, true);
+            sMuxer.doMux(dstFile, 0);
             LTRACE(LT_INFO, 2, "Demux complete.");
         }
         auto endTime = std::chrono::steady_clock::now();

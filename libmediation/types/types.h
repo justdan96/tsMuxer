@@ -2,6 +2,7 @@
 #define __T_TYPES_H
 
 #include <cstdint>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -45,6 +46,7 @@ std::string extractFileName(const std::string& src);
 std::string extractFileName2(const std::string& src, bool withExt = true);
 std::string extractFilePath(const std::string& src);
 std::string closeDirPath(const std::string& src, char delimiter = ' ');
+bool isValidFileName(const std::string& src);
 
 std::vector<std::string> splitQuotedStr(const char* str, char splitter);
 
