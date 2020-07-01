@@ -376,6 +376,10 @@ void MuxerManager::parseMuxOpt(const string& opts)
         {
             m_demuxMode = true;
         }
+        else if (paramPair[0] == "--constant-iso-hdr")
+        {
+            m_reproducibleIsoHeader = true;
+        }
     }
 }
 

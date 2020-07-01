@@ -167,10 +167,21 @@ struct FileEntryInfo
     bool m_subMode;  // sub file in stereo interleaved mode
 };
 
+struct IsoHeaderData
+{
+    std::string appId;
+    std::string impId;
+    time_t fileTime;
+    uint32_t volumeId;
+
+    static IsoHeaderData normal();
+    static IsoHeaderData reproducible();
+};
+
 class IsoWriter
 {
    public:
-    IsoWriter();
+    IsoWriter(const IsoHeaderData&);
     ~IsoWriter();
 
     void setVolumeLabel(const std::string& value);
@@ -230,12 +241,12 @@ class IsoWriter
     friend class ISOFile;
 
     std::string m_volumeLabel;
-    std::string m_impId;
-    std::string m_appId;
-    uint32_t m_volumeId;
+    const std::string m_impId;
+    const std::string m_appId;
+    const uint32_t m_volumeId;
     File m_file;
     uint8_t m_buffer[SECTOR_SIZE];
-    time_t m_currentTime;
+    const time_t m_currentTime;
 
     uint32_t m_objectUniqId;
     uint32_t m_totalFiles;

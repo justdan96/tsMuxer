@@ -575,13 +575,9 @@ int64_t ISOFile::size() const { return m_entry ? m_entry->m_fileSize : -1; }
 
 // ------------------------------ IsoWriter ----------------------------------
 
-IsoWriter::IsoWriter()
+IsoWriter::IsoWriter(const IsoHeaderData& hdrData)
+    : m_impId(hdrData.impId), m_appId(hdrData.appId), m_volumeId(hdrData.volumeId), m_currentTime(hdrData.fileTime)
 {
-    m_volumeId = random32();
-    m_appId = "*tsMuxeR " TSMUXER_VERSION;
-    m_impId = std::string("*tsMuxeR ") + int32ToHex(random32());
-
-    m_currentTime = time(0);
     m_objectUniqId = 16;
     m_totalFiles = 0;
     m_totalDirectories = 0;
@@ -1402,3 +1398,11 @@ void IsoWriter::checkLayerBreakPoint(int maxExtentSize)
 }
 
 void IsoWriter::setLayerBreakPoint(int lbn) { m_layerBreakPoint = lbn; }
+
+IsoHeaderData IsoHeaderData::normal()
+{
+    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32ToHex(random32()), time(0),
+                         random32()};
+}
+
+IsoHeaderData IsoHeaderData::reproducible() { return IsoHeaderData{"*tsMuxeR", "*tsMuxeR", 1, 1593630000}; }
