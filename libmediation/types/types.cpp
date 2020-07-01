@@ -31,7 +31,7 @@ const std::regex& invalidChars()
 #else
         // <>:"/|?\*, ASCII 0 to 31 and all reserved names such as CON or LPT1
         // see here: https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions
-        "[:<>\"/|?\\*\\x00-\\x1F]|^CON$|^PRN$|^AUX$|^NUL$|^COM\d$|^LPT\d$"
+        "[:<>\"/|?\\*\\x00-\\x1F]|^CON$|^PRN$|^AUX$|^NUL$|^COM\\d$|^LPT\\d$"
 #endif
         ,
         std::regex_constants::ECMAScript | std::regex_constants::optimize);
@@ -323,7 +323,7 @@ string extractFileName(const string& src)
             if (endPos == src.size())
                 endPos = i;
         }
-        else if (src[i] == getDirSeparator())
+        else if (src[i] == '/' || src[i] == '\\')
         {
             string rez = src.substr(i + 1, endPos - i - 1);
             if (rez.size() > 0 && rez[rez.size() - 1] == '\"')
@@ -339,7 +339,10 @@ string extractFileName2(const string& src, bool withExt)
     string fileName = src;
 
     size_t extSep = fileName.find_last_of('.');
-    size_t dirSep = fileName.find_last_of(getDirSeparator());
+    size_t dirSep = fileName.find_last_of('/');
+
+    if (dirSep == string::npos)
+        dirSep = fileName.find_last_of('\\');
 
     if (extSep != string::npos && !withExt)
         fileName = fileName.substr(0, extSep);
@@ -353,7 +356,7 @@ string extractFileName2(const string& src, bool withExt)
 string extractFilePath(const string& src)
 {
     for (int i = src.size() - 1; i >= 0; i--)
-        if (src[i] == getDirSeparator())
+        if (src[i] == '/' || src[i] == '\\')
         {
             string rez = src.substr(0, i);
             return rez;
@@ -367,7 +370,7 @@ string closeDirPath(const string& src, char delimiter)
         delimiter = getDirSeparator();
     if (src.length() == 0)
         return src;
-    if (src[src.length() - 1] == getDirSeparator())
+    if (src[src.length() - 1] == '/' || src[src.length() - 1] == '\\')
         return src;
     return src + delimiter;
 }

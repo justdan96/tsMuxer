@@ -33,9 +33,14 @@ char getDirSeparator()
 
 string extractFileDir(const string& fileName)
 {
-    size_t index = fileName.find_last_of(getDirSeparator());
+    size_t index = fileName.find_last_of('/');
     if (index != string::npos)
         return fileName.substr(0, index + 1);
+#ifdef _WIN32
+    index = fileName.find_last_of('\\');
+    if (index != string::npos)
+        return fileName.substr(0, index + 1);
+#endif
 
     return "";
 }
