@@ -37,6 +37,7 @@ class TsMuxerWindow : public QWidget
     Q_OBJECT
    public:
     TsMuxerWindow();
+    ~TsMuxerWindow() override;
 
     void addFiles(const QList<QUrl>& files);
    signals:
