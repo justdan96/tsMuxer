@@ -548,6 +548,8 @@ All parameters in this group start with two dashes:
                     and directory names). Normally, tsMuxeR allocates this space
                     automatically, but if split condition generates a lot
                     of small files, it may be required to define extra space.
+--constant-iso-hdr  Generates an ISO header that does not depend on the program
+                    version or the current time. Not meant for normal usage.
 )help";
     LTRACE(LT_INFO, 2, help);
 }
@@ -744,7 +746,8 @@ int main(int argc, char** argv)
 
             if (dt != DT_NONE)
             {
-                if (!blurayHelper.open(dstFile, dt, muxerManager.totalSize(), muxerManager.getExtraISOBlocks()))
+                if (!blurayHelper.open(dstFile, dt, muxerManager.totalSize(), muxerManager.getExtraISOBlocks(),
+                                       muxerManager.useReproducibleIsoHeader()))
                     throw runtime_error(string("Can't create output file ") + dstFile);
                 blurayHelper.setVolumeLabel(isoDiskLabel);
                 blurayHelper.createBluRayDirs();

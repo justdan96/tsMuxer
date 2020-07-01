@@ -278,7 +278,8 @@ void BlurayHelper::close()
     }
 }
 
-bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int extraISOBlocks)
+bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int extraISOBlocks,
+                        bool useReproducibleIsoHeader)
 {
     m_dstPath = toNativeSeparators(dst);
 
@@ -287,7 +288,7 @@ bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int ex
     fileExt = unquoteStr(strToUpperCase(fileExt));
     if (fileExt == "ISO")
     {
-        m_isoWriter = new IsoWriter();
+        m_isoWriter = new IsoWriter(useReproducibleIsoHeader ? IsoHeaderData::reproducible() : IsoHeaderData::normal());
         m_isoWriter->setLayerBreakPoint(0xBA7200);  // around 25Gb
         return m_isoWriter->open(m_dstPath, diskSize, extraISOBlocks);
     }

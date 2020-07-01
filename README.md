@@ -278,8 +278,8 @@ Parameter           | Description
 --insertBlankPL     | Add an additional short playlist.  Used for cropped video muxed to BD disc.
 --blankOffset       | Blank playlist number.
 --label             | Disk label when muxing to ISO.
---extra-iso-space   | Allocate extra space in 64K units for ISO metadata (file and directory names). Normally, tsMuxeR allocates this space automatically, but if split condition generates a lot of small files, it may be required to define extra space. 
-
+--extra-iso-space   | Allocate extra space in 64K units for ISO metadata (file and directory names). Normally, tsMuxeR allocates this space automatically, but if split condition generates a lot of small files, it may be required to define extra space.
+--constant-iso-hdr  | Generates an ISO header that does not depend on the program version or the current time. Normally, the ISO header's "application ID", "implementation ID", and "volume ID" fields are set to strings containing the program version and/or a random number, while the access/modification/creation times of the files in the image are set to the current time. This option disables this behaviour by filling these fields with hardcoded values and setting the file times to the equivalent of `Wed 1 Jul 20:00:00 UTC 2020` in the local timezone. Using this option is not recommended for normal usage, as it is meant only for testing ISO output validity.
 
 ## Todo
 

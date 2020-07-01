@@ -57,6 +57,8 @@ class MuxerManager
     int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
     int getExtraISOBlocks() const { return m_extraIsoBlocks; }
 
+    bool useReproducibleIsoHeader() const { return m_reproducibleIsoHeader; }
+
     enum class SubTrackMode
     {
         All,
@@ -97,6 +99,7 @@ class MuxerManager
     int m_extraIsoBlocks;
     bool m_bluRayMode;
     bool m_demuxMode;
+    bool m_reproducibleIsoHeader = false;
 };
 
 #endif  // __MUXER_MANAGER_H
