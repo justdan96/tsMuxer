@@ -453,6 +453,8 @@ TsMuxerWindow::TsMuxerWindow()
     writeSettings();
 }
 
+TsMuxerWindow::~TsMuxerWindow() { writeSettings(); }
+
 void TsMuxerWindow::onTsMuxerCodecInfoReceived()
 {
     m_updateMeta = false;
