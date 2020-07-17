@@ -34,7 +34,7 @@ struct StreamInfo
         m_pid = pid;
         m_readCnt = 0;
         m_lastAVRez = AbstractStreamReader::NEED_MORE_DATA;
-        m_lastDTS = -1000000000;
+        m_lastDTS = 0;
         lastReadRez = 0;
         m_flushed = false;
         m_timeShift = 0;
