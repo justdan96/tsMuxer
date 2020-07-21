@@ -25,12 +25,13 @@ namespace
 QString fileDialogFilter()
 {
     return TsMuxerWindow::tr(
-        "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
+        "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
 AC3/E-AC3 (*.ac3 *.ddp);;\
 AAC (advanced audio coding) (*.aac);;\
 AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;\
 HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;\
 Digital Theater System (*.dts);;\
+DTS-HD Master Audio (*.dtshd);;\
 Mpeg video elementary stream (*.mpv *.m1v *.m2v);;\
 Mpeg audio elementary stream (*.mpa);;\
 Transport Stream (*.ts);;\
