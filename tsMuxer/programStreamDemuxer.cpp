@@ -395,7 +395,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
     }
     m_tmpBufferLen = end - curBuf;
     if (m_tmpBufferLen > 0)
-        memcpy(m_tmpBuffer, curBuf, end - curBuf);
+        memmove(m_tmpBuffer, curBuf, end - curBuf);
     return 0;
 }
 

@@ -39,14 +39,14 @@ void SRTStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
     m_lastBlock = lastBlock;
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
     if (m_tmpBuffer.size() > 0)
-        memcpy(dataBegin, &m_tmpBuffer[0], m_tmpBuffer.size());
+        memmove(dataBegin, &m_tmpBuffer[0], m_tmpBuffer.size());
     int parsedLen = parseText(dataBegin, dataLen + m_tmpBuffer.size());
     int rest = dataLen + m_tmpBuffer.size() - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
         THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)");
     m_tmpBuffer.resize(rest);
     if (rest > 0)
-        memcpy(&m_tmpBuffer[0], dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
+        memmove(&m_tmpBuffer[0], dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
 }
 
 bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLen)

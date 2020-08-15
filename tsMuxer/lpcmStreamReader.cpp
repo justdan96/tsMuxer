@@ -787,7 +787,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     avPacket.dts = avPacket.pts = m_curPts * m_stretch + m_timeOffset;
     if (m_bufEnd - m_curPos < getHeaderLen())
     {
-        memcpy(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
@@ -797,7 +797,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     int frameLen = decodeFrame(m_curPos, m_bufEnd, skipBytes, skipBeforeBytes);
     if (frameLen == NOT_ENOUGH_BUFFER)
     {
-        memcpy(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
@@ -810,7 +810,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     }
     if (m_bufEnd - m_curPos < frameLen + skipBytes + skipBeforeBytes)
     {
-        memcpy(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;

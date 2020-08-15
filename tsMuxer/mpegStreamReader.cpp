@@ -85,7 +85,7 @@ void MPEGStreamReader::onShiftBuffer(int offset) {}
 void MPEGStreamReader::storeBufferRest()
 {
     onShiftBuffer(m_curPos - m_tmpBuffer);
-    memcpy(m_tmpBuffer, m_curPos, m_bufEnd - m_curPos);
+    memmove(m_tmpBuffer, m_curPos, m_bufEnd - m_curPos);
     m_tmpBufferLen = m_bufEnd - m_curPos;
     if (m_lastDecodedPos > m_curPos)
         m_lastDecodedPos = m_tmpBuffer + (m_lastDecodedPos - m_curPos);

@@ -1291,7 +1291,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
         if (currentSize > lastReadCnt)
         {
             uint8_t* dataStart = streamData.data() + m_readBuffOffset;
-            memcpy(dataStart, dataStart + lastReadCnt, currentSize - lastReadCnt);
+            memmove(dataStart, dataStart + lastReadCnt, currentSize - lastReadCnt);
         }
         streamData.resize(m_readBuffOffset + currentSize - lastReadCnt);
         demuxerData.lastReadCnt[pid] = 0;

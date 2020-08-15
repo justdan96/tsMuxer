@@ -189,7 +189,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         else
         {
             m_owner->syncWriteBuffer(this, streamInfo->m_buffer, toFileLen, &streamInfo->m_file);
-            memcpy(streamInfo->m_buffer, streamInfo->m_buffer + toFileLen, streamInfo->m_bufLen - toFileLen);
+            memmove(streamInfo->m_buffer, streamInfo->m_buffer + toFileLen, streamInfo->m_bufLen - toFileLen);
         }
         streamInfo->m_totalWrited += toFileLen;
         streamInfo->m_bufLen -= toFileLen;
@@ -274,7 +274,7 @@ bool SingleFileMuxer::doFlush()
         else
         {
             m_owner->syncWriteBuffer(this, streamInfo->m_buffer, roundBufLen, &streamInfo->m_file);
-            memcpy(streamInfo->m_buffer, streamInfo->m_buffer + roundBufLen, lastBlockSize);
+            memmove(streamInfo->m_buffer, streamInfo->m_buffer + roundBufLen, lastBlockSize);
         }
         streamInfo->m_bufLen = lastBlockSize;
     }

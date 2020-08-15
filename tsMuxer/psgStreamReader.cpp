@@ -522,7 +522,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     if (m_bufEnd - m_curPos < 3)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
-        memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+        memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
         return NEED_MORE_DATA;
     }
     bool pgStartCode = m_curPos[0] == 'P' && m_curPos[1] == 'G';
@@ -531,7 +531,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         if (m_bufEnd - m_curPos < 10)
         {
             m_tmpBufferLen = m_bufEnd - m_curPos;
-            memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+            memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
         m_lastPTS = getTimeValueNano(m_curPos + 2) * m_scale;
@@ -561,7 +561,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         if (m_bufEnd - m_curPos < 8)
         {
             m_tmpBufferLen = m_bufEnd - m_curPos;
-            memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+            memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
         PESPacket* pesPacket = (PESPacket*)m_curPos;
@@ -570,7 +570,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         if (m_bufEnd - m_curPos < pesHeaderLen)
         {
             m_tmpBufferLen = m_bufEnd - m_curPos;
-            memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+            memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
         if (pesPacket->flagsLo & 0x80)
@@ -600,7 +600,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     if (m_bufEnd - m_curPos < 3)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
-        memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+        memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
         return NEED_MORE_DATA;
     }
     uint8_t segment_type = *m_curPos;
@@ -608,7 +608,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     if (m_bufEnd - m_curPos < 3 + segment_len)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
-        memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+        memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
         return NEED_MORE_DATA;
     }
     m_curPos += 3;
@@ -638,7 +638,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
                 if (readObjectDef(m_curPos, m_curPos + segment_len) == NEED_MORE_DATA)
                 {
                     m_tmpBufferLen = m_bufEnd - m_curPos;
-                    memcpy(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
+                    memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
                     return NEED_MORE_DATA;
                 }
                 renderTextShow(m_maxPTS);
@@ -740,7 +740,7 @@ void PGSStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (m_tmpBuffer.size() > 0)
-        memcpy(&m_tmpBuffer[0] + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
+        memmove(&m_tmpBuffer[0] + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
     m_tmpBufferLen += dataLen;
 
     if (m_tmpBuffer.size() > 0)
