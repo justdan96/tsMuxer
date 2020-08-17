@@ -1619,7 +1619,8 @@ QString TsMuxerWindow::getMuxOpts()
     if (ui->splitByDuration->isChecked())
         rez += QString(" --split-duration=") + ui->spinEditSplitDuration->text();
     if (ui->splitBySize->isChecked())
-        rez += QString(" --split-size=") + ui->editSplitSize->text() + ui->comboBoxMeasure->currentData().toString();
+        rez += QString(" --split-size=") + QString::number(ui->editSplitSize->value(), 'f', 3) +
+               ui->comboBoxMeasure->currentData().toString();
 
     int startCut = qTimeToMsec(ui->cutStartTimeEdit->time());
     int endCut = qTimeToMsec(ui->cutEndTimeEdit->time());
