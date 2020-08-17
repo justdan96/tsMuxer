@@ -464,7 +464,7 @@ bool TSMuxer::doFlush(uint64_t newPCR, int64_t pcrGAP)
     else
     {
         m_owner->syncWriteBuffer(this, m_outBuf, roundBufLen, m_muxFile);
-        memcpy(m_outBuf, m_outBuf + roundBufLen, lastBlockSize);
+        memmove(m_outBuf, m_outBuf + roundBufLen, lastBlockSize);
     }
     m_outBufLen = lastBlockSize;
     assert(!m_sectorSize || m_outBufLen == 0);
@@ -1358,7 +1358,7 @@ void TSMuxer::writeOutBuffer()
                     m_m2tsDelayBlocks.push_back(std::make_pair(newBuf, toFileLen));
                 }
             }
-            memcpy(m_outBuf, m_outBuf + toFileLen, m_outBufLen - toFileLen);
+            memmove(m_outBuf, m_outBuf + toFileLen, m_outBufLen - toFileLen);
         }
         m_outBufLen -= toFileLen;
     }

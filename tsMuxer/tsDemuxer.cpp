@@ -146,7 +146,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
         if (curPos < data + readedBytes)
         {
             tmpBufferLen = data + readedBytes - curPos;
-            memcpy(m_tmpBuffer, curPos, tmpBufferLen);
+            memmove(m_tmpBuffer, curPos, tmpBufferLen);
         }
     }
 
@@ -446,7 +446,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     if (m_curPos < data + readedBytes)
     {
         m_tmpBufferLen = data + readedBytes - m_curPos;
-        memcpy(m_tmpBuffer, m_curPos, m_tmpBufferLen);
+        memmove(m_tmpBuffer, m_curPos, m_tmpBufferLen);
     }
 
     return 0;
