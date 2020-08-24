@@ -687,6 +687,8 @@ int HevcSpsUnit::deserialize()
             separate_colour_plane_flag = m_reader.getBit();
         pic_width_in_luma_samples = extractUEGolombCode();
         pic_height_in_luma_samples = extractUEGolombCode();
+        if (pic_width_in_luma_samples >= 3840)
+            V3_flags |= FOUR_K;
 
         bool conformance_window_flag = m_reader.getBit();
         if (conformance_window_flag)
