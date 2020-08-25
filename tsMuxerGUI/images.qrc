@@ -9,5 +9,6 @@
   <file>images/btn_donate.png</file>
   <file alias="about_en.html">translations/about_en.html</file>
   <file alias="about_ru.html">translations/about_ru.html</file>
+  <file alias="about_fr.html">translations/about_fr.html</file>
 </qresource>
 </RCC>
