@@ -2,5 +2,6 @@
 <qresource prefix="i18n">
 <file alias="tsmuxergui_en.qm">tsmuxergui_en.qm</file>
 <file alias="tsmuxergui_ru.qm">tsmuxergui_ru.qm</file>
+<file alias="tsmuxergui_fr.qm">tsmuxergui_fr.qm</file>
 </qresource>
 </RCC>
