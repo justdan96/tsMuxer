@@ -246,7 +246,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="905"/>
         <source>Min bitrate, kbps</source>
-        <translation>Mitrate mini, en kb/s</translation>
+        <translation>Bitrate mini, en kb/s</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="960"/>
@@ -486,7 +486,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="1675"/>
         <source>Splitting</source>
-        <translation>Division</translation>
+        <translation>Diviser</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="1686"/>
