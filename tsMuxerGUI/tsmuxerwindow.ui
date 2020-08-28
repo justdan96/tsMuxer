@@ -417,7 +417,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" rowspan="3">
+              <item row="1" column="1">
                <widget class="QComboBox" name="comboBoxLevel">
                 <property name="enabled">
                  <bool>false</bool>
@@ -505,7 +505,7 @@
                 </item>
                </widget>
               </item>
-              <item row="1" column="3" rowspan="3">
+              <item row="1" column="3">
                <widget class="QLabel" name="labelAR">
                 <property name="enabled">
                  <bool>false</bool>
@@ -524,7 +524,7 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="4" rowspan="3">
+              <item row="1" column="4">
                <widget class="QComboBox" name="comboBoxAR">
                 <property name="enabled">
                  <bool>false</bool>
@@ -562,14 +562,14 @@
                 </item>
                </widget>
               </item>
-              <item row="3" column="0">
+              <item row="1" column="0">
                <widget class="QCheckBox" name="checkBoxLevel">
                 <property name="text">
                  <string>Change level:</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
+              <item row="1" column="2">
                <widget class="QCheckBox" name="checkBoxSPS">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
