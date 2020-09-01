@@ -39,7 +39,7 @@ class Process
 #define bswap_32(x) my_ntohl(x)
 //#define fabs(a) ((a)>=0?(a):-(a))
 
-const static int DETECT_STREAM_BUFFER_SIZE = 1024 * 1024 * 16;
+const static int DETECT_STREAM_BUFFER_SIZE = 1024 * 1024 * 64;
 const static unsigned TS_PID_NULL = 8191;
 const static unsigned TS_PID_PAT = 0;
 const static unsigned TS_PID_PMT = 1;
