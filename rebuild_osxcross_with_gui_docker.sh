@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+set -x
+set -o pipefail
+
 readonly OSXCROSS_SYSROOT=/usr/lib/osxcross/macports/pkgs
 
 gui_lib_copy() {
@@ -8,20 +12,38 @@ gui_lib_copy() {
   cp "${OSXCROSS_SYSROOT}/opt/local/lib/${dep_lib}" "libs/${dep_lib}"
 }
 
+osxcross_lib_copy_change_path() {
+  local dep_lib=$1
+  local dep_lib_actual_path="${OSXCROSS_SYSROOT}${dep_lib}"
+  local bin_path=$2
+  local lib_fname=${dep_lib##*/}
+  local lib_path_declared=${dep_lib##${OSXCROSS_SYSROOT}/}
+  local target_lib_fname="../bin/${lib_fname}"
+  [[ -e $target_lib_fname ]] && return
+
+  cp "$dep_lib_actual_path" ../bin/
+  x86_64-apple-darwin14-install_name_tool -change "$lib_path_declared" "@executable_path/${lib_fname}" "${target_lib_fname}"
+  for_each_dep_lib "$dep_lib_actual_path" '/opt/local/lib/' osxcross_lib_copy_change_path
+}
+
 tsmuxer_lib_copy_change_path() {
   local dep_lib=$1
+  local bin_path=$2
   local lib_fname=${dep_lib##*/}
-  cp "${OSXCROSS_SYSROOT}/${dep_lib}" ../bin/
-  x86_64-apple-darwin14-install_name_tool -change "$dep_lib" "@executable_path/${lib_fname}" tsMuxer/tsmuxer
+  local dep_lib_actual_path="${OSXCROSS_SYSROOT}${dep_lib}"
+  cp "$dep_lib_actual_path" ../bin/
+  x86_64-apple-darwin14-install_name_tool -change "$dep_lib" "@executable_path/${lib_fname}" "$bin_path"
+  for_each_dep_lib "$dep_lib_actual_path" '/opt/local/lib/' osxcross_lib_copy_change_path
 }
 
 for_each_dep_lib() {
   local bin_path=$1
   local wanted_pfx=$2
   local cbk=$3
+  local declared_path=${bin_path##${OSXCROSS_SYSROOT}}
   for dep_lib in $(x86_64-apple-darwin14-otool -L "$bin_path" | awk '{ print $1 }'); do
-    if [[ $dep_lib =~ ^${wanted_pfx} ]]; then
-      "$cbk" "$dep_lib"
+    if [[ $dep_lib != $bin_path && $dep_lib != $declared_path && $dep_lib =~ ^${wanted_pfx} ]]; then
+      "$cbk" "$dep_lib" "$bin_path"
     fi
   done
 }
