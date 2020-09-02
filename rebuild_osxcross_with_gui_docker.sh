@@ -19,11 +19,12 @@ osxcross_lib_copy_change_path() {
   local lib_fname=${dep_lib##*/}
   local lib_path_declared=${dep_lib##${OSXCROSS_SYSROOT}/}
   local target_lib_fname="../bin/${lib_fname}"
-  [[ -e $target_lib_fname ]] && return
 
-  cp "$dep_lib_actual_path" ../bin/
-  x86_64-apple-darwin14-install_name_tool -change "$lib_path_declared" "@executable_path/${lib_fname}" "${target_lib_fname}"
-  for_each_dep_lib "$dep_lib_actual_path" '/opt/local/lib/' osxcross_lib_copy_change_path
+  x86_64-apple-darwin14-install_name_tool -change "$lib_path_declared" "@executable_path/${lib_fname}" "$bin_path"
+
+  [[ -e $target_lib_fname ]] && return
+  cp "$dep_lib_actual_path" "$target_lib_fname"
+  for_each_dep_lib "$target_lib_fname" '/opt/local/lib/' osxcross_lib_copy_change_path
 }
 
 tsmuxer_lib_copy_change_path() {
@@ -31,9 +32,10 @@ tsmuxer_lib_copy_change_path() {
   local bin_path=$2
   local lib_fname=${dep_lib##*/}
   local dep_lib_actual_path="${OSXCROSS_SYSROOT}${dep_lib}"
-  cp "$dep_lib_actual_path" ../bin/
+  local target_lib_path="../bin/${lib_fname}"
+  cp "$dep_lib_actual_path" "$target_lib_path"
   x86_64-apple-darwin14-install_name_tool -change "$dep_lib" "@executable_path/${lib_fname}" "$bin_path"
-  for_each_dep_lib "$dep_lib_actual_path" '/opt/local/lib/' osxcross_lib_copy_change_path
+  for_each_dep_lib "$target_lib_path" '/opt/local/lib/' osxcross_lib_copy_change_path
 }
 
 for_each_dep_lib() {
@@ -41,7 +43,7 @@ for_each_dep_lib() {
   local wanted_pfx=$2
   local cbk=$3
   local declared_path=${bin_path##${OSXCROSS_SYSROOT}}
-  for dep_lib in $(x86_64-apple-darwin14-otool -L "$bin_path" | awk '{ print $1 }'); do
+  for dep_lib in $(x86_64-apple-darwin14-otool -L "$bin_path" | awk '/^\t/ { print $1 }' | sort -u); do
     if [[ $dep_lib != $bin_path && $dep_lib != $declared_path && $dep_lib =~ ^${wanted_pfx} ]]; then
       "$cbk" "$dep_lib" "$bin_path"
     fi
