@@ -1296,7 +1296,12 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
 // -------------------------- MPLSParser ----------------------------
 
 MPLSParser::MPLSParser()
-    : m_chapterLen(0), m_playItem(0), number_of_SubPaths(0), m_m2tsOffset(0), isDependStreamExist(false), mvc_base_view_r(false)
+    : m_chapterLen(0),
+      m_playItem(0),
+      number_of_SubPaths(0),
+      m_m2tsOffset(0),
+      isDependStreamExist(false),
+      mvc_base_view_r(false)
 {
     number_of_primary_video_stream_entries = 0;
     number_of_primary_audio_stream_entries = 0;
