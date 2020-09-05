@@ -2634,7 +2634,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 
     if (streamInfos.size() > m_streamInfo.size())
     {
-        m_streamInfo = streamInfos;
+        m_streamInfo = std::move(streamInfos);
         m_playItem = PlayItem_id;
     }
 }
