@@ -529,6 +529,7 @@ struct MPLSParser
     bool is_seamless_angle_change;
 
     int m_chapterLen;
+    int m_playItem;
 
     uint32_t IN_time;
     uint32_t OUT_time;

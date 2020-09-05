@@ -1296,7 +1296,12 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
 // -------------------------- MPLSParser ----------------------------
 
 MPLSParser::MPLSParser()
-    : m_chapterLen(0), number_of_SubPaths(0), m_m2tsOffset(0), isDependStreamExist(false), mvc_base_view_r(false)
+    : m_chapterLen(0),
+      m_playItem(0),
+      number_of_SubPaths(0),
+      m_m2tsOffset(0),
+      isDependStreamExist(false),
+      mvc_base_view_r(false)
 {
     number_of_primary_video_stream_entries = 0;
     number_of_primary_audio_stream_entries = 0;
@@ -2525,14 +2530,15 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
     number_of_DolbyVision_video_stream_entries = reader.getBits(8);   // 8 uimsbf
     reader.skipBits(32);                                              // reserved_for_future_use 32 bslbf
 
+    std::vector<MPLSStreamInfo> streamInfos;
+
     for (int primary_video_stream_id = 0; primary_video_stream_id < number_of_primary_video_stream_entries;
          primary_video_stream_id++)
     {
         MPLSStreamInfo streamInfo;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
     }
     for (int primary_audio_stream_id = 0; primary_audio_stream_id < number_of_primary_audio_stream_entries;
          primary_audio_stream_id++)
@@ -2540,8 +2546,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         MPLSStreamInfo streamInfo;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
     }
 
     for (int PG_textST_stream_id = 0;
@@ -2551,8 +2556,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         MPLSStreamInfo streamInfo;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
     }
 
     for (int IG_stream_id = 0; IG_stream_id < number_of_IG_stream_entries; IG_stream_id++)
@@ -2560,8 +2564,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         MPLSStreamInfo streamInfo;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
     }
 
     for (int secondary_audio_stream_id = 0; secondary_audio_stream_id < number_of_secondary_audio_stream_entries;
@@ -2571,8 +2574,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         streamInfo.isSecondary = true;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
 
         // comb_info_Secondary_audio_Primary_audio(){
         int number_of_primary_audio_ref_entries = reader.getBits(8);  // 8 uimsbf
@@ -2594,8 +2596,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         streamInfo.isSecondary = true;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
 
         // comb_info_Secondary_video_Secondary_audio(){
         int number_of_secondary_audio_ref_entries = reader.getBits(8);  // 8 uimsbf
@@ -2628,8 +2629,13 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
         MPLSStreamInfo streamInfo;
         streamInfo.parseStreamEntry(reader);
         streamInfo.parseStreamAttributes(reader);
-        if (PlayItem_id == 0)
-            m_streamInfo.push_back(streamInfo);
+        streamInfos.push_back(streamInfo);
+    }
+
+    if (streamInfos.size() > m_streamInfo.size())
+    {
+        m_streamInfo = std::move(streamInfos);
+        m_playItem = PlayItem_id;
     }
 }
 
