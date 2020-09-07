@@ -616,7 +616,7 @@ int main(int argc, char** argv)
                 bool switchToSsif = false;
                 if (mplsParser.m_playItems.size() > 0)
                 {
-                    MPLSPlayItem& item = mplsParser.m_playItems[mplsParser.m_playItem];
+                    MPLSPlayItem& item = mplsParser.m_playItems[0];
                     string itemName = streamDir + item.fileName + mediaExt;
                     if (fileExists(itemName))
                     {
