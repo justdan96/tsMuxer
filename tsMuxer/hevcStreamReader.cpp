@@ -104,8 +104,8 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             }
         }
 
-        // check Frame Depth
-        if (isSlice(nalType))
+        // check Frame Depth on first slices
+        if (isSlice(nalType) && (nal[2] & 0x80))
         {
             slice.decodeBuffer(nal, FFMIN(nal + MAX_SLICE_HEADER, nextNal));
             if (slice.deserialize(m_sps, m_pps))
@@ -114,6 +114,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             incTimings();
         }
     }
+    m_totalFrameNum = 0;
 
     // Set HDR10 flag if PQ detected
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
