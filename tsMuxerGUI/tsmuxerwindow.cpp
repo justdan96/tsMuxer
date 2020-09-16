@@ -895,12 +895,12 @@ void TsMuxerWindow::addFiles(const QList<QUrl> &files)
 
 void TsMuxerWindow::onAddBtnClick()
 {
-    auto files = QFileDialog::getOpenFileNames(this, tr("Add media files"), lastInputDir, fileDialogFilter());
+    const auto files = QFileDialog::getOpenFileNames(this, tr("Add media files"), lastInputDir, fileDialogFilter());
     if (files.isEmpty())
         return;
     lastInputDir = QDir::toNativeSeparators(files.back());
     addFileList.clear();
-    for (auto &&f : qAsConst(files))
+    for (auto f : files)
     {
         addFileList << QUrl::fromLocalFile(QDir::toNativeSeparators(f));
     }
