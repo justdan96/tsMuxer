@@ -1,6 +1,7 @@
 #include "tsmuxerwindow.h"
 
 #include <QColorDialog>
+#include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDropEvent>
@@ -722,13 +723,19 @@ void TsMuxerWindow::removeTrackFromDefaultComboBox(QComboBox *targetComboBox, QC
     {
         targetCheckBox->setChecked(false);
     }
-    for (int i = comboBoxIdx + 1; i < targetComboBox->count(); ++i)
-    {
-        auto curTrackIdx = targetComboBox->itemData(i).toInt();
-        targetComboBox->setItemData(i, curTrackIdx - 1);
-    }
     targetComboBox->removeItem(comboBoxIdx);
-    updateTracksComboBox(targetComboBox);
+}
+
+static void fixupIndices(QComboBox *comboBox, int removedTrackIdx)
+{
+    for (int i = 0; i < comboBox->count(); ++i)
+    {
+        auto trackIdx = comboBox->itemData(i).toInt();
+        if (trackIdx > removedTrackIdx)
+        {
+            comboBox->setItemData(i, trackIdx - 1);
+        }
+    }
 }
 
 void TsMuxerWindow::removeTrackFromDefaultComboBox(int trackRowIdx)
@@ -745,6 +752,10 @@ void TsMuxerWindow::removeTrackFromDefaultComboBox(int trackRowIdx)
         removeTrackFromDefaultComboBox(ui->defaultSubTrackComboBox, ui->defaultSubTrackCheckBox, comboBoxIdx,
                                        trackRowIdx);
     }
+    fixupIndices(ui->defaultAudioTrackComboBox, trackRowIdx);
+    fixupIndices(ui->defaultSubTrackComboBox, trackRowIdx);
+    updateTracksComboBox(ui->defaultAudioTrackComboBox);
+    updateTracksComboBox(ui->defaultSubTrackComboBox);
 }
 
 void TsMuxerWindow::updateTracksComboBox(QComboBox *comboBox)
@@ -757,11 +768,8 @@ void TsMuxerWindow::updateTracksComboBox(QComboBox *comboBox)
     }
 }
 
-#include <QDebug>
-
 void TsMuxerWindow::moveTrackInDefaultComboBox(int oldTrackRowIdx, int newTrackRowIdx)
 {
-    qDebug() << oldTrackRowIdx << newTrackRowIdx;
     auto currentSubTrack = ui->defaultSubTrackComboBox->currentData();
     auto currentAudioTrack = ui->defaultAudioTrackComboBox->currentData();
     ui->defaultSubTrackComboBox->clear();
@@ -2163,6 +2171,7 @@ void TsMuxerWindow::delTracksByFileName(const QString &fileName)
 void TsMuxerWindow::deleteTrack(int idx)
 {
     disableUpdatesCnt++;
+    removeTrackFromDefaultComboBox(idx);
     delete getCodecInfo(idx);
     int lastItemIndex = idx;  // trackLV.items[idx].index;
     ui->trackLV->removeRow(idx);
@@ -2192,7 +2201,6 @@ void TsMuxerWindow::deleteTrack(int idx)
     ui->removeTrackBtn->setEnabled(ui->trackLV->currentItem() != 0);
     disableUpdatesCnt--;
     trackLVItemSelectionChanged();
-    removeTrackFromDefaultComboBox(idx);
 }
 
 void TsMuxerWindow::updateNum()
