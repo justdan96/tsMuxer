@@ -754,8 +754,6 @@ void TsMuxerWindow::removeTrackFromDefaultComboBox(int trackRowIdx)
     }
     fixupIndices(ui->defaultAudioTrackComboBox, trackRowIdx);
     fixupIndices(ui->defaultSubTrackComboBox, trackRowIdx);
-    updateTracksComboBox(ui->defaultAudioTrackComboBox);
-    updateTracksComboBox(ui->defaultSubTrackComboBox);
 }
 
 void TsMuxerWindow::updateTracksComboBox(QComboBox *comboBox)
@@ -2177,6 +2175,8 @@ void TsMuxerWindow::deleteTrack(int idx)
     ui->removeTrackBtn->setEnabled(ui->trackLV->currentItem() != 0);
     disableUpdatesCnt--;
     trackLVItemSelectionChanged();
+    updateTracksComboBox(ui->defaultAudioTrackComboBox);
+    updateTracksComboBox(ui->defaultSubTrackComboBox);
 }
 
 void TsMuxerWindow::updateNum()
