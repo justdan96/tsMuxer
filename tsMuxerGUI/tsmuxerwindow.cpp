@@ -2224,7 +2224,7 @@ void TsMuxerWindow::onAppendButtonClick()
         return;
     }
     QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, fileDialogFilter()));
+        QFileDialog::getOpenFileName(this, tr("Append media files"), lastInputDir, fileDialogFilter()));
     if (fileName.isEmpty())
         return;
     lastInputDir = fileName;

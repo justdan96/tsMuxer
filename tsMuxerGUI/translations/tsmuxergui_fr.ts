@@ -906,8 +906,8 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2227"/>
-        <source>Append media file</source>
-        <translation>Concaténer un fichier média</translation>
+        <source>Append media files</source>
+        <translation>Concaténer un fichiers médias</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2264"/>
