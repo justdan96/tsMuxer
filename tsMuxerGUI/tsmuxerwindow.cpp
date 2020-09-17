@@ -850,9 +850,8 @@ void TsMuxerWindow::onAudioSubtitlesParamsChanged()
     updateMetaLines();
 }
 
-void TsMuxerWindow::onEditDelayChanged(int i)
+void TsMuxerWindow::onEditDelayChanged(int)
 {
-    Q_UNUSED(i);
     if (disableUpdatesCnt)
         return;
     QtvCodecInfo *codecInfo = getCurrentCodec();
@@ -903,36 +902,12 @@ void TsMuxerWindow::addFiles(const QList<QUrl> &files)
 
 void TsMuxerWindow::onAddBtnClick()
 {
-    const auto files = QFileDialog::getOpenFileNames(this, tr("Add media files"), lastInputDir, fileDialogFilter());
-    if (files.isEmpty())
-        return;
-    lastInputDir = QDir::toNativeSeparators(files.back());
-    addFileList.clear();
-    for (auto f : files)
-    {
-        addFileList << QUrl::fromLocalFile(QDir::toNativeSeparators(f));
-    }
-    addFile();
+    showAddFilesDialog(tr("Add media files"), [this]() { addFile(); });
 }
 
 void TsMuxerWindow::addFile()
 {
-    if (addFileList.isEmpty())
-        return;
-    newFileName = QDir::toNativeSeparators(addFileList[0].toLocalFile());
-    if (lastSourceDir.isEmpty())
-        lastSourceDir = QFileInfo(newFileName).absolutePath();
-    addFileList.removeAt(0);
-    if (!checkFileDuplicate(newFileName))
-        return;
-    // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
-    // disconnect(this, SIGNAL(codecListReady()));
-    disconnect();
-    connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::onTsMuxerCodecInfoReceived);
-    connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAddFile);
-    connect(this, &TsMuxerWindow::fileAdded, this, &TsMuxerWindow::addFile);
-    runInMuxMode = false;
-    tsMuxerExecute(QStringList() << newFileName);
+    processAddFileList(&TsMuxerWindow::continueAddFile, &TsMuxerWindow::fileAdded, &TsMuxerWindow::addFile);
 }
 
 bool TsMuxerWindow::checkFileDuplicate(const QString &fileName)
@@ -2223,34 +2198,12 @@ void TsMuxerWindow::onAppendButtonClick()
         msgBox.exec();
         return;
     }
-    QString fileName = QDir::toNativeSeparators(
-        QFileDialog::getOpenFileName(this, tr("Append media file"), lastInputDir, fileDialogFilter()));
-    if (fileName.isEmpty())
-        return;
-    lastInputDir = fileName;
-    addFileList.clear();
-    addFileList << QUrl::fromLocalFile(fileName);
-    appendFile();
+    showAddFilesDialog(tr("Append media files"), [this]() { appendFile(); });
 }
 
 void TsMuxerWindow::appendFile()
 {
-    if (addFileList.isEmpty())
-        return;
-    newFileName = QDir::toNativeSeparators(addFileList[0].toLocalFile());
-    if (lastSourceDir.isEmpty())
-        lastSourceDir = QFileInfo(newFileName).absolutePath();
-    addFileList.removeAt(0);
-    if (!checkFileDuplicate(newFileName))
-        return;
-    // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
-    // disconnect(this, SIGNAL(codecListReady()));
-    disconnect();
-    connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::onTsMuxerCodecInfoReceived);
-    connect(this, &TsMuxerWindow::codecListReady, this, &TsMuxerWindow::continueAppendFile);
-    connect(this, &TsMuxerWindow::fileAppended, this, &TsMuxerWindow::appendFile);
-    runInMuxMode = false;
-    tsMuxerExecute(QStringList() << newFileName);
+    processAddFileList(&TsMuxerWindow::continueAppendFile, &TsMuxerWindow::fileAppended, &TsMuxerWindow::appendFile);
 }
 
 void TsMuxerWindow::continueAppendFile()
@@ -2870,4 +2823,41 @@ bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 
     settings->endGroup();
     return true;
+}
+
+template <typename OnCodecListReadyFn, typename PostActionSignal, typename PostActionFn>
+void TsMuxerWindow::processAddFileList(OnCodecListReadyFn onCodecListReady, PostActionSignal postActionSignal,
+                                       PostActionFn postActionFn)
+{
+    if (addFileList.isEmpty())
+        return;
+    newFileName = QDir::toNativeSeparators(addFileList[0].toLocalFile());
+    if (lastSourceDir.isEmpty())
+        lastSourceDir = QFileInfo(newFileName).absolutePath();
+    addFileList.removeAt(0);
+    if (!checkFileDuplicate(newFileName))
+        return;
+    // disconnect(this, SIGNAL(tsMuxerSuccessFinished()));
+    // disconnect(this, SIGNAL(codecListReady()));
+    disconnect();
+    connect(this, &TsMuxerWindow::tsMuxerSuccessFinished, this, &TsMuxerWindow::onTsMuxerCodecInfoReceived);
+    connect(this, &TsMuxerWindow::codecListReady, this, onCodecListReady);
+    connect(this, postActionSignal, this, postActionFn);
+    runInMuxMode = false;
+    tsMuxerExecute(QStringList() << newFileName);
+}
+
+template <typename F>
+void TsMuxerWindow::showAddFilesDialog(QString &&windowTitle, F &&windowOkFn)
+{
+    const auto files = QFileDialog::getOpenFileNames(this, windowTitle, lastInputDir, fileDialogFilter());
+    if (files.isEmpty())
+        return;
+    lastInputDir = QDir::toNativeSeparators(files.back());
+    addFileList.clear();
+    for (auto f : files)
+    {
+        addFileList << QUrl::fromLocalFile(QDir::toNativeSeparators(f));
+    }
+    windowOkFn();
 }

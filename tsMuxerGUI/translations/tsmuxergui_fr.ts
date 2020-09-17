@@ -172,7 +172,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="693"/>
-        <location filename="../tsmuxerwindow.cpp" line="1029"/>
+        <location filename="../tsmuxerwindow.cpp" line="1004"/>
         <source>Downconvert HD audio</source>
         <translation>Supprimer les données HD de l&apos;audio</translation>
     </message>
@@ -766,7 +766,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2713"/>
-        <location filename="../tsmuxerwindow.cpp" line="1412"/>
+        <location filename="../tsmuxerwindow.cpp" line="1387"/>
         <source>Demux</source>
         <translation>Démuxer</translation>
     </message>
@@ -777,7 +777,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2747"/>
-        <location filename="../tsmuxerwindow.cpp" line="2381"/>
+        <location filename="../tsmuxerwindow.cpp" line="2334"/>
         <source>File name</source>
         <translation>Nom du fichier</translation>
     </message>
@@ -793,7 +793,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2866"/>
-        <location filename="../tsmuxerwindow.cpp" line="2365"/>
+        <location filename="../tsmuxerwindow.cpp" line="2318"/>
         <source>Sta&amp;rt muxing</source>
         <translation>&amp;Démarrer le muxage</translation>
     </message>
@@ -829,7 +829,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="609"/>
-        <location filename="../tsmuxerwindow.cpp" line="1154"/>
+        <location filename="../tsmuxerwindow.cpp" line="1129"/>
         <source>Unsupported format</source>
         <translation>Format non pris en charge</translation>
     </message>
@@ -839,160 +839,160 @@
         <translation>Impossible de déterminer le type de flux pour le fichier : &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="906"/>
+        <location filename="../tsmuxerwindow.cpp" line="905"/>
         <source>Add media files</source>
         <translation>Ajouter un fichiers médias</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="945"/>
+        <location filename="../tsmuxerwindow.cpp" line="920"/>
         <source>File already exists</source>
         <translation>Le fichier existe déjà</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="946"/>
+        <location filename="../tsmuxerwindow.cpp" line="921"/>
         <source>File &quot;%1&quot; already exists</source>
         <translation>Le fichier &quot;%1&quot; existe déjà</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1023"/>
+        <location filename="../tsmuxerwindow.cpp" line="998"/>
         <source>Downconvert DTS-HD to DTS</source>
         <translation>Réduire le DTS-HD en DTS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1025"/>
+        <location filename="../tsmuxerwindow.cpp" line="1000"/>
         <source>Downconvert TRUE-HD to AC3</source>
         <translation>Réduire le TRUE-HD en AC3</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1027"/>
+        <location filename="../tsmuxerwindow.cpp" line="1002"/>
         <source>Downconvert E-AC3 to AC3</source>
         <translation>Réduire le E-AC3 en AC3</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1160"/>
+        <location filename="../tsmuxerwindow.cpp" line="1135"/>
         <source>Unsupported format or all tracks are not recognized. File name: &quot;%1&quot;</source>
         <translation>Format non pris en charge ou aucune piste n&apos;a été reconnue pour le fichier &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1170"/>
+        <location filename="../tsmuxerwindow.cpp" line="1145"/>
         <source>Track %1 was not recognized and ignored. File name: &quot;%2&quot;</source>
         <translation>La piste %1 n&apos;a pas été reconnue et a été ignorée pour le fichier &quot;%2&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1412"/>
+        <location filename="../tsmuxerwindow.cpp" line="1387"/>
         <source>Mux</source>
         <translation>Muxer</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1431"/>
+        <location filename="../tsmuxerwindow.cpp" line="1406"/>
         <source>tsMuxeR error</source>
         <translation>Erreur de tsMuxeR</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1435"/>
+        <location filename="../tsmuxerwindow.cpp" line="1410"/>
         <source>tsMuxeR not found!</source>
         <translation>tsMuxer introuvable !</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1453"/>
+        <location filename="../tsmuxerwindow.cpp" line="1428"/>
         <source>Can&apos;t execute tsMuxeR!</source>
         <translation>Impossible d&apos;exécuter tsMuxer !</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2219"/>
-        <location filename="../tsmuxerwindow.cpp" line="2220"/>
+        <location filename="../tsmuxerwindow.cpp" line="2194"/>
+        <location filename="../tsmuxerwindow.cpp" line="2195"/>
         <source>No track selected</source>
         <translation>Aucune piste sélectionnée</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2227"/>
-        <source>Append media file</source>
-        <translation>Concaténer un fichier média</translation>
+        <location filename="../tsmuxerwindow.cpp" line="2201"/>
+        <source>Append media files</source>
+        <translation>Concaténer un fichiers médias</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2264"/>
+        <location filename="../tsmuxerwindow.cpp" line="2217"/>
         <source>Invalid file extension</source>
         <translation>Extension de fichier non valide</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2265"/>
+        <location filename="../tsmuxerwindow.cpp" line="2218"/>
         <source>Appended file must have same file extension.</source>
         <translation>Le fichier concaténé doit avoir la même extension de fichier.</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2363"/>
+        <location filename="../tsmuxerwindow.cpp" line="2316"/>
         <source>Sta&amp;rt demuxing</source>
         <translation>Déma&amp;rrer le démuxage</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2377"/>
+        <location filename="../tsmuxerwindow.cpp" line="2330"/>
         <source>Folder</source>
         <translation>Dossier</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2467"/>
+        <location filename="../tsmuxerwindow.cpp" line="2420"/>
         <source>Select file for muxing</source>
         <translation>Sélectionner un fichier pour le muxage</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2489"/>
-        <location filename="../tsmuxerwindow.cpp" line="2505"/>
+        <location filename="../tsmuxerwindow.cpp" line="2442"/>
+        <location filename="../tsmuxerwindow.cpp" line="2458"/>
         <source>Invalid file name</source>
         <translation>Nom de fichier non valide</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2490"/>
+        <location filename="../tsmuxerwindow.cpp" line="2443"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.m2ts&quot;</source>
         <translation>Le fichier de sortie &quot;%1&quot;&apos; n&apos;a pas une extension valide. Veuillez changer l&apos;extension du fichier en &quot;.m2ts&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2506"/>
+        <location filename="../tsmuxerwindow.cpp" line="2459"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.iso&quot;</source>
         <translation>Le fichier de sortie &quot;%1&quot;&apos; n&apos;a pas une extension valide. Veuillez changer l&apos;extension du fichier en &quot;.iso&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2520"/>
+        <location filename="../tsmuxerwindow.cpp" line="2473"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
         <translation>fichier</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2520"/>
+        <location filename="../tsmuxerwindow.cpp" line="2473"/>
         <source>directory</source>
         <translation>dossier</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2522"/>
+        <location filename="../tsmuxerwindow.cpp" line="2475"/>
         <source>Overwrite existing %1?</source>
         <translation>Écraser %1 qui existe déjà ?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2523"/>
+        <location filename="../tsmuxerwindow.cpp" line="2476"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
         <translation>La sortie %1 &quot;%2&quot; existe déjà. Souhaitez-vous l&apos;écraser ?</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2540"/>
+        <location filename="../tsmuxerwindow.cpp" line="2493"/>
         <source>Muxing in progress</source>
         <translation>Muxage en cours</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2540"/>
+        <location filename="../tsmuxerwindow.cpp" line="2493"/>
         <source>Demuxing in progress</source>
         <translation>Démuxage en cours</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2554"/>
+        <location filename="../tsmuxerwindow.cpp" line="2507"/>
         <source>tsMuxeR project file (*.meta);;All files (*.*)</source>
         <translation>Fichier de projet tsMuxeR (*.meta);;Tous les fichiers (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2569"/>
+        <location filename="../tsmuxerwindow.cpp" line="2522"/>
         <source>Can&apos;t create temporary meta file</source>
         <translation>Impossible de créer le fichier Meta temporaire</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2570"/>
+        <location filename="../tsmuxerwindow.cpp" line="2523"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
         <translation>Impossible de créer le fichier Meta temporaire &quot;%1&quot;</translation>
     </message>
