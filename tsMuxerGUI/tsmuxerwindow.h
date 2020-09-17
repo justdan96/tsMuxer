@@ -47,6 +47,8 @@ class TsMuxerWindow : public QWidget
     void fileAppended();
 
    private:
+    template <typename F>
+    void showAddFilesDialog(QString&& windowTitle, F&& windowOkFn);
     void onAddBtnClick();
     void readFromStdout();
     void readFromStderr();
@@ -89,6 +91,9 @@ class TsMuxerWindow : public QWidget
     void updateMuxTime1();
     void updateMuxTime2();
     void onLanguageComboBoxIndexChanged(int);
+    template <typename OnCodecListReadyFn, typename PostActionSignal, typename PostActionFn>
+    void processAddFileList(OnCodecListReadyFn onCodecListReady, PostActionSignal postActionSignal,
+                            PostActionFn postActionFn);
 
    protected:
     void closeEvent(QCloseEvent* event) override;
