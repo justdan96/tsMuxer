@@ -244,55 +244,68 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     }
 
     // cf. "http://www.dolby.com/us/en/technologies/dolby-vision/dolby-vision-profiles-levels.pdf"
+    // "For profiles 7, 8.1 and 8.4, VUI parameters are required, as bitstreams employing these profiles
+    // have a non-SDR base layer. For other Dolby Vision profiles, VUI parameters are optional."
     int profile;
     int compatibility;
-    if (m_sps->bit_depth_luma_minus8 == 2)
+
+    if (m_sps->bit_depth_luma_minus8 == 2)  // 10-bit
     {
-        if (!isDVBL)  // dual HEVC track
+        if (m_hdr->isDVEL)
         {
-            profile = 7;
-            compatibility = 6;
+            switch (m_sps->transfer_characteristics)
+            {
+            case 16:                                               // PQ
+                if (m_sps->chroma_sample_loc_type_top_field == 2)  // Blu-ray
+                {
+                    profile = 7;
+                    compatibility = 6;
+                }
+                else  // CTA HDR10
+                {
+                    profile = 6;
+                    compatibility = 1;
+                }
+                break;
+            default:  // unspecified, assumed DV IPT
+                profile = 4;
+                compatibility = 2;
+            }
         }
-        else if (m_hdr->isDVEL && (V3_flags & HDR10))
+        else  // single BL layer
         {
-            profile = 6;
-            compatibility = 1;
-        }
-        else if (m_hdr->isDVEL)
-        {
-            profile = 4;
-            compatibility = 2;
-        }
-        else if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
-                 m_sps->matrix_coeffs == 2)  // DV IPT color space
-        {
-            profile = 5;
-            compatibility = 0;
-        }
-        else if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
-                 m_sps->matrix_coeffs == 9)  // DV BT.2100
-        {
-            profile = 8;
-            compatibility = 1;
-        }
-        else  // DV SDR
-        {
-            profile = 8;
-            compatibility = 2;
+            switch (m_sps->transfer_characteristics)
+            {
+            case 16:  // PQ
+                profile = 8;
+                compatibility = 1;
+                break;
+            case 14:  // HLG-DVB
+            case 18:  // HLG-ARIB
+                profile = 8;
+                compatibility = 4;
+                break;
+            case 1:  // SDR
+                profile = 8;
+                compatibility = 2;
+                break;
+            default:  // unspecified, assumed DV IPT
+                profile = 5;
+                compatibility = 0;
+            }
         }
     }
     else  // 8-bit
     {
-        if (m_sps->colour_primaries == 2 && m_sps->transfer_characteristics == 2 &&
-            m_sps->matrix_coeffs == 2)  // DV IPT color space
+        switch (m_sps->transfer_characteristics)
         {
-            profile = 3;
-            compatibility = 0;
-        }
-        else
-        {
+        case 1:  // SDR
             profile = 2;
             compatibility = 2;
+            break;
+        default:  // unspecified, assumed DV IPT
+            profile = 3;
+            compatibility = 0;
         }
     }
 

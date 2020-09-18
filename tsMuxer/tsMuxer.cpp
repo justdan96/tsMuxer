@@ -303,8 +303,8 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     else if (codecName == "V_MPEGH/ISO/HEVC")
     {
         int stream_type = STREAM_TYPE_VIDEO_H265;
-        // For non-bluray, Dolby Vision track must be stream_type 06 = private data
-        if (!m_bluRayMode && tsStreamIndex == 0x1015)
+        // For non-bluray, second Dolby Vision track must be stream_type 06 = private data
+        if (!m_bluRayMode && tsStreamIndex == 0x1015 && (V3_flags & NON_DV_TRACK))
             stream_type = STREAM_TYPE_PRIVATE_DATA;
         m_pmt.pidList.insert(std::make_pair(
             tsStreamIndex,

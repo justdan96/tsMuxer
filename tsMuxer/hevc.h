@@ -157,9 +157,12 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     */
     std::vector<ShortTermRPS> st_rps;
 
+    int video_full_range_flag;
     int colour_primaries;
     int transfer_characteristics;
     int matrix_coeffs;
+    int chroma_sample_loc_type_top_field;
+    int chroma_sample_loc_type_bottom_field;
 
     int num_short_term_ref_pic_sets;
     int num_units_in_tick;
