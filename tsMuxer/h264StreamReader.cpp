@@ -650,8 +650,10 @@ void H264StreamReader::additionalStreamCheck(uint8_t* buff, uint8_t* end)
             rez = deserializeSliceHeader(slice, nal, end);
             if (rez == 0)
             {
-                if (slice.getSPS()->frame_mbs_only_flag == 0)
+                // coded fields
+                if (slice.getSPS()->frame_mbs_only_flag == 0 && slice.m_field_pic_flag)
                     m_forceLsbDiv = 1;
+                // coded frames
                 else if (slice.pic_order_cnt_lsb % 2 == 1)
                     m_forceLsbDiv = 0;
             }
