@@ -362,7 +362,7 @@ void HevcSpsUnit::vui_parameters()
     if (video_signal_type_present_flag)
     {
         m_reader.skipBits(3);  // video_format u(3)
-        m_reader.skipBit();    // video_full_range_flag u(1)
+        video_full_range_flag = m_reader.getBit();
         bool colour_description_present_flag = m_reader.getBit();
         if (colour_description_present_flag)
         {
@@ -375,8 +375,8 @@ void HevcSpsUnit::vui_parameters()
     bool chroma_loc_info_present_flag = m_reader.getBit();
     if (chroma_loc_info_present_flag)
     {
-        extractUEGolombCode();  // chroma_sample_loc_type_top_field
-        extractUEGolombCode();  // chroma_sample_loc_type_bottom_field
+        chroma_sample_loc_type_top_field = extractUEGolombCode();
+        chroma_sample_loc_type_bottom_field = extractUEGolombCode();
     }
 
     m_reader.skipBit();  // neutral_chroma_indication_flag u(1)
