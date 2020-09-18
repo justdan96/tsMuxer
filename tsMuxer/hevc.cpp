@@ -271,9 +271,12 @@ HevcSpsUnit::HevcSpsUnit()
       vcl_hrd_parameters_present_flag(false),
       sub_pic_hrd_params_present_flag(false),
       num_short_term_ref_pic_sets(0),
+      video_full_range_flag(0),
       colour_primaries(2),
       transfer_characteristics(2),
       matrix_coeffs(2),
+      chroma_sample_loc_type_top_field(0),
+      chroma_sample_loc_type_bottom_field(0),
       num_units_in_tick(0),
       time_scale(0),
       PicSizeInCtbsY_bits(0)
