@@ -696,6 +696,10 @@ int MPEGSliceHeader::readMacroblockAddressIncrement(BitStreamReader& reader)
         return 33 - reader.getBits(3);
     case 7:
         return MB_ESCAPE_CODE;
+    // avoid compiler warning: control reaches end of non-void function
+    default:
+        assert(0);
+        return 0;
     }
 }
 
