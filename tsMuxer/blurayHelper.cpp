@@ -116,8 +116,10 @@ std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
     case BDMV_VersionNumber::Version3:
         rv[1] = 0x33;
         return rv;
+    // avoid compiler warning: control reaches end of non-void function
     default:
         assert(0);
+        return rv;
     }
 }
 std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
