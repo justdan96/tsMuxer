@@ -114,7 +114,8 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             incTimings();
         }
     }
-    m_totalFrameNum = 0;
+    m_totalFrameNum = m_frameNum = m_fullPicOrder = 0;
+    m_curDts = m_curPts = 0;
 
     // Set HDR10 flag if PQ detected
     if (m_vps && m_sps && m_pps && m_sps->vps_id == m_vps->vps_id && m_pps->sps_id == m_sps->sps_id)
