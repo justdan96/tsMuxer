@@ -1060,10 +1060,12 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     m_streamInfo[tsIndex].m_dts = avPacket.dts;
     int pesStreamID = m_pesType[tsIndex];
     if (pesStreamID <= SYSTEM_START_CODE)
+    {
         if (m_useNewStyleAudioPES)
             pesStreamID = PES_VC1_ID;
         else
             pesStreamID = PES_PRIVATE_DATA1;
+    }
 
     addData(pesStreamID, tsIndex, avPacket);
 

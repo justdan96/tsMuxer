@@ -482,6 +482,9 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
             return 6;
         }
     }
+    // avoid compiler warning: control reaches end of non-void function
+    assert(0);
+    return 0;
 }
 
 void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
