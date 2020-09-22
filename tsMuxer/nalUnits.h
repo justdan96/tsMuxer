@@ -6,6 +6,7 @@
 
 #include <map>
 #include <set>
+#include <unordered_set>
 #include <vector>
 
 #include "bitStream.h"
@@ -335,7 +336,7 @@ class SEIUnit : public NALUnit
     int pic_struct;
     uint8_t* m_cpb_removal_delay_baseaddr;
     int m_cpb_removal_delay_bitpos;
-    std::set<int> m_processedMessages;
+    std::unordered_set<int> m_processedMessages;
 
     int cpb_removal_delay;
     int dpb_output_delay;
@@ -345,6 +346,8 @@ class SEIUnit : public NALUnit
     int metadataPtsOffset;
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
+
+    bool hasProcessedMessage(int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
 
    private:
     void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuf, int payloadSize,
