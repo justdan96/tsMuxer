@@ -343,23 +343,23 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag
     bitWriter.putBits(8, isDVBL ? 5 : 7);  // descriptor length
-    bitWriter.putBits(8, 1);               // dv version major
+    bitWriter.putBits(8, 2);               // dv version major
     bitWriter.putBits(8, 0);               // dv version minor
     bitWriter.putBits(7, profile);         // dv profile
     bitWriter.putBits(6, level);           // dv level
     bitWriter.putBits(1, m_hdr->isDVRPU);  // rpu_present_flag
     bitWriter.putBits(1, m_hdr->isDVEL);   // el_present_flag
     bitWriter.putBits(1, isDVBL);          // bl_present_flag
+    bitWriter.putBits(4, compatibility);   // dv_bl_signal_compatibility_id
+    bitWriter.putBits(4, 15);              // reserved
     if (!isDVBL)
     {
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
-    bitWriter.putBits(4, compatibility);  // dv_bl_signal_compatibility_id
-    bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
-    return 2 + (isDVBL ? 5 : 7);
+    return isDVBL ? 7 : 9;
 }
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
