@@ -919,7 +919,7 @@ bool H264StreamReader::skipNal(uint8_t* nal)
 
         if (sei.m_processedMessages.find(SEI_MSG_BUFFERING_PERIOD) != sei.m_processedMessages.end() ||
             sei.m_processedMessages.find(SEI_MSG_PIC_TIMING) != sei.m_processedMessages.end())
-                return true;
+            return true;
     }
     return false;
 }
