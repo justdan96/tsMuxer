@@ -603,9 +603,10 @@ void H264StreamReader::additionalStreamCheck(uint8_t* buff, uint8_t* end)
                     break;
                 sei.decodeBuffer(nal, nalEnd);
                 sei.deserialize(tmpsps, orig_hrd_parameters_present_flag || orig_vcl_parameters_present_flag);
-                if (sei.m_processedMessages.find(SEI_MSG_BUFFERING_PERIOD) != sei.m_processedMessages.end() ||
-                    sei.m_processedMessages.find(SEI_MSG_PIC_TIMING) != sei.m_processedMessages.end())
+                if (sei.hasProcessedMessage(SEI_MSG_BUFFERING_PERIOD) || sei.hasProcessedMessage(SEI_MSG_PIC_TIMING))
+                {
                     SEIFound = true;
+                }
 
                 if (sei.number_of_offset_sequences >= 0)
                 {
@@ -917,9 +918,10 @@ bool H264StreamReader::skipNal(uint8_t* nal)
         sei.deserialize(*(m_spsMap.begin()->second),
                         orig_hrd_parameters_present_flag || orig_vcl_parameters_present_flag);
 
-        if (sei.m_processedMessages.find(SEI_MSG_BUFFERING_PERIOD) != sei.m_processedMessages.end() ||
-            sei.m_processedMessages.find(SEI_MSG_PIC_TIMING) != sei.m_processedMessages.end())
+        if (sei.hasProcessedMessage(SEI_MSG_BUFFERING_PERIOD) || sei.hasProcessedMessage(SEI_MSG_PIC_TIMING))
+        {
             return true;
+        }
     }
     return false;
 }
@@ -944,24 +946,25 @@ int H264StreamReader::processSEI(uint8_t* buff)
 
         bool timingSEI = false;
         bool nonTimingSEI = false;
-        for (std::set<int>::iterator itr = lastSEI.m_processedMessages.begin();
-             itr != lastSEI.m_processedMessages.end(); ++itr)
+        for (auto msg : lastSEI.m_processedMessages)
         {
-            if (*itr == SEI_MSG_BUFFERING_PERIOD)
+            if (msg == SEI_MSG_BUFFERING_PERIOD)
             {
                 timingSEI = true;
             }
-            else if (*itr == SEI_MSG_PIC_TIMING)
+            else if (msg == SEI_MSG_PIC_TIMING)
             {
                 timingSEI = true;
                 m_lastPictStruct = lastSEI.pic_struct;
             }
-            else if (*itr == SEI_MSG_MVC_SCALABLE_NESTING)
+            else if (msg == SEI_MSG_MVC_SCALABLE_NESTING)
             {
                 ;
             }
             else
+            {
                 nonTimingSEI = true;
+            }
         }
 
         if (m_mvcSubStream)
