@@ -911,19 +911,15 @@ bool H264StreamReader::skipNal(uint8_t* nal)
     }
     else if (nalType == nuSEI)
     {
-        return true;
-        /*
         SEIUnit sei;
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
         sei.decodeBuffer(nal, nextNal);
-        sei.deserialize(*(m_spsMap.begin()->second), orig_hrd_parameters_present_flag);
+        sei.deserialize(*(m_spsMap.begin()->second),
+                        orig_hrd_parameters_present_flag || orig_vcl_parameters_present_flag);
 
-        for (std::set<int>::iterator itr = sei.m_processedMessages.begin(); itr != sei.m_processedMessages.end(); ++itr)
-        {
-            if (*itr == SEI_MSG_BUFFERING_PERIOD || *itr == SEI_MSG_PIC_TIMING)
-                return true;
-        }
-        */
+        if (sei.m_processedMessages.find(SEI_MSG_BUFFERING_PERIOD) != sei.m_processedMessages.end() ||
+            sei.m_processedMessages.find(SEI_MSG_PIC_TIMING) != sei.m_processedMessages.end())
+            return true;
     }
     return false;
 }
