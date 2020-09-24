@@ -355,8 +355,8 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
-    bitWriter.putBits(4, compatibility);   // dv_bl_signal_compatibility_id
-    bitWriter.putBits(4, 15);              // reserved
+    bitWriter.putBits(4, compatibility);  // dv_bl_signal_compatibility_id
+    bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
     return isDVBL ? 7 : 9;
