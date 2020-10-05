@@ -456,7 +456,12 @@ TsMuxerWindow::TsMuxerWindow()
     writeSettings();
 }
 
-TsMuxerWindow::~TsMuxerWindow() { writeSettings(); }
+TsMuxerWindow::~TsMuxerWindow()
+{
+    disableUpdatesCnt = 0;
+    writeSettings();
+    delete settings;
+}
 
 void TsMuxerWindow::onTsMuxerCodecInfoReceived()
 {
@@ -2713,6 +2718,7 @@ void TsMuxerWindow::writeSettings()
 
     settings->setValue("outputToInputFolder", ui->radioButtonOutoutInInput->isChecked());
     settings->setValue("language", ui->languageSelectComboBox->currentText());
+    settings->setValue("windowSize", size());
 
     settings->endGroup();
 
@@ -2789,6 +2795,12 @@ bool TsMuxerWindow::readSettings()
 bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 {
     settings->beginGroup(prefix);
+
+    auto size = settings->value("windowSize");
+    if (size.isValid() && size.canConvert<QSize>())
+    {
+        resize(size.toSize());
+    }
 
     auto lang = settings->value("language");
     if (lang.isValid())
