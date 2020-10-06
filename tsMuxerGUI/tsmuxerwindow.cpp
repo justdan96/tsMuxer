@@ -2611,7 +2611,7 @@ void TsMuxerWindow::updateBtns(QWidget *w)
     if (w)
     {
         ui->btnAppend->setDefault(w == ui->btnAppend && w->isEnabled());
-        ui->addBtn->setDefault(w == ui->addBtn && ui->addBtn->isEnabled());
+        ui->addBtn->setDefault(w == ui->addBtn && w->isEnabled());
     }
     else
     {
