@@ -2279,9 +2279,9 @@ void TsMuxerWindow::onMoveUpButtonCLick()
     auto preMoveRow = ui->trackLV->currentRow();
     moveRow(preMoveRow, preMoveRow - 1);
     moveTrackInDefaultComboBox(preMoveRow, preMoveRow - 1);
+    disableUpdatesCnt--;
     updateMetaLines();
     updateNum();
-    disableUpdatesCnt--;
 }
 
 void TsMuxerWindow::onMoveDownButtonCLick()
@@ -2293,9 +2293,9 @@ void TsMuxerWindow::onMoveDownButtonCLick()
     auto preMoveRow = ui->trackLV->currentRow();
     moveRow(preMoveRow, preMoveRow + 2);
     moveTrackInDefaultComboBox(preMoveRow, preMoveRow + 1);
+    disableUpdatesCnt--;
     updateMetaLines();
     updateNum();
-    disableUpdatesCnt--;
 }
 
 void TsMuxerWindow::moveRow(int index, int index2)
