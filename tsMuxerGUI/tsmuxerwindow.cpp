@@ -2576,10 +2576,6 @@ void TsMuxerWindow::dropEvent(QDropEvent *event)
 {
     setWindowOpacity(1.0);
     updateBtns(0);
-    QWidget *w = childAt(event->pos());
-    QString wName;
-    if (w)
-        wName = w->objectName();
     if (event->mimeData()->hasFormat("text/uri-list"))
     {
         addFileList = event->mimeData()->urls();
@@ -2596,7 +2592,8 @@ void TsMuxerWindow::dropEvent(QDropEvent *event)
     }
     if (addFileList.isEmpty())
         return;
-    if (wName == "btnAppend" && ui->btnAppend->isEnabled())
+    auto w = childAt(event->pos());
+    if (w && w == ui->btnAppend && w->isEnabled())
         appendFile();
     else if (ui->addBtn->isEnabled())
         addFile();
@@ -2613,9 +2610,8 @@ void TsMuxerWindow::updateBtns(QWidget *w)
 {
     if (w)
     {
-        QString wName = w->objectName();
-        ui->btnAppend->setDefault(wName == "btnAppend" && ui->btnAppend->isEnabled());
-        ui->addBtn->setDefault(wName == "addBtn" && ui->addBtn->isEnabled());
+        ui->btnAppend->setDefault(w == ui->btnAppend && w->isEnabled());
+        ui->addBtn->setDefault(w == ui->addBtn && w->isEnabled());
     }
     else
     {
