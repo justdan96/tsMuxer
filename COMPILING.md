@@ -48,9 +48,7 @@ First we have to install the pre-requisites. On Debian 10 you have to enable the
 Common:
 ```
 sudo apt-get update
-sudo apt-get install build-essential \
-g++-multilib
-ninja
+sudo apt-get install build-essential g++-multilib ninja-build cmake
 
 # on Ubuntu:
 sudo apt-get install checkinstall
@@ -89,7 +87,9 @@ qtdeclarative5-dev \
 qtmultimedia5-dev \
 libqt5multimediawidgets5 \
 libqt5multimedia5-plugins \
-libqt5multimedia5
+libqt5multimedia5 \
+qttools5-dev \
+qttools5-dev-tools
 ```
 
 With all the dependencies set up we can now actually compile the code.
