@@ -78,25 +78,37 @@ The ZIP file for Linux from Bintray can just be unzipped and the executables can
 The following are packages created specifically for each distribution. To update, please uninstall the package and then install it again.
 
 #### Mageia Cauldron
+```
 dnf config-manager --add-repo https://download.opensuse.org/repositories/home:/justdan96/Mageia_Cauldron/home:justdan96.repo
+```
 
 #### openSUSE Leap 15.2
+```
 zypper ar -r https://download.opensuse.org/repositories/home:/justdan96/openSUSE_Leap_15.2/home:justdan96.repo
+```
 
 #### openSUSE Tumbleweed
+```
 zypper ar -r https://download.opensuse.org/repositories/home:/justdan96/openSUSE_Tumbleweed/home:justdan96.repo
+```
 
 #### Fedora 31
+```
 dnf config-manager --add-repo https://download.opensuse.org/repositories/home:/justdan96/Fedora_31/home:justdan96.repo
 dnf config-manager --set-enabled home_justdan96
+```
 
 #### Debian 10
+```
 wget -qO - https://download.opensuse.org/repositories/home:/justdan96/Debian_debbuild_10/Release.key | sudo apt-key add -
-sudo echo "deb https://download.opensuse.org/repositories/home:/justdan96/Debian_debbuild_10  ./" >> /etc/apt/sources.list
+echo "deb https://download.opensuse.org/repositories/home:/justdan96/Debian_debbuild_10  ./" | sudo tee -a /etc/apt/sources.list > /dev/null
+```
 
-#### Ubuntu 18.03 - 19.10
+#### Ubuntu 18.04 - 20.10
+```
 wget -qO - https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debbuild_$(lsb_release -r -s)/Release.key | sudo apt-key add -
-sudo echo "deb https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debbuild_$(lsb_release -r -s)  ./" >> /etc/apt/sources.list
+echo "deb https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debbuild_$(lsb_release -r -s)  ./" | sudo tee -a /etc/apt/sources.list > /dev/null
+```
 
 ### MacOS
 
