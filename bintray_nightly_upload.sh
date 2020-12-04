@@ -18,7 +18,7 @@ upload_to_bintray() {
 
 # upload the ZIP files to the version we just created on bintray
 echo "uploading files..."
-for i in w32 w64 lnx mac; do
+for i in w32 w64 lnx; do
   upload_to_bintray "$i"
 done
 echo "files uploaded!"

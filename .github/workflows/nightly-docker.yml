@@ -36,9 +36,6 @@ jobs:
     - run: ./rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
       
-    - run: ./rebuild_osxcross_with_gui_docker.sh
-      name: build-for-mac
-      
     - run: ./bintray_nightly_upload.sh
       name: upload-to-bintray-nightly
       env:
