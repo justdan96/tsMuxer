@@ -25,8 +25,8 @@ fi
 
 # upload the ZIP files to the version we just created on bintray
 echo "uploading files..."
-for i in w32 w64 lnx; do
-  upload_to_bintray "./bin/${buildname}.zip" "$i"
+for buildname in w32 w64 lnx; do
+  upload_to_bintray "./bin/${buildname}.zip" "$buildname"
 done
 echo "files uploaded!"
 
