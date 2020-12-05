@@ -14,7 +14,7 @@ find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
 set(lang_qrc "translations.qrc")
 configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
 # create_translation is not used due to QTBUG-41736
-qt5_add_translation(QM_FILES translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts translations/tsmuxergui_fr.ts)
+qt5_add_translation(QM_FILES translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts translations/tsmuxergui_fr.ts translations/tsmuxergui_zh.ts)
 
 set(tsmuxer_gui_sources
   main.cpp

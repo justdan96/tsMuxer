@@ -242,6 +242,7 @@ void initLanguageComboBox(QComboBox *comboBox)
     comboBox->addItem("English", "en");  // 0th index is also used as default if the language isn't set in the settings.
     comboBox->addItem(QString::fromUtf8("Русский"), "ru");
     comboBox->addItem(QString::fromUtf8("Français"), "fr");
+    comboBox->addItem(QString::fromUtf8("简体中文"), "zh");
     comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
 }
 
