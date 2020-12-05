@@ -4,11 +4,12 @@
 
 BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
-version_date=$(date +%Y-%m-%d--%H-%M-%S)
+version_date=$(date +%Y-%m-%d)
 
 upload_to_bintray() {
-  local buildname=$1
-  curl -T "./bin/${buildname}.zip" "-u$BINTRAY_USER:$BINTRAY_API_KEY" \
+  local localpath="$1"
+  local buildname="$2"
+  curl -T "$localpath" "-u$BINTRAY_USER:$BINTRAY_API_KEY" \
     -H "X-Bintray-Package:$PCK_NAME" \
     -H "X-Bintray-Version:$version_date" \
     -H "X-Bintray-Publish:1" \
@@ -16,10 +17,16 @@ upload_to_bintray() {
     "https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/${buildname}-nightly-$version_date.zip"
 }
 
+# when triggered with arguments, just upload the given file and exit.
+if [[ "$@" ]]; then
+  upload_to_bintray "$@"
+  exit 0
+fi
+
 # upload the ZIP files to the version we just created on bintray
 echo "uploading files..."
 for i in w32 w64 lnx; do
-  upload_to_bintray "$i"
+  upload_to_bintray "./bin/${buildname}.zip" "$i"
 done
 echo "files uploaded!"
 

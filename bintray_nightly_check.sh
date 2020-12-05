@@ -2,8 +2,8 @@
 
 # Checks if the commit hash of the current newest nightly build on
 # Bintray is the same as the current HEAD, in which case returns a
-# nonzero exit code. Otherwise, creates a new "version" in the Bintray
-# repostiory.
+# nonzero exit code. Otherwise, tries to create a new "version" in the
+# Bintray repository.
 
 # This script should be used as the entry point of "build nightly"
 # actions in order to prevent unnecessarily triggering builds if nothing
@@ -15,7 +15,7 @@ BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
 repo_commit=$(curl -s https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPO/commit.txt)
 local_commit=$(git rev-parse HEAD)
-version_date=$(date +%Y-%m-%d--%H-%M-%S)
+version_date=$(date +%Y-%m-%d)
 
 if [[ $repo_commit == $local_commit ]]; then
   echo "latest nightly build already in bintray!"
@@ -33,8 +33,8 @@ echo "$version_data"
 version_created=$(curl -u$BINTRAY_USER:$BINTRAY_API_KEY -H "Content-Type: application/json" --write-out %{http_code} --silent --output /dev/null --request POST --data "$version_data" https://api.bintray.com/packages/$BINTRAY_USER/$BINTRAY_REPO/$PCK_NAME/versions)
 if [[ $version_created -eq 201 ]]; then
   echo "version $version_date has been created!"
-  exit 0
 else
-  echo "error creating version $version_date!"
-  exit 2
+  echo "error creating version $version_date : server returned $version_created"
 fi
+
+exit 0 # don't return an error in case the version already exists
