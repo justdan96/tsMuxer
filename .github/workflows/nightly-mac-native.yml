@@ -2,7 +2,7 @@ name: Nightly native Mac build
 
 on:
   schedule:
-    - cron:  '1 15 * * *'
+    - cron:  '50 1 * * *'
 
 jobs:
   build-mac-native:
