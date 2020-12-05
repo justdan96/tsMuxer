@@ -3,7 +3,7 @@
 set -x
 set -e
 
-export MACOSX_DEPLOYMENT_TARGET=10.10
+export MACOSX_DEPLOYMENT_TARGET=10.13
 
 brew install pkg-config
 brew install freetype
