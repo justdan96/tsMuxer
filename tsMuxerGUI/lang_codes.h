@@ -10,7 +10,7 @@ struct QtvLangCode
 };
 
 static const std::array<QtvLangCode, 13> shortLangList = {
-    QtvLangCode{"chi", "Chinese"},   QtvLangCode{"nld", "\"Dutch; Flemish\""},
+    QtvLangCode{"zho", "Chinese"},   QtvLangCode{"nld", "\"Dutch; Flemish\""},
     QtvLangCode{"eng", "English"},   QtvLangCode{"fin", "Finnish"},
     QtvLangCode{"fre", "French"},    QtvLangCode{"ger", "German"},
     QtvLangCode{"ita", "Italian"},   QtvLangCode{"jpn", "Japanese"},
