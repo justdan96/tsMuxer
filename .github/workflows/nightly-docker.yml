@@ -17,6 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
       name: checkout
+    
+    - run: ./bintray_nightly_check.sh
+      name: nightly-check
+      env:
+        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
       
     - run: rm -f bin/.gitkeep
       name: clean-bin-folder
@@ -29,9 +35,6 @@ jobs:
       
     - run: ./rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
-      
-    - run: ./rebuild_osxcross_with_gui_docker.sh
-      name: build-for-mac
       
     - run: ./bintray_nightly_upload.sh
       name: upload-to-bintray-nightly
