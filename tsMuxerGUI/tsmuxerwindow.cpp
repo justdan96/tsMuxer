@@ -2416,13 +2416,9 @@ void TsMuxerWindow::saveFileDialog()
     }
     else
     {
-        QString path = getOutputDir();
-        if (path.isEmpty())
-        {
-            QString fileName = unquoteStr(ui->outFileName->text());
-            path = QFileInfo(fileName).absolutePath();
-        }
-        QString fileName = QDir::toNativeSeparators(
+        auto fileName = unquoteStr(ui->outFileName->text());
+        auto path = fileName.isEmpty() ? getOutputDir() : QFileInfo(fileName).absoluteFilePath();
+        fileName = QDir::toNativeSeparators(
             QFileDialog::getSaveFileName(this, tr("Select file for muxing"), path, mSaveDialogFilter));
         if (!fileName.isEmpty())
         {
