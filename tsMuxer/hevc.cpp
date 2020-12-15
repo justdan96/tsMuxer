@@ -208,8 +208,9 @@ int HevcVpsUnit::deserialize()
             int vps_max_num_reorder_pics = extractUEGolombCode();
             if (vps_max_num_reorder_pics > vps_max_dec_pic_buffering_minus1)
                 return 1;
-            int vps_max_latency_increase_plus1 = extractUEGolombCode();
-            if (vps_max_latency_increase_plus1 > (1 << 32) - 2)
+            auto vps_max_latency_increase_plus1 = static_cast<unsigned>(extractUEGolombCode());
+            const unsigned max_allowed_latency_increase = ~0;
+            if (vps_max_latency_increase_plus1 > (max_allowed_latency_increase - 1))
                 return 1;
         }
         int vps_max_layer_id = m_reader.getBits(6);
@@ -730,8 +731,9 @@ int HevcSpsUnit::deserialize()
             int sps_max_num_reorder_pics = extractUEGolombCode();
             if (sps_max_num_reorder_pics > sps_max_dec_pic_buffering_minus1)
                 return 1;
-            int sps_max_latency_increase_plus1 = extractUEGolombCode();
-            if (sps_max_latency_increase_plus1 > (1 << 32) - 2)
+            auto sps_max_latency_increase_plus1 = static_cast<unsigned>(extractUEGolombCode());
+            const unsigned max_allowed_latency_increase = ~0;
+            if (sps_max_latency_increase_plus1 > (max_allowed_latency_increase - 1))
                 return 1;
         }
 
