@@ -63,7 +63,7 @@ struct HevcUnit
     int nuh_temporal_id_plus1;
 
    protected:
-    int extractUEGolombCode();
+    unsigned extractUEGolombCode();
     int extractSEGolombCode();
     void updateBits(int bitOffset, int bitLen, int value);
 
@@ -102,8 +102,8 @@ struct HevcVpsUnit : public HevcUnitWithProfile
     int vps_id;
     int vps_max_layers;
     int vps_max_sub_layers;
-    int num_units_in_tick;
-    int time_scale;
+    unsigned num_units_in_tick;
+    unsigned time_scale;
     int num_units_in_tick_bit_pos;
 };
 
@@ -116,7 +116,7 @@ struct ShortTermRPS
         memset(delta_poc, 0, sizeof(delta_poc));
         memset(used, 0, sizeof(used));
     }
-    int num_negative_pics;
+    unsigned num_negative_pics;
     int num_delta_pocs;
     int32_t delta_poc[MAX_REFS];
     uint8_t used[MAX_REFS];
@@ -130,21 +130,21 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     std::string getDescription() const;
 
    public:
-    int vps_id;
-    int max_sub_layers;
-    int sps_id;
-    int chromaFormat;
+    unsigned vps_id;
+    unsigned max_sub_layers;
+    unsigned sps_id;
+    unsigned chromaFormat;
     bool separate_colour_plane_flag;
-    int pic_width_in_luma_samples;
-    int pic_height_in_luma_samples;
-    int bit_depth_luma_minus8;
-    int bit_depth_chroma_minus8;
-    int log2_max_pic_order_cnt_lsb;
+    unsigned pic_width_in_luma_samples;
+    unsigned pic_height_in_luma_samples;
+    unsigned bit_depth_luma_minus8;
+    unsigned bit_depth_chroma_minus8;
+    unsigned log2_max_pic_order_cnt_lsb;
     bool nal_hrd_parameters_present_flag;
     bool vcl_hrd_parameters_present_flag;
     bool sub_pic_hrd_params_present_flag;
 
-    std::vector<int> cpb_cnt_minus1;
+    std::vector<unsigned> cpb_cnt_minus1;
     /*
     std::vector<int> NumNegativePics;
     std::vector<int> NumPositivePics;
@@ -161,20 +161,20 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     int colour_primaries;
     int transfer_characteristics;
     int matrix_coeffs;
-    int chroma_sample_loc_type_top_field;
-    int chroma_sample_loc_type_bottom_field;
+    unsigned chroma_sample_loc_type_top_field;
+    unsigned chroma_sample_loc_type_bottom_field;
 
-    int num_short_term_ref_pic_sets;
-    int num_units_in_tick;
-    int time_scale;
-    int PicSizeInCtbsY_bits;
+    unsigned num_short_term_ref_pic_sets;
+    unsigned num_units_in_tick;
+    unsigned time_scale;
+    unsigned PicSizeInCtbsY_bits;
 
    private:
-    void hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1);
-    void sub_layer_hrd_parameters(int subLayerId);
-    void short_term_ref_pic_set(int stRpsIdx);
-    void vui_parameters();
-    void scaling_list_data();
+    int hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1);
+    int sub_layer_hrd_parameters(int subLayerId);
+    int short_term_ref_pic_set(int stRpsIdx);
+    int vui_parameters();
+    int scaling_list_data();
 };
 
 struct HevcPpsUnit : public HevcUnit
@@ -183,8 +183,8 @@ struct HevcPpsUnit : public HevcUnit
     int deserialize() override;
 
    public:
-    int pps_id;
-    int sps_id;
+    unsigned pps_id;
+    unsigned sps_id;
     bool dependent_slice_segments_enabled_flag;
     bool output_flag_present_flag;
     int num_extra_slice_header_bits;
@@ -210,9 +210,9 @@ struct HevcSliceHeader : public HevcUnit
 
    public:
     bool first_slice;
-    int pps_id;
-    int slice_type;
-    int pic_order_cnt_lsb;
+    unsigned pps_id;
+    unsigned slice_type;
+    unsigned pic_order_cnt_lsb;
 };
 
 std::vector<std::vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size);
