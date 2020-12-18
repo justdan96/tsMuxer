@@ -100,8 +100,8 @@ class NALUnit
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     static uint8_t* addStartCode(uint8_t* buffer, uint8_t* boundStart);
 
-    static int extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd);
-    static int extractUEGolombCode(BitStreamReader& bitReader);
+    static unsigned extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd);
+    static unsigned extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value);
     void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
     const BitStreamReader& getBitReader() const { return bitReader; }
@@ -114,7 +114,7 @@ class NALUnit
    protected:
     // GetBitContext getBitContext;
     BitStreamReader bitReader;
-    inline int extractUEGolombCode();
+    inline unsigned extractUEGolombCode();
     inline int extractSEGolombCode();
     void updateBits(int bitOffset, int bitLen, int value);
 };
@@ -143,8 +143,8 @@ class PPSUnit : public NALUnit
     // int m_ppsLenInMbit;
     // int entropy_coding_mode_BitPos;
    public:
-    int pic_parameter_set_id;
-    int seq_parameter_set_id;
+    unsigned pic_parameter_set_id;
+    unsigned seq_parameter_set_id;
     int entropy_coding_mode_flag;
     int pic_order_present_flag;
     /*
@@ -186,11 +186,11 @@ struct HRDParams
     bool isPresent;
     int bitLen;
 
-    int cpb_cnt_minus1;
+    unsigned cpb_cnt_minus1;
     int bit_rate_scale;
     int cpb_size_scale;
-    std::vector<int> bit_rate_value_minus1;
-    std::vector<int> cpb_size_value_minus1;
+    std::vector<unsigned> bit_rate_value_minus1;
+    std::vector<unsigned> cpb_size_value_minus1;
     std::vector<uint8_t> cbr_flag;
 
     int initial_cpb_removal_delay_length_minus1;
@@ -211,10 +211,10 @@ class SPSUnit : public NALUnit
     int num_units_in_tick_bit_pos;
     int pic_struct_present_flag;
     int mb_adaptive_frame_field_flag;
-    int frame_crop_left_offset;
-    int frame_crop_right_offset;
-    int frame_crop_top_offset;
-    int frame_crop_bottom_offset;
+    unsigned frame_crop_left_offset;
+    unsigned frame_crop_right_offset;
+    unsigned frame_crop_top_offset;
+    unsigned frame_crop_bottom_offset;
     int full_sps_bit_len;
     int vui_parameters_bit_pos;
     int low_delay_hrd_flag;
@@ -228,23 +228,23 @@ class SPSUnit : public NALUnit
     int constraint_set0_flag3;
     int level_idc;
     std::vector<int> level_idc_ext;
-    int seq_parameter_set_id;
-    int chroma_format_idc;
-    int log2_max_frame_num;
-    int pic_order_cnt_type;
-    int log2_max_pic_order_cnt_lsb;
+    unsigned seq_parameter_set_id;
+    unsigned chroma_format_idc;
+    unsigned log2_max_frame_num;
+    unsigned pic_order_cnt_type;
+    unsigned log2_max_pic_order_cnt_lsb;
     int delta_pic_order_always_zero_flag;
     int offset_for_non_ref_pic;
-    int num_ref_frames_in_pic_order_cnt_cycle;
+    unsigned num_ref_frames_in_pic_order_cnt_cycle;
     // int offset_for_ref_frame[256];
-    int num_ref_frames;
-    int pic_width_in_mbs;
-    int pic_height_in_map_units;
+    unsigned num_ref_frames;
+    unsigned pic_width_in_mbs;
+    unsigned pic_height_in_map_units;
     int frame_mbs_only_flag;
     int frame_cropping_flag;
     int vui_parameters_present_flag;
     // int field_pic_flag;
-    int pic_size_in_map_units;
+    unsigned pic_size_in_map_units;
     // int orig_hrd_parameters_present_flag;
 
     int timing_info_present_flag;
@@ -274,7 +274,7 @@ class SPSUnit : public NALUnit
     // bool m_pulldown;
 
     // subSPS (SVC/MVC) extension
-    std::vector<int> view_id;
+    std::vector<unsigned> view_id;
 
     std::string getStreamDescr();
     int getWidth() { return pic_width_in_mbs * 16 - getCropX(); }
@@ -289,18 +289,18 @@ class SPSUnit : public NALUnit
     void insertHrdParameters();
     void updateTimingInfo();
     int getMaxBitrate();
-    void hrd_parameters(HRDParams& params);
-    void deserializeVuiParameters();
+    int hrd_parameters(HRDParams& params);
+    int deserializeVuiParameters();
     int getCropY();
     int getCropX();
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
     void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
     int deserializeSubSPS();
-    void seq_parameter_set_mvc_extension();
+    int seq_parameter_set_mvc_extension();
     void seq_parameter_set_svc_extension();
     void svc_vui_parameters_extension();
-    void mvc_vui_parameters_extension();
+    int mvc_vui_parameters_extension();
 
    private:
     void insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool addVuiHeader, const HRDParams& params);
@@ -373,7 +373,7 @@ class SEIUnit : public NALUnit
     void progressive_refinement_segment_end(int payloadSize);
     void motion_constrained_slice_group_set(int payloadSize);
     void film_grain_characteristics(int payloadSize);
-    void mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag);
+    int mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag);
     void processBlurayOffsetMetadata();
     void processBlurayGopStructure();
     void deblocking_filter_display_preference(int payloadSize);
@@ -404,13 +404,13 @@ class SliceUnit : public NALUnit
     int non_idr_flag;
     int memory_management_control_operation;
 
-    int first_mb_in_slice;
-    int slice_type;
-    int orig_slice_type;
-    int pic_parameter_set_id;
+    unsigned first_mb_in_slice;
+    unsigned slice_type;
+    unsigned orig_slice_type;
+    unsigned pic_parameter_set_id;
     int frame_num;
     int bottom_field_flag;
-    int idr_pic_id;
+    unsigned idr_pic_id;
     int pic_order_cnt_lsb;
     int delta_pic_order_cnt_bottom;
     int m_picOrderBitPos;

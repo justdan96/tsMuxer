@@ -1367,9 +1367,9 @@ int H264StreamReader::processSPS(uint8_t* buff)
     if (replaceToOwnSPS())
     {
         // do not updat SPS in stream because of we are going to insert own sps
-        int seq_parameter_set_id = NALUnit::extractUEGolombCode(buff + 4, m_bufEnd);
-        if (seq_parameter_set_id == -1)
+        if (m_bufEnd - buff < 8)
             return NOT_ENOUGH_BUFFER;
+        unsigned seq_parameter_set_id = NALUnit::extractUEGolombCode(buff + 4, m_bufEnd);
         if (updatedSPSList.find(seq_parameter_set_id) != updatedSPSList.end())
             return 0;  // already processed
     }
