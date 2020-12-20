@@ -131,7 +131,7 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
         else
             srcBuffer++;
     }
-    if (dstBufferSize < srcEnd - srcStart)
+    if (dstBufferSize < (size_t)(srcEnd - srcStart))
         return -1;
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
@@ -194,21 +194,14 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
     return dstBuffer - initDstBuffer;
 }
 
-int NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
+unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
 {
-    try
-    {
-        BitStreamReader reader;
-        reader.setBuffer(buffer, bufEnd);
-        return extractUEGolombCode(reader);
-    }
-    catch (...)
-    {
-        return -1;
-    }
+    BitStreamReader reader;
+    reader.setBuffer(buffer, bufEnd);
+    return extractUEGolombCode(reader);
 }
 
-int NALUnit::extractUEGolombCode()
+unsigned NALUnit::extractUEGolombCode()
 {
     int cnt = 0;
     for (; bitReader.getBits(1) == 0; cnt++)
@@ -237,7 +230,7 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value)
             nBit++;
     }
     */
-    int maxVal = 0;
+    uint32_t maxVal = 0;
     int x = 1;
     int nBit = 0;
     for (; maxVal < value; maxVal += x)
@@ -250,7 +243,7 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value)
     bitWriter.putBits(nBit, value - (x - 1));
 }
 
-int NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
+unsigned NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
 {
     int cnt = 0;
     for (; bitReader.getBits(1) == 0; cnt++)
@@ -260,11 +253,11 @@ int NALUnit::extractUEGolombCode(BitStreamReader& bitReader)
 
 int NALUnit::extractSEGolombCode()
 {
-    int rez = extractUEGolombCode();
+    unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
-        return -rez / 2;
+        return -(int)(rez / 2);
     else
-        return (rez + 1) / 2;
+        return (int)((rez + 1) / 2);
 }
 
 int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
@@ -369,7 +362,11 @@ int PPSUnit::deserialize()
     {
         bitReader.setBuffer(m_nalBuffer + 1, nalEnd);
         pic_parameter_set_id = extractUEGolombCode();
+        if (pic_parameter_set_id >= 256)
+            return 1;
         seq_parameter_set_id = extractUEGolombCode();
+        if (seq_parameter_set_id >= 32)
+            return 1;
         // entropy_coding_mode_BitPos = bitReader.getBitsCount();
         entropy_coding_mode_flag = bitReader.getBit();
         pic_order_present_flag = bitReader.getBit();
@@ -583,15 +580,23 @@ int SPSUnit::deserialize()
     {
         bitReader.setBuffer(m_nalBuffer + 4, m_nalBuffer + m_nalBufferLen);
         seq_parameter_set_id = extractUEGolombCode();
+        if (seq_parameter_set_id >= 32)
+            return 1;
         pic_order_cnt_type = 0;
         if (profile_idc == 100 || profile_idc == 110 || profile_idc == 122 || profile_idc == 244 || profile_idc == 44 ||
             profile_idc == 83 || profile_idc == 86 || profile_idc == 118 || profile_idc == 128)
         {
             chroma_format_idc = extractUEGolombCode();
+            if (chroma_format_idc >= 4)
+                return 1;
             if (chroma_format_idc == 3)
                 separate_colour_plane_flag = bitReader.getBits(1);
-            int bit_depth_luma = extractUEGolombCode() + 8;
-            int bit_depth_chroma = extractUEGolombCode() + 8;
+            unsigned bit_depth_luma = extractUEGolombCode() + 8;
+            if (bit_depth_luma > 14)
+                return 1;
+            unsigned bit_depth_chroma = extractUEGolombCode() + 8;
+            if (bit_depth_chroma > 14)
+                return 1;
             int qpprime_y_zero_transform_bypass_flag = bitReader.getBits(1);
             int seq_scaling_matrix_present_flag = bitReader.getBits(1);
             if (seq_scaling_matrix_present_flag != 0)
@@ -616,26 +621,32 @@ int SPSUnit::deserialize()
             }
         }
         log2_max_frame_num = extractUEGolombCode() + 4;
+        if (log2_max_frame_num > 16)
+            return 1;
 
         // next parameters not used  now.
 
         pic_order_cnt_type = extractUEGolombCode();
+        if (pic_order_cnt_type > 2)
+            return 1;
         log2_max_pic_order_cnt_lsb = 0;
         delta_pic_order_always_zero_flag = 0;
         if (pic_order_cnt_type == 0)
+        {
             log2_max_pic_order_cnt_lsb = extractUEGolombCode() + 4;
+            if (log2_max_pic_order_cnt_lsb > 16)
+                return 1;
+        }
         else if (pic_order_cnt_type == 1)
         {
             delta_pic_order_always_zero_flag = bitReader.getBits(1);
             offset_for_non_ref_pic = extractSEGolombCode();
-            int offset_for_top_to_bottom_field = extractSEGolombCode();
+            extractSEGolombCode();  // offset_for_top_to_bottom_field
             num_ref_frames_in_pic_order_cnt_cycle = extractUEGolombCode();
             if (num_ref_frames_in_pic_order_cnt_cycle >= 256)
-            {
-                THROW_BITSTREAM_ERR;
-            }
+                return 1;
 
-            for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
+            for (size_t i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
                 extractSEGolombCode();  // offset_for_ref_frame[i]
         }
 
@@ -659,9 +670,8 @@ int SPSUnit::deserialize()
         vui_parameters_bit_pos = bitReader.getBitsCount() + 32;
         vui_parameters_present_flag = bitReader.getBits(1);
         if (vui_parameters_present_flag)
-        {
-            deserializeVuiParameters();
-        }
+            if (deserializeVuiParameters() != 0)
+                return 1;
 
         if (nal_unit_type == nuSubSPS)
         {
@@ -700,17 +710,19 @@ int SPSUnit::deserializeSubSPS()
     {
         if (bitReader.getBit() != 1)
             return INVALID_BITSTREAM_SYNTAX;
-        seq_parameter_set_mvc_extension();  // specified in Annex H
+        if (seq_parameter_set_mvc_extension() != 0)  // specified in Annex H
+            return 1;
         int mvc_vui_parameters_present_flag = bitReader.getBit();
         if (mvc_vui_parameters_present_flag)
-            mvc_vui_parameters_extension();  // specified in Annex H
+            if (mvc_vui_parameters_extension() != 0)  // specified in Annex H
+                return 1;
     }
 
     // int additional_extension2_flag = bitReader.getBit();
     return 0;
 }
 
-void SPSUnit::deserializeVuiParameters()
+int SPSUnit::deserializeVuiParameters()
 {
     aspect_ratio_info_present_flag = bitReader.getBit();
     if (aspect_ratio_info_present_flag)
@@ -741,8 +753,12 @@ void SPSUnit::deserializeVuiParameters()
     int chroma_loc_info_present_flag = bitReader.getBit();
     if (chroma_loc_info_present_flag)
     {
-        int chroma_sample_loc_type_top_field = extractUEGolombCode();
-        int chroma_sample_loc_type_bottom_field = extractUEGolombCode();
+        unsigned chroma_sample_loc_type_top_field = extractUEGolombCode();
+        if (chroma_sample_loc_type_top_field > 5)
+            return 1;
+        unsigned chroma_sample_loc_type_bottom_field = extractUEGolombCode();
+        if (chroma_sample_loc_type_bottom_field > 5)
+            return 1;
     }
     timing_info_present_flag = bitReader.getBit();
     if (timing_info_present_flag)
@@ -759,7 +775,8 @@ void SPSUnit::deserializeVuiParameters()
     if (nalHrdParams.isPresent)
     {
         int beforeCount = bitReader.getBitsCount();
-        hrd_parameters(nalHrdParams);
+        if (hrd_parameters(nalHrdParams) != 0)
+            return 1;
         nalHrdParams.bitLen = bitReader.getBitsCount() - beforeCount;
     }
 
@@ -767,7 +784,8 @@ void SPSUnit::deserializeVuiParameters()
     if (vclHrdParams.isPresent)
     {
         int beforeCount = bitReader.getBitsCount();
-        hrd_parameters(vclHrdParams);
+        if (hrd_parameters(vclHrdParams) != 0)
+            return 1;
         vclHrdParams.bitLen = bitReader.getBitsCount() - beforeCount;
     }
     if (nalHrdParams.isPresent || vclHrdParams.isPresent)
@@ -777,13 +795,24 @@ void SPSUnit::deserializeVuiParameters()
     if (bitstream_restriction_flag)
     {
         int motion_vectors_over_pic_boundaries_flag = bitReader.getBit();
-        int max_bytes_per_pic_denom = extractUEGolombCode();
-        int max_bits_per_mb_denom = extractUEGolombCode();
-        int log2_max_mv_length_horizontal = extractUEGolombCode();
-        int log2_max_mv_length_vertical = extractUEGolombCode();
-        int num_reorder_frames = extractUEGolombCode();
-        int max_dec_frame_buffering = extractUEGolombCode();
+        unsigned max_bytes_per_pic_denom = extractUEGolombCode();
+        if (max_bytes_per_pic_denom > 16)
+            return 1;
+        unsigned max_bits_per_mb_denom = extractUEGolombCode();
+        if (max_bits_per_mb_denom > 16)
+            return 1;
+        unsigned log2_max_mv_length_horizontal = extractUEGolombCode();
+        if (log2_max_mv_length_horizontal >= 16)
+            return 1;
+        unsigned log2_max_mv_length_vertical = extractUEGolombCode();
+        if (log2_max_mv_length_vertical >= 16)
+            return 1;
+        unsigned num_reorder_frames = extractUEGolombCode();
+        unsigned max_dec_frame_buffering = extractUEGolombCode();
+        if (num_reorder_frames > max_dec_frame_buffering)
+            return 1;
     }
+    return 0;
 }
 
 void SPSUnit::serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params)
@@ -791,7 +820,7 @@ void SPSUnit::serializeHRDParameters(BitStreamWriter& writer, const HRDParams& p
     writeUEGolombCode(writer, params.cpb_cnt_minus1);
     writer.putBits(4, params.bit_rate_scale);
     writer.putBits(4, params.cpb_size_scale);
-    for (int SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
+    for (size_t SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
     {
         writeUEGolombCode(writer, params.bit_rate_value_minus1[SchedSelIdx]);
         writeUEGolombCode(writer, params.cpb_size_value_minus1[SchedSelIdx]);
@@ -1023,9 +1052,11 @@ int SPSUnit::getMaxBitrate()
         return (nalHrdParams.bit_rate_value_minus1[0] + 1) << (6 + nalHrdParams.bit_rate_scale);
 }
 
-void SPSUnit::hrd_parameters(HRDParams& params)
+int SPSUnit::hrd_parameters(HRDParams& params)
 {
     params.cpb_cnt_minus1 = extractUEGolombCode();
+    if (params.cpb_cnt_minus1 >= 32)
+        return 1;
     params.bit_rate_scale = bitReader.getBits(4);
     params.cpb_size_scale = bitReader.getBits(4);
 
@@ -1033,16 +1064,22 @@ void SPSUnit::hrd_parameters(HRDParams& params)
     params.cpb_size_value_minus1.resize(params.cpb_cnt_minus1 + 1);
     params.cbr_flag.resize(params.cpb_cnt_minus1 + 1);
 
-    for (int SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
+    for (size_t SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
     {
         params.bit_rate_value_minus1[SchedSelIdx] = extractUEGolombCode();
+        if (params.bit_rate_value_minus1[SchedSelIdx] == 0xffffffff)
+            return 1;
         params.cpb_size_value_minus1[SchedSelIdx] = extractUEGolombCode();
+        if (params.cpb_size_value_minus1[SchedSelIdx] == 0xffffffff)
+            return 1;
         params.cbr_flag[SchedSelIdx] = bitReader.getBit();
     }
     params.initial_cpb_removal_delay_length_minus1 = bitReader.getBits(5);
     params.cpb_removal_delay_length_minus1 = bitReader.getBits(5);
     params.dpb_output_delay_length_minus1 = bitReader.getBits(5);
     params.time_offset_length = bitReader.getBits(5);
+
+    return 0;
 }
 
 int SPSUnit::getCropY()
@@ -1134,18 +1171,26 @@ std::string SPSUnit::getStreamDescr()
     return rez.str();
 }
 
-void SPSUnit::seq_parameter_set_mvc_extension()
+int SPSUnit::seq_parameter_set_mvc_extension()
 {
-    num_views = extractUEGolombCode() + 1;
+    unsigned num_views_minus1 = extractUEGolombCode();
+    if (num_views_minus1 >= 1 << 10)
+        return 1;
+    num_views = num_views_minus1 + 1;
 
     view_id.resize(num_views);
-    for (int i = 0; i < num_views; i++) view_id[i] = extractUEGolombCode();
+    for (int i = 0; i < num_views; i++)
+    {
+        view_id[i] = extractUEGolombCode();
+        if (view_id[i] >= 1 << 10)
+            return 1;
+    }
 
-    std::vector<int> num_anchor_refs_l0;
-    std::vector<int> num_anchor_refs_l1;
-    std::vector<int> num_non_anchor_refs_l0;
-    std::vector<int> num_applicable_ops_minus1;
-    std::vector<int> num_non_anchor_refs_l1;
+    std::vector<unsigned> num_anchor_refs_l0;
+    std::vector<unsigned> num_anchor_refs_l1;
+    std::vector<unsigned> num_non_anchor_refs_l0;
+    std::vector<unsigned> num_applicable_ops_minus1;
+    std::vector<unsigned> num_non_anchor_refs_l1;
 
     num_anchor_refs_l0.resize(num_views);
     num_anchor_refs_l1.resize(num_views);
@@ -1155,43 +1200,71 @@ void SPSUnit::seq_parameter_set_mvc_extension()
     for (int i = 1; i < num_views; i++)
     {
         num_anchor_refs_l0[i] = extractUEGolombCode();
-        for (int j = 0; j < num_anchor_refs_l0[i]; j++) extractUEGolombCode();  // anchor_ref_l0[ i ][ j ]
+        if (num_anchor_refs_l0[i] >= 16)
+            return 1;
+        for (size_t j = 0; j < num_anchor_refs_l0[i]; j++)
+            if (extractUEGolombCode() >= 1 << 10)  // anchor_ref_l0[ i ][ j ]
+                return 1;
         num_anchor_refs_l1[i] = extractUEGolombCode();
-        for (int j = 0; j < num_anchor_refs_l1[i]; j++) extractUEGolombCode();  // anchor_ref_l1[ i ][ j ]
+        if (num_anchor_refs_l1[i] >= 16)
+            return 1;
+        for (size_t j = 0; j < num_anchor_refs_l1[i]; j++)
+            if (extractUEGolombCode() >= 1 << 10)  // anchor_ref_l1[ i ][ j ]
+                return 1;
     }
 
     for (int i = 1; i < num_views; i++)
     {
         num_non_anchor_refs_l0[i] = extractUEGolombCode();
-        for (int j = 0; j < num_non_anchor_refs_l0[i]; j++) extractUEGolombCode();  // non_anchor_ref_l0[ i ][ j ]
+        if (num_non_anchor_refs_l0[i] >= 16)
+            return 1;
+        for (size_t j = 0; j < num_non_anchor_refs_l0[i]; j++)
+            if (extractUEGolombCode() >= 1 << 10)  // non_anchor_ref_l0[ i ][ j ]
+                return 1;
         num_non_anchor_refs_l1[i] = extractUEGolombCode();
-        for (int j = 0; j < num_non_anchor_refs_l1[i]; j++) extractUEGolombCode();  // non_anchor_ref_l1[ i ][ j ]
+        if (num_non_anchor_refs_l1[i] >= 16)
+            return 1;
+        for (size_t j = 0; j < num_non_anchor_refs_l1[i]; j++)
+            if (extractUEGolombCode() >= 1 << 10)  // non_anchor_ref_l1[ i ][ j ]
+                return 1;
     }
 
     int num_level_values_signalled_minus1 = extractUEGolombCode();
+    if (num_level_values_signalled_minus1 >= 64)
+        return 1;
     num_applicable_ops_minus1.resize(num_level_values_signalled_minus1 + 1);
     level_idc_ext.resize(num_level_values_signalled_minus1 + 1);
     for (int i = 0; i <= num_level_values_signalled_minus1; i++)
     {
         level_idc_ext[i] = bitReader.getBits(8);
         num_applicable_ops_minus1[i] = extractUEGolombCode();
-        for (int j = 0; j <= num_applicable_ops_minus1[i]; j++)
+        if (num_applicable_ops_minus1[i] >= 1 << 10)
+            return 1;
+        for (size_t j = 0; j <= num_applicable_ops_minus1[i]; j++)
         {
-            bitReader.getBits(3);                                    // applicable_op_temporal_id[ i ][ j ]
-            int dummy = extractUEGolombCode();                       // applicable_op_num_target_views_minus1[ i ][ j ]
-            for (int k = 0; k <= dummy; k++) extractUEGolombCode();  // applicable_op_target_view_id[ i ][ j ][ k ]
-            extractUEGolombCode();                                   // applicable_op_num_views_minus1[ i ][ j ]
+            bitReader.getBits(3);                    // applicable_op_temporal_id[ i ][ j ]
+            unsigned dummy = extractUEGolombCode();  // applicable_op_num_target_views_minus1[ i ][ j ]
+            if (dummy >= 1 << 10)
+                return 1;
+            for (size_t k = 0; k <= dummy; k++)
+                if (extractUEGolombCode() >= 1 << 10)  // applicable_op_target_view_id[ i ][ j ][ k ]
+                    return 1;
+            if (extractUEGolombCode() >= 1 << 10)  // applicable_op_num_views_minus1[ i ][ j ]
+                return 1;
         }
     }
+    return 0;
 }
 
 void SPSUnit::seq_parameter_set_svc_extension() {}
 
 void SPSUnit::svc_vui_parameters_extension() {}
 
-void SPSUnit::mvc_vui_parameters_extension()
+int SPSUnit::mvc_vui_parameters_extension()
 {
-    int vui_mvc_num_ops = extractUEGolombCode() + 1;
+    unsigned vui_mvc_num_ops = extractUEGolombCode() + 1;
+    if (vui_mvc_num_ops > 1 << 10)
+        return 1;
     std::vector<int> vui_mvc_temporal_id;
     vui_mvc_temporal_id.resize(vui_mvc_num_ops);
     mvcHrdParamsBitPos.resize(vui_mvc_num_ops);
@@ -1200,15 +1273,16 @@ void SPSUnit::mvc_vui_parameters_extension()
 
     // vui_mvc_pic_struct_present_flag.resize(vui_mvc_num_ops);
 
-    for (int i = 0; i < vui_mvc_num_ops; i++)
+    for (size_t i = 0; i < vui_mvc_num_ops; i++)
     {
         vui_mvc_temporal_id[i] = bitReader.getBits(3);
-        int vui_mvc_num_target_output_views = extractUEGolombCode() + 1;
-        for (int j = 0; j < vui_mvc_num_target_output_views; j++)
-        {
-            int viewID = extractUEGolombCode();  // vui_mvc_view_id[ i ][ j ]
-            viewID = viewID;
-        }
+        unsigned vui_mvc_num_target_output_views = extractUEGolombCode() + 1;
+        if (vui_mvc_num_target_output_views > 1 << 10)
+            return 1;
+        for (size_t j = 0; j < vui_mvc_num_target_output_views; j++)
+            if (extractUEGolombCode() >= 1 << 10)  // vui_mvc_view_id[ i ][ j ]
+                return 1;
+
         int vui_mvc_timing_info_present_flag = bitReader.getBit();  // vui_mvc_timing_info_present_flag[ i ]
         if (vui_mvc_timing_info_present_flag)
         {
@@ -1222,14 +1296,16 @@ void SPSUnit::mvc_vui_parameters_extension()
         if (mvcNalHrdParams[i].isPresent)
         {
             int beforeCount = bitReader.getBitsCount();
-            hrd_parameters(mvcNalHrdParams[i]);
+            if (hrd_parameters(mvcNalHrdParams[i]) != 0)
+                return 1;
             mvcNalHrdParams[i].bitLen = bitReader.getBitsCount() - beforeCount;
         }
         mvcVclHrdParams[i].isPresent = bitReader.getBit();
         if (mvcVclHrdParams[i].isPresent)
         {
             int beforeCount = bitReader.getBitsCount();
-            hrd_parameters(mvcVclHrdParams[i]);
+            if (hrd_parameters(mvcVclHrdParams[i]) != 0)
+                return 1;
             mvcVclHrdParams[i].bitLen = bitReader.getBitsCount() - beforeCount;
         }
         if (mvcNalHrdParams[i].isPresent || mvcVclHrdParams[i].isPresent)
@@ -1237,6 +1313,7 @@ void SPSUnit::mvc_vui_parameters_extension()
         int picStructpresent = bitReader.getBit();  // vui_mvc_pic_struct_present_flag[i]
         picStructpresent = picStructpresent;
     }
+    return 0;
 }
 
 // --------------------- SliceUnit -----------------------
@@ -1311,7 +1388,9 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
         bitReader.setBuffer(buffer + offset, end);
         first_mb_in_slice = extractUEGolombCode();
         orig_slice_type = slice_type = extractUEGolombCode();
-        if (slice_type >= 5)
+        if (slice_type > 9)
+            return 1;
+        if (slice_type > 4)
             slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
 
         return 0;
@@ -1395,9 +1474,13 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
 {
     first_mb_in_slice = extractUEGolombCode();
     orig_slice_type = slice_type = extractUEGolombCode();
-    if (slice_type >= 5)
+    if (slice_type > 9)
+        return 1;
+    if (slice_type > 4)
         slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
     pic_parameter_set_id = extractUEGolombCode();
+    if (pic_parameter_set_id >= 256)
+        return 1;
     std::map<uint32_t, PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
     if (itr == ppsMap.end())
         return SPS_OR_PPS_NOT_READY;
@@ -1423,7 +1506,11 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
             bottom_field_flag = bitReader.getBits(1);
     }
     if (isIDR())
+    {
         idr_pic_id = extractUEGolombCode();
+        if (idr_pic_id >= 1 << 16)
+            return 1;
+    }
     m_picOrderBitPos = -1;
     if (sps->pic_order_cnt_type == 0)
     {
@@ -2177,7 +2264,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     writeUEGolombCode(writer, sps.seq_parameter_set_id);
     if (sps.nalHrdParams.isPresent)
     {  // NalHrdBpPresentFlag
-        for (int SchedSelIdx = 0; SchedSelIdx <= sps.nalHrdParams.cpb_cnt_minus1; SchedSelIdx++)
+        for (size_t SchedSelIdx = 0; SchedSelIdx <= sps.nalHrdParams.cpb_cnt_minus1; SchedSelIdx++)
         {
             writer.putBits(sps.nalHrdParams.initial_cpb_removal_delay_length_minus1 + 1,
                            initial_cpb_removal_delay[SchedSelIdx]);
@@ -2187,7 +2274,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     }
     if (sps.vclHrdParams.isPresent)
     {  // NalHrdBpPresentFlag
-        for (int SchedSelIdx = 0; SchedSelIdx <= sps.vclHrdParams.cpb_cnt_minus1; SchedSelIdx++)
+        for (size_t SchedSelIdx = 0; SchedSelIdx <= sps.vclHrdParams.cpb_cnt_minus1; SchedSelIdx++)
         {
             writer.putBits(sps.vclHrdParams.initial_cpb_removal_delay_length_minus1 + 1,
                            initial_cpb_removal_delay[SchedSelIdx]);
@@ -2302,7 +2389,7 @@ void SEIUnit::deblocking_filter_display_preference(int payloadSize) {}
 void SEIUnit::stereo_video_info(int payloadSize) {}
 void SEIUnit::reserved_sei_message(int payloadSize) {}
 
-void SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag)
+int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag)
 {
     try
     {
@@ -2313,14 +2400,18 @@ void SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int 
             int all_view_components_in_au_flag = bitReader.getBit();
             if (!all_view_components_in_au_flag)
             {
-                int num_view_components_minus1 = extractUEGolombCode();
-                for (int i = 0; i <= num_view_components_minus1; i++) bitReader.getBits(10);  // sei_view_id[ i ]
+                unsigned num_view_components_minus1 = extractUEGolombCode();
+                if (num_view_components_minus1 >= 1 << 10)
+                    return 1;
+                for (size_t i = 0; i <= num_view_components_minus1; i++) bitReader.getBits(10);  // sei_view_id[ i ]
             }
         }
         else
         {
-            int num_view_components_op_minus1 = extractUEGolombCode();
-            for (int i = 0; i <= num_view_components_op_minus1; i++)
+            unsigned num_view_components_op_minus1 = extractUEGolombCode();
+            if (num_view_components_op_minus1 >= 1 << 10)
+                return 1;
+            for (size_t i = 0; i <= num_view_components_op_minus1; i++)
             {
                 int sei_op_view_id = bitReader.getBits(10);     // sei_op_view_id[ i ]
                 int sei_op_temporal_id = bitReader.getBits(3);  // sei_op_temporal_id
@@ -2386,6 +2477,7 @@ void SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int 
     catch (...)
     {
     }
+    return 0;
 }
 
 void SEIUnit::processBlurayGopStructure() {}
