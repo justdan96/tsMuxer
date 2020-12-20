@@ -131,7 +131,7 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
         else
             srcBuffer++;
     }
-    if (dstBufferSize < srcEnd - srcStart)
+    if (dstBufferSize < (size_t)(srcEnd - srcStart))
         return -1;
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
@@ -230,7 +230,7 @@ void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value)
             nBit++;
     }
     */
-    int maxVal = 0;
+    uint32_t maxVal = 0;
     int x = 1;
     int nBit = 0;
     for (; maxVal < value; maxVal += x)
@@ -646,7 +646,7 @@ int SPSUnit::deserialize()
             if (num_ref_frames_in_pic_order_cnt_cycle >= 256)
                 return 1;
 
-            for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
+            for (size_t i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++)
                 extractSEGolombCode();  // offset_for_ref_frame[i]
         }
 
@@ -820,7 +820,7 @@ void SPSUnit::serializeHRDParameters(BitStreamWriter& writer, const HRDParams& p
     writeUEGolombCode(writer, params.cpb_cnt_minus1);
     writer.putBits(4, params.bit_rate_scale);
     writer.putBits(4, params.cpb_size_scale);
-    for (int SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
+    for (size_t SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
     {
         writeUEGolombCode(writer, params.bit_rate_value_minus1[SchedSelIdx]);
         writeUEGolombCode(writer, params.cpb_size_value_minus1[SchedSelIdx]);
@@ -1064,7 +1064,7 @@ int SPSUnit::hrd_parameters(HRDParams& params)
     params.cpb_size_value_minus1.resize(params.cpb_cnt_minus1 + 1);
     params.cbr_flag.resize(params.cpb_cnt_minus1 + 1);
 
-    for (int SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
+    for (size_t SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
     {
         params.bit_rate_value_minus1[SchedSelIdx] = extractUEGolombCode();
         if (params.bit_rate_value_minus1[SchedSelIdx] == 0xffffffff)
@@ -1202,13 +1202,13 @@ int SPSUnit::seq_parameter_set_mvc_extension()
         num_anchor_refs_l0[i] = extractUEGolombCode();
         if (num_anchor_refs_l0[i] >= 16)
             return 1;
-        for (int j = 0; j < num_anchor_refs_l0[i]; j++)
+        for (size_t j = 0; j < num_anchor_refs_l0[i]; j++)
             if (extractUEGolombCode() >= 1 << 10)  // anchor_ref_l0[ i ][ j ]
                 return 1;
         num_anchor_refs_l1[i] = extractUEGolombCode();
         if (num_anchor_refs_l1[i] >= 16)
             return 1;
-        for (int j = 0; j < num_anchor_refs_l1[i]; j++)
+        for (size_t j = 0; j < num_anchor_refs_l1[i]; j++)
             if (extractUEGolombCode() >= 1 << 10)  // anchor_ref_l1[ i ][ j ]
                 return 1;
     }
@@ -1218,13 +1218,13 @@ int SPSUnit::seq_parameter_set_mvc_extension()
         num_non_anchor_refs_l0[i] = extractUEGolombCode();
         if (num_non_anchor_refs_l0[i] >= 16)
             return 1;
-        for (int j = 0; j < num_non_anchor_refs_l0[i]; j++)
+        for (size_t j = 0; j < num_non_anchor_refs_l0[i]; j++)
             if (extractUEGolombCode() >= 1 << 10)  // non_anchor_ref_l0[ i ][ j ]
                 return 1;
         num_non_anchor_refs_l1[i] = extractUEGolombCode();
         if (num_non_anchor_refs_l1[i] >= 16)
             return 1;
-        for (int j = 0; j < num_non_anchor_refs_l1[i]; j++)
+        for (size_t j = 0; j < num_non_anchor_refs_l1[i]; j++)
             if (extractUEGolombCode() >= 1 << 10)  // non_anchor_ref_l1[ i ][ j ]
                 return 1;
     }
@@ -1240,13 +1240,13 @@ int SPSUnit::seq_parameter_set_mvc_extension()
         num_applicable_ops_minus1[i] = extractUEGolombCode();
         if (num_applicable_ops_minus1[i] >= 1 << 10)
             return 1;
-        for (int j = 0; j <= num_applicable_ops_minus1[i]; j++)
+        for (size_t j = 0; j <= num_applicable_ops_minus1[i]; j++)
         {
             bitReader.getBits(3);                    // applicable_op_temporal_id[ i ][ j ]
             unsigned dummy = extractUEGolombCode();  // applicable_op_num_target_views_minus1[ i ][ j ]
             if (dummy >= 1 << 10)
                 return 1;
-            for (int k = 0; k <= dummy; k++)
+            for (size_t k = 0; k <= dummy; k++)
                 if (extractUEGolombCode() >= 1 << 10)  // applicable_op_target_view_id[ i ][ j ][ k ]
                     return 1;
             if (extractUEGolombCode() >= 1 << 10)  // applicable_op_num_views_minus1[ i ][ j ]
@@ -1273,13 +1273,13 @@ int SPSUnit::mvc_vui_parameters_extension()
 
     // vui_mvc_pic_struct_present_flag.resize(vui_mvc_num_ops);
 
-    for (int i = 0; i < vui_mvc_num_ops; i++)
+    for (size_t i = 0; i < vui_mvc_num_ops; i++)
     {
         vui_mvc_temporal_id[i] = bitReader.getBits(3);
         unsigned vui_mvc_num_target_output_views = extractUEGolombCode() + 1;
         if (vui_mvc_num_target_output_views > 1 << 10)
             return 1;
-        for (int j = 0; j < vui_mvc_num_target_output_views; j++)
+        for (size_t j = 0; j < vui_mvc_num_target_output_views; j++)
             if (extractUEGolombCode() >= 1 << 10)  // vui_mvc_view_id[ i ][ j ]
                 return 1;
 
@@ -2264,7 +2264,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     writeUEGolombCode(writer, sps.seq_parameter_set_id);
     if (sps.nalHrdParams.isPresent)
     {  // NalHrdBpPresentFlag
-        for (int SchedSelIdx = 0; SchedSelIdx <= sps.nalHrdParams.cpb_cnt_minus1; SchedSelIdx++)
+        for (size_t SchedSelIdx = 0; SchedSelIdx <= sps.nalHrdParams.cpb_cnt_minus1; SchedSelIdx++)
         {
             writer.putBits(sps.nalHrdParams.initial_cpb_removal_delay_length_minus1 + 1,
                            initial_cpb_removal_delay[SchedSelIdx]);
@@ -2274,7 +2274,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
     }
     if (sps.vclHrdParams.isPresent)
     {  // NalHrdBpPresentFlag
-        for (int SchedSelIdx = 0; SchedSelIdx <= sps.vclHrdParams.cpb_cnt_minus1; SchedSelIdx++)
+        for (size_t SchedSelIdx = 0; SchedSelIdx <= sps.vclHrdParams.cpb_cnt_minus1; SchedSelIdx++)
         {
             writer.putBits(sps.vclHrdParams.initial_cpb_removal_delay_length_minus1 + 1,
                            initial_cpb_removal_delay[SchedSelIdx]);
@@ -2403,7 +2403,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
                 unsigned num_view_components_minus1 = extractUEGolombCode();
                 if (num_view_components_minus1 >= 1 << 10)
                     return 1;
-                for (int i = 0; i <= num_view_components_minus1; i++) bitReader.getBits(10);  // sei_view_id[ i ]
+                for (size_t i = 0; i <= num_view_components_minus1; i++) bitReader.getBits(10);  // sei_view_id[ i ]
             }
         }
         else
@@ -2411,7 +2411,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
             unsigned num_view_components_op_minus1 = extractUEGolombCode();
             if (num_view_components_op_minus1 >= 1 << 10)
                 return 1;
-            for (int i = 0; i <= num_view_components_op_minus1; i++)
+            for (size_t i = 0; i <= num_view_components_op_minus1; i++)
             {
                 int sei_op_view_id = bitReader.getBits(10);     // sei_op_view_id[ i ]
                 int sei_op_temporal_id = bitReader.getBits(3);  // sei_op_temporal_id
