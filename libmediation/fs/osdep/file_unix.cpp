@@ -5,6 +5,7 @@
  ***********************************************************************/
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -19,7 +20,12 @@
 #define O_LARGEFILE 0
 #endif
 
-void makeUnixOpenFlags(unsigned int oflag, int* const unixOflag)
+namespace
+{
+int to_fd(void* impl) { return static_cast<int>(reinterpret_cast<std::intptr_t>(impl)); }
+void* from_fd(int fd) { return reinterpret_cast<void*>(static_cast<std::intptr_t>(fd)); }
+
+int makeUnixOpenFlags(unsigned int oflag)
 {
     int sysFlags = 0;
     if (oflag & File::ofRead)
@@ -44,23 +50,23 @@ void makeUnixOpenFlags(unsigned int oflag, int* const unixOflag)
     }
     if (oflag & File::ofCreateNew)
         sysFlags |= O_CREAT | O_EXCL;
-    *unixOflag = sysFlags;
+    return sysFlags;
 }
+}  // namespace
 
-File::File() : m_impl((void*)0xffffffff), m_name(""), m_pos(0) {}
+File::File() : m_impl(from_fd(-1)), m_pos(0) {}
 
-File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFlags) /* throw ( std::runtime_error ) */
-    : m_name(fName), m_pos(0)
+File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFlags) : m_name(fName), m_pos(0)
 {
-    int sysFlags = 0;
-    makeUnixOpenFlags(oflag, &sysFlags);
-    m_impl = (void*)::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-    if ((long)m_impl == -1)
+    int sysFlags = makeUnixOpenFlags(oflag);
+    auto fd = ::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+    if (fd == -1)
     {
         std::ostringstream ss;
         ss << "Error opening file " << fName << ": " << strerror(errno) << "(" << errno << ")";
         throw std::runtime_error(ss.str());
     }
+    m_impl = from_fd(fd);
 }
 
 File::~File()
@@ -76,19 +82,18 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
     if (isOpen())
         close();
 
-    int sysFlags = 0;
-    makeUnixOpenFlags(oflag, &sysFlags);
+    int sysFlags = makeUnixOpenFlags(oflag);
     createDir(extractFileDir(fName), true);
-    m_impl = (void*)::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-
-    return (long)m_impl != -1;
+    auto fd = ::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+    m_impl = from_fd(fd);
+    return fd != -1;
 }
 
 bool File::close()
 {
-    if (::close((long)m_impl) == 0)
+    if (::close(to_fd(m_impl)) == 0)
     {
-        m_impl = (void*)0xffffffff;
+        m_impl = from_fd(-1);
         return true;
     }
 
@@ -100,7 +105,7 @@ int File::read(void* buffer, uint32_t count) const
     if (!isOpen())
         return -1;
     m_pos += count;
-    return ::read((long)m_impl, buffer, count);
+    return ::read(to_fd(m_impl), buffer, count);
 }
 
 int File::write(const void* buffer, uint32_t count)
@@ -108,10 +113,10 @@ int File::write(const void* buffer, uint32_t count)
     if (!isOpen())
         return -1;
     m_pos += count;
-    return ::write((long)m_impl, buffer, count);
+    return ::write(to_fd(m_impl), buffer, count);
 }
 
-bool File::isOpen() const { return m_impl != (void*)0xffffffff; }
+bool File::isOpen() const { return to_fd(m_impl) != -1; }
 
 bool File::size(uint64_t* const fileSize) const
 {
@@ -119,7 +124,7 @@ bool File::size(uint64_t* const fileSize) const
 
     struct stat64 buf;
 
-    if (isOpen() && (fstat64((long)m_impl, &buf) == 0))
+    if (isOpen() && (fstat64(to_fd(m_impl), &buf) == 0))
     {
         *fileSize = buf.st_size;
         res = true;
@@ -131,7 +136,7 @@ bool File::size(uint64_t* const fileSize) const
 uint64_t File::seek(int64_t offset, SeekMethod whence)
 {
     if (!isOpen())
-        return (uint64_t)-1;
+        return UINT64_C(-1);
 
     int sWhence = 0;
     switch (whence)
@@ -148,18 +153,18 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     }
     m_pos = offset;
 #if defined(__APPLE__) && defined(__MACH__)
-    return lseek((long)m_impl, offset, sWhence);
+    return lseek(to_fd(m_impl), offset, sWhence);
 #else
-    return lseek64((long)m_impl, offset, sWhence);
+    return lseek64(to_fd(m_impl), offset, sWhence);
 #endif
 }
 
 bool File::truncate(uint64_t newFileSize)
 {
 #if defined(__APPLE__) && defined(__MACH__)
-    return ftruncate((long)m_impl, newFileSize) == 0;
+    return ftruncate(to_fd(m_impl), newFileSize) == 0;
 #else
-    return ftruncate64((long)m_impl, newFileSize) == 0;
+    return ftruncate64(to_fd(m_impl), newFileSize) == 0;
 #endif
 }
 
