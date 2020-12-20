@@ -1,15 +1,7 @@
 #ifndef LIBMEDIATION_FILE_H
 #define LIBMEDIATION_FILE_H
 
-#include <fcntl.h>
-
-#include <stdexcept>
-
 #include "../types/types.h"
-
-#ifdef _WIN32
-#pragma warning(disable : 4290)
-#endif
 
 class AbstractStream
 {
@@ -58,8 +50,7 @@ class File : public AbstractOutputStream
                     In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
                     In the unix implementation, this is the second parameter to the open function.
     */
-    File(const char* fName, unsigned int oflag,
-         unsigned int systemDependentFlags = 0) /* throw ( std::runtime_error ) */;
+    File(const char* fName, unsigned int oflag, unsigned int systemDependentFlags = 0);
     ~File() override;
 
     //! Open the file
@@ -138,9 +129,6 @@ class File : public AbstractOutputStream
 
    private:
     void* m_impl;
-
-    friend class MemoryMappedFile;
-
     std::string m_name;
     mutable uint64_t m_pos;
 };
