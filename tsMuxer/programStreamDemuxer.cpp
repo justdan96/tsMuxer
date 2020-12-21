@@ -341,8 +341,8 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 }
 
                 uint8_t* payloadData = curBuf + pesPacket->getHeaderLength() + afterPesHeader;
-                uint32_t pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
-                uint32_t copyLen = FFMIN(pesPayloadLen, end - payloadData);
+                int pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
+                int copyLen = FFMIN(pesPayloadLen, end - payloadData);
                 vect.append(payloadData, copyLen);
                 m_dataProcessed += copyLen;
                 discardSize += payloadData - curBuf;
@@ -356,7 +356,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
             }
             else
             {
-                uint32_t tmpLen = pesPacket->getPacketLength();
+                int tmpLen = pesPacket->getPacketLength();
                 if (tmpLen > end - curBuf)
                 {
                     discardSize += end - curBuf;

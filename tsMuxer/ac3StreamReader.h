@@ -40,7 +40,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
     bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
 
    protected:
-    unsigned getHeaderLen() override { return AC3Codec::getHeaderLen(); }
+    int getHeaderLen() override { return AC3Codec::getHeaderLen(); }
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override
     {
         skipBeforeBytes = 0;

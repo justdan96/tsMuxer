@@ -6,17 +6,17 @@
 #include <map>
 #include <string>
 
-static const uint32_t SECTOR_SIZE = 2048;
-static const uint32_t ALLOC_BLOCK_SIZE = 1024 * 64;
-static const uint32_t METADATA_START_ADDR = 1024 * 640 / SECTOR_SIZE;
-static const uint32_t MAX_EXTENT_SIZE = 0x40000000;
+static const int SECTOR_SIZE = 2048;
+static const int ALLOC_BLOCK_SIZE = 1024 * 64;
+static const int METADATA_START_ADDR = 1024 * 640 / SECTOR_SIZE;
+static const int MAX_EXTENT_SIZE = 0x40000000;
 static const uint32_t NEXT_EXTENT = 0xc0000000;
 
 static const int64_t META_BLOCK_PER_DATA = 16 * 1000000000ll;
 
 // it can be allocated inside single sector of a extended file
-static const int MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
-static const int MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
+static const unsigned MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
+static const unsigned MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
 
 static const int MAIN_INTERLEAVE_BLOCKSIZE = 6144 * 3168;
 static const int SUB_INTERLEAVE_BLOCKSIZE = 6144 * 1312;
@@ -216,7 +216,7 @@ class IsoWriter
     void writeLogicalVolumeIntegrityDescriptor();
     int writeExtentFileDescriptor(uint8_t fileType, uint64_t len, uint32_t pos, int linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
-    void writeAllocationExtentDescriptor(ExtentList* extents, int start, int indexEnd);
+    void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();
 
     void writeEntity(FileEntryInfo* dir);

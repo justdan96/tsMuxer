@@ -131,7 +131,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
 
    public:
     unsigned vps_id;
-    unsigned max_sub_layers;
+    int max_sub_layers;
     unsigned sps_id;
     unsigned chromaFormat;
     bool separate_colour_plane_flag;
@@ -212,7 +212,7 @@ struct HevcSliceHeader : public HevcUnit
     bool first_slice;
     unsigned pps_id;
     unsigned slice_type;
-    unsigned pic_order_cnt_lsb;
+    int pic_order_cnt_lsb;
 };
 
 std::vector<std::vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size);

@@ -37,7 +37,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
    private:
     uint32_t m_tmpBufferLen;
     uint8_t m_tmpBuffer[MAX_PES_HEADER_SIZE];  // TS_FRAME_SIZE
-    int m_lastPesLen;
+    uint32_t m_lastPesLen;
     uint32_t m_lastPID;
     const BufferedReaderManager& m_readManager;
     int m_readCnt;

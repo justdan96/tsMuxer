@@ -359,7 +359,7 @@ uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, uint8_
 {
     size_t patternLen = strlen(pattern);
     for (uint8_t* curPos = buff; curPos < end - patternLen; curPos++)
-        for (int j = 0; j < patternLen; j++)
+        for (size_t j = 0; j < patternLen; j++)
             if (curPos[j] != pattern[j])
                 break;
             else if (j == patternLen - 1)
@@ -577,7 +577,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
         }
         else
         {
-            if (end - buff < m_frameRest + hdrSize)
+            if (end - buff < (int)(m_frameRest + hdrSize))
                 return NOT_ENOUGH_BUFFER;
             int frameLen = m_frameRest;
             m_frameRest = 0;

@@ -67,7 +67,7 @@ class AC3Codec
         m_dsurmod = 0;
         m_mixinfoexists = false;
     };
-    unsigned getHeaderLen() { return AC3_HEADER_SIZE; }
+    int getHeaderLen() { return AC3_HEADER_SIZE; }
     inline bool isEAC3() { return m_bsid > 10; }
     inline bool isAC3() { return m_bsidBase > 0; }
     void setDownconvertToAC3(bool value) { m_downconvertToAC3 = value; }

@@ -34,14 +34,14 @@ int VC1StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         m_firstFileFrame = false;
         if (m_seqBuffer.size() > 0)
         {
-            if (dstEnd - curPtr < m_seqBuffer.size())
+            if (dstEnd - curPtr < (int)m_seqBuffer.size())
                 THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
             memcpy(curPtr, &m_seqBuffer[0], m_seqBuffer.size());
             curPtr += m_seqBuffer.size();
         }
         if (m_entryPointBuffer.size() > 0)
         {
-            if (dstEnd - curPtr < m_entryPointBuffer.size())
+            if (dstEnd - curPtr < (int)m_entryPointBuffer.size())
                 THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
             memcpy(curPtr, &m_entryPointBuffer[0], m_entryPointBuffer.size());
             curPtr += m_entryPointBuffer.size();

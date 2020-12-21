@@ -39,7 +39,7 @@ class MovDemuxer : public IOContextDemuxer
 
     struct MOVFragment
     {
-        unsigned track_id;
+        int track_id;
         uint64_t base_data_offset;
         uint64_t moof_offset;
         unsigned stsd_id;
@@ -71,7 +71,7 @@ class MovDemuxer : public IOContextDemuxer
     int64_t fileDuration;
     int isom;
     std::vector<std::pair<int64_t, uint64_t>> chunks;
-    int m_curChunk;
+    size_t m_curChunk;
     AVPacket m_deliveredPacket;
     std::vector<uint8_t> m_tmpChunkBuffer;
     bool m_firstDemux;

@@ -60,7 +60,7 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     void setImageBuffer(uint8_t* value) { m_imageBuffer = value; }
 
    public:
-    uint32_t m_rleLen;
+    int m_rleLen;
     int m_bottomOffset;
     int m_composition_number;
     int m_videoWidth;

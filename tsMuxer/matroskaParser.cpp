@@ -69,14 +69,14 @@ void ParsedH264TrackData::writeNalHeader(uint8_t*& dst)
 int ParsedH264TrackData::getSPSPPSLen()
 {
     int rez = 0;
-    for (int i = 0; i < m_spsPpsList.size(); i++) rez += m_spsPpsList[i].size() + 4;
+    for (size_t i = 0; i < m_spsPpsList.size(); i++) rez += m_spsPpsList[i].size() + 4;
     return rez;
 }
 
 int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
 {
     uint8_t* start = dst;
-    for (int i = 0; i < m_spsPpsList.size(); i++)
+    for (size_t i = 0; i < m_spsPpsList.size(); i++)
     {
         writeNalHeader(dst);
         memcpy(dst, &m_spsPpsList[i][0], m_spsPpsList[i].size());
@@ -173,7 +173,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
             THROW(ERR_COMMON, "Unsupported nal unit size " << elSize);
         writeNalHeader(dst);
         assert((curPos[m_nalSize] & 0x80) == 0);
-        memcpy(dst, curPos + m_nalSize, FFMIN(elSize, end - curPos));
+        memcpy(dst, curPos + m_nalSize, FFMIN(elSize, (uint32_t)(end - curPos)));
         curPos += elSize + m_nalSize;
         dst += elSize;
     }

@@ -243,7 +243,7 @@ int H264StreamReader::writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUn
         static const uint8_t DEFAULT_MVC_SEI_HEADER[] = {192, 16};
         if (!m_lastSeiMvcHeader.empty())
         {
-            for (int i = 0; i < m_lastSeiMvcHeader.size(); ++i) writer.putBits(8, m_lastSeiMvcHeader[i]);
+            for (size_t i = 0; i < m_lastSeiMvcHeader.size(); ++i) writer.putBits(8, m_lastSeiMvcHeader[i]);
         }
         else
         {

@@ -119,8 +119,8 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
     {
-        unsigned int numblkscod, strmtyp, substreamid, number_of_blocks_per_syncframe;
-        uint8_t acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
+        int numblkscod, strmtyp, substreamid, number_of_blocks_per_syncframe;
+        int acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
         bsmod = fscod = dsurmod = pgmscle = extpgmscle = mixdef = paninfoe = 0;
 
         strmtyp = gbc.getBits(2);

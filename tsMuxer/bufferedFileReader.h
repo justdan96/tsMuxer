@@ -41,7 +41,7 @@ class FileListIterator : public FileNameIterator
 
    private:
     std::vector<std::string> m_files;
-    int m_index;
+    size_t m_index;
 };
 
 struct FileReaderData : public ReaderData
