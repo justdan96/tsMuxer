@@ -4,5 +4,5 @@ Type=Application
 Name=TS Muxer GUI
 Comment=Transport stream muxer for remuxing/muxing elementary streams
 Exec=tsMuxerGUI
-Icon=txMuxerGUI
+Icon=tsMuxerGUI
 Categories=AudioVideo;
