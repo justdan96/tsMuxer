@@ -23,13 +23,15 @@ else()
 endif()
 add_definitions("-DTSMUXER_VERSION=\"${TSMUXER_VERSION}\"")
 
-if(UNIX)
+if(NOT MSVC)
   include(GNUInstallDirs)
   mark_as_advanced(CLEAR
     CMAKE_INSTALL_BINDIR
 	CMAKE_INSTALL_DATADIR
   )
-endif()
+else(NOT MSVC)
+  set(CMAKE_INSTALL_BINDIR bin)
+endif(NOT MSVC)
 
 add_subdirectory (libmediation)
 add_subdirectory (tsMuxer)
