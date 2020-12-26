@@ -18,7 +18,7 @@ HEVCStreamReader::HEVCStreamReader()
       m_vps(0),
       m_sps(0),
       m_pps(0),
-      m_hdr(0),
+      m_hdr(new HevcHdrUnit),
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
@@ -84,16 +84,12 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 return rez;
             break;
         case NAL_SEI_PREFIX:
-            if (!m_hdr)
-                m_hdr = new HevcHdrUnit();
             m_hdr->decodeBuffer(nal, nextNal);
             if (m_hdr->deserialize() != 0)
                 return rez;
             break;
         case NAL_DVRPU:
         case NAL_DVEL:
-            if (!m_hdr)
-                m_hdr = new HevcHdrUnit();
             if (nal[1] == 1)
             {
                 if (nalType == NAL_DVEL)
@@ -123,8 +119,6 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         if (m_sps->colour_primaries == 9 && m_sps->transfer_characteristics == 16 &&
             m_sps->matrix_coeffs == 9)  // SMPTE.ST.2084 (PQ)
         {
-            if (!m_hdr)
-                m_hdr = new HevcHdrUnit();
             m_hdr->isHDR10 = true;
             V3_flags |= HDR10;
         }
@@ -567,8 +561,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
                 break;
             case NAL_SEI_PREFIX:
-                if (!m_hdr)
-                    m_hdr = new HevcHdrUnit();
                 m_hdr->decodeBuffer(curPos, nextNal);
                 if (m_hdr->deserialize() != 0)
                     return rez;
