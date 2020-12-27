@@ -113,4 +113,4 @@ else()
   target_include_directories(tsmuxer PRIVATE ${FREETYPE2_INCLUDE_DIRS})
 endif()
 
-install (TARGETS tsmuxer DESTINATION bin)
+install (TARGETS tsmuxer DESTINATION ${CMAKE_INSTALL_BINDIR})

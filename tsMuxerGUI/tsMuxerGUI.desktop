@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=TS Muxer GUI
+Comment=Transport stream muxer for remuxing/muxing elementary streams
+Exec=tsMuxerGUI
+Icon=tsMuxerGUI
+Categories=AudioVideo;

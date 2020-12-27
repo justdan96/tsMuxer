@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-project (tsmuxer_main)
+project (tsmuxer_main CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -22,6 +22,16 @@ else()
   set(TSMUXER_VERSION "${VERSION_NUMBER}-dev")
 endif()
 add_definitions("-DTSMUXER_VERSION=\"${TSMUXER_VERSION}\"")
+
+if(NOT MSVC)
+  include(GNUInstallDirs)
+  mark_as_advanced(CLEAR
+    CMAKE_INSTALL_BINDIR
+	CMAKE_INSTALL_DATADIR
+  )
+else(NOT MSVC)
+  set(CMAKE_INSTALL_BINDIR bin)
+endif(NOT MSVC)
 
 add_subdirectory (libmediation)
 add_subdirectory (tsMuxer)

@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.1)
-project(tsMuxerGUI)
+project(tsMuxerGUI CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -30,6 +30,14 @@ set(tsmuxer_gui_sources
 
 add_executable(tsMuxerGUI ${tsmuxer_gui_sources})
 target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
+
+if(NOT MSVC)
+  install(TARGETS tsMuxerGUI DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES tsMuxerGUI.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+  install(FILES images/icon.png
+          DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps/
+		  RENAME tsMuxerGUI.png)
+endif(NOT MSVC)
 
 if (WIN32)
   target_sources(tsMuxerGUI PRIVATE icon.rc)
