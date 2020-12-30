@@ -262,7 +262,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bool endTag = false;
             string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
             string ltagStr = tagStr;
-            for (size_t j = 0; j < ltagStr.size(); j++) ltagStr[j] = towlower(ltagStr[j]);
+            for (auto &j : ltagStr) j = towlower(j);
             if (ltagStr == "i" || ltagStr == "italic")
             {
                 curFont.m_opts |= Font::ITALIC;
@@ -374,7 +374,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
     if (line.size() > (unsigned)prevTextPos)
         rez.push_back(make_pair(curFont, line.substr(prevTextPos, line.size() - prevTextPos)));
     double rSize = m_initFont.m_size;
-    for (size_t i = 0; i < rez.size(); i++) rez[i].first.m_size = browserSizeToRealSize(rez[i].first.m_size, rSize);
+    for (auto &i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
     return rez;
 }
 
@@ -386,12 +386,12 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
-    for (size_t i = 0; i < lines.size(); ++i)
+    for (auto &i : lines)
     {
-        vector<pair<Font, string>> txtParts = processTxtLine(lines[i], fontStack);
-        for (size_t i = 0; i < txtParts.size(); ++i)
+        vector<pair<Font, string>> txtParts = processTxtLine(i, fontStack);
+        for (auto &j : txtParts)
         {
-            if (txtParts[i].first.m_opts & Font::FORCED)
+            if (j.first.m_opts & Font::FORCED)
                 forced = true;
         }
 
@@ -400,11 +400,11 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
         int maxHeight = 0;
         int maxBaseLine = 0;
         vector<int> xSize;
-        for (size_t j = 0; j < txtParts.size(); j++)
+        for (auto &j : txtParts)
         {
-            setFont(txtParts[j].first);
+            setFont(j.first);
             SIZE mSize;
-            getTextSize(txtParts[j].second, &mSize);
+            getTextSize(j.second, &mSize);
             ySize = FFMAX(ySize, mSize.cy);
             maxHeight = FFMAX(maxHeight, getLineSpacing());
             maxBaseLine = FFMAX(maxBaseLine, getBaseline());

@@ -192,7 +192,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_state = PARSE_TIME;
         bool isNUmber = true;
         {
-            for (auto c : m_sourceText.front())
+            for (auto &c : m_sourceText.front())
                 if (!(c >= '0' && c <= '9') && c != ' ')
                 {
                     isNUmber = false;

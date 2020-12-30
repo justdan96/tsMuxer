@@ -556,9 +556,9 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     }
     else
     {
-        for (size_t i = 0; i < customChapters.size(); i++)
+        for (auto &i : customChapters)
         {
-            int64_t mark = customChapters[i] * 45000.0;
+            int64_t mark = i * 45000.0;
             if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }

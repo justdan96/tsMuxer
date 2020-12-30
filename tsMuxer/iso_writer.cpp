@@ -66,10 +66,10 @@ void writeDescriptorTag(uint8_t* buffer, uint16_t tag, uint32_t tagLocation)
 std::string toIsoSeparator(const std::string& path)
 {
     std::string result = path;
-    for (size_t i = 0; i < result.size(); ++i)
+    for (auto &i : result)
     {
-        if (result[i] == '\\')
-            result[i] = '/';
+        if (i == '\\')
+            i = '/';
     }
     return result;
 }
@@ -333,8 +333,8 @@ bool FileEntryInfo::isFile() const { return m_fileType == FileType_File || m_fil
 FileEntryInfo::~FileEntryInfo()
 {
     delete[] m_sectorBuffer;
-    for (size_t i = 0; i < m_files.size(); ++i) delete m_files[i];
-    for (size_t i = 0; i < m_subDirs.size(); ++i) delete m_subDirs[i];
+    m_files.clear();
+    m_subDirs.clear();
 }
 
 bool FileEntryInfo::setName(const std::string& name)
@@ -422,8 +422,8 @@ void FileEntryInfo::serializeDir()
     writer.closeDescriptorTag();
 
     // ------------ 2 (entries) ---------------
-    for (size_t i = 0; i < m_files.size(); ++i) writeEntity(writer, m_files[i]);
-    for (size_t i = 0; i < m_subDirs.size(); ++i) writeEntity(writer, m_subDirs[i]);
+    for (auto &i : m_files) writeEntity(writer, i);
+    for (auto &i : m_subDirs) writeEntity(writer, i);
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
     m_owner->writeExtentFileDescriptor(m_fileType, writer.size(), m_sectorNum + 1, m_subDirs.size() + 1);
@@ -518,20 +518,20 @@ void FileEntryInfo::setSubMode(bool value) { m_subMode = value; }
 
 FileEntryInfo* FileEntryInfo::subDirByName(const std::string& name) const
 {
-    for (size_t i = 0; i < m_subDirs.size(); ++i)
+    for (auto &i : m_subDirs)
     {
-        if (m_subDirs[i]->m_name == name)
-            return m_subDirs[i];
+        if (i->m_name == name)
+            return i;
     }
     return 0;
 }
 
 FileEntryInfo* FileEntryInfo::fileByName(const std::string& name) const
 {
-    for (size_t i = 0; i < m_files.size(); ++i)
+    for (auto &i : m_files)
     {
-        if (m_files[i]->m_name == name)
-            return m_files[i];
+        if (i->m_name == name)
+            return i;
     }
     return 0;
 }
@@ -932,8 +932,8 @@ void IsoWriter::sectorSeek(Partition partition, int pos)
 void IsoWriter::writeEntity(FileEntryInfo* dir)
 {
     dir->serialize();
-    for (size_t i = 0; i < dir->m_files.size(); ++i) writeEntity(dir->m_files[i]);
-    for (size_t i = 0; i < dir->m_subDirs.size(); ++i) writeEntity(dir->m_subDirs[i]);
+    for (auto &i : dir->m_files) writeEntity(i);
+    for (auto &i : dir->m_subDirs) writeEntity(i);
 }
 
 int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
@@ -947,8 +947,8 @@ int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
     if (entity->m_objectId)
         m_mappingEntries[entity->m_objectId] = MappingEntry(entity->m_parent->m_sectorNum, entity->m_sectorNum);
 
-    for (size_t i = 0; i < entity->m_files.size(); ++i) sectorNum = allocateEntity(entity->m_files[i], sectorNum);
-    for (size_t i = 0; i < entity->m_subDirs.size(); ++i) sectorNum = allocateEntity(entity->m_subDirs[i], sectorNum);
+    for (auto &i : entity->m_files) sectorNum = allocateEntity(i, sectorNum);
+    for (auto &i : entity->m_subDirs) sectorNum = allocateEntity(i, sectorNum);
     return sectorNum;
 }
 
@@ -1401,7 +1401,7 @@ void IsoWriter::setLayerBreakPoint(int lbn) { m_layerBreakPoint = lbn; }
 
 IsoHeaderData IsoHeaderData::normal()
 {
-    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32ToHex(random32()), time(0),
+    return IsoHeaderData{"*tsMuxeR ", std::string("*tsMuxeR ") + int32ToHex(random32()), time(0),
                          random32()};
 }
 

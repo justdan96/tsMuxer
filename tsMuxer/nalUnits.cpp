@@ -118,14 +118,14 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
             dstBufferSize -= srcBuffer - srcStart + 2;
             *dstBuffer++ = 3;
             *dstBuffer++ = *srcBuffer++;
-            for (int k = 0; k < 1; k++)
-                if (srcBuffer < srcEnd)
-                {
-                    if (dstBufferSize < 1)
-                        return -1;
-                    *dstBuffer++ = *srcBuffer++;
-                    dstBufferSize--;
-                }
+
+            if (srcBuffer < srcEnd)
+            {
+                if (dstBufferSize < 1)
+                    return -1;
+                *dstBuffer++ = *srcBuffer++;
+                dstBufferSize--;
+            }
             srcStart = srcBuffer;
         }
         else

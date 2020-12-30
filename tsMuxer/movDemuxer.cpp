@@ -305,15 +305,15 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         if (!spsPpsList.empty())
         {
-            for (size_t i = 0; i < spsPpsList.size(); ++i)
+            for (auto &i : spsPpsList)
             {
                 *dst++ = 0x0;
                 *dst++ = 0x0;
                 *dst++ = 0x0;
                 *dst++ = 0x1;
 
-                memcpy(dst, &spsPpsList[i][0], spsPpsList[i].size());
-                dst += spsPpsList[i].size();
+                memcpy(dst, &i[0], i.size());
+                dst += i.size();
             }
             spsPpsList.clear();
         }
@@ -350,7 +350,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             ++nalCnt;
         }
         int spsPpsSize = 0;
-        for (size_t i = 0; i < spsPpsList.size(); ++i) spsPpsSize += spsPpsList[i].size() + 4;
+        for (auto &i : spsPpsList) spsPpsSize += i.size() + 4;
 
         return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
@@ -618,12 +618,12 @@ void MovDemuxer::buildIndex()
         for (int i = 0; i < num_tracks; ++i)
         {
             MOVStreamContext* st = (MOVStreamContext*)tracks[i];
-            for (size_t j = 0; j < st->chunk_offsets.size(); ++j)
+            for (auto &j : st->chunk_offsets)
             {
                 if (!found_moof)
-                    if (st->chunk_offsets[j] < m_mdat_pos || st->chunk_offsets[j] > m_mdat_pos + m_mdat_size)
-                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << st->chunk_offsets[j]);
-                chunks.push_back(make_pair(st->chunk_offsets[j] - m_mdat_pos, i));
+                    if (j < m_mdat_pos || j > m_mdat_pos + m_mdat_size)
+                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << j);
+                chunks.push_back(make_pair(j - m_mdat_pos, i));
             }
         }
         sort(chunks.begin(), chunks.end());
@@ -1063,10 +1063,10 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
-    for (size_t i = 0; i < trex_data.size(); i++)
-        if (trex_data[i].track_id == frag->track_id)
+    for (auto &i : trex_data)
+        if (i.track_id == frag->track_id)
         {
-            trex = &trex_data[i];
+            trex = &i;
             break;
         }
     if (!trex)
