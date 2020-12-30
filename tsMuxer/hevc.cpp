@@ -471,7 +471,7 @@ int HevcSpsUnit::vui_parameters()
 int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
 {
     uint8_t rps_predict = 0;
-    int delta_poc;
+    unsigned delta_poc;
     int k0 = 0;
     int k1 = 0;
     int k = 0;
@@ -524,7 +524,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
         // sort in increasing order (smallest first)
         if (rps->num_delta_pocs != 0)
         {
-            int used, tmp;
+            unsigned used, tmp;
             for (int i = 1; i < rps->num_delta_pocs; i++)
             {
                 delta_poc = rps->delta_poc[i];
