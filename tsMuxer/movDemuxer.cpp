@@ -305,7 +305,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         if (!spsPpsList.empty())
         {
-            for (auto &i : spsPpsList)
+            for (auto& i : spsPpsList)
             {
                 *dst++ = 0x0;
                 *dst++ = 0x0;
@@ -350,7 +350,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             ++nalCnt;
         }
         int spsPpsSize = 0;
-        for (auto &i : spsPpsList) spsPpsSize += i.size() + 4;
+        for (auto& i : spsPpsList) spsPpsSize += i.size() + 4;
 
         return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
@@ -618,7 +618,7 @@ void MovDemuxer::buildIndex()
         for (int i = 0; i < num_tracks; ++i)
         {
             MOVStreamContext* st = (MOVStreamContext*)tracks[i];
-            for (auto &j : st->chunk_offsets)
+            for (auto& j : st->chunk_offsets)
             {
                 if (!found_moof)
                     if (j < m_mdat_pos || j > m_mdat_pos + m_mdat_size)
@@ -1063,7 +1063,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
-    for (auto &i : trex_data)
+    for (auto& i : trex_data)
         if (i.track_id == frag->track_id)
         {
             trex = &i;

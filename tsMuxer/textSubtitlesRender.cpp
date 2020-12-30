@@ -262,7 +262,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bool endTag = false;
             string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
             string ltagStr = tagStr;
-            for (auto &j : ltagStr) j = towlower(j);
+            for (auto& j : ltagStr) j = towlower(j);
             if (ltagStr == "i" || ltagStr == "italic")
             {
                 curFont.m_opts |= Font::ITALIC;
@@ -374,7 +374,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
     if (line.size() > (unsigned)prevTextPos)
         rez.push_back(make_pair(curFont, line.substr(prevTextPos, line.size() - prevTextPos)));
     double rSize = m_initFont.m_size;
-    for (auto &i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
+    for (auto& i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
     return rez;
 }
 
@@ -386,10 +386,10 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
-    for (auto &i : lines)
+    for (auto& i : lines)
     {
         vector<pair<Font, string>> txtParts = processTxtLine(i, fontStack);
-        for (auto &j : txtParts)
+        for (auto& j : txtParts)
         {
             if (j.first.m_opts & Font::FORCED)
                 forced = true;
@@ -400,7 +400,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
         int maxHeight = 0;
         int maxBaseLine = 0;
         vector<int> xSize;
-        for (auto &j : txtParts)
+        for (auto& j : txtParts)
         {
             setFont(j.first);
             SIZE mSize;

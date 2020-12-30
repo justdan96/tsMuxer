@@ -207,7 +207,7 @@ void METADemuxer::openFile(const string& streamName)
     }
 
     H264StreamReader::SeiMethod primarySEI = H264StreamReader::SEI_NotDefined;
-    for (auto &i : m_codecInfo)
+    for (auto& i : m_codecInfo)
     {
         H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
         if (reader && !reader->isSubStream())
@@ -220,7 +220,7 @@ void METADemuxer::openFile(const string& streamName)
     bool warned = false;
     if (primarySEI != H264StreamReader::SEI_NotDefined)
     {
-        for (auto &i : m_codecInfo)
+        for (auto& i : m_codecInfo)
         {
             H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
             if (reader && reader->isSubStream())
@@ -287,10 +287,10 @@ int METADemuxer::addPGSubStream(const string& codec, const string& _codecStreamN
 std::vector<MPLSPlayItem> METADemuxer::mergePlayItems(const std::vector<MPLSParser>& mplsInfoList)
 {
     std::vector<MPLSPlayItem> result;
-    for (auto &i : mplsInfoList)
+    for (auto& i : mplsInfoList)
     {
         const MPLSParser& mplsInfo = i;
-        for (auto &j : mplsInfo.m_playItems) result.push_back(j);
+        for (auto& j : mplsInfo.m_playItems) result.push_back(j);
     }
     return result;
 }
@@ -558,7 +558,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
 
 void METADemuxer::readClose()
 {
-    for (auto &codecInfo : m_codecInfo)
+    for (auto& codecInfo : m_codecInfo)
     {
         codecInfo.m_dataReader->deleteReader(codecInfo.m_readerID);
         delete codecInfo.m_streamReader;
@@ -1126,7 +1126,7 @@ const std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileNam
     std::vector<MPLSParser> result;
 
     std::vector<std::string> mplsFiles = splitQuotedStr(mplsFileName.c_str(), '+');
-    for (auto &i : mplsFiles)
+    for (auto& i : mplsFiles)
     {
         MPLSCache::iterator itr = m_mplsStreamMap.find(i);
         if (itr != m_mplsStreamMap.end())

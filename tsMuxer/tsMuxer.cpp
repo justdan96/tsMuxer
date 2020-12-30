@@ -507,7 +507,7 @@ bool TSMuxer::close()
 int TSMuxer::calcM2tsFrameCnt()
 {
     uint32_t byteCnt = 0;
-    for (auto &i : m_m2tsDelayBlocks) byteCnt += i.second;
+    for (auto& i : m_m2tsDelayBlocks) byteCnt += i.second;
     byteCnt -= m_prevM2TSPCROffset;
     byteCnt += m_outBufLen;
     assert(byteCnt % 192 == 0);
@@ -526,7 +526,7 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
     if (m_m2tsDelayBlocks.size() > 0)
     {
         int offset = m_prevM2TSPCROffset;
-        for (auto &i : m_m2tsDelayBlocks)
+        for (auto& i : m_m2tsDelayBlocks)
         {
             curPos = i.first + offset;
             int j = offset;
@@ -645,7 +645,7 @@ void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
     int bufLen = pesPacket->getHeaderLength() + additionDataSize;
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
-    for (auto &i : tmpPriorityData)
+    for (auto& i : tmpPriorityData)
         m_priorityData.push_back(
             std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
 }
@@ -858,7 +858,7 @@ void TSMuxer::writePESPacket()
         uint8_t* curPtr = m_pesData.data();
         uint8_t* dataEnd = curPtr + m_pesData.size();
         bool payloadStart = true;
-        for (auto &i : m_priorityData)
+        for (auto& i : m_priorityData)
         {
             uint8_t* blockPtr = m_pesData.data() + i.first;
             if (blockPtr > curPtr)
@@ -1369,7 +1369,7 @@ void TSMuxer::writeOutBuffer()
 void TSMuxer::parseMuxOpt(const std::string& opts)
 {
     vector<string> params = splitStr(opts.c_str(), ' ');
-    for (auto &i : params)
+    for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)
@@ -1400,7 +1400,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
         {
             uint64_t coeff = 1;
             string postfix;
-            for (auto &j : paramPair[1])
+            for (auto& j : paramPair[1])
                 if (!(j >= '0' && j <= '9' || j == '.'))
                     postfix += j;
             postfix = strToUpperCase(postfix);
@@ -1470,7 +1470,7 @@ void TSMuxer::openDstFile()
 vector<int64_t> TSMuxer::getFirstPts()
 {
     std::vector<int64_t> rez;
-    for (auto &i : m_firstPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_firstPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
     return rez;
 }
 
@@ -1487,7 +1487,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
 vector<int64_t> TSMuxer::getLastPts()
 {
     std::vector<int64_t> rez;
-    for (auto &i : m_lastPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_lastPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
     // if (!rez.empty())
     //    *rez.rbegin() += m_mainStreamFrameDuration;
     return rez;

@@ -69,14 +69,14 @@ void ParsedH264TrackData::writeNalHeader(uint8_t*& dst)
 int ParsedH264TrackData::getSPSPPSLen()
 {
     int rez = 0;
-    for (auto &i : m_spsPpsList) rez += i.size() + 4;
+    for (auto& i : m_spsPpsList) rez += i.size() + 4;
     return rez;
 }
 
 int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
 {
     uint8_t* start = dst;
-    for (auto &i : m_spsPpsList)
+    for (auto& i : m_spsPpsList)
     {
         writeNalHeader(dst);
         memcpy(dst, &i[0], i.size());

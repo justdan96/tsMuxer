@@ -313,7 +313,7 @@ bool SingleFileMuxer::close()
 void SingleFileMuxer::parseMuxOpt(const std::string& opts)
 {
     vector<string> params = splitStr(opts.c_str(), ' ');
-    for (auto &i : params)
+    for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)

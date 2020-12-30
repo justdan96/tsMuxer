@@ -225,7 +225,7 @@ void MuxerManager::doMux(const string& outFileName, FileFactory* fileFactory)
         m_subMuxer->doFlush();
     m_mainMuxer->doFlush();
 
-    for (auto &i : m_delayedData) asyncWriteBlock(i);
+    for (auto& i : m_delayedData) asyncWriteBlock(i);
 
     waitForWriting();
 
@@ -274,7 +274,7 @@ void MuxerManager::muxBlockFinished(AbstractMuxer* muxer)
 
     if (m_subBlockFinished && m_mainBlockFinished)
     {
-        for (auto &i : m_delayedData) asyncWriteBlock(i);
+        for (auto& i : m_delayedData) asyncWriteBlock(i);
 
         m_delayedData.clear();
         m_subBlockFinished = false;
@@ -320,7 +320,7 @@ int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, 
 void MuxerManager::parseMuxOpt(const string& opts)
 {
     vector<string> params = splitQuotedStr(opts.c_str(), ' ');
-    for (auto &i : params)
+    for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)
