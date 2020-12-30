@@ -782,8 +782,7 @@ int main(int argc, char** argv)
                     }
                 }
 
-                for (auto& i : customChapterList)
-                    i -= (double)muxerManager.getCutStart() / 1e9;
+                for (auto& i : customChapterList) i -= (double)muxerManager.getCutStart() / 1e9;
                 // createMPLSFile(dstDir, mainMuxer->getPidList(), *(mainMuxer->getFirstPts().begin()),
                 // *(mainMuxer->getLastPts().rbegin()),
                 //    autoChapterLen, customChapterList, dt, firstMplsOffset, firstM2tsOffset);

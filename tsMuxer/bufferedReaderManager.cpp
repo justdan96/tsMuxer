@@ -27,10 +27,7 @@ void BufferedReaderManager::init(uint32_t blockSize, uint32_t allocSize, uint32_
     m_prereadThreshold = prereadThreshold > 0 ? prereadThreshold : m_blockSize / 2;
 }
 
-BufferedReaderManager::~BufferedReaderManager()
-{
-    m_fileReaders.clear();
-}
+BufferedReaderManager::~BufferedReaderManager() { m_fileReaders.clear(); }
 
 AbstractReader* BufferedReaderManager::getReader(const char* streamName)
 {

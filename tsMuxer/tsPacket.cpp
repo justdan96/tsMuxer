@@ -908,7 +908,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
     for (auto& i : processStream)
     {
         writer.putBits(16, i.streamPID);  // stream_PID[k] 16 bslbf
-        writer.putBits(10, 0);                           // reserved_for_word_align 10 bslbf
+        writer.putBits(10, 0);            // reserved_for_word_align 10 bslbf
         writer.putBits(4, EP_stream_type);
         std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(i);
         writer.putBits(16, coarseInfo.size());  // number_of_EP_coarse_entries[k] 16 uimsbf

@@ -646,8 +646,7 @@ void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
     for (auto& i : tmpPriorityData)
-        m_priorityData.push_back(
-            std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
+        m_priorityData.push_back(std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
 }
 
 void TSMuxer::addData(int pesStreamID, int pid, AVPacket& avPacket)
