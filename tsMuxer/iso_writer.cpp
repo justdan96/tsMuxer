@@ -333,8 +333,8 @@ bool FileEntryInfo::isFile() const { return m_fileType == FileType_File || m_fil
 FileEntryInfo::~FileEntryInfo()
 {
     delete[] m_sectorBuffer;
-    m_files.clear();
-    m_subDirs.clear();
+    std::vector<FileEntryInfo*>().swap(m_files);
+    std::vector<FileEntryInfo*>().swap(m_subDirs);
 }
 
 bool FileEntryInfo::setName(const std::string& name)
