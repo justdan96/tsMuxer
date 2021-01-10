@@ -802,10 +802,10 @@ int SPSUnit::deserializeVuiParameters()
         if (max_bits_per_mb_denom > 16)
             return 1;
         unsigned log2_max_mv_length_horizontal = extractUEGolombCode();
-        if (log2_max_mv_length_horizontal >= 16)
+        if (log2_max_mv_length_horizontal > 16)
             return 1;
         unsigned log2_max_mv_length_vertical = extractUEGolombCode();
-        if (log2_max_mv_length_vertical >= 16)
+        if (log2_max_mv_length_vertical > 16)
             return 1;
         unsigned num_reorder_frames = extractUEGolombCode();
         unsigned max_dec_frame_buffering = extractUEGolombCode();
