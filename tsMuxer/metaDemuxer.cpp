@@ -289,8 +289,7 @@ std::vector<MPLSPlayItem> METADemuxer::mergePlayItems(const std::vector<MPLSPars
     std::vector<MPLSPlayItem> result;
     for (auto& i : mplsInfoList)
     {
-        const MPLSParser& mplsInfo = i;
-        for (auto& j : mplsInfo.m_playItems) result.push_back(j);
+        for (auto& j : i.m_playItems) result.push_back(j);
     }
     return result;
 }
