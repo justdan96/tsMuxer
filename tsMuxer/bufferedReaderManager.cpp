@@ -27,7 +27,14 @@ void BufferedReaderManager::init(uint32_t blockSize, uint32_t allocSize, uint32_
     m_prereadThreshold = prereadThreshold > 0 ? prereadThreshold : m_blockSize / 2;
 }
 
-BufferedReaderManager::~BufferedReaderManager() { std::vector<BufferedReader*>().swap(m_fileReaders); }
+BufferedReaderManager::~BufferedReaderManager()
+{
+    for (size_t i = 0; i < m_fileReaders.size(); i++)
+    {
+        delete m_fileReaders[i];  // need to define destruction order first. This object MUST be deleted after
+                                  // MCVodStreamer
+    }
+}
 
 AbstractReader* BufferedReaderManager::getReader(const char* streamName)
 {
