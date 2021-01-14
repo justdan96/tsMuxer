@@ -9,7 +9,7 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-unsigned AACStreamReader::getHeaderLen() { return AAC_HEADER_LEN; }
+int AACStreamReader::getHeaderLen() { return AAC_HEADER_LEN; }
 
 const std::string AACStreamReader::getStreamInfo()
 {

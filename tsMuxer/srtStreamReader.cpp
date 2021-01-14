@@ -192,7 +192,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_state = PARSE_TIME;
         bool isNUmber = true;
         {
-            for (auto c : m_sourceText.front())
+            for (auto& c : m_sourceText.front())
                 if (!(c >= '0' && c <= '9') && c != ' ')
                 {
                     isNUmber = false;
@@ -254,16 +254,16 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
 
 bool SRTStreamReader::parseTime(const string& text)
 {
-    for (int i = 0; i < text.length() - 2; i++)
+    for (size_t i = 0; i < text.length() - 2; i++)
     {
         if (text[i] == '-' && text[i + 1] == '-' && text[i + 2] == '>')
         {
             string first = trimStr(text.substr(0, i));
             string second = trimStr(text.substr(i + 3, text.length() - i - 3));
-            for (int j = 0; j < first.length(); j++)
+            for (size_t j = 0; j < first.length(); j++)
                 if (first[j] == ',')
                     first[j] = '.';
-            for (int j = 0; j < second.length(); j++)
+            for (size_t j = 0; j < second.length(); j++)
                 if (second[j] == ',')
                     second[j] = '.';
             m_inTime = timeToFloat(first);

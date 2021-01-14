@@ -402,8 +402,8 @@ int MatroskaDemuxer::matroska_find_track_by_num(int num)
 
 int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num)
 {
-    int len_mask = 0x80, read = 1, n = 1, num_ffs = 0;
-    uint64_t total;
+    unsigned read = 1, n = 1, num_ffs = 0;
+    uint64_t total, len_mask = 0x80;
 
     if (size <= 0)
         return AVERROR_INVALIDDATA;

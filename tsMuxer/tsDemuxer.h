@@ -70,7 +70,7 @@ class TSDemuxer : public AbstractDemuxer
     int64_t m_firstPTS;
     int64_t m_lastPTS;
     int64_t m_prevFileLen;
-    int m_curFileNum;
+    uint32_t m_curFileNum;
     int64_t m_firstVideoPTS;
     int64_t m_lastVideoPTS;
     int64_t m_lastVideoDTS;

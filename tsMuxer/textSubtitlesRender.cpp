@@ -161,14 +161,14 @@ size_t findUnquotedStr(const string& str, const string& substr)
     if (substr.size() == 0)
         return string::npos;
     bool quote = false;
-    for (int i = 0; i < str.size(); i++)
+    for (size_t i = 0; i < str.size(); i++)
     {
         if (str[i] == '\"' || str[i] == '\'')
             quote = !quote;
         else if (!quote && str[i] == substr[0])
         {
             bool found = true;
-            for (int j = 1; j < substr.size(); j++)
+            for (size_t j = 1; j < substr.size(); j++)
             {
                 if (i + j >= str.size() || str[i + j] != substr[j])
                 {
@@ -201,7 +201,7 @@ string findFontArg(const string& text, int pos)
 {
     bool delFound = false;
     int firstPos = -1;
-    for (int i = pos; i < text.size(); i++)
+    for (size_t i = pos; i < text.size(); i++)
     {
         if (text[i] == '=')
             delFound = true;
@@ -252,7 +252,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
     vector<pair<Font, string>> rez;
     int prevTextPos = 0;
     int bStartPos = -1;
-    for (int i = 0; i < line.size(); i++)
+    for (size_t i = 0; i < line.size(); i++)
     {
         if (line[i] == '<')
             bStartPos = i;
@@ -262,7 +262,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bool endTag = false;
             string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
             string ltagStr = tagStr;
-            for (int j = 0; j < ltagStr.size(); j++) ltagStr[j] = towlower(ltagStr[j]);
+            for (auto& j : ltagStr) j = towlower(j);
             if (ltagStr == "i" || ltagStr == "italic")
             {
                 curFont.m_opts |= Font::ITALIC;
@@ -371,10 +371,10 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bStartPos = -1;
         }
     }
-    if (line.size() > prevTextPos)
+    if (line.size() > (unsigned)prevTextPos)
         rez.push_back(make_pair(curFont, line.substr(prevTextPos, line.size() - prevTextPos)));
     double rSize = m_initFont.m_size;
-    for (int i = 0; i < rez.size(); i++) rez[i].first.m_size = browserSizeToRealSize(rez[i].first.m_size, rSize);
+    for (auto& i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
     return rez;
 }
 
@@ -386,12 +386,12 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
-    for (int i = 0; i < lines.size(); ++i)
+    for (auto& i : lines)
     {
-        vector<pair<Font, string>> txtParts = processTxtLine(lines[i], fontStack);
-        for (int i = 0; i < txtParts.size(); ++i)
+        vector<pair<Font, string>> txtParts = processTxtLine(i, fontStack);
+        for (auto& j : txtParts)
         {
-            if (txtParts[i].first.m_opts & Font::FORCED)
+            if (j.first.m_opts & Font::FORCED)
                 forced = true;
         }
 
@@ -400,11 +400,11 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
         int maxHeight = 0;
         int maxBaseLine = 0;
         vector<int> xSize;
-        for (int j = 0; j < txtParts.size(); j++)
+        for (auto& j : txtParts)
         {
-            setFont(txtParts[j].first);
+            setFont(j.first);
             SIZE mSize;
-            getTextSize(txtParts[j].second, &mSize);
+            getTextSize(j.second, &mSize);
             ySize = FFMAX(ySize, mSize.cy);
             maxHeight = FFMAX(maxHeight, getLineSpacing());
             maxBaseLine = FFMAX(maxBaseLine, getBaseline());
@@ -413,7 +413,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
         }
         int xOffs = (m_width - tWidth) / 2;
         int curX = 0;
-        for (int j = 0; j < txtParts.size(); j++)
+        for (size_t j = 0; j < txtParts.size(); j++)
         {
             Font font(txtParts[j].first);
             setFont(font);

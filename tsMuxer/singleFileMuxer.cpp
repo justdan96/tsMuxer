@@ -313,9 +313,9 @@ bool SingleFileMuxer::close()
 void SingleFileMuxer::parseMuxOpt(const std::string& opts)
 {
     vector<string> params = splitStr(opts.c_str(), ' ');
-    for (int i = 0; i < params.size(); i++)
+    for (auto& i : params)
     {
-        vector<string> paramPair = splitStr(trimStr(params[i]).c_str(), '=');
+        vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)
             continue;
         if (paramPair[0] == "--split-duration")

@@ -57,7 +57,7 @@ class DTSStreamReader : public SimplePacketizerReader
     void setTestMode(bool value) override { m_testMode = value; }
 
    protected:
-    unsigned getHeaderLen() override { return DTS_HEADER_SIZE; };
+    int getHeaderLen() override { return DTS_HEADER_SIZE; };
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
     double getFrameDurationNano() override;
@@ -96,7 +96,7 @@ class DTSStreamReader : public SimplePacketizerReader
 
     // unsigned int i_audio_mode;
     unsigned int nblks;
-    unsigned int i_frame_size;
+    int i_frame_size;
     unsigned int pi_audio_mode;
     unsigned int pi_sample_rate;
     unsigned int hd_pi_sample_rate;

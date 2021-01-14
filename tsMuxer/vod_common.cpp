@@ -15,7 +15,7 @@ bool sLastMsg = false;
 std::string toNativeSeparators(const std::string& dirName)
 {
     std::string rez = dirName;
-    for (int i = 0; i < rez.length(); ++i)
+    for (size_t i = 0; i < rez.length(); ++i)
         if (rez[i] == '\\' || rez[i] == '/')
             rez[i] = getDirSeparator();
     return rez;
@@ -47,7 +47,7 @@ std::vector<std::string> extractFileList(const std::string& val)
     std::vector<std::string> rez;
     bool quoted = false;
     size_t lastStartPos = 0;
-    for (int i = 0; i < val.size(); i++)
+    for (size_t i = 0; i < val.size(); i++)
     {
         if (val[i] == '"')
             quoted = !quoted;

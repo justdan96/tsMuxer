@@ -216,7 +216,7 @@ int HevcVpsUnit::deserialize()
         unsigned vps_num_layer_sets_minus1 = extractUEGolombCode();
         if (vps_num_layer_sets_minus1 > 1023)
             return 1;
-        for (int i = 1; i <= vps_num_layer_sets_minus1; i++)
+        for (size_t i = 1; i <= vps_num_layer_sets_minus1; i++)
         {
             for (int j = 0; j <= vps_max_layer_id; j++) m_reader.skipBit();  // layer_id_included_flag[ i ][ j ] u(1)
         }
@@ -351,7 +351,7 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
 
 int HevcSpsUnit::sub_layer_hrd_parameters(int subLayerId)
 {
-    for (int i = 0; i <= cpb_cnt_minus1[subLayerId]; i++)
+    for (size_t i = 0; i <= cpb_cnt_minus1[subLayerId]; i++)
     {
         unsigned bit_rate_value_minus1 = extractUEGolombCode();
         if (bit_rate_value_minus1 == 0xffffffff)
@@ -475,7 +475,6 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
     int k0 = 0;
     int k1 = 0;
     int k = 0;
-    int i;
 
     if (stRpsIdx != 0)
         rps_predict = m_reader.getBit();
@@ -498,7 +497,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
         if (abs_delta_rps > 0x8000)
             return 1;
         delta_rps = (1 - (delta_rps_sign << 1)) * abs_delta_rps;
-        for (i = 0; i <= rps_ridx->num_delta_pocs; i++)
+        for (int i = 0; i <= rps_ridx->num_delta_pocs; i++)
         {
             int used = rps->used[k] = m_reader.getBit();
 
@@ -525,8 +524,8 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
         // sort in increasing order (smallest first)
         if (rps->num_delta_pocs != 0)
         {
-            int used, tmp;
-            for (i = 1; i < rps->num_delta_pocs; i++)
+            unsigned used, tmp;
+            for (int i = 1; i < rps->num_delta_pocs; i++)
             {
                 delta_poc = rps->delta_poc[i];
                 used = rps->used[i];
@@ -548,7 +547,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
             int used;
             k = rps->num_negative_pics - 1;
             // flip the negative values to largest first
-            for (i = 0; i < (rps->num_negative_pics >> 1); i++)
+            for (size_t i = 0; i < (rps->num_negative_pics >> 1); i++)
             {
                 delta_poc = rps->delta_poc[i];
                 used = rps->used[i];
@@ -570,7 +569,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
         if (rps->num_delta_pocs)
         {
             prev = 0;
-            for (i = 0; i < rps->num_negative_pics; i++)
+            for (size_t i = 0; i < rps->num_negative_pics; i++)
             {
                 delta_poc = extractUEGolombCode() + 1;
                 if (delta_poc > 0x8000)
@@ -580,7 +579,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
                 rps->used[i] = m_reader.getBit();
             }
             prev = 0;
-            for (i = 0; i < nb_positive_pics; i++)
+            for (size_t i = 0; i < nb_positive_pics; i++)
             {
                 delta_poc = extractUEGolombCode() + 1;
                 if (delta_poc > 0x8000)
@@ -866,7 +865,7 @@ int HevcSpsUnit::deserialize()
         */
         st_rps.resize(num_short_term_ref_pic_sets);
 
-        for (int i = 0; i < num_short_term_ref_pic_sets; i++)
+        for (size_t i = 0; i < num_short_term_ref_pic_sets; i++)
             if (short_term_ref_pic_set(i) != 0)
                 return 1;
         bool long_term_ref_pics_present_flag = m_reader.getBit();
@@ -875,7 +874,7 @@ int HevcSpsUnit::deserialize()
             unsigned num_long_term_ref_pics_sps = extractUEGolombCode();
             if (num_long_term_ref_pics_sps > 32)
                 return 1;
-            for (int i = 0; i < num_long_term_ref_pics_sps; i++)
+            for (size_t i = 0; i < num_long_term_ref_pics_sps; i++)
             {
                 m_reader.skipBits(log2_max_pic_order_cnt_lsb);  // lt_ref_pic_poc_lsb_sps[ i ] u(v)
                 m_reader.skipBit();                             // used_by_curr_pic_lt_sps_flag[ i ] u(1)

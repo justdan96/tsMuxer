@@ -46,7 +46,7 @@ void SimplePacketizerReader::doMplsCorrection()
 
 void SimplePacketizerReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
 {
-    if (m_tmpBufferLen + dataLen > m_tmpBuffer.size())
+    if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (m_tmpBuffer.size() > 0)

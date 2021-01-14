@@ -206,7 +206,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
         LTRACE(LT_INFO, 2, "");
     if (streamInfo.fileDurationNano)
         LTRACE(LT_INFO, 2, "Duration: " << floatToTime(streamInfo.fileDurationNano / 1e9));
-    for (int j = 0; j < chapters.size(); j++)
+    for (size_t j = 0; j < chapters.size(); j++)
     {
         uint64_t time = chapters[j].start;
         if (j % 5 == 0)
@@ -642,9 +642,9 @@ int main(int argc, char** argv)
                     detectStreamReader(itemName.c_str(), &mplsParser, false);
                 }
 
-                int markIndex = 0;
+                size_t markIndex = 0;
                 int64_t prevFileOffset = 0;
-                for (int i = 0; i < mplsParser.m_playItems.size(); i++)
+                for (size_t i = 0; i < mplsParser.m_playItems.size(); i++)
                 {
                     MPLSPlayItem& item = mplsParser.m_playItems[i];
 
@@ -771,7 +771,7 @@ int main(int argc, char** argv)
                     IsoWriter* IsoWriter = blurayHelper.isoWriter();
                     if (IsoWriter)
                     {
-                        for (int i = 0; i < mainMuxer->splitFileCnt(); ++i)
+                        for (size_t i = 0; i < mainMuxer->splitFileCnt(); ++i)
                         {
                             string file1 = mainMuxer->getFileNameByIdx(i);
                             string file2 = subMuxer->getFileNameByIdx(i);
@@ -782,8 +782,7 @@ int main(int argc, char** argv)
                     }
                 }
 
-                for (int i = 0; i < customChapterList.size(); ++i)
-                    customChapterList[i] -= (double)muxerManager.getCutStart() / 1e9;
+                for (auto& i : customChapterList) i -= (double)muxerManager.getCutStart() / 1e9;
                 // createMPLSFile(dstDir, mainMuxer->getPidList(), *(mainMuxer->getFirstPts().begin()),
                 // *(mainMuxer->getLastPts().rbegin()),
                 //    autoChapterLen, customChapterList, dt, firstMplsOffset, firstM2tsOffset);

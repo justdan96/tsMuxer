@@ -196,7 +196,7 @@ struct PMTIndexData
     PMTIndexData(uint32_t pktCnt, uint32_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
-typedef std::map<int64_t, PMTIndexData> PMTIndex;
+typedef std::map<uint64_t, PMTIndexData> PMTIndex;
 
 struct PMTStreamInfo
 {
@@ -483,7 +483,7 @@ struct MPLSPlayItem
 
 struct PlayListMark
 {
-    int m_playItemID;
+    unsigned m_playItemID;
     uint32_t m_markTime;
     PlayListMark(int playItemID, uint32_t markTime) : m_playItemID(playItemID), m_markTime(markTime) {}
 };

@@ -420,7 +420,7 @@ bool TSMuxer::doFlush()
         newPCR = (m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset;
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
-            int64_t cbrPCR = m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5;
+            uint64_t cbrPCR = m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5;
             newPCR = FFMAX(newPCR, cbrPCR);
         }
     }
@@ -507,7 +507,7 @@ bool TSMuxer::close()
 int TSMuxer::calcM2tsFrameCnt()
 {
     uint32_t byteCnt = 0;
-    for (int i = 0; i < m_m2tsDelayBlocks.size(); i++) byteCnt += m_m2tsDelayBlocks[i].second;
+    for (auto& i : m_m2tsDelayBlocks) byteCnt += i.second;
     byteCnt -= m_prevM2TSPCROffset;
     byteCnt += m_outBufLen;
     assert(byteCnt % 192 == 0);
@@ -526,24 +526,24 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
     if (m_m2tsDelayBlocks.size() > 0)
     {
         int offset = m_prevM2TSPCROffset;
-        for (int i = 0; i < m_m2tsDelayBlocks.size(); i++)
+        for (auto& i : m_m2tsDelayBlocks)
         {
-            curPos = m_m2tsDelayBlocks[i].first + offset;
+            curPos = i.first + offset;
             int j = offset;
-            for (; j < m_m2tsDelayBlocks[i].second; j += 192)
+            for (; j < i.second; j += 192)
             {
                 curM2TSPCR += pcrIncPerFrame;
                 writeM2TSHeader(curPos, (uint64_t)curM2TSPCR);
                 curPos += 192;
             }
             if (m_owner->isAsyncMode())
-                m_owner->asyncWriteBuffer(this, m_m2tsDelayBlocks[i].first, m_m2tsDelayBlocks[i].second, m_muxFile);
+                m_owner->asyncWriteBuffer(this, i.first, i.second, m_muxFile);
             else
             {
-                m_owner->syncWriteBuffer(this, m_m2tsDelayBlocks[i].first, m_m2tsDelayBlocks[i].second, m_muxFile);
-                delete[] m_m2tsDelayBlocks[i].first;
+                m_owner->syncWriteBuffer(this, i.first, i.second, m_muxFile);
+                delete[] i.first;
             }
-            offset = j - m_m2tsDelayBlocks[i].second;
+            offset = j - i.second;
         }
         m_prevM2TSPCROffset = offset;
         m_m2tsDelayBlocks.clear();
@@ -645,9 +645,8 @@ void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
     int bufLen = pesPacket->getHeaderLength() + additionDataSize;
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
-    for (int i = 0; i < tmpPriorityData.size(); ++i)
-        m_priorityData.push_back(
-            std::pair<int, int>(tmpPriorityData[i].first + pesPacket->getHeaderLength(), tmpPriorityData[i].second));
+    for (auto& i : tmpPriorityData)
+        m_priorityData.push_back(std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
 }
 
 void TSMuxer::addData(int pesStreamID, int pid, AVPacket& avPacket)
@@ -858,16 +857,16 @@ void TSMuxer::writePESPacket()
         uint8_t* curPtr = m_pesData.data();
         uint8_t* dataEnd = curPtr + m_pesData.size();
         bool payloadStart = true;
-        for (int i = 0; i < m_priorityData.size(); ++i)
+        for (auto& i : m_priorityData)
         {
-            uint8_t* blockPtr = m_pesData.data() + m_priorityData[i].first;
+            uint8_t* blockPtr = m_pesData.data() + i.first;
             if (blockPtr > curPtr)
             {
                 tsPackets += writeTSFrames(m_pesPID, curPtr, blockPtr - curPtr, false, payloadStart);
                 payloadStart = false;
             }
-            tsPackets += writeTSFrames(m_pesPID, blockPtr, m_priorityData[i].second, true, payloadStart);
-            curPtr = blockPtr + m_priorityData[i].second;
+            tsPackets += writeTSFrames(m_pesPID, blockPtr, i.second, true, payloadStart);
+            curPtr = blockPtr + i.second;
         }
         tsPackets += writeTSFrames(m_pesPID, curPtr, dataEnd - curPtr, false, payloadStart);
 
@@ -1369,9 +1368,9 @@ void TSMuxer::writeOutBuffer()
 void TSMuxer::parseMuxOpt(const std::string& opts)
 {
     vector<string> params = splitStr(opts.c_str(), ' ');
-    for (int i = 0; i < params.size(); i++)
+    for (auto& i : params)
     {
-        vector<string> paramPair = splitStr(trimStr(params[i]).c_str(), '=');
+        vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)
             continue;
         if (paramPair[0] == "--pcr-on-video-pid")
@@ -1400,9 +1399,9 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
         {
             uint64_t coeff = 1;
             string postfix;
-            for (int i = paramPair[1].size() - 1; i >= 0; i--)
-                if (!(paramPair[1][i] >= '0' && paramPair[1][i] <= '9' || paramPair[1][i] == '.'))
-                    postfix = paramPair[1][i] + postfix;
+            for (auto& j : paramPair[1])
+                if (!(j >= '0' && j <= '9' || j == '.'))
+                    postfix += j;
             postfix = strToUpperCase(postfix);
             if (postfix == "GB")
                 coeff = 1000000000ull;
@@ -1470,7 +1469,7 @@ void TSMuxer::openDstFile()
 vector<int64_t> TSMuxer::getFirstPts()
 {
     std::vector<int64_t> rez;
-    for (int i = 0; i < m_firstPts.size(); i++) rez.push_back(nanoClockToPts(m_firstPts[i]) + m_timeOffset);
+    for (auto& i : m_firstPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
     return rez;
 }
 
@@ -1487,7 +1486,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
 vector<int64_t> TSMuxer::getLastPts()
 {
     std::vector<int64_t> rez;
-    for (int i = 0; i < m_lastPts.size(); i++) rez.push_back(nanoClockToPts(m_lastPts[i]) + m_timeOffset);
+    for (auto& i : m_lastPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
     // if (!rez.empty())
     //    *rez.rbegin() += m_mainStreamFrameDuration;
     return rez;
@@ -1505,7 +1504,7 @@ void TSMuxer::setFileName(const std::string& fileName, FileFactory* fileFactory)
     m_fileNames.push_back(m_outFileName);
 }
 
-std::string TSMuxer::getFileNameByIdx(int idx)
+std::string TSMuxer::getFileNameByIdx(size_t idx)
 {
     if (idx < m_fileNames.size())
         return m_fileNames[idx];

@@ -66,10 +66,10 @@ void writeDescriptorTag(uint8_t* buffer, uint16_t tag, uint32_t tagLocation)
 std::string toIsoSeparator(const std::string& path)
 {
     std::string result = path;
-    for (int i = 0; i < result.size(); ++i)
+    for (auto& i : result)
     {
-        if (result[i] == '\\')
-            result[i] = '/';
+        if (i == '\\')
+            i = '/';
     }
     return result;
 }
@@ -136,7 +136,7 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, int fieldLen)
     auto& utf8Str = str;
 #endif
     using namespace convertUTF;
-    const auto maxHeaderAndContentLength = fieldLen - 1;
+    const unsigned maxHeaderAndContentLength = fieldLen - 1;
     rv.reserve(fieldLen);
     if (canUse8BitUnicode(utf8Str))
     {
@@ -422,8 +422,8 @@ void FileEntryInfo::serializeDir()
     writer.closeDescriptorTag();
 
     // ------------ 2 (entries) ---------------
-    for (int i = 0; i < m_files.size(); ++i) writeEntity(writer, m_files[i]);
-    for (int i = 0; i < m_subDirs.size(); ++i) writeEntity(writer, m_subDirs[i]);
+    for (auto& i : m_files) writeEntity(writer, i);
+    for (auto& i : m_subDirs) writeEntity(writer, i);
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
     m_owner->writeExtentFileDescriptor(m_fileType, writer.size(), m_sectorNum + 1, m_subDirs.size() + 1);
@@ -518,20 +518,20 @@ void FileEntryInfo::setSubMode(bool value) { m_subMode = value; }
 
 FileEntryInfo* FileEntryInfo::subDirByName(const std::string& name) const
 {
-    for (int i = 0; i < m_subDirs.size(); ++i)
+    for (auto& i : m_subDirs)
     {
-        if (m_subDirs[i]->m_name == name)
-            return m_subDirs[i];
+        if (i->m_name == name)
+            return i;
     }
     return 0;
 }
 
 FileEntryInfo* FileEntryInfo::fileByName(const std::string& name) const
 {
-    for (int i = 0; i < m_files.size(); ++i)
+    for (auto& i : m_files)
     {
-        if (m_files[i]->m_name == name)
-            return m_files[i];
+        if (i->m_name == name)
+            return i;
     }
     return 0;
 }
@@ -727,7 +727,7 @@ bool IsoWriter::createInterleavedFile(const std::string& inFile1, const std::str
         return false;
 
     assert(inEntry1->m_extents.size() == inEntry2->m_extents.size());
-    for (int i = 0; i < inEntry1->m_extents.size(); ++i)
+    for (size_t i = 0; i < inEntry1->m_extents.size(); ++i)
     {
         assert(inEntry1->m_extents[i].size % SECTOR_SIZE == 0);
         assert(inEntry2->m_extents[i].size % SECTOR_SIZE == 0);
@@ -932,8 +932,8 @@ void IsoWriter::sectorSeek(Partition partition, int pos)
 void IsoWriter::writeEntity(FileEntryInfo* dir)
 {
     dir->serialize();
-    for (int i = 0; i < dir->m_files.size(); ++i) writeEntity(dir->m_files[i]);
-    for (int i = 0; i < dir->m_subDirs.size(); ++i) writeEntity(dir->m_subDirs[i]);
+    for (auto& i : dir->m_files) writeEntity(i);
+    for (auto& i : dir->m_subDirs) writeEntity(i);
 }
 
 int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
@@ -947,19 +947,19 @@ int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
     if (entity->m_objectId)
         m_mappingEntries[entity->m_objectId] = MappingEntry(entity->m_parent->m_sectorNum, entity->m_sectorNum);
 
-    for (int i = 0; i < entity->m_files.size(); ++i) sectorNum = allocateEntity(entity->m_files[i], sectorNum);
-    for (int i = 0; i < entity->m_subDirs.size(); ++i) sectorNum = allocateEntity(entity->m_subDirs[i], sectorNum);
+    for (auto& i : entity->m_files) sectorNum = allocateEntity(i, sectorNum);
+    for (auto& i : entity->m_subDirs) sectorNum = allocateEntity(i, sectorNum);
     return sectorNum;
 }
 
-void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, int start, int indexEnd)
+void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd)
 {
     uint32_t* buff32 = (uint32_t*)m_buffer;
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DESC_TYPE_AllocationExtent, absoluteSectorNum());
 
     uint8_t* curPos = m_buffer + 24;
-    for (int i = start; i < indexEnd; ++i)
+    for (size_t i = start; i < indexEnd; ++i)
     {
         writeLongAD(curPos, extents->at(i).size, extents->at(i).lbnPos, 0, 0);
         curPos += 16;
@@ -1052,12 +1052,12 @@ int IsoWriter::writeExtentFileDescriptor(uint8_t fileType, uint64_t len, uint32_
     }
     else
     {
-        int indexEnd = FFMIN(MAX_EXTENTS_IN_EXTFILE, extents->size());
+        size_t indexEnd = FFMIN(MAX_EXTENTS_IN_EXTFILE, extents->size());
         if (extents->size() - indexEnd == 1)
             indexEnd++;  // continue record may be replaced by payload data
         buff32[212 / 4] = 0x10 * indexEnd;
         uint8_t* curPos = m_buffer + 216;
-        for (int i = 0; i < indexEnd; ++i)
+        for (size_t i = 0; i < indexEnd; ++i)
         {
             writeLongAD(curPos, extents->at(i).size, extents->at(i).lbnPos, 0, 0);
             curPos += 16;
@@ -1072,7 +1072,7 @@ int IsoWriter::writeExtentFileDescriptor(uint8_t fileType, uint64_t len, uint32_
         m_file.write(m_buffer, SECTOR_SIZE);
         sectorsWrited++;
 
-        int indexStart = indexEnd;
+        size_t indexStart = indexEnd;
         while (indexStart < extents->size())
         {
             indexEnd = FFMIN(indexStart + MAX_EXTENTS_IN_EXTCONT, extents->size());

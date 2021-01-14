@@ -305,15 +305,15 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         if (!spsPpsList.empty())
         {
-            for (int i = 0; i < spsPpsList.size(); ++i)
+            for (auto& i : spsPpsList)
             {
                 *dst++ = 0x0;
                 *dst++ = 0x0;
                 *dst++ = 0x0;
                 *dst++ = 0x1;
 
-                memcpy(dst, &spsPpsList[i][0], spsPpsList[i].size());
-                dst += spsPpsList[i].size();
+                memcpy(dst, &i[0], i.size());
+                dst += i.size();
             }
             spsPpsList.clear();
         }
@@ -350,7 +350,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             ++nalCnt;
         }
         int spsPpsSize = 0;
-        for (int i = 0; i < spsPpsList.size(); ++i) spsPpsSize += spsPpsList[i].size() + 4;
+        for (auto& i : spsPpsList) spsPpsSize += i.size() + 4;
 
         return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
@@ -477,7 +477,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
     MOVStreamContext* m_sc;
     int m_packetCnt;
-    int sttsPos;
+    size_t sttsPos;
     int sttsCnt;
     int64_t m_timeOffset;
 };
@@ -618,12 +618,12 @@ void MovDemuxer::buildIndex()
         for (int i = 0; i < num_tracks; ++i)
         {
             MOVStreamContext* st = (MOVStreamContext*)tracks[i];
-            for (int j = 0; j < st->chunk_offsets.size(); ++j)
+            for (auto& j : st->chunk_offsets)
             {
                 if (!found_moof)
-                    if (st->chunk_offsets[j] < m_mdat_pos || st->chunk_offsets[j] > m_mdat_pos + m_mdat_size)
-                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << st->chunk_offsets[j]);
-                chunks.push_back(make_pair(st->chunk_offsets[j] - m_mdat_pos, i));
+                    if (j < m_mdat_pos || j > m_mdat_pos + m_mdat_size)
+                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << j);
+                chunks.push_back(make_pair(j - m_mdat_pos, i));
             }
         }
         sort(chunks.begin(), chunks.end());
@@ -968,7 +968,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     int64_t dts;
     int data_offset = 0;
     unsigned entries, first_sample_flags = frag->flags;
-    int flags, distance, i;
+    int flags, distance;
 
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
@@ -986,7 +986,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     offset = frag->base_data_offset + data_offset;
     sc->chunk_offsets.push_back(offset);
     distance = 0;
-    for (i = 0; i < entries; i++)
+    for (size_t i = 0; i < entries; i++)
     {
         unsigned sample_size = frag->size;
         int sample_flags = i ? frag->flags : first_sample_flags;
@@ -1063,10 +1063,10 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
-    for (int i = 0; i < trex_data.size(); i++)
-        if (trex_data[i].track_id == frag->track_id)
+    for (auto& i : trex_data)
+        if (i.track_id == frag->track_id)
         {
-            trex = &trex_data[i];
+            trex = &i;
             break;
         }
     if (!trex)
@@ -1137,7 +1137,7 @@ int MovDemuxer::mov_read_stsz(MOVAtom atom)
         return 0;
     if (entries >= UINT_MAX / sizeof(int))
         return -1;
-    for (int i = 0; i < entries; i++) st->m_index.push_back(get_be32());
+    for (size_t i = 0; i < entries; i++) st->m_index.push_back(get_be32());
     return 0;
 }
 
@@ -1152,7 +1152,7 @@ int MovDemuxer::mov_read_stss(MOVAtom atom)
         return 0;
     if (entries >= UINT_MAX / sizeof(int))
         return -1;
-    for (int i = 0; i < entries; i++) st->keyframes.push_back(get_be32());
+    for (size_t i = 0; i < entries; i++) st->keyframes.push_back(get_be32());
     return 0;
 }
 

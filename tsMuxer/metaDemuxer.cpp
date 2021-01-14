@@ -207,9 +207,9 @@ void METADemuxer::openFile(const string& streamName)
     }
 
     H264StreamReader::SeiMethod primarySEI = H264StreamReader::SEI_NotDefined;
-    for (int i = 0; i < m_codecInfo.size(); ++i)
+    for (auto& i : m_codecInfo)
     {
-        H264StreamReader* reader = dynamic_cast<H264StreamReader*>(m_codecInfo[i].m_streamReader);
+        H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
         if (reader && !reader->isSubStream())
         {
             primarySEI = reader->getInsertSEI();
@@ -220,9 +220,9 @@ void METADemuxer::openFile(const string& streamName)
     bool warned = false;
     if (primarySEI != H264StreamReader::SEI_NotDefined)
     {
-        for (int i = 0; i < m_codecInfo.size(); ++i)
+        for (auto& i : m_codecInfo)
         {
-            H264StreamReader* reader = dynamic_cast<H264StreamReader*>(m_codecInfo[i].m_streamReader);
+            H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
             if (reader && reader->isSubStream())
             {
                 if (!warned && (int)reader->getInsertSEI() != primarySEI)
@@ -287,13 +287,9 @@ int METADemuxer::addPGSubStream(const string& codec, const string& _codecStreamN
 std::vector<MPLSPlayItem> METADemuxer::mergePlayItems(const std::vector<MPLSParser>& mplsInfoList)
 {
     std::vector<MPLSPlayItem> result;
-    for (int i = 0; i < mplsInfoList.size(); ++i)
+    for (auto& i : mplsInfoList)
     {
-        const MPLSParser& mplsInfo = mplsInfoList[i];
-        for (int j = 0; j < mplsInfo.m_playItems.size(); ++j)
-        {
-            result.push_back(mplsInfo.m_playItems[j]);
-        }
+        for (auto& j : i.m_playItems) result.push_back(j);
     }
     return result;
 }
@@ -326,11 +322,11 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     {
         mplsInfoList = getMplsInfo(codecStreamName);
         vector<string> mplsNames = splitQuotedStr(codecStreamName.c_str(), '+');
-        for (int k = 0; k < mplsInfoList.size(); ++k)
+        for (size_t k = 0; k < mplsInfoList.size(); ++k)
         {
             MPLSParser& mplsInfo = mplsInfoList[k];
             string unquotedStreamName = unquoteStr(mplsNames[k]);
-            for (int i = 0; i < mplsInfo.m_playItems.size(); ++i)
+            for (size_t i = 0; i < mplsInfo.m_playItems.size(); ++i)
             {
                 string playItemName;
                 if (isSubStream)
@@ -1129,18 +1125,18 @@ const std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileNam
     std::vector<MPLSParser> result;
 
     std::vector<std::string> mplsFiles = splitQuotedStr(mplsFileName.c_str(), '+');
-    for (int i = 0; i < mplsFiles.size(); ++i)
+    for (auto& i : mplsFiles)
     {
-        MPLSCache::iterator itr = m_mplsStreamMap.find(mplsFiles[i]);
+        MPLSCache::iterator itr = m_mplsStreamMap.find(i);
         if (itr != m_mplsStreamMap.end())
             result.push_back(itr->second);
         else
         {
             MPLSParser parser;
-            if (!parser.parse(unquoteStr(mplsFiles[i]).c_str()))
-                THROW(ERR_COMMON, "Can't parse play list file " << mplsFiles[i]);
-            pair<MPLSCache::iterator, bool> insRez = m_mplsStreamMap.insert(make_pair(mplsFiles[i], parser));
-            m_mplsStreamMap.insert(make_pair(mplsFiles[i], insRez.first->second));
+            if (!parser.parse(unquoteStr(i).c_str()))
+                THROW(ERR_COMMON, "Can't parse play list file " << i);
+            pair<MPLSCache::iterator, bool> insRez = m_mplsStreamMap.insert(make_pair(i, parser));
+            m_mplsStreamMap.insert(make_pair(i, insRez.first->second));
             result.push_back(insRez.first->second);
         }
     }

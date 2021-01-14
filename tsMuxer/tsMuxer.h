@@ -55,14 +55,14 @@ class TSMuxer : public AbstractMuxer
     std::vector<int64_t> getFirstPts();
     void alignPTS(TSMuxer* otherMuxer);
     std::vector<int64_t> getLastPts();
-    const std::vector<int64_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
-    int splitFileCnt() const { return m_fileNames.size(); }
+    const std::vector<uint64_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
+    size_t splitFileCnt() const { return m_fileNames.size(); }
     void setSplitDuration(uint64_t value) { m_splitDuration = value; }
     void setSplitSize(uint64_t value) { m_splitSize = value; }
     void parseMuxOpt(const std::string& opts) override;
 
     void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
-    std::string getFileNameByIdx(int idx);
+    std::string getFileNameByIdx(size_t idx);
     int getFirstFileNum() const;
     bool isInterleaveMode() const;
     std::vector<int32_t> getInterleaveInfo(int idx) const;
@@ -194,7 +194,7 @@ class TSMuxer : public AbstractMuxer
     int64_t m_lastMuxedDts;
     MemoryBlock m_pesData;
     int m_pesPID;
-    std::vector<int64_t> m_muxedPacketCnt;
+    std::vector<uint64_t> m_muxedPacketCnt;
     bool m_pesIFrame;
     bool m_pesSpsPps;
     bool m_computeMuxStats;
@@ -204,7 +204,7 @@ class TSMuxer : public AbstractMuxer
     int m_mainStreamIndex;
 
     std::string m_outFileName;
-    int m_writeBlockSize;
+    unsigned m_writeBlockSize;
     int m_frameSize;
     int64_t m_processedBlockSize;
     TSMuxer* m_sublingMuxer;

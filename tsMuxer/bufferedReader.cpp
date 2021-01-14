@@ -209,7 +209,7 @@ void BufferedReader::thread_main()
                 uint8_t* buffer = data->m_nextBlock[data->m_bufferIndex] + data->m_readOffset;
                 if (!data->m_deleted)
                 {
-                    int bytesReaded = data->readBlock(buffer, data->m_blockSize);
+                    uint32_t bytesReaded = data->readBlock(buffer, data->m_blockSize);
                     if (data->m_lastBlock)
                     {
                         data->m_lastBlock = false;

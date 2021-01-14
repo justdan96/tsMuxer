@@ -41,7 +41,7 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual bool isIFrame(AVPacket* packet) { return true; }
 
    protected:
-    virtual unsigned getHeaderLen() = 0;  // return fixed frame header size at bytes
+    virtual int getHeaderLen() = 0;  // return fixed frame header size at bytes
     virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes,
                             int& skipBeforeBytes) = 0;  // decode frame parameters. bitrate, channels for audio e.t.c
     virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end) = 0;  // find forawrd nearest frame
@@ -55,7 +55,7 @@ class SimplePacketizerReader : public AbstractStreamReader
 
    protected:
     // uint8_t* m_tmpBuffer;
-    int m_curMplsIndex;
+    unsigned m_curMplsIndex;
     double m_stretch;
     std::vector<uint8_t> m_tmpBuffer;
     uint64_t m_processedBytes;

@@ -449,11 +449,11 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         CLPIStreamInfo streamInfo(itr->second);
         clpiParser.m_streamInfo.insert(make_pair(streamInfo.streamPID, streamInfo));
     }
-    vector<int64_t> packetCount = muxer->getMuxedPacketCnt();
+    vector<uint64_t> packetCount = muxer->getMuxedPacketCnt();
     vector<int64_t> firstPts = muxer->getFirstPts();
     vector<int64_t> lastPts = muxer->getLastPts();
 
-    for (unsigned i = 0; i < muxer->splitFileCnt(); i++)
+    for (size_t i = 0; i < muxer->splitFileCnt(); i++)
     {
         if (muxer->isInterleaveMode())
             clpiParser.interleaveInfo = muxer->getInterleaveInfo(i);
@@ -556,9 +556,9 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     }
     else
     {
-        for (int i = 0; i < customChapters.size(); i++)
+        for (auto& i : customChapters)
         {
-            int64_t mark = customChapters[i] * 45000.0;
+            int64_t mark = i * 45000.0;
             if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }

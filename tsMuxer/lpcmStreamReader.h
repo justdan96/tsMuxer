@@ -41,7 +41,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     void setHeadersType(LPCMHeaderType value);
 
    protected:
-    unsigned getHeaderLen() override { return 4; }
+    int getHeaderLen() override { return 4; }
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
     double getFrameDurationNano() override;
