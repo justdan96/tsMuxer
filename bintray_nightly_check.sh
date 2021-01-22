@@ -15,13 +15,14 @@ version_date=$(date +%Y-%m-%d)
 
 create_version() {
   local package_name=$1
+  local vcs_ver=$2
 
   # create a new version with the timestamp
   version_data='{ "name": "'
   version_data+=$version_date
   version_data+='", "desc": "tsMuxer CLI and GUI binaries built on '
   version_data+=$version_date
-  version_data+='"}'
+  version_data+="\", \"vcs_tag\": \"${vcs_ver}\"}"
   echo "$version_data"
 
   version_created=$(curl -u$BINTRAY_USER:$BINTRAY_API_KEY -H "Content-Type: application/json" --write-out %{http_code} --silent --output /dev/null --request POST --data "$version_data" https://api.bintray.com/packages/$BINTRAY_USER/$BINTRAY_REPO/${package_name}/versions)
@@ -34,7 +35,7 @@ create_version() {
 
 BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
-repo_commit=$(curl -s https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPO/commit.txt)
+repo_commit=$(curl -s https://api.bintray.com/packages/$BINTRAY_USER/$BINTRAY_REPO/$PCK_NAME/versions/_latest | jq -r .vcs_tag)
 local_commit=$(git rev-parse HEAD)
 
 if [[ $repo_commit == $local_commit ]]; then
@@ -42,7 +43,6 @@ if [[ $repo_commit == $local_commit ]]; then
   exit 1
 fi
 
-create_version "$PCK_NAME"
-create_version "commit"
+create_version "$PCK_NAME" "$local_commit"
 
 exit 0 # don't return an error in case the version already exists
