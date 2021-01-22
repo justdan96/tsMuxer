@@ -483,7 +483,7 @@ struct MPLSPlayItem
 
 struct PlayListMark
 {
-    unsigned m_playItemID;
+    int m_playItemID;
     uint32_t m_markTime;
     PlayListMark(int playItemID, uint32_t markTime) : m_playItemID(playItemID), m_markTime(markTime) {}
 };
