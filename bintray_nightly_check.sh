@@ -35,7 +35,8 @@ create_version() {
 
 BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
-repo_commit=$(curl -s https://api.bintray.com/packages/$BINTRAY_USER/$BINTRAY_REPO/$PCK_NAME/versions/_latest | jq -r .vcs_tag)
+repo_commit=$(curl -u$BINTRAY_USER:$BINTRAY_API_KEY -s https://api.bintray.com/packages/$BINTRAY_USER/$BINTRAY_REPO/$PCK_NAME/versions/_latest | jq -r .vcs_tag)
+echo "latest vcs_tag : ${repo_commit}"
 local_commit=$(git rev-parse HEAD)
 
 if [[ $repo_commit == $local_commit ]]; then
