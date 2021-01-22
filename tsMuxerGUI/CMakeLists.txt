@@ -28,6 +28,9 @@ set(tsmuxer_gui_sources
   ${CMAKE_CURRENT_BINARY_DIR}/${lang_qrc}
 )
 
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
 add_executable(tsMuxerGUI ${tsmuxer_gui_sources})
 target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
 
