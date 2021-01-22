@@ -32,7 +32,12 @@ echo "files uploaded!"
 
 # update the latest commit on bintray
 echo "updating commit record on bintray..."
-git rev-parse HEAD | curl -T - "-u$BINTRAY_USER:$BINTRAY_API_KEY" -H "X-Bintray-Package:commit" -H "X-Bintray-Version:latest"  -H "X-Bintray-Publish:1"  -H "X-Bintray-Override:1" "https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/commit.txt"0
+git rev-parse HEAD | curl -T - "-u$BINTRAY_USER:$BINTRAY_API_KEY" \
+  -H "X-Bintray-Package:commit" \
+  -H "X-Bintray-Version:$version_date" \
+  -H "X-Bintray-Publish:1" \
+  -H "X-Bintray-Override:1" \
+  "https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/commit.txt"
 echo "commit record updated!"
 
 # try to trigger a new build in OBS
