@@ -2269,7 +2269,7 @@ int MPLSParser::calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts)
         if (streamInfo.m_index[i].size() > 0)
         {
             if (streamInfo.m_index[i].begin()->first > pts)
-                return FFMAX(i - 1, 0);
+                return FFMAX(i, 1) - 1;
         }
     }
     return streamInfo.m_index.size() - 1;
