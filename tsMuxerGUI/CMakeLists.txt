@@ -31,7 +31,14 @@ set(tsmuxer_gui_sources
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_executable(tsMuxerGUI ${tsmuxer_gui_sources})
+set(GUI_OPTIONS "")
+if(WIN32)
+  set(GUI_OPTIONS WIN32)
+elseif(APPLE)
+  set(GUI_OPTIONS MACOSX_BUNDLE)
+endif()
+
+add_executable(tsMuxerGUI ${GUI_OPTIONS} ${tsmuxer_gui_sources})
 target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
 
 if(NOT MSVC)
