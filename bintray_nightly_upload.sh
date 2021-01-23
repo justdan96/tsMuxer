@@ -4,7 +4,6 @@
 
 BINTRAY_REPO=tsMuxer
 PCK_NAME=tsMuxerGUI-Nightly
-version_date=$(date +%Y-%m-%d)
 
 upload_to_bintray() {
   local localpath="$1"
@@ -16,6 +15,9 @@ upload_to_bintray() {
     -H "X-Bintray-Override:1" \
     "https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/${buildname}-nightly-$version_date.zip"
 }
+
+version_date=$1
+shift
 
 # when triggered with arguments, just upload the given file and exit.
 if [[ "$@" ]]; then
@@ -29,16 +31,6 @@ for buildname in w32 w64 lnx; do
   upload_to_bintray "./bin/${buildname}.zip" "$buildname"
 done
 echo "files uploaded!"
-
-# update the latest commit on bintray
-echo "updating commit record on bintray..."
-git rev-parse HEAD | curl -T - "-u$BINTRAY_USER:$BINTRAY_API_KEY" \
-  -H "X-Bintray-Package:commit" \
-  -H "X-Bintray-Version:$version_date" \
-  -H "X-Bintray-Publish:1" \
-  -H "X-Bintray-Override:1" \
-  "https://api.bintray.com/content/$BINTRAY_USER/$BINTRAY_REPO/commit.txt"
-echo "commit record updated!"
 
 # try to trigger a new build in OBS
 obs_trigger=$(curl --user $OBS_USER:$OBS_SECRET --write-out %{http_code} --silent --output /dev/null -H 'Accept-Encoding: identity' -H 'User-agent: osc/0.164.2' -H 'Content-type: application/x-www-form-urlencoded' -X POST https://api.opensuse.org/build/home:justdan96?cmd=rebuild&package=tsMuxer)

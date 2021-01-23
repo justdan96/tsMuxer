@@ -10,12 +10,17 @@ jobs:
     
     outputs:
       status: ${{ steps.check.outputs.status }}
+      version: ${{ steps.check.outputs.version }}
     
     steps:
     - uses: actions/checkout@master
       name: checkout
     
-    - run: ./bintray_nightly_check.sh; echo "::set-output name=status::$?"
+    - run: |
+        ver=$(./bintray_nightly_check.sh)
+        echo "::set-output name=status::$?"
+        echo "::set-output name=version::${ver}"
+
       name: nightly-check
       id: check
       shell: bash {0}
@@ -51,7 +56,7 @@ jobs:
     - run: ./rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
       
-    - run: ./bintray_nightly_upload.sh
+    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}}
       name: upload-to-bintray-nightly
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
@@ -76,7 +81,7 @@ jobs:
     - run: ./build_macos_native.sh
       name: build-for-mac
     
-    - run: ./bintray_nightly_upload.sh ./build/bin/mac.zip mac
+    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}} ./build/bin/mac.zip mac
       name: upload-bintray-mac-build
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
