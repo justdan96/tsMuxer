@@ -66,7 +66,7 @@ class VC1Unit
 {
    public:
     VC1Unit() : m_nalBuffer(0), m_nalBufferLen(0) {}
-    ~VC1Unit() { delete m_nalBuffer; }
+    ~VC1Unit() { delete[] m_nalBuffer; }
 
     inline static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
     inline static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
@@ -95,7 +95,7 @@ class VC1Unit
         int dsize = 0, i;
         if (size < 4)
         {
-            for (dsize = 0; dsize < size; dsize++) *m_nalBuffer++ = *src++;
+            std::copy(src, src + size, m_nalBuffer);
             m_nalBufferLen = size;
             return size;
         }
