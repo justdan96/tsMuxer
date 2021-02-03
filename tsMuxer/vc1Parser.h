@@ -89,8 +89,7 @@ class VC1Unit
     }
     inline int vc1_unescape_buffer(uint8_t* src, int size)
     {
-        if (m_nalBuffer != 0)
-            delete m_nalBuffer;
+        delete[] m_nalBuffer;
         m_nalBuffer = new uint8_t[size];
         int dsize = 0, i;
         if (size < 4)
