@@ -10,7 +10,7 @@ jobs:
     
     outputs:
       status: ${{ steps.check.outputs.status }}
-      version: ${{ steps.check.outputs.version }}
+      upload_url: ${{ steps.create.outputs.upload_url }}
     
     steps:
     - uses: actions/checkout@v2
@@ -72,13 +72,40 @@ jobs:
       
     - run: ./rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
-      
-    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}}
-      name: upload-to-bintray-nightly
+    
+    - name: Upload Linux Build
+      id: upload-linux
+      uses: actions/upload-release-asset@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-  
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/lnx.zip
+        asset_name: lnx.zip
+        asset_content_type: application/zip
+
+    - name: Upload Win64 Build
+      id: upload-w64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/w64.zip
+        asset_name: w64.zip
+        asset_content_type: application/zip
+
+    - name: Upload Win32 Build
+      id: upload-w32
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/w32.zip
+        asset_name: w32.zip
+        asset_content_type: application/zip
+
   build-macos:
   
     needs: check
@@ -96,8 +123,13 @@ jobs:
     - run: ./build_macos_native.sh
       name: build-for-mac
     
-    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}} ./build/bin/mac.zip mac
-      name: upload-bintray-mac-build
+    - name: Upload Mac Build
+      id: upload-mac
+      uses: actions/upload-release-asset@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./build/bin/mac.zip
+        asset_name: mac.zip
+        asset_content_type: application/zip
