@@ -31,3 +31,16 @@
 *.exe
 *.out
 *.app
+
+#Visual Studio
+.vs
+*.sln
+*.json
+**/Debug
+**/Release
+*.vcxproj*
+
+#CMakeFiles
+**/CMakeFiles
+*.cmake
+CMakeCache.txt
