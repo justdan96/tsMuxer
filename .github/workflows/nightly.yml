@@ -13,20 +13,37 @@ jobs:
       version: ${{ steps.check.outputs.version }}
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
     
-    - run: |
-        ver=$(./bintray_nightly_check.sh)
+    - name: nightly-check
+      id: check
+      shell: bash {0}
+      run: |
+        ver=$(./.github/workflows/nightly_check.sh)
         echo "::set-output name=status::$?"
         echo "::set-output name=version::${ver}"
 
-      name: nightly-check
-      id: check
-      shell: bash {0}
+    - name: create-release
+      id: create
+      if: steps.check.outputs.status == 0
+      uses: actions/create-release@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: nightly-${{ steps.check.outputs.version }}
+        release_name: Nightly build from ${{ steps.check.outputs.version }}
+        draft: false
+        prerelease: true
+        commitish: env.GITHUB_SHA
+    
+    - name: obs-trigger
+      id: obs
+      if: steps.check.outputs.status == 0
+      run: ./.github/workflows/obs_trigger.sh
+      env:
+        OBS_USER: ${{ secrets.OBS_USER }}
+        OBS_SECRET: ${{ secrets.OBS_SECRET }}
   
   build-docker:
   
@@ -61,8 +78,6 @@ jobs:
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-        OBS_USER: ${{ secrets.OBS_USER }}
-        OBS_SECRET: ${{ secrets.OBS_SECRET }}
   
   build-macos:
   
