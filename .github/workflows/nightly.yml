@@ -33,7 +33,6 @@ jobs:
       with:
         tag_name: nightly-${{ steps.check.outputs.version }}
         release_name: Nightly build from ${{ steps.check.outputs.version }}
-        draft: false
         prerelease: true
         commitish: env.GITHUB_SHA
     
