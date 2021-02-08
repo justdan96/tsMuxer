@@ -34,7 +34,7 @@ jobs:
         tag_name: nightly-${{ steps.check.outputs.version }}
         release_name: Nightly build from ${{ steps.check.outputs.version }}
         prerelease: true
-        commitish: env.GITHUB_SHA
+        commitish: ${{ env.GITHUB_SHA }}
     
     - name: obs-trigger
       id: obs
