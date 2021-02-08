@@ -57,7 +57,7 @@ jobs:
       - /workspace:/github/workspace
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
       
     - run: rm -f bin/.gitkeep
@@ -113,7 +113,7 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
     
     - name: Install Qt
