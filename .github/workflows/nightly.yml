@@ -10,23 +10,39 @@ jobs:
     
     outputs:
       status: ${{ steps.check.outputs.status }}
-      version: ${{ steps.check.outputs.version }}
+      upload_url: ${{ steps.create.outputs.upload_url }}
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
     
-    - run: |
-        ver=$(./bintray_nightly_check.sh)
+    - name: nightly-check
+      id: check
+      shell: bash {0}
+      run: |
+        ver=$(./.github/workflows/nightly_check.sh)
         echo "::set-output name=status::$?"
         echo "::set-output name=version::${ver}"
 
-      name: nightly-check
-      id: check
-      shell: bash {0}
+    - name: create-release
+      id: create
+      if: steps.check.outputs.status == 0
+      uses: actions/create-release@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: nightly-${{ steps.check.outputs.version }}
+        release_name: Nightly build from ${{ steps.check.outputs.version }}
+        prerelease: true
+        commitish: ${{ env.GITHUB_SHA }}
+    
+    - name: obs-trigger
+      id: obs
+      if: steps.check.outputs.status == 0
+      run: ./.github/workflows/obs_trigger.sh
+      env:
+        OBS_USER: ${{ secrets.OBS_USER }}
+        OBS_SECRET: ${{ secrets.OBS_SECRET }}
   
   build-docker:
   
@@ -41,7 +57,7 @@ jobs:
       - /workspace:/github/workspace
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
       
     - run: rm -f bin/.gitkeep
@@ -55,15 +71,40 @@ jobs:
       
     - run: ./rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
-      
-    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}}
-      name: upload-to-bintray-nightly
+    
+    - name: Upload Linux Build
+      id: upload-linux
+      uses: actions/upload-release-asset@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
-        OBS_USER: ${{ secrets.OBS_USER }}
-        OBS_SECRET: ${{ secrets.OBS_SECRET }}
-  
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/lnx.zip
+        asset_name: lnx.zip
+        asset_content_type: application/zip
+
+    - name: Upload Win64 Build
+      id: upload-w64
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/w64.zip
+        asset_name: w64.zip
+        asset_content_type: application/zip
+
+    - name: Upload Win32 Build
+      id: upload-w32
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./bin/w32.zip
+        asset_name: w32.zip
+        asset_content_type: application/zip
+
   build-macos:
   
     needs: check
@@ -72,7 +113,7 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
       name: checkout
     
     - name: Install Qt
@@ -81,8 +122,13 @@ jobs:
     - run: ./build_macos_native.sh
       name: build-for-mac
     
-    - run: ./bintray_nightly_upload.sh ${{needs.check.outputs.version}} ./build/bin/mac.zip mac
-      name: upload-bintray-mac-build
+    - name: Upload Mac Build
+      id: upload-mac
+      uses: actions/upload-release-asset@v1
       env:
-        BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.check.outputs.upload_url }}
+        asset_path: ./build/bin/mac.zip
+        asset_name: mac.zip
+        asset_content_type: application/zip
