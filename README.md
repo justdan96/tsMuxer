@@ -53,19 +53,7 @@ This project was created by Roman Vasilenko, with the last public release 20th J
 
 The following executables are created to be portable, so you can just save and extract the compressed package for your platform. 
 
-Nightly builds are created in Bintray, use the link below to go directly to the latest nightly build:
-[ ![Download](https://api.bintray.com/packages/justdan96/tsMuxer/tsMuxerGUI-Nightly/images/download.svg) ](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly/_latestVersion#files)
-
-Or browse to the version you want via [this link](https://bintray.com/justdan96/tsMuxer/tsMuxerGUI-Nightly), clicking the link for the version you want.
-![bintray_version_list](https://user-images.githubusercontent.com/503722/70852149-f3f37300-1e95-11ea-8fb4-c9a82d698448.png)
-
-Then when you are on the page for your chosen version, click on the "Files" tab:
-![bintray_file_link](https://user-images.githubusercontent.com/503722/70852150-f48c0980-1e95-11ea-8bb8-76168fb0c2cb.png)
-
-Finally select the ZIP file for your platform - Linux, Mac, Windows 32-bit or Windows 64-bit:
-![bintray_file_list](https://user-images.githubusercontent.com/503722/70852151-f48c0980-1e95-11ea-8914-7d525b614bf3.png)
-
-We also have versions available for various Linux distributions.
+Nightly builds are created by GitHub Actions and stored as [releases](https://github.com/justdan96/tsMuxer/releases). Please visit the releases page in order to download the release you're interested in.
 
 ### Windows
 
