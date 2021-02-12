@@ -43,7 +43,7 @@ jobs:
       if: steps.check.outputs.status == 0
       run: ./.github/workflows/obs_trigger.sh
       env:
-        OBS_USER: ${{ secrets.OBS_USER }}
+        OBS_USER: justdan96
         OBS_SECRET: ${{ secrets.OBS_SECRET }}
   
   build-docker:
