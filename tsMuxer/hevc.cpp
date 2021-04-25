@@ -563,8 +563,11 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
     {
         unsigned int prev, nb_positive_pics;
         rps->num_negative_pics = extractUEGolombCode();
+        if (rps->num_negative_pics > 64)
+            return 1;
         nb_positive_pics = extractUEGolombCode();
-
+        if (nb_positive_pics > 64)
+            return 1;
         rps->num_delta_pocs = rps->num_negative_pics + nb_positive_pics;
         if (rps->num_delta_pocs)
         {
