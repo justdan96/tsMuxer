@@ -42,7 +42,9 @@ class AbstractStreamReader : public BaseAbstractStreamReader
           m_timeOffset(0),
           m_containerType(ctNone),
           m_demuxMode(false),
-          m_secondary(false)
+          m_secondary(false),
+          m_buffer(0),
+          m_bufEnd(0)
     {
     }
     virtual ~AbstractStreamReader() {}

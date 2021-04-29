@@ -367,7 +367,7 @@ void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");
 
-    if (newSpsLen != oldNalSize)
+    if (m_bufEnd && newSpsLen != oldNalSize)
     {
         m_vpsSizeDiff = newSpsLen - oldNalSize;
         if (m_bufEnd + m_vpsSizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
