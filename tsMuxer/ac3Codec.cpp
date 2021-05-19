@@ -346,6 +346,8 @@ bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
         mh.group2_bits = mlp_quants[reader.getBits(4)];
         ratebits = reader.getBits(4);
         mh.group1_samplerate = mlp_samplerate(ratebits);
+        if (mh.group1_samplerate == 0)
+            return false;
         mh.group2_samplerate = mlp_samplerate(reader.getBits(4));
         reader.skipBits(11);
         mh.channels_mlp = reader.getBits(5);
@@ -358,6 +360,8 @@ bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
         mh.group2_bits = 0;
         ratebits = reader.getBits(4);
         mh.group1_samplerate = mlp_samplerate(ratebits);
+        if (mh.group1_samplerate == 0)
+            return false;
         mh.group2_samplerate = 0;
         reader.skipBits(8);
         mh.channels_thd_stream1 = reader.getBits(5);
