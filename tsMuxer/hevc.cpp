@@ -50,7 +50,8 @@ int HevcUnit::deserialize()
         nal_unit_type = m_reader.getBits(6);
         nuh_layer_id = m_reader.getBits(6);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
-        if (nuh_temporal_id_plus1 == 0)
+        if (nuh_temporal_id_plus1 == 0 || (nuh_temporal_id_plus1 != 1 && (nal_unit_type == 32 || nal_unit_type == 33 ||
+                                                                          nal_unit_type == 36 || nal_unit_type == 37)))
             return 1;
         return 0;
     }
