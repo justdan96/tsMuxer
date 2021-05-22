@@ -1998,7 +1998,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
         while (curBuff < nalEnd - 1)
         {
             int payloadType = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadType += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadType += 0xFF;
             if (curBuff >= nalEnd)
                 return;
             payloadType += *curBuff++;
@@ -2006,7 +2006,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
                 return;
 
             int payloadSize = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadSize += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadSize += 0xFF;
             if (curBuff >= nalEnd)
                 return;
             payloadSize += *curBuff++;
@@ -2038,7 +2038,7 @@ int SEIUnit::isMVCSEI()
         while (curBuff < nalEnd - 1)
         {
             int payloadType = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadType += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadType += 0xFF;
             if (curBuff >= nalEnd)
                 return NOT_ENOUGH_BUFFER;
             payloadType += *curBuff++;
@@ -2046,7 +2046,7 @@ int SEIUnit::isMVCSEI()
                 return NOT_ENOUGH_BUFFER;
 
             int payloadSize = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadSize += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadSize += 0xFF;
             if (curBuff >= nalEnd)
                 return NOT_ENOUGH_BUFFER;
             payloadSize += *curBuff++;
