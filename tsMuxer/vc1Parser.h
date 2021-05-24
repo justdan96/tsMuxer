@@ -36,7 +36,7 @@ enum Profile
 };
 //@}
 
-const int ff_vc1_fps_nr[5] = {24, 25, 30, 50, 60};
+const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
 const int ff_vc1_fps_dr[2] = {1000, 1001};
 
 /*
