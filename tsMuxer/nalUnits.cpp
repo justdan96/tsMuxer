@@ -2010,8 +2010,11 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
             if (curBuff >= nalEnd)
                 return;
             payloadSize += *curBuff++;
-            if (curBuff >= nalEnd)
+            if (nalEnd - curBuff < payloadSize)
+            {
+                LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
                 return;
+            }
             sei_payload(sps, payloadType, curBuff, payloadSize, orig_hrd_parameters_present_flag);
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
@@ -2075,7 +2078,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
     while (curBuff < nalEnd)
     {
         int payloadType = 0;
-        for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++)
+        for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++)
         {
             payloadType += 0xFF;
             tmpBuffer[tmpBufferLen++] = 0xff;
@@ -2088,7 +2091,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
             break;
 
         int payloadSize = 0;
-        for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++)
+        for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++)
         {
             payloadSize += 0xFF;
             tmpBuffer[tmpBufferLen++] = 0xff;
