@@ -68,8 +68,9 @@ class BitStreamReader : public BitStream
     inline void setBuffer(uint8_t* buffer, uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);
-        m_bitLeft = INT_BIT;
+        m_bitLeft = 0;
         m_curVal = getCurVal(m_buffer);
+        m_bitLeft = INT_BIT;
     }
     inline unsigned getBits(unsigned num)
     {
