@@ -364,10 +364,12 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
     while (curPtr <= end - 3)
     {
         uint16_t blockSize = AV_RB16(curPtr + 1) + 3;
+        if (blockSize == 0)
+            break;
         curPtr += blockSize;
         blocks++;
     }
-    assert(curPtr == end);
+    // assert(curPtr == end);
     if (curPtr != end)
     {
         pkt->size = 0;
