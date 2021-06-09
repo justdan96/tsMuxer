@@ -980,6 +980,11 @@ int HevcHdrUnit::deserialize()
                 nbyte = m_reader.getBits(8);
                 payloadSize += nbyte;
             }
+            if (m_reader.getBitsLeft() < payloadSize * 8)
+            {
+                LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
+                return 1;
+            }
             if (payloadType == 137 && !isHDR10)  // mastering_display_colour_volume
             {
                 isHDR10 = true;
