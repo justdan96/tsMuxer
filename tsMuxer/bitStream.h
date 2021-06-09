@@ -52,13 +52,13 @@ class BitStreamReader : public BitStream
     inline unsigned getCurVal(unsigned* buff)
     {
         uint8_t* tmpBuf = (uint8_t*)buff;
-        if (m_totalBits >= 32)
+        if (m_totalBits - m_bitLeft >= 32)
             return my_ntohl(*buff);
-        else if (m_totalBits >= 24)
+        else if (m_totalBits - m_bitLeft >= 24)
             return (tmpBuf[0] << 24) + (tmpBuf[1] << 16) + (tmpBuf[2] << 8);
-        else if (m_totalBits >= 16)
+        else if (m_totalBits - m_bitLeft >= 16)
             return (tmpBuf[0] << 24) + (tmpBuf[1] << 16);
-        else if (m_totalBits >= 8)
+        else if (m_totalBits - m_bitLeft >= 8)
             return tmpBuf[0] << 24;
         else
             THROW_BITSTREAM_ERR;
@@ -68,6 +68,7 @@ class BitStreamReader : public BitStream
     inline void setBuffer(uint8_t* buffer, uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);
+        m_bitLeft = 0;
         m_curVal = getCurVal(m_buffer);
         m_bitLeft = INT_BIT;
     }
@@ -85,7 +86,7 @@ class BitStreamReader : public BitStream
             prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
-            m_bitLeft = INT_BIT - num + m_bitLeft;
+            m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
         return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
@@ -105,7 +106,7 @@ class BitStreamReader : public BitStream
             prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
             // curVal = my_ntohl(m_buffer[1]);
             curVal = getCurVal(m_buffer + 1);
-            bitLeft = INT_BIT - num + bitLeft;
+            bitLeft += INT_BIT - num;
         }
         return prevVal + (curVal >> bitLeft) & m_masks[num];
     }
@@ -135,7 +136,7 @@ class BitStreamReader : public BitStream
         {
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
-            m_bitLeft = INT_BIT - num + m_bitLeft;
+            m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
     }
