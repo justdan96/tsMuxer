@@ -273,7 +273,7 @@ if(psf) { //PsF, 6.1.13
                 m_fpsFieldBitVal = bitReader.getBitsCount();
                 nr = bitReader.getBits(8);
                 dr = bitReader.getBits(4);
-                if (nr && nr < 8 && dr && dr < 3)
+                if (nr > 0 && nr < 8 && dr > 0 && dr < 3)
                 {
                     time_base_num = ff_vc1_fps_dr[dr - 1];
                     time_base_den = ff_vc1_fps_nr[nr - 1] * 1000;
