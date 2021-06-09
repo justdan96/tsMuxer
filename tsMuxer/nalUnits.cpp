@@ -1998,7 +1998,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
         while (curBuff < nalEnd - 1)
         {
             int payloadType = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadType += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadType += 0xFF;
             if (curBuff >= nalEnd)
                 return;
             payloadType += *curBuff++;
@@ -2006,12 +2006,15 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
                 return;
 
             int payloadSize = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadSize += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadSize += 0xFF;
             if (curBuff >= nalEnd)
                 return;
             payloadSize += *curBuff++;
-            if (curBuff >= nalEnd)
+            if (nalEnd - curBuff < payloadSize - 1)
+            {
+                LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
                 return;
+            }
             sei_payload(sps, payloadType, curBuff, payloadSize, orig_hrd_parameters_present_flag);
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
@@ -2038,7 +2041,7 @@ int SEIUnit::isMVCSEI()
         while (curBuff < nalEnd - 1)
         {
             int payloadType = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadType += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadType += 0xFF;
             if (curBuff >= nalEnd)
                 return NOT_ENOUGH_BUFFER;
             payloadType += *curBuff++;
@@ -2046,7 +2049,7 @@ int SEIUnit::isMVCSEI()
                 return NOT_ENOUGH_BUFFER;
 
             int payloadSize = 0;
-            for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++) payloadSize += 0xFF;
+            for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++) payloadSize += 0xFF;
             if (curBuff >= nalEnd)
                 return NOT_ENOUGH_BUFFER;
             payloadSize += *curBuff++;
@@ -2075,7 +2078,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
     while (curBuff < nalEnd)
     {
         int payloadType = 0;
-        for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++)
+        for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++)
         {
             payloadType += 0xFF;
             tmpBuffer[tmpBufferLen++] = 0xff;
@@ -2088,7 +2091,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
             break;
 
         int payloadSize = 0;
-        for (; *curBuff == 0xFF && curBuff < nalEnd; curBuff++)
+        for (; curBuff < nalEnd && *curBuff == 0xFF; curBuff++)
         {
             payloadSize += 0xFF;
             tmpBuffer[tmpBufferLen++] = 0xff;
