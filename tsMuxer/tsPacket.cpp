@@ -2367,8 +2367,16 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
         }
         else if (stream_coding_type == 0x90)
             number_of_PG_textST_stream_entries++;
+        else if (stream_coding_type == 0x87)
+        {
+            LTRACE(LT_ERROR, 2, "Pure E-AC3 is not supported by AVCHD/Blu-ray. Aborting...");
+            THROW(ERR_COMMON, "");
+        }
         else
-            THROW(ERR_COMMON, "Unsupported media type " << stream_coding_type << " for AVCHD/Blu-ray muxing");
+        {
+            LTRACE(LT_ERROR, 2, "Unsupported media type " << stream_coding_type << " for AVCHD/Blu-ray muxing. Aborting...");
+            THROW(ERR_COMMON, "");
+        }
     }
 
     if (!isSSEx)
