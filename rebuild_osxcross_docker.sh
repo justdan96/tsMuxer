@@ -2,7 +2,9 @@ export PATH=/usr/lib/osxcross/bin:$PATH
 export MACOSX_DEPLOYMENT_TARGET=10.13
 
 OSXCROSS_WRAPPER=$(ls -1 /usr/lib/osxcross/bin/x86_64-apple-darwin*-wrapper | xargs basename)
-OSXCROSS_TRIPLE="${OSXCROSS_WRAPPER/-wrapper/}" 
+echo $OSXCROSS_WRAPPER
+OSXCROSS_TRIPLE=$(echo $OSXCROSS_WRAPPER | sed "s/-wrapper//g") 
+echo $OSXCROSS_TRIPLE
 
 export PKG_CONFIG=/usr/lib/osxcross/bin/$OSXCROSS_TRIPLE-pkg-config
 export OSXCROSS_MP_INC=1
