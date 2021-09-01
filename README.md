@@ -100,7 +100,9 @@ echo "deb https://download.opensuse.org/repositories/home:/justdan96/Ubuntu_debb
 
 ### MacOS
 
-This ZIP file for MacOS can just be unzipped and the executables can be used after installing a couple of dependencies. To install those run the commands below in the Terminal:
+The ZIP file for MacOS can just be unzipped, as the executables should be relocatable. 
+
+If you receive missing dependency errors you may need to install a couple of dependencies, using the commands below in the Terminal:
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
 brew install freetype
