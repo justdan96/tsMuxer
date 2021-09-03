@@ -35,7 +35,7 @@ EOF
 
 cd ./bin/lnx
 
-/opt/linuxdeploy/usr/bin/linuxdeploy --appdir AppDir --plugin qt --output appimage
+APPIMAGE_EXTRACT_AND_RUN=1 /usr/local/bin/linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage
 
 cd ../..
 
