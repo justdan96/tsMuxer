@@ -310,6 +310,12 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             tsStreamIndex,
             PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary)));
     }
+    else if (codecName == "V_MPEGI/ISO/VVC")
+    {
+        m_pmt.pidList.insert(
+            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_H266, tsStreamIndex, descrBuffer,
+                                                        descriptorLen, codecReader, lang, isSecondary)));
+    }
     else if (codecName == "V_MS/VFW/WVC1")
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_VC1, tsStreamIndex, descrBuffer,

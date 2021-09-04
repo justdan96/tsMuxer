@@ -106,6 +106,10 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         {
             fileExt = ".hevc";
         }
+        else if (codecName == "V_MPEGI/ISO/VVC")
+        {
+            fileExt = ".vvc";
+        }
         else
         {
             fileExt = ".mpv";

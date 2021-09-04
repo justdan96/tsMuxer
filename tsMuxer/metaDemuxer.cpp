@@ -31,6 +31,7 @@
 #include "vc1StreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
+#include "vvcStreamReader.h"
 
 using namespace std;
 
@@ -771,6 +772,11 @@ CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,
     if (rez.codecInfo.codecID)
         return rez;
 
+    VVCStreamReader vvcCodec;
+    rez = vvcCodec.checkStream(tmpBuffer, len);
+    if (rez.codecInfo.codecID)
+        return rez;
+
     MPEG2StreamReader mpeg2ccodec;
     rez = mpeg2ccodec.checkStream(tmpBuffer, len);
     if (rez.codecInfo.codecID)
@@ -902,6 +908,17 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
             ((HEVCStreamReader*)rez)->setFPS(fps);
+        }
+    }
+    else if (codecName == "V_MPEGI/ISO/VVC")
+    {
+        rez = new VVCStreamReader();
+        map<string, string>::const_iterator itr = addParams.find("fps");
+        if (itr != addParams.end())
+        {
+            double fps = strToDouble(itr->second.c_str());
+            fps = correctFps(fps);
+            ((VVCStreamReader*)rez)->setFPS(fps);
         }
     }
     else if (codecName == "V_MS/VFW/WVC1")
