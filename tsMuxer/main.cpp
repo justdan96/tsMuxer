@@ -378,6 +378,7 @@ Supported input containers:
 - MPLS (Blu-ray media play list file)
 
 Names of codecs in the meta file:
+- V_MPEGI/ISO/VVC   H.266/VVC
 - V_MPEGH/ISO/HEVC  H.265/HEVC
 - V_MPEG4/ISO/AVC   H.264/AVC
 - V_MPEG4/ISO/MVC   H.264/MVC

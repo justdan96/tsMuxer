@@ -23,6 +23,7 @@ const static int CODEC_S_PGS = 12;
 const static int CODEC_S_SRT = 13;
 const static int CODEC_V_MPEG4_H264_DEP = 14;
 const static int CODEC_V_MPEG4_H265 = 15;
+const static int CODEC_V_MPEG4_H266 = 16;
 
 struct CodecInfo
 {
@@ -52,6 +53,7 @@ struct CheckStreamRez
     bool unused;
 };
 
+const static CodecInfo vvcCodecInfo(CODEC_V_MPEG4_H266, "VVC", "V_MPEGI/ISO/VVC");
 const static CodecInfo hevcCodecInfo(CODEC_V_MPEG4_H265, "HEVC", "V_MPEGH/ISO/HEVC");
 const static CodecInfo h264CodecInfo(CODEC_V_MPEG4_H264, "H.264", "V_MPEG4/ISO/AVC");
 const static CodecInfo h264DepCodecInfo(CODEC_V_MPEG4_H264_DEP, "MVC",

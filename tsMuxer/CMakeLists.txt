@@ -52,6 +52,8 @@ add_executable (tsmuxer
   vc1Parser.cpp
   vc1StreamReader.cpp
   vod_common.cpp
+  vvc.cpp
+  vvcStreamReader.cpp
   wave.cpp
 )
 
