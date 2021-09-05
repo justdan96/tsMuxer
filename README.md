@@ -6,7 +6,7 @@ This project is for tsMuxer - a transport stream muxer for remuxing/muxing eleme
 
 EVO/VOB/MPG, MKV/MKA, MP4/MOV, TS, M2TS to TS to M2TS.
 
-Supported video codecs H.264/AVC, H.265/HEVC, VC-1, MPEG2. 
+Supported video codecs H.264/AVC, H.265/HEVC, H.266/VVC (Alpha release), VC-1, MPEG2. 
 Supported audio codecs AAC, AC3 / E-AC3(DD+), DTS/ DTS-HD - please note TrueHD must have the AC3 core intact.
 
 Some of the major features include:
@@ -159,6 +159,7 @@ Names of codecs in the meta file:
 
 Meta File Code    | Description 
 ---               | --- 
+V_MPEGI/ISO/VVC   | H.266/VVC 
 V_MPEGH/ISO/HEVC  | H.265/HEVC 
 V_MPEG4/ISO/AVC   | H.264/AVC 
 V_MPEG4/ISO/MVC   | H.264/MVC 
