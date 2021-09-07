@@ -30,7 +30,7 @@ bool isVideoStreamType(int stream_coding_type)
 {
     return stream_coding_type == STREAM_TYPE_VIDEO_MPEG2 || stream_coding_type == STREAM_TYPE_VIDEO_H264 ||
            stream_coding_type == STREAM_TYPE_VIDEO_VC1 || stream_coding_type == STREAM_TYPE_VIDEO_MVC ||
-           stream_coding_type == STREAM_TYPE_VIDEO_H265 || STREAM_TYPE_VIDEO_H266;
+           stream_coding_type == STREAM_TYPE_VIDEO_H265 || stream_coding_type == STREAM_TYPE_VIDEO_H266;
 }
 
 bool isAudioStreamType(int stream_coding_type)
