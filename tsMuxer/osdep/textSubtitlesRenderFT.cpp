@@ -21,7 +21,7 @@ const static char FONT_ROOT[] = "c:/WINDOWS/Fonts";  // for debug only
 #elif __linux__ == 1
 const static char FONT_ROOT[] = "/usr/share/fonts/";
 #elif defined(__APPLE__) && defined(__MACH__)
-const static char FONT_ROOT[] = "/Library/Fonts/";
+const static char FONT_ROOT[] = "/System/Library/Fonts/";
 #endif
 
 #include <freetype/ftstroke.h>
@@ -79,6 +79,14 @@ void TextSubtitlesRenderFT::loadFontMap()
     vector<string> fileList;
     // sort(fileList.begin(), fileList.end());
     findFilesRecursive(FONT_ROOT, "*.ttf", &fileList);
+#if defined(__APPLE__) && defined(__MACH__)
+    vector<string> fileList1;
+    findFilesRecursive("/Library/Fonts/", "*.ttf", &fileList1);
+    fileList.insert(fileList.end(), fileList1.begin(), fileList1.end());
+    findFilesRecursive("~/Library/Fonts/", "*.ttf", &fileList1);
+    fileList.insert(fileList.end(), fileList1.begin(), fileList1.end());
+#endif
+
     for (int i = 0; i < fileList.size(); ++i)
     {
         // LTRACE(LT_INFO, 2, "before loading font " << fileList[i].c_str());
