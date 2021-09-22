@@ -54,7 +54,7 @@ for_each_dep_lib() {
 }
 
 export PATH=/usr/lib/osxcross/bin:$PATH
-export MACOSX_DEPLOYMENT_TARGET=10.13
+export MACOSX_DEPLOYMENT_TARGET=10.15
 export PKG_CONFIG=/usr/lib/osxcross/bin/$OSXCROSS_TRIPLE-pkg-config
 export OSXCROSS_MP_INC=1
 export LD_LIBRARY_PATH=/usr/lib/osxcross/lib:$LD_LIBRARY_PATH:/usr/lib/osxcross/macports/pkgs/opt/local/lib/

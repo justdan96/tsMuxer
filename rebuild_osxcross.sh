@@ -1,5 +1,5 @@
 export PATH=/usr/lib/osxcross/bin:$PATH
-export MACOSX_DEPLOYMENT_TARGET=10.13
+export MACOSX_DEPLOYMENT_TARGET=10.15
 
 OSXCROSS_WRAPPER=$(ls -1 /usr/lib/osxcross/bin/x86_64-apple-darwin*-wrapper | xargs basename)
 OSXCROSS_TRIPLE="${OSXCROSS_WRAPPER/-wrapper/}" 
