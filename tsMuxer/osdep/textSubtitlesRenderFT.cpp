@@ -27,6 +27,8 @@ const static char FONT_ROOT[] = "/System/Library/Fonts/";
 #include <freetype/ftstroke.h>
 #include <fs/systemlog.h>
 
+#include <filesystem>
+
 using namespace std;
 
 namespace text_subtitles
@@ -101,10 +103,12 @@ void TextSubtitlesRenderFT::loadFontMap()
 
             std::map<std::string, std::string>::iterator itr = m_fontNameToFile.find(fontFamily);
 
-            if (itr == m_fontNameToFile.end())
-                m_fontNameToFile[fontFamily] = fileList[i];
-            else if (fileList[i].length() < itr->second.length())
-                m_fontNameToFile[fontFamily] = fileList[i];
+            if (itr == m_fontNameToFile.end() || fileList[i].length() < itr->second.length())
+#if defined(__APPLE__) && defined(__MACH__)
+                m_fontNameToFile[fontFamily] = std::__fs::filesystem::canonical(fileList[i]).string();
+#else
+                m_fontNameToFile[fontFamily] = std::filesystem::canonical(fileList[i]).string();
+#endif
 
             FT_Done_Face(font);
         }
@@ -298,7 +302,8 @@ void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, RECT* rect
     for (int x = left; x <= right; ++x) *dst++ = convertColor(m_font.m_color);
 }
 
-union Pixel32 {
+union Pixel32
+{
     Pixel32(uint32_t val = 0) : integer(val) {}
     Pixel32(uint8_t bi, uint8_t gi, uint8_t ri, uint8_t ai = 255)
     {
