@@ -302,8 +302,7 @@ void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, RECT* rect
     for (int x = left; x <= right; ++x) *dst++ = convertColor(m_font.m_color);
 }
 
-union Pixel32
-{
+union Pixel32 {
     Pixel32(uint32_t val = 0) : integer(val) {}
     Pixel32(uint8_t bi, uint8_t gi, uint8_t ri, uint8_t ai = 255)
     {
