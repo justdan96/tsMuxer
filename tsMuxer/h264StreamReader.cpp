@@ -783,6 +783,7 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
     // int dpb_output_delay;
     // SPSUnit* sps;
 
+    // First NAL of Access Unit
     switch (nal_unit_type)
     {
     case nuPPS:
@@ -791,7 +792,7 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
         if (nalRez != 0)
             return nalRez;
         m_spsPpsFound = true;
-        break;
+        goto getAU;
     case nuSPS:
     case nuSubSPS:
         // LTRACE(LT_DEBUG, 0, "SPS");
@@ -799,26 +800,19 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
         if (nalRez != 0)
             return nalRez;
         m_spsCounter++;
-        if (m_delimiterFound)
-            break;
-        nalRez = nalRez;
+        goto getAU;
     case nuSEI:
-        if (nal_unit_type == nuSEI)
-        {
-            nalRez = processSEI(buff);
-            if (nalRez != 0)
-                return nalRez;
-        }
         // LTRACE(LT_DEBUG, 0, "SEI");
-        // if (m_isFirstFrame)
-        //	break;
+        nalRez = processSEI(buff);
+        if (nalRez != 0)
+            return nalRez;
+        goto getAU;
     case nuDRD:
     case nuDelimiter:
-        if (nal_unit_type == nuDelimiter || (m_blurayMode && nal_unit_type == nuDRD))
-        {
-            // LTRACE(LT_DEBUG, 0, "NAUD type " << int32ToStr(buff[1],16));
-            m_delimiterFound = true;
-        }
+        // LTRACE(LT_DEBUG, 0, "NAUD type " << int32ToStr(buff[1],16));
+        m_delimiterFound = true;
+    // Remaining NALs of Access Unit
+    getAU:
         nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
         while (1)
         {
@@ -1117,11 +1111,8 @@ int H264StreamReader::processSliceNal(uint8_t* buff)
     if (slice.bottom_field_flag == 1)  // insrease PTS/DTS only for whole frame
         return 0;
 
-    // if (!m_delimiterFound)
-    {
-        if (detectPrimaryPicType(slice, buff) != 0)
-            return NOT_ENOUGH_BUFFER;
-    }
+    if (detectPrimaryPicType(slice, buff) != 0)
+        return NOT_ENOUGH_BUFFER;
 
     // forceLsbDiv check
     if (slice.getSPS()->frame_mbs_only_flag && m_forceLsbDiv != 0)
