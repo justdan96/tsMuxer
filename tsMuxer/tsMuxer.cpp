@@ -260,9 +260,13 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         {
             m_pesType[tsStreamIndex] = PES_VC1_ID;
         }
+        else if (codecName == "V_MPEGH/ISO/HEVC")
+        {
+            m_pesType[tsStreamIndex] = PES_HEVC_ID;
+        }
         else
         {
-            m_pesType[tsStreamIndex] = (m_m2tsMode ? PES_VIDEO_ID : PES_VIDEO_ID - 1);  // m_videoCnt++;
+            m_pesType[tsStreamIndex] = PES_VIDEO_ID;  // m_videoCnt++;
         }
     }
 
