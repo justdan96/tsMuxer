@@ -29,7 +29,8 @@ static const uint8_t PES_PRIVATE_DATA2 = 0xbf;
 static const uint8_t PROGRAM_STREAM_DIRECTORY = 0xff;
 
 static const uint8_t PES_AUDIO_ID = 0xc0;
-static const uint8_t PES_VIDEO_ID = 0xe1;
+static const uint8_t PES_VIDEO_ID = 0xe0;
+static const uint8_t PES_HEVC_ID = 0xe1;
 static const uint8_t PES_VC1_ID = 0xfd;
 
 static const uint8_t DVB_SUBT_DESCID = 0x59;
