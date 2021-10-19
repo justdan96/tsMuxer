@@ -570,6 +570,8 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
         if (nb_positive_pics > 64)
             return 1;
         rps->num_delta_pocs = rps->num_negative_pics + nb_positive_pics;
+        if (rps->num_delta_pocs > 64)
+            return 1;
         if (rps->num_delta_pocs)
         {
             prev = 0;
