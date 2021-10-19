@@ -190,14 +190,14 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
     while (end - buff >= 16)
     {
         int64_t* ptr = (int64_t*)buff;
-        int64_t hdrType = my_ntohll(ptr[0]);
-        int64_t hdrSize = my_ntohll(ptr[1]) + 16;
+        uint64_t hdrType = my_ntohll(ptr[0]);
+        uint64_t hdrSize = my_ntohll(ptr[1]) + 16;
 
         if (hdrType == AUPRINFO || hdrType == BITSHVTB || hdrType == BLACKOUT || hdrType == BRANCHPT ||
             hdrType == BUILDVER || hdrType == CORESSMD || hdrType == EXTSS_MD || hdrType == FILEINFO ||
             hdrType == NAVI_TBL || hdrType == TIMECODE || hdrType == DTSHDHDR)
         {
-            if (buff + hdrSize > end)
+            if (hdrSize > end - buff)
                 return 0;  // need more data
             buff += hdrSize;
         }
