@@ -132,7 +132,8 @@ void VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int Max
             m_reader.skipBits(32);
             m_reader.skipBits(32);
             m_reader.skipBits(7);
-            m_reader.skipBits(m_reader.getBits(8));  // gci_reserved_zero_bit[i]
+            int gci_num_reserved_bits = m_reader.getBits(8);
+            for (int i = 0; i < gci_num_reserved_bits; i++) m_reader.skipBit();  // gci_reserved_zero_bit[i]
         }
         m_reader.skipBits(m_reader.getBitsLeft() % 8);  // gci_alignment_zero_bit
     }
