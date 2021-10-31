@@ -1635,12 +1635,6 @@ QString TsMuxerWindow::getMuxOpts()
     return rez;
 }
 
-int getCharsetCode(const QString &name)
-{
-    Q_UNUSED(name);
-    return 0;  // todo: refactor this function
-}
-
 double TsMuxerWindow::getRendererAnimationTime() const
 {
     switch (ui->comboBoxAnimation->currentIndex())
