@@ -309,6 +309,7 @@ TsMuxerWindow::TsMuxerWindow()
     }
 
     ui->outFileName->setText(getDefaultOutputFileName());
+    provideDefaultFontSettings();
 
     m_header = new QnCheckBoxedHeaderView(this);
     ui->trackLV->setHorizontalHeader(m_header);
@@ -1875,6 +1876,20 @@ void TsMuxerWindow::onLanguageComboBoxIndexChanged(int idx)
         ui->textEdit->clear();
     }
     writeSettings();
+}
+
+void TsMuxerWindow::provideDefaultFontSettings()
+{
+    if (ui->listViewFont->item(0, 1)->text().isEmpty()) {
+        ui->listViewFont->item(0, 1)->setText("Arial");
+    }
+    if (ui->listViewFont->item(1, 1)->text().isEmpty()) {
+        ui->listViewFont->item(1, 1)->setText("65");
+    }
+    if (ui->listViewFont->item(2, 1)->text().isEmpty()) {
+        quint32 color = ~0;
+        setTextItemColor(QString::number(color, 16));
+    }
 }
 
 void TsMuxerWindow::updateMetaLines()

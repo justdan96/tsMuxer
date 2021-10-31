@@ -2016,7 +2016,7 @@
                </item>
                <item row="0" column="1">
                 <property name="text">
-                 <string notr="true">Arial</string>
+                 <string/>
                 </property>
                </item>
                <item row="1" column="0">
@@ -2026,7 +2026,7 @@
                </item>
                <item row="1" column="1">
                 <property name="text">
-                 <string>65</string>
+                 <string/>
                 </property>
                </item>
                <item row="2" column="0">
@@ -2036,7 +2036,7 @@
                </item>
                <item row="2" column="1">
                 <property name="text">
-                 <string>0xffffffff</string>
+                 <string/>
                 </property>
                </item>
                <item row="3" column="0">
@@ -2046,7 +2046,7 @@
                </item>
                <item row="3" column="1">
                 <property name="text">
-                 <string>Default</string>
+                 <string/>
                 </property>
                </item>
                <item row="4" column="0">

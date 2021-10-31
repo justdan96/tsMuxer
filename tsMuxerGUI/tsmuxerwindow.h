@@ -91,6 +91,7 @@ class TsMuxerWindow : public QWidget
     void updateMuxTime1();
     void updateMuxTime2();
     void onLanguageComboBoxIndexChanged(int);
+    void provideDefaultFontSettings();
     template <typename OnCodecListReadyFn, typename PostActionSignal, typename PostActionFn>
     void processAddFileList(OnCodecListReadyFn onCodecListReady, PostActionSignal postActionSignal,
                             PostActionFn postActionFn);
