@@ -1677,26 +1677,23 @@ void TsMuxerWindow::setRendererAnimationTime(double value)
 
 QString TsMuxerWindow::getSrtParams()
 {
-    QString rez;
-    if (ui->listViewFont->rowCount() < 5)
-        return rez;
-    rez = QString(",font-name=\"") + ui->listViewFont->item(0, 1)->text();
-    rez += QString("\",font-size=") + ui->listViewFont->item(1, 1)->text();
-    rez += QString(",font-color=") + ui->listViewFont->item(2, 1)->text();
-    int charsetCode = getCharsetCode(ui->listViewFont->item(3, 1)->text());
-    if (charsetCode)
-        rez += QString(",font-charset=") + QString::number(charsetCode);
+    auto rez = QString(",font-name=\"%1\",font-size=%2,font-color=%3")
+                   .arg(ui->listViewFont->item(0, 1)->text(), ui->listViewFont->item(1, 1)->text(),
+                        ui->listViewFont->item(2, 1)->text());
+
     if (ui->lineSpacing->value() != 1.0)
         rez += ",line-spacing=" + QString::number(ui->lineSpacing->value());
 
-    if (ui->listViewFont->item(4, 1)->text().indexOf("Italic") >= 0)
+    const auto fontOptions = ui->listViewFont->item(3, 1)->text();
+    if (fontOptions.contains("Italic"))
         rez += ",font-italic";
-    if (ui->listViewFont->item(4, 1)->text().indexOf("Bold") >= 0)
+    if (fontOptions.contains("Bold"))
         rez += ",font-bold";
-    if (ui->listViewFont->item(4, 1)->text().indexOf("Underline") >= 0)
+    if (fontOptions.contains("Underline"))
         rez += ",font-underline";
-    if (ui->listViewFont->item(4, 1)->text().indexOf("Strikeout") >= 0)
+    if (fontOptions.contains("Strikeout"))
         rez += ",font-strikeout";
+
     rez += QString(",bottom-offset=") + QString::number(ui->spinEditOffset->value()) +
            ",font-border=" + QString::number(ui->spinEditBorder->value());
     if (ui->rbhLeft->isChecked())
@@ -1880,13 +1877,16 @@ void TsMuxerWindow::onLanguageComboBoxIndexChanged(int idx)
 
 void TsMuxerWindow::provideDefaultFontSettings()
 {
-    if (ui->listViewFont->item(0, 1)->text().isEmpty()) {
+    if (ui->listViewFont->item(0, 1)->text().isEmpty())
+    {
         ui->listViewFont->item(0, 1)->setText("Arial");
     }
-    if (ui->listViewFont->item(1, 1)->text().isEmpty()) {
+    if (ui->listViewFont->item(1, 1)->text().isEmpty())
+    {
         ui->listViewFont->item(1, 1)->setText("65");
     }
-    if (ui->listViewFont->item(2, 1)->text().isEmpty()) {
+    if (ui->listViewFont->item(2, 1)->text().isEmpty())
+    {
         quint32 color = ~0;
         setTextItemColor(QString::number(color, 16));
     }
@@ -1984,10 +1984,13 @@ void TsMuxerWindow::onFontBtnClicked()
     QFont font;
     font.setFamily(ui->listViewFont->item(0, 1)->text());
     font.setPointSize((ui->listViewFont->item(1, 1)->text()).toInt());
-    font.setItalic(ui->listViewFont->item(4, 1)->text().indexOf("Italic") >= 0);
-    font.setBold(ui->listViewFont->item(4, 1)->text().indexOf("Bold") >= 0);
-    font.setUnderline(ui->listViewFont->item(4, 1)->text().indexOf("Underline") >= 0);
-    font.setStrikeOut(ui->listViewFont->item(4, 1)->text().indexOf("Strikeout") >= 0);
+    {
+        auto fontOptions = ui->listViewFont->item(3, 1)->text();
+        font.setItalic(fontOptions.contains("Italic"));
+        font.setBold(fontOptions.contains("Bold"));
+        font.setUnderline(fontOptions.contains("Underline"));
+        font.setStrikeOut(fontOptions.contains("Strikeout"));
+    }
     font = QFontDialog::getFont(&ok, font, this);
     if (ok)
     {
@@ -2015,7 +2018,7 @@ void TsMuxerWindow::onFontBtnClicked()
                 optStr += ',';
             optStr += "Strikeout";
         }
-        ui->listViewFont->item(4, 1)->setText(optStr);
+        ui->listViewFont->item(3, 1)->setText(optStr);
         writeSettings();
         updateMetaLines();
     }
@@ -2738,7 +2741,7 @@ void TsMuxerWindow::writeSettings()
     settings->setValue("family", ui->listViewFont->item(0, 1)->text());
     settings->setValue("size", ui->listViewFont->item(1, 1)->text().toUInt());
     settings->setValue("color", ui->listViewFont->item(2, 1)->text().mid(2).toUInt(0, 16));
-    settings->setValue("options", ui->listViewFont->item(4, 1)->text());
+    settings->setValue("options", ui->listViewFont->item(3, 1)->text());
     settings->endGroup();
 
     settings->beginGroup("pip");
@@ -2787,7 +2790,7 @@ bool TsMuxerWindow::readSettings()
         quint32 color = settings->value("color").toUInt();
         setTextItemColor(QString::number(color, 16));
     }
-    ui->listViewFont->item(4, 1)->setText(settings->value("options").toString());
+    ui->listViewFont->item(3, 1)->setText(settings->value("options").toString());
     settings->endGroup();
 
     settings->beginGroup("pip");
