@@ -333,9 +333,9 @@ TsMuxerWindow::TsMuxerWindow()
     ui->listViewFont->horizontalHeader()->resizeSection(1, 185);
     for (int i = 0; i < ui->listViewFont->rowCount(); ++i)
     {
-        ui->listViewFont->setRowHeight(i, 16);
+        ui->listViewFont->setRowHeight(i, 20);
         ui->listViewFont->item(i, 0)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
-        ui->listViewFont->item(i, 1)->setFlags(ui->listViewFont->item(i, 0)->flags() & (~Qt::ItemIsEditable));
+        ui->listViewFont->item(i, 1)->setFlags(ui->listViewFont->item(i, 1)->flags() & (~Qt::ItemIsEditable));
     }
     void (QSpinBox::*spinBoxValueChanged)(int) = &QSpinBox::valueChanged;
     void (QDoubleSpinBox::*doubleSpinBoxValueChanged)(double) = &QDoubleSpinBox::valueChanged;
