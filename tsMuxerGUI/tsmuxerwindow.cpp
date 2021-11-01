@@ -17,6 +17,7 @@
 
 #include "checkboxedheaderview.h"
 #include "codecinfo.h"
+#include "fontsettingstablemodel.h"
 #include "lang_codes.h"
 #include "muxForm.h"
 #include "ui_tsmuxerwindow.h"
@@ -328,10 +329,11 @@ TsMuxerWindow::TsMuxerWindow()
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
     ui->trackLV->setWordWrap(false);
 
-    ui->fontSettingsTableView->setModel(&fontSettingsModel);
+    fontSettingsModel = new FontSettingsTableModel();
+    ui->fontSettingsTableView->setModel(fontSettingsModel);
     ui->fontSettingsTableView->horizontalHeader()->resizeSection(0, 65);
     ui->fontSettingsTableView->horizontalHeader()->resizeSection(1, 185);
-    for (int i = 0; i < fontSettingsModel.rowCount(QModelIndex()); ++i)
+    for (int i = 0; i < fontSettingsModel->rowCount(QModelIndex()); ++i)
     {
         ui->fontSettingsTableView->setRowHeight(i, 20);
     }
@@ -1670,9 +1672,9 @@ void TsMuxerWindow::setRendererAnimationTime(double value)
 
 QString TsMuxerWindow::getSrtParams()
 {
-    auto &font = fontSettingsModel.font();
+    auto &font = fontSettingsModel->font();
     auto rez = QString(",font-name=\"%1\",font-size=%2,font-color=%3")
-                   .arg(font.family(), font.pointSize(), fontSettingsModel.color());
+                   .arg(font.family(), font.pointSize(), fontSettingsModel->color());
 
     if (ui->lineSpacing->value() != 1.0)
         rez += ",line-spacing=" + QString::number(ui->lineSpacing->value());
@@ -1956,10 +1958,10 @@ void TsMuxerWindow::updateMetaLines()
 void TsMuxerWindow::onFontBtnClicked()
 {
     bool ok;
-    auto font = QFontDialog::getFont(&ok, fontSettingsModel.font(), this);
+    auto font = QFontDialog::getFont(&ok, fontSettingsModel->font(), this);
     if (ok)
     {
-        fontSettingsModel.setFont(font);
+        fontSettingsModel->setFont(font);
         writeSettings();
         updateMetaLines();
     }
@@ -1967,9 +1969,9 @@ void TsMuxerWindow::onFontBtnClicked()
 
 void TsMuxerWindow::onColorBtnClicked()
 {
-    QColor color = fontSettingsModel.color();
+    QColor color = fontSettingsModel->color();
     color = QColorDialog::getColor(color, this);
-    fontSettingsModel.setColor(color.rgba());
+    fontSettingsModel->setColor(color.rgba());
 
     writeSettings();
     updateMetaLines();

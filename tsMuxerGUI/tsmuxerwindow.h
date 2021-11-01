@@ -9,7 +9,6 @@
 #include <QWidget>
 
 #include "codecinfo.h"
-#include "fontsettingstablemodel.h"
 
 class QFileDialog;
 class QTableWidgetItem;
@@ -23,6 +22,7 @@ class TsMuxerWindow;
 }
 
 class QnCheckBoxedHeaderView;
+class FontSettingsTableModel;
 
 typedef QList<double> ChapterList;
 
@@ -198,7 +198,7 @@ class TsMuxerWindow : public QWidget
     void myPlaySound(const QString& fileName);
     bool isVideoCropped();
     
-    FontSettingsTableModel fontSettingsModel;
+    FontSettingsTableModel *fontSettingsModel;
 };
 
 Q_DECLARE_METATYPE(ChapterList);
