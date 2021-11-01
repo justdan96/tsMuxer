@@ -3,6 +3,8 @@
 #include <QBrush>
 #include <QColor>
 #include <QSettings>
+#include <array>
+#include <functional>
 
 namespace
 {
