@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>FontSettingsTableModel</name>
+    <message>
+        <location filename="../fontsettingstablemodel.cpp" line="132"/>
+        <source>Name:</source>
+        <translation>名称：</translation>
+    </message>
+    <message>
+        <location filename="../fontsettingstablemodel.cpp" line="132"/>
+        <source>Size:</source>
+        <translation>尺寸：</translation>
+    </message>
+    <message>
+        <location filename="../fontsettingstablemodel.cpp" line="132"/>
+        <source>Color:</source>
+        <translation>颜色：</translation>
+    </message>
+    <message>
+        <location filename="../fontsettingstablemodel.cpp" line="133"/>
+        <source>Options:</source>
+        <translation>选项：</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../muxForm.cpp" line="48"/>
@@ -106,7 +129,7 @@
         <location filename="../tsmuxerwindow.ui" line="325"/>
         <location filename="../tsmuxerwindow.ui" line="629"/>
         <location filename="../tsmuxerwindow.ui" line="810"/>
-        <location filename="../tsmuxerwindow.cpp" line="52"/>
+        <location filename="../tsmuxerwindow.cpp" line="53"/>
         <source>General track options</source>
         <translation>常规轨道选项</translation>
     </message>
@@ -172,7 +195,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="693"/>
-        <location filename="../tsmuxerwindow.cpp" line="1004"/>
+        <location filename="../tsmuxerwindow.cpp" line="1010"/>
         <source>Downconvert HD audio</source>
         <translation>降频高清音频</translation>
     </message>
@@ -198,7 +221,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="767"/>
-        <location filename="../tsmuxerwindow.cpp" line="54"/>
+        <location filename="../tsmuxerwindow.cpp" line="55"/>
         <source>Demux options</source>
         <translation>Demux选项</translation>
     </message>
@@ -569,430 +592,375 @@
         <translation> 默认的基于文本的字幕字体： </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="1979"/>
-        <location filename="../tsmuxerwindow.ui" line="1984"/>
-        <location filename="../tsmuxerwindow.ui" line="1989"/>
-        <location filename="../tsmuxerwindow.ui" line="1994"/>
-        <location filename="../tsmuxerwindow.ui" line="1999"/>
-        <source>New Row</source>
-        <translation>新行</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2004"/>
-        <location filename="../tsmuxerwindow.ui" line="2009"/>
-        <source>New Column</source>
-        <translation>新列</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2014"/>
-        <source>Name:</source>
-        <translation>名称：</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2024"/>
-        <source>Size:</source>
-        <translation>尺寸：</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2029"/>
-        <source>65</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2034"/>
-        <source>Color:</source>
-        <translation>颜色：</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2039"/>
-        <source>0xffffffff</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2044"/>
-        <source>Charset:</source>
-        <translation>字符集：</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2049"/>
-        <source>Default</source>
-        <translation>默认</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2054"/>
-        <source>Options:</source>
-        <translation>选项：</translation>
-    </message>
-    <message>
-        <location filename="../tsmuxerwindow.ui" line="2075"/>
+        <location filename="../tsmuxerwindow.ui" line="1990"/>
         <source>Font</source>
         <translation>字体</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2082"/>
+        <location filename="../tsmuxerwindow.ui" line="1997"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2106"/>
+        <location filename="../tsmuxerwindow.ui" line="2021"/>
         <source>Additional border, pixels:</source>
         <translation>额外边框, 像素：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2132"/>
+        <location filename="../tsmuxerwindow.ui" line="2047"/>
         <source>line spacing:</source>
         <translation>行间距：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2158"/>
+        <location filename="../tsmuxerwindow.ui" line="2073"/>
         <source>Fade in/out animation:</source>
         <translation>淡入/淡出 动画：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2169"/>
+        <location filename="../tsmuxerwindow.ui" line="2084"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2174"/>
+        <location filename="../tsmuxerwindow.ui" line="2089"/>
         <source>Fast</source>
         <translation>快速</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2179"/>
+        <location filename="../tsmuxerwindow.ui" line="2094"/>
         <source>Medium</source>
         <translation>中等</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2184"/>
+        <location filename="../tsmuxerwindow.ui" line="2099"/>
         <source>Slow</source>
         <translation>慢</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2189"/>
+        <location filename="../tsmuxerwindow.ui" line="2104"/>
         <source>Very slow</source>
         <translation>非常慢</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2225"/>
+        <location filename="../tsmuxerwindow.ui" line="2140"/>
         <source> Vertical position: </source>
         <translation> 垂直位置： </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2236"/>
+        <location filename="../tsmuxerwindow.ui" line="2151"/>
         <source>Top of screen</source>
         <translation>屏幕上方</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2270"/>
+        <location filename="../tsmuxerwindow.ui" line="2185"/>
         <source>top offset, pixels:</source>
         <translation>顶部偏移,像素：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2304"/>
-        <location filename="../tsmuxerwindow.ui" line="2476"/>
+        <location filename="../tsmuxerwindow.ui" line="2219"/>
+        <location filename="../tsmuxerwindow.ui" line="2391"/>
         <source>Screen center</source>
         <translation>屏幕中心</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2311"/>
+        <location filename="../tsmuxerwindow.ui" line="2226"/>
         <source>Bottom of screen</source>
         <translation>屏幕底部</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2345"/>
+        <location filename="../tsmuxerwindow.ui" line="2260"/>
         <source>bottom offset, pixels:</source>
         <translation>底部偏移, 像素：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2397"/>
+        <location filename="../tsmuxerwindow.ui" line="2312"/>
         <source> Horizontal position: </source>
         <translation> 水平位置： </translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2408"/>
+        <location filename="../tsmuxerwindow.ui" line="2323"/>
         <source>Left of screen</source>
         <translation>屏幕左侧</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2442"/>
+        <location filename="../tsmuxerwindow.ui" line="2357"/>
         <source>left offset, pixels:</source>
         <translation>左偏移, 像素：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2489"/>
+        <location filename="../tsmuxerwindow.ui" line="2404"/>
         <source>Right of screen</source>
         <translation>屏幕右侧</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2526"/>
+        <location filename="../tsmuxerwindow.ui" line="2441"/>
         <source>right offset, pixels:</source>
         <translation>右偏移, 像素：</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2591"/>
+        <location filename="../tsmuxerwindow.ui" line="2506"/>
         <source>About</source>
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2643"/>
+        <location filename="../tsmuxerwindow.ui" line="2558"/>
         <source>Output</source>
         <translation>输出</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2657"/>
+        <location filename="../tsmuxerwindow.ui" line="2572"/>
         <source>TS muxing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2673"/>
+        <location filename="../tsmuxerwindow.ui" line="2588"/>
         <source>M2TS muxing</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2680"/>
+        <location filename="../tsmuxerwindow.ui" line="2595"/>
         <source>Blu-ray ISO</source>
         <translation>蓝光ISO</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2693"/>
+        <location filename="../tsmuxerwindow.ui" line="2608"/>
         <source>Blu-ray folder</source>
         <translation>蓝光目录</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2700"/>
+        <location filename="../tsmuxerwindow.ui" line="2615"/>
         <source>AVCHD folder</source>
         <translation>AVCHD 目录</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2713"/>
-        <location filename="../tsmuxerwindow.cpp" line="1387"/>
+        <location filename="../tsmuxerwindow.ui" line="2628"/>
+        <location filename="../tsmuxerwindow.cpp" line="1393"/>
         <source>Demux</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2737"/>
+        <location filename="../tsmuxerwindow.ui" line="2652"/>
         <source>Disk label</source>
         <translation>ISO标签</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2747"/>
-        <location filename="../tsmuxerwindow.cpp" line="2334"/>
+        <location filename="../tsmuxerwindow.ui" line="2662"/>
+        <location filename="../tsmuxerwindow.cpp" line="2282"/>
         <source>File name</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2773"/>
+        <location filename="../tsmuxerwindow.ui" line="2688"/>
         <source>Browse</source>
         <translation>浏览</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2797"/>
+        <location filename="../tsmuxerwindow.ui" line="2712"/>
         <source>Meta file</source>
         <translation>项目文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2866"/>
-        <location filename="../tsmuxerwindow.cpp" line="2318"/>
+        <location filename="../tsmuxerwindow.ui" line="2781"/>
+        <location filename="../tsmuxerwindow.cpp" line="2266"/>
         <source>Sta&amp;rt muxing</source>
         <translation>开始muxing</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.ui" line="2891"/>
+        <location filename="../tsmuxerwindow.ui" line="2806"/>
         <source>Save meta file</source>
         <translation>保存项目文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="28"/>
+        <location filename="../tsmuxerwindow.cpp" line="29"/>
         <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
         <translation>所有支持的媒体文件 (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (高级音频编码)) (*.aac);;AVC/MVC/H.264 基本流 (*.avc *.mvc *.264 *.h264);;HEVC (高效视频编解码器) (*.hevc *.hvc *.265 *.h265);;数字影院系统 (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg视频基本流 (*.mpv *.m1v *.m2v);;MPEG 音频基本流 (*.mpa);;传输流 (*.ts);;BDAV 传输流 (*.m2ts *.mts *.ssif);;节目流 (*.mpg *.mpeg *.vob *.evo);;Matroska 音频/视频 文件 (*.mkv *.mka *.mks);;MP4 音频/视频 文件 (*.mp4 *.m4a *.m4v);;Quick 音频/视频 文件 (*.mov);;蓝光播放列表 (*.mpls *.mpl);;蓝光PGS字幕 (*.sup);;文本字幕 (*.srt);;WAVE-未压缩的PCM音频 (*.wav *.w64);;RAW LPCM流 (*.pcm);;所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="56"/>
+        <location filename="../tsmuxerwindow.cpp" line="57"/>
         <source>Transport stream (*.ts);;all files (*.*)</source>
         <translation>传输流 (*.ts);;所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="58"/>
+        <location filename="../tsmuxerwindow.cpp" line="59"/>
         <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
         <translation>BDAV 传输流 (*.m2ts);;所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="60"/>
+        <location filename="../tsmuxerwindow.cpp" line="61"/>
         <source>Disk image (*.iso);;all files (*.*)</source>
         <translation>磁盘镜像 (*.iso);;所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="543"/>
+        <location filename="../tsmuxerwindow.cpp" line="551"/>
         <source>Not supported</source>
         <translation>不支持</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="609"/>
-        <location filename="../tsmuxerwindow.cpp" line="1129"/>
+        <location filename="../tsmuxerwindow.cpp" line="617"/>
+        <location filename="../tsmuxerwindow.cpp" line="1135"/>
         <source>Unsupported format</source>
         <translation>不支持的格式</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="610"/>
+        <location filename="../tsmuxerwindow.cpp" line="618"/>
         <source>Can&apos;t detect stream type. File name: &quot;%1&quot;</source>
         <translation>无法检测流类型。 文件名： &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="905"/>
+        <location filename="../tsmuxerwindow.cpp" line="911"/>
         <source>Add media files</source>
         <translation>添加媒体文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="920"/>
+        <location filename="../tsmuxerwindow.cpp" line="926"/>
         <source>File already exists</source>
         <translation>文件已存在</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="921"/>
+        <location filename="../tsmuxerwindow.cpp" line="927"/>
         <source>File &quot;%1&quot; already exists</source>
         <translation>文件 &quot;%1&quot; 已存在</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="998"/>
+        <location filename="../tsmuxerwindow.cpp" line="1004"/>
         <source>Downconvert DTS-HD to DTS</source>
         <translation>降频转换DTS-HD为DTS</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1000"/>
+        <location filename="../tsmuxerwindow.cpp" line="1006"/>
         <source>Downconvert TRUE-HD to AC3</source>
         <translation>降频转换TRUE-HD为AC3</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1002"/>
+        <location filename="../tsmuxerwindow.cpp" line="1008"/>
         <source>Downconvert E-AC3 to AC3</source>
         <translation>降频转换E-AC3为AC3</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1135"/>
+        <location filename="../tsmuxerwindow.cpp" line="1141"/>
         <source>Unsupported format or all tracks are not recognized. File name: &quot;%1&quot;</source>
         <translation>不支持的格式或无法识别所有轨道。文件名： &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1145"/>
+        <location filename="../tsmuxerwindow.cpp" line="1151"/>
         <source>Track %1 was not recognized and ignored. File name: &quot;%2&quot;</source>
         <translation>轨道 %1 无法识别和忽略。文件名： &quot;%2&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1387"/>
+        <location filename="../tsmuxerwindow.cpp" line="1393"/>
         <source>Mux</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1406"/>
+        <location filename="../tsmuxerwindow.cpp" line="1412"/>
         <source>tsMuxeR error</source>
         <translation>tsMuxeR 错误</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1410"/>
+        <location filename="../tsmuxerwindow.cpp" line="1416"/>
         <source>tsMuxeR not found!</source>
         <translation>tsMuxeR 未找到！</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="1428"/>
+        <location filename="../tsmuxerwindow.cpp" line="1434"/>
         <source>Can&apos;t execute tsMuxeR!</source>
         <translation>无法执行tsMuxeR！</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2194"/>
-        <location filename="../tsmuxerwindow.cpp" line="2195"/>
+        <location filename="../tsmuxerwindow.cpp" line="2142"/>
+        <location filename="../tsmuxerwindow.cpp" line="2143"/>
         <source>No track selected</source>
         <translation>未选定轨道</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2201"/>
+        <location filename="../tsmuxerwindow.cpp" line="2149"/>
         <source>Append media files</source>
         <translation>附加媒体文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2217"/>
+        <location filename="../tsmuxerwindow.cpp" line="2165"/>
         <source>Invalid file extension</source>
         <translation>无效的文件扩展名</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2218"/>
+        <location filename="../tsmuxerwindow.cpp" line="2166"/>
         <source>Appended file must have same file extension.</source>
         <translation>附加文件必须具有相同的文件扩展名。</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2316"/>
+        <location filename="../tsmuxerwindow.cpp" line="2264"/>
         <source>Sta&amp;rt demuxing</source>
         <translation>开始demuxing</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2330"/>
+        <location filename="../tsmuxerwindow.cpp" line="2278"/>
         <source>Folder</source>
         <translation>文件夹</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2420"/>
+        <location filename="../tsmuxerwindow.cpp" line="2364"/>
         <source>Select file for muxing</source>
         <translation>选择要muxing的文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2442"/>
-        <location filename="../tsmuxerwindow.cpp" line="2458"/>
+        <location filename="../tsmuxerwindow.cpp" line="2386"/>
+        <location filename="../tsmuxerwindow.cpp" line="2402"/>
         <source>Invalid file name</source>
         <translation>无效的文件名</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2443"/>
+        <location filename="../tsmuxerwindow.cpp" line="2387"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.m2ts&quot;</source>
         <translation>输出文件 &quot;%1&quot; 具有无效的扩展名。 请将文件扩展名更改为 &quot;.m2ts&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2459"/>
+        <location filename="../tsmuxerwindow.cpp" line="2403"/>
         <source>The output file &quot;%1&quot; has invalid extension. Please, change file extension to &quot;.iso&quot;</source>
         <translation>输出文件 &quot;%1&quot; 具有无效的扩展名。 请将文件扩展名更改为 &quot;.iso&quot;</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2473"/>
+        <location filename="../tsmuxerwindow.cpp" line="2417"/>
         <source>file</source>
         <extracomment>Used in expressions &quot;Overwrite existing %1&quot; and &quot;The output %1 already exists&quot;.</extracomment>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2473"/>
+        <location filename="../tsmuxerwindow.cpp" line="2417"/>
         <source>directory</source>
         <translation>目录</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2475"/>
+        <location filename="../tsmuxerwindow.cpp" line="2419"/>
         <source>Overwrite existing %1?</source>
         <translation>覆盖现有的 %1？</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2476"/>
+        <location filename="../tsmuxerwindow.cpp" line="2420"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
         <translation>输出 %1 &quot;%2&quot; 已存在。要覆盖它吗？</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2493"/>
+        <location filename="../tsmuxerwindow.cpp" line="2437"/>
         <source>Muxing in progress</source>
         <translation>Muxing正在进行中</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2493"/>
+        <location filename="../tsmuxerwindow.cpp" line="2437"/>
         <source>Demuxing in progress</source>
         <translation>Demuxing正在进行中</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2507"/>
+        <location filename="../tsmuxerwindow.cpp" line="2451"/>
         <source>tsMuxeR project file (*.meta);;All files (*.*)</source>
         <translation>tsMuxeR 项目文件 (*.meta);;所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2522"/>
+        <location filename="../tsmuxerwindow.cpp" line="2466"/>
         <source>Can&apos;t create temporary meta file</source>
         <translation>无法创建临时项目文件</translation>
     </message>
     <message>
-        <location filename="../tsmuxerwindow.cpp" line="2523"/>
+        <location filename="../tsmuxerwindow.cpp" line="2467"/>
         <source>Can&apos;t create temporary meta file &quot;%1&quot;</source>
         <translation>无法创建临时项目文件 &quot;%1&quot;</translation>
     </message>

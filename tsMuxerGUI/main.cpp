@@ -6,6 +6,8 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    app.setOrganizationName("Network Optix");
+    app.setApplicationName("tsMuxeR");
     TsMuxerWindow win;
     win.show();
     QList<QUrl> files;

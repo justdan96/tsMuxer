@@ -1952,7 +1952,7 @@
            <item>
             <layout class="QGridLayout" name="gridLayout_7">
              <item row="1" column="0">
-              <widget class="QTableWidget" name="listViewFont">
+              <widget class="QTableView" name="fontSettingsTableView">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -1974,76 +1974,6 @@
                <attribute name="verticalHeaderVisible">
                 <bool>false</bool>
                </attribute>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <column>
-                <property name="text">
-                 <string>New Column</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>New Column</string>
-                </property>
-               </column>
-               <item row="0" column="0">
-                <property name="text">
-                 <string>Name:</string>
-                </property>
-               </item>
-               <item row="0" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="1" column="0">
-                <property name="text">
-                 <string>Size:</string>
-                </property>
-               </item>
-               <item row="1" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="2" column="0">
-                <property name="text">
-                 <string>Color:</string>
-                </property>
-               </item>
-               <item row="2" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="3" column="0">
-                <property name="text">
-                 <string>Options:</string>
-                </property>
-               </item>
-               <item row="3" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
               </widget>
              </item>
              <item row="1" column="1">
@@ -2978,7 +2908,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>editSplitSize</tabstop>
   <tabstop>comboBoxMeasure</tabstop>
   <tabstop>checkBoxCut</tabstop>
-  <tabstop>listViewFont</tabstop>
+  <tabstop>fontSettingsTableView</tabstop>
   <tabstop>fontButton</tabstop>
   <tabstop>colorButton</tabstop>
   <tabstop>spinEditBorder</tabstop>
