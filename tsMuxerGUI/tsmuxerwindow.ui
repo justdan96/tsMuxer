@@ -31,7 +31,7 @@
      </property>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="GeneralTab">
        <property name="enabled">
@@ -629,7 +629,16 @@
             <string>General track options</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
              <number>5</number>
             </property>
             <item>
@@ -767,7 +776,16 @@
             <string>Demux options</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_5">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
              <number>5</number>
             </property>
             <item>
@@ -827,7 +845,16 @@
              <string>Bitrate</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_17">
-             <property name="margin">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
+             <property name="topMargin">
+              <number>5</number>
+             </property>
+             <property name="rightMargin">
+              <number>5</number>
+             </property>
+             <property name="bottomMargin">
               <number>5</number>
              </property>
              <item>
@@ -1167,7 +1194,16 @@
            <string>Chapters</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_11">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
             <number>5</number>
            </property>
            <item>
@@ -1314,14 +1350,14 @@
             </layout>
            </item>
            <item>
-             <widget class="QCheckBox" name="checkBoxV3">
-               <property name="text">
-                 <string>Force BD-ROM V3 format</string>
-               </property>
-               <property name="checked">
-                 <bool>false</bool>
-               </property>
-             </widget>
+            <widget class="QCheckBox" name="checkBoxV3">
+             <property name="text">
+              <string>Force BD-ROM V3 format</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QGridLayout" name="gridLayout_10">
@@ -1660,7 +1696,16 @@
         <string>Split &amp;&amp; cut</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_8">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
          <number>5</number>
         </property>
         <item>
@@ -1675,7 +1720,16 @@
            <string>Splitting</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_21">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
             <number>5</number>
            </property>
            <item>
@@ -1819,7 +1873,16 @@
            <string>Cutting</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_23">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
             <number>5</number>
            </property>
            <item>
@@ -1931,7 +1994,16 @@
         <string>Subtitles</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_9">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
          <number>5</number>
         </property>
         <item>
@@ -1946,106 +2018,20 @@
            <string> Default text based subtitles font: </string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_25">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
             <number>5</number>
            </property>
            <item>
             <layout class="QGridLayout" name="gridLayout_7">
-             <item row="1" column="0">
-              <widget class="QTableWidget" name="listViewFont">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>84</height>
-                </size>
-               </property>
-               <attribute name="horizontalHeaderVisible">
-                <bool>false</bool>
-               </attribute>
-               <attribute name="horizontalHeaderStretchLastSection">
-                <bool>true</bool>
-               </attribute>
-               <attribute name="verticalHeaderVisible">
-                <bool>false</bool>
-               </attribute>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <row>
-                <property name="text">
-                 <string>New Row</string>
-                </property>
-               </row>
-               <column>
-                <property name="text">
-                 <string>New Column</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>New Column</string>
-                </property>
-               </column>
-               <item row="0" column="0">
-                <property name="text">
-                 <string>Name:</string>
-                </property>
-               </item>
-               <item row="0" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="1" column="0">
-                <property name="text">
-                 <string>Size:</string>
-                </property>
-               </item>
-               <item row="1" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="2" column="0">
-                <property name="text">
-                 <string>Color:</string>
-                </property>
-               </item>
-               <item row="2" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-               <item row="3" column="0">
-                <property name="text">
-                 <string>Options:</string>
-                </property>
-               </item>
-               <item row="3" column="1">
-                <property name="text">
-                 <string/>
-                </property>
-               </item>
-              </widget>
-             </item>
              <item row="1" column="1">
               <layout class="QVBoxLayout" name="verticalLayout_16">
                <item>
@@ -2177,6 +2163,37 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item row="1" column="0">
+              <widget class="QTableView" name="fontSettingsTableView">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>84</height>
+                </size>
+               </property>
+               <attribute name="horizontalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="horizontalHeaderDefaultSectionSize">
+                <number>26</number>
+               </attribute>
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <attribute name="verticalHeaderCascadingSectionResizes">
+                <bool>true</bool>
+               </attribute>
+               <attribute name="verticalHeaderDefaultSectionSize">
+                <number>19</number>
+               </attribute>
+              </widget>
              </item>
             </layout>
            </item>
@@ -2576,7 +2593,16 @@
         <string>About</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>5</number>
+        </property>
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="rightMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
          <number>5</number>
         </property>
         <item>
@@ -2613,7 +2639,16 @@ p, li { white-space: pre-wrap; }
        <property name="spacing">
         <number>4</number>
        </property>
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -2978,7 +3013,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>editSplitSize</tabstop>
   <tabstop>comboBoxMeasure</tabstop>
   <tabstop>checkBoxCut</tabstop>
-  <tabstop>listViewFont</tabstop>
+  <tabstop>fontSettingsTableView</tabstop>
   <tabstop>fontButton</tabstop>
   <tabstop>colorButton</tabstop>
   <tabstop>spinEditBorder</tabstop>

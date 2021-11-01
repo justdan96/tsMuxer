@@ -24,6 +24,7 @@ set(tsmuxer_gui_sources
   muxForm.ui
   checkboxedheaderview.cpp
   images.qrc
+  fontsettingstablemodel.cpp
   ${QM_FILES}
   ${CMAKE_CURRENT_BINARY_DIR}/${lang_qrc}
 )

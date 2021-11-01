@@ -9,6 +9,7 @@
 #include <QWidget>
 
 #include "codecinfo.h"
+#include "fontsettingstablemodel.h"
 
 class QFileDialog;
 class QTableWidgetItem;
@@ -91,7 +92,6 @@ class TsMuxerWindow : public QWidget
     void updateMuxTime1();
     void updateMuxTime2();
     void onLanguageComboBoxIndexChanged(int);
-    void provideDefaultFontSettings();
     template <typename OnCodecListReadyFn, typename PostActionSignal, typename PostActionFn>
     void processAddFileList(OnCodecListReadyFn onCodecListReady, PostActionSignal postActionSignal,
                             PostActionFn postActionFn);
@@ -197,6 +197,8 @@ class TsMuxerWindow : public QWidget
     QSoundEffect sound;
     void myPlaySound(const QString& fileName);
     bool isVideoCropped();
+    
+    FontSettingsTableModel fontSettingsModel;
 };
 
 Q_DECLARE_METATYPE(ChapterList);
