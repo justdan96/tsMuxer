@@ -2,6 +2,7 @@
 
 #include <QBrush>
 #include <QColor>
+#include <QSettings>
 
 namespace
 {
@@ -34,8 +35,56 @@ QString fontOptions(const QFont &font)
     return optStr;
 }
 
+void stringToFontOptions(const QString &serialized, QFont &font)
+{
+    font.setItalic(serialized.contains("Italic"));
+    font.setBold(serialized.contains("Bold"));
+    font.setUnderline(serialized.contains("Underline"));
+    font.setStrikeOut(serialized.contains("Strikeout"));
+}
+
 int colorLight(QColor color) { return (0.257 * color.red()) + (0.504 * color.green()) + (0.098 * color.blue()) + 16; }
 }  // namespace
+
+FontSettingsTableModel::FontSettingsTableModel(QObject *parent) : QAbstractTableModel(parent)
+{
+    QSettings settings;
+    settings.beginGroup("subtitles");
+
+    // keep backward compatibility with versions < 2.6.15 which contain "famaly" key
+    if (settings.contains("famaly"))
+    {
+        settings.setValue("family", settings.value("famaly"));
+        settings.remove("famaly");
+    }
+    QString fontName = settings.value("family").toString();
+    if (!fontName.isEmpty())
+        m_font.setFamily(fontName);
+
+    int fontSize = settings.value("size").toInt();
+    if (fontSize > 0)
+        m_font.setPointSize(fontSize);
+
+    if (!settings.value("color").isNull())
+    {
+        m_color = settings.value("color").toUInt();
+    }
+
+    stringToFontOptions(settings.value("options").toString(), m_font);
+
+    settings.endGroup();
+}
+
+FontSettingsTableModel::~FontSettingsTableModel()
+{
+    QSettings settings;
+    settings.beginGroup("subtitles");
+    settings.setValue("family", m_font.family());
+    settings.setValue("size", m_font.pointSize());
+    settings.setValue("color", m_color);
+    settings.setValue("options", fontOptions(m_font));
+    settings.endGroup();
+}
 
 int FontSettingsTableModel::rowCount(const QModelIndex &) const { return NUM_ROWS; }
 

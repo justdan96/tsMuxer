@@ -296,7 +296,7 @@ TsMuxerWindow::TsMuxerWindow()
     QString path = QFileInfo(QApplication::arguments()[0]).absolutePath();
     QString iniName = QDir::toNativeSeparators(path) + QDir::separator() + QString("tsMuxerGUI.ini");
 
-    settings = new QSettings(QSettings::UserScope, "Network Optix", "tsMuxeR");
+    settings = new QSettings();
     readSettings();
 
     if (QFile::exists(iniName))
@@ -2658,12 +2658,6 @@ void TsMuxerWindow::writeSettings()
     settings->setValue("fontLineSpacing", ui->lineSpacing->value());
     settings->setValue("offset", ui->spinEditOffset->value());
     settings->setValue("fadeTime", getRendererAnimationTime());
-#if 0
-    settings->setValue("family", ui->listViewFont->item(0, 1)->text());
-    settings->setValue("size", ui->listViewFont->item(1, 1)->text().toUInt());
-    settings->setValue("color", ui->listViewFont->item(2, 1)->text().mid(2).toUInt(0, 16));
-    settings->setValue("options", ui->listViewFont->item(3, 1)->text());
-#endif
     settings->endGroup();
 
     settings->beginGroup("pip");
@@ -2695,26 +2689,6 @@ bool TsMuxerWindow::readSettings()
     ui->lineSpacing->setValue(settings->value("fontLineSpacing").toDouble());
     setRendererAnimationTime(settings->value("fadeTime").toDouble());
     ui->spinEditOffset->setValue(settings->value("offset").toInt());
-    // keep backward compatibility with versions < 2.6.15 which contain "famaly" key
-    if (settings->contains("famaly"))
-    {
-        settings->setValue("family", settings->value("famaly"));
-        settings->remove("famaly");
-    }
-    QString fontName = settings->value("family").toString();
-#if 0
-    if (!fontName.isEmpty())
-        ui->listViewFont->item(0, 1)->setText(fontName);
-    int fontSize = settings->value("size").toInt();
-    if (fontSize > 0)
-        ui->listViewFont->item(1, 1)->setText(QString::number(fontSize));
-    if (!settings->value("color").isNull())
-    {
-        quint32 color = settings->value("color").toUInt();
-        setTextItemColor(QString::number(color, 16));
-    }
-    ui->listViewFont->item(3, 1)->setText(settings->value("options").toString());
-#endif
     settings->endGroup();
 
     settings->beginGroup("pip");
