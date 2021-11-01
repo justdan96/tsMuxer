@@ -7,11 +7,12 @@
 TEMPLATE = app
 TARGET = tsMuxerGUI
 QT = core gui widgets multimedia
-CONFIG += c++14 strict_c++ lrelease embed_translations
+CONFIG += c++17 strict_c++ lrelease embed_translations
 
 HEADERS += tsmuxerwindow.h lang_codes.h muxForm.h checkboxedheaderview.h \
-           codecinfo.h
-SOURCES += main.cpp tsmuxerwindow.cpp muxForm.cpp checkboxedheaderview.cpp
+           codecinfo.h fontsettingstablemodel.h
+SOURCES += main.cpp tsmuxerwindow.cpp muxForm.cpp checkboxedheaderview.cpp \
+           fontsettingstablemodel.cpp
 FORMS += tsmuxerwindow.ui muxForm.ui
 
 RESOURCES += images.qrc

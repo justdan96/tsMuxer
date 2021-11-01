@@ -2492,6 +2492,7 @@ void TsMuxerWindow::changeEvent(QEvent *event)
     if (event->type() == QEvent::LanguageChange)
     {
         ui->retranslateUi(this);
+        fontSettingsModel->onLanguageChanged();
     }
     QWidget::changeEvent(event);
 }

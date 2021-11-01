@@ -6,6 +6,8 @@
 
 class FontSettingsTableModel : public QAbstractTableModel
 {
+    Q_OBJECT
+
    public:
     FontSettingsTableModel(QObject *parent = nullptr);
     ~FontSettingsTableModel() override;
@@ -18,6 +20,8 @@ class FontSettingsTableModel : public QAbstractTableModel
     const QFont &font() const { return m_font; }
     void setFont(const QFont &font);
     void setColor(quint32 color);
+
+    void onLanguageChanged();
 
    private:
     QFont m_font = QFont{"Arial", 65};

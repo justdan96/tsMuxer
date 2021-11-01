@@ -135,7 +135,8 @@ QVariant FontSettingsTableModel::data(const QModelIndex &index, int role) const
             [this]() { return m_font.family(); }, [this]() { return m_font.pointSize(); },
             [this]() { return QString("0x%1").arg(m_color, 8, 16, QLatin1Char('0')); },
             [this]() { return fontOptions(m_font); }};
-        return providers[index.column() * NUM_ROWS + index.row()]();
+        auto idx = index.column() * NUM_ROWS + index.row();
+        return idx < static_cast<int>(providers.size()) ? providers[idx]() : QVariant();
     }
 
     default:
@@ -159,3 +160,5 @@ void FontSettingsTableModel::setColor(quint32 color)
     m_color = color;
     emit dataChanged(index(2, 1), index(2, 1));
 }
+
+void FontSettingsTableModel::onLanguageChanged() { emit dataChanged(index(0, 0), index(3, 0)); }
