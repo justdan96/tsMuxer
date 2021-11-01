@@ -127,7 +127,7 @@ QVariant FontSettingsTableModel::data(const QModelIndex &index, int role) const
 
     case Qt::DisplayRole:
     {
-        static const std::array<std::function<QVariant()>, 8> providers = {
+        const std::array<std::function<QVariant()>, 8> providers = {
             // column 0
             []() { return tr("Name:"); }, []() { return tr("Size:"); }, []() { return tr("Color:"); },
             []() { return tr("Options:"); },

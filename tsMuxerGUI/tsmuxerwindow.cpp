@@ -1673,8 +1673,10 @@ void TsMuxerWindow::setRendererAnimationTime(double value)
 QString TsMuxerWindow::getSrtParams()
 {
     auto &font = fontSettingsModel->font();
-    auto rez = QString(",font-name=\"%1\",font-size=%2,font-color=%3")
-                   .arg(font.family(), font.pointSize(), fontSettingsModel->color());
+    auto rez = QString(",font-name=\"%1\",font-size=%2,font-color=0x%3")
+                   .arg(font.family())
+                   .arg(font.pointSize())
+                   .arg(fontSettingsModel->color(), 8, 16, QLatin1Char('0'));
 
     if (ui->lineSpacing->value() != 1.0)
         rez += ",line-spacing=" + QString::number(ui->lineSpacing->value());
