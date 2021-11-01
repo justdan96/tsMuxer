@@ -197,8 +197,8 @@ class TsMuxerWindow : public QWidget
     QSoundEffect sound;
     void myPlaySound(const QString& fileName);
     bool isVideoCropped();
-    
-    FontSettingsTableModel *fontSettingsModel;
+
+    FontSettingsTableModel* fontSettingsModel;
 };
 
 Q_DECLARE_METATYPE(ChapterList);
