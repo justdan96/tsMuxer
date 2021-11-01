@@ -329,7 +329,7 @@ TsMuxerWindow::TsMuxerWindow()
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
     ui->trackLV->setWordWrap(false);
 
-    fontSettingsModel = new FontSettingsTableModel();
+    fontSettingsModel = new FontSettingsTableModel(this);
     ui->fontSettingsTableView->setModel(fontSettingsModel);
     ui->fontSettingsTableView->horizontalHeader()->resizeSection(0, 65);
     ui->fontSettingsTableView->horizontalHeader()->resizeSection(1, 185);
