@@ -43,7 +43,7 @@ static const uint8_t STREAM_TYPE_VIDEO_MPEG4 = 0x10;
 static const uint8_t STREAM_TYPE_VIDEO_H264 = 0x1b;
 static const uint8_t STREAM_TYPE_VIDEO_MVC = 0x20;
 static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
-static const uint8_t STREAM_TYPE_VIDEO_H266 = 0x32;
+static const uint8_t STREAM_TYPE_VIDEO_H266 = 0x33;
 static const uint8_t STREAM_TYPE_VIDEO_VC1 = 0xea;
 
 static const uint8_t STREAM_TYPE_AUDIO_MPEG1 = 0x03;
