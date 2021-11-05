@@ -11,7 +11,7 @@
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
-static const int VVC_DESCRIPTOR_TAG = 0x38;
+static const int VVC_DESCRIPTOR_TAG = 0x39;
 
 VVCStreamReader::VVCStreamReader()
     : MPEGStreamReader(),
