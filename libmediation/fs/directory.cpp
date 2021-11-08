@@ -51,8 +51,8 @@ bool fileExists(const string& fileName)
     File f;
     return f.open(fileName.c_str(), File::ofRead | File::ofOpenExisting);
 #else
-    struct stat64 buf;
-    return stat64(fileName.c_str(), &buf) == 0;
+    struct stat buf;
+    return stat(fileName.c_str(), &buf) == 0;
 #endif
 }
 
@@ -70,8 +70,8 @@ uint64_t getFileSize(const std::string& fileName)
         return 0;
     }
 #else
-    struct stat64 fileStat;
-    auto res = stat64(fileName.c_str(), &fileStat) == 0;
+    struct stat fileStat;
+    auto res = stat(fileName.c_str(), &fileStat) == 0;
     return res ? static_cast<uint64_t>(fileStat.st_size) : 0;
 #endif
 }
