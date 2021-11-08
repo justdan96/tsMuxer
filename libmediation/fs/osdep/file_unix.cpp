@@ -151,9 +151,6 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     return lseek(to_fd(m_impl), offset, sWhence);
 }
 
-bool File::truncate(uint64_t newFileSize)
-{
-    return ftruncate(to_fd(m_impl), newFileSize) == 0;
-}
+bool File::truncate(uint64_t newFileSize) { return ftruncate(to_fd(m_impl), newFileSize) == 0; }
 
 void File::sync() { ::sync(); }
