@@ -16,10 +16,6 @@
 #include "../directory.h"
 #include "../file.h"
 
-#if defined(__APPLE__) && defined(__MACH__)
-#define O_LARGEFILE 0
-#endif
-
 namespace
 {
 int to_fd(void* impl) { return static_cast<int>(reinterpret_cast<std::intptr_t>(impl)); }
@@ -59,7 +55,7 @@ File::File() : m_impl(from_fd(-1)), m_pos(0) {}
 File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFlags) : m_name(fName), m_pos(0)
 {
     int sysFlags = makeUnixOpenFlags(oflag);
-    auto fd = ::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+    auto fd = ::open(fName, sysFlags | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     if (fd == -1)
     {
         std::ostringstream ss;
@@ -84,7 +80,7 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
 
     int sysFlags = makeUnixOpenFlags(oflag);
     createDir(extractFileDir(fName), true);
-    auto fd = ::open(fName, sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+    auto fd = ::open(fName, sysFlags | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     m_impl = from_fd(fd);
     return fd != -1;
 }
@@ -122,9 +118,9 @@ bool File::size(uint64_t* const fileSize) const
 {
     bool res = false;
 
-    struct stat64 buf;
+    struct stat buf;
 
-    if (isOpen() && (fstat64(to_fd(m_impl), &buf) == 0))
+    if (isOpen() && (fstat(to_fd(m_impl), &buf) == 0))
     {
         *fileSize = buf.st_size;
         res = true;
@@ -152,20 +148,9 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
         break;
     }
     m_pos = offset;
-#if defined(__APPLE__) && defined(__MACH__)
     return lseek(to_fd(m_impl), offset, sWhence);
-#else
-    return lseek64(to_fd(m_impl), offset, sWhence);
-#endif
 }
 
-bool File::truncate(uint64_t newFileSize)
-{
-#if defined(__APPLE__) && defined(__MACH__)
-    return ftruncate(to_fd(m_impl), newFileSize) == 0;
-#else
-    return ftruncate64(to_fd(m_impl), newFileSize) == 0;
-#endif
-}
+bool File::truncate(uint64_t newFileSize) { return ftruncate(to_fd(m_impl), newFileSize) == 0; }
 
 void File::sync() { ::sync(); }

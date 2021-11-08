@@ -11,6 +11,7 @@ IF(WIN32)
     target_compile_definitions(mediation PRIVATE "-DUNICODE")
     target_sources(mediation PRIVATE fs/osdep/file_win32.cpp)
 ELSE()
+    target_compile_definitions(mediation PRIVATE "-D_FILE_OFFSET_BITS=64")
     target_sources(mediation PRIVATE fs/osdep/file_unix.cpp)
 ENDIF()
 
