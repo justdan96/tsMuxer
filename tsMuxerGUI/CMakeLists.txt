@@ -15,8 +15,8 @@ set_property(CACHE QT_VERSION PROPERTY STRINGS 5 6)
 set(qt_ver_pfx "Qt${QT_VERSION}")
 
 find_package(${qt_ver_pfx}
-    REQUIRED COMPONENTS Widgets LinguistTools
-    OPTIONAL_COMPONENTS Multimedia)
+  REQUIRED COMPONENTS Widgets LinguistTools
+  OPTIONAL_COMPONENTS Multimedia)
 set(tsmuxer_gui_libs ${qt_ver_pfx}::Widgets)
 
 if(${${qt_ver_pfx}Multimedia_FOUND})
@@ -75,7 +75,7 @@ if(NOT MSVC)
   install(FILES tsMuxerGUI.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
   install(FILES images/icon.png
           DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps/
-		  RENAME tsMuxerGUI.png)
+          RENAME tsMuxerGUI.png)
 endif(NOT MSVC)
 
 if (WIN32)
