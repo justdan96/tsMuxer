@@ -11,7 +11,7 @@ on:
     - 'tsMuxerGUI/**'
 
 jobs:
-  build-mac-native:
+  build-qt6-test:
 
     runs-on: ubuntu-latest
     

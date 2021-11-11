@@ -14,7 +14,6 @@
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTime>
-
 #include <unordered_set>
 #include <vector>
 
