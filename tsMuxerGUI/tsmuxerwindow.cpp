@@ -11,15 +11,23 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QSettings>
-#include <QSound>
+#include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTime>
+
+#include <unordered_set>
+#include <vector>
 
 #include "checkboxedheaderview.h"
 #include "codecinfo.h"
 #include "fontsettingstablemodel.h"
 #include "lang_codes.h"
 #include "muxForm.h"
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+#define setTabStopDistance setTabStopWidth
+#endif
+
 #include "ui_tsmuxerwindow.h"
 
 namespace
@@ -304,7 +312,9 @@ TsMuxerWindow::TsMuxerWindow()
     {
         delete settings;
         settings = new QSettings(iniName, QSettings::IniFormat);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
         settings->setIniCodec("UTF-8");
+#endif
         if (!readSettings())
             writeSettings();  // copy current registry settings to the ini file
     }
@@ -432,7 +442,7 @@ TsMuxerWindow::TsMuxerWindow()
     connect(&proc, &QProcess::readyReadStandardError, this, &TsMuxerWindow::readFromStderr);
     void (QProcess::*processFinished)(int, QProcess::ExitStatus) = &QProcess::finished;
     connect(&proc, processFinished, this, &TsMuxerWindow::onProcessFinished);
-    void (QProcess::*processError)(QProcess::ProcessError) = &QProcess::error;
+    void (QProcess::*processError)(QProcess::ProcessError) = &QProcess::errorOccurred;
     connect(&proc, processError, this, &TsMuxerWindow::onProcessError);
 
     ui->DiskLabel->setVisible(false);
@@ -698,7 +708,7 @@ void TsMuxerWindow::updateCurrentColor(int dr, int dg, int db, int row)
     for (int i = 0; i < 5; ++i)
     {
         QModelIndex index = ui->trackLV->model()->index(row, i);
-        ui->trackLV->model()->setData(index, QBrush(color), Qt::BackgroundColorRole);
+        ui->trackLV->model()->setData(index, QBrush(color), Qt::BackgroundRole);
     }
 }
 
@@ -1241,9 +1251,7 @@ void TsMuxerWindow::continueAddFile()
     if (!mplsFileList.empty())
         fileItem->setData(MplsItemRole, MPLS_PRIMARY);
     fileItem->setData(FileNameRole, newFileName);
-    QVariant v;
-    v.setValue<ChapterList>(chapters);
-    fileItem->setData(ChaptersRole, v);
+    fileItem->setData(ChaptersRole, QVariant::fromValue(chapters));
     fileItem->setData(FileDurationRole, fileDuration);
     chapters.clear();
     fileDuration = 0.0;
@@ -1273,7 +1281,7 @@ void TsMuxerWindow::continueAddFile()
 
 void TsMuxerWindow::updateCustomChapters()
 {
-    QSet<qint64> chaptersSet;
+    std::unordered_set<qint64> chaptersSet;
     double prevDuration = 0.0;
     double offset = 0.0;
     for (int i = 0; i < ui->inputFilesLV->count(); ++i)
@@ -1288,12 +1296,12 @@ void TsMuxerWindow::updateCustomChapters()
 
         ChapterList chapters = item->data(ChaptersRole).value<ChapterList>();
         foreach (double chapter, chapters)
-            chaptersSet << qint64((chapter + offset) * 1000000);
+            chaptersSet.insert(qint64((chapter + offset) * 1000000));
         prevDuration = item->data(FileDurationRole).toDouble();
     }
 
     ui->memoChapters->clear();
-    QList<qint64> mergedChapterList = chaptersSet.toList();
+    std::vector<qint64> mergedChapterList(std::begin(chaptersSet), std::end(chaptersSet));
     std::sort(std::begin(mergedChapterList), std::end(mergedChapterList));
     for (auto chapter : mergedChapterList)
         ui->memoChapters->insertPlainText(floatToTime(chapter / 1000000.0) + QString('\n'));
@@ -1482,9 +1490,7 @@ void TsMuxerWindow::doAppendInt(const QString &fileName, const QString &parentFi
     item->setData(FileNameRole, fileName);
     if (duration > 0)
         item->setData(FileDurationRole, duration);
-    QVariant v;
-    v.setValue<ChapterList>(chapters);
-    item->setData(ChaptersRole, v);
+    item->setData(ChaptersRole, QVariant::fromValue(chapters));
 
     ui->inputFilesLV->setCurrentItem(item);
 
