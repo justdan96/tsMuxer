@@ -14,8 +14,6 @@
 #include <QStandardPaths>
 #include <QTemporaryFile>
 #include <QTime>
-#include <unordered_set>
-#include <vector>
 
 #include "checkboxedheaderview.h"
 #include "codecinfo.h"
@@ -1280,7 +1278,7 @@ void TsMuxerWindow::continueAddFile()
 
 void TsMuxerWindow::updateCustomChapters()
 {
-    std::unordered_set<qint64> chaptersSet;
+    QSet<qint64> chaptersSet;
     double prevDuration = 0.0;
     double offset = 0.0;
     for (int i = 0; i < ui->inputFilesLV->count(); ++i)
@@ -1295,12 +1293,12 @@ void TsMuxerWindow::updateCustomChapters()
 
         ChapterList chapters = item->data(ChaptersRole).value<ChapterList>();
         foreach (double chapter, chapters)
-            chaptersSet.insert(qint64((chapter + offset) * 1000000));
+            chaptersSet << qint64((chapter + offset) * 1000000);
         prevDuration = item->data(FileDurationRole).toDouble();
     }
 
     ui->memoChapters->clear();
-    std::vector<qint64> mergedChapterList(std::begin(chaptersSet), std::end(chaptersSet));
+    QList<qint64> mergedChapterList = chaptersSet.values();
     std::sort(std::begin(mergedChapterList), std::end(mergedChapterList));
     for (auto chapter : mergedChapterList)
         ui->memoChapters->insertPlainText(floatToTime(chapter / 1000000.0) + QString('\n'));
