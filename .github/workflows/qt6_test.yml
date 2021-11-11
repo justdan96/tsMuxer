@@ -20,7 +20,7 @@ jobs:
       name: checkout
       
     - name: Install Qt
-      uses: jurplel/install-qt-action@master
+      uses: jurplel/install-qt-action@v2
       with:
         version: '6.2.0'
       
