@@ -1,11 +1,10 @@
-#define _POSIX_C_SOURCE 200809L
-
 #include "../directory.h"
 #include "../directory_priv.h"
 
 #include <dirent.h>
 #include <fnmatch.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 using namespace std;
