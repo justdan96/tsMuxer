@@ -11,5 +11,5 @@ cd ..
 rm -fR build
 mkdir build
 cd build
-cmake -DTSMUXER_GUI=TRUE -DQT_VERSION=6 -GNinja ..
-ninja tsMuxerGUI
+cmake -DTSMUXER_GUI=TRUE -DQT_VERSION=6 ..
+make -j$(nproc --all) tsMuxerGUI
