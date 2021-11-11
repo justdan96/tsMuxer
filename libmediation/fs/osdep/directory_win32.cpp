@@ -43,33 +43,24 @@ uint64_t getFileSize(const std::string& fileName)
 
 bool createDir(const std::string& dirName, bool createParentDirs)
 {
-    if (dirName.empty())
-        return false;
-
-    if (createParentDirs)
-    {
-        for (string::size_type separatorPos = dirName.find_first_not_of(getDirSeparator()), dirEnd = string::npos;
-             separatorPos != string::npos;
-             dirEnd = separatorPos, separatorPos = dirName.find_first_not_of(getDirSeparator(), separatorPos))
+    bool ok = preCreateDir(
+        [](auto&& parentDir)
         {
-            separatorPos = dirName.find(getDirSeparator(), separatorPos);
-            if (dirEnd != string::npos)
+            return parentDir.empty() || parentDir[parentDir.size() - 1] == ':' || parentDir == "\\\\." ||
+                   parentDir == "\\\\.\\" ||                                                        // UNC patch prefix
+                   (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size() - 1] == '}');  // UNC patch prefix
+        },
+        [](auto&& parentDir)
+        {
+            if (CreateDirectory(toWide(parentDir).data(), 0) == 0)
             {
-                string parentDir = dirName.substr(0, dirEnd);
-                if (parentDir.size() == 0 || parentDir[parentDir.size() - 1] == ':' || parentDir == string("\\\\.") ||
-                    parentDir == string("\\\\.\\") ||                                                // UNC patch prefix
-                    (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size() - 1] == '}'))  // UNC patch prefix
-                    continue;
-                if (CreateDirectory(toWide(parentDir).data(), 0) == 0)
-                {
-                    if (GetLastError() != ERROR_ALREADY_EXISTS)
-                        return false;
-                }
+                if (GetLastError() != ERROR_ALREADY_EXISTS)
+                    return false;
             }
-        }
-    }
-
-    return CreateDirectory(toWide(dirName).data(), 0) != 0;
+            return true;
+        },
+        getDirSeparator(), dirName, createParentDirs);
+    return ok ? CreateDirectory(toWide(dirName).data(), 0) != 0 : false;
 }
 
 bool deleteFile(const string& fileName)

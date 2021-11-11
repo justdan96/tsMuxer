@@ -45,29 +45,19 @@ uint64_t getFileSize(const std::string& fileName)
 
 bool createDir(const std::string& dirName, bool createParentDirs)
 {
-    if (dirName.empty())
-        return false;
+    auto ok = preCreateDir([](auto) { return false; },
+                           [](auto&& parentDir)
+                           {
+                               if (mkdir(parentDir.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == -1)
+                               {
+                                   if (errno != EEXIST)
+                                       return false;
+                               }
+                               return true;
+                           },
+                           getDirSeparator(), dirName, createParentDirs);
 
-    if (createParentDirs)
-    {
-        for (string::size_type separatorPos = dirName.find_first_not_of(getDirSeparator()), dirEnd = string::npos;
-             separatorPos != string::npos;
-             dirEnd = separatorPos, separatorPos = dirName.find_first_not_of(getDirSeparator(), separatorPos))
-        {
-            separatorPos = dirName.find(getDirSeparator(), separatorPos);
-            if (dirEnd != string::npos)
-            {
-                string parentDir = dirName.substr(0, dirEnd);
-                if (mkdir(parentDir.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == -1)
-                {
-                    if (errno != EEXIST)
-                        return false;
-                }
-            }
-        }
-    }
-
-    return mkdir(dirName.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == 0;
+    return ok ? mkdir(dirName.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == 0 : false;
 }
 
 bool deleteFile(const string& fileName)

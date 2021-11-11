@@ -20,4 +20,36 @@ void recurseDirectorySearch(F&& findFilesFn, D&& findDirsFn, const std::string& 
     }
 }
 
+template <typename SkipParentDirFn, typename CreateParentDirFn>
+bool preCreateDir(SkipParentDirFn&& skipParentFn, CreateParentDirFn&& createParentFn, char dirSeparator,
+                  const std::string& dirName, bool createParentDirs)
+{
+    if (dirName.empty())
+        return false;
+
+    if (createParentDirs)
+    {
+        for (auto separatorPos = dirName.find_first_not_of(dirSeparator), dirEnd = std::string::npos;
+             separatorPos != std::string::npos;
+             dirEnd = separatorPos, separatorPos = dirName.find_first_not_of(dirSeparator, separatorPos))
+        {
+            separatorPos = dirName.find(dirSeparator, separatorPos);
+            if (dirEnd != std::string::npos)
+            {
+                auto parentDir = dirName.substr(0, dirEnd);
+                if (skipParentFn(parentDir))
+                {
+                    continue;
+                }
+                if (!createParentFn(parentDir))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 #endif
