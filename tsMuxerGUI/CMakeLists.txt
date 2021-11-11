@@ -9,18 +9,40 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
-set(tsmuxer_gui_libs Qt5::Widgets)
+set(QT_VERSION 5 CACHE STRING "Qt version to use")
+set_property(CACHE QT_VERSION PROPERTY STRINGS 5 6)
 
-find_package(Qt5 COMPONENTS Multimedia)
-if(${Qt5Multimedia_FOUND})
-  list(APPEND tsmuxer_gui_libs Qt5::Multimedia)
+set(qt_ver_pfx "Qt${QT_VERSION}")
+
+find_package(${qt_ver_pfx}
+    REQUIRED COMPONENTS Widgets LinguistTools
+    OPTIONAL_COMPONENTS Multimedia)
+set(tsmuxer_gui_libs ${qt_ver_pfx}::Widgets)
+
+if(${${qt_ver_pfx}Multimedia_FOUND})
+  list(APPEND tsmuxer_gui_libs ${qt_ver_pfx}::Multimedia)
 endif()
+
+set(tsmuxer_ts_files
+  translations/tsmuxergui_en.ts
+  translations/tsmuxergui_ru.ts
+  translations/tsmuxergui_fr.ts
+  translations/tsmuxergui_zh.ts
+)
 
 set(lang_qrc "translations.qrc")
 configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
-# create_translation is not used due to QTBUG-41736
-qt5_add_translation(QM_FILES translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts translations/tsmuxergui_fr.ts translations/tsmuxergui_zh.ts)
+
+if(${QT_VERSION} EQUAL 5)
+  # create_translation is not used due to QTBUG-41736
+  qt5_add_translation(QM_FILES ${tsmuxer_ts_files})
+elseif(${QT_VERSION} EQUAL 6)
+  # should use qt6_add_translations once Qt6 is the only supported version.
+  # this will also make ${lang_qrc} and all QM_FILES shenanigans unnecessary as
+  # that command turns the compiled qrcs into resources automatically, and adds
+  # them to the target's sources so they're embedded in the final binary.
+  qt6_add_translation(QM_FILES ${tsmuxer_ts_files})
+endif()
 
 set(tsmuxer_gui_sources
   main.cpp
