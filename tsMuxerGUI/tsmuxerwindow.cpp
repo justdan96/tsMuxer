@@ -1377,8 +1377,12 @@ void TsMuxerWindow::readFromStderr()
 
 void TsMuxerWindow::myPlaySound(const QString &fileName)
 {
+#if QT_MULTIMEDIA_LIB
     sound.setSource(QUrl(QString("qrc%1").arg(fileName)));
     sound.play();
+#else
+    QApplication::beep();
+#endif
 }
 
 void TsMuxerWindow::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)

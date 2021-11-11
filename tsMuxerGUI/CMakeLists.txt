@@ -9,7 +9,13 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets Multimedia LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Widgets LinguistTools REQUIRED)
+set(tsmuxer_gui_libs Qt5::Widgets)
+
+find_package(Qt5 COMPONENTS Multimedia)
+if(${Qt5Multimedia_FOUND})
+  list(APPEND tsmuxer_gui_libs Qt5::Multimedia)
+endif()
 
 set(lang_qrc "translations.qrc")
 configure_file(${lang_qrc} ${lang_qrc} COPYONLY)
@@ -40,7 +46,7 @@ elseif(APPLE)
 endif()
 
 add_executable(tsMuxerGUI ${GUI_OPTIONS} ${tsmuxer_gui_sources})
-target_link_libraries(tsMuxerGUI Qt5::Widgets Qt5::Multimedia)
+target_link_libraries(tsMuxerGUI ${tsmuxer_gui_libs})
 
 if(NOT MSVC)
   install(TARGETS tsMuxerGUI DESTINATION ${CMAKE_INSTALL_BINDIR})
