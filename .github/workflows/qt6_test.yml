@@ -21,7 +21,8 @@ jobs:
       
     - name: Install Qt
       uses: jurplel/install-qt-action@master
-      version: 6.2.0
+      with:
+        version: '6.2.0'
       
     - run: ./.github/workflows/qt6_test.sh
       name: build-qt6-linux
