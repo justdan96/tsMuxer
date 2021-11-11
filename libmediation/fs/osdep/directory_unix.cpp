@@ -36,8 +36,7 @@ uint64_t getFileSize(const std::string& fileName)
 bool createDir(const std::string& dirName, bool createParentDirs)
 {
     auto ok = preCreateDir([](auto) { return false; },
-                           [](auto&& parentDir)
-                           {
+                           [](auto&& parentDir) {
                                if (mkdir(parentDir.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == -1)
                                {
                                    if (errno != EEXIST)

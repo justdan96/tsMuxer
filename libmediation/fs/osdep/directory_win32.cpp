@@ -41,14 +41,12 @@ uint64_t getFileSize(const std::string& fileName)
 bool createDir(const std::string& dirName, bool createParentDirs)
 {
     bool ok = preCreateDir(
-        [](auto&& parentDir)
-        {
+        [](auto&& parentDir) {
             return parentDir.empty() || parentDir[parentDir.size() - 1] == ':' || parentDir == "\\\\." ||
                    parentDir == "\\\\.\\" ||                                                        // UNC patch prefix
                    (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size() - 1] == '}');  // UNC patch prefix
         },
-        [](auto&& parentDir)
-        {
+        [](auto&& parentDir) {
             if (CreateDirectory(toWide(parentDir).data(), 0) == 0)
             {
                 if (GetLastError() != ERROR_ALREADY_EXISTS)
