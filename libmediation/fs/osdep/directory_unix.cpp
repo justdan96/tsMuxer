@@ -1,26 +1,16 @@
+#define _POSIX_C_SOURCE 200809L
 
 #include "../directory.h"
 #include "../directory_priv.h"
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <sstream>
-
 #include <dirent.h>
-#include <memory.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <fnmatch.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 using namespace std;
 
-char getDirSeparator()
-{
-    return '/';
-}
+char getDirSeparator() { return '/'; }
 
 string extractFileDir(const string& fileName)
 {
@@ -60,12 +50,7 @@ bool createDir(const std::string& dirName, bool createParentDirs)
     return ok ? mkdir(dirName.c_str(), S_IREAD | S_IWRITE | S_IEXEC) == 0 : false;
 }
 
-bool deleteFile(const string& fileName)
-{
-    return unlink(fileName.c_str()) == 0;
-}
-
-#include <fnmatch.h>
+bool deleteFile(const string& fileName) { return unlink(fileName.c_str()) == 0; }
 
 bool findFiles(const string& path, const string& fileMask, vector<string>* fileList, bool savePaths)
 {

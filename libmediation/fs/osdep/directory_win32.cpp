@@ -7,10 +7,7 @@
 
 using namespace std;
 
-char getDirSeparator()
-{
-    return '\\';
-}
+char getDirSeparator() { return '\\'; }
 
 string extractFileDir(const string& fileName)
 {
