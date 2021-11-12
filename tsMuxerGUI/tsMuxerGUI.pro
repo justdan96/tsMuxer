@@ -6,7 +6,10 @@
 
 TEMPLATE = app
 TARGET = tsMuxerGUI
-QT = core gui widgets multimedia
+QT = core gui widgets
+qtHaveModule(multimedia) {
+  QT += multimedia
+}
 CONFIG += c++17 strict_c++ lrelease embed_translations
 
 HEADERS += tsmuxerwindow.h lang_codes.h muxForm.h checkboxedheaderview.h \

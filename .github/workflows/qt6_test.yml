@@ -1,0 +1,28 @@
+name: Qt6 test build
+
+on:
+  push:
+    branches: [master]
+    paths:
+    - 'tsMuxerGUI/**'
+  pull_request:
+    branches: [master]
+    paths:
+    - 'tsMuxerGUI/**'
+
+jobs:
+  build-qt6-test:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@master
+      name: checkout
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '6.2.0'
+      
+    - run: ./.github/workflows/qt6_test.sh
+      name: build-qt6-linux
