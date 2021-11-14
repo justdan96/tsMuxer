@@ -60,6 +60,9 @@ set(tsmuxer_gui_sources
 if (WIN32)
   add_executable(tsMuxerGUI WIN32 ${tsmuxer_gui_sources} icon.rc)
 elseif (APPLE)
+  set(MACOSX_BUNDLE_ICON_FILE tsMuxerGUI.icns)
+  set_source_files_properties(tsMuxerGUI.icns PROPERTIES
+         MACOSX_PACKAGE_LOCATION "Resources")
   add_executable(tsMuxerGUI MACOSX_BUNDLE ${tsmuxer_gui_sources} tsMuxerGUI.icns)
 # UNIX must be last here, as it's going to be true for APPLE and CYGWIN as well,
 # but we want those to be handled by the code above.
