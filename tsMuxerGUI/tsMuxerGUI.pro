@@ -23,6 +23,9 @@ TRANSLATIONS = translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts trans
 win32 {
   RC_FILE += icon.rc
 }
+win32-msvc* {
+  QMAKE_CXXFLAGS += /utf-8
+}
 
 version_num = 2.6.16
 tsmuxer_release = 0

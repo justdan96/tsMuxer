@@ -23,18 +23,39 @@ else()
 endif()
 add_definitions("-DTSMUXER_VERSION=\"${TSMUXER_VERSION}\"")
 
-if(NOT MSVC)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
   include(GNUInstallDirs)
   mark_as_advanced(CLEAR
     CMAKE_INSTALL_BINDIR
-	CMAKE_INSTALL_DATADIR
+    CMAKE_INSTALL_DATADIR
   )
-else(NOT MSVC)
+else()
   set(CMAKE_INSTALL_BINDIR bin)
-endif(NOT MSVC)
+endif()
 
-add_subdirectory (libmediation)
-add_subdirectory (tsMuxer)
+if(MSVC)
+  add_compile_options("/utf-8")
+endif()
+
+if(WIN32)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
+set(TSMUXER_COVERAGE FALSE CACHE BOOL "Enable collecting coverage information")
+if(${TSMUXER_COVERAGE})
+  if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+    add_compile_options("--coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+  elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+    add_compile_options("-fprofile-instr-generate" "-fcoverage-mapping")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-instr-generate")
+  else()
+    message(FATAL_ERROR "Coverage not supported for compiler ${CMAKE_CXX_COMPILER_ID}")
+  endif()
+endif()
+
+add_subdirectory(libmediation)
+add_subdirectory(tsMuxer)
 if(TSMUXER_GUI)
-	add_subdirectory (tsMuxerGUI)
+  add_subdirectory(tsMuxerGUI)
 endif()

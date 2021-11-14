@@ -115,7 +115,6 @@ target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
 if (WIN32)
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
   target_link_libraries(tsmuxer gdiplus)
-  target_compile_definitions(tsmuxer PRIVATE "-DUNICODE")
 else()
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
   # on osxcross use the static freetype library explicitly
