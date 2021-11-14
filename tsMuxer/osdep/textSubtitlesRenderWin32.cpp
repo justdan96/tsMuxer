@@ -1,3 +1,5 @@
+#undef WIN32_LEAN_AND_MEAN  // for GDI
+
 #include "textSubtitlesRenderWin32.h"
 
 #include <gdiplus.h>

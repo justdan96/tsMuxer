@@ -38,7 +38,7 @@ if(MSVC)
 endif()
 
 if(WIN32)
-  add_definitions(-DUNICODE -D_UNICODE)
+  add_definitions(-DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN)
 endif()
 
 set(TSMUXER_COVERAGE FALSE CACHE BOOL "Enable collecting coverage information")

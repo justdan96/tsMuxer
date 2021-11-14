@@ -2,7 +2,8 @@
 #define __TEXT_SUBTITLES_RENDER_WIN_H
 
 #include "../textSubtitlesRender.h"
-#include "windows.h"
+
+#include <minwindef.h>
 
 namespace text_subtitles
 {
