@@ -7,7 +7,6 @@ export MACOSX_DEPLOYMENT_TARGET=10.15
 
 brew install pkg-config
 brew install freetype
-brew install zlib
 
 builddir=$PWD
 
