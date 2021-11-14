@@ -37,6 +37,10 @@ if(MSVC)
   add_compile_options("/utf-8")
 endif()
 
+if(WIN32)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 set(TSMUXER_COVERAGE FALSE CACHE BOOL "Enable collecting coverage information")
 if(${TSMUXER_COVERAGE})
   if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
