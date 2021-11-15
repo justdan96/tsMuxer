@@ -28,10 +28,7 @@ class TextSubtitlesRenderWin32 : public TextSubtitlesRender
     HDC m_hdcScreen;
     HDC m_dc;
     HFONT m_hfont;
-#ifndef OLD_WIN32_RENDERER
     GdiPlusPriv* m_gdiPriv;
-#else
-#endif
 };
 
 }  // namespace text_subtitles

@@ -13,7 +13,6 @@ using namespace Gdiplus;
 
 namespace text_subtitles
 {
-#ifndef OLD_WIN32_RENDERER
 class GdiPlusPriv
 {
    public:
@@ -24,15 +23,11 @@ class GdiPlusPriv
     Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
     ULONG_PTR m_gdiplusToken;
 };
-#endif
 
 TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : TextSubtitlesRender(), m_hbmp(0)
 {
     m_hfont = 0;
-#ifndef OLD_WIN32_RENDERER
     m_gdiPriv = new GdiPlusPriv();
-#endif
-
     m_pbmpInfo = 0;
     m_hdcScreen = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
     m_dc = ::CreateCompatibleDC(m_hdcScreen);
@@ -46,9 +41,7 @@ TextSubtitlesRenderWin32::~TextSubtitlesRenderWin32()
     ::DeleteDC(m_dc);
     ::DeleteDC(m_hdcScreen);
 
-#ifndef OLD_WIN32_RENDERER
     delete m_gdiPriv;
-#endif
 }
 
 void TextSubtitlesRenderWin32::setRenderSize(int width, int height)
@@ -72,39 +65,10 @@ void TextSubtitlesRenderWin32::setRenderSize(int width, int height)
     ::SetBkMode(m_dc, TRANSPARENT);
 }
 
-void TextSubtitlesRenderWin32::setFont(const Font& font)
-{
-    m_font = font;
-#ifdef OLD_WIN32_RENDERER
-    if (m_hfont)
-        ::DeleteObject(m_hfont);
-    m_hfont = CreateFont(font.m_size,                                        // height of font
-                         0,                                                  // average character width
-                         0,                                                  // angle of escapement
-                         0,                                                  // base-line orientation angle
-                         (font.m_opts & Font::BOLD) ? FW_BOLD : FW_REGULAR,  // font weight
-                         font.m_opts & Font::ITALIC,                         // italic attribute option
-                         font.m_opts & Font::UNDERLINE,                      // underline attribute option
-                         font.m_opts & Font::STRIKE_OUT,                     // strikeout attribute option
-                         font.m_charset,                                     // character set identifier
-                         OUT_DEFAULT_PRECIS,                                 // output precision
-                         CLIP_DEFAULT_PRECIS,                                // clipping precision
-                         ANTIALIASED_QUALITY,  // DEFAULT_QUALITY,          // output quality
-                         DEFAULT_PITCH,        // pitch and family
-                         font.m_name.c_str()   // typeface name
-    );
-    if (m_hfont == 0)
-        THROW(ERR_COMMON, "Can't create font " << font.m_name.c_str());
-    ::SelectObject(m_dc, m_hfont);
-    ::SetTextColor(m_dc, font.m_color);
-#endif
-}
+void TextSubtitlesRenderWin32::setFont(const Font& font) { m_font = font; }
 
 void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 {
-#ifdef OLD_WIN32_RENDERER
-    ::DrawText(m_dc, text.c_str(), text.length(), rect, DT_NOPREFIX);
-#else
     Graphics graphics(m_dc);
     graphics.SetSmoothingMode(SmoothingModeHighQuality);
     graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
@@ -129,14 +93,10 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 
     SolidBrush brush(Color(m_font.m_color));
     graphics.FillPath(&brush, &path);
-#endif
 }
 
 void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 {
-#ifdef OLD_WIN32_RENDERER
-    ::GetTextExtentPoint32(m_dc, text.c_str(), text.size(), mSize);
-#else
     int opts = m_font.m_opts & 0xf;
     FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
@@ -155,16 +115,10 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     path.GetBounds(&rect, 0, &pen);
     mSize->cx = rect.Width;
     mSize->cy = lineSpacingPixel;
-#endif
 }
 
 int TextSubtitlesRenderWin32::getLineSpacing()
 {
-#ifdef OLD_WIN32_RENDERER
-    TEXTMETRIC tm;
-    ::GetTextMetrics(m_dc, &tm);
-    return tm.tmAscent;
-#else
     int opts = m_font.m_opts & 0xf;
     FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
@@ -176,16 +130,10 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     // int ascent = fontFamily.GetCellAscent(opts);
     // int ascentPixel = font.GetSize() * ascent / fontFamily.GetEmHeight(opts);
     // return ascentPixel;
-#endif
 }
 
 int TextSubtitlesRenderWin32::getBaseline()
 {
-#ifdef OLD_WIN32_RENDERER
-    TEXTMETRIC tm;
-    ::GetTextMetrics(m_dc, &tm);
-    return tm.tmAscent;
-#else
     int opts = m_font.m_opts & 0xf;
     FontFamily fontFamily(toWide(m_font.m_name).data());
     ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
@@ -197,7 +145,6 @@ int TextSubtitlesRenderWin32::getBaseline()
     // int ascent = fontFamily.GetCellAscent(opts);
     // int ascentPixel = font.GetSize() * ascent / fontFamily.GetEmHeight(opts);
     // return ascentPixel;
-#endif
 }
 
 void TextSubtitlesRenderWin32::flushRasterBuffer() { GdiFlush(); }
