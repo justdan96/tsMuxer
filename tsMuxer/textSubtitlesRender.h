@@ -65,7 +65,6 @@ struct Font
     const static int UNDERLINE = 4;
     const static int STRIKE_OUT = 8;
     const static int FORCED = 16;
-    Font() : m_size(18), m_opts(0), m_borderWidth(0), m_charset(0), m_color(0x00ffffff), m_lineSpacing(1.0) {}
     bool operator!=(const Font& other) const
     {
         return m_name != other.m_name || m_size != other.m_size || m_opts != other.m_opts ||
@@ -74,12 +73,12 @@ struct Font
     }
 
     std::string m_name;
-    int m_size;
-    int m_opts;
-    int m_borderWidth;
-    uint32_t m_charset;
-    uint32_t m_color;
-    float m_lineSpacing;
+    int m_size = 18;
+    int m_opts = 0;
+    int m_borderWidth = 0;
+    uint32_t m_charset = 0;
+    uint32_t m_color = 0x00ffffff;
+    float m_lineSpacing = 1.0f;
 };
 
 class TextSubtitlesRender
