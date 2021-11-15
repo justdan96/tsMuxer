@@ -189,15 +189,6 @@ RGBQUAD TextToPGSConverter::YUVAToRGBA(const YUVQuad& yuv)
     return rez;
 }
 
-void TextToPGSConverter::reduceColors(uint8_t mask)
-{
-    mask = ~mask;
-    uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
-    uint32_t* dst = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
-    uint32_t* end = dst + m_videoWidth * m_videoHeight;
-    for (; dst < end; ++dst) *dst &= val;
-}
-
 bool TextToPGSConverter::rlePack(uint32_t colorMask)
 {
     try
