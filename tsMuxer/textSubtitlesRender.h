@@ -104,7 +104,6 @@ class TextSubtitlesRender
     virtual int getBaseline() = 0;
     virtual void drawText(const std::string& text, RECT* rect) = 0;
     virtual void flushRasterBuffer() = 0;
-    static void addBorder(int borderWidth, uint8_t* data, int width, int height);
 
     int m_width;
     int m_height;
@@ -113,11 +112,11 @@ class TextSubtitlesRender
    protected:
     Font m_font;
     int m_borderWidth;
-    std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack);
-    int browserSizeToRealSize(int bSize, double rSize);
 
    private:
     Font m_initFont;
+    int browserSizeToRealSize(int bSize, double rSize);
+    std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack);
 };
 }  // namespace text_subtitles
 #endif

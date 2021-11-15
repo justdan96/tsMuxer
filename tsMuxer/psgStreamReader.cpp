@@ -21,6 +21,65 @@ using namespace std;
 double pgs_frame_rates[16] = {
     0, 23.97602397602397, 24, 25, 29.97002997002997, 30, 50, 59.94005994005994, 60, 0, 0, 0, 0, 0, 0, 0};
 
+namespace {
+const static uint32_t BORDER_COLOR = 0xff020202;
+const static uint32_t BORDER_COLOR_TMP = RGB(0x1, 0x1, 0x1);
+
+inline void setBPoint(uint32_t* addr)
+{
+    if (*addr == 0)
+        *addr = BORDER_COLOR_TMP;
+}
+
+void addBorder(int borderWidth, uint8_t* data, int width, int height)
+{
+    // add black border
+    for (int i = 0; i < borderWidth; ++i)
+    {
+        uint32_t* dst = (uint32_t*)data;
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                if (*dst != 0 && *dst != BORDER_COLOR_TMP)
+                {
+                    if (x > 0)
+                    {
+                        setBPoint(dst - 1);
+                        if (y > 0)
+                            setBPoint(dst - 1 - width);
+                        if (y < height - 1)
+                            setBPoint(dst - 1 + width);
+                    }
+                    if (y > 0)
+                        setBPoint(dst - width);
+                    if (y < height - 1)
+                        setBPoint(dst + width);
+                    if (x < width - 1)
+                    {
+                        setBPoint(dst + 1);
+                        if (y > 0)
+                            setBPoint(dst + 1 - width);
+                        if (y < height - 1)
+                            setBPoint(dst + 1 + width);
+                    }
+                }
+                dst++;
+            }
+        }
+        dst = (uint32_t*)data;
+        for (int y = 0; y < height; ++y)
+            for (int x = 0; x < width; ++x)
+            {
+                if (*dst == BORDER_COLOR_TMP)
+                    *dst = BORDER_COLOR;
+                dst++;
+            }
+    }
+    return;
+}
+}
+
 PGSStreamReader::PGSStreamReader()
 {
     m_curPos = m_buffer = 0;
@@ -262,7 +321,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
 
         rescaleRGB(&bmpDest, &bmpRef);
         if (m_fontBorder)
-            TextSubtitlesRender::addBorder(m_fontBorder, m_scaledRgbBuffer, m_scaled_width, m_scaled_height);
+            addBorder(m_fontBorder, m_scaledRgbBuffer, m_scaled_width, m_scaled_height);
         // memcpy(bmpDest.buffer, bmpRef.buffer, bmpDest.Width * bmpDest.Height * 4);
     }
     return 0;
