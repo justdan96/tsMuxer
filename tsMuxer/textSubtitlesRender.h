@@ -16,6 +16,15 @@ const static int DEFAULT_BROWSER_STYLE_FS = 3;
 const static double BROWSER_FONT_STYLE_INC_COEFF = 1.4142135623730950488016887242097;  // example: font 2 > font1 to 20%
 
 #ifndef _WIN32
+struct RGBQUAD
+{
+    uint8_t rgbBlue;
+    uint8_t rgbGreen;
+    uint8_t rgbRed;
+    uint8_t rgbReserved;
+};
+typedef RGBQUAD* LPRGBQUAD;
+
 struct RECT
 {
     int32_t left;
