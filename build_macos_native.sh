@@ -21,7 +21,7 @@ download()
 build_libpng()
 {
   local png_ver='1.6.37'
-  local pkg_name='libpng-${png_ver}'
+  local pkg_name="libpng-${png_ver}"
   local pkg_fname="${pkg_name}.tar.xz"
 
   download "https://download.sourceforge.net/libpng/${pkg_fname}"
@@ -70,8 +70,8 @@ build_tsmuxer()
 
   pushd build
   cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE \
-    "-DCMAKE_PREFIX_PATH=${ft_installdir}" \
-    '-DFREETYPE_EXTRA_LIBRARIES=z;bz2' ..
+    "-DCMAKE_PREFIX_PATH=${deps_installdir}" \
+    "-DFREETYPE_EXTRA_LIBRARIES=bz2;${deps_installdir}/lib/libpng.a" ..
   make -j${num_cores}
 
   pushd tsMuxerGUI
