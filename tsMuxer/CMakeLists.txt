@@ -57,72 +57,38 @@ add_executable (tsmuxer
   wave.cpp
 )
 
-if(TSMUXER_STATIC_BUILD)
-  if(MSVC)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-      target_compile_options(tsmuxer "/MTd")
-    else()
-      target_compile_options(tsmuxer "/MT")
-    endif()
-  else()
-    # static linking isn't supported on Mac
-    if (NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      set (CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
-    endif()
-  endif()
-  set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+if(TSMUXER_STATIC_BUILD AND MSVC)
+  target_compile_options(tsmuxer "/MT$<$<CONFIG:Debug>:d>")
 endif()
-
-function(pkg_check_modules_with_static prefix req_or_opt package)
-  pkg_check_modules (${prefix} ${req_or_opt} ${package})
-  if (TSMUXER_STATIC_BUILD)
-    set(static_libs "${${prefix}_STATIC_LIBRARIES}")
-    # for osxcross if we want a mostly static build we need to append "-static" to the libraries
-    if(DEFINED OSXCROSS_SDK)
-      list(TRANSFORM static_libs APPEND "-static")
-    endif()
-    set(${prefix}_LIBRARIES "${static_libs}" CACHE INTERNAL "")
-  endif()
-endfunction()
 
 find_package (Threads REQUIRED)
-find_package (PkgConfig)
 
-if (PkgConfig_FOUND)
-  pkg_check_modules_with_static (ZLIB REQUIRED zlib)
-  if (NOT WIN32)
-    pkg_check_modules_with_static (FREETYPE2 REQUIRED freetype2)
-  endif()
-else()
-  find_package(ZLIB REQUIRED)
-endif()
+# needed by the Matroska demuxer
+find_package (ZLIB REQUIRED)
 
 target_include_directories(tsmuxer PRIVATE
   "${PROJECT_SOURCE_DIR}/../libmediation"
   ${ZLIB_INCLUDE_DIRS}
 )
 
-# this part looks messy as it is working around a bug in pthread when static linking
-SET(THREADSLIB Threads::Threads)
-if(TSMUXER_STATIC_BUILD)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    message("-- Static Linux build, will link whole pthread!")
-    SET(THREADSLIB -pthread -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
-  endif()
-endif()
-target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
+set(TSMUXER_FONT_RENDERER_BACKEND "" CACHE STRING "Font renderer to use")
+set_property(CACHE TSMUXER_FONT_RENDERER_BACKEND PROPERTY STRINGS freetype gdi)
 
-if (WIN32)
+if(WIN32)
+    set(TSMUXER_FONT_RENDERER_BACKEND gdi)
+else()
+    set(TSMUXER_FONT_RENDERER_BACKEND freetype)
+endif()
+
+if (${TSMUXER_FONT_RENDERER_BACKEND} STREQUAL "gdi")
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
   target_link_libraries(tsmuxer gdiplus)
-else()
+elseif(${TSMUXER_FONT_RENDERER_BACKEND} STREQUAL "freetype")
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
-  # on osxcross use the static freetype library explicitly
-  if(DEFINED OSXCROSS_SDK)
-    list(TRANSFORM FREETYPE2_LDFLAGS REPLACE "(-lfreetype)" "-lfreetype-static")
-  endif()
-  target_link_libraries(tsmuxer ${FREETYPE2_LIBRARIES} ${FREETYPE2_LDFLAGS})
-  target_include_directories(tsmuxer PRIVATE ${FREETYPE2_INCLUDE_DIRS})
+  find_package(Freetype REQUIRED)
+  target_link_libraries(tsmuxer ${FREETYPE_LIBRARIES} ${FREETYPE_EXTRA_LIBRARIES})
+  target_include_directories(tsmuxer PRIVATE ${FREETYPE_INCLUDE_DIRS})
 endif()
 
+target_link_libraries(tsmuxer mediation Threads::Threads ${ZLIB_LIBRARIES})
 install (TARGETS tsmuxer DESTINATION ${CMAKE_INSTALL_BINDIR})
