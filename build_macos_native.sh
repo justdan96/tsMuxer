@@ -55,6 +55,8 @@ build_freetype()
   # ourselves as a static library.
   cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=FALSE \
     -DFT_WITH_PNG=TRUE -DFT_WITH_ZLIB=TRUE -DFT_WITH_BZIP2=TRUE \
+    -DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=TRUE \
+    -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=TRUE \
     -DCMAKE_INSTALL_PREFIX="${deps_installdir}" \
     -DCMAKE_PREFIX_PATH="${deps_installdir}" ..
   make -j${num_cores}
