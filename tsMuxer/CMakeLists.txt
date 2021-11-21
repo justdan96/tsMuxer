@@ -88,7 +88,7 @@ endfunction()
 find_package (Threads REQUIRED)
 find_package (PkgConfig)
 
-if (PkgConfig_FOUND)
+if (${PkgConfig_FOUND} AND NOT ${WITHOUT_PKGCONFIG})
   pkg_check_modules_with_static (ZLIB REQUIRED zlib)
   if (NOT WIN32)
     pkg_check_modules_with_static (FREETYPE REQUIRED freetype2)
