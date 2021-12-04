@@ -104,12 +104,9 @@ void TextSubtitlesRenderFT::loadFontMap()
             std::map<std::string, std::string>::iterator itr = m_fontNameToFile.find(fontFamily);
 
             if (itr == m_fontNameToFile.end() || fileList[i].length() < itr->second.length())
-#if defined(__APPLE__) && defined(__MACH__)
-                m_fontNameToFile[fontFamily] = std::__fs::filesystem::canonical(fileList[i]).string();
-#else
+            {
                 m_fontNameToFile[fontFamily] = std::filesystem::canonical(fileList[i]).string();
-#endif
-
+            }
             FT_Done_Face(font);
         }
         // LTRACE(LT_INFO, 2, "after loading font " << fileList[i].c_str());
