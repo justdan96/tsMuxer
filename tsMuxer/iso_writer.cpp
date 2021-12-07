@@ -279,6 +279,7 @@ void ByteFileWriter::writeDString(const std::string& value, int len) { writeDStr
 
 void ByteFileWriter::doPadding(int padSize)
 {
+    m_curpos--;
     int rest = (m_curPos - m_buffer) % padSize;
     if (rest)
     {
