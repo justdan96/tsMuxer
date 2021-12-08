@@ -1101,10 +1101,12 @@ void IsoWriter::writeIcbTag(uint8_t* buffer, uint8_t fileType)
     // skip reserved byte
     buffer[11] = fileType;  // metadata file type
     // skip 6 byte zero Parent ICB Location
-    if (fileType != FileType_File && fileType != FileType_RealtimeFile)
-        buff16[18 / 2] = 0x20;  // flags. Archive: This bit shall be set to ONE when the file is created or is written.
+    if (fileType == FileType_File || fileType == FileType_RealtimeFile)
+        buff16[18 / 2] = 0x0021;  // flags: archive + long AD
+    else if (fileType == FileType_SystemStreamDirectory)
+        buff16[18 / 2] = 0x2020;  // flags: stream + archive
     else
-        buff16[18 / 2] = 0x21;  // archive + long AD
+        buff16[18 / 2] = 0x0020;  // flags: archive
 }
 
 void IsoWriter::writeFileSetDescriptor()
