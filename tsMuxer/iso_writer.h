@@ -214,7 +214,7 @@ class IsoWriter
     void writeUnallocatedSpaceDescriptor();
     void writeTerminationDescriptor();
     void writeLogicalVolumeIntegrityDescriptor();
-    int writeExtentFileDescriptor(uint8_t fileType, uint64_t len, uint32_t pos, int linkCount, ExtentList* extents = 0);
+    int writeExtentFileDescriptor(bool namedStream, uint8_t fileType, uint64_t len, uint32_t pos, int linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();
@@ -226,7 +226,7 @@ class IsoWriter
     void writeSector(uint8_t* sectorData);
     uint32_t absoluteSectorNum();
 
-    void writeIcbTag(uint8_t* buffer, uint8_t fileType);
+    void writeIcbTag(bool namedStream, uint8_t* buffer, uint8_t fileType);
     void writeDescriptors();
     void allocateMetadata();
     void writeMetadata(int lbn);
