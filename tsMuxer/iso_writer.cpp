@@ -852,8 +852,8 @@ void IsoWriter::close()
     int64_t sz = m_file.size();
     m_metadataMirrorLBN = m_file.size() / SECTOR_SIZE + 1;
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtentFileDescriptor(0, FileType_MetadataMirror, m_metadataFileLen, m_metadataMirrorLBN - m_partitionStartAddress,
-                              0);
+    writeExtentFileDescriptor(0, FileType_MetadataMirror, m_metadataFileLen,
+                              m_metadataMirrorLBN - m_partitionStartAddress, 0);
 
     // allocate space for metadata mirror file
     memset(m_buffer, 0, sizeof(m_buffer));
