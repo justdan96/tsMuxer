@@ -978,8 +978,8 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t star
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, uint8_t fileType, uint64_t len, uint32_t pos, int linkCount,
-                                         ExtentList* extents)
+int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, uint8_t fileType, uint64_t len,
+                                         uint32_t pos, int linkCount, ExtentList* extents)
 {
     int sectorsWrited = 0;
 
