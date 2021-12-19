@@ -27,8 +27,11 @@ class TSDemuxer : public AbstractDemuxer
     int64_t getTrackDelay(uint32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
-            return (int64_t)((m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS)) / 90.0 +
-                             0.5);  // convert to ms
+        {
+            int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
+            return clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5);  // convert to ms
+        }
+
         else
             return 0;
     }
