@@ -1003,7 +1003,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         if (m_firstPts[m_firstPts.size() - 1] == -1)
         {
             m_curFileStartPts = avPacket.pts;
-            uint64_t firstPtsShift = nanoClockToPts(avPacket.pts);
+            int64_t firstPtsShift = nanoClockToPts(avPacket.pts);
             m_fixed_pcr_offset = m_timeOffset - m_vbvLen + firstPtsShift;
             if (m_fixed_pcr_offset < 0)
                 m_fixed_pcr_offset = 0;

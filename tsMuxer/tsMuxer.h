@@ -199,7 +199,7 @@ class TSMuxer : public AbstractMuxer
     bool m_pesSpsPps;
     bool m_computeMuxStats;
     int m_pmtFrames;
-    uint64_t m_curFileStartPts;
+    int64_t m_curFileStartPts;
     int64_t m_vbvLen;
     int m_mainStreamIndex;
 
