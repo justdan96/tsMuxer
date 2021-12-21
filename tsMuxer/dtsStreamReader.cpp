@@ -193,6 +193,9 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
         uint64_t hdrType = my_ntohll(ptr[0]);
         uint64_t hdrSize = my_ntohll(ptr[1]) + 16;
 
+        if (hdrSize > (uint64_t)1 << 61)
+            break;
+
         if (hdrType == AUPRINFO || hdrType == BITSHVTB || hdrType == BLACKOUT || hdrType == BRANCHPT ||
             hdrType == BUILDVER || hdrType == CORESSMD || hdrType == EXTSS_MD || hdrType == FILEINFO ||
             hdrType == NAVI_TBL || hdrType == TIMECODE || hdrType == DTSHDHDR)

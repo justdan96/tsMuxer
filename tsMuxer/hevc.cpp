@@ -191,6 +191,10 @@ int HevcVpsUnit::deserialize()
     int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
+
+    if (m_reader.getBitsLeft() < 128)
+        return NOT_ENOUGH_BUFFER;
+
     try
     {
         vps_id = m_reader.getBits(4);
