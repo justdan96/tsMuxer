@@ -115,42 +115,50 @@ bool VvcUnit::dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag)
 
 VvcUnitWithProfile::VvcUnitWithProfile() : profile_idc(0), level_idc(0) {}
 
-void VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1)
+int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1)
 {
-    if (profileTierPresentFlag)
+    try
     {
-        profile_idc = m_reader.getBits(7);
-        bool tier_flag = m_reader.getBit();
-    }
-    level_idc = m_reader.getBits(8);
-    m_reader.skipBits(2);  // ptl_frame_only_constraint_flag, ptl_multilayer_enabled_flag
-
-    if (profileTierPresentFlag)
-    {                           // general_constraints_info()
-        if (m_reader.getBit())  // gci_present_flag
+        if (profileTierPresentFlag)
         {
-            m_reader.skipBits(32);
-            m_reader.skipBits(32);
-            m_reader.skipBits(7);
-            int gci_num_reserved_bits = m_reader.getBits(8);
-            for (int i = 0; i < gci_num_reserved_bits; i++) m_reader.skipBit();  // gci_reserved_zero_bit[i]
+            profile_idc = m_reader.getBits(7);
+            bool tier_flag = m_reader.getBit();
         }
-        m_reader.skipBits(m_reader.getBitsLeft() % 8);  // gci_alignment_zero_bit
+        level_idc = m_reader.getBits(8);
+        m_reader.skipBits(2);  // ptl_frame_only_constraint_flag, ptl_multilayer_enabled_flag
+
+        if (profileTierPresentFlag)
+        {                           // general_constraints_info()
+            if (m_reader.getBit())  // gci_present_flag
+            {
+                m_reader.skipBits(32);
+                m_reader.skipBits(32);
+                m_reader.skipBits(7);
+                int gci_num_reserved_bits = m_reader.getBits(8);
+                for (int i = 0; i < gci_num_reserved_bits; i++) m_reader.skipBit();  // gci_reserved_zero_bit[i]
+            }
+            m_reader.skipBits(m_reader.getBitsLeft() % 8);  // gci_alignment_zero_bit
+        }
+        std::vector<int> ptl_sublayer_level_present_flag;
+        ptl_sublayer_level_present_flag.resize(MaxNumSubLayersMinus1);
+
+        for (int i = MaxNumSubLayersMinus1 - 1; i >= 0; i--) ptl_sublayer_level_present_flag[i] = m_reader.getBit();
+
+        m_reader.skipBits(m_reader.getBitsLeft() % 8);  // ptl_reserved_zero_bit
+
+        for (int i = MaxNumSubLayersMinus1 - 1; i >= 0; i--)
+            if (ptl_sublayer_level_present_flag[i])
+                m_reader.skipBits(8);  // sublayer_level_idc[i]
+        if (profileTierPresentFlag)
+        {
+            int ptl_num_sub_profiles = m_reader.getBits(8);
+            for (int i = 0; i < ptl_num_sub_profiles; i++) m_reader.skipBits(32);  // general_sub_profile_idc[i]
+        }
+        return 0;
     }
-    std::vector<int> ptl_sublayer_level_present_flag;
-    ptl_sublayer_level_present_flag.resize(MaxNumSubLayersMinus1);
-
-    for (int i = MaxNumSubLayersMinus1 - 1; i >= 0; i--) ptl_sublayer_level_present_flag[i] = m_reader.getBit();
-
-    m_reader.skipBits(m_reader.getBitsLeft() % 8);  // ptl_reserved_zero_bit
-
-    for (int i = MaxNumSubLayersMinus1 - 1; i >= 0; i--)
-        if (ptl_sublayer_level_present_flag[i])
-            m_reader.skipBits(8);  // sublayer_level_idc[i]
-    if (profileTierPresentFlag)
+    catch (BitStreamException& e)
     {
-        int ptl_num_sub_profiles = m_reader.getBits(8);
-        for (int i = 0; i < ptl_num_sub_profiles; i++) m_reader.skipBits(32);  // general_sub_profile_idc[i]
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -270,7 +278,9 @@ int VvcVpsUnit::deserialize()
 
         m_reader.skipBits(m_reader.getBitsLeft() % 8);  // vps_ptl_alignment_zero_bit
 
-        for (int i = 0; i < vps_num_ptls; i++) profile_tier_level(vps_pt_present_flag[i], vps_ptl_max_tid[i]);
+        for (int i = 0; i < vps_num_ptls; i++)
+            if (profile_tier_level(vps_pt_present_flag[i], vps_ptl_max_tid[i]) != 0)
+                return 1;
 
         for (int i = 0; i < TotalNumOlss; i++)
             if (vps_num_ptls > 1 && vps_num_ptls != TotalNumOlss)
@@ -444,7 +454,8 @@ int VvcSpsUnit::deserialize()
         if (sps_id == 0 && !sps_ptl_dpb_hrd_params_present_flag)
             return 1;
         if (sps_ptl_dpb_hrd_params_present_flag)
-            profile_tier_level(1, max_sublayers_minus1);
+            if (profile_tier_level(1, max_sublayers_minus1) != 0)
+                return 1;
         m_reader.skipBit();      // sps_gdr_enabled_flag
         if (m_reader.getBit())   // sps_ref_pic_resampling_enabled_flag
             m_reader.skipBit();  // sps_res_change_in_clvs_allowed_flag
