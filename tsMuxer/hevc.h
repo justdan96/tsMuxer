@@ -87,7 +87,7 @@ struct HevcUnitWithProfile : public HevcUnit
     uint8_t sub_layer_profile_space[16];
 
    protected:
-    void profile_tier_level(int subLayers);
+    int profile_tier_level(int subLayers);
 };
 
 struct HevcVpsUnit : public HevcUnitWithProfile

@@ -106,47 +106,55 @@ HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), inter
     memset(sub_layer_profile_space, 0, sizeof(sub_layer_profile_space));
 }
 
-void HevcUnitWithProfile::profile_tier_level(int subLayers)
+int HevcUnitWithProfile::profile_tier_level(int subLayers)
 {
-    int profile_space = m_reader.getBits(2);
-    int tier_flag = m_reader.getBit();
-    profile_idc = m_reader.getBits(5);
-    m_reader.skipBits(32);  // general_profile_compatibility_flag
-    int progressive_source_flag = m_reader.getBit();
-    interlaced_source_flag = m_reader.getBit();
-    int non_packed_constraint_flag = m_reader.getBit();
-    int frame_only_constraint_flag = m_reader.getBit();
-    m_reader.skipBits(32);  // reserved_zero_44bits
-    m_reader.skipBits(12);  // reserved_zero_44bits
-    level_idc = m_reader.getBits(8);
+    try
+    {
+        int profile_space = m_reader.getBits(2);
+        int tier_flag = m_reader.getBit();
+        profile_idc = m_reader.getBits(5);
+        m_reader.skipBits(32);  // general_profile_compatibility_flag
+        int progressive_source_flag = m_reader.getBit();
+        interlaced_source_flag = m_reader.getBit();
+        int non_packed_constraint_flag = m_reader.getBit();
+        int frame_only_constraint_flag = m_reader.getBit();
+        m_reader.skipBits(32);  // reserved_zero_44bits
+        m_reader.skipBits(12);  // reserved_zero_44bits
+        level_idc = m_reader.getBits(8);
 
-    for (int i = 0; i < subLayers - 1; i++)
-    {
-        sub_layer_profile_present_flag[i] = m_reader.getBit();
-        sub_layer_level_present_flag[i] = m_reader.getBit();
-    }
-    if (subLayers > 1)
-    {
-        for (int i = subLayers - 1; i < 8; i++) m_reader.skipBits(2);  // reserved_zero_2bits
-    }
-
-    for (int i = 0; i < subLayers - 1; i++)
-    {
-        if (sub_layer_profile_present_flag[i])
+        for (int i = 0; i < subLayers - 1; i++)
         {
-            sub_layer_profile_space[i] = m_reader.getBits(2);
-            bool sub_layer_tier_flag = m_reader.getBit();
-            int sub_layer_profile_idc = m_reader.getBits(5);
-            for (int j = 0; j < 32; j++) m_reader.skipBit();  // sub_layer_profile_compatibility_flag[ i ][ j ] u(1)
-            m_reader.skipBit();                               // sub_layer_progressive_source_flag[ i ] u(1)
-            m_reader.skipBit();                               // sub_layer_interlaced_source_flag[ i ] u(1)
-            m_reader.skipBit();                               // sub_layer_non_packed_constraint_flag[ i ] u(1)
-            m_reader.skipBit();                               // sub_layer_frame_only_constraint_flag[ i ] u(1)
-            m_reader.skipBits(32);                            // sub_layer_reserved_zero_44bits
-            m_reader.skipBits(12);                            // sub_layer_reserved_zero_44bits
+            sub_layer_profile_present_flag[i] = m_reader.getBit();
+            sub_layer_level_present_flag[i] = m_reader.getBit();
         }
-        if (sub_layer_level_present_flag[i])
-            m_reader.skipBits(8);  // sub_layer_level_idc[ i ]
+        if (subLayers > 1)
+        {
+            for (int i = subLayers - 1; i < 8; i++) m_reader.skipBits(2);  // reserved_zero_2bits
+        }
+
+        for (int i = 0; i < subLayers - 1; i++)
+        {
+            if (sub_layer_profile_present_flag[i])
+            {
+                sub_layer_profile_space[i] = m_reader.getBits(2);
+                bool sub_layer_tier_flag = m_reader.getBit();
+                int sub_layer_profile_idc = m_reader.getBits(5);
+                for (int j = 0; j < 32; j++) m_reader.skipBit();  // sub_layer_profile_compatibility_flag[ i ][ j ] u(1)
+                m_reader.skipBit();                               // sub_layer_progressive_source_flag[ i ] u(1)
+                m_reader.skipBit();                               // sub_layer_interlaced_source_flag[ i ] u(1)
+                m_reader.skipBit();                               // sub_layer_non_packed_constraint_flag[ i ] u(1)
+                m_reader.skipBit();                               // sub_layer_frame_only_constraint_flag[ i ] u(1)
+                m_reader.skipBits(32);                            // sub_layer_reserved_zero_44bits
+                m_reader.skipBits(12);                            // sub_layer_reserved_zero_44bits
+            }
+            if (sub_layer_level_present_flag[i])
+                m_reader.skipBits(8);  // sub_layer_level_idc[ i ]
+        }
+        return 0;
+    }
+    catch (BitStreamException& e)
+    {
+        return NOT_ENOUGH_BUFFER;
     }
 }
 
@@ -192,18 +200,18 @@ int HevcVpsUnit::deserialize()
     if (rez)
         return rez;
 
-    if (m_reader.getBitsLeft() < 128)
-        return NOT_ENOUGH_BUFFER;
-
     try
     {
         vps_id = m_reader.getBits(4);
         m_reader.skipBits(2);  // reserved
         vps_max_layers = m_reader.getBits(6) + 1;
         vps_max_sub_layers = m_reader.getBits(3) + 1;
+        if (vps_max_sub_layers > 7)
+            return 1;
         int vps_temporal_id_nesting_flag = m_reader.getBit();
         m_reader.skipBits(16);  // reserved
-        profile_tier_level(vps_max_sub_layers);
+        if (profile_tier_level(vps_max_sub_layers) != 0)
+            return 1;
 
         bool vps_sub_layer_ordering_info_present_flag = m_reader.getBit();
         for (int i = (vps_sub_layer_ordering_info_present_flag ? 0 : vps_max_sub_layers - 1);
@@ -760,7 +768,8 @@ int HevcSpsUnit::deserialize()
             return 1;
         max_sub_layers = max_sub_layers_minus1 + 1;
         int temporal_id_nesting_flag = m_reader.getBit();
-        profile_tier_level(max_sub_layers);
+        if (profile_tier_level(max_sub_layers) != 0)
+            return 1;
         sps_id = extractUEGolombCode();
         if (sps_id > 15)
             return 1;

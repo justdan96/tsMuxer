@@ -74,7 +74,7 @@ struct VvcUnitWithProfile : public VvcUnit
     int level_idc;
 
    protected:
-    void profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1);
+    int profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1);
 };
 
 struct VvcHrdUnit : public VvcUnit
