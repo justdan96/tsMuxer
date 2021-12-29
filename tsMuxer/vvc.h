@@ -37,6 +37,19 @@ enum VVCUnitType
     V_FD = 25
 };
 
+struct VvcHrdUnit
+{
+    VvcHrdUnit();
+
+   public:
+    unsigned num_units_in_tick;
+    unsigned time_scale;
+    bool general_nal_hrd_params_present_flag;
+    bool general_vcl_hrd_params_present_flag;
+    bool general_du_hrd_params_present_flag;
+    int hrd_cpb_cnt_minus1;
+};
+
 struct VvcUnit
 {
     VvcUnit() : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0) {}
@@ -58,6 +71,10 @@ struct VvcUnit
     void updateBits(int bitOffset, int bitLen, int value);
     bool dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag);
 
+    bool general_timing_hrd_parameters(VvcHrdUnit& m_hrd);
+    bool ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal);
+    bool sublayer_hrd_parameters(VvcHrdUnit m_hrd, int subLayerId);
+
    protected:
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
@@ -75,23 +92,6 @@ struct VvcUnitWithProfile : public VvcUnit
 
    protected:
     int profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1);
-};
-
-struct VvcHrdUnit : public VvcUnit
-{
-    VvcHrdUnit();
-
-   public:
-    unsigned num_units_in_tick;
-    unsigned time_scale;
-    bool general_nal_hrd_params_present_flag;
-    bool general_vcl_hrd_params_present_flag;
-    bool general_du_hrd_params_present_flag;
-    int hrd_cpb_cnt_minus1;
-
-    bool general_timing_hrd_parameters();
-    bool ols_timing_hrd_parameters(int firstSubLayer, int MaxSubLayersVal);
-    bool sublayer_hrd_parameters(int subLayerId);
 };
 
 struct VvcVpsUnit : public VvcUnitWithProfile
@@ -139,8 +139,6 @@ struct VvcSpsUnit : public VvcUnitWithProfile
     unsigned chroma_sample_loc_type_frame;
     unsigned chroma_sample_loc_type_top_field;
     unsigned chroma_sample_loc_type_bottom_field;
-    unsigned num_units_in_tick;
-    unsigned time_scale;
 
    private:
     int ref_pic_list_struct(int listIdx, int rplsIdx);
