@@ -344,7 +344,7 @@ int VvcVpsUnit::deserialize()
             bool vps_timing_hrd_params_present_flag = m_reader.getBit();
             if (vps_timing_hrd_params_present_flag)
             {
-                if (m_vps_hrd.general_timing_hrd_parameters())
+                if (general_timing_hrd_parameters(m_vps_hrd))
                     return 1;
                 bool vps_sublayer_cpb_params_present_flag = (vps_max_sublayers > 1) ? m_reader.getBit() : 0;
                 unsigned vps_num_ols_timing_hrd_params = extractUEGolombCode() + 1;
@@ -356,7 +356,7 @@ int VvcVpsUnit::deserialize()
                     if (!vps_default_ptl_dpb_hrd_max_tid_flag)
                         vps_hrd_max_tid = m_reader.getBits(3);
                     int firstSubLayer = vps_sublayer_cpb_params_present_flag ? 0 : vps_hrd_max_tid;
-                    m_vps_hrd.ols_timing_hrd_parameters(firstSubLayer, vps_hrd_max_tid);
+                    ols_timing_hrd_parameters(m_vps_hrd, firstSubLayer, vps_hrd_max_tid);
                 }
                 if (vps_num_ols_timing_hrd_params > 1 && vps_num_ols_timing_hrd_params != NumMultiLayerOlss)
                 {
@@ -422,8 +422,6 @@ VvcSpsUnit::VvcSpsUnit()
       chroma_sample_loc_type_frame(0),
       chroma_sample_loc_type_top_field(0),
       chroma_sample_loc_type_bottom_field(0),
-      num_units_in_tick(0),
-      time_scale(0),
       inter_layer_prediction_enabled_flag(0),
       long_term_ref_pics_flag(0),
       sps_num_ref_pic_lists(0),
@@ -758,11 +756,11 @@ int VvcSpsUnit::deserialize()
         {
             if (m_reader.getBit())  // sps_timing_hrd_params_present_flag
             {
-                if (m_sps_hrd.general_timing_hrd_parameters())
+                if (general_timing_hrd_parameters(m_sps_hrd))
                     return 1;
                 int sps_sublayer_cpb_params_present_flag = (max_sublayers_minus1 > 0) ? m_reader.getBit() : 0;
                 int firstSubLayer = sps_sublayer_cpb_params_present_flag ? 0 : max_sublayers_minus1;
-                m_sps_hrd.ols_timing_hrd_parameters(firstSubLayer, max_sublayers_minus1);
+                ols_timing_hrd_parameters(m_sps_hrd, firstSubLayer, max_sublayers_minus1);
             }
         }
         bool sps_field_seq_flag = m_reader.getBit();
@@ -815,7 +813,10 @@ int VvcSpsUnit::ref_pic_list_struct(int listIdx, int rplsIdx)
     return 0;
 }
 
-double VvcSpsUnit::getFPS() const { return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0; }
+double VvcSpsUnit::getFPS() const
+{
+    return m_sps_hrd.num_units_in_tick ? m_sps_hrd.time_scale / (float)m_sps_hrd.num_units_in_tick : 0;
+}
 
 string VvcSpsUnit::getDescription() const
 {
@@ -905,30 +906,30 @@ VvcHrdUnit::VvcHrdUnit()
 {
 }
 
-bool VvcHrdUnit::general_timing_hrd_parameters()
+bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit &m_hrd)
 {
-    num_units_in_tick = m_reader.getBits(32);
-    time_scale = m_reader.getBits(32);
-    general_nal_hrd_params_present_flag = m_reader.getBit();
-    general_vcl_hrd_params_present_flag = m_reader.getBit();
-    if (general_nal_hrd_params_present_flag || general_vcl_hrd_params_present_flag)
+    m_hrd.num_units_in_tick = m_reader.getBits(32);
+    m_hrd.time_scale = m_reader.getBits(32);
+    m_hrd.general_nal_hrd_params_present_flag = m_reader.getBit();
+    m_hrd.general_vcl_hrd_params_present_flag = m_reader.getBit();
+    if (m_hrd.general_nal_hrd_params_present_flag || m_hrd.general_vcl_hrd_params_present_flag)
     {
         m_reader.skipBit();  // general_same_pic_timing_in_all_ols_flag
-        general_du_hrd_params_present_flag = m_reader.getBit();
-        if (general_du_hrd_params_present_flag)
+        m_hrd.general_du_hrd_params_present_flag = m_reader.getBit();
+        if (m_hrd.general_du_hrd_params_present_flag)
             int tick_divisor_minus2 = m_reader.getBits(8);
         m_reader.skipBits(4);  // bit_rate_scale
         m_reader.skipBits(4);  // cpb_size_scale
-        if (general_du_hrd_params_present_flag)
+        if (m_hrd.general_du_hrd_params_present_flag)
             m_reader.skipBits(4);  // cpb_size_du_scale
-        hrd_cpb_cnt_minus1 = extractUEGolombCode();
-        if (hrd_cpb_cnt_minus1 > 31)
+        m_hrd.hrd_cpb_cnt_minus1 = extractUEGolombCode();
+        if (m_hrd.hrd_cpb_cnt_minus1 > 31)
             return 1;
     }
     return 0;
 }
 
-bool VvcHrdUnit::ols_timing_hrd_parameters(int firstSubLayer, int MaxSubLayersVal)
+bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal)
 {
     for (int i = firstSubLayer; i <= MaxSubLayersVal; i++)
     {
@@ -939,20 +940,20 @@ bool VvcHrdUnit::ols_timing_hrd_parameters(int firstSubLayer, int MaxSubLayersVa
             if (extractUEGolombCode() > 2047)  // elemental_duration_in_tc_minus1
                 return 1;
         }
-        else if ((general_nal_hrd_params_present_flag || general_vcl_hrd_params_present_flag) &&
-                 hrd_cpb_cnt_minus1 == 0)
+        else if ((m_hrd.general_nal_hrd_params_present_flag || m_hrd.general_vcl_hrd_params_present_flag) &&
+                 m_hrd.hrd_cpb_cnt_minus1 == 0)
             m_reader.skipBit();  // low_delay_hrd_flag
-        if (general_nal_hrd_params_present_flag)
-            sublayer_hrd_parameters(i);
-        if (general_vcl_hrd_params_present_flag)
-            sublayer_hrd_parameters(i);
+        if (m_hrd.general_nal_hrd_params_present_flag)
+            sublayer_hrd_parameters(m_hrd, i);
+        if (m_hrd.general_vcl_hrd_params_present_flag)
+            sublayer_hrd_parameters(m_hrd, i);
     }
     return 0;
 }
 
-bool VvcHrdUnit::sublayer_hrd_parameters(int subLayerId)
+bool VvcUnit::sublayer_hrd_parameters(VvcHrdUnit m_hrd, int subLayerId)
 {
-    for (int j = 0; j <= hrd_cpb_cnt_minus1; j++)
+    for (int j = 0; j <= m_hrd.hrd_cpb_cnt_minus1; j++)
     {
         unsigned bit_rate_value_minus1 = extractUEGolombCode();
         if (bit_rate_value_minus1 == 0xffffffff)
@@ -960,7 +961,7 @@ bool VvcHrdUnit::sublayer_hrd_parameters(int subLayerId)
         unsigned cpb_size_value_minus1 = extractUEGolombCode();
         if (cpb_size_value_minus1 == 0xffffffff)
             return 1;
-        if (general_du_hrd_params_present_flag)
+        if (m_hrd.general_du_hrd_params_present_flag)
         {
             unsigned cpb_size_du_value_minus1 = extractUEGolombCode();
             if (cpb_size_du_value_minus1 == 0xffffffff)
