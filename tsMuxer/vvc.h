@@ -70,10 +70,9 @@ struct VvcUnit
     int extractSEGolombCode();
     void updateBits(int bitOffset, int bitLen, int value);
     bool dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag);
-
     bool general_timing_hrd_parameters(VvcHrdUnit& m_hrd);
     bool ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal);
-    bool sublayer_hrd_parameters(VvcHrdUnit m_hrd, int subLayerId);
+    bool sublayer_hrd_parameters(VvcHrdUnit m_hrd);
 
    protected:
     uint8_t* m_nalBuffer;
@@ -136,12 +135,9 @@ struct VvcSpsUnit : public VvcUnitWithProfile
     int transfer_characteristics;
     int matrix_coeffs;
     bool full_range_flag;
-    unsigned chroma_sample_loc_type_frame;
-    unsigned chroma_sample_loc_type_top_field;
-    unsigned chroma_sample_loc_type_bottom_field;
 
    private:
-    int ref_pic_list_struct(int listIdx, int rplsIdx);
+    int ref_pic_list_struct(int rplsIdx);
     unsigned sps_num_ref_pic_lists;
     bool weighted_pred_flag;
     bool weighted_bipred_flag;
