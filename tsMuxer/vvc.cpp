@@ -906,7 +906,7 @@ VvcHrdUnit::VvcHrdUnit()
 {
 }
 
-bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit &m_hrd)
+bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit& m_hrd)
 {
     m_hrd.num_units_in_tick = m_reader.getBits(32);
     m_hrd.time_scale = m_reader.getBits(32);
