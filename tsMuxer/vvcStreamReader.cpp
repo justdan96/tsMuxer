@@ -140,8 +140,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
     *dstBuff++ = m_sps->ptl_num_sub_profiles;
     uint32_t* bufPos = (uint32_t*)dstBuff;
-    for (auto i : m_sps->general_sub_profile_idc)
-        *bufPos++ = i;
+    for (auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
     dstBuff = (uint8_t*)bufPos;
     *dstBuff++ = (m_sps->progressive_source_flag << 7) | (m_sps->interlaced_source_flag << 6) |
                  (m_sps->non_packed_constraint_flag << 5) | (m_sps->ptl_frame_only_constraint_flag << 4);
