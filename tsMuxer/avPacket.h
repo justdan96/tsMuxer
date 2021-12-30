@@ -30,7 +30,10 @@ class BaseAbstractStreamReader;
 
 struct AVPacket
 {
-    AVPacket() : pts(0), dts(0), data(0), size(0), stream_index(0), flags(0), duration(0), pos(0), pcr(0), codecID(0) {}
+    AVPacket()
+        : pts(0), dts(0), data(0), size(0), stream_index(0), flags(0), duration(0), pos(0), pcr(0), codecID(0), codec()
+    {
+    }
     int64_t pts;  // presentation time stamp in time_base units
     int64_t dts;  // decompression time stamp in time_base units
     uint8_t* data;

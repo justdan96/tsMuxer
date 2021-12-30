@@ -21,7 +21,7 @@ class AbstractReader
     static const int DATA_DELAYED = 4;
     static const int DATA_NOT_READY2 = 5;
 
-    AbstractReader() {}
+    AbstractReader() : m_blockSize(0), m_allocSize(0), m_prereadThreshold(0) {}
     virtual ~AbstractReader() {}
     virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) = 0;
     virtual void notify(uint32_t readerID, uint32_t dataReaded) = 0;

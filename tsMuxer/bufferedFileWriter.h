@@ -20,7 +20,7 @@ struct WriterData
     int m_command;
 
    public:
-    WriterData() {}
+    WriterData() : m_buffer(0), m_bufferLen(0), m_mainFile(), m_command(0) {}
     enum Commands
     {
         wdNone,

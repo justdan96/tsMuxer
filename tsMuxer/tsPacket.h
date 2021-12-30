@@ -203,13 +203,17 @@ typedef std::map<uint64_t, PMTIndexData> PMTIndex;
 struct PMTStreamInfo
 {
     PMTStreamInfo()
+        : m_streamType(0),
+          m_esInfoLen(0),
+          m_pid(0),
+          m_pmtPID(-1),
+          isSecondary(false),
+          m_codecReader(),
+          m_esInfoData(),
+          m_lang()
     {
-        m_streamType = 0;
-        m_esInfoLen = 0;
-        m_pid = 0;
-        m_pmtPID = -1;
-        isSecondary = false;
     }
+
     PMTStreamInfo(int streamType, int pid, uint8_t* esInfoData, int esInfoLen, AbstractStreamReader* codecReader,
                   const std::string& lang, bool secondary)
     {
@@ -310,7 +314,13 @@ struct M2TSStreamInfo
           HDR(0),
           frame_rate_index(3),
           video_format(0),
-          isSecondary(false)
+          isSecondary(false),
+          aspect_ratio_index(0),
+          audio_presentation_type(0),
+          language_code(),
+          number_of_offset_sequences(0),
+          sampling_frequency_index(0),
+          stream_coding_type(0)
     {
     }
     M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
@@ -394,7 +404,21 @@ struct CLPIProgramInfo
 class CLPIParser
 {
    public:
-    CLPIParser() : isDependStream(false) {}
+    CLPIParser()
+        : isDependStream(false),
+          TS_recording_rate(0),
+          application_type(0),
+          clip_stream_type(0),
+          format_identifier(),
+          is_ATC_delta(false),
+          m_clpiNum(0),
+          number_of_source_packets(0),
+          presentation_start_time(0),
+          presentation_end_time(0),
+          type_indicator(),
+          version_number()
+    {
+    }
 
     void parse(uint8_t* buffer, int len);
     bool parse(const char* fileName);
