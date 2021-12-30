@@ -56,6 +56,7 @@ int VvcUnit::deserialize()
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -113,7 +114,15 @@ bool VvcUnit::dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag)
 
 // ------------------------- VvcUnitWithProfile  -------------------
 
-VvcUnitWithProfile::VvcUnitWithProfile() : profile_idc(0), level_idc(0) {}
+VvcUnitWithProfile::VvcUnitWithProfile()
+    : profile_idc(0),
+      tier_flag(0),
+      level_idc(0),
+      ptl_frame_only_constraint_flag(true),
+      ptl_num_sub_profiles(0),
+      general_sub_profile_idc(0)
+{
+}
 
 int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1)
 {
@@ -122,10 +131,11 @@ int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxN
         if (profileTierPresentFlag)
         {
             profile_idc = m_reader.getBits(7);
-            m_reader.skipBit();  // tier_flag
+            tier_flag = m_reader.getBit();
         }
         level_idc = m_reader.getBits(8);
-        m_reader.skipBits(2);  // ptl_frame_only_constraint_flag, ptl_multilayer_enabled_flag
+        ptl_frame_only_constraint_flag = m_reader.getBit();
+        m_reader.skipBit();  // ptl_multilayer_enabled_flag
 
         if (profileTierPresentFlag)
         {                           // general_constraints_info()
@@ -139,7 +149,7 @@ int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxN
             }
             m_reader.skipBits(m_reader.getBitsLeft() % 8);  // gci_alignment_zero_bit
         }
-        std::vector<int> ptl_sublayer_level_present_flag;
+        vector<int> ptl_sublayer_level_present_flag;
         ptl_sublayer_level_present_flag.resize(MaxNumSubLayersMinus1);
 
         for (int i = MaxNumSubLayersMinus1 - 1; i >= 0; i--) ptl_sublayer_level_present_flag[i] = m_reader.getBit();
@@ -151,13 +161,15 @@ int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxN
                 m_reader.skipBits(8);  // sublayer_level_idc[i]
         if (profileTierPresentFlag)
         {
-            int ptl_num_sub_profiles = m_reader.getBits(8);
-            for (int i = 0; i < ptl_num_sub_profiles; i++) m_reader.skipBits(32);  // general_sub_profile_idc[i]
+            ptl_num_sub_profiles = m_reader.getBits(8);
+            general_sub_profile_idc.resize(ptl_num_sub_profiles);
+            for (auto& i : general_sub_profile_idc) i = m_reader.getBits(32);
         }
         return 0;
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -430,6 +442,7 @@ int VvcVpsUnit::deserialize()
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -471,6 +484,9 @@ VvcSpsUnit::VvcSpsUnit()
       pic_height_max_in_luma_samples(0),
       bitdepth_minus8(0),
       log2_max_pic_order_cnt_lsb(0),
+      progressive_source_flag(true),
+      interlaced_source_flag(true),
+      non_packed_constraint_flag(true),
       colour_primaries(2),
       transfer_characteristics(2),
       matrix_coeffs(2),  // 2 = unspecified
@@ -817,6 +833,7 @@ int VvcSpsUnit::deserialize()
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -873,9 +890,10 @@ string VvcSpsUnit::getDescription() const
 /* Specified in Rec. ITU-T H.274 */
 int VvcSpsUnit::vui_parameters()
 {
-    bool progressive_source_flag = m_reader.getBit();
-    bool interlaced_source_flag = m_reader.getBit();
-    m_reader.skipBits(2);  // non_packed_constraint_flag, non_projected_constraint_flag
+    progressive_source_flag = m_reader.getBit();
+    interlaced_source_flag = m_reader.getBit();
+    non_packed_constraint_flag = m_reader.getBit();
+    m_reader.skipBit();  // non_projected_constraint_flag
 
     if (m_reader.getBit())  // aspect_ratio_info_present_flag
     {
@@ -931,6 +949,7 @@ int VvcPpsUnit::deserialize()
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -1039,6 +1058,7 @@ int VvcSliceHeader::deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps)
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
