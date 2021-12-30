@@ -1007,8 +1007,8 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
             sc->ctts_data[sc->ctts_count].duration = get_be32();
             sc->ctts_count++;
         }
-        if ((keyframe =
-                 st->type == IOContextTrackType::TRACK_TYPE_AUDIO || (flags & 0x004 && !i && !sample_flags) || sample_flags & 0x2000000))
+        if ((keyframe = st->type == IOContextTrackType::TRACK_TYPE_AUDIO || (flags & 0x004 && !i && !sample_flags) ||
+                        sample_flags & 0x2000000))
             distance = 0;
         distance++;
         // assert(sample_duration % sc->time_rate == 0);
