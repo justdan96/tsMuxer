@@ -103,7 +103,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
         m_srcFormat = UtfConverter::SourceFormat::sfANSI;  // default value for win32
 #else
         LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to UTF-8");
-        m_srcFormat = UtfConverter::sfUTF8;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF8;
 #endif
     }
     return true;
