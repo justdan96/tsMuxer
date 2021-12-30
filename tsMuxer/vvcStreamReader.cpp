@@ -112,14 +112,14 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
 int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     if (m_firstFrame)
-        CheckStreamRez rez = checkStream(m_buffer, m_bufEnd - m_buffer);
+        CheckStreamRez rez = checkStream(m_buffer, (int)(m_bufEnd - m_buffer));
 
     if (hdmvDescriptors)
     {
         // 'HDMV' registration descriptor
         *dstBuff++ = 0x05;
         *dstBuff++ = 8;
-        memcpy(dstBuff, "HDMV\xff\x24", 6);
+        memcpy(dstBuff, "HDMV\xff\x33", 6);
         dstBuff += 6;
 
         int video_format, frame_rate_index, aspect_ratio_index;
@@ -141,7 +141,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
             if (nalType == V_SPS)
             {
-                int toDecode = FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
+                int toDecode = (int)FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
                 int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
                 break;
             }
@@ -186,7 +186,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
 void VVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
 {
-    int oldNalSize = nextNal - buff;
+    int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
     VvcVpsUnit* vps = (VvcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
@@ -282,7 +282,7 @@ void VVCStreamReader::storeBuffer(MemoryBlock& dst, const uint8_t* data, const u
     while (dataEnd > data && dataEnd[-1] == 0) dataEnd--;
     if (dataEnd > data)
     {
-        dst.resize(dataEnd - data);
+        dst.resize((int)(dataEnd - data));
         memcpy(dst.data(), data, dataEnd - data);
     }
 }
@@ -411,7 +411,7 @@ uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, 
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    int bytesLeft = dstEnd - dstBuffer;
+    int bytesLeft = (int)(dstEnd - dstBuffer);
     int requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
@@ -452,5 +452,5 @@ int VVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     }
 
     m_firstFileFrame = false;
-    return curPos - dstBuffer;
+    return (int)(curPos - dstBuffer);
 }

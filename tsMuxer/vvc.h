@@ -137,7 +137,7 @@ struct VvcSpsUnit : public VvcUnitWithProfile
     bool full_range_flag;
 
    private:
-    int ref_pic_list_struct(int rplsIdx);
+    int ref_pic_list_struct(size_t rplsIdx);
     unsigned sps_num_ref_pic_lists;
     bool weighted_pred_flag;
     bool weighted_bipred_flag;
