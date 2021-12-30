@@ -437,7 +437,7 @@ int VvcVpsUnit::deserialize()
 void VvcVpsUnit::setFPS(double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
-    num_units_in_tick = time_scale / fps + 0.5;
+    num_units_in_tick = (int)(time_scale / fps + 0.5);
 
     // num_units_in_tick = time_scale/2 / fps;
     assert(num_units_in_tick_bit_pos > 0);
@@ -536,13 +536,13 @@ int VvcSpsUnit::deserialize()
                     if (!sps_subpic_same_size_flag || i == 0)
                     {
                         if (i != 0 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(ceil(log2(tmpWidthVal)));  // sps_subpic_ctu_top_left_x[i]
+                            m_reader.skipBits((unsigned)ceil(log2(tmpWidthVal)));  // sps_subpic_ctu_top_left_x[i]
                         if (i != 0 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(ceil(log2(tmpHeightVal)));  // sps_subpic_ctu_top_left_y[i]
+                            m_reader.skipBits((unsigned)ceil(log2(tmpHeightVal)));  // sps_subpic_ctu_top_left_y[i]
                         if (i < sps_num_subpics_minus1 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(ceil(log2(tmpWidthVal)));  // sps_subpic_width_minus1[i]
+                            m_reader.skipBits((unsigned)ceil(log2(tmpWidthVal)));  // sps_subpic_width_minus1[i]
                         if (i < sps_num_subpics_minus1 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(ceil(log2(tmpHeightVal)));  // sps_subpic_height_minus1[i]
+                            m_reader.skipBits((unsigned)ceil(log2(tmpHeightVal)));  // sps_subpic_height_minus1[i]
                     }
                     if (!sps_independent_subpics_flag)
                         m_reader.skipBits(
@@ -724,7 +724,7 @@ int VvcSpsUnit::deserialize()
                     return 1;
             }
         }
-        if (extractUEGolombCode() > CtbLog2SizeY - 2)  // sps_log2_parallel_merge_level_minus2
+        if (extractUEGolombCode() + 2 > (unsigned)CtbLog2SizeY)  // sps_log2_parallel_merge_level_minus2
             return 1;
 
         m_reader.skipBits(3);  // sps_isp_enabled_flag, sps_mrl_enabled_flag, sps_mip_enabled_flag
@@ -757,7 +757,7 @@ int VvcSpsUnit::deserialize()
                 int sps_ladf_qp_offset = extractSEGolombCode();
                 if (sps_ladf_qp_offset < -63 || sps_ladf_qp_offset > 63)
                     return 1;
-                if (extractUEGolombCode() > (1 << (bitdepth_minus8 + 8)) - 3)  // sps_ladf_delta_threshold_minus1
+                if (extractUEGolombCode() > (1U << (bitdepth_minus8 + 8)) - 3)  // sps_ladf_delta_threshold_minus1
                     return 1;
             }
         }
@@ -774,7 +774,7 @@ int VvcSpsUnit::deserialize()
             if (m_reader.getBit())  // sps_virtual_boundaries_present_flag
             {
                 unsigned sps_num_ver_virtual_boundaries = extractUEGolombCode();
-                if (sps_num_ver_virtual_boundaries > (pic_width_max_in_luma_samples <= 8 ? 0 : 3))
+                if (sps_num_ver_virtual_boundaries > (unsigned)(pic_width_max_in_luma_samples <= 8 ? 0 : 3))
                     return 1;
                 for (size_t i = 0; i < sps_num_ver_virtual_boundaries; i++)
                 {
@@ -783,7 +783,7 @@ int VvcSpsUnit::deserialize()
                         return 1;
                 }
                 unsigned sps_num_hor_virtual_boundaries = extractUEGolombCode();
-                if (sps_num_hor_virtual_boundaries > (pic_height_max_in_luma_samples <= 8 ? 0 : 3))
+                if (sps_num_hor_virtual_boundaries > (unsigned)(pic_height_max_in_luma_samples <= 8 ? 0 : 3))
                     return 1;
                 for (size_t i = 0; i < sps_num_hor_virtual_boundaries; i++)
                 {
@@ -821,7 +821,7 @@ int VvcSpsUnit::deserialize()
     }
 }
 
-int VvcSpsUnit::ref_pic_list_struct(int rplsIdx)
+int VvcSpsUnit::ref_pic_list_struct(size_t rplsIdx)
 {
     unsigned num_ref_entries = extractUEGolombCode();
     bool ltrp_in_header_flag = 1;
