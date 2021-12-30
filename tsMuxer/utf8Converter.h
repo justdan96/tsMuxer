@@ -7,7 +7,7 @@
 
 namespace UtfConverter
 {
-enum SourceFormat
+enum class SourceFormat
 {
     sfUnknown,
 #ifdef _WIN32

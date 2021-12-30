@@ -25,7 +25,7 @@ static const int MAX_MAIN_MUXER_RATE = 48000000;
 static const int MAX_4K_MUXER_RATE = 109000000;
 static const int MAX_SUBMUXER_RATE = 35000000;
 
-enum DescriptorTag
+enum class DescriptorTag
 {
     DESC_TYPE_SpoaringTable = 0,  // UDF
     DESC_TYPE_PrimVol = 1,
@@ -51,7 +51,7 @@ enum DescriptorTag
     DESC_TYPE_ExtendedFile = 266
 };
 
-enum FileTypes
+enum class FileTypes
 {
     FileType_Unspecified = 0,
     FileType_UnallocatedSpace = 1,
@@ -197,7 +197,7 @@ class IsoWriter
     void setLayerBreakPoint(int lbn);
 
    private:
-    enum Partition
+    enum class Partition
     {
         MainPartition,
         MetadataPartition
@@ -214,7 +214,7 @@ class IsoWriter
     void writeUnallocatedSpaceDescriptor();
     void writeTerminationDescriptor();
     void writeLogicalVolumeIntegrityDescriptor();
-    int writeExtentFileDescriptor(bool namedStream, uint32_t objectId, uint8_t fileType, uint64_t len, uint32_t pos,
+    int writeExtentFileDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len, uint32_t pos,
                                   int linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
@@ -227,7 +227,7 @@ class IsoWriter
     void writeSector(uint8_t* sectorData);
     uint32_t absoluteSectorNum();
 
-    void writeIcbTag(bool namedStream, uint8_t* buffer, uint8_t fileType);
+    void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);
     void writeDescriptors();
     void allocateMetadata();
     void writeMetadata(int lbn);
