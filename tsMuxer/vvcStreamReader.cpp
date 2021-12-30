@@ -124,64 +124,35 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+                                           (float)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
         *dstBuff++ = (video_format << 4) + frame_rate_index;
         *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
-    }
-    else
-    {
-        uint8_t tmpBuffer[512];
 
-        for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
-             nal = NALUnit::findNextNAL(nal, m_bufEnd))
-        {
-            uint8_t nalType = (*nal >> 1) & 0x3f;
-            uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
-
-            if (nalType == V_SPS)
-            {
-                int toDecode = (int)FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
-                int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
-                break;
-            }
-        }
-
-        *dstBuff++ = VVC_DESCRIPTOR_TAG;
-        *dstBuff++ = 13;  // descriptor length
-        memcpy(dstBuff, tmpBuffer + 3, 12);
-        dstBuff += 12;
-        // flags temporal_layer_subset, VVC_still_present,
-        // VVC_24hr_picture_present, HDR_WCG unspecified
-        *dstBuff = 0x0f;
-        dstBuff++;
-
-        /* VVC_timing_and_HRD_descriptor
-        // mandatory for interlaced video only
-        memcpy(dstBuff, "\x3f\x0f\x03\x7f\x7f", 5);
-        dstBuff += 5;
-
-        uint32_t N = 1001 * getFPS();
-        uint32_t K = 27000000;
-        uint32_t num_units_in_tick = 1001;
-        if (N % 1000)
-        {
-            N = 1000 * getFPS();
-            num_units_in_tick = 1000;
-        }
-        N = my_htonl(N);
-        K = my_htonl(K);
-        num_units_in_tick = my_htonl(num_units_in_tick);
-        memcpy(dstBuff, &N, 4);
-        dstBuff += 4;
-        memcpy(dstBuff, &K, 4);
-        dstBuff += 4;
-        memcpy(dstBuff, &num_units_in_tick, 4);
-        dstBuff += 4;
-        */
+        return 10;
     }
 
-    return (hdmvDescriptors ? 10 : 15);
+    uint8_t* descStart = dstBuff;
+
+    // ITU-T Rec.H.222 Table 2-133 - VVC video descriptor
+    *dstBuff++ = VVC_DESCRIPTOR_TAG;
+    uint8_t* descLength = dstBuff++;
+    *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
+    *dstBuff++ = m_sps->ptl_num_sub_profiles;
+    uint32_t* bufPos = (uint32_t*)dstBuff;
+    for (auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
+    dstBuff = (uint8_t*)bufPos;
+    *dstBuff++ = (m_sps->progressive_source_flag << 7) | (m_sps->interlaced_source_flag << 6) |
+                 (m_sps->non_packed_constraint_flag << 5) | (m_sps->ptl_frame_only_constraint_flag << 4);
+    *dstBuff++ = m_sps->level_idc;
+    *dstBuff++ = 0;
+    *dstBuff++ = 0xc0;
+
+    uint8_t* descEnd = dstBuff;
+    int descSize = (int)(descEnd - descStart);
+    *descLength = descSize - 2;
+
+    return descSize;
 }
 
 void VVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)

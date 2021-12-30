@@ -52,7 +52,10 @@ struct VvcHrdUnit
 
 struct VvcUnit
 {
-    VvcUnit() : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0) {}
+    VvcUnit()
+        : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
+    {
+    }
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     virtual int deserialize();
@@ -87,7 +90,11 @@ struct VvcUnitWithProfile : public VvcUnit
 
    public:
     int profile_idc;
+    int tier_flag;
     int level_idc;
+    bool ptl_frame_only_constraint_flag;
+    int ptl_num_sub_profiles;
+    std::vector<int> general_sub_profile_idc;
 
    protected:
     int profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1);
@@ -131,6 +138,10 @@ struct VvcSpsUnit : public VvcUnitWithProfile
 
     std::vector<unsigned> cpb_cnt_minus1;
 
+    // T-Rec. H.274 7.2 vui_parameters()
+    bool progressive_source_flag;
+    bool interlaced_source_flag;
+    bool non_packed_constraint_flag;
     int colour_primaries;
     int transfer_characteristics;
     int matrix_coeffs;
