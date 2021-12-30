@@ -19,9 +19,13 @@ struct ReaderData
           m_notified(false),
           m_nextBlockSize(0),
           m_deleted(false),
+          m_firstBlock(false),
+          m_lastBlock(false),
           m_eof(false),
           m_atQueue(0),
           itr(0),
+          m_blockSize(0),
+          m_allocSize(0),
           m_readOffset(0)
     {
         m_nextBlock[0] = NULL;

@@ -49,7 +49,10 @@ enum HEVCUnitType
 
 struct HevcUnit
 {
-    HevcUnit() : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0) {}
+    HevcUnit()
+        : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
+    {
+    }
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     virtual int deserialize();
