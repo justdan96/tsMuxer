@@ -339,12 +339,12 @@ void MPEGStreamReader::checkPulldownSync()
 
 void MPEGStreamReader::fillAspectBySAR(double sar)
 {
-    if (m_streamAR == AR_KEEP_DEFAULT)
+    if (m_streamAR == VideoAspectRatio::AR_KEEP_DEFAULT)
     {
         double ar = getStreamWidth() * sar / (double)getStreamHeight();
         const static double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
         double minEps = INT_MAX;
-        m_streamAR = AR_KEEP_DEFAULT;
+        m_streamAR = VideoAspectRatio::AR_KEEP_DEFAULT;
         for (int i = 0; i < sizeof(base_ar) / sizeof(double); ++i)
         {
             if (fabs(ar - base_ar[i]) < minEps)

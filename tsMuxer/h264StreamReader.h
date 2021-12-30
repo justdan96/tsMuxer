@@ -12,7 +12,7 @@
 class H264StreamReader : public MPEGStreamReader
 {
    public:
-    enum SeiMethod
+    enum class SeiMethod
     {
         SEI_DoNotInsert,
         SEI_InsertAuto,

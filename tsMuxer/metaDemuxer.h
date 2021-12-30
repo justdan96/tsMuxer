@@ -75,7 +75,7 @@ struct StreamInfo
 
 // drpReadSequence - the stream is not fragmented
 // drpFragmented   - the stream is fragmented according to the resulting container
-enum DemuxerReadPolicy
+enum class DemuxerReadPolicy
 {
     drpReadSequence,
     drpFragmented

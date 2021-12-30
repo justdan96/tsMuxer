@@ -230,7 +230,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
           {0x21, 0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}}};
 
     BDMV_VersionNumber num = BDMV_VersionNumber::Version1;
-    if (diskType == DT_BLURAY)
+    if (diskType == DiskType::DT_BLURAY)
     {
         num = isV3() ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
     }
@@ -266,7 +266,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
 
 // ------------------------- BlurayHelper ---------------------------
 
-BlurayHelper::BlurayHelper() : m_isoWriter(0) {}
+BlurayHelper::BlurayHelper() : m_isoWriter(0), m_dt() {}
 
 BlurayHelper::~BlurayHelper() { close(); }
 
@@ -303,7 +303,7 @@ bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int ex
 
 bool BlurayHelper::createBluRayDirs()
 {
-    if (m_dt == DT_BLURAY)
+    if (m_dt == DiskType::DT_BLURAY)
     {
         if (m_isoWriter)
         {
@@ -359,7 +359,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
         file = new File();
 
     uint8_t* V3metaData;
-    if (m_dt == DT_BLURAY)
+    if (m_dt == DiskType::DT_BLURAY)
     {
         if (isV3())
         {
@@ -420,7 +420,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     uint8_t* clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
     CLPIParser clpiParser;
     string version_number;
-    if (m_dt == DT_BLURAY)
+    if (m_dt == DiskType::DT_BLURAY)
         memcpy(&clpiParser.version_number, isV3() ? "0300" : "0200", 5);
     else
         memcpy(&clpiParser.version_number, "0100", 5);
@@ -433,7 +433,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     clpiParser.is_ATC_delta = false;
     if (doLog)
     {
-        if (m_dt == DT_BLURAY)
+        if (m_dt == DiskType::DT_BLURAY)
         {
             LTRACE(LT_INFO, 2, "Creating Blu-ray stream info and seek index");
         }
@@ -623,7 +623,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
         }
     }
 
-    if (dt == DT_BLURAY)
+    if (dt == DiskType::DT_BLURAY)
     {
         LTRACE(LT_INFO, 2, "Creating Blu-ray playlist");
     }

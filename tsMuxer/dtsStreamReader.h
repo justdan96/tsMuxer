@@ -8,7 +8,7 @@
 class DTSStreamReader : public SimplePacketizerReader
 {
    public:
-    enum DTSHD_SUBTYPE
+    enum class DTSHD_SUBTYPE
     {
         DTS_SUBTYPE_UNINITIALIZED,
         DTS_SUBTYPE_MASTER_AUDIO,
@@ -26,10 +26,10 @@ class DTSStreamReader : public SimplePacketizerReader
         m_dts_hd_mode = false;
         m_downconvertToDTS = false;
         m_useNewStyleAudioPES = false;
-        m_state = stDecodeDTS;
+        m_state = DTSDecodeState::stDecodeDTS;
         m_hdFrameLen = 0;
         m_frameDuration = 0;
-        m_hdType = DTS_SUBTYPE_UNINITIALIZED;
+        m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED;
         hd_bitDepth = 0;
         hd_pi_lfeCnt = pi_lfeCnt = 0;
         hd_pi_channels = pi_channels = 0;
@@ -66,7 +66,7 @@ class DTSStreamReader : public SimplePacketizerReader
     {
         if (m_dts_hd_mode)
         {
-            if (m_hdType == DTS_SUBTYPE_EXPRESS)
+            if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS)
                 return dtsCodecInfo;
             else
                 return dtshdCodecInfo;
@@ -80,7 +80,7 @@ class DTSStreamReader : public SimplePacketizerReader
 
    private:
     enum DTSHD_SUBTYPE m_hdType;
-    enum DTSDecodeState
+    enum class DTSDecodeState
     {
         stDecodeDTS,
         stDecodeHD,

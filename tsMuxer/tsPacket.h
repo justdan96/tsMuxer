@@ -342,7 +342,7 @@ struct M2TSStreamInfo
     bool isSecondary;
     std::vector<PMTIndex> m_index;
 
-    static void blurayStreamParams(double fps, bool interlaced, int width, int height, float ar, int* video_format,
+    static void blurayStreamParams(double fps, bool interlaced, int width, int height, int ar, int* video_format,
                                    int* frame_rate_index, int* aspect_ratio_index);
 };
 

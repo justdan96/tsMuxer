@@ -7,7 +7,7 @@
 
 const static int MAX_AV_PACKET_SIZE = 32768 /*16 * 1024*/;
 
-enum VideoAspectRatio
+enum class VideoAspectRatio
 {
     AR_KEEP_DEFAULT,
     AR_VGA,

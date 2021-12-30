@@ -302,7 +302,7 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
 void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 {
     // return; // todo delete this!!!
-    buff[3] = (buff[3] & 0x0f) + (ar << 4);
+    buff[3] = (buff[3] & 0x0f) + ((int)ar << 4);
 }
 
 // --------------- gop header ------------------

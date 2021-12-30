@@ -19,7 +19,7 @@ const static int PTS_CONST_OFFSET = 0;
 class AbstractStreamReader : public BaseAbstractStreamReader
 {
    public:
-    enum ContainerType
+    enum class ContainerType
     {
         ctNone,
         ctEVOB,
@@ -40,7 +40,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
         : BaseAbstractStreamReader(),
           m_flags(0),
           m_timeOffset(0),
-          m_containerType(ctNone),
+          m_containerType(ContainerType::ctNone),
           m_demuxMode(false),
           m_secondary(false),
           m_curPos(0),

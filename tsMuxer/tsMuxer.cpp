@@ -392,12 +392,13 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         DTSStreamReader* dtsReader = (DTSStreamReader*)codecReader;
         dtsReader->setNewStyleAudioPES(m_useNewStyleAudioPES);
         int audioType = 0;
-        if (dtsReader->getDTSHDMode() && !dtsReader->getDownconvertToDTS())
+        if (dtsReader->getDTSHDMode() != DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED &&
+            !dtsReader->getDownconvertToDTS())
         {
             // if (dtsReader->getDTSHDMode() == DTSStreamReader::DTS_SUBTYPE_EXPRESS)
             if (dtsReader->isSecondary())
                 audioType = STREAM_TYPE_AUDIO_DTS_HD_SECONDARY;
-            else if (dtsReader->getDTSHDMode() == DTSStreamReader::DTS_SUBTYPE_MASTER_AUDIO)
+            else if (dtsReader->getDTSHDMode() == DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
                 audioType = STREAM_TYPE_AUDIO_DTS_HD_MASTER_AUDIO;
             else
                 audioType = STREAM_TYPE_AUDIO_DTS_HD;
