@@ -31,7 +31,7 @@ H264StreamReader::H264StreamReader() : MPEGStreamReader()
     m_lastSliceIDR = false;
     m_h264SPSCont = false;
     m_spsCounter = 0;
-    m_insertSEIMethod = SEI_DoNotInsert;
+    m_insertSEIMethod = SeiMethod::SEI_DoNotInsert;
     m_needSeiCorrection = false;
     m_firstDecodeNal = true;
     // m_cpb_removal_delay_baseaddr = 0;
@@ -456,7 +456,7 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+                                           (int)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
         *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
         *dstBuff++ = (video_format << 4) + frame_rate_index;
@@ -617,9 +617,9 @@ void H264StreamReader::additionalStreamCheck(uint8_t* buff, uint8_t* end)
         }
     }
 
-    if (m_removePulldown || m_insertSEIMethod == SEI_InsertForce)
+    if (m_removePulldown || m_insertSEIMethod == SeiMethod::SEI_InsertForce)
         m_needSeiCorrection = true;
-    else if (m_insertSEIMethod == SEI_InsertAuto)
+    else if (m_insertSEIMethod == SeiMethod::SEI_InsertAuto)
     {
         m_needSeiCorrection =
             orig_hrd_parameters_present_flag == 0 || orig_vcl_parameters_present_flag == 0 || !SEIFound;

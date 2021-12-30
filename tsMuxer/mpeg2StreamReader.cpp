@@ -361,6 +361,6 @@ void MPEG2StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* n
 
 void MPEG2StreamReader::updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
-    if (m_ar != AR_KEEP_DEFAULT)
+    if (m_ar != VideoAspectRatio::AR_KEEP_DEFAULT)
         m_sequence.setAspectRatio(buff + 1, m_ar);  // todo: delete this line! debug only
 }

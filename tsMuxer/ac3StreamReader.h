@@ -15,7 +15,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         : SimplePacketizerReader(), m_useNewStyleAudioPES(false), m_hdFrameOffset(0), m_thdTsLen(0), m_ac3TsLen(0)
     {
         m_downconvertToAC3 = m_true_hd_mode = false;
-        m_state = stateDecodeAC3;
+        m_state = AC3State::stateDecodeAC3;
         m_waitMoreData = false;
 
         m_thdDemuxWaitAc3 = true;  // wait ac3 packet
@@ -33,7 +33,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         if (m_downconvertToAC3)
             return AC3Codec::m_sample_rate;
         else
-            return mh.subType == MLPHeaderInfo::stUnknown ? AC3Codec::m_sample_rate : mh.group1_samplerate;
+            return mh.subType == MLPHeaderInfo::MlpSubType::stUnknown ? AC3Codec::m_sample_rate : mh.group1_samplerate;
     }
     int getChannels() override { return AC3Codec::m_channels; }
     bool isPriorityData(AVPacket* packet) override;

@@ -757,7 +757,8 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
                                             int containerDataType, int containerStreamIndex)
 {
     CheckStreamRez rez;
-    if ((containerType == ctM2TS || containerType == ctTS) && containerDataType == STREAM_TYPE_SUB_PGS)
+    if ((containerType == ContainerType::ctM2TS || containerType == ContainerType::ctTS) &&
+        containerDataType == STREAM_TYPE_SUB_PGS)
     {
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
@@ -765,13 +766,13 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
             rez.streamDescr +=
                 std::string(" #") + int32ToStr(containerStreamIndex - (V3_flags & 0x1e ? 0x12A0 : 0x1200));
     }
-    else if (containerType == ctMKV && containerDataType == STREAM_TYPE_SUB_PGS)
+    else if (containerType == ContainerType::ctMKV && containerDataType == STREAM_TYPE_SUB_PGS)
     {
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
         rez.streamDescr += std::string(" #") + int32ToStr(containerStreamIndex);
     }
-    else if (containerType == ctSUP && len > 2 && buffer[0] == 'P' && buffer[1] == 'G')
+    else if (containerType == ContainerType::ctSUP && len > 2 && buffer[0] == 'P' && buffer[1] == 'G')
     {
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = std::string("Presentation Graphic Stream");

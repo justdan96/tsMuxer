@@ -278,12 +278,13 @@ CheckStreamRez SRTStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
                                             int containerDataType, int containerStreamIndex)
 {
     CheckStreamRez rez;
-    if ((containerType == ctMKV || containerType == ctMOV) && containerDataType == TRACKTYPE_SRT ||
-        containerType == ctSRT)
+    if ((containerType == ContainerType::ctMKV || containerType == ContainerType::ctMOV) &&
+            containerDataType == TRACKTYPE_SRT ||
+        containerType == ContainerType::ctSRT)
     {
         rez.codecInfo = srtCodecInfo;
         rez.streamDescr = "SRT text subtitles";
-        if (containerType == ctSRT)
+        if (containerType == ContainerType::ctSRT)
             rez.lang = detectUTF8Lang(buffer, len);
     }
     return rez;

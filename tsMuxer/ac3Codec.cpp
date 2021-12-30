@@ -338,10 +338,10 @@ bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
         return false;
     mh.stream_type = reader.getBits(8);
 
-    mh.subType = MLPHeaderInfo::stUnknown;
+    mh.subType = MLPHeaderInfo::MlpSubType::stUnknown;
     if (mh.stream_type == 0xbb)
     {
-        mh.subType = MLPHeaderInfo::stMLP;
+        mh.subType = MLPHeaderInfo::MlpSubType::stMLP;
         mh.group1_bits = mlp_quants[reader.getBits(4)];
         mh.group2_bits = mlp_quants[reader.getBits(4)];
         ratebits = reader.getBits(4);
@@ -355,7 +355,7 @@ bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
     }
     else if (mh.stream_type == 0xba)
     {
-        mh.subType = MLPHeaderInfo::stTRUEHD;
+        mh.subType = MLPHeaderInfo::MlpSubType::stTRUEHD;
         mh.group1_bits = 24;  // TODO: Is this information actually conveyed anywhere?
         mh.group2_bits = 0;
         ratebits = reader.getBits(4);
@@ -402,13 +402,13 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
 
         if (end - buf < 2)
             return NOT_ENOUGH_BUFFER;
-        if (m_state != stateDecodeAC3 && buf[0] == 0x0B && buf[1] == 0x77)
+        if (m_state != AC3State::stateDecodeAC3 && buf[0] == 0x0B && buf[1] == 0x77)
         {
             if (testDecodeTestFrame(buf, end))
-                m_state = stateDecodeAC3;
+                m_state = AC3State::stateDecodeAC3;
         }
 
-        if (m_state == stateDecodeAC3)
+        if (m_state == AC3State::stateDecodeAC3)
         {
             skipBytes = 0;
             err = parseHeader(buf, end);
@@ -438,7 +438,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             uint8_t* trueHDData = buf + rez;
             if (end - trueHDData < 7)
                 return NOT_ENOUGH_BUFFER;
-            if (m_state == stateDecodeAC3)
+            if (m_state == AC3State::stateDecodeAC3)
             {
                 // check if it is a real HD frame
 
@@ -446,11 +446,11 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
                 {
                     uint8_t* tmpNextFrame = findFrame(buf + 7, end);
                     m_waitMoreData = true;
-                    m_state = stateDecodeTrueHDFirst;
+                    m_state = AC3State::stateDecodeTrueHDFirst;
                 }
                 return rez;
             }
-            m_state = stateDecodeTrueHD;
+            m_state = AC3State::stateDecodeTrueHD;
             int trueHDFrameLen = (trueHDData[0] & 0x0f) << 8;
             trueHDFrameLen += trueHDData[1];
             trueHDFrameLen *= 2;
@@ -586,9 +586,9 @@ const std::string AC3Codec::getStreamInfo()
 {
     std::ostringstream str;
     std::string hd_type;
-    if (mh.subType == MLPHeaderInfo::stTRUEHD)
+    if (mh.subType == MLPHeaderInfo::MlpSubType::stTRUEHD)
         hd_type = "TRUE-HD";
-    else if (mh.subType == MLPHeaderInfo::stMLP)
+    else if (mh.subType == MLPHeaderInfo::MlpSubType::stMLP)
         hd_type = "MLP";
     else
         hd_type = "UNKNOWN";

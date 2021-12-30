@@ -74,7 +74,7 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     int skipBytes = 0;
     int skipBeforeBytes = 0;
     int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
-    m_state = stDecodeDTS;
+    m_state = DTSDecodeState::stDecodeDTS;
     if (len < 1)
         return 0;
     BitStreamWriter bitWriter;
@@ -121,7 +121,7 @@ void DTSStreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
         uint8_t* data = (uint8_t*)(pesPacket) + pesPacket->getHeaderLength();
         *data++ = 1;     // PES_extension_flag_2
         *data++ = 0x81;  // marker bit + extension2 len
-        if (m_state == stDecodeHD2 || !m_isCoreExists)
+        if (m_state == DTSDecodeState::stDecodeHD2 || !m_isCoreExists)
             *data++ = 0x72;  // stream id extension. 71 = DTS frame, 72 HD frame
         else
             *data++ = 0x71;  // stream id extension
@@ -293,7 +293,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
             headerSize = reader.getBits(8) + 1;
             hdFrameSize = reader.getBits(16) + 1;
         }
-        if (m_hdType == DTS_SUBTYPE_UNINITIALIZED)
+        if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED)
         {
             if (buff + headerSize + 4 > end)
                 return NOT_ENOUGH_BUFFER;
@@ -301,21 +301,21 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
             switch (my_ntohl(*hdAudioData))
             {
             case 0x41A29547:
-                m_hdType = DTS_SUBTYPE_MASTER_AUDIO;  // XLL
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO;  // XLL
                 break;
             case 0x655E315E:
-                m_hdType = DTS_SUBTYPE_HIGH_RES;  // XBR
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES;  // XBR
                 break;
             case 0x0A801921:
-                m_hdType = DTS_SUBTYPE_EXPRESS;
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS;
                 break;
             case 0x47004A03:
             case 0x5A5A5A5A:
-                m_hdType = DTS_SUBTYPE_EX;
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_EX;
             case 0x1D95F262:
-                m_hdType = DTS_SUBTYPE_96;
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_96;
             default:
-                m_hdType = DTS_SUBTYPE_OTHER;
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_OTHER;
             }
         }
         else
@@ -420,7 +420,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 if (!m_isCoreExists)
                     m_frameDuration = pi_frame_length * 1e9 / (double)hd_pi_sample_rate;
 
-                if (m_hdType != DTS_SUBTYPE_MASTER_AUDIO)
+                if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
                     m_hdBitrate = hd_pi_sample_rate / (double)pi_frame_length * hdFrameSize * 8;
 
                 hd_pi_lfeCnt = 0;
@@ -456,12 +456,12 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
     if (m_isCoreExists)
     {
         skipBeforeBytes = skipBytes = 0;
-        if (m_state == stDecodeHD && *((uint32_t*)buff) == my_htonl(DTS_HD_PREFIX))
+        if (m_state == DTSDecodeState::stDecodeHD && *((uint32_t*)buff) == my_htonl(DTS_HD_PREFIX))
         {
-            m_state = stDecodeHD2;
+            m_state = DTSDecodeState::stDecodeHD2;
             return m_hdFrameLen;
         }
-        m_state = stDecodeDTS;
+        m_state = DTSDecodeState::stDecodeDTS;
 
         // if (m_state == stDecodeDTS)
         {
@@ -642,7 +642,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         }
         else
         {
-            m_state = stDecodeHD;
+            m_state = DTSDecodeState::stDecodeHD;
             m_hdFrameLen = nextFrame - afterFrameData;
             return m_isCoreExists ? i_frame_size : m_hdFrameLen;
             // return nextFrame - buff;
@@ -753,7 +753,7 @@ double DTSStreamReader::getFrameDurationNano()
 {
     if (!m_isCoreExists)
         return m_frameDuration;
-    else if (m_dts_hd_mode && !m_downconvertToDTS && m_state != stDecodeHD2)
+    else if (m_dts_hd_mode && !m_downconvertToDTS && m_state != DTSDecodeState::stDecodeHD2)
         return 0;
     else
         return m_frameDuration;
@@ -795,7 +795,7 @@ const std::string DTSStreamReader::getStreamInfo()
         str << "Loseless. ";
     else
         str << (pi_bit_rate + m_hdBitrate) / 1000 << "Kbps  ";
-    if (m_hdType == DTS_SUBTYPE_MASTER_AUDIO)
+    if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
         str << "core + MLP data.";
     str << "Sample Rate: " << (hd_pi_sample_rate ? hd_pi_sample_rate : pi_sample_rate) / 1000 << "KHz  ";
     str << "Channels: ";
@@ -816,17 +816,17 @@ const std::string DTSStreamReader::getStreamInfo()
     if (m_dts_hd_mode)
     {
         // str << "DTS core + MLP data. ";
-        if (m_hdType == DTS_SUBTYPE_MASTER_AUDIO)
+        if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
             str << " (DTS Master Audio";
-        else if (m_hdType == DTS_SUBTYPE_HIGH_RES)
+        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES)
             str << " (DTS High Resolution";
-        else if (m_hdType == DTS_SUBTYPE_EXPRESS)
+        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS)
             str << " (DTS Express";
-        else if (m_hdType == DTS_SUBTYPE_EX)
+        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_EX)
             str << " (DTS Ex";
-        else if (m_hdType == DTS_SUBTYPE_96)
+        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_96)
             str << " (DTS 96";
-        else if (m_hdType == DTS_SUBTYPE_96)
+        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_96)
             str << " (DTS HD";
         if (hd_bitDepth > 16)
             str << " 24bit";

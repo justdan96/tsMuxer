@@ -21,7 +21,7 @@ using namespace wave_format;
 
 int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
-    if (m_headerType == htNone)
+    if (m_headerType == LPCMHeaderType::htNone)
         if (!detectLPCMType(m_buffer, m_bufEnd - m_buffer))
             return 0;
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
@@ -376,7 +376,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
     {
         WAVEFORMATPCMEX* waveFormatPCMEx;
         uint64_t fmtSize;
-        if (m_headerType == htWAVE64)
+        if (m_headerType == LPCMHeaderType::htWAVE64)
         {
             curPos = findSubstr("fmt ", buff, end);
             if (curPos == 0 || curPos + sizeof(wave_format::GUID) + 8 >= end)
@@ -490,7 +490,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
             return 0;  // 'riff' header was wrong detected, it is just data
     }
 
-    if (m_headerType == htWAVE)
+    if (m_headerType == LPCMHeaderType::htWAVE)
     {
         if (curPos + 8 >= end)
             return NOT_ENOUGH_BUFFER;
@@ -515,7 +515,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
 int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes)
 {
     skipBeforeBytes = skipBytes = 0;
-    if (m_headerType == htM2TS)
+    if (m_headerType == LPCMHeaderType::htM2TS)
     {
         int audio_data_payload_size = decodeLPCMHeader(buff);
         if (end - buff < audio_data_payload_size + 4)
@@ -532,7 +532,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
             return 4 + audio_data_payload_size;  // 4 byte header + payload
         }
     }
-    else if (m_headerType == htWAVE || m_headerType == htWAVE64)
+    else if (m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64)
     {
         int hdrSize = 0;
         if (end - buff < 4)
@@ -591,7 +591,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
 
 uint8_t* LPCMStreamReader::findFrame(uint8_t* buff, uint8_t* end)
 {
-    if (m_headerType == htNone)
+    if (m_headerType == LPCMHeaderType::htNone)
         if (!detectLPCMType(buff, end - buff))
             return 0;
     return buff;
@@ -676,7 +676,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int len)
 
     if (m_containerDataType == TRACKTYPE_WAV)
     {
-        m_headerType = htWAVE;
+        m_headerType = LPCMHeaderType::htWAVE;
         return true;
     }
 
@@ -686,14 +686,14 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int len)
     if ((curPos[0] == 'R' && curPos[1] == 'I' && curPos[2] == 'F' && curPos[3] == 'F') ||
         (curPos[0] == 'r' && curPos[1] == 'i' && curPos[2] == 'f' && curPos[3] == 'f'))
     {
-        m_headerType = htWAVE;
+        m_headerType = LPCMHeaderType::htWAVE;
         wave_format::GUID* testWave64 = (wave_format::GUID*)curPos;
         if (*testWave64 == WAVE64GUID)
-            m_headerType = htWAVE64;
+            m_headerType = LPCMHeaderType::htWAVE64;
         return true;
     }
 
-    if (m_testMode && m_containerType != ctLPCM && m_containerDataType != STREAM_TYPE_AUDIO_LPCM)
+    if (m_testMode && m_containerType != ContainerType::ctLPCM && m_containerDataType != STREAM_TYPE_AUDIO_LPCM)
         return false;  // LPCM definition has too few bytes. We can't detect LPCM without hints from source container
 
     // 2. test for M2TS LPCM headers
@@ -711,7 +711,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int len)
     }
     if (curPos >= end)
     {
-        m_headerType = htM2TS;
+        m_headerType = LPCMHeaderType::htM2TS;
         return true;
     }
 
@@ -825,7 +825,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     avPacket.duration = getFrameDurationNano();  // m_ptsIncPerFrame;
     m_curPts += avPacket.duration;
     doMplsCorrection();
-    if ((m_headerType == htWAVE || m_headerType == htWAVE64) && !m_demuxMode)
+    if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)
     {
         avPacket.size = convertWavToPCM(avPacket.data, avPacket.data + avPacket.size);
         avPacket.data = m_tmpFrameBuffer;
@@ -868,7 +868,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
     {
         avPacket.size = m_tmpBufferLen;
     }
-    if ((m_headerType == htWAVE || m_headerType == htWAVE64) && !m_demuxMode)
+    if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)
     {
         if (m_frameRest > 0)
             m_needPCMHdr = false;

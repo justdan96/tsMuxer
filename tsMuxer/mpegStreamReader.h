@@ -32,7 +32,7 @@ class MPEGStreamReader : public AbstractStreamReader
         // m_firstPulldownWarn = true;
         m_pulldownWarnCnt = 1;
         m_testPulldownDts = 0;
-        m_streamAR = m_ar = AR_KEEP_DEFAULT;
+        m_streamAR = m_ar = VideoAspectRatio::AR_KEEP_DEFAULT;
         m_spsPpsFound = false;
     }
     ~MPEGStreamReader() override { delete[] m_tmpBuffer; }

@@ -21,11 +21,6 @@
 
 using namespace std;
 
-enum SubPathType
-{
-    SUBPATH_PIP = 7
-};
-
 bool isVideoStreamType(int stream_coding_type)
 {
     return stream_coding_type == STREAM_TYPE_VIDEO_MPEG2 || stream_coding_type == STREAM_TYPE_VIDEO_H264 ||
@@ -1495,7 +1490,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
     std::string type_indicator = "MPLS";
     std::string version_number;
-    if (dt == DT_BLURAY)
+    if (dt == DiskType::DT_BLURAY)
         version_number = (isV3() ? "0300" : "0200");
     else
         version_number = "0100";
@@ -1926,9 +1921,11 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
                     int pipWidth = pipStreams[k].width * pipParams.getScaleCoeff();
                     int pipHeight = pipStreams[k].height * pipParams.getScaleCoeff();
 
-                    if (pipParams.corner == PIPParams::TopRight || pipParams.corner == PIPParams::BottomRight)
+                    if (pipParams.corner == PIPParams::PipCorner::TopRight ||
+                        pipParams.corner == PIPParams::PipCorner::BottomRight)
                         hPos = mainHSize - pipWidth - pipParams.hOffset;
-                    if (pipParams.corner == PIPParams::BottomRight || pipParams.corner == PIPParams::BottomLeft)
+                    if (pipParams.corner == PIPParams::PipCorner::BottomRight ||
+                        pipParams.corner == PIPParams::PipCorner::BottomLeft)
                         vPos = mainVSize - pipHeight - pipParams.vOffset;
                 }
 
@@ -2643,7 +2640,7 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 
 // ------------- M2TSStreamInfo -----------------------
 
-void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, int height, float ar, int* video_format,
+void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, int height, int ar, int* video_format,
                                         int* frame_rate_index, int* aspect_ratio_index)
 {
     *video_format = 0;
@@ -2681,7 +2678,7 @@ void M2TSStreamInfo::blurayStreamParams(double fps, bool interlaced, int width, 
     else if (fabs(fps - 59.94) < 1e-4)
         *frame_rate_index = 7;
 
-    if (ar == AR_3_4 || ar == AR_VGA)
+    if (ar == (int)VideoAspectRatio::AR_3_4 || ar == (int)VideoAspectRatio::AR_VGA)
         *aspect_ratio_index = 2;  // 4x3
 }
 
@@ -2711,13 +2708,13 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             height = vStream->getStreamHeight();
             HDR = vStream->getStreamHDR();
             VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar, &video_format,
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, (int)ar, &video_format,
                                &frame_rate_index, &aspect_ratio_index);
-            if (ar == AR_3_4)
+            if (ar == VideoAspectRatio::AR_3_4)
                 width = height * 4 / 3;
-            else if (ar == AR_16_9)
+            else if (ar == VideoAspectRatio::AR_16_9)
                 width = height * 16 / 9;
-            else if (ar == AR_221_100)
+            else if (ar == VideoAspectRatio::AR_221_100)
                 width = height * 221 / 100;
         }
         H264StreamReader* h264Stream = dynamic_cast<H264StreamReader*>(pmtStreamInfo.m_codecReader);

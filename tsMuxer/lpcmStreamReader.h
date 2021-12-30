@@ -7,7 +7,7 @@
 class LPCMStreamReader : public SimplePacketizerReader
 {
    public:
-    enum LPCMHeaderType
+    enum class LPCMHeaderType
     {
         htNone,
         htM2TS,
@@ -19,7 +19,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     {
         m_bitsPerSample = m_freq = m_channels = 0;
         m_lfeExists = false;
-        m_headerType = htNone;
+        m_headerType = LPCMHeaderType::htNone;
         m_testMode = false;
         m_firstFrame = true;
         m_demuxMode = false;

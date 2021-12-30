@@ -7,8 +7,8 @@ struct CodecInfo;
 
 typedef struct MLPHeaderInfo
 {
-    MLPHeaderInfo() : subType(stUnknown), channels(0) {}
-    enum MlpSubType
+    MLPHeaderInfo() : subType(MlpSubType::stUnknown), channels(0) {}
+    enum class MlpSubType
     {
         stUnknown,
         stTRUEHD,
@@ -44,7 +44,7 @@ class AC3Codec
    public:
     static const int AC3_HEADER_SIZE = 7;
 
-    enum AC3State
+    enum class AC3State
     {
         stateDecodeAC3,
         stateDecodeAC3Plus,
@@ -54,7 +54,7 @@ class AC3Codec
     AC3Codec()
     {
         m_downconvertToAC3 = m_true_hd_mode = false;
-        m_state = stateDecodeAC3;
+        m_state = AC3State::stateDecodeAC3;
         m_waitMoreData = false;
         setTestMode(false);
         m_frameDuration = false;

@@ -207,7 +207,7 @@ void METADemuxer::openFile(const string& streamName)
         file.readLine(str);
     }
 
-    H264StreamReader::SeiMethod primarySEI = H264StreamReader::SEI_NotDefined;
+    H264StreamReader::SeiMethod primarySEI = H264StreamReader::SeiMethod::SEI_NotDefined;
     for (auto& i : m_codecInfo)
     {
         H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
@@ -219,14 +219,14 @@ void METADemuxer::openFile(const string& streamName)
     }
 
     bool warned = false;
-    if (primarySEI != H264StreamReader::SEI_NotDefined)
+    if (primarySEI != H264StreamReader::SeiMethod::SEI_NotDefined)
     {
         for (auto& i : m_codecInfo)
         {
             H264StreamReader* reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
             if (reader && reader->isSubStream())
             {
-                if (!warned && (int)reader->getInsertSEI() != primarySEI)
+                if (!warned && reader->getInsertSEI() != primarySEI)
                 {
                     LTRACE(LT_INFO, 2,
                            "Parameter 'insertSEI' for MVC dependent view differs from same param for AVC base view. "
@@ -426,7 +426,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (pid)
         {
             dataReader = &m_containerReader;
-            codecReader->setSrcContainerType(AbstractStreamReader::ctMultiH264);
+            codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMultiH264);
             if (listIterator)
                 ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         }
@@ -445,9 +445,9 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (listIterator)
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".ts"))
-            codecReader->setSrcContainerType(AbstractStreamReader::ctTS);
+            codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctTS);
         else
-            codecReader->setSrcContainerType(AbstractStreamReader::ctM2TS);
+            codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctM2TS);
     }
     else if (strEndWith(tmpname, ".vob") || strEndWith(tmpname, ".evo") || strEndWith(tmpname, ".mpg"))
     {
@@ -458,9 +458,9 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (listIterator)
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".evo") || strEndWith(tmpname, ".evo\""))
-            codecReader->setSrcContainerType(AbstractStreamReader::ctEVOB);
+            codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctEVOB);
         else
-            codecReader->setSrcContainerType(AbstractStreamReader::ctVOB);
+            codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctVOB);
     }
     else if (strEndWith(tmpname, ".mkv") || strEndWith(tmpname, ".mka"))
     {
@@ -470,7 +470,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MKV container need track parameter.");
         if (listIterator)
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
-        codecReader->setSrcContainerType(AbstractStreamReader::ctMKV);
+        codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMKV);
     }
     else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") ||
              strEndWith(tmpname, ".m4a"))
@@ -481,7 +481,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MOV/MP4 container need track parameter.");
         if (listIterator)
             ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
-        codecReader->setSrcContainerType(AbstractStreamReader::ctMOV);
+        codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMOV);
     }
     else
     {
@@ -575,13 +575,13 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     AbstractDemuxer* demuxer = 0;
     auto unquoted = unquoteStr(fileName);
     string fileExt = strToLowerCase(extractFileExt(unquoted));
-    AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ctNone;
+    AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ContainerType::ctNone;
     CLPIParser clpi;
     bool clpiParsed = false;
     if (fileExt == "m2ts" || fileExt == "mts" || fileExt == "ssif")
     {
         demuxer = new TSDemuxer(readManager, "");
-        containerType = AbstractStreamReader::ctM2TS;
+        containerType = AbstractStreamReader::ContainerType::ctM2TS;
         string clpiFileName = findBluRayFile(extractFileDir(unquoted), "CLIPINF", extractFileName(unquoted) + ".clpi");
         if (!clpiFileName.empty())
             clpiParsed = clpi.parse(clpiFileName.c_str());
@@ -589,27 +589,27 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     else if (fileExt == "ts")
     {
         demuxer = new TSDemuxer(readManager, "");
-        containerType = AbstractStreamReader::ctTS;
+        containerType = AbstractStreamReader::ContainerType::ctTS;
     }
     else if (fileExt == "vob" || fileExt == "mpg")
     {
         demuxer = new ProgramStreamDemuxer(readManager);
-        containerType = AbstractStreamReader::ctVOB;
+        containerType = AbstractStreamReader::ContainerType::ctVOB;
     }
     else if (fileExt == "evo")
     {
         demuxer = new ProgramStreamDemuxer(readManager);
-        containerType = AbstractStreamReader::ctEVOB;
+        containerType = AbstractStreamReader::ContainerType::ctEVOB;
     }
     else if (fileExt == "mkv" || fileExt == "mka")
     {
         demuxer = new MatroskaDemuxer(readManager);
-        containerType = AbstractStreamReader::ctMKV;
+        containerType = AbstractStreamReader::ContainerType::ctMKV;
     }
     else if (fileExt == "mp4" || fileExt == "m4v" || fileExt == "m4a" || fileExt == "mov")
     {
         demuxer = new MovDemuxer(readManager);
-        containerType = AbstractStreamReader::ctMOV;
+        containerType = AbstractStreamReader::ContainerType::ctMOV;
     }
 
     if (demuxer)
@@ -671,17 +671,17 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     else
     {
         File file;
-        containerType = AbstractStreamReader::ctNone;
+        containerType = AbstractStreamReader::ContainerType::ctNone;
         if (!file.open(fileName.c_str(), File::ofRead))
             return DetectStreamRez();
         uint8_t* tmpBuffer = new uint8_t[DETECT_STREAM_BUFFER_SIZE];
         int len = file.read(tmpBuffer, DETECT_STREAM_BUFFER_SIZE);
         if (fileExt == "sup")
-            containerType = AbstractStreamReader::ctSUP;
+            containerType = AbstractStreamReader::ContainerType::ctSUP;
         else if (fileExt == "pcm" || fileExt == "lpcm" || fileExt == "wav" || fileExt == "w64")
-            containerType = AbstractStreamReader::ctLPCM;
+            containerType = AbstractStreamReader::ContainerType::ctLPCM;
         else if (fileExt == "srt")
-            containerType = AbstractStreamReader::ctSRT;
+            containerType = AbstractStreamReader::ContainerType::ctSRT;
         CheckStreamRez trackRez = detectTrackReader(tmpBuffer, len, containerType, 0, 0);
 
         if (strStartWith(trackRez.codecInfo.programName, "V_"))
@@ -798,16 +798,16 @@ CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,
 VideoAspectRatio arNameToCode(const string& arName)
 {
     if (arName == "9x16" || arName == "16x9" || arName == "9:16" || arName == "16:9")
-        return AR_16_9;
+        return VideoAspectRatio::AR_16_9;
     else if (arName == "3:4" || arName == "4:3" || arName == "4x3" || arName == "3x4")
-        return AR_3_4;
+        return VideoAspectRatio::AR_3_4;
     else if (arName == "Square" || arName == "VGA" || arName == "1:1" || arName == "1x1" || arName == "1:1 (Square)")
-        return AR_VGA;
+        return VideoAspectRatio::AR_VGA;
     else if (arName == "WIDE" || arName == "1x2,21" || arName == "1x2.21" || arName == "1:2.21" || arName == "1:2,21" ||
              arName == "2.21:1" || arName == "2,21:1" || arName == "2.21x1" || arName == "2,21x1")
-        return AR_221_100;
+        return VideoAspectRatio::AR_221_100;
     else
-        return AR_KEEP_DEFAULT;
+        return VideoAspectRatio::AR_KEEP_DEFAULT;
 }
 
 double correctFps(double fps)
@@ -826,13 +826,13 @@ PIPParams::PipCorner pipCornerFromStr(const std::string& value)
 {
     std::string v = trimStr(strToLowerCase(value));
     if (v == "topleft")
-        return PIPParams::TopLeft;
+        return PIPParams::PipCorner::TopLeft;
     else if (v == "topright")
-        return PIPParams::TopRight;
+        return PIPParams::PipCorner::TopRight;
     else if (v == "bottomright")
-        return PIPParams::BottomRight;
+        return PIPParams::PipCorner::BottomRight;
     else
-        return PIPParams::BottomLeft;
+        return PIPParams::PipCorner::BottomLeft;
 }
 
 int pipScaleFromStr(const std::string& value)
@@ -881,17 +881,17 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         itr = addParams.find("insertSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SEI_InsertAuto);
+            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
         }
         itr = addParams.find("autoSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SEI_InsertAuto);
+            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
         }
         itr = addParams.find("forceSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SEI_InsertForce);
+            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertForce);
         }
         itr = addParams.find("contSPS");
         if (itr != addParams.end())
@@ -1312,8 +1312,9 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
 
     readCnt = FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset;
     DemuxerReadPolicy policy = demuxerData.m_pids[pid];
-    if ((readCnt > 0 && (policy == drpFragmented || demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2 ||
-                         demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2)) ||
+    if ((readCnt > 0 &&
+         (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2 ||
+          demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2)) ||
         readCnt >= MIN_READED_BLOCK)
     {
         data = streamData.data();
@@ -1340,7 +1341,8 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
             }
             m_discardedSize += discardSize;
             readCnt = streamData.size() - m_readBuffOffset;
-        } while (demuxRez == 0 && readCnt < MIN_READED_BLOCK && policy != drpFragmented && !m_terminated);
+        } while (demuxRez == 0 && readCnt < MIN_READED_BLOCK && policy != DemuxerReadPolicy::drpFragmented &&
+                 !m_terminated);
 
         demuxerData.lastReadCnt[pid] = readCnt;
         data = streamData.data();
@@ -1352,7 +1354,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
             rez = AbstractReader::DATA_EOF;
         else
         {
-            if (policy == drpReadSequence)
+            if (policy == DemuxerReadPolicy::drpReadSequence)
                 rez = AbstractReader::DATA_NOT_READY;
             else
                 rez = AbstractReader::DATA_DELAYED;
@@ -1467,10 +1469,10 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
 
     if (codecInfo &&
         (codecInfo->codecID == CODEC_S_PGS || codecInfo->codecID == CODEC_S_SUP || codecInfo->codecID == CODEC_S_SRT))
-        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, drpFragmented));
+        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, DemuxerReadPolicy::drpFragmented));
     else
     {
-        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, drpReadSequence));
+        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, DemuxerReadPolicy::drpReadSequence));
         m_demuxers[streamName].m_allFragmented = false;
     }
     m_demuxers[streamName].m_pidSet.insert(pid);

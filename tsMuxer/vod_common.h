@@ -101,7 +101,7 @@ struct AVRational
 
 typedef std::vector<std::pair<int, int>> PriorityDataInfo;  // mark some data as priority data
 
-enum DiskType
+enum class DiskType
 {
     DT_NONE,
     DT_BLURAY,
@@ -130,7 +130,7 @@ static int64_t ptsToNanoClock(int64_t value)
 
 struct PIPParams
 {
-    enum PipCorner
+    enum class PipCorner
     {
         TopLeft,
         TopRight,
@@ -138,7 +138,7 @@ struct PIPParams
         BottomLeft
     };
 
-    PIPParams() : scaleIndex(1), corner(TopLeft), hOffset(0), vOffset(0), lumma(3) {}
+    PIPParams() : scaleIndex(1), corner(PipCorner::TopLeft), hOffset(0), vOffset(0), lumma(3) {}
 
     bool isFullScreen() const { return scaleIndex == 5; }
     float getScaleCoeff() const

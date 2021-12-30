@@ -19,7 +19,7 @@ bool AC3StreamReader::isPriorityData(AVPacket* packet)
     // return packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10 && m_state !=
     // stateDecodeTrueHD;
     bool rez = packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10;
-    if (rez && m_state == stateDecodeTrueHD)
+    if (rez && m_state == AC3State::stateDecodeTrueHD)
     {
         int gg = 4;
     }
@@ -76,7 +76,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         if (getFrameDurationNano() > 0)
             i++;
     }
-    m_state = stateDecodeAC3;
+    m_state = AC3State::stateDecodeAC3;
     AC3Codec::setTestMode(false);
 
     if (isAC3())
@@ -178,7 +178,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         if (rez != 0)
             return rez;
 
-        bool isAc3Packet = (m_state == stateDecodeTrueHDFirst);
+        bool isAc3Packet = (m_state == AC3State::stateDecodeTrueHDFirst);
 
         if (isAc3Packet)
         {
