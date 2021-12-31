@@ -183,10 +183,10 @@ class VC1SequenceHeader : public VC1Unit
     int coded_height;
     int display_width;
     int display_height;
-    int pulldown;    ///< TFF/RFF present
-    bool interlace;  ///< Progressive/interlaced (RPTFTM syntax element)
+    int pulldown;     ///< TFF/RFF present
+    bool interlace;   ///< Progressive/interlaced (RPTFTM syntax element)
     bool tfcntrflag;  ///< TFCNTR present
-    int psf;         ///< Progressive Segmented Frame
+    int psf;          ///< Progressive Segmented Frame
     int time_base_num;
     int time_base_den;
     int hrd_param_flag;
