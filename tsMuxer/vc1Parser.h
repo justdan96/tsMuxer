@@ -53,7 +53,7 @@ const AVRational ff_vc1_pixel_aspect[16] = {
     AVRational(32, 11), AVRational(80, 33),  AVRational(18, 11), AVRational(15, 11),
     AVRational(64, 33), AVRational(160, 99), AVRational(0, 1),   AVRational(0, 1)};
 
-enum VC1PictType
+enum class VC1PictType
 {
     I_TYPE,
     P_TYPE,
@@ -65,7 +65,7 @@ extern const char* pict_type_str[4];
 class VC1Unit
 {
    public:
-    VC1Unit() : m_nalBuffer(0), m_nalBufferLen(0) {}
+    VC1Unit() : m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
     ~VC1Unit() { delete[] m_nalBuffer; }
 
     inline static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
@@ -235,7 +235,7 @@ class VC1Frame : public VC1Unit
     int interpfrm;
     int framecnt;
     int rangeredfrm;
-    int pict_type;
+    VC1PictType pict_type;
     int rptfrm;
     int tff;
     int rff;

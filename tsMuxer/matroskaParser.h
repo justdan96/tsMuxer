@@ -148,20 +148,20 @@ const static uint8_t MATROSKA_ID_BLOCK = 0xA1;
 const static uint8_t MATROSKA_ID_BLOCKDURATION = 0x9B;
 const static uint8_t MATROSKA_ID_BLOCKREFERENCE = 0xFB;
 
-typedef enum
+enum class MatroskaEyeMode
 {
     MATROSKA_EYE_MODE_MONO = 0x0,
     MATROSKA_EYE_MODE_RIGHT = 0x1,
     MATROSKA_EYE_MODE_LEFT = 0x2,
-    MATROSKA_EYE_MODE_BOTH = 0x3,
-} MatroskaEyeMode;
+    MATROSKA_EYE_MODE_BOTH = 0x3
+};
 
-typedef enum
+enum class MatroskaAspectRatioMode
 {
     MATROSKA_ASPECT_RATIO_MODE_FREE = 0x0,
     MATROSKA_ASPECT_RATIO_MODE_KEEP = 0x1,
-    MATROSKA_ASPECT_RATIO_MODE_FIXED = 0x2,
-} MatroskaAspectRatioMode;
+    MATROSKA_ASPECT_RATIO_MODE_FIXED = 0x2
+};
 
 /*
  * These aren't in any way "matroska-form" things,

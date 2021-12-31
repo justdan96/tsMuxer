@@ -50,8 +50,8 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
     auto targetStart = reinterpret_cast<UTF8 *>(&rv[0]);
     auto targetStart_out = targetStart;
     auto targetEnd = targetStart + rv.size();
-    auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, strictConversion);
-    if (result != conversionOK)
+    auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, ConversionFlags::strictConversion);
+    if (result != ConversionResult::conversionOK)
     {
         THROW(ERR_COMMON, "Cannot convert string : invalid source text");
     }
@@ -66,18 +66,18 @@ std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat
 {
     switch (srcFormat)
     {
-    case sfUTF8:
+    case SourceFormat::sfUTF8:
         return std::string(start, start + numBytes);
-    case sfUTF16be:
+    case SourceFormat::sfUTF16be:
         return from_utf_nn(make_vector(start, numBytes, read_be16), ConvertUTF16toUTF8);
-    case sfUTF16le:
+    case SourceFormat::sfUTF16le:
         return from_utf_nn(make_vector(start, numBytes, read_le16), ConvertUTF16toUTF8);
-    case sfUTF32be:
+    case SourceFormat::sfUTF32be:
         return from_utf_nn(make_vector(start, numBytes, read_be32), ConvertUTF32toUTF8);
-    case sfUTF32le:
+    case SourceFormat::sfUTF32le:
         return from_utf_nn(make_vector(start, numBytes, read_le32), ConvertUTF32toUTF8);
 #ifdef _WIN32
-    case sfANSI:
+    case SourceFormat::sfANSI:
     {
         return ::toUtf8(fromAcp(reinterpret_cast<const char *>(start), numBytes).data());
     }
