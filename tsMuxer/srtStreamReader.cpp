@@ -21,7 +21,7 @@ SRTStreamReader::SRTStreamReader() : m_lastBlock(false)
     m_processedSize = 0;
     m_state = PARSE_FIRST_LINE;
     m_inTime = m_outTime = 0.0;
-    m_srcFormat = UtfConverter::sfUnknown;
+    m_srcFormat = UtfConverter::SourceFormat::sfUnknown;
     m_charSize = 1;
     m_splitterOfs = 0;
 }
@@ -59,12 +59,12 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
         convertUTF::isLegalUTF8String(dataStart, len))
     {
         m_charSize = 1;
-        m_srcFormat = UtfConverter::sfUTF8;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF8;
         prefixLen = 3;
     }
     else if (dataStart[0] == 0 && dataStart[1] == 0 && dataStart[2] == 0xFE && dataStart[3] == 0xFF)
     {
-        m_srcFormat = UtfConverter::sfUTF32be;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF32be;
         m_charSize = 4;
         prefixLen = 4;
         m_splitterOfs = 3;
@@ -73,7 +73,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     }
     else if (dataStart[0] == 0xFF && dataStart[1] == 0xFE && dataStart[2] == 0 && dataStart[3] == 0)
     {
-        m_srcFormat = UtfConverter::sfUTF32le;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF32le;
         m_charSize = 4;
         prefixLen = 4;
         m_long_N = my_htonl(0x0a000000);
@@ -81,7 +81,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     }
     else if (dataStart[0] == 0xFE && dataStart[1] == 0xFF)
     {
-        m_srcFormat = UtfConverter::sfUTF16be;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF16be;
         m_charSize = 2;
         prefixLen = 2;
         m_splitterOfs = 1;
@@ -90,7 +90,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     }
     else if (dataStart[0] == 0xFF && dataStart[1] == 0xFE)
     {
-        m_srcFormat = UtfConverter::sfUTF16le;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF16le;
         m_charSize = 2;
         prefixLen = 2;
         m_short_N = my_htons(0x0a00);
@@ -100,10 +100,10 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     {
 #ifdef _WIN32
         LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to the active code page");
-        m_srcFormat = UtfConverter::sfANSI;  // default value for win32
+        m_srcFormat = UtfConverter::SourceFormat::sfANSI;  // default value for win32
 #else
         LTRACE(LT_INFO, 2, "Failed to auto-detect SRT encoding : falling back to UTF-8");
-        m_srcFormat = UtfConverter::sfUTF8;
+        m_srcFormat = UtfConverter::SourceFormat::sfUTF8;
 #endif
     }
     return true;
@@ -112,7 +112,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
 int SRTStreamReader::parseText(uint8_t* dataStart, int len)
 {
     int prefixLen = 0;
-    if (m_srcFormat == UtfConverter::sfUnknown)
+    if (m_srcFormat == UtfConverter::SourceFormat::sfUnknown)
     {
         if (!detectSrcFormat(dataStart, len, prefixLen))
             return false;

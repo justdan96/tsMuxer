@@ -25,8 +25,9 @@ class ParsedTrackPrivData
     virtual int newBufferSize(uint8_t* buff, int size) { return 0; }
 };
 
-enum IOContextTrackType
+enum class IOContextTrackType
 {
+    TRACK_TYPE_UNDEFINED = 0x0,
     TRACK_TYPE_VIDEO = 0x1,
     TRACK_TYPE_AUDIO = 0x2,
     TRACK_TYPE_COMPLEX = 0x3,
@@ -49,6 +50,7 @@ struct Track
         memset(language, 0, sizeof(language));
         default_duration = 0;
         encodingAlgo = 0;
+        type = IOContextTrackType::TRACK_TYPE_UNDEFINED;
     }
     ~Track()
     {

@@ -2078,7 +2078,7 @@ int MatroskaDemuxer::matroska_add_stream()
             uint64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            if (track->type && track->type != num)
+            if (track->type != IOContextTrackType::TRACK_TYPE_UNDEFINED && (uint64_t)track->type != num)
             {
                 LTRACE(LT_INFO, 0, "More than one tracktype in an entry - skip");
                 break;
@@ -2087,15 +2087,15 @@ int MatroskaDemuxer::matroska_add_stream()
 
             switch (track->type)
             {
-            case TRACK_TYPE_VIDEO:
-            case TRACK_TYPE_AUDIO:
-            case TRACK_TYPE_SUBTITLE:
+            case IOContextTrackType::TRACK_TYPE_VIDEO:
+            case IOContextTrackType::TRACK_TYPE_AUDIO:
+            case IOContextTrackType::TRACK_TYPE_SUBTITLE:
                 break;
-            case TRACK_TYPE_COMPLEX:
-            case TRACK_TYPE_LOGO:
-            case TRACK_TYPE_CONTROL:
+            case IOContextTrackType::TRACK_TYPE_COMPLEX:
+            case IOContextTrackType::TRACK_TYPE_LOGO:
+            case IOContextTrackType::TRACK_TYPE_CONTROL:
             default:
-                LTRACE(LT_INFO, 0, "Unknown or unsupported track type " << track->type);
+                LTRACE(LT_INFO, 0, "Unknown or unsupported track type " << (uint64_t)track->type);
                 track->type = (MatroskaTrackType)0;
                 break;
             }
@@ -2107,9 +2107,9 @@ int MatroskaDemuxer::matroska_add_stream()
         case MATROSKA_ID_TRACKVIDEO:
         {
             MatroskaVideoTrack *videotrack;
-            if (!track->type)
-                track->type = TRACK_TYPE_VIDEO;
-            if (track->type != TRACK_TYPE_VIDEO)
+            if (track->type == IOContextTrackType::TRACK_TYPE_UNDEFINED)
+                track->type = IOContextTrackType::TRACK_TYPE_VIDEO;
+            if (track->type != IOContextTrackType::TRACK_TYPE_VIDEO)
             {
                 LTRACE(LT_INFO, 0, "video data in non-video track - ignoring");
                 res = AVERROR_INVALIDDATA;
@@ -2217,8 +2217,10 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    if (num != MATROSKA_EYE_MODE_MONO && num != MATROSKA_EYE_MODE_LEFT &&
-                        num != MATROSKA_EYE_MODE_RIGHT && num != MATROSKA_EYE_MODE_BOTH)
+                    if (num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_MONO &&
+                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_LEFT &&
+                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_RIGHT &&
+                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_BOTH)
                     {
                         LTRACE(LT_INFO, 0, "Ignoring unknown eye mode " << (uint32_t)num);
                         break;
@@ -2233,8 +2235,9 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    if (num != MATROSKA_ASPECT_RATIO_MODE_FREE && num != MATROSKA_ASPECT_RATIO_MODE_KEEP &&
-                        num != MATROSKA_ASPECT_RATIO_MODE_FIXED)
+                    if (num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_FREE &&
+                        num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_KEEP &&
+                        num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_FIXED)
                     {
                         LTRACE(LT_INFO, 0, "Ignoring unknown aspect ratio " << (uint32_t)num);
                         break;
@@ -2276,9 +2279,9 @@ int MatroskaDemuxer::matroska_add_stream()
         case MATROSKA_ID_TRACKAUDIO:
         {
             MatroskaAudioTrack *audiotrack;
-            if (!track->type)
-                track->type = TRACK_TYPE_AUDIO;
-            if (track->type != TRACK_TYPE_AUDIO)
+            if (track->type == IOContextTrackType::TRACK_TYPE_UNDEFINED)
+                track->type = IOContextTrackType::TRACK_TYPE_AUDIO;
+            if (track->type != IOContextTrackType::TRACK_TYPE_AUDIO)
             {
                 LTRACE(LT_INFO, 0, "audio data in non-audio track - ignoring");
                 res = AVERROR_INVALIDDATA;

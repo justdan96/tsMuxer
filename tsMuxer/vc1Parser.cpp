@@ -381,21 +381,21 @@ int VC1Frame::vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr)
     rangeredfrm = 0;
     if (sequenceHdr.rangered)
         rangeredfrm = bitReader.getBit();
-    pict_type = bitReader.getBit();
+    pict_type = (VC1PictType)bitReader.getBit();
     if (sequenceHdr.max_b_frames > 0)
     {
-        if (pict_type == 0)
+        if (pict_type == VC1PictType::I_TYPE)
         {
             if (bitReader.getBit())
-                pict_type = I_TYPE;
+                pict_type = VC1PictType::I_TYPE;
             else
-                pict_type = B_TYPE;
+                pict_type = VC1PictType::B_TYPE;
         }
         else
-            pict_type = P_TYPE;
+            pict_type = VC1PictType::P_TYPE;
     }
     else
-        pict_type = pict_type ? P_TYPE : I_TYPE;
+        pict_type = (pict_type != VC1PictType::I_TYPE) ? VC1PictType::P_TYPE : VC1PictType::I_TYPE;
     return 0;
 }
 
@@ -443,19 +443,19 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
         {
         case 0:
         case 1:
-            pict_type = I_TYPE;
+            pict_type = VC1PictType::I_TYPE;
             break;
         case 2:
         case 3:
-            pict_type = P_TYPE;
+            pict_type = VC1PictType::P_TYPE;
             break;
         case 4:
         case 5:
-            pict_type = B_TYPE;
+            pict_type = VC1PictType::B_TYPE;
             break;
         case 6:
         case 7:
-            pict_type = BI_TYPE;
+            pict_type = VC1PictType::BI_TYPE;
             break;
         }
     }
@@ -464,19 +464,19 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
         switch (get_unary(bitReader, 0, 4))
         {
         case 0:
-            pict_type = P_TYPE;
+            pict_type = VC1PictType::P_TYPE;
             break;
         case 1:
-            pict_type = B_TYPE;
+            pict_type = VC1PictType::B_TYPE;
             break;
         case 2:
-            pict_type = I_TYPE;
+            pict_type = VC1PictType::I_TYPE;
             break;
         case 3:
-            pict_type = BI_TYPE;
+            pict_type = VC1PictType::BI_TYPE;
             break;
         case 4:
-            pict_type = P_TYPE;  // skipped pic
+            pict_type = VC1PictType::P_TYPE;  // skipped pic
             break;
         }
     }

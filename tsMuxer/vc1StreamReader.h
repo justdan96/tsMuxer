@@ -12,7 +12,7 @@ class VC1StreamReader : public MPEGStreamReader
     {
         m_isFirstFrame = true;
         m_spsFound = 0;
-        m_frame.pict_type = -1;
+        m_frame.pict_type = VC1PictType::I_TYPE;
         m_lastIFrame = false;
         m_decodedAfterSeq = false;
         m_firstFileFrame = false;

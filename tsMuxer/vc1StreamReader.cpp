@@ -28,7 +28,7 @@ int VC1StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
 {
     // uint8_t* afterPesData = (uint8_t*)pesPacket + pesPacket->getHeaderLength();
     uint8_t* curPtr = dstBuffer;  // afterPesData;
-    if ((m_totalFrameNum > 1 && m_spsFound < 2 && m_frame.pict_type == I_TYPE) ||
+    if ((m_totalFrameNum > 1 && m_spsFound < 2 && m_frame.pict_type == VC1PictType::I_TYPE) ||
         (m_totalFrameNum > 1 && m_firstFileFrame && !m_decodedAfterSeq))
     {
         m_firstFileFrame = false;
@@ -129,7 +129,7 @@ CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, int len)
                     pulldown |= (m_frame.rff > 0) && (m_frame.fcm != 2);
                 }
             }
-            if (m_frame.pict_type == I_TYPE)
+            if (m_frame.pict_type == VC1PictType::I_TYPE)
                 iFrameFound = true;
             break;
         case VC1_CODE_ENTRYPOINT:
@@ -262,14 +262,15 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
 
     int nextBFrameCnt = 0;
     int64_t bTiming = 0;
-    if (m_sequence.max_b_frames > 0 && (m_frame.pict_type == I_TYPE || m_frame.pict_type == P_TYPE))
+    if (m_sequence.max_b_frames > 0 &&
+        (m_frame.pict_type == VC1PictType::I_TYPE || m_frame.pict_type == VC1PictType::P_TYPE))
     {
         nextBFrameCnt = getNextBFrames(buff, bTiming);
         if (nextBFrameCnt == -1)
             return NOT_ENOUGH_BUFFER;
     }
 
-    m_lastIFrame = m_frame.pict_type == I_TYPE;
+    m_lastIFrame = m_frame.pict_type == VC1PictType::I_TYPE;
     m_totalFrameNum++;
 
     m_curDts += m_prevDtsInc;
@@ -321,7 +322,7 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
         */
     }
 
-    if (m_frame.pict_type == I_TYPE || m_frame.pict_type == P_TYPE)
+    if (m_frame.pict_type == VC1PictType::I_TYPE || m_frame.pict_type == VC1PictType::P_TYPE)
     {
         if (m_removePulldown)
             m_curPts = m_curDts + (nextBFrameCnt)*m_pcrIncPerFrame;
@@ -361,7 +362,7 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
             VC1Frame frame;
             if (frame.decode_frame_direct(m_sequence, nal + 4, m_bufEnd) != 0)
                 break;
-            if (frame.pict_type == I_TYPE || frame.pict_type == P_TYPE)
+            if (frame.pict_type == VC1PictType::I_TYPE || frame.pict_type == VC1PictType::P_TYPE)
                 return bFrameCnt;
             bFrameCnt++;
 
