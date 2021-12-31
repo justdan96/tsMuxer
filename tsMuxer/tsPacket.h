@@ -446,7 +446,6 @@ class CLPIParser
     bool isDependStream;
 
    private:
-    void StreamCodingInfo_SS(BitStreamReader& reader, int i, int streamIndex);
     void HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, int dataLength);
     void Extent_Start_Point(uint8_t* buffer, int dataLength);
     void ProgramInfo_SS(uint8_t* buffer, int dataLength);
@@ -501,10 +500,10 @@ struct MPLSStreamInfo : public M2TSStreamInfo
 
 struct MPLSPlayItem
 {
-    uint32_t IN_time;
-    uint32_t OUT_time;
+    uint32_t IN_time = 0;
+    uint32_t OUT_time = 0;
     std::string fileName;
-    int connection_condition;
+    int connection_condition = 0;
 };
 
 struct PlayListMark
@@ -538,16 +537,10 @@ struct MPLSParser
     MPLSStreamInfo getStreamByPID(int pid) const;
     std::vector<MPLSStreamInfo> getPgStreams() const;
 
-    // char type_indicator[5];
-    // char version_number[5];
     int PlayList_playback_type;
     int playback_count;
-    // int number_of_PlayItems;
     int number_of_SubPaths;
-    // char clip_Information_file_name[6];
-    // char clip_codec_identifier[5];
     bool is_multi_angle;
-    // int connection_condition;
     int ref_to_STC_id;
     bool PlayItem_random_access_flag;
     int number_of_angles;
@@ -560,38 +553,9 @@ struct MPLSParser
     uint32_t OUT_time;
     std::vector<MPLSPlayItem> m_playItems;
 
-    bool chapter_search_mask;
-    bool time_search_mask;
-    bool skip_to_next_point_mask;
-    bool skip_back_to_previous_point_mask;
-    bool stop_mask;
-    bool pause_on_mask;
-    bool still_off_mask;
-    bool forward_play_mask;
-    bool backward_play_mask;
-    bool resume_mask;
-    bool move_up_selected_button_mask;
-    bool move_down_selected_button_mask;
-    bool move_left_selected_button_mask;
-    bool move_right_selected_button_mask;
-    bool select_button_mask;
-    bool activate_button_mask;
-    bool select_button_and_activate_mask;
-    bool primary_audio_stream_number_change_mask;
-    bool angle_number_change_mask;
-    bool popup_on_mask;
-    bool popup_off_mask;
-    bool PG_textST_enable_disable_mask;
-    bool PG_textST_stream_number_change_mask;
-    bool secondary_video_enable_disable_mask;
-    bool secondary_video_stream_number_change_mask;
-    bool secondary_audio_enable_disable_mask;
-    bool secondary_audio_stream_number_change_mask;
-    bool PiP_PG_textST_stream_number_change_mask;
     std::vector<MPLSStreamInfo> m_streamInfo;
     std::vector<MPLSStreamInfo> m_streamInfoMVC;
     std::vector<PlayListMark> m_marks;
-    void deserializePlayList(const std::string& str);
     int m_m2tsOffset;
     bool isDependStreamExist;
     bool mvc_base_view_r;
