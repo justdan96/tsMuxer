@@ -36,7 +36,7 @@ static inline int decode012(BitStreamReader& bitReader)
 void VC1Unit::updateBits(int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
@@ -66,16 +66,16 @@ string VC1SequenceHeader::getStreamDescr()
     rez << "Profile: ";
     switch (profile)
     {
-    case PROFILE_SIMPLE:
+    case Profile::PROFILE_SIMPLE:
         rez << "Simple";
         break;
-    case PROFILE_MAIN:
+    case Profile::PROFILE_MAIN:
         rez << "Main";
         break;
-    case PROFILE_COMPLEX:
+    case Profile::PROFILE_COMPLEX:
         rez << "Complex";
         break;
-    case PROFILE_ADVANCED:
+    case Profile::PROFILE_ADVANCED:
         rez << "Advanced@" << level;
         break;
     default:
@@ -107,11 +107,12 @@ void VC1SequenceHeader::setFPS(double value)
 {
     // if (value < 25.0 && pulldown)
     //	value *= 1.25;
-    int nr, dr;
+
     if (m_fpsFieldBitVal > 0)
     {
-        int time_scale = (uint32_t)(value + 0.5) * 1000;
-        int num_units_in_tick = time_scale / value + 0.5;
+        int nr, dr;
+        int time_scale = (int)(value + 0.5) * 1000;
+        int num_units_in_tick = (int)(time_scale / value + 0.5);
         if ((time_scale == 24000 || time_scale == 25000 || time_scale == 30000 || time_scale == 50000 ||
              time_scale == 60000) &&
             (num_units_in_tick == 1000 || num_units_in_tick == 1001))
@@ -122,25 +123,33 @@ void VC1SequenceHeader::setFPS(double value)
         else
             THROW(ERR_VC1_ERR_FPS,
                   "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
-        if (time_scale == 24000)
+
+        switch (time_scale)
+        {
+        case 24000:
             nr = 1;
-        else if (time_scale == 25000)
+            break;
+        case 25000:
             nr = 2;
-        else if (time_scale == 30000)
+            break;
+        case 30000:
             nr = 3;
-        else if (time_scale == 50000)
+            break;
+        case 50000:
             nr = 4;
-        else  // if (time_scale == 60000)
+            break;
+        case 60000:
             nr = 5;
-        if (num_units_in_tick == 1000)
-            dr = 1;
-        else
-            dr = 2;
+            break;
+        default:
+            THROW(ERR_VC1_ERR_FPS,
+                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
+        }
+        dr = (num_units_in_tick == 1000) ? 1 : 2;
+
         updateBits(m_fpsFieldBitVal, 8, nr);
         updateBits(m_fpsFieldBitVal + 8, 4, dr);
     }
-    else
-        THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
 }
 
 int VC1SequenceHeader::decode_sequence_header()
@@ -148,15 +157,15 @@ int VC1SequenceHeader::decode_sequence_header()
     try
     {
         bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen);  // skip 00 00 01 xx marker
-        profile = bitReader.getBits(2);
-        if (profile == PROFILE_COMPLEX)
+        profile = (Profile)bitReader.getBits(2);
+        if (profile == Profile::PROFILE_COMPLEX)
             LTRACE(LT_WARN, 0, "WMV3 Complex Profile is not fully supported");
 
-        if (profile == PROFILE_ADVANCED)
+        else if (profile == Profile::PROFILE_ADVANCED)
             return decode_sequence_header_adv();
         else
         {
-            res_sm = bitReader.getBits(2);  // reserved
+            int res_sm = bitReader.getBits(2);  // reserved
             if (res_sm)
             {
                 LTRACE(LT_ERROR, 0, "Reserved RES_SM=" << res_sm << " is forbidden");
@@ -164,48 +173,42 @@ int VC1SequenceHeader::decode_sequence_header()
             }
         }
 
-        frmrtq_postproc = bitReader.getBits(3);  // common
-        bitrtq_postproc = bitReader.getBits(5);  // common
-        loop_filter = bitReader.getBit();        // common
-        if (loop_filter == 1 && profile == PROFILE_SIMPLE)
+        bitReader.skipBits(8);                                         // frmrtq_postproc, bitrtq_postproc
+        if (bitReader.getBit() && profile == Profile::PROFILE_SIMPLE)  // loop_filter
             LTRACE(LT_WARN, 0, "LOOPFILTER shell not be enabled in simple profile");
-        int res_x8 = bitReader.getBit();  // reserved
-        if (res_x8)
+        if (bitReader.getBit())  // reserved res_x8
             LTRACE(LT_WARN, 0, "1 for reserved RES_X8 is forbidden");
-        multires = bitReader.getBit();
-        int res_fasttx = bitReader.getBit();
+        bitReader.skipBit();                  // multires
+        int res_fasttx = bitReader.getBit();  // reserved
         if (!res_fasttx)
             LTRACE(LT_WARN, 0, "0 for reserved RES_FASTTX is forbidden");
-        fastuvmc = bitReader.getBit();
-        if (!profile && !fastuvmc)
+        if (profile == Profile::PROFILE_SIMPLE && !bitReader.getBit())  // fastuvmc
         {
             LTRACE(LT_ERROR, 0, "FASTUVMC unavailable in Simple Profile");
             return NALUnit::UNSUPPORTED_PARAM;
         }
-        extended_mv = bitReader.getBit();
-        if (!profile && extended_mv)
+        if (profile == Profile::PROFILE_SIMPLE && bitReader.getBit())  // extended_mv
         {
             LTRACE(LT_ERROR, 0, "Extended MVs unavailable in Simple Profile");
             return NALUnit::UNSUPPORTED_PARAM;
         }
-        dquant = bitReader.getBits(2);
-        vstransform = bitReader.getBit();
-        int res_transtab = bitReader.getBit();
-        if (res_transtab)
+        bitReader.skipBits(3);  // dquant, vstransform
+
+        if (bitReader.getBit())  // res_transtab
         {
             LTRACE(LT_ERROR, 0, "1 for reserved RES_TRANSTAB is forbidden\n");
             return NALUnit::UNSUPPORTED_PARAM;
         }
-        overlap = bitReader.getBit();
-        resync_marker = bitReader.getBit();
+        bitReader.skipBits(2);  // overlap, resync_marker
+
         rangered = bitReader.getBit();
-        if (rangered && profile == PROFILE_SIMPLE)
+        if (rangered && profile == Profile::PROFILE_SIMPLE)
             LTRACE(LT_WARN, 0, "RANGERED should be set to 0 in simple profile");
         max_b_frames = bitReader.getBits(3);
-        quantizer_mode = bitReader.getBits(2);
+        bitReader.skipBits(2);  // quantizer_mode
         finterpflag = bitReader.getBit();
-        int res_rtm_flag = bitReader.getBit();
-        if (res_rtm_flag)
+
+        if (!bitReader.getBit())  // res_rtm_flag
             LTRACE(LT_WARN, 0, "Old WMV3 version detected.");
         // TODO: figure out what they mean (always 0x402F)
         if (!res_fasttx)
@@ -223,10 +226,7 @@ int VC1SequenceHeader::decode_sequence_header_adv()
     level = bitReader.getBits(3);
     if (level >= 5)
         LTRACE(LT_WARN, 0, "Reserved LEVEL " << level);
-    chromaformat = bitReader.getBits(2);
-    frmrtq_postproc = bitReader.getBits(3);  // common
-    bitrtq_postproc = bitReader.getBits(5);  // common
-    postprocflag = bitReader.getBit();       // common
+    bitReader.skipBits(11);  // chromaformat, frmrtq_postproc, bitrtq_postproc, postprocflag
     coded_width = (bitReader.getBits(12) + 1) << 1;
     coded_height = (bitReader.getBits(12) + 1) << 1;
     pulldown = bitReader.getBit();
@@ -284,49 +284,36 @@ if(psf) { //PsF, 6.1.13
         }
 
         if (bitReader.getBit())
-        {
-            color_prim = bitReader.getBits(8);
-            transfer_char = bitReader.getBits(8);
-            matrix_coef = bitReader.getBits(8);
-        }
+            bitReader.skipBits(24);  // color_prim, transfer_char, matrix_coef
     }
 
     hrd_param_flag = bitReader.getBit();
     if (hrd_param_flag)
     {
         hrd_num_leaky_buckets = bitReader.getBits(5);
-        bitReader.skipBits(4);  // bitrate exponent
-        bitReader.skipBits(4);  // buffer size exponent
-        for (int i = 0; i < hrd_num_leaky_buckets; i++)
-        {
-            bitReader.skipBits(16);  // hrd_rate[n]
-            bitReader.skipBits(16);  // hrd_buffer[n]
-        }
+        bitReader.skipBits(8);  // bitrate exponent, buffer size exponent
+        for (int i = 0; i < hrd_num_leaky_buckets; i++) bitReader.skipBits(32);  // hrd_rate[n], hrd_buffer[n]
     }
     return 0;
 }
 
 int VC1SequenceHeader::decode_entry_point()
 {
-    int i, blink, clentry, refdist;
     try
     {
         bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen);  // skip 00 00 01 xx marker
-        blink = bitReader.getBit();                                      // broken link
-        clentry = bitReader.getBit();                                    // closed entry
-        panscanflag = bitReader.getBit();
-        refdist = bitReader.getBit();  // refdist flag
-        loop_filter = bitReader.getBit();
-        fastuvmc = bitReader.getBit();
-        extended_mv = bitReader.getBit();
-        dquant = bitReader.getBits(2);
-        vstransform = bitReader.getBit();
-        overlap = bitReader.getBit();
-        quantizer_mode = bitReader.getBits(2);
+        bitReader.skipBit();                                             // blink = broken link
+        bitReader.skipBit();                                             // clentry = closed entry
+        bitReader.skipBit();                                             // panscanflag
+        bitReader.skipBit();                                             // refdist flag
+        bitReader.skipBit();                                             // loop_filter
+        bitReader.skipBit();                                             // fastuvmc
+        int extended_mv = bitReader.getBit();
+        bitReader.skipBits(6);  // dquant, vstransform, overlap, quantizer_mode
 
         if (hrd_param_flag)
         {
-            for (i = 0; i < hrd_num_leaky_buckets; i++) bitReader.skipBits(8);  // hrd_full[n]
+            for (int i = 0; i < hrd_num_leaky_buckets; i++) bitReader.skipBits(8);  // hrd_full[n]
         }
 
         if (bitReader.getBit())
@@ -335,7 +322,7 @@ int VC1SequenceHeader::decode_entry_point()
             coded_height = (bitReader.getBits(12) + 1) << 1;
         }
         if (extended_mv)
-            extended_dmv = bitReader.getBit();
+            bitReader.skipBit();  // extended_dmv
         if (bitReader.getBit())
         {
             // av_log(avctx, AV_LOG_ERROR, "Luma scaling is not supported, expect wrong picture\n");
@@ -361,7 +348,7 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
     try
     {
         bitReader.setBuffer(buffer, end);  // skip 00 00 01 xx marker
-        if (sequenceHdr.profile < PROFILE_ADVANCED)
+        if (sequenceHdr.profile < Profile::PROFILE_ADVANCED)
             return vc1_parse_frame_header(sequenceHdr);
         else
             return vc1_parse_frame_header_adv(sequenceHdr);
@@ -374,13 +361,11 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
 
 int VC1Frame::vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr)
 {
-    interpfrm = -1;
     if (sequenceHdr.finterpflag)
-        interpfrm = bitReader.getBit();
-    framecnt = bitReader.getBits(2);  // framecnt unused
-    rangeredfrm = 0;
+        bitReader.skipBit();  // interpfrm
+    bitReader.skipBits(2);    // framecnt
     if (sequenceHdr.rangered)
-        rangeredfrm = bitReader.getBit();
+        bitReader.skipBit();  // rangeredfrm
     pict_type = (VC1PictType)bitReader.getBit();
     if (sequenceHdr.max_b_frames > 0)
     {
@@ -401,42 +386,8 @@ int VC1Frame::vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr)
 
 int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
 {
-    fcm = 0;
-    if (sequenceHdr.interlace)
-        fcm = decode012(bitReader);
+    fcm = sequenceHdr.interlace ? decode012(bitReader) : 0;
 
-    /*
-    if (fcm == 2) // is coded field
-    {
-            int tmpType = bitReader.getBits(3);
-            switch(tmpType) {
-                    case 0:
-                    pict_type = I_TYPE;
-                            break;
-                    case 1:
-                            pict_type = isFrame ? I_TYPE : P_TYPE;
-                            break;
-                    case 2:
-                            pict_type = isFrame ? P_TYPE : I_TYPE;
-                            break;
-                    case 3:
-                            pict_type = P_TYPE;
-                            break;
-                    case 4:
-                            pict_type = B_TYPE;
-                            break;
-                    case 5:
-                            pict_type = isFrame ? B_TYPE : BI_TYPE;
-                            break;
-                    case 6:
-                            pict_type = isFrame ? BI_TYPE : B_TYPE;
-                            break;
-                    case 7:
-                            pict_type = isFrame ? BI_TYPE : B_TYPE;
-                            break;
-            }
-    }
-    */
     if (fcm == 2)  // is coded field
     {
         switch (bitReader.getBits(3))
@@ -482,7 +433,7 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
     }
 
     if (sequenceHdr.tfcntrflag)
-        int TFCNTR = bitReader.getBits(8);
+        bitReader.skipBits(8);  // TFCNTR
     if (sequenceHdr.pulldown)
     {
         rptfrmBitPos = bitReader.getBitsCount();
