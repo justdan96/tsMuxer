@@ -2,25 +2,19 @@
 
 #include <sstream>
 
-enum DCAExtensionMask
-{
-    DCA_EXT_CORE = 0x001,       ///< core in core substream
-    DCA_EXT_XXCH = 0x002,       ///< XXCh channels extension in core substream
-    DCA_EXT_X96 = 0x004,        ///< 96/24 extension in core substream
-    DCA_EXT_XCH = 0x008,        ///< XCh channel extension in core substream
-    DCA_EXT_EXSS_CORE = 0x010,  ///< core in ExSS (extension substream)
-    DCA_EXT_EXSS_XBR = 0x020,   ///< extended bitrate extension in ExSS
-    DCA_EXT_EXSS_XXCH = 0x040,  ///< XXCh channels extension in ExSS
-    DCA_EXT_EXSS_X96 = 0x080,   ///< 96/24 extension in ExSS
-    DCA_EXT_EXSS_LBR = 0x100,   ///< low bitrate component in ExSS
-    DCA_EXT_EXSS_XLL = 0x200,   ///< lossless extension in ExSS
-};
+static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
+static const int DCA_EXT_XXCH = 0x002;       ///< XXCh channels extension in core substream
+static const int DCA_EXT_X96 = 0x004;        ///< 96/24 extension in core substream
+static const int DCA_EXT_XCH = 0x008;        ///< XCh channel extension in core substream
+static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
+static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
+static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
+static const int DCA_EXT_EXSS_X96 = 0x080;   ///< 96/24 extension in ExSS
+static const int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
+static const int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
 
-static const int dca_ext_audio_descr_mask[] = {
-    DCA_EXT_XCH, -1, DCA_EXT_X96, DCA_EXT_XCH | DCA_EXT_X96, -1, -1, DCA_EXT_XXCH, -1,
-};
-
-#define DCA_CORE_EXTS (DCA_EXT_XCH | DCA_EXT_XXCH | DCA_EXT_X96)
+static const int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
+                                               -1,          -1, DCA_EXT_XXCH, -1};
 
 static const unsigned int ppi_dts_samplerate[] = {0,     8000, 16000, 32000, 0,     0,     11025, 22050,
                                                   44100, 0,    0,     12000, 24000, 48000, 96000, 192000};
@@ -48,21 +42,21 @@ static const int64_t NAVI_TBL = 0x4E4156492D54424Cll;
 static const int64_t STRMDATA = 0x5354524D44415441ll;
 static const int64_t TIMECODE = 0x54494D45434F4445ll;
 
-const static int DTS_DESCRIPTOR_TAG = 0x7b;
+static const int DTS_DESCRIPTOR_TAG = 0x7b;
 
-const static int AOUT_CHAN_CENTER = 0x1;
-const static int AOUT_CHAN_LEFT = 0x2;
-const static int AOUT_CHAN_RIGHT = 0x4;
-const static int AOUT_CHAN_REARCENTER = 0x10;
-const static int AOUT_CHAN_REARLEFT = 0x20;
-const static int AOUT_CHAN_REARRIGHT = 0x40;
-const static int AOUT_CHAN_MIDDLELEFT = 0x100;
-const static int AOUT_CHAN_MIDDLERIGHT = 0x200;
-const static int AOUT_CHAN_LFE = 0x1000;
+static const int AOUT_CHAN_CENTER = 0x1;
+static const int AOUT_CHAN_LEFT = 0x2;
+static const int AOUT_CHAN_RIGHT = 0x4;
+static const int AOUT_CHAN_REARCENTER = 0x10;
+static const int AOUT_CHAN_REARLEFT = 0x20;
+static const int AOUT_CHAN_REARRIGHT = 0x40;
+static const int AOUT_CHAN_MIDDLELEFT = 0x100;
+static const int AOUT_CHAN_MIDDLERIGHT = 0x200;
+static const int AOUT_CHAN_LFE = 0x1000;
 
-const static int AOUT_CHAN_DOLBYSTEREO = 0x10000;
-const static int AOUT_CHAN_DUALMONO = 0x20000;
-const static int AOUT_CHAN_REVERSESTEREO = 0x40000;
+static const int AOUT_CHAN_DOLBYSTEREO = 0x10000;
+static const int AOUT_CHAN_DUALMONO = 0x20000;
+static const int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;
 
@@ -74,12 +68,13 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     int skipBytes = 0;
     int skipBeforeBytes = 0;
     int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
-    m_state = DTSDecodeState::stDecodeDTS;
     if (len < 1)
         return 0;
-    BitStreamWriter bitWriter;
+
+    m_state = DTSDecodeState::stDecodeDTS;
 
     return 0;
+    // TODO: fix DTS descriptor
 
     *dstBuff++ = 0x05;  // dts registration descriptor tag
     *dstBuff++ = 4;
@@ -96,6 +91,8 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         *dstBuff++ = ' ';
 
     return 6;
+
+    BitStreamWriter bitWriter{};
 
     dstBuff[0] = DTS_DESCRIPTOR_TAG;
     bitWriter.setBuffer(dstBuff + 2, dstBuff + 1024);
@@ -164,7 +161,7 @@ void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, uint8_t* end)
         if (!isHDData)
             return;
 
-        BitStreamReader reader;
+        BitStreamReader reader{};
         reader.setBuffer(buff + 5, end);  // skip 4 byte magic and 1 unknown byte
         int headerSize;
         int hdFrameSize;
@@ -200,7 +197,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
             hdrType == BUILDVER || hdrType == CORESSMD || hdrType == EXTSS_MD || hdrType == FILEINFO ||
             hdrType == NAVI_TBL || hdrType == TIMECODE || hdrType == DTSHDHDR)
         {
-            if (hdrSize > end - buff)
+            if (hdrSize > (size_t)(end - buff))
                 return 0;  // need more data
             buff += hdrSize;
         }
@@ -214,7 +211,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
         }
         else if (hdrType == STRMDATA)
         {
-            m_dataSegmentLen = hdrSize;
+            // m_dataSegmentLen = hdrSize;
             buff += 16;
             break;
         }
@@ -277,7 +274,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 {
     try
     {
-        BitStreamReader reader;
+        BitStreamReader reader{};
         reader.setBuffer(buff + 5, end);  // skip 4 byte magic and 1 unknown byte
         int headerSize;
         int hdFrameSize;
@@ -300,21 +297,23 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
             uint32_t* hdAudioData = (uint32_t*)(buff + headerSize);
             switch (my_ntohl(*hdAudioData))
             {
-            case 0x41A29547:
-                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO;  // XLL
+            case 0x41A29547:  // XLL
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO;
                 break;
-            case 0x655E315E:
-                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES;  // XBR
+            case 0x655E315E:  // XBR
+                m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES;
                 break;
-            case 0x0A801921:
+            case 0x0A801921:  // LBR
                 m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS;
                 break;
-            case 0x47004A03:
-            case 0x5A5A5A5A:
+            case 0x47004A03:  // XXCH
+            case 0x5A5A5A5A:  // XCH
                 m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_EX;
-            case 0x1D95F262:
+                break;
+            case 0x1D95F262:  // X96
                 m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_96;
-            default:
+                break;
+            default:  // Core, Substream, Neo, Sensation...
                 m_hdType = DTSHD_SUBTYPE::DTS_SUBTYPE_OTHER;
             }
         }
@@ -323,18 +322,18 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 
         int nuNumAudioPresent = 1;
         int nuNumAssets = 1;
-        int bStaticFieldsPresent = reader.getBit();
+        bool bStaticFieldsPresent = reader.getBit();
         if (bStaticFieldsPresent)
         {
             int nuRefClockCode = reader.getBits(2);
             int nuExSSFrameDurationCode = reader.getBits(3) + 1;
             if (pi_frame_length == 0)
-                pi_frame_length = nuExSSFrameDurationCode * 512;
+                pi_frame_length = nuExSSFrameDurationCode << 9;
 
-            int64_t nuTimeStamp = 0;
             if (reader.getBit())
             {
-                nuTimeStamp = (reader.getBits(18) << 18) + reader.getBits(18);
+                reader.getBits(18);  // nuTimeStamp, 18 high bits
+                reader.getBits(18);  // nuTimeStamp, 18 low bits
             }
             nuNumAudioPresent = reader.getBits(3) + 1;
             nuNumAssets = reader.getBits(3) + 1;
@@ -355,61 +354,39 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 for (int i = 0; i < nuNumMixOutConfigs; i++) reader.skipBits(nuBits4MixOutMask);
             }
         }
-        for (int i = 0; i < nuNumAssets; i++)
-        {
-            if (isBlownUpHeader)
-                reader.skipBits(20);
-            else
-                reader.skipBits(16);
-        }
+        for (int i = 0; i < nuNumAssets; i++) reader.skipBits(isBlownUpHeader ? 20 : 16);
 
         for (int i = 0; i < nuNumAssets; i++)
         {
-            int64_t bufferPosition = reader.getBitsCount();
-            int nuAssetDescriptorFSIZE = reader.getBits(9) + 1;
-            int DescriptorDataForAssetIndex = reader.getBits(3);
+            reader.skipBits(12);  // nuAssetDescriptorFSIZE - 1, DescriptorDataForAssetIndex
             if (bStaticFieldsPresent)
             {
-                int AssetTypeDescrPresent = reader.getBit();
-                if (AssetTypeDescrPresent)
-                {
-                    int AssetTypeDescriptor = reader.getBits(4);
-                }
-                int LanguageDescrPresent = reader.getBit();
-                if (LanguageDescrPresent)
-                {
-                    int LanguageDescriptor = reader.getBits(24);
-                }
-                int bInfoTextPresent = reader.getBit();
-                if (bInfoTextPresent)
+                if (reader.getBit())     // AssetTypeDescrPresent
+                    reader.skipBits(4);  // AssetTypeDescriptor
+
+                if (reader.getBit())      // LanguageDescrPresent
+                    reader.skipBits(24);  // LanguageDescriptor
+
+                if (reader.getBit())  // bInfoTextPresent
                 {
                     int nuInfoTextByteSize = reader.getBits(10) + 1;
                     for (int j = 0; j < nuInfoTextByteSize; j++) reader.skipBits(8);
                 }
                 int nuBitResolution = reader.getBits(5) + 1;
                 int nuMaxSampleRate = reader.getBits(4);
-                // int nuTotalNumChs = reader.getBits(8) + 1;
                 hd_pi_channels = reader.getBits(8) + 1;
-                int bOne2OneMapChannels2Speakers = reader.getBit();
                 int nuSpkrActivityMask = 0;
-                if (bOne2OneMapChannels2Speakers)
+                if (reader.getBit())  // bOne2OneMapChannels2Speakers
                 {
-                    int bEmbeddedStereoFlag = 0;
                     if (hd_pi_channels > 2)
-                    {
-                        bEmbeddedStereoFlag = reader.getBit();
-                    }
-                    int bEmbeddedSixChFlag = 0;
+                        reader.skipBit();  // bEmbeddedStereoFlag
+
                     if (hd_pi_channels > 6)
+                        reader.skipBit();  // bEmbeddedSixChFlag
+
+                    if (reader.getBit())  // bSpkrMaskEnabled
                     {
-                        bEmbeddedSixChFlag = reader.getBit();
-                    }
-                    int bSpkrMaskEnabled = reader.getBit();
-                    int nuNumBits4SAMask = 0;
-                    if (bSpkrMaskEnabled)
-                    {
-                        nuNumBits4SAMask = reader.getBits(2);
-                        nuNumBits4SAMask = nuNumBits4SAMask * 4 + 4;
+                        int nuNumBits4SAMask = reader.getBits(2) * 4 + 4;
                         nuSpkrActivityMask = reader.getBits(nuNumBits4SAMask);
                     }
                     // TODO...
@@ -418,20 +395,18 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 hd_bitDepth = nuBitResolution;
 
                 if (!m_isCoreExists)
-                    m_frameDuration = pi_frame_length * 1e9 / (double)hd_pi_sample_rate;
+                    m_frameDuration = pi_frame_length * 1e9 / hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                    m_hdBitrate = hd_pi_sample_rate / (double)pi_frame_length * hdFrameSize * 8;
+                    m_hdBitrate = (unsigned)(hd_pi_sample_rate / (double)pi_frame_length * hdFrameSize * 8);
 
                 hd_pi_lfeCnt = 0;
+
                 if ((nuSpkrActivityMask & 0x8) == 0x8)
-                {
                     ++hd_pi_lfeCnt;
-                }
+
                 if ((nuSpkrActivityMask & 0x1000) == 0x1000)
-                {
                     ++hd_pi_lfeCnt;
-                }
             }
             break;
         }
@@ -439,6 +414,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -463,143 +439,139 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         }
         m_state = DTSDecodeState::stDecodeDTS;
 
-        // if (m_state == stDecodeDTS)
+        // 14 bits, little endian version of the bitstream
+        if (buff[0] == 0xff && buff[1] == 0x1f && buff[2] == 0x00 && buff[3] == 0xe8 && (buff[4] & 0xf0) == 0xf0 &&
+            buff[5] == 0x07)
         {
-            // 14 bits, little endian version of the bitstream
-            if (buff[0] == 0xff && buff[1] == 0x1f && buff[2] == 0x00 && buff[3] == 0xe8 && (buff[4] & 0xf0) == 0xf0 &&
-                buff[5] == 0x07)
+            uint8_t conv_buf[DTS_HEADER_SIZE];
+            buf14To16(conv_buf, buff, DTS_HEADER_SIZE, 1);
+            i_frame_size = syncInfo16be(conv_buf);
+            i_frame_size = i_frame_size * 8 / 14 * 2;
+        }
+        // 14 bits, big endian version of the bitstream
+        else if (buff[0] == 0x1f && buff[1] == 0xff && buff[2] == 0xe8 && buff[3] == 0x00 && buff[4] == 0x07 &&
+                 (buff[5] & 0xf0) == 0xf0)
+        {
+            uint8_t conv_buf[DTS_HEADER_SIZE];
+            buf14To16(conv_buf, buff, DTS_HEADER_SIZE, 0);
+            i_frame_size = syncInfo16be(conv_buf);
+            i_frame_size = i_frame_size * 8 / 14 * 2;
+        }
+        // 16 bits, big endian version of the bitstream
+        else if (buff[0] == 0x7f && buff[1] == 0xfe && buff[2] == 0x80 && buff[3] == 0x01)
+        {
+            i_frame_size = syncInfo16be(buff);
+        }
+        // 16 bits, little endian version of the bitstream
+        else if (buff[0] == 0xfe && buff[1] == 0x7f && buff[2] == 0x01 && buff[3] == 0x80)
+        {
+            uint8_t conv_buf[DTS_HEADER_SIZE];
+            BufLeToBe(conv_buf, buff, DTS_HEADER_SIZE);
+            i_frame_size = syncInfo16be(buff);
+        }
+        else
+            return 0;
+
+        switch (pi_audio_mode & 0xFFFF)
+        {
+        case 0x0:
+            // Mono
+            pi_channels_conf = AOUT_CHAN_CENTER;
+            break;
+        case 0x1:
+            // Dual-mono = stereo + dual-mono
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DUALMONO;
+            break;
+        case 0x2:
+        case 0x3:
+        case 0x4:
+            // Stereo
+            pi_channels = 2;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            break;
+        case 0x5:
+            // 3F
+            pi_channels = 3;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER;
+            break;
+        case 0x6:
+            // 2F/1R
+            pi_channels = 3;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER;
+            break;
+        case 0x7:
+            // 3F/1R
+            pi_channels = 4;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER;
+            break;
+        case 0x8:
+            // 2F2R
+            pi_channels = 4;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 0x9:
+            // 3F2R
+            pi_channels = 5;
+            pi_channels_conf =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 0xA:
+        case 0xB:
+            // 2F2M2R
+            pi_channels = 6;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
+                               AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 0xC:
+            // 3F2M2R
+            pi_channels = 7;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT |
+                               AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case 0xD:
+        case 0xE:
+            // 3F2M2R/LFE
+            pi_channels = 8;
+            pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT |
+                               AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
+            break;
+        default:
+            if (pi_audio_mode <= 63)
             {
-                uint8_t conv_buf[DTS_HEADER_SIZE];
-                buf14To16(conv_buf, buff, DTS_HEADER_SIZE, 1);
-                i_frame_size = syncInfo16be(conv_buf);
-                i_frame_size = i_frame_size * 8 / 14 * 2;
-            }
-            // 14 bits, big endian version of the bitstream
-            else if (buff[0] == 0x1f && buff[1] == 0xff && buff[2] == 0xe8 && buff[3] == 0x00 && buff[4] == 0x07 &&
-                     (buff[5] & 0xf0) == 0xf0)
-            {
-                uint8_t conv_buf[DTS_HEADER_SIZE];
-                buf14To16(conv_buf, buff, DTS_HEADER_SIZE, 0);
-                i_frame_size = syncInfo16be(conv_buf);
-                i_frame_size = i_frame_size * 8 / 14 * 2;
-            }
-            // 16 bits, big endian version of the bitstream
-            else if (buff[0] == 0x7f && buff[1] == 0xfe && buff[2] == 0x80 && buff[3] == 0x01)
-            {
-                i_frame_size = syncInfo16be(buff);
-            }
-            // 16 bits, little endian version of the bitstream
-            else if (buff[0] == 0xfe && buff[1] == 0x7f && buff[2] == 0x01 && buff[3] == 0x80)
-            {
-                uint8_t conv_buf[DTS_HEADER_SIZE];
-                BufLeToBe(conv_buf, buff, DTS_HEADER_SIZE);
-                i_frame_size = syncInfo16be(buff);
+                // User defined
+                pi_channels = 0;
+                pi_channels_conf = 0;
             }
             else
                 return 0;
-
-            switch (pi_audio_mode & 0xFFFF)
-            {
-            case 0x0:
-                // Mono
-                pi_channels_conf = AOUT_CHAN_CENTER;
-                break;
-            case 0x1:
-                // Dual-mono = stereo + dual-mono
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DUALMONO;
-                break;
-            case 0x2:
-            case 0x3:
-            case 0x4:
-                // Stereo
-                pi_channels = 2;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-                break;
-            case 0x5:
-                // 3F
-                pi_channels = 3;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER;
-                break;
-            case 0x6:
-                // 2F/1R
-                pi_channels = 3;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER;
-                break;
-            case 0x7:
-                // 3F/1R
-                pi_channels = 4;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARCENTER;
-                break;
-            case 0x8:
-                // 2F2R
-                pi_channels = 4;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                break;
-            case 0x9:
-                // 3F2R
-                pi_channels = 5;
-                pi_channels_conf =
-                    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                break;
-            case 0xA:
-            case 0xB:
-                // 2F2M2R
-                pi_channels = 6;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
-                                   AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                break;
-            case 0xC:
-                // 3F2M2R
-                pi_channels = 7;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT |
-                                   AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-                break;
-            case 0xD:
-            case 0xE:
-                // 3F2M2R/LFE
-                pi_channels = 8;
-                pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT |
-                                   AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-                break;
-
-            default:
-                if (pi_audio_mode <= 63)
-                {
-                    // User defined
-                    pi_channels = 0;
-                    pi_channels_conf = 0;
-                }
-                else
-                    return 0;
-                break;
-            }
-
-            if (pi_audio_mode & 0x10000)
-            {
-                (pi_channels)++;
-                pi_channels_conf |= AOUT_CHAN_LFE;
-                pi_lfeCnt = 1;
-            }
-
-            if (pi_sample_rate_index >= sizeof(ppi_dts_samplerate) / sizeof(ppi_dts_samplerate[0]))
-            {
-                return 0;
-            }
-            pi_sample_rate = ppi_dts_samplerate[pi_sample_rate_index];
-            if (!pi_sample_rate)
-                return 0;
-
-            if (pi_bit_rate_index >= sizeof(ppi_dts_bitrate) / sizeof(ppi_dts_bitrate[0]))
-            {
-                return 0;
-            }
-            pi_bit_rate = ppi_dts_bitrate[pi_bit_rate_index];
-            if (!pi_bit_rate)
-                return 0;
-
-            pi_frame_length = (nblks + 1) * 32;
-            m_frameDuration = pi_frame_length * 1e9 / (double)pi_sample_rate;
         }
+
+        if (pi_audio_mode & 0x10000)
+        {
+            (pi_channels)++;
+            pi_channels_conf |= AOUT_CHAN_LFE;
+            pi_lfeCnt = 1;
+        }
+
+        if (pi_sample_rate_index >= sizeof(ppi_dts_samplerate) / sizeof(ppi_dts_samplerate[0]))
+        {
+            return 0;
+        }
+        pi_sample_rate = ppi_dts_samplerate[pi_sample_rate_index];
+        if (!pi_sample_rate)
+            return 0;
+
+        if (pi_bit_rate_index >= sizeof(ppi_dts_bitrate) / sizeof(ppi_dts_bitrate[0]))
+        {
+            return 0;
+        }
+        pi_bit_rate = ppi_dts_bitrate[pi_bit_rate_index];
+        if (!pi_bit_rate)
+            return 0;
+
+        pi_frame_length = (nblks + 1) * 32;
+        m_frameDuration = pi_frame_length * 1e9 / pi_sample_rate;
+
         afterFrameData = buff + i_frame_size;
         if (afterFrameData > end - 4)
             return NOT_ENOUGH_BUFFER;
@@ -607,14 +579,14 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         if (m_testMode && m_dtsEsChannels == 0)
         {
             uint32_t* curPtr32 = (uint32_t*)(buff + 16);
-            int findSize = FFMIN(end - buff, i_frame_size) / 4 - 4;
+            int findSize = FFMIN((int)(end - buff), i_frame_size) / 4 - 4;
             for (int i = 0; i < findSize; ++i)
             {
                 if (*curPtr32++ == 0x5a5a5a5a)
                 {
                     uint8_t* exHeader = (uint8_t*)curPtr32;
-                    int dataRest = buff + i_frame_size - exHeader;
-                    int frameSize = (int(exHeader[0]) << 2) + (exHeader[1] >> 6) - 4;  // remove 4 bytes of ext world
+                    int dataRest = (int)(buff + i_frame_size - exHeader);
+                    int frameSize = (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
                     if (dataRest - frameSize == 0 || dataRest - frameSize == 1)
                     {
                         m_dtsEsChannels = (int(exHeader[1]) >> 2) & 0x07;
@@ -637,15 +609,14 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             return NOT_ENOUGH_BUFFER;
         if (m_downconvertToDTS)
         {
-            skipBytes = nextFrame - buff - i_frame_size;
+            skipBytes = (int)(nextFrame - buff - i_frame_size);
             return i_frame_size;
         }
         else
         {
             m_state = DTSDecodeState::stDecodeHD;
-            m_hdFrameLen = nextFrame - afterFrameData;
+            m_hdFrameLen = (int)(nextFrame - afterFrameData);
             return m_isCoreExists ? i_frame_size : m_hdFrameLen;
-            // return nextFrame - buff;
         }
     }
     else
@@ -665,10 +636,12 @@ int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
     if (i_lfe)
         pi_audio_mode |= 0x10000;
 
-    pi_ext_coding = (p_buf[10] >> 4) & 0x01;
-    int ext_descr = p_buf[10] >> 5;
+    int pi_ext_coding = (p_buf[10] >> 4) & 0x01;
     if (pi_ext_coding)
+    {
+        int ext_descr = p_buf[10] >> 5;
         core_ext_mask = dca_ext_audio_descr_mask[ext_descr];
+    }
     else
     {
         core_ext_mask = 0;
@@ -787,14 +760,21 @@ const std::string DTSStreamReader::getStreamInfo()
 
     str << "Bitrate: ";
     // 1/*open*/, 2/*variable*/, 3/*lossless*/
-    if (pi_bit_rate == 1)
+    switch (pi_bit_rate)
+    {
+    case 1:
         str << "Open. ";
-    else if (pi_bit_rate == 2)
+        break;
+    case 2:
         str << "VBR. ";
-    else if (pi_bit_rate == 3)
+        break;
+    case 3:
         str << "Loseless. ";
-    else
+        break;
+    default:
         str << (pi_bit_rate + m_hdBitrate) / 1000 << "Kbps  ";
+    }
+
     if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
         str << "core + MLP data.";
     str << "Sample Rate: " << (hd_pi_sample_rate ? hd_pi_sample_rate : pi_sample_rate) / 1000 << "KHz  ";
@@ -802,9 +782,9 @@ const std::string DTSStreamReader::getStreamInfo()
     if (hd_pi_channels)
     {
         if (hd_pi_lfeCnt)
-            str << (int)hd_pi_channels - hd_pi_lfeCnt << '.' << hd_pi_lfeCnt;
+            str << hd_pi_channels - hd_pi_lfeCnt << '.' << hd_pi_lfeCnt;
         else
-            str << (int)hd_pi_channels;
+            str << hd_pi_channels;
     }
     else
     {
@@ -815,21 +795,27 @@ const std::string DTSStreamReader::getStreamInfo()
     }
     if (m_dts_hd_mode)
     {
-        // str << "DTS core + MLP data. ";
-        if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
+        switch (m_hdType)
+        {
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO:
             str << " (DTS Master Audio";
-        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES)
+            break;
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_HIGH_RES:
             str << " (DTS High Resolution";
-        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS)
+            break;
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_EXPRESS:
             str << " (DTS Express";
-        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_EX)
+            break;
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_EX:
             str << " (DTS Ex";
-        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_96)
+            break;
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_96:
             str << " (DTS 96";
-        else if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_96)
-            str << " (DTS HD";
+        }
+
         if (hd_bitDepth > 16)
             str << " 24bit";
+
         str << ")";
     }
     return str.str();

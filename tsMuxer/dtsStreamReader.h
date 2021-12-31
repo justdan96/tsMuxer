@@ -18,8 +18,18 @@ class DTSStreamReader : public SimplePacketizerReader
         DTS_SUBTYPE_96,
         DTS_SUBTYPE_OTHER
     };
+
     const static uint32_t DTS_HD_PREFIX = 0x64582025;
-    DTSStreamReader() : SimplePacketizerReader()
+
+    DTSStreamReader()
+        : SimplePacketizerReader(),
+          hd_pi_bit_rate_index(0),
+          hd_sample_rate(0),
+          i_frame_size(0),
+          nblks(0),
+          pi_audio_mode(0),
+          pi_bit_rate_index(0),
+          pi_channels_conf(0)
     {
         pi_sample_rate_index = 0;
         pi_bit_rate = 0;
@@ -40,7 +50,6 @@ class DTSStreamReader : public SimplePacketizerReader
         pi_frame_length = 0;  // todo: investigate how to fill it if core absent
         m_skippingSamples = 0;
         m_dataSegmentLen = 0;
-        pi_ext_coding = 0;
         core_ext_mask = 0;
         m_dtsEsChannels = 0;
         m_testMode = false;
@@ -79,7 +88,7 @@ class DTSStreamReader : public SimplePacketizerReader
     void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
 
    private:
-    enum DTSHD_SUBTYPE m_hdType;
+    DTSHD_SUBTYPE m_hdType;
     enum class DTSDecodeState
     {
         stDecodeDTS,
@@ -120,7 +129,6 @@ class DTSStreamReader : public SimplePacketizerReader
     bool m_firstCall;
     int m_skippingSamples;
     int64_t m_dataSegmentLen;
-    int pi_ext_coding;
     int core_ext_mask;
     int m_dtsEsChannels;
     bool m_testMode;
