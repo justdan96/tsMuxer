@@ -332,8 +332,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 
             if (reader.getBit())
             {
-                reader.getBits(18);  // nuTimeStamp, 18 high bits
-                reader.getBits(18);  // nuTimeStamp, 18 low bits
+                reader.skipBits(18);  // nuTimeStamp, 18 high bits
+                reader.skipBits(18);  // nuTimeStamp, 18 low bits
             }
             nuNumAudioPresent = reader.getBits(3) + 1;
             nuNumAssets = reader.getBits(3) + 1;
