@@ -9,7 +9,7 @@
 #include "memory.h"
 #include "vod_common.h"
 
-enum VC1Code
+enum class VC1Code
 {
     VC1_CODE_ENDOFSEQ = 0x0A,
     VC1_CODE_SLICE,
@@ -25,16 +25,13 @@ enum VC1Code
     VC1_USER_CODE_SEQHDR
 };
 
-/** Available Profiles */
-//@{
-enum Profile
+enum class Profile
 {
     PROFILE_SIMPLE,
     PROFILE_MAIN,
     PROFILE_COMPLEX,  ///< TODO: WMV9 specific
     PROFILE_ADVANCED
 };
-//@}
 
 const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
 const int ff_vc1_fps_dr[2] = {1000, 1001};
@@ -87,18 +84,18 @@ class VC1Unit
         }
         return end;
     }
-    inline int vc1_unescape_buffer(uint8_t* src, int size)
+    inline size_t vc1_unescape_buffer(uint8_t* src, size_t size)
     {
         delete[] m_nalBuffer;
         m_nalBuffer = new uint8_t[size];
-        int dsize = 0, i;
+        size_t dsize = 0;
         if (size < 4)
         {
             std::copy(src, src + size, m_nalBuffer);
             m_nalBufferLen = size;
             return size;
         }
-        for (i = 0; i < size; i++, src++)
+        for (size_t i = 0; i < size; i++, src++)
         {
             if (src[0] == 3 && i >= 2 && !src[-1] && !src[-2] && i < size - 1 && src[1] < 4)
             {
@@ -148,55 +145,55 @@ class VC1Unit
     void updateBits(int bitOffset, int bitLen, int value);
     BitStreamReader bitReader;
     uint8_t* m_nalBuffer;
-    uint32_t m_nalBufferLen;
+    size_t m_nalBufferLen;
 };
 
 class VC1SequenceHeader : public VC1Unit
 {
    public:
     VC1SequenceHeader()
-        : VC1Unit(), interlace(0), time_base_num(0), time_base_den(0), m_fpsFieldBitVal(0), sample_aspect_ratio(1, 1)
+        : VC1Unit(),
+          profile(Profile::PROFILE_SIMPLE),
+          level(0),
+          interlace(0),
+          time_base_num(0),
+          time_base_den(0),
+          m_fpsFieldBitVal(0),
+          sample_aspect_ratio(1, 1),
+          coded_height(0),
+          coded_width(0),
+          display_height(0),
+          display_width(0),
+          finterpflag(false),
+          hrd_param_flag(false),
+          hrd_num_leaky_buckets(0),
+          psf(0),
+          pulldown(0),
+          rangered(0),
+          max_b_frames(0),
+          tfcntrflag(false)
     {
     }
-    int profile;
-    int res_sm;
-    int frmrtq_postproc;
-    int bitrtq_postproc;
-    int loop_filter;
-    int multires;
-    int fastuvmc;
-    int extended_mv;
-    int dquant;
-    int vstransform;
-    int overlap;
-    int resync_marker;
+    Profile profile;
     int rangered;
     int max_b_frames;
-    int quantizer_mode;
     int finterpflag;  ///< INTERPFRM present
     int level;
-    int chromaformat;  ///< 2bits, 2=4:2:0, only defined
     int coded_width;
     int coded_height;
     int display_width;
     int display_height;
-    int pulldown;    ///< TFF/RFF present
-    bool interlace;  ///< Progressive/interlaced (RPTFTM syntax element)
-    int tfcntrflag;  ///< TFCNTR present
-    int psf;         ///< Progressive Segmented Frame
+    int pulldown;     ///< TFF/RFF present
+    bool interlace;   ///< Progressive/interlaced (RPTFTM syntax element)
+    bool tfcntrflag;  ///< TFCNTR present
+    int psf;          ///< Progressive Segmented Frame
     int time_base_num;
     int time_base_den;
-    int color_prim;     ///< 8bits, chroma coordinates of the color primaries
-    int transfer_char;  ///< 8bits, Opto-electronic transfer characteristics
-    int matrix_coef;    ///< 8bits, Color primaries->YCbCr transform matrix
     int hrd_param_flag;
     int hrd_num_leaky_buckets;
-    int postprocflag;
 
     /* for decoding entry point */
-    int panscanflag;
     int decode_entry_point();
-    int extended_dmv;
     /* ------------------------*/
 
     AVRational sample_aspect_ratio;  // w, h
@@ -210,31 +207,11 @@ class VC1SequenceHeader : public VC1Unit
     int m_fpsFieldBitVal;
 };
 
-/*
-VC1EntryPoint: public VC1Unit {
-public:
-        int panscanflag;
-        int loop_filter;
-        int fastuvmc;
-        int extended_mv;
-        int dquant;
-        int vstransform;
-        int overlap;
-        int quantizer_mode;
-        int coded_width;
-        int coded_height;
-    int extended_dmv;     ///< Additional extended dmv range at P/B frame-level
-};
-*/
-
 class VC1Frame : public VC1Unit
 {
    public:
-    VC1Frame() : VC1Unit(), rptfrm(0), fcm(0), rff(0), rptfrmBitPos(0) {}
+    VC1Frame() : VC1Unit(), rptfrm(0), fcm(0), rff(0), tff(0), rptfrmBitPos(0), pict_type(VC1PictType::I_TYPE) {}
     int fcm;
-    int interpfrm;
-    int framecnt;
-    int rangeredfrm;
     VC1PictType pict_type;
     int rptfrm;
     int tff;
