@@ -46,10 +46,10 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, int buf_size)
     bitReader.setBuffer(buffer, buffer + buf_size);
     if (bitReader.getBits(2) != 1)
         return false;  // 0b01 required
-    m_pts = (bitReader.getBits(3) << 30);
+    m_pts = ((uint64_t)bitReader.getBits(3) << 30);
     if (bitReader.getBit() != 1)
         return false;
-    m_pts += (bitReader.getBits(15) << 15);
+    m_pts += ((uint64_t)bitReader.getBits(15) << 15);
     if (bitReader.getBit() != 1)
         return false;
     m_pts += bitReader.getBits(15);
@@ -1292,7 +1292,22 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
 // -------------------------- MPLSParser ----------------------------
 
 MPLSParser::MPLSParser()
-    : m_chapterLen(0), number_of_SubPaths(0), m_m2tsOffset(0), isDependStreamExist(false), mvc_base_view_r(false)
+    : m_chapterLen(0),
+      number_of_SubPaths(0),
+      m_m2tsOffset(0),
+      isDependStreamExist(false),
+      mvc_base_view_r(false),
+      IN_time(0),
+      OUT_time(0),
+      PlayItem_random_access_flag(false),
+      PlayList_playback_type(0),
+      is_different_audios(false),
+      is_multi_angle(false),
+      is_seamless_angle_change(false),
+      number_of_angles(0),
+      playback_count(0),
+      ref_to_STC_id(0),
+      subPath_type(0)
 {
     number_of_primary_video_stream_entries = 0;
     number_of_primary_audio_stream_entries = 0;
@@ -1607,41 +1622,8 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
 
 void MPLSParser::UO_mask_table(BitStreamReader& reader)
 {
-    reader.skipBit();                           // reserved_for_future_use // reserved for menu call mask 1 bslbf
-    reader.skipBit();                           // reserved_for_future_use // reserved for title search mask 1 bslbf
-    chapter_search_mask = reader.getBit();      // 1 bslbf
-    time_search_mask = reader.getBit();         // 1 bslbf
-    skip_to_next_point_mask = reader.getBit();  // 1 bslbf
-    skip_back_to_previous_point_mask = reader.getBit();  // 1 bslbf
-    reader.skipBit();                      // reserved_for_future_use // reserved for play FirstPlay mask 1 bslbf
-    stop_mask = reader.getBit();           // 1 bslbf
-    pause_on_mask = reader.getBit();       // 1 bslbf
-    reader.skipBit();                      // reserved_for_future_use // reserved for pause off mask 1 bslbf
-    still_off_mask = reader.getBit();      // 1 bslbf
-    forward_play_mask = reader.getBit();   // 1 bslbf
-    backward_play_mask = reader.getBit();  // 1 bslbf
-    resume_mask = reader.getBit();         // 1 bslbf
-    move_up_selected_button_mask = reader.getBit();               // 1 bslbf
-    move_down_selected_button_mask = reader.getBit();             // 1 bslbf
-    move_left_selected_button_mask = reader.getBit();             // 1 bslbf
-    move_right_selected_button_mask = reader.getBit();            // 1 bslbf
-    select_button_mask = reader.getBit();                         // 1 bslbf
-    activate_button_mask = reader.getBit();                       // 1 bslbf
-    select_button_and_activate_mask = reader.getBit();            // 1 bslbf
-    primary_audio_stream_number_change_mask = reader.getBit();    // 1 bslbf
-    reader.skipBit();                                             // reserved_for_future_use 1 bslbf
-    angle_number_change_mask = reader.getBit();                   // 1 bslbf
-    popup_on_mask = reader.getBit();                              // 1 bslbf
-    popup_off_mask = reader.getBit();                             // 1 bslbf
-    PG_textST_enable_disable_mask = reader.getBit();              // 1 bslbf
-    PG_textST_stream_number_change_mask = reader.getBit();        // 1 bslbf
-    secondary_video_enable_disable_mask = reader.getBit();        // 1 bslbf
-    secondary_video_stream_number_change_mask = reader.getBit();  // 1 bslbf
-    secondary_audio_enable_disable_mask = reader.getBit();        // 1 bslbf
-    secondary_audio_stream_number_change_mask = reader.getBit();  //
-    reader.skipBit();                                             // reserved_for_future_use 1 bslbf
-    PiP_PG_textST_stream_number_change_mask = reader.getBit();    // 1 bslbf
-    reader.skipBits(30);                                          // reserved_for_future_use 30 bslbf
+    reader.skipBits(32);  // UO_mask_table;
+    reader.skipBits(32);  // UO_mask_table cont;
 }
 
 void MPLSParser::parsePlayList(uint8_t* buffer, int len)
@@ -2793,7 +2775,14 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
 // -------------- MPLSStreamInfo -----------------------
 
 MPLSStreamInfo::MPLSStreamInfo()
-    : M2TSStreamInfo(), type(0), offsetId(0xff), isSSPG(false), SS_PG_offset_sequence_id(0xff), leftEye(0), rightEye(0)
+    : M2TSStreamInfo(),
+      type(0),
+      offsetId(0xff),
+      isSSPG(false),
+      SS_PG_offset_sequence_id(0xff),
+      leftEye(0),
+      rightEye(0),
+      character_code(0)
 {
 }
 
@@ -2804,7 +2793,8 @@ MPLSStreamInfo::MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
       isSSPG(false),
       SS_PG_offset_sequence_id(0xff),
       leftEye(0),
-      rightEye(0)
+      rightEye(0),
+      character_code(0)
 {
     pipParams = pmtStreamInfo.m_codecReader->getPipParams();
 }
