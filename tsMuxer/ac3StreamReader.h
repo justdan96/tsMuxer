@@ -11,8 +11,7 @@
 class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
 {
    public:
-    AC3StreamReader()
-        : SimplePacketizerReader(), m_useNewStyleAudioPES(false)
+    AC3StreamReader() : SimplePacketizerReader(), m_useNewStyleAudioPES(false)
     {
         m_downconvertToAC3 = m_true_hd_mode = false;
         m_state = AC3State::stateDecodeAC3;

@@ -118,7 +118,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
             int m_fscod2 = gbc.getBits(2);
             if (m_fscod2 == 3)
                 return AC3ParseError::AC3_PARSE_ERROR_SYNC;
-            
+
             numblkscod = 3;
             m_sample_rate = ff_ac3_freqs[m_fscod2] / 2;
         }
@@ -277,9 +277,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_bsmod = gbc.getBits(3);
         m_acmod = gbc.getBits(3);
         if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)
-           gbc.skipBits(2);  // m_cmixlev
+            gbc.skipBits(2);  // m_cmixlev
         if (m_acmod & 4)
-           gbc.skipBits(2);  // m_surmixlev
+            gbc.skipBits(2);  // m_surmixlev
         if (m_acmod == AC3_ACMOD_STEREO)
             m_dsurmod = gbc.getBits(2);
         m_lfeon = gbc.getBit();
@@ -539,7 +539,7 @@ uint64_t AC3Codec::getFrameDurationNano()
         return m_bsid > 10 ? m_frameDurationNano : 0;  // E-AC3. finish frame after AC3 frame
     if (m_waitMoreData)
         return 0;  // AC3 HD
-    
+
     return m_frameDurationNano;
 }
 
