@@ -57,7 +57,7 @@ class SRTStreamReader : public AbstractStreamReader
     double m_inTime;
     double m_outTime;
     int m_processedSize;
-    long m_charSize;
+    int32_t m_charSize;
     AbstractStreamReader* m_dstSubCodec;
     text_subtitles::TextToPGSConverter* m_srtRender;
     bool m_lastBlock;
@@ -73,12 +73,13 @@ class SRTStreamReader : public AbstractStreamReader
     uint32_t m_long_N;
     text_subtitles::TextAnimation m_animation;
 
-    enum
+    enum class ParseState
     {
         PARSE_FIRST_LINE,
         PARSE_TIME,
         PARSE_TEXT
-    } m_state;
+    };
+    ParseState m_state;
     uint8_t* renderNextMessage(uint32_t& renderedLen);
     bool parseTime(const std::string& text);
     std::string detectUTF8Lang(uint8_t* buffer, int len);

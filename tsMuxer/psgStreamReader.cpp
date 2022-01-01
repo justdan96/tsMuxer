@@ -22,10 +22,20 @@ double pgs_frame_rates[16] = {
     0, 23.97602397602397, 24, 25, 29.97002997002997, 30, 50, 59.94005994005994, 60, 0, 0, 0, 0, 0, 0, 0};
 
 PGSStreamReader::PGSStreamReader()
+    : m_avFragmentEnd(0),
+      m_firstRenderedPacket(true),
+      m_objectWindowHeight(0),
+      m_objectWindowTop(0),
+      m_paletteVersion(0),
+      m_palleteID(0),
+      m_ptsStart(0),
+      object_height(0),
+      object_width(0)
 {
     m_curPos = m_buffer = 0;
     m_tmpBufferLen = 0;
-    m_state = stParsePES;
+    m_state = State::stParsePES;
+    composition_state = CompositionState::csEpochStart;
     m_processedSize = 0;
     m_demuxMode = false;
     m_afterPesByte = 0;
@@ -38,19 +48,16 @@ PGSStreamReader::PGSStreamReader()
     m_scale = 1.0;
     m_isNewFrame = false;
     m_needRescale = false;
-    window_horizontal_position = 0;
-    window_vertical_position = 0;
     m_imgBuffer = 0;
     m_rgbBuffer = 0;
     m_scaledRgbBuffer = 0;
     m_scaled_width = 0;
     m_scaled_height = 0;
     m_render = new text_subtitles::TextToPGSConverter(false);
-    m_renderedLen = 0;
     m_renderedData = 0;
     m_fontBorder = 0;
     m_offsetId = 0xff;
-    m_forced_on_flag = 0;
+    m_forced_on_flag = false;
 
     // SS PG data
     isSSPG = false;
@@ -70,7 +77,7 @@ void PGSStreamReader::video_descriptor(BitStreamReader& bitReader)
 
 void PGSStreamReader::composition_descriptor(BitStreamReader& bitReader)
 {
-    composition_number = bitReader.getBits(16);
+    bitReader.skipBits(16);  // composition_number
     composition_state = (CompositionState)bitReader.getBits(2);
     bitReader.skipBits(6);
 }
@@ -78,29 +85,24 @@ void PGSStreamReader::composition_descriptor(BitStreamReader& bitReader)
 void PGSStreamReader::composition_object(BitStreamReader& bitReader)
 {
     int object_id_ref = bitReader.getBits(16);
-    int window_id_ref = bitReader.getBits(8);
-    int object_cropped_flag = bitReader.getBit();
+    bitReader.skipBits(8);  // window_id_ref
+    bool object_cropped_flag = bitReader.getBit();
     m_forced_on_flag = bitReader.getBit();
     bitReader.skipBits(6);
     composition_object_horizontal_position[object_id_ref] = bitReader.getBits(16);
     composition_object_vertical_position[object_id_ref] = bitReader.getBits(16);
     if (object_cropped_flag)
     {
-        int object_cropping_horizontal_position = bitReader.getBits(16);
-        int object_cropping_vertical_position = bitReader.getBits(16);
-        int object_cropping_width = bitReader.getBits(16);
-        int object_cropping_height = bitReader.getBits(16);
+        bitReader.skipBits(32);  // object_cropping_horizontal_position, object_cropping_vertical_position
+        bitReader.skipBits(32);  // object_cropping_width, object_cropping_height
     }
 }
 
 void PGSStreamReader::pgs_window(BitStreamReader& bitReader)
 {
-    int window_id = bitReader.getBits(8);
-    window_horizontal_position = bitReader.getBits(16);
-    window_vertical_position = bitReader.getBits(16);
-    int window_width = bitReader.getBits(16);
-    int window_heigh = bitReader.getBits(16);
-    window_heigh = window_heigh;
+    bitReader.skipBits(8);   // window_id
+    bitReader.skipBits(32);  // window_horizontal_position, window_vertical_position
+    bitReader.skipBits(32);  // window_width, window_height
 }
 
 int PGSStreamReader::calcFpsIndex(double fps)
@@ -136,7 +138,7 @@ void PGSStreamReader::yuvToRgb(int minY)
     // uint8_t* dst = m_rgbBuffer;
     RGBQUAD* dst = (RGBQUAD*)m_rgbBuffer;
 
-    RGBQUAD rgbPal[256];
+    RGBQUAD rgbPal[256]{};
     text_subtitles::YUVQuad yuvPal[256];
     memset(&rgbPal[0], 0, sizeof(rgbPal));
     memset(&rgbPal[0], 0, sizeof(yuvPal));
@@ -163,10 +165,7 @@ void PGSStreamReader::decodeRleData(int xOffset, int yOffset)
         return;
     uint8_t* src = &m_dstRle[0];
     uint8_t* srcEnd = src + m_dstRle.size();
-    // object_width
-    // object_height
-    // window_horizontal_position
-    // window_vertical_position
+
     uint8_t* dst = m_imgBuffer + (yOffset * m_video_width + xOffset);
     int dstLineStep = m_video_width - object_width;
     uint8_t color;
@@ -240,7 +239,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
             pos += 3;  // skip object ID and version number
             seq = *pos++;
         }
-        int oldSize = m_dstRle.size();
+        size_t oldSize = m_dstRle.size();
         m_dstRle.resize(oldSize + end - pos);
         memcpy(&m_dstRle[oldSize], pos, end - pos);
         pos += end - pos;
@@ -250,8 +249,8 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
         decodeRleData(composition_object_horizontal_position[object_id],
                       composition_object_vertical_position[object_id]);
         yuvToRgb(m_fontBorder ? Y_THRESHOLD : 0);
-        BitmapInfo bmpDest;
-        BitmapInfo bmpRef;
+        BitmapInfo bmpDest{};
+        BitmapInfo bmpRef{};
 
         bmpRef.buffer = (RGBQUAD*)m_rgbBuffer;
         bmpRef.Width = m_video_width;
@@ -279,8 +278,8 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
     {
         for (int xDest = 0; xDest < bmpDest->Width; xDest++)
         {
-            int floor_x = floor(xDest * xFactor);
-            int floor_y = floor(yDest * yFactor);
+            int floor_x = (int)floor(xDest * xFactor);
+            int floor_y = (int)floor(yDest * yFactor);
             int ceil_x = FFMIN(bmpRef->Width - 1, floor_x + 1);
             int ceil_y = FFMIN(bmpRef->Height - 1, floor_y + 1);
             double fraction_x = xDest * xFactor - floor_x;
@@ -295,16 +294,16 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
             c4 += ceil_x;
             double b1 = one_minus_x * c1->rgbRed + fraction_x * c2->rgbRed;
             double b2 = one_minus_x * c3->rgbRed + fraction_x * c4->rgbRed;
-            ImagePixels->rgbRed = one_minus_y * b1 + fraction_y * b2;
+            ImagePixels->rgbRed = (uint8_t)(one_minus_y * b1 + fraction_y * b2);
             b1 = one_minus_x * c1->rgbGreen + fraction_x * c2->rgbGreen;
             b2 = one_minus_x * c3->rgbGreen + fraction_x * c4->rgbGreen;
-            ImagePixels->rgbGreen = one_minus_y * b1 + fraction_y * b2;
+            ImagePixels->rgbGreen = (uint8_t)(one_minus_y * b1 + fraction_y * b2);
             b1 = one_minus_x * c1->rgbBlue + fraction_x * c2->rgbBlue;
             b2 = one_minus_x * c3->rgbBlue + fraction_x * c4->rgbBlue;
-            ImagePixels->rgbBlue = one_minus_y * b1 + fraction_y * b2;
+            ImagePixels->rgbBlue = (uint8_t)(one_minus_y * b1 + fraction_y * b2);
             b1 = one_minus_x * c1->rgbReserved + fraction_x * c2->rgbReserved;
             b2 = one_minus_x * c3->rgbReserved + fraction_x * c4->rgbReserved;
-            ImagePixels->rgbReserved = one_minus_y * b1 + fraction_y * b2;
+            ImagePixels->rgbReserved = (uint8_t)(one_minus_y * b1 + fraction_y * b2);
             ImagePixels++;
         }
     }
@@ -325,25 +324,25 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
         tmp[idx] <<= 1;
         tmp[idx]++;
     }
-    inTime /= INT_FREQ_TO_TS_FREQ;
+    inTime = (int64_t)(inTime / INT_FREQ_TO_TS_FREQ);
 
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
-    int64_t compositionDecodeTime = 90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999;
-    int64_t windowsTransferTime = 90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999;
+    int64_t compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PLANEINITIALIZATIONTIME =
-        90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999;
+        (int64_t)(90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
     m_objectWindowHeight = FFMAX(0, m_render->renderedHeight());
-    // m_objectWindowTop = FFMAX(0, m_render->m_videoHeight - m_objectWindowHeight - m_render->m_bottomOffset);
     m_objectWindowTop = m_render->maxLine();
 
     // show text
     uint8_t* curPos = m_renderedData;
     // composition segment. pts=x,  dts = x-0.0648 (pts alignment to video grid) (I get constant value from real PGS
     // track as example)
-    int rLen = m_render->composePresentationSegment(curPos, CM_Start, inTime, inTime - PRESENTATION_DTS_DELTA,
-                                                    m_objectWindowTop, m_demuxMode, m_forced_on_flag);
+    int rLen =
+        m_render->composePresentationSegment(curPos, CompositionMode::CM_Start, inTime, inTime - PRESENTATION_DTS_DELTA,
+                                             m_objectWindowTop, m_demuxMode, m_forced_on_flag);
     m_renderedBlocks.push_back(PGSRenderedBlock(inTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
     curPos += rLen;
     // window definition.   pts=x-0.001, dts = x-0.0648
@@ -369,27 +368,26 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
     // end                  pts=x-0.0627, dts = x-0.0627
     rLen = m_render->composeEnd(curPos, odfPTS, odfPTS, m_demuxMode);
     m_renderedBlocks.push_back(PGSRenderedBlock(odfPTS, odfPTS, rLen, curPos));
-    curPos += rLen;
-    m_renderedLen = curPos - m_renderedData;
 }
 
 void PGSStreamReader::renderTextHide(int64_t outTime)
 {
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
-    int64_t compositionDecodeTime = 90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999;
-    int64_t windowsTransferTime = 90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999;
+    int64_t compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PLANEINITIALIZATIONTIME =
-        90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999;
+        (int64_t)(90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
     m_firstRenderedPacket = true;
-    outTime /= INT_FREQ_TO_TS_FREQ;
+    outTime = (int64_t)(outTime / INT_FREQ_TO_TS_FREQ);
     m_renderedBlocks.clear();
     // hide text
     uint8_t* curPos = m_renderedData;
     // composition segment. pts=x,       dts = x-0.001 (pts alignment to video grid)
-    int rLen = m_render->composePresentationSegment(curPos, CM_Finish, outTime, outTime - windowsTransferTime - 90,
-                                                    m_objectWindowTop, m_demuxMode, false);
+    int rLen =
+        m_render->composePresentationSegment(curPos, CompositionMode::CM_Finish, outTime,
+                                             outTime - windowsTransferTime - 90, m_objectWindowTop, m_demuxMode, false);
     m_renderedBlocks.push_back(PGSRenderedBlock(outTime, outTime - windowsTransferTime - 90, rLen, curPos));
     curPos += rLen;
     // windows              pts=x-0.001, dts = x-0.001
@@ -401,23 +399,21 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
     // end                  pts=x-0.001, dts = x-0.001
     rLen = m_render->composeEnd(curPos, outTime - 90, outTime - 90, m_demuxMode);
     m_renderedBlocks.push_back(PGSRenderedBlock(outTime - 90, outTime - 90, rLen, curPos));
-    curPos += rLen;
-    m_renderedLen = curPos - m_renderedData;
 }
 
 int64_t getTimeValueNano(uint8_t* pos)
 {
-    uint32_t pts = AV_RB32(pos);
+    int64_t pts = (int64_t)AV_RB32(pos);
     if (pts > 0xff000000u)
-        return ptsToNanoClock((int64_t)pts - 0x100000000ll);
+        return ptsToNanoClock(pts - 0x100000000ll);
     else
         return ptsToNanoClock(pts);
 }
 
-int64_t getTimeValueNano(uint64_t pts)
+int64_t getTimeValueNano(int64_t pts)
 {
     if (pts > 0x1ff000000ull)
-        return ptsToNanoClock(int64_t(pts) - 0x200000000ll);
+        return ptsToNanoClock(pts - 0x200000000ll);
     else
         return ptsToNanoClock(pts);
 }
@@ -441,8 +437,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         PGSRenderedBlock& block = m_renderedBlocks[0];
         avPacket.data = block.data;
         avPacket.size = FFMIN(MAX_AV_PACKET_SIZE, block.len);
-        avPacket.pts = block.pts * INT_FREQ_TO_TS_FREQ;
-        avPacket.dts = block.dts * INT_FREQ_TO_TS_FREQ;
+        avPacket.pts = (int64_t)(block.pts * INT_FREQ_TO_TS_FREQ);
+        avPacket.dts = (int64_t)(block.dts * INT_FREQ_TO_TS_FREQ);
         block.data += avPacket.size;
         block.len -= avPacket.size;
         if (block.len == 0)
@@ -474,9 +470,9 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             m_scaledRgbBuffer = new uint8_t[m_scaled_width * m_scaled_height * 4];
             m_renderedData = new uint8_t[(m_scaled_width + 16) * m_scaled_height + 16384];
 
-            memset(m_imgBuffer, 0xff, m_video_width * m_video_height);
-            memset(m_rgbBuffer, 0x00, m_video_width * m_video_height * 4);
-            memset(m_scaledRgbBuffer, 0x00, m_scaled_width * m_scaled_height * 4);
+            memset(m_imgBuffer, 0xff, (size_t)m_video_width * m_video_height);
+            memset(m_rgbBuffer, 0x00, (size_t)m_video_width * m_video_height * 4);
+            memset(m_scaledRgbBuffer, 0x00, (size_t)m_scaled_width * m_scaled_height * 4);
             m_render->setImageBuffer(m_scaledRgbBuffer);
         }
         LTRACE(LT_INFO, 2,
@@ -496,15 +492,15 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
                                                  << ". Scaling method: Bilinear interpolation");
     }
 
-    if (m_state == stAVPacketFragmented)
+    if (m_state == State::stAVPacketFragmented)
     {
-        int avLen = m_avFragmentEnd - m_curPos;
+        int avLen = (int)(m_avFragmentEnd - m_curPos);
         if (avLen > MAX_AV_PACKET_SIZE)
         {
             avLen = MAX_AV_PACKET_SIZE;
         }
         else
-            m_state = stParsePES;
+            m_state = State::stParsePES;
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         avPacket.data = m_curPos;
@@ -534,14 +530,14 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
-        m_lastPTS = getTimeValueNano(m_curPos + 2) * m_scale;
+        m_lastPTS = (int64_t)(getTimeValueNano(m_curPos + 2) * m_scale);
         m_maxPTS = FFMAX(m_maxPTS, m_lastPTS);
-        m_lastDTS = getTimeValueNano(m_curPos + 6) * m_scale;
+        m_lastDTS = (int64_t)(getTimeValueNano(m_curPos + 6) * m_scale);
         if (m_lastDTS == 0)
             m_lastDTS = m_lastPTS;
         m_curPos += 10;
         m_processedSize += 10;
-        m_state = stParsePGS;
+        m_state = State::stParsePGS;
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         m_isNewFrame = true;
@@ -555,7 +551,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     }
 
     bool pesStartCode = m_curPos[0] == 0 && m_curPos[1] == 0 && m_curPos[2] == 01;
-    // if (m_state == stParsePES)
+
     if (pesStartCode)
     {
         if (m_bufEnd - m_curPos < 8)
@@ -582,7 +578,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             m_lastDTS = getTimeValueNano(pesPacket->getDts());
         m_curPos += pesHeaderLen;
         m_processedSize += pesHeaderLen;
-        m_state = stParsePGS;
+        m_state = State::stParsePGS;
         // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/1e9 << " DTS=" << m_lastDTS/1e9);
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
@@ -605,14 +601,14 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     }
     uint8_t segment_type = *m_curPos;
     uint16_t segment_len = (uint16_t)AV_RB16(m_curPos + 1);
-    if (m_bufEnd - m_curPos < 3 + segment_len)
+    if (m_bufEnd - m_curPos < 3ll + segment_len)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
         memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
         return NEED_MORE_DATA;
     }
     m_curPos += 3;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         int number_of_composition_objects, palette_update_flag, palette_id_ref, number_of_windows;
@@ -632,9 +628,9 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             //	  << " objectID=" << (int)m_curPos[0] << " version=" << (int) m_curPos[2]);
             if (m_needRescale)
             {
-                memset(m_imgBuffer, 0xff, m_video_width * m_video_height);
-                memset(m_rgbBuffer, 0x00, m_video_width * m_video_height * 4);
-                memset(m_scaledRgbBuffer, 0x00, m_scaled_width * m_scaled_height * 4);
+                memset(m_imgBuffer, 0xff, (size_t)m_video_width * m_video_height);
+                memset(m_rgbBuffer, 0x00, (size_t)m_video_width * m_video_height * 4);
+                memset(m_scaledRgbBuffer, 0x00, (size_t)m_scaled_width * m_scaled_height * 4);
                 if (readObjectDef(m_curPos, m_curPos + segment_len) == NEED_MORE_DATA)
                 {
                     m_tmpBufferLen = m_bufEnd - m_curPos;
@@ -660,9 +656,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             {
                 composition_object(bitReader);
             }
-            // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " Presentation Composition Segment. State = "
-            //	<< composition_state << " number=" << composition_number);
-            if (composition_state != EPOTH_START && m_needRescale)
+            if (composition_state != CompositionState::csEpochStart && m_needRescale)
                 renderTextHide(m_maxPTS);
             break;
         case WINDOWS_DEF_SEGMENT:
@@ -694,6 +688,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NEED_MORE_DATA;
     }
     avPacket.pts = m_lastPTS;
@@ -709,18 +704,18 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     if (avLen > MAX_AV_PACKET_SIZE - 3)
     {
         avLen = MAX_AV_PACKET_SIZE - 3;
-        m_state = stAVPacketFragmented;
+        m_state = State::stAVPacketFragmented;
         m_avFragmentEnd = m_curPos + segment_len;
     }
     m_curPos += avLen;
-    m_processedSize += avLen + 3;
-    avPacket.size = avLen + 3;
+    m_processedSize += 3ll + avLen;
+    avPacket.size = 3ll + avLen;
     if (m_needRescale)
     {
         if (m_renderedBlocks.size() > 0)
         {
-            avPacket.pts = m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ;
-            avPacket.dts = m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ;
+            avPacket.pts = (int64_t)(m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ);
+            avPacket.dts = (int64_t)(m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ);
         }
         else
         {
@@ -787,7 +782,7 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
     return rez;
 }
 
-void PGSStreamReader::intDecodeStream(uint8_t* buffer, int len)
+void PGSStreamReader::intDecodeStream(uint8_t* buffer, size_t len)
 {
     uint8_t* bufEnd = buffer + len;
     uint8_t* curPos = buffer;
@@ -807,13 +802,13 @@ void PGSStreamReader::intDecodeStream(uint8_t* buffer, int len)
 
         uint8_t segment_type = *curPos;
         uint16_t segment_len = (uint16_t)AV_RB16(curPos + 1);
-        if (bufEnd - curPos < 3 + segment_len)
+        if (bufEnd - curPos < 3ll + segment_len)
             return;
 
         curPos += 3;
         if (segment_type == 0x16)
         {
-            BitStreamReader bitReader;
+            BitStreamReader bitReader{};
             bitReader.setBuffer(curPos, bufEnd);
             video_descriptor(bitReader);
             return;
@@ -834,9 +829,9 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         *dstBuffer++ = 'P';
         *dstBuffer++ = 'G';
         uint32_t* data = (uint32_t*)dstBuffer;
-        *data++ = my_htonl(nanoClockToPts(m_lastPTS));
+        *data++ = my_htonl((uint32_t)nanoClockToPts(m_lastPTS));
         if (m_lastDTS != m_lastPTS)
-            *data = my_htonl(nanoClockToPts(m_lastDTS));
+            *data = my_htonl((uint32_t)nanoClockToPts(m_lastDTS));
         else
             *data = 0;
         return 10;

@@ -63,9 +63,9 @@ void TextSubtitlesRenderWin32::setRenderSize(int width, int height)
     m_pbmpInfo->bmiHeader.biCompression = BI_RGB;
     m_pbmpInfo->bmiHeader.biClrUsed = 256 * 256 * 256;
     m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, (void**)&m_pData, 0, 0);
-    SelectObject(m_dc, m_hbmp);
     if (m_hbmp == 0)
         THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles");
+    SelectObject(m_dc, m_hbmp);
     ::SetBkColor(m_dc, RGB(0, 0, 0));
     ::SetBkMode(m_dc, TRANSPARENT);
 }
@@ -103,25 +103,25 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 #ifdef OLD_WIN32_RENDERER
     ::DrawText(m_dc, text.c_str(), text.length(), rect, DT_NOPREFIX);
 #else
-    Graphics graphics(m_dc);
+    Gdiplus::Graphics graphics(m_dc);
     graphics.SetSmoothingMode(SmoothingModeHighQuality);
     graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
 
     FontFamily fontFamily(toWide(m_font.m_name).data());
     StringFormat strformat;
-    GraphicsPath path;
+    Gdiplus::GraphicsPath path;
 
     auto text_wide = toWide(text);
-    path.AddString(text_wide.data(), text_wide.size(), &fontFamily, m_font.m_opts & 0xf, m_font.m_size,
+    path.AddString(text_wide.data(), (int)text_wide.size(), &fontFamily, m_font.m_opts & 0xf, (float)m_font.m_size,
                    Gdiplus::Point(rect->left, rect->top), &strformat);
 
     uint8_t alpha = m_font.m_color >> 24;
-    uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
-    Pen pen(Color(outColor, 0, 0, 0), m_font.m_borderWidth * 2);
+    uint8_t outColor = (alpha * 48 + 128) / 255;
+    Pen pen(Color(outColor, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&pen, &path);
 
-    Pen penInner(Color(alpha, 0, 0, 0), m_font.m_borderWidth);
+    Pen penInner(Color(alpha, 0, 0, 0), (float)m_font.m_borderWidth);
     penInner.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&penInner, &path);
 
@@ -137,21 +137,21 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 #else
     int opts = m_font.m_opts & 0xf;
     FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
+    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
     int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
-    int lineSpacingPixel = font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts);
+    int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
 
     StringFormat strformat;
-    GraphicsPath path;
+    Gdiplus::GraphicsPath path;
     auto text_wide = toWide(text);
-    path.AddString(text_wide.data(), text_wide.size(), &fontFamily, opts, m_font.m_size, Gdiplus::Point(0, 0),
-                   &strformat);
-    RectF rect;
-    Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2);
+    path.AddString(text_wide.data(), (int)text_wide.size(), &fontFamily, opts, (float)m_font.m_size,
+                   Gdiplus::Point(0, 0), &strformat);
+    Gdiplus::RectF rect;
+    Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
     path.GetBounds(&rect, 0, &pen);
-    mSize->cx = rect.Width;
+    mSize->cx = (int)rect.Width;
     mSize->cy = lineSpacingPixel;
 #endif
 }
@@ -164,16 +164,12 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     return tm.tmAscent;
 #else
     int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
+    Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
     int lineSpacing = fontFamily.GetLineSpacing(opts);
-    int lineSpacingPixel = font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts);
+    int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
     return lineSpacingPixel;
-
-    // int ascent = fontFamily.GetCellAscent(opts);
-    // int ascentPixel = font.GetSize() * ascent / fontFamily.GetEmHeight(opts);
-    // return ascentPixel;
 #endif
 }
 
@@ -185,16 +181,12 @@ int TextSubtitlesRenderWin32::getBaseline()
     return tm.tmAscent;
 #else
     int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, m_font.m_size, opts, UnitPoint);
+    Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
     int descentOffset = fontFamily.GetCellDescent(opts);
-    int descentPixel = font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts);
+    int descentPixel = (int)(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
     return descentPixel;
-
-    // int ascent = fontFamily.GetCellAscent(opts);
-    // int ascentPixel = font.GetSize() * ascent / fontFamily.GetEmHeight(opts);
-    // return ascentPixel;
 #endif
 }
 

@@ -13,13 +13,13 @@ using namespace std;
 
 using namespace text_subtitles;
 
-SRTStreamReader::SRTStreamReader() : m_lastBlock(false)
+SRTStreamReader::SRTStreamReader() : m_lastBlock(false), m_long_N(0), m_long_R(0), m_short_N(0), m_short_R(0)
 {
     // in future version here must be case for destination subtitle format (DVB sub, DVD sub e.t.c)
     m_dstSubCodec = new PGSStreamReader();
     m_srtRender = new TextToPGSConverter(true);
     m_processedSize = 0;
-    m_state = PARSE_FIRST_LINE;
+    m_state = ParseState::PARSE_FIRST_LINE;
     m_inTime = m_outTime = 0.0;
     m_srcFormat = UtfConverter::SourceFormat::sfUnknown;
     m_charSize = 1;
@@ -40,8 +40,8 @@ void SRTStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
     if (m_tmpBuffer.size() > 0)
         memmove(dataBegin, &m_tmpBuffer[0], m_tmpBuffer.size());
-    int parsedLen = parseText(dataBegin, dataLen + m_tmpBuffer.size());
-    int rest = dataLen + m_tmpBuffer.size() - parsedLen;
+    int parsedLen = parseText(dataBegin, dataLen + (int)m_tmpBuffer.size());
+    int rest = dataLen + (int)m_tmpBuffer.size() - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
         THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)");
     m_tmpBuffer.resize(rest);
@@ -128,8 +128,8 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
         if (m_charSize == 1 && *cur == '\n' || m_charSize == 2 && *((uint16_t*)cur) == m_short_N ||
             m_charSize == 4 && *((uint32_t*)cur) == m_long_N)
         {
-            long x = 0;
-            if (cur - lastProcessedLine >= m_charSize)
+            int32_t x = 0;
+            if (cur >= m_charSize + lastProcessedLine)
                 if (m_charSize == 1 && cur[-1] == '\r' || m_charSize == 2 && ((uint16_t*)cur)[-1] == m_short_R ||
                     m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R)
                     x = m_charSize;
@@ -139,12 +139,12 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
             if (strOnlySpace(tmp))
                 tmp.clear();
 
-            m_origSize.push(cur + m_charSize - lastProcessedLine + prefixLen);
+            m_origSize.push((uint32_t)(cur + m_charSize - lastProcessedLine + prefixLen));
             prefixLen = 0;
             lastProcessedLine = cur + m_charSize;
         }
     }
-    return lastProcessedLine - dataStart;
+    return (int)(lastProcessedLine - dataStart);
 }
 
 bool SRTStreamReader::strOnlySpace(std::string& str)
@@ -179,7 +179,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
     uint8_t* rez = 0;
     if (m_sourceText.size() == 0)
         return 0;
-    if (m_state == PARSE_FIRST_LINE)
+    if (m_state == ParseState::PARSE_FIRST_LINE)
     {
         while (m_sourceText.size() > 0 && m_sourceText.front().size() == 0)
         {
@@ -189,7 +189,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         }
         if (m_sourceText.size() == 0)
             return 0;
-        m_state = PARSE_TIME;
+        m_state = ParseState::PARSE_TIME;
         bool isNUmber = true;
         {
             for (auto& c : m_sourceText.front())
@@ -208,11 +208,11 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
                 return 0;
         }
     }
-    if (m_state == PARSE_TIME)
+    if (m_state == ParseState::PARSE_TIME)
     {
         if (!parseTime(m_sourceText.front()))
             THROW(ERR_COMMON, "Invalid SRT format. \"" << m_sourceText.front().c_str() << "\" is invalid timing info");
-        m_state = PARSE_TEXT;
+        m_state = ParseState::PARSE_TEXT;
         m_sourceText.pop();
         m_processedSize += m_origSize.front();
         m_origSize.pop();
@@ -234,7 +234,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
     {
         if (m_lastBlock && m_renderedText.size() > 0)
         {
-            m_state = PARSE_FIRST_LINE;
+            m_state = ParseState::PARSE_FIRST_LINE;
             m_renderedText.clear();
             rez = m_srtRender->doConvert(m_renderedText, m_animation, m_inTime, m_outTime, renderedLen);
         }
@@ -246,7 +246,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_processedSize += m_origSize.front();
         m_origSize.pop();
         rez = m_srtRender->doConvert(m_renderedText, m_animation, m_inTime, m_outTime, renderedLen);
-        m_state = PARSE_FIRST_LINE;
+        m_state = ParseState::PARSE_FIRST_LINE;
         m_renderedText.clear();
     }
     return rez;

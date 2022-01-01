@@ -116,9 +116,7 @@ class TextSubtitlesRender
     Font m_font;
 
    protected:
-    YUVQuad RGBAToYUVA(RGBQUAD* rgba);
     int m_borderWidth;
-    int getRepeatCnt(uint32_t* pos, uint32_t* end);
     std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack);
     int browserSizeToRealSize(int bSize, double rSize);
 

@@ -15,7 +15,7 @@
 
 namespace text_subtitles
 {
-enum CompositionMode
+enum class CompositionMode
 {
     CM_Start,
     CM_Update,
