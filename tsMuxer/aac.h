@@ -8,24 +8,21 @@ const static int AAC_HEADER_LEN = 7;
 class AACCodec
 {
    public:
-    // convert AAC prifle to mpeg 4 object type.
-    // static const int object_type[9];
-    const static int OBJECT_AAC_MAIN = 1;
-    const static int OBJECT_AAC_LC = 2;
-    const static int OBJECT_AAC_SSR = 3;
-    const static int OBJECT_AAC_LTP = 4;
-
-    const static int PROFILE_LC = 0;
-    const static int PROFILE_MAIN = 1;
-    const static int PROFILE_SSR = 2;
-    const static int PROFILE_LTP = 3;
 
     static const int aac_sample_rates[16];
     static const int aac_channels[8];
     AACCodec()
+        : m_sample_rate(48000),
+          m_channels(0),
+          m_bit_rate(0),
+          m_channels_index(0),
+          m_id(0),
+          m_layer(0),
+          m_profile(0),
+          m_rdb(0),
+          m_sample_rates_index(0),
+          m_samples(0)
     {
-        m_sample_rate = 48000;
-        m_channels = 0;
     }
     uint8_t* findAacFrame(uint8_t* buffer, uint8_t* end);
     int getFrameSize(uint8_t* buffer);

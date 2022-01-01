@@ -3,21 +3,6 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-// convert AAC prifle to mpeg 4 object type.
-
-/*
-const int AACCodec::object_type[9] = {1, // 'AAC_MAIN' -> AAC Main
-                                                                   2, // 'AAC_LC' -> AAC Low complexity
-                                                                   3, // 'AAC_SSR' -> AAC SSR
-                                                                   4, // 'AAC_LTP' -> AAC Long term prediction
-                                                                   5, // HE_AAC
-                                                                   17, // ER_LC
-                                                                   19, // ER_LTP
-                                                                   23, // LD
-                                                                   27 //DRM_ER_LC
-                                  };
-*/
-
 const int AACCodec::aac_sample_rates[16] = {96000, 88200, 64000, 48000, 44100, 32000, 24000,
                                             22050, 16000, 12000, 11025, 8000,  7350};
 
@@ -44,17 +29,16 @@ int AACCodec::getFrameSize(uint8_t* buffer) { return ((buffer[3] & 0x03) << 11) 
 
 bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
 {
-    BitStreamReader bits;
+    BitStreamReader bits{};
     try
     {
         bits.setBuffer(buffer, end);
-        int synh = bits.getBits(12);
-
-        if (synh != 0xfff)
+        if (bits.getBits(12) != 0xfff)  // sync bytes
             return false;
-        m_id = bits.getBit();                  /* 0: MPEG-4, 1: MPEG-2*/
-        m_layer = bits.getBits(2);             /* layer */
-        int protection_absent = bits.getBit(); /* protection_absent */
+
+        m_id = bits.getBit();      /* 0: MPEG-4, 1: MPEG-2*/
+        m_layer = bits.getBits(2); /* layer */
+        bits.skipBit();            /* protection_absent */
         // -- 16 bit
         m_profile = bits.getBits(2);            /* profile_objecttype */
         m_sample_rates_index = bits.getBits(4); /* sample_frequency_index */
@@ -66,8 +50,6 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
             return false;
         bits.skipBit(); /* original/copy */
         bits.skipBit(); /* home */
-        // if (m_id == 0) // this is MPEG4
-        //    bits.skipBits(2);   // emphasis
 
         /* adts_variable_header */
         bits.skipBit(); /* copyright_identification_bit */
@@ -84,15 +66,16 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
         m_bit_rate = frameSize * 8 * m_sample_rate / m_samples;
         return true;
     }
-    catch (BitStreamException)
+    catch (BitStreamException e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
 
 void AACCodec::buildADTSHeader(uint8_t* buffer, int frameSize)
 {
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + AAC_HEADER_LEN);
     writer.putBits(12, 0xfff);
     writer.putBit(m_id);
@@ -120,9 +103,6 @@ void AACCodec::buildADTSHeader(uint8_t* buffer, int frameSize)
     writer.putBit(0); /* original/copy */
     writer.putBit(0); /* home */
 
-    // if (m_id == 0) // this is MPEG4
-    //    writer.putBits(2,0);   // emphasis
-
     /* adts_variable_header */
     writer.putBit(0); /* copyright_identification_bit */
     writer.putBit(0); /* copyright_identification_start */
@@ -135,7 +115,7 @@ void AACCodec::buildADTSHeader(uint8_t* buffer, int frameSize)
 
 void AACCodec::readConfig(uint8_t* buff, int size)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buff, buff + size);
     int object_type = reader.getBits(5);
     if (object_type == 31)
