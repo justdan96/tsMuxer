@@ -75,13 +75,13 @@ class PGSStreamReader : public AbstractStreamReader
         uint8_t* data;
     };
 
-    enum State
+    enum class State
     {
         stParsePES,
         stParsePGS,
         stAVPacketFragmented
     };
-    enum CompositionState
+    enum class CompositionState
     {
         csNormalCase,
         csAcquisitionPoint,
@@ -91,7 +91,7 @@ class PGSStreamReader : public AbstractStreamReader
     State m_state;
     uint8_t* m_curPos;
     uint8_t* m_buffer;
-    int m_tmpBufferLen;
+    size_t m_tmpBufferLen;
     std::vector<uint8_t> m_tmpBuffer;
     int64_t m_lastPTS;
     int64_t m_maxPTS;
@@ -114,8 +114,6 @@ class PGSStreamReader : public AbstractStreamReader
     uint8_t* m_imgBuffer;
     uint8_t* m_rgbBuffer;
     uint8_t* m_scaledRgbBuffer;
-    uint16_t window_horizontal_position;
-    uint16_t window_vertical_position;
     std::map<uint8_t, text_subtitles::YUVQuad> m_palette;
     int m_scaled_width;
     int m_scaled_height;
@@ -123,7 +121,6 @@ class PGSStreamReader : public AbstractStreamReader
     bool m_firstRenderedPacket;
 
     text_subtitles::TextToPGSConverter* m_render;
-    uint32_t m_renderedLen;
     uint8_t* m_renderedData;
     std::vector<PGSRenderedBlock> m_renderedBlocks;
 
@@ -141,7 +138,7 @@ class PGSStreamReader : public AbstractStreamReader
     void decodeRleData(int xOffset, int yOffset);
     void yuvToRgb(int minY);
     void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
-    void intDecodeStream(uint8_t* buffer, int len);
+    void intDecodeStream(uint8_t* buffer, size_t len);
 
     int m_palleteID;
     int m_paletteVersion;
@@ -149,10 +146,9 @@ class PGSStreamReader : public AbstractStreamReader
     int m_objectWindowHeight;
     int m_objectWindowTop;
     uint8_t m_offsetId;
-    int m_forced_on_flag;
+    bool m_forced_on_flag;
 
     CompositionState composition_state;
-    int composition_number;
 };
 
 #endif
