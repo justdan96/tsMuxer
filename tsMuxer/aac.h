@@ -8,7 +8,6 @@ const static int AAC_HEADER_LEN = 7;
 class AACCodec
 {
    public:
-
     static const int aac_sample_rates[16];
     static const int aac_channels[8];
     AACCodec()
