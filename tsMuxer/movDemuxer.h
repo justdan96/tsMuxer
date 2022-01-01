@@ -62,7 +62,7 @@ class MovDemuxer : public IOContextDemuxer
     int64_t m_mdat_pos;
     int64_t m_mdat_size;
     uint64_t m_fileSize;
-    std::vector<std::pair<int64_t, uint64_t>> m_mdat_data;
+    std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;
     std::map<std::string, std::string> metaData;
@@ -70,7 +70,7 @@ class MovDemuxer : public IOContextDemuxer
     std::vector<MOVTrackExt> trex_data;
     int64_t fileDuration;
     int isom;
-    std::vector<std::pair<int64_t, uint64_t>> chunks;
+    std::vector<std::pair<int64_t, int64_t>> chunks;
     size_t m_curChunk;
     AVPacket m_deliveredPacket;
     std::vector<uint8_t> m_tmpChunkBuffer;
