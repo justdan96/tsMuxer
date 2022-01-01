@@ -145,8 +145,8 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     StringFormat strformat;
     Gdiplus::GraphicsPath path;
     auto text_wide = toWide(text);
-    path.AddString(text_wide.data(), (int)text_wide.size(), &fontFamily, opts, (float)m_font.m_size, Gdiplus::Point(0, 0),
-                   &strformat);
+    path.AddString(text_wide.data(), (int)text_wide.size(), &fontFamily, opts, (float)m_font.m_size,
+                   Gdiplus::Point(0, 0), &strformat);
     Gdiplus::RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);

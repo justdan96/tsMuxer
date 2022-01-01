@@ -100,7 +100,7 @@ void PGSStreamReader::composition_object(BitStreamReader& bitReader)
 
 void PGSStreamReader::pgs_window(BitStreamReader& bitReader)
 {
-    bitReader.skipBits(8);  // window_id
+    bitReader.skipBits(8);   // window_id
     bitReader.skipBits(32);  // window_horizontal_position, window_vertical_position
     bitReader.skipBits(32);  // window_width, window_height
 }
