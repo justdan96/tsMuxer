@@ -9,29 +9,15 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-const static int AC3_DESCRIPTOR_TAG = 0x6A;
-const static int EAC3_DESCRIPTOR_TAG = 0x7A;
-
-static const int64_t THD_EPS = 100;
-
 bool AC3StreamReader::isPriorityData(AVPacket* packet)
 {
-    // return packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10 && m_state !=
-    // stateDecodeTrueHD;
-    bool rez = packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10;
-    if (rez && m_state == AC3State::stateDecodeTrueHD)
-    {
-        int gg = 4;
-    }
-    return rez;
+    return (packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10);
 }
 
 void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket)
 {
     if (m_useNewStyleAudioPES)
     {
-        // 0f 81 71 - from blu ray DTS-HD
-        // 0x01 0x81 0x71 - ordinal DTS == 0x71?
         pesPacket->flagsLo |= 1;  // enable PES extension for AC3 stream
         uint8_t* data = (uint8_t*)(pesPacket) + pesPacket->getHeaderLength();
         *data++ = 0x01;
@@ -88,7 +74,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
         *dstBuff++ = 0x81;  // AC-3_audio_stream_descriptor( )
         *dstBuff++ = 4;     // descriptor len
-        BitStreamWriter bitWriter;
+        BitStreamWriter bitWriter{};
         bitWriter.setBuffer(dstBuff, dstBuff + 4);
 
         bitWriter.putBits(3, m_fscod);  // bitrate code;
@@ -115,7 +101,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     // ATSC Standard : Digital Audio Compression (AC-3, EAC3) Table G.1
     *dstBuff++ = 0xCC;  // EAC3_audio_stream_descriptor
     *dstBuff++ = 4;     // descriptor len
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     bitWriter.setBuffer(dstBuff, dstBuff + 4);
 
     bitWriter.putBits(4, 12);
@@ -151,8 +137,8 @@ int AC3StreamReader::flushPacket(AVPacket& avPacket)
     if (rez > 0 && m_true_hd_mode && !m_downconvertToAC3)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
-            avPacket.pts = avPacket.dts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate -
-                                          m_thdFrameOffset;  // replace time to a next HD packet
+            avPacket.pts = avPacket.dts =
+                m_totalTHDSamples * 1000000000ll / mh.group1_samplerate;  // replace time to a next HD packet
     }
     return rez;
 }
@@ -168,7 +154,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         m_thdDemuxWaitAc3 = false;
         avPacket.dts = avPacket.pts = m_nextAc3Time;
         avPacket.flags |= AVPacket::IS_CORE_PACKET;
-        m_nextAc3Time += m_frameDuration;
+        m_nextAc3Time += m_frameDurationNano;
         return 0;
     }
 
@@ -187,7 +173,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
                 m_thdDemuxWaitAc3 = false;
                 avPacket.dts = avPacket.pts = m_nextAc3Time;
                 avPacket.flags |= AVPacket::IS_CORE_PACKET;
-                m_nextAc3Time += m_frameDuration;
+                m_nextAc3Time += m_frameDurationNano;
                 return 0;
             }
             else
@@ -209,28 +195,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         else
         {
             // thg packet
-            avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate - m_thdFrameOffset;
-
-#if 0
-            if (m_curMplsIndex >= 0 && avPacket.pts >= m_lastMplsTime && m_curMplsIndex < m_mplsInfo.size()-1) 
-            {
-                m_curMplsIndex++;
-                if (m_mplsInfo[m_curMplsIndex].connection_condition == 5) {
-                    int64_t delta = avPacket.pts - m_lastMplsTime;
-                    m_thdFrameOffset += delta;
-                    avPacket.pts -= delta;
-                    avPacket.dts = avPacket.pts;
-                    m_nextAc3Time -= delta;
-                }
-                m_lastMplsTime += (int64_t) ((m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time)*(1000000000/45000.0));
-                /*
-                if (m_thdFrameOffset >= mh.frame_duration_nano) {
-                    m_thdFrameOffset -= mh.frame_duration_nano;
-                    continue; // skip thd frame
-                }
-                */
-            }
-#endif
+            avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate;
 
             m_totalTHDSamples += mh.access_unit_size;
             m_demuxedTHDSamples += mh.access_unit_size;

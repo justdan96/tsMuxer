@@ -37,28 +37,7 @@ const uint16_t ff_ac3_frame_sizes[38][3] = {
     {384, 417, 576},    {384, 418, 576},    {448, 487, 672},    {448, 488, 672},    {512, 557, 768},
     {512, 558, 768},    {640, 696, 960},    {640, 697, 960},    {768, 835, 1152},   {768, 836, 1152},
     {896, 975, 1344},   {896, 976, 1344},   {1024, 1114, 1536}, {1024, 1115, 1536}, {1152, 1253, 1728},
-    {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920},
-};
-
-typedef enum
-{
-    AC3_PARSE_ERROR_SYNC = -1,
-    AC3_PARSE_ERROR_BSID = -2,
-    AC3_PARSE_ERROR_SAMPLE_RATE = -3,
-    AC3_PARSE_ERROR_FRAME_SIZE = -4,
-} AC3ParseError;
-
-typedef enum
-{
-    AC3_ACMOD_DUALMONO = 0,
-    AC3_ACMOD_MONO,
-    AC3_ACMOD_STEREO,
-    AC3_ACMOD_3F,
-    AC3_ACMOD_2F1R,
-    AC3_ACMOD_3F1R,
-    AC3_ACMOD_2F2R,
-    AC3_ACMOD_3F2R
-} AC3ChannelMode;
+    {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920}};
 
 static const uint8_t mlp_quants[16] = {
     16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -82,15 +61,15 @@ static int mlp_samplerate(int in)
 
 static int truehd_channels(int chanmap)
 {
-    int channels = 0, i;
+    int channels = 0;
 
-    for (i = 0; i < 13; i++) channels += thd_chancount[i] * ((chanmap >> i) & 1);
+    for (int i = 0; i < 13; i++) channels += thd_chancount[i] * ((chanmap >> i) & 1);
 
     return channels;
 }
 
-const static int AC3_DESCRIPTOR_TAG = 0x6A;
-const static int EAC3_DESCRIPTOR_TAG = 0x7A;
+static const int AC3_ACMOD_MONO = 1;
+static const int AC3_ACMOD_STEREO = 2;
 
 const CodecInfo& AC3Codec::getCodecInfo()
 {
@@ -102,19 +81,18 @@ const CodecInfo& AC3Codec::getCodecInfo()
         return ac3CodecInfo;
 }
 
-int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
+AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 {
-    BitStreamReader gbc;
+    BitStreamReader gbc{};
     gbc.setBuffer(buf, end);
 
-    m_sync_word = gbc.getBits(16);
-    if (m_sync_word != 0x0B77)
-        return AC3_PARSE_ERROR_SYNC;
+    if (gbc.getBits(16) != 0x0B77)  // sync_word
+        return AC3ParseError::AC3_PARSE_ERROR_SYNC;
 
     // read ahead to bsid to make sure this is AC-3, not E-AC-3
     int id = gbc.showBits(29) & 0x1F;
     if (id > 16)
-        return AC3_PARSE_ERROR_BSID;
+        return AC3ParseError::AC3_PARSE_ERROR_BSID;
 
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
@@ -125,23 +103,23 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 
         strmtyp = gbc.getBits(2);
         if (strmtyp == 3)
-            return AC3_PARSE_ERROR_SYNC;  // invalid stream type
+            return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // invalid stream type
 
         substreamid = gbc.getBits(3);
 
         m_frame_size = (gbc.getBits(11) + 1) * 2;
         if (m_frame_size < AC3_HEADER_SIZE)
-            return 0;  // invalid header size
+            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;  // invalid header size
 
         fscod = gbc.getBits(2);
 
         if (fscod == 3)
         {
-            m_fscod2 = gbc.getBits(2);
-            numblkscod = 3;
+            int m_fscod2 = gbc.getBits(2);
             if (m_fscod2 == 3)
-                return AC3_PARSE_ERROR_SYNC;
-
+                return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+            
+            numblkscod = 3;
             m_sample_rate = ff_ac3_freqs[m_fscod2] / 2;
         }
         else
@@ -153,7 +131,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         acmod = gbc.getBits(3);
         lfeon = gbc.getBit();
 
-        m_samples = eac3_blocks[numblkscod] * 256;
+        m_samples = eac3_blocks[numblkscod] << 8;
         m_bit_rateExt = m_frame_size * (m_sample_rate)*8 / (m_samples);
 
         gbc.skipBits(5);  // skip bsid, already got it
@@ -269,7 +247,7 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
             if (acmod == 2)
                 dsurmod = gbc.getBits(2);
         }
-        m_mixinfoexists = pgmscle || extpgmscle || mixdef || paninfoe;
+        m_mixinfoexists = pgmscle || extpgmscle || mixdef > 0 || paninfoe;
 
         if (m_channels == 0)  // no AC3 interleave
         {
@@ -285,23 +263,23 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     {
         m_bsidBase = m_bsid;  // id except AC3+ frames
         m_samples = AC3_FRAME_SIZE;
-        m_crc1 = gbc.getBits(16);
+        gbc.skipBits(16);  // m_crc1
         m_fscod = gbc.getBits(2);
         if (m_fscod == 3)
-            return AC3_PARSE_ERROR_SAMPLE_RATE;
+            return AC3ParseError::AC3_PARSE_ERROR_SAMPLE_RATE;
 
         m_frmsizecod = gbc.getBits(6);
         if (m_frmsizecod > 37)
-            return AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;
 
         gbc.skipBits(5);  // skip bsid, already got it
 
         m_bsmod = gbc.getBits(3);
         m_acmod = gbc.getBits(3);
         if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)
-            m_cmixlev = gbc.getBits(2);
+           gbc.skipBits(2);  // m_cmixlev
         if (m_acmod & 4)
-            m_surmixlev = gbc.getBits(2);
+           gbc.skipBits(2);  // m_surmixlev
         if (m_acmod == AC3_ACMOD_STEREO)
             m_dsurmod = gbc.getBits(2);
         m_lfeon = gbc.getBit();
@@ -312,80 +290,61 @@ int AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_channels = ff_ac3_channels[m_acmod] + m_lfeon;
         m_frame_size = ff_ac3_frame_sizes[m_frmsizecod][m_fscod] * 2;
     }
-    return 0;
-}
-
-bool AC3Codec::findMajorSync(uint8_t* buffer, uint8_t* end)
-{
-    uint32_t majorSyncVal = my_htonl(TRUE_HD_MAJOR_SYNC);
-    for (uint8_t* cur = buffer; cur < end - 4; cur++)
-    {
-        uint32_t* testVal = (uint32_t*)cur;
-        if (*testVal == majorSyncVal)
-            return true;
-    }
-    return false;
+    return AC3ParseError::AC3_PARSE_NO_ERROR;
 }
 
 bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
 {
     if (end - buffer < 21)
         return false;
-    int ratebits = 0;
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer + 4, end);
     if (reader.getBits(24) != HD_SYNC_WORLD) /* Sync words */
         return false;
-    mh.stream_type = reader.getBits(8);
+
+    int ratebits = 0;
+    int stream_type = reader.getBits(8);
 
     mh.subType = MLPHeaderInfo::MlpSubType::stUnknown;
-    if (mh.stream_type == 0xbb)
+    if (stream_type == 0xbb)  // MLP
     {
         mh.subType = MLPHeaderInfo::MlpSubType::stMLP;
-        mh.group1_bits = mlp_quants[reader.getBits(4)];
-        mh.group2_bits = mlp_quants[reader.getBits(4)];
+        reader.skipBits(8);  // group1_bits, group2_bits
         ratebits = reader.getBits(4);
         mh.group1_samplerate = mlp_samplerate(ratebits);
         if (mh.group1_samplerate == 0)
             return false;
-        mh.group2_samplerate = mlp_samplerate(reader.getBits(4));
+        reader.skipBits(4);  // group2_samplerate
         reader.skipBits(11);
-        mh.channels_mlp = reader.getBits(5);
-        mh.channels = mlp_channels[mh.channels_mlp];
+        mh.channels = mlp_channels[reader.getBits(5)];
     }
-    else if (mh.stream_type == 0xba)
+    else if (stream_type == 0xba)  // True-HD
     {
         mh.subType = MLPHeaderInfo::MlpSubType::stTRUEHD;
-        mh.group1_bits = 24;  // TODO: Is this information actually conveyed anywhere?
-        mh.group2_bits = 0;
         ratebits = reader.getBits(4);
         mh.group1_samplerate = mlp_samplerate(ratebits);
         if (mh.group1_samplerate == 0)
             return false;
-        mh.group2_samplerate = 0;
         reader.skipBits(8);
-        mh.channels_thd_stream1 = reader.getBits(5);
+        int channels_thd_stream1 = reader.getBits(5);
         reader.skipBits(2);
-        mh.channels_thd_stream2 = reader.getBits(13);
+        int channels_thd_stream2 = reader.getBits(13);
 
-        if (mh.channels_thd_stream2)
-            mh.channels = truehd_channels(mh.channels_thd_stream2);
+        if (channels_thd_stream2)
+            mh.channels = truehd_channels(channels_thd_stream2);
         else
-            mh.channels = truehd_channels(mh.channels_thd_stream1);
+            mh.channels = truehd_channels(channels_thd_stream1);
     }
     else
         return false;
 
     mh.access_unit_size = 40 << (ratebits & 7);
-    mh.access_unit_size_pow2 = 64 << (ratebits & 7);
-    mh.frame_duration_nano = mh.access_unit_size * 1000000000ll / mh.group1_samplerate;
-
     reader.skipBits(32);
     reader.skipBits(16);
 
-    mh.is_vbr = reader.getBit();
+    reader.skipBit();  // is_vbr
     mh.peak_bitrate = (reader.getBits(15) * mh.group1_samplerate + 8) >> 4;
-    mh.num_substreams = reader.getBits(4);
+    reader.skipBits(4);  // num_substreams
     // for (int i = 0; i < 11; ++i)
     //	reader.skipBits(8);
     // reader.skipBits(4);
@@ -398,7 +357,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
     try
     {
         int rez = 0;
-        int err;
+        AC3ParseError err;
 
         if (end - buf < 2)
             return NOT_ENOUGH_BUFFER;
@@ -413,10 +372,10 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             skipBytes = 0;
             err = parseHeader(buf, end);
 
-            if (err < 0)
+            if (err != AC3ParseError::AC3_PARSE_NO_ERROR)
                 return 0;  // parse error
 
-            m_frameDuration = (1000000000ull * m_samples) / (double)m_sample_rate;
+            m_frameDurationNano = (1000000000ull * m_samples) / m_sample_rate;
             rez = m_frame_size;
         }
 
@@ -454,11 +413,10 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             int trueHDFrameLen = (trueHDData[0] & 0x0f) << 8;
             trueHDFrameLen += trueHDData[1];
             trueHDFrameLen *= 2;
-            if (end - trueHDData < trueHDFrameLen + 7)
+            if (end - trueHDData < (int64_t)(trueHDFrameLen) + 7)
                 return NOT_ENOUGH_BUFFER;
             if (!m_true_hd_mode)
             {
-                // m_true_hd_mode |= findMajorSync(trueHDData, trueHDData + trueHDFrameLen);
                 m_true_hd_mode = decodeDtsHdFrame(trueHDData, trueHDData + trueHDFrameLen);
             }
             uint8_t* nextFrame = trueHDData + trueHDFrameLen;
@@ -494,14 +452,14 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
     }
 }
 
-int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
+AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 {
-    BitStreamReader gbc;
+    BitStreamReader gbc{};
     gbc.setBuffer(buf, buf + 7);
 
     int test_sync_word = gbc.getBits(16);
     if (test_sync_word != 0x0B77)
-        return AC3_PARSE_ERROR_SYNC;
+        return AC3ParseError::AC3_PARSE_ERROR_SYNC;
 
     // read ahead to bsid to make sure this is AC-3, not E-AC-3
     int test_bsid = gbc.showBits(29) & 0x1F;
@@ -512,22 +470,22 @@ int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 
     if (test_bsid > 16)
     {
-        return AC3_PARSE_ERROR_SYNC;  // invalid stream type
+        return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // invalid stream type
     }
     else if (m_bsid > 10)
     {
-        return AC3_PARSE_ERROR_SYNC;  // doesn't used for EAC3
+        return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // doesn't used for EAC3
     }
     else
     {
         int test_crc1 = gbc.getBits(16);
         int test_fscod = gbc.getBits(2);
         if (test_fscod == 3)
-            return AC3_PARSE_ERROR_SAMPLE_RATE;
+            return AC3ParseError::AC3_PARSE_ERROR_SAMPLE_RATE;
 
         int test_frmsizecod = gbc.getBits(6);
         if (test_frmsizecod > 37)
-            return AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;
 
         gbc.skipBits(5);  // skip bsid, already got it
 
@@ -536,7 +494,7 @@ int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 
         if (test_fscod != m_fscod || /*(test_frmsizecod>>1) != (m_frmsizecod>>1) ||*/
             test_bsmod != m_bsmod /*|| test_acmod != m_acmod*/)
-            return AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
 
         if ((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO)
         {
@@ -551,12 +509,12 @@ int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
         {
             int test_dsurmod = gbc.getBits(2);
             if (test_dsurmod != m_dsurmod)
-                return AC3_PARSE_ERROR_SYNC;
+                return AC3ParseError::AC3_PARSE_ERROR_SYNC;
         }
         int test_lfeon = gbc.getBit();
 
         if (test_lfeon != m_lfeon)
-            return AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
 
         int test_halfratecod = max(test_bsid, 8) - 8;
         int test_sample_rate = ff_ac3_freqs[test_fscod] >> test_halfratecod;
@@ -565,21 +523,24 @@ int AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
         int test_frame_size = ff_ac3_frame_sizes[test_frmsizecod][test_fscod] * 2;
         if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
             test_channels != m_channels /*|| test_frame_size != m_frame_size*/)
-            return AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
     }
-    return 0;
+    return AC3ParseError::AC3_PARSE_NO_ERROR;
 }
 
-bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end) { return testParseHeader(buf, end) == 0; }
+bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
+{
+    return testParseHeader(buf, end) == AC3ParseError::AC3_PARSE_NO_ERROR;
+}
 
-double AC3Codec::getFrameDurationNano()
+uint64_t AC3Codec::getFrameDurationNano()
 {
     if (m_bit_rateExt)
-        return m_bsid > 10 ? m_frameDuration : 0;  // E-AC3. finish frame after AC3 frame
-    else if (m_waitMoreData)
+        return m_bsid > 10 ? m_frameDurationNano : 0;  // E-AC3. finish frame after AC3 frame
+    if (m_waitMoreData)
         return 0;  // AC3 HD
-    else
-        return m_frameDuration;
+    
+    return m_frameDurationNano;
 }
 
 const std::string AC3Codec::getStreamInfo()
@@ -600,9 +561,7 @@ const std::string AC3Codec::getStreamInfo()
         str << "AC3 core+";
         str << hd_type;
         str << ". ";
-    }
-    if (m_true_hd_mode)
-    {
+
         str << "Peak bitrate: " << mh.peak_bitrate / 1000 << "Kbps (core " << m_bit_rate / 1000 << "Kbps) ";
         str << "Sample Rate: " << mh.group1_samplerate / 1000 << "KHz ";
         if (m_sample_rate != mh.group1_samplerate)
