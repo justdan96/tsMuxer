@@ -53,7 +53,7 @@ int MatroskaDemuxer::matroska_parse_index()
 {
     int res = 0;
     uint32_t id;
-    MatroskaDemuxIndex idx;
+    MatroskaDemuxIndex idx{};
 
     // return 0;
 
@@ -137,11 +137,11 @@ int MatroskaDemuxer::matroska_parse_index()
                             uint64_t num;
                             if ((res = ebml_read_uint(&id, &num)) < 0)
                                 break;
-                            idx.track = num;
+                            idx.track = (uint16_t)num;
                             break;
                         }
 
-                            /* position in file */
+                        /* position in file */
                         case MATROSKA_ID_CUECLUSTERPOSITION:
                         {
                             uint64_t num;
@@ -150,14 +150,12 @@ int MatroskaDemuxer::matroska_parse_index()
                             idx.pos = num + segment_start;
                             break;
                         }
-
-                        default:
-                            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in CuesTrackPositions");
-                            /* fall-through */
-
                         case EBML_ID_VOID:
                             res = ebml_read_skip();
                             break;
+                        default:
+                            res = ebml_read_skip();
+                            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in CuesTrackPositions");
                         }
 
                         if (level_up)
@@ -166,16 +164,13 @@ int MatroskaDemuxer::matroska_parse_index()
                             break;
                         }
                     }
-
                     break;
-
-                default:
-                    LTRACE(LT_INFO, 0, "Unknown entry " << id << " in cuespoint index");
-                    /* fall-through */
-
                 case EBML_ID_VOID:
                     res = ebml_read_skip();
                     break;
+                default:
+                    res = ebml_read_skip();
+                    LTRACE(LT_INFO, 0, "Unknown entry " << id << " in cuespoint index");
                 }
 
                 if (level_up)
@@ -191,14 +186,12 @@ int MatroskaDemuxer::matroska_parse_index()
                 indexes.push_back(idx);
             }
             break;
-
-        default:
-            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in cues header");
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in cues header");
         }
 
         if (level_up)
@@ -211,7 +204,8 @@ int MatroskaDemuxer::matroska_parse_index()
     return res;
 }
 
-MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager) : IOContextDemuxer(readManager)
+MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
+    : IOContextDemuxer(readManager), created(0), fileDuration(0), levels(), title()
 {
     m_lastDeliveryPacket = 0;
     num_levels = 0;
@@ -235,7 +229,7 @@ int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    size = rlength;
+    size = (int)rlength;
 
     // ebml strings are usually not 0-terminated, so we allocate one
     // byte more, read the string and NULL-terminate it ourselves.
@@ -337,6 +331,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
             {
                 if (*doctype)
                     delete[] doctype;
+                // TODO: solve uninitialized memory 'doctype':
                 *doctype = text;
             }
             else
@@ -351,21 +346,18 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 return res;
             if (version)
-                *version = num;
+                *version = (int)num;
             break;
         }
-
-        default:
-            LTRACE(LT_INFO, 0, "Unknown data type " << id << " in EBML header");
-            /* pass-through */
-
+        /* we ignore these three, as they don't tell us anything we care about */
         case EBML_ID_VOID:
-        /* we ignore these two, as they don't tell us anything we
-         * care about */
         case EBML_ID_EBMLVERSION:
         case EBML_ID_DOCTYPEVERSION:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown data type " << id << " in EBML header");
         }
     }
 
@@ -391,7 +383,7 @@ int MatroskaDemuxer::rv_offset(uint8_t *data, int slice, int slices)
  * XXX: use ebml_read_num().
  */
 
-int MatroskaDemuxer::matroska_find_track_by_num(int num)
+int MatroskaDemuxer::matroska_find_track_by_num(uint64_t num)
 {
     int i;
     for (i = 0; i < num_tracks; i++)
@@ -478,8 +470,8 @@ int MatroskaDemuxer::matroska_deliver_packet(AVPacket *&avPacket)
 
 int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
 {
-    int size, n = 1, negative = 0, res;
-    uint64_t rlength;
+    int n = 1, negative = 0, res;
+    uint64_t size, rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
@@ -592,7 +584,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
         data += 1;
         size -= 1;
         lace_size = (uint32_t *)new uint8_t[laces * sizeof(int)];
-        memset(lace_size, 0, laces * sizeof(int));
+        memset(lace_size, 0, (size_t)laces * sizeof(int));
 
         switch ((flags & 0x06) >> 1)
         {
@@ -637,7 +629,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
             }
             data += n;
             size -= n;
-            total = lace_size[0] = num;
+            total = lace_size[0] = (uint32_t)num;
             for (n = 1; res == 0 && n < laces - 1; n++)
             {
                 int64_t snum;
@@ -650,7 +642,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 }
                 data += r;
                 size -= r;
-                lace_size[n] = lace_size[n - 1] + snum;
+                lace_size[n] = lace_size[n - 1] + (uint32_t)snum;
                 total += lace_size[n];
             }
             lace_size[n] = size - total;
@@ -706,7 +698,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 m_tmpBuffer.clear();
                 if (tracks[track]->encodingAlgo == COMPRESSION_STRIP_HEADERS)
                 {
-                    offset = tracks[track]->encodingAlgoPriv.size();
+                    offset = (int)tracks[track]->encodingAlgoPriv.size();
                     if (offset)
                     {
                         curPtr -= offset;
@@ -730,7 +722,8 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 {
                     pkt->data = new uint8_t[slice_size + offset];
                     pkt->size = slice_size + offset;
-                    memcpy(pkt->data, curPtr, slice_size + offset);
+                    // TODO : check compiler warning 'Reading invalid data from curPtr'
+                    memcpy(pkt->data, curPtr, (size_t)(slice_size + offset));
                 }
                 if (offset)
                     memcpy(curPtr, m_tmpBuffer.data(), offset);  // restore data
@@ -758,7 +751,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
     uint32_t id;
     int is_bframe = 0;
     int is_keyframe = PKT_FLAG_KEY;
-    int last_num_packets = packets.size();
+    size_t last_num_packets = packets.size();
     uint64_t duration = AV_NOPTS_VALUE;
     uint8_t *data;
     int size = 0;
@@ -810,14 +803,12 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
                 is_bframe = 1;
             break;
         }
-
-        default:
-            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in blockgroup data");
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in blockgroup data");
         }
 
         if (level_up)
@@ -843,8 +834,8 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
 
 int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
 {
-    int n = 0, size, res;
-    uint64_t rlength;
+    int n = 0, res;
+    uint64_t size, rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
@@ -882,7 +873,7 @@ int MatroskaDemuxer::ebml_read_element_id(uint32_t *id, int *level_up)
     /* read out the "EBML number", include tag in ID */
     if ((read = ebml_read_num(4, &total)) < 0)
         return read;
-    *id = peek_id = total | (1 << (read * 7));
+    *id = peek_id = ((int)total | (1 << (read * 7)));
 
     /* level tracking */
     if (level_up)
@@ -957,7 +948,7 @@ int MatroskaDemuxer::ebml_read_binary(uint32_t *id, uint8_t **binary, int *size)
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    *size = rlength;
+    *size = (int)rlength;
 
     *binary = new uint8_t[*size];
     if (!(*binary))
@@ -1006,7 +997,7 @@ int MatroskaDemuxer::matroska_parse_cluster()
             break;
         }
 
-            /* a group of blocks inside a cluster */
+        /* a group of blocks inside a cluster */
         case MATROSKA_ID_BLOCKGROUP:
             if ((res = ebml_read_master(&id)) < 0)
                 break;
@@ -1023,15 +1014,13 @@ int MatroskaDemuxer::matroska_parse_cluster()
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        // Don't know why here is the next cluster without level up. Probably file error
+        // TODO: does the EBML need to be skipped ?
         case MATROSKA_ID_CLUSTER:
-            return 0;  // I don't know why here is the next cluster without level up. Jim send me it. Probably file
-                       // error
+            return 0;
         default:
             LTRACE(LT_WARN, 0, "Unknown entry " << id << " in cluster data");
-            /* fall-through */
-
             res = ebml_read_skip();
-            break;
         }
 
         if (level_up)
@@ -1200,9 +1189,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
                 matroska_read_header();
                 break;
             default:
-            case EBML_ID_VOID:
                 res = ebml_read_skip();
-                break;
             }
 
             if (level_up)
@@ -1243,6 +1230,7 @@ int MatroskaDemuxer::matroska_read_header()
     if ((doctype == NULL) || strcmp(doctype, "matroska"))
     {
         if (doctype)
+            // TODO: solve uninitialized memory 'doctype':
             delete[] doctype;
         THROW(ERR_MATROSKA_PARSE, "Wrong EBML doctype ('" << (doctype ? doctype : "(none)") << "' != 'matroska').");
     }
@@ -1363,13 +1351,13 @@ res = matroska_parse_seekhead();
             break;
         }
 
-        default:
-            LTRACE(LT_INFO, 0, "Unknown matroska file header ID " << id);
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown matroska file header ID " << id);
         }
 
         if (level_up)
@@ -1492,7 +1480,7 @@ int MatroskaDemuxer::matroska_parse_info()
             double num;
             if ((res = ebml_read_float(&id, &num)) < 0)
                 break;
-            fileDuration = num * time_scale;
+            fileDuration = (uint64_t)(num * time_scale);
             break;
         }
 
@@ -1532,14 +1520,13 @@ int MatroskaDemuxer::matroska_parse_info()
             created = time;
             break;
         }
-
-        default:
-            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in info header");
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in info header");
         }
 
         if (level_up)
@@ -1566,8 +1553,8 @@ int MatroskaDemuxer::ebml_read_date(uint32_t *id, int64_t *date) { return ebml_r
 
 int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
 {
-    int size, res;
-    uint64_t rlength;
+    int res;
+    uint64_t size, rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
@@ -1617,13 +1604,12 @@ int MatroskaDemuxer::matroska_parse_metadata()
         switch (id)
         {
         /* Hm, this is unsupported... */
-        default:
-            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in metadata header");
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in metadata header");
         }
 
         if (level_up)
@@ -1671,7 +1657,8 @@ int MatroskaDemuxer::matroska_parse_chapters()
         case MATROSKA_ID_EDITIONENTRY:
         {
             uint64_t end = AV_NOPTS_VALUE, start = AV_NOPTS_VALUE;
-            uint64_t uid = -1;
+            uint64_t uid = 0;
+            bool uidFound = false;
             char *title = NULL;
             // if there is more than one chapter edition we take only the first one
             if (chapters.size() > 0)
@@ -1747,12 +1734,13 @@ int MatroskaDemuxer::matroska_parse_chapters()
                                 case MATROSKA_ID_CHAPSTRING:
                                     res = ebml_read_utf8(&id, &title);
                                     break;
-
-                                default:
-                                    LTRACE(LT_INFO, 0, "Ignoring unknown Chapter display ID " << id);
                                 case EBML_ID_VOID:
                                     res = ebml_read_skip();
                                     break;
+
+                                default:
+                                    res = ebml_read_skip();
+                                    LTRACE(LT_INFO, 0, "Ignoring unknown Chapter display ID " << id);
                                 }
 
                                 if (level_up)
@@ -1765,13 +1753,17 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
                         case MATROSKA_ID_CHAPTERUID:
                             res = ebml_read_uint(&id, &uid);
+                            uidFound = true;
                             break;
-                        default:
-                            LTRACE(LT_INFO, 0, "Ignoring unknown Chapter atom ID " << id);
+
                         case MATROSKA_ID_CHAPTERFLAGHIDDEN:
                         case EBML_ID_VOID:
                             res = ebml_read_skip();
                             break;
+
+                        default:
+                            res = ebml_read_skip();
+                            LTRACE(LT_INFO, 0, "Ignoring unknown Chapter atom ID " << id);
                         }
 
                         if (level_up)
@@ -1781,22 +1773,24 @@ int MatroskaDemuxer::matroska_parse_chapters()
                         }
                     }
 
-                    if (start != AV_NOPTS_VALUE && uid != -1)
+                    if (start != AV_NOPTS_VALUE && uidFound)
                     {
                         AVChapter chapter(start, title);
-                        chapters[uid] = chapter;
+                        // TODO:  uid should be stored with 64 bits
+                        chapters[(int)uid] = chapter;
                     }
+                    // TODO: solve uninitialized memory 'title':
                     delete[] title;
                     break;
-
-                default:
-                    LTRACE(LT_INFO, 0, "Ignoring unknown Edition entry ID " << id);
                 case MATROSKA_ID_EDITIONUID:
                 case MATROSKA_ID_EDITIONFLAGHIDDEN:
                 case MATROSKA_ID_EDITIONFLAGDEFAULT:
                 case EBML_ID_VOID:
                     res = ebml_read_skip();
                     break;
+                default:
+                    res = ebml_read_skip();
+                    LTRACE(LT_INFO, 0, "Ignoring unknown Edition entry ID " << id);
                 }
 
                 if (level_up)
@@ -1807,12 +1801,12 @@ int MatroskaDemuxer::matroska_parse_chapters()
             }
             break;
         }
-
-        default:
-            LTRACE(LT_INFO, 0, "Expected an Edition entry (" << MATROSKA_ID_EDITIONENTRY << "), but found " << id);
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Expected an Edition entry (" << MATROSKA_ID_EDITIONENTRY << "), but found " << id);
         }
 
         if (level_up)
@@ -1851,14 +1845,12 @@ int MatroskaDemuxer::matroska_parse_tracks()
         case MATROSKA_ID_TRACKENTRY:
             res = matroska_add_stream();
             break;
-
-        default:
-            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in track header");
-            /* fall-through */
-
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown entry " << id << " in track header");
         }
 
         if (level_up)
@@ -1901,7 +1893,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
             uint64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            track->encodingAlgo = num;
+            track->encodingAlgo = (uint32_t)num;
             break;
         }
         case MATROSKA_ID_ENCODINGCOMPSETTINGS:
@@ -1919,7 +1911,6 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
         }
         default:
             res = ebml_read_skip();
-            break;
         }
 
         if (level_up)
@@ -1961,7 +1952,6 @@ int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
         }
         default:
             res = ebml_read_skip();
-            break;
         }
 
         if (level_up)
@@ -2003,7 +1993,6 @@ int MatroskaDemuxer::readTrackEncodings(MatroskaTrack *track)
         }
         default:
             res = ebml_read_skip();
-            break;
         }
 
         if (level_up)
@@ -2058,7 +2047,7 @@ int MatroskaDemuxer::matroska_add_stream()
             uint64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            track->num = num;
+            track->num = (uint32_t)num;
             break;
         }
 
@@ -2097,7 +2086,6 @@ int MatroskaDemuxer::matroska_add_stream()
             default:
                 LTRACE(LT_INFO, 0, "Unknown or unsupported track type " << (uint64_t)track->type);
                 track->type = (MatroskaTrackType)0;
-                break;
             }
             tracks[num_tracks - 1] = track;
             break;
@@ -2151,7 +2139,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     if ((res = ebml_read_float(&id, &num)) < 0)
                         break;
                     if (!track->default_duration)
-                        track->default_duration = 1000000000 / num;
+                        track->default_duration = (uint64_t)(1000000000 / num);
                     break;
                 }
 
@@ -2161,7 +2149,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    videotrack->display_width = num;
+                    videotrack->display_width = (int)num;
                     break;
                 }
 
@@ -2171,7 +2159,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    videotrack->display_height = num;
+                    videotrack->display_height = (int)num;
                     break;
                 }
 
@@ -2181,7 +2169,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    videotrack->pixel_width = num;
+                    videotrack->pixel_width = (int)num;
                     break;
                 }
 
@@ -2191,7 +2179,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    videotrack->pixel_height = num;
+                    videotrack->pixel_height = (int)num;
                     break;
                 }
 
@@ -2253,17 +2241,15 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    videotrack->fourcc = num;
+                    videotrack->fourcc = (uint32_t)num;
                     break;
                 }
-
-                default:
-                    LTRACE(LT_INFO, 0, "Unknown video track header entry " << id << " - ignoring\n");
-                    /* pass-through */
-
                 case EBML_ID_VOID:
                     res = ebml_read_skip();
                     break;
+                default:
+                    res = ebml_read_skip();
+                    LTRACE(LT_INFO, 0, "Unknown video track header entry " << id << " - ignoring\n");
                 }
 
                 if (level_up)
@@ -2314,16 +2300,15 @@ int MatroskaDemuxer::matroska_add_stream()
                     double num;
                     if ((res = ebml_read_float(&id, &num)) < 0)
                         break;
-                    audiotrack->internal_samplerate = audiotrack->samplerate = num;
+                    audiotrack->internal_samplerate = audiotrack->samplerate = (int)num;
                     break;
                 }
-
                 case MATROSKA_ID_AUDIOOUTSAMPLINGFREQ:
                 {
                     double num;
                     if ((res = ebml_read_float(&id, &num)) < 0)
                         break;
-                    audiotrack->samplerate = num;
+                    audiotrack->samplerate = (int)num;
                     break;
                 }
 
@@ -2333,7 +2318,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->bitdepth = num;
+                    audiotrack->bitdepth = (int)num;
                     break;
                 }
 
@@ -2343,17 +2328,15 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->channels = num;
+                    audiotrack->channels = (int)num;
                     break;
                 }
-
-                default:
-                    LTRACE(LT_INFO, 0, "Unknown audio track header entry " << id << " - ignoring\n");
-                    /* pass-through */
-
                 case EBML_ID_VOID:
                     res = ebml_read_skip();
                     break;
+                default:
+                    res = ebml_read_skip();
+                    LTRACE(LT_INFO, 0, "Unknown audio track header entry " << id << " - ignoring\n");
                 }
 
                 if (level_up)
@@ -2474,18 +2457,17 @@ int MatroskaDemuxer::matroska_add_stream()
         case MATROSKA_ID_TRACKCONTENTENCODINGS:
             readTrackEncodings(track);
             break;
-        default:
-            LTRACE(LT_INFO, 0, "Unknown track header entry " << id << " - ignoring");
-            /* pass-through */
-
+            /* we ignore these because they're nothing useful. */
         case EBML_ID_VOID:
-        /* we ignore these because they're nothing useful. */
         case MATROSKA_ID_CODECINFOURL:
         case MATROSKA_ID_CODECDOWNLOADURL:
         case MATROSKA_ID_TRACKMINCACHE:
         case MATROSKA_ID_TRACKMAXCACHE:
             res = ebml_read_skip();
             break;
+        default:
+            res = ebml_read_skip();
+            LTRACE(LT_INFO, 0, "Unknown track header entry " << id << " - ignoring");
         }
 
         if (level_up)
@@ -2498,7 +2480,7 @@ int MatroskaDemuxer::matroska_add_stream()
     return res;
 }
 
-// ------------- need to implemented --------------
+// ------------- need to be implemented --------------
 
 int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize)
 {

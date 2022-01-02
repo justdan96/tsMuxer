@@ -16,12 +16,12 @@ using namespace wave_format;
 
 // ------------ H-264 ---------------
 
-ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size)
+ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size), m_nalSize(0)
 {
     m_firstExtract = true;
     if (buff == 0)
         return;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         bitReader.setBuffer(buff, buff + size);
@@ -66,9 +66,9 @@ void ParsedH264TrackData::writeNalHeader(uint8_t*& dst)
     for (int i = 0; i < 3; i++) *dst++ = 0;
     *dst++ = 1;
 }
-int ParsedH264TrackData::getSPSPPSLen()
+size_t ParsedH264TrackData::getSPSPPSLen()
 {
-    int rez = 0;
+    size_t rez = 0;
     for (auto& i : m_spsPpsList) rez += i.size() + 4;
     return rez;
 }
@@ -82,7 +82,7 @@ int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
         memcpy(dst, &i[0], i.size());
         dst += i.size();
     }
-    return dst - start;
+    return (int)(dst - start);
 }
 
 bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
@@ -122,7 +122,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         m_firstExtract = false;
 
     if (m_firstExtract)
-        newBufSize += getSPSPPSLen();
+        newBufSize += (int)getSPSPPSLen();
 
     while (curPos <= end - m_nalSize)
     {
@@ -230,8 +230,7 @@ ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPri
 
 void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 {
-    // pkt->size = size + 4 + (m_firstPacket ? m_seqHeader.size() : 0);
-    pkt->size = size + (m_firstPacket ? m_seqHeader.size() : 0);
+    pkt->size = size + (m_firstPacket ? (int)m_seqHeader.size() : 0);
     bool addFrameHdr = !(size >= 4 && buff[0] == 0 && buff[1] == 0 && buff[2] == 1);
     if (addFrameHdr)
         pkt->size += 4;
@@ -249,6 +248,8 @@ void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         *dst++ = 1;
         *dst++ = 0x0d;
     }
+    // TODO: check compiler warning C6386 : Buffer overrun while writing to 'dst' :
+    // the writable size is 'size*1' bytes, but '4' bytes might be written.
     memcpy(dst, buff, size);
     m_firstPacket = false;
 }
@@ -346,7 +347,7 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
     prefix += floatToTime((pkt->pts + pkt->duration) / 1e9, ',');
     prefix += '\n';
     std::string postfix = "\n\n";
-    pkt->size = size + prefix.length() + postfix.length();
+    pkt->size = (int)(size + prefix.length() + postfix.length());
     pkt->data = new uint8_t[pkt->size];
     memcpy(pkt->data, prefix.c_str(), prefix.length());
     memcpy(pkt->data + prefix.length(), buff, size);
@@ -388,7 +389,7 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         dst[0] = 'P';
         dst[1] = 'G';
         uint32_t* ptsDts = (uint32_t*)(dst + 2);
-        ptsDts[0] = my_htonl((pkt->pts * 90000) / 1000000000ll);
+        ptsDts[0] = my_htonl((uint32_t)((pkt->pts * 90000) / 1000000000));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;
         memcpy(dst, curPtr, blockSize);

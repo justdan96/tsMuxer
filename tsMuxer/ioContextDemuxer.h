@@ -63,7 +63,7 @@ struct Track
     /* Unique track number and track ID. stream_index is the index that
      * the calling app uses for this track. */
     uint32_t num;
-    uint32_t uid;
+    uint64_t uid;
     int stream_index;
 
     char* name;
