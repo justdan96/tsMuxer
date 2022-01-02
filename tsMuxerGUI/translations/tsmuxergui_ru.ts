@@ -844,8 +844,8 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="73"/>
-        <source>Quick time audio/video files</source>
-        <translation>Аудио/видео файлы Quick time</translation>
+        <source>QuickTime audio/video files</source>
+        <translation>Аудио/видео файлы QuickTime</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="74"/>

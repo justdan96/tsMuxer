@@ -844,7 +844,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="73"/>
-        <source>Quick time audio/video files</source>
+        <source>QuickTime audio/video files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

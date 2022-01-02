@@ -70,7 +70,7 @@ QString fileDialogFilter()
                              {TsMuxerWindow::tr("Program Stream"), {"mpg", "mpeg", "vob", "evo"}},
                              {TsMuxerWindow::tr("Matroska audio/video files"), {"mkv", "mka", "mks"}},
                              {TsMuxerWindow::tr("MP4 audio/video files"), {"mp4", "m4a", "m4v"}},
-                             {TsMuxerWindow::tr("Quick time audio/video files"), {"mov"}},
+                             {TsMuxerWindow::tr("QuickTime audio/video files"), {"mov"}},
                              {TsMuxerWindow::tr("Blu-ray play list"), {"mpls", "mpl"}},
                              {TsMuxerWindow::tr("Blu-ray PGS subtitles"), {"sup"}},
                              {TsMuxerWindow::tr("Text subtitles"), {"srt"}},
