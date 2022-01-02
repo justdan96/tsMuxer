@@ -39,36 +39,41 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
                                    const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     codecReader->setDemuxMode(true);
-    uint8_t descrBuffer[188];
-    int descriptorLen = codecReader->getTSDescriptor(descrBuffer, true, true);
     string fileExt = "track";
-    if (codecName == "A_AC3")
-        fileExt = ".ac3";
-    else if (codecName == "A_AAC")
+
+    // this call seemingly does nothing, but it actually makes some
+    // StreamReaders refresh/set their private variables, enabling proper
+    // codec->extension mapping in here. don't remove it.
+    uint8_t descrBuffer[188];
+    codecReader->getTSDescriptor(descrBuffer, true, true);
+
+    if (codecName == "A_AAC")
+    {
         fileExt = ".aac";
+    }
     else if (codecName == "A_MP3")
     {
-        MpegAudioStreamReader* mp3Reader = (MpegAudioStreamReader*)codecReader;
+        const auto mp3Reader = static_cast<MpegAudioStreamReader*>(codecReader);
         if (mp3Reader->getLayer() == 3)
             fileExt = ".mp3";
         else
             fileExt = ".mpa";
     }
     else if (codecName == "A_DTS")
+    {
         fileExt = ".dts";
+    }
     else if (codecName == "A_LPCM")
     {
         fileExt = ".wav";
-        LPCMStreamReader* lpcmReader = (LPCMStreamReader*)codecReader;
-        // lpcmReader->setDemuxMode(true);
     }
     else if (codecName == "A_AC3")
     {
-        AC3StreamReader* ac3Reader = (AC3StreamReader*)codecReader;
+        const auto ac3Reader = static_cast<AC3StreamReader*>(codecReader);
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
             fileExt = ".trueHD";
         else if (ac3Reader->isEAC3())
-            fileExt = ".ddp";
+            fileExt = ".ec3";
         else
             fileExt = ".ac3";
     }
@@ -79,14 +84,10 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     else if (codecName == "S_HDMV/PGS")
     {
         fileExt = ".sup";
-        PGSStreamReader* pgsReader = (PGSStreamReader*)codecReader;
-        // pgsReader->setDemuxMode(true);
     }
     else if (codecName == "S_TEXT/UTF8")
     {
         fileExt = ".sup";
-        SRTStreamReader* srtReader = (SRTStreamReader*)codecReader;
-        // srtReader->setDemuxMode(true);
     }
     else if (codecName[0] == 'V')
     {
@@ -115,13 +116,6 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
             fileExt = ".mpv";
         }
     }
-
-    /*
-    if (codecName[0] == 'A') {
-            // Used for "more correct" switching between the boundaries of Blu-Ray disc files
-            ((SimplePacketizerReader*) codecReader)->setMPLSInfo(m_mplsParser.m_playItems);
-    }
-    */
 
     vector<string> fileList = extractFileList(streamName);
     string fileName;
