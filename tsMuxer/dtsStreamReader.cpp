@@ -811,6 +811,10 @@ const std::string DTSStreamReader::getStreamInfo()
             break;
         case DTSHD_SUBTYPE::DTS_SUBTYPE_96:
             str << " (DTS 96";
+            break;
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED:
+        case DTSHD_SUBTYPE::DTS_SUBTYPE_OTHER:
+            break;
         }
 
         if (hd_bitDepth > 16)
