@@ -15,6 +15,8 @@
 #include <QTemporaryFile>
 #include <QTime>
 
+#include <unordered_set>
+
 #include "checkboxedheaderview.h"
 #include "codecinfo.h"
 #include "fontsettingstablemodel.h"
@@ -29,41 +31,76 @@
 
 namespace
 {
+using FileFilterVec = std::vector<std::pair<QString, std::vector<const char *>>>;
+
+QString makeFileFilter(const FileFilterVec &filters)
+{
+    QString rv;
+    QTextStream s(&rv);
+    for (auto &f : filters)
+    {
+        s << f.first << " (";
+        for (auto &e : f.second)
+        {
+            s << "*." << e;
+            if (&e != &f.second.back())
+            {
+                s << ' ';
+            }
+        }
+        s << ");;";
+    }
+    rv.append(QString("%1 (*.*)").arg(TsMuxerWindow::tr("All files")));
+    return rv;
+}
+
 QString fileDialogFilter()
 {
-    return TsMuxerWindow::tr(
-        "All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;\
-AC3/E-AC3 (*.ac3 *.ddp);;\
-AAC (advanced audio coding) (*.aac);;\
-AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;\
-HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;\
-Digital Theater System (*.dts);;\
-DTS-HD Master Audio (*.dtshd);;\
-Mpeg video elementary stream (*.mpv *.m1v *.m2v);;\
-Mpeg audio elementary stream (*.mpa);;\
-Transport Stream (*.ts);;\
-BDAV Transport Stream (*.m2ts *.mts *.ssif);;\
-Program Stream (*.mpg *.mpeg *.vob *.evo);;\
-Matroska audio/video files (*.mkv *.mka *.mks);;\
-MP4 audio/video files (*.mp4 *.m4a *.m4v);;\
-Quick time audio/video files (*.mov);;\
-Blu-ray play list (*.mpls *.mpl);;\
-Blu-ray PGS subtitles (*.sup);;\
-Text subtitles (*.srt);;\
-WAVE - Uncompressed PCM audio (*.wav *.w64);;\
-RAW LPCM Stream (*.pcm);;\
-All files (*.*)");
+    FileFilterVec filters = {{TsMuxerWindow::tr("AC3/E-AC3"), {"ac3", "ddp", "ec3"}},
+                             {TsMuxerWindow::tr("AAC (advanced audio coding)"), {"aac"}},
+                             {TsMuxerWindow::tr("AVC/MVC/H.264 elementary stream"), {"avc", "mvc", "264", "h264"}},
+                             {TsMuxerWindow::tr("HEVC (High Efficiency Video Codec)"), {"hevc", "hvc", "265", "h265"}},
+                             {TsMuxerWindow::tr("Digital Theater System"), {"dts"}},
+                             {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd"}},
+                             {TsMuxerWindow::tr("Mpeg video elementary stream"), {"mpv", "m1v", "m2v"}},
+                             {TsMuxerWindow::tr("Mpeg audio elementary stream"), {"mpa"}},
+                             {TsMuxerWindow::tr("Transport Stream"), {"ts"}},
+                             {TsMuxerWindow::tr("BDAV Transport Stream"), {"m2ts", "mts", "ssif"}},
+                             {TsMuxerWindow::tr("Program Stream"), {"mpg", "mpeg", "vob", "evo"}},
+                             {TsMuxerWindow::tr("Matroska audio/video files"), {"mkv", "mka", "mks"}},
+                             {TsMuxerWindow::tr("MP4 audio/video files"), {"mp4", "m4a", "m4v"}},
+                             {TsMuxerWindow::tr("QuickTime audio/video files"), {"mov"}},
+                             {TsMuxerWindow::tr("Blu-ray play list"), {"mpls", "mpl"}},
+                             {TsMuxerWindow::tr("Blu-ray PGS subtitles"), {"sup"}},
+                             {TsMuxerWindow::tr("Text subtitles"), {"srt"}},
+                             {TsMuxerWindow::tr("WAVE - Uncompressed PCM audio"), {"wav", "w64"}},
+                             {TsMuxerWindow::tr("RAW LPCM Stream"), {"pcm"}}};
+    std::unordered_set<std::string> uniqueExts;
+    for (auto &f : filters)
+    {
+        uniqueExts.insert(std::begin(f.second), std::end(f.second));
+    }
+    std::vector<const char *> allSupportedExts;
+    for (auto &s : uniqueExts)
+    {
+        allSupportedExts.push_back(s.c_str());
+    }
+    filters.insert(std::begin(filters), {TsMuxerWindow::tr("All supported media files"), allSupportedExts});
+    return makeFileFilter(filters);
 }
 
 QString TI_DEFAULT_TAB_NAME() { return TsMuxerWindow::tr("General track options"); }
 
 QString TI_DEMUX_TAB_NAME() { return TsMuxerWindow::tr("Demux options"); }
 
-QString TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Transport stream (*.ts);;all files (*.*)"); }
+QString TS_SAVE_DIALOG_FILTER() { return makeFileFilter({{TsMuxerWindow::tr("Transport Stream"), {"ts"}}}); }
 
-QString M2TS_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("BDAV Transport Stream (*.m2ts);;all files (*.*)"); }
+QString M2TS_SAVE_DIALOG_FILTER()
+{
+    return makeFileFilter({{TsMuxerWindow::tr("BDAV Transport Stream"), {"m2ts", "mts", "ssif"}}});
+}
 
-QString ISO_SAVE_DIALOG_FILTER() { return TsMuxerWindow::tr("Disk image (*.iso);;all files (*.*)"); }
+QString ISO_SAVE_DIALOG_FILTER() { return makeFileFilter({{TsMuxerWindow::tr("Disk image"), {"iso"}}}); }
 
 QSettings *settings = nullptr;
 
