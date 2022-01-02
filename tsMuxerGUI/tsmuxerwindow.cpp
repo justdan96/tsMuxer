@@ -51,7 +51,6 @@ QString makeFileFilter(const FileFilterVec &filters)
         s << ");;";
     }
     rv.append(QString("%1 (*.*)").arg(TsMuxerWindow::tr("All files")));
-    qDebug() << rv;
     return rv;
 }
 
