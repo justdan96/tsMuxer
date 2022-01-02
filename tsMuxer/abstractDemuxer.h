@@ -52,7 +52,7 @@ class MemoryBlock
         }
     }
 
-    int size() const { return m_size; }
+    size_t size() const { return m_size; }
 
     uint8_t* data() { return m_data.empty() ? 0 : &m_data[0]; }
 
@@ -62,7 +62,7 @@ class MemoryBlock
 
    private:
     std::vector<uint8_t> m_data;
-    int m_size;
+    size_t m_size;
 };
 
 typedef MemoryBlock StreamData;
