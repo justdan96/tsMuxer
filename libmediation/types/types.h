@@ -29,7 +29,7 @@ uint16_t strToInt16u(const char* const);
 int8_t strToInt8(const char* const);
 uint8_t strToInt8u(const char* const);
 double strToDouble(const char* const);  // The length of the string should not exceed 15 characters
-float strToFloat(const char* const);  // The length of the string should not exceed 15 characters
+float strToFloat(const char* const);    // The length of the string should not exceed 15 characters
 bool strToBool(const char* const);
 bool strEndWith(const std::string& str, const std::string& substr);
 bool strStartWith(const std::string& str, const std::string& substr);
