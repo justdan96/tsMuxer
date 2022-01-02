@@ -73,8 +73,6 @@ struct StreamInfo
     bool m_isSubStream;
 };
 
-// drpReadSequence - the stream is not fragmented
-// drpFragmented   - the stream is fragmented according to the resulting container
 enum class DemuxerReadPolicy
 {
     drpReadSequence,
@@ -138,13 +136,12 @@ class ContainerToReaderWrapper : public AbstractReader
 
     bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
     void terminate();
-    void openAllStream();
     std::map<std::string, DemuxerData> m_demuxers;
 
    private:
     int64_t m_discardedSize;
     int m_readerCnt;
-    int m_readBuffOffset;
+    size_t m_readBuffOffset;
     const BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
     const METADemuxer& m_owner;
@@ -165,7 +162,6 @@ struct DetectStreamRez
 class METADemuxer : public AbstractDemuxer
 {
    public:
-    // METADemuxer(const BufferedReaderManager& readManager, const char* streamName);
     METADemuxer(const BufferedReaderManager& readManager);
     ~METADemuxer() override;
     // virtual void initStream();

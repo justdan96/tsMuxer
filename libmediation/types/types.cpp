@@ -96,6 +96,8 @@ uint8_t strToInt8u(const char* const str) { return (uint8_t)strtol(str, 0, 10); 
 
 double strToDouble(const char* const str) { return strtod(str, 0); }
 
+float strToFloat(const char* const str) { return strtof(str, 0); }
+
 bool strToBool(const char* const str)
 {
     if (!strcmp(str, "true"))
@@ -302,7 +304,7 @@ void splitStr(vector<string>& rez, const char* str, char splitter)
 
 string extractFileExt(const string& src)
 {
-    for (int i = src.size() - 1; i >= 0; i--)
+    for (size_t i = src.size() - 1; i > 0; i--)
         if (src[i] == '.')
         {
             string rez = src.substr(i + 1);
@@ -317,7 +319,7 @@ string extractFileExt(const string& src)
 string extractFileName(const string& src)
 {
     int endPos = src.size();
-    for (int i = src.size() - 1; i >= 0; i--)
+    for (size_t i = src.size() - 1; i > 0; i--)
         if (src[i] == '.')
         {
             if (endPos == src.size())
