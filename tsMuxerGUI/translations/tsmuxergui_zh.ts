@@ -771,22 +771,6 @@
         <translation>保存项目文件</translation>
     </message>
     <message>
-        <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
-        <translation type="vanished">所有支持的媒体文件 (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (高级音频编码)) (*.aac);;AVC/MVC/H.264 基本流 (*.avc *.mvc *.264 *.h264);;HEVC (高效视频编解码器) (*.hevc *.hvc *.265 *.h265);;数字影院系统 (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg视频基本流 (*.mpv *.m1v *.m2v);;MPEG 音频基本流 (*.mpa);;传输流 (*.ts);;BDAV 传输流 (*.m2ts *.mts *.ssif);;节目流 (*.mpg *.mpeg *.vob *.evo);;Matroska 音频/视频 文件 (*.mkv *.mka *.mks);;MP4 音频/视频 文件 (*.mp4 *.m4a *.m4v);;Quick 音频/视频 文件 (*.mov);;蓝光播放列表 (*.mpls *.mpl);;蓝光PGS字幕 (*.sup);;文本字幕 (*.srt);;WAVE-未压缩的PCM音频 (*.wav *.w64);;RAW LPCM流 (*.pcm);;所有文件 (*.*)</translation>
-    </message>
-    <message>
-        <source>Transport stream (*.ts);;all files (*.*)</source>
-        <translation type="vanished">传输流 (*.ts);;所有文件 (*.*)</translation>
-    </message>
-    <message>
-        <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
-        <translation type="vanished">BDAV 传输流 (*.m2ts);;所有文件 (*.*)</translation>
-    </message>
-    <message>
-        <source>Disk image (*.iso);;all files (*.*)</source>
-        <translation type="vanished">磁盘镜像 (*.iso);;所有文件 (*.*)</translation>
-    </message>
-    <message>
         <location filename="../tsmuxerwindow.cpp" line="53"/>
         <source>All files</source>
         <translation>所有文件</translation>

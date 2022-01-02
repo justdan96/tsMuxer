@@ -771,22 +771,6 @@
         <translation>Сохранить проект</translation>
     </message>
     <message>
-        <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
-        <translation type="vanished">Все поддерживаемые медиафайлы (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;Элементарный поток AVC/MVC/H.264 (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Элеменарный поток MPEG видео (*.mpv *.m1v *.m2v);;Элеменарный поток MPEG аудио (*.mpa);;Транспортный поток (*.ts);;Транспортный поток BDAV (*.m2ts *.mts *.ssif);;Программный поток (*.mpg *.mpeg *.vob *.evo);;Аудио/видео файлы матрёшки (*.mkv *.mka *.mks);;Аудио/видео файлы MP4 (*.mp4 *.m4a *.m4v);;Аудио/видео файлы Quick time (*.mov);;Плейлист блюрея (*.mpls *.mpl);;PGS субтитры блюрея (*.sup);;Текстовые субтитры (*.srt);;WAVE - Несжатый звук PCM (*.wav *.w64);;RAW LPCM поток (*.pcm);;Все файлы (*.*)</translation>
-    </message>
-    <message>
-        <source>Transport stream (*.ts);;all files (*.*)</source>
-        <translation type="vanished">Транспортный поток (*.ts);;все файлы (*.*)</translation>
-    </message>
-    <message>
-        <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
-        <translation type="vanished">Транспортный поток BDAV (*.m2ts);;все файлы (*.*)</translation>
-    </message>
-    <message>
-        <source>Disk image (*.iso);;all files (*.*)</source>
-        <translation type="vanished">Образ диска (*.iso);;все файлы (*.*)</translation>
-    </message>
-    <message>
         <location filename="../tsmuxerwindow.cpp" line="53"/>
         <source>All files</source>
         <translation>Все файлы</translation>

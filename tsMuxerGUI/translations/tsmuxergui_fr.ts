@@ -771,22 +771,6 @@
         <translation>Sauvegarder le fichier Meta</translation>
     </message>
     <message>
-        <source>All supported media files (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 elementary stream (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Mpeg video elementary stream (*.mpv *.m1v *.m2v);;Mpeg audio elementary stream (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Matroska audio/video files (*.mkv *.mka *.mks);;MP4 audio/video files (*.mp4 *.m4a *.m4v);;Quick time audio/video files (*.mov);;Blu-ray play list (*.mpls *.mpl);;Blu-ray PGS subtitles (*.sup);;Text subtitles (*.srt);;WAVE - Uncompressed PCM audio (*.wav *.w64);;RAW LPCM Stream (*.pcm);;All files (*.*)</source>
-        <translation type="vanished">Tous les fichiers média pris en charge (*.aac *.mpv *.mpa *.avc *.mvc *.264 *.h264 *.ac3 *.dts *.dtshd *.ts *.m2ts *.mts *.ssif *.mpg *.mpeg *.vob *.evo *.mkv *.mka *.mks *.mp4 *.m4a *.m4v *.mov *.sup *.wav *.w64 *.pcm *.m1v *.m2v *.vc1 *.hevc *.hvc *.265 *.h265 *.mpls *.mpl *.srt);;AC3/E-AC3 (*.ac3 *.ddp);;AAC (advanced audio coding) (*.aac);;AVC/MVC/H.264 flux élémentaire (*.avc *.mvc *.264 *.h264);;HEVC (High Efficiency Video Codec) (*.hevc *.hvc *.265 *.h265);;Digital Theater System (*.dts);;DTS-HD Master Audio (*.dtshd);;Flux vidéo élémentaire Mpeg (*.mpv *.m1v *.m2v);;Flux audio élémentaire Mpeg (*.mpa);;Transport Stream (*.ts);;BDAV Transport Stream (*.m2ts *.mts *.ssif);;Program Stream (*.mpg *.mpeg *.vob *.evo);;Fichiers audio/vidéo Matroska (*.mkv *.mka *.mks);;Fichiers audio/vidéo MP4 (*.mp4 *.m4a *.m4v);;Fichiers audio/vidéo QuickTime (*.mov);;Liste de lecture Blu-Ray (*.mpls *.mpl);;Sous-titres PGS de Blu-ray (*.sup);;Sous-titres à base de texte (*.srt);;WAVE - Audio PCM non compressé (*.wav *.w64);;Flux LPCM RAW (*.pcm);;Tous les fichiers (*.*)</translation>
-    </message>
-    <message>
-        <source>Transport stream (*.ts);;all files (*.*)</source>
-        <translation type="vanished">Transport stream (*.ts);;Tous les fichiers (*.*)</translation>
-    </message>
-    <message>
-        <source>BDAV Transport Stream (*.m2ts);;all files (*.*)</source>
-        <translation type="vanished">BDAV Transport Stream (*.m2ts);;Tous les fichiers (*.*)</translation>
-    </message>
-    <message>
-        <source>Disk image (*.iso);;all files (*.*)</source>
-        <translation type="vanished">Image disque (*.iso);; Tous les fichiers (*.*)</translation>
-    </message>
-    <message>
         <location filename="../tsmuxerwindow.cpp" line="53"/>
         <source>All files</source>
         <translation>Tous les fichiers</translation>
