@@ -722,7 +722,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 {
                     pkt->data = new uint8_t[slice_size + offset];
                     pkt->size = slice_size + offset;
-                    // TODO : check compiler warning 'Reading invalid data from curPtr' 
+                    // TODO : check compiler warning 'Reading invalid data from curPtr'
                     memcpy(pkt->data, curPtr, (size_t)(slice_size + offset));
                 }
                 if (offset)
