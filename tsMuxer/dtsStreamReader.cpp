@@ -425,6 +425,8 @@ bool DTSStreamReader::isPriorityData(AVPacket* packet)
                                  (packet->data[0] == 0xfe && packet->data[1] == 0x7f));
 }
 
+bool DTSStreamReader::isSecondary() { return m_secondary; }
+
 int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes)
 {
     uint8_t* afterFrameData = buff;
