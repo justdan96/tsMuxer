@@ -89,23 +89,23 @@ void TextSubtitlesRenderFT::loadFontMap()
     fileList.insert(fileList.end(), fileList1.begin(), fileList1.end());
 #endif
 
-    for (int i = 0; i < fileList.size(); ++i)
+    for (auto& fontFile : fileList)
     {
         // LTRACE(LT_INFO, 2, "before loading font " << fileList[i].c_str());
-        if (strEndWith(fileList[i], "AppleMyungjo.ttf"))
+        if (strEndWith(fontFile, "AppleMyungjo.ttf"))
             continue;
 
         FT_Face font;
-        int error = FT_New_Face(library, fileList[i].c_str(), 0, &font);
+        int error = FT_New_Face(library, fontFile.c_str(), 0, &font);
         if (error == 0)
         {
             string fontFamily = strToLowerCase(font->family_name);
 
             std::map<std::string, std::string>::iterator itr = m_fontNameToFile.find(fontFamily);
 
-            if (itr == m_fontNameToFile.end() || fileList[i].length() < itr->second.length())
+            if (itr == m_fontNameToFile.end() || fontFile.length() < itr->second.length())
             {
-                m_fontNameToFile[fontFamily] = std::filesystem::canonical(fileList[i]).string();
+                m_fontNameToFile[fontFamily] = std::filesystem::canonical(fontFile).string();
             }
             FT_Done_Face(font);
         }
@@ -299,8 +299,12 @@ void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, RECT* rect
     for (int x = left; x <= right; ++x) *dst++ = convertColor(m_font.m_color);
 }
 
-union Pixel32 {
-    Pixel32(uint32_t val = 0) : integer(val) {}
+struct Pixel32
+{
+    Pixel32(uint32_t val = 0)
+        : b(val & 0xff), g((val & 0xff00) >> 8), r((val & 0xff0000) >> 16), a((val & 0xff000000) >> 24)
+    {
+    }
     Pixel32(uint8_t bi, uint8_t gi, uint8_t ri, uint8_t ai = 255)
     {
         b = bi;
@@ -309,16 +313,7 @@ union Pixel32 {
         a = ai;
     }
 
-    uint32_t integer;
-
-    struct
-    {
-#ifdef BIG_ENDIAN
-        uint8_t a, r, g, b;
-#else   // BIG_ENDIAN
-        uint8_t b, g, r, a;
-#endif  // BIG_ENDIAN
-    };
+    uint8_t b, g, r, a;
 };
 
 struct Vec2
@@ -375,9 +370,9 @@ void RenderSpans(FT_Library& library, FT_Outline* const outline, Spans* spans)
     FT_Outline_Render(library, outline, &params);
 }
 
-void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, int size, const Pixel32& fontCol,
-                 const Pixel32 outlineColOut, const Pixel32 outlineColIner, float outlineWidth, int left, int top,
-                 int width, int height, uint32_t* dstData)
+void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, const Pixel32& fontCol, const Pixel32 outlineColOut,
+                 const Pixel32 outlineColIner, float outlineWidth, int left, int top, int width, int height,
+                 uint32_t* dstData)
 {
     // Load the glyph we are looking for.
     FT_UInt gindex = FT_Get_Char_Index(face, ch);
@@ -447,10 +442,9 @@ void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, int size, cons
             // more than one glyph.
             float bearingX = face->glyph->metrics.horiBearingX >> 6;
             float bearingY = face->glyph->metrics.horiBearingY >> 6;
-            float advance = face->glyph->advance.x >> 6;
 
             // Get some metrics of our image.
-            int imgWidth = rect.Width(), imgHeight = rect.Height(), imgSize = imgWidth * imgHeight;
+            int imgHeight = rect.Height();
 
             top += (face->size->metrics.ascender >> 6) - bearingY;
             left += bearingX;
@@ -521,9 +515,7 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
     if (rect->top < 0)
         rect->top = 0;
 
-    int use_kerning = FT_HAS_KERNING(face);
     int maxX = 0;
-    int firstOffs = 0;
 
     if (m_emulateItalic && m_emulateBold)
         FT_Set_Transform(face, &italic_bold_matrix, &pen);
@@ -537,9 +529,8 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
     uint8_t alpha = m_font.m_color >> 24;
     uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
     convertUTF::IterateUTF8Chars(text, [&](auto c) {
-        RenderGlyph(library, c, face, m_font.m_size, m_font.m_color, Pixel32(0, 0, 0, outColor),
-                    Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom,
-                    (uint32_t*)m_pData);
+        RenderGlyph(library, c, face, m_font.m_color, Pixel32(0, 0, 0, outColor), Pixel32(0, 0, 0, alpha),
+                    m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom, (uint32_t*)m_pData);
 
         pen.x += face->glyph->advance.x >> 6;
         pen.x += m_font.m_borderWidth / 2;
@@ -572,7 +563,6 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
     FT_Vector pen;
     pen.x = 0;
     pen.y = 0;
-    int use_kerning = FT_HAS_KERNING(face);
     mSize->cy = mSize->cx = 0;
 
     if (m_emulateItalic && m_emulateBold)
