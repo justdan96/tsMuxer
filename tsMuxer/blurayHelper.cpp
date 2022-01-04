@@ -541,7 +541,8 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     uint32_t firstPts = *(mainMuxer->getFirstPts().begin());
     uint32_t lastPts = *(mainMuxer->getLastPts().rbegin());
 
-    uint8_t mplsBuffer[1024 * 100];
+    int bufSize = 1024 * 100;
+    uint8_t* mplsBuffer = new uint8_t[bufSize];
     MPLSParser mplsParser;
     mplsParser.m_m2tsOffset = mainMuxer->getFirstFileNum();
     mplsParser.PlayList_playback_type = 1;
@@ -631,7 +632,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     {
         LTRACE(LT_INFO, 2, "Creating AVCHD playlist");
     }
-    int fileLen = mplsParser.compose(mplsBuffer, sizeof(mplsBuffer), dt);
+    int fileLen = mplsParser.compose(mplsBuffer, bufSize, dt);
 
     string prefix = m_isoWriter ? "" : m_dstPath;
     AbstractOutputStream* file;
@@ -643,9 +644,13 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     string dstDir = string("BDMV") + getDirSeparator() + string("PLAYLIST") + getDirSeparator();
     if (!file->open((prefix + dstDir + strPadLeft(int32ToStr(mplsOffset), 5, '0') + string(".mpls")).c_str(),
                     File::ofWrite))
+    {
+        delete[] mplsBuffer;
         return false;
+    }
     if (file->write(mplsBuffer, fileLen) != fileLen)
     {
+        delete[] mplsBuffer;
         delete file;
         return false;
     }
@@ -656,15 +661,18 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     if (!file->open((prefix + dstDir + strPadLeft(int32ToStr(mplsOffset), 5, '0') + string(".mpls")).c_str(),
                     File::ofWrite))
     {
+        delete[] mplsBuffer;
         delete file;
         return false;
     }
     if (file->write(mplsBuffer, fileLen) != fileLen)
     {
+        delete[] mplsBuffer;
         delete file;
         return false;
     }
     file->close();
+    delete[] mplsBuffer;
     delete file;
     return true;
 }
