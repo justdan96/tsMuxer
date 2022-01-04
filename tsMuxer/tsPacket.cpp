@@ -116,7 +116,7 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, int buf_size)
         transport_stream_id = bitReader.getBits(16);
         bitReader.skipBits(2);  // reserved
         bitReader.getBits(5);   // int version_number
-        bitReader.getBits(1);   // int current_next_indicator
+        bitReader.getBit();   // int current_next_indicator
 
         bitReader.getBits(8);  // int section_number
         bitReader.getBits(8);  // int last_section_number
@@ -277,7 +277,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
         program_number = bitReader.getBits(16);
         bitReader.skipBits(2);                         // reserved
         bitReader.getBits(5);                          // int version_number
-        int nextIndicator = bitReader.getBits(1);      // int current_next_indicator
+        int nextIndicator = bitReader.getBit();      // int current_next_indicator
         int sectionNumber = bitReader.getBits(8);      // int section_number
         int lastSectionNumber = bitReader.getBits(8);  // int last_section_number
         bitReader.skipBits(3);                         // reserved

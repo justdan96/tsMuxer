@@ -55,7 +55,6 @@ class MPEG2StreamReader : public MPEGStreamReader
     int decodePicture(uint8_t* buff);
     int processExtStartCode(uint8_t* buff);
     int processSeqStartCode(uint8_t* buff);
-    uint8_t* m_nextFrameAddr;
 };
 
 #endif

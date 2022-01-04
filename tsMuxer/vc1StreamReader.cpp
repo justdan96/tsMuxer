@@ -360,9 +360,6 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
     for (uint8_t* nal = VC1Unit::findNextMarker(buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))
     {
-        if (nal[3] != (uint8_t)VC1Code::VC1_CODE_FIELD && nal[3] != (uint8_t)VC1Code::VC1_USER_CODE_FIELD)
-            m_nextFrameAddr = nal;
-
         if (nal[3] == (uint8_t)VC1Code::VC1_CODE_FRAME || nal[3] == (uint8_t)VC1Code::VC1_USER_CODE_FRAME)
         {
             VC1Frame frame;
@@ -395,12 +392,10 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
     }
     if (m_eof)
     {
-        m_nextFrameAddr = m_bufEnd;
         return bFrameCnt;
     }
     else
     {
-        m_nextFrameAddr = 0;
         return -1;
     }
 }

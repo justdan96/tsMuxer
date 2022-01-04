@@ -391,8 +391,7 @@ int HevcSpsUnit::vui_parameters()
     bool aspect_ratio_info_present_flag = m_reader.getBit();
     if (aspect_ratio_info_present_flag)
     {
-        int aspect_ratio_idc = m_reader.getBits(8);
-        if (aspect_ratio_idc == EXTENDED_SAR)
+        if (m_reader.getBits(8) == EXTENDED_SAR)  // // aspect_ratio_idc
         {
             int sar_width = m_reader.getBits(16);
             int sar_height = m_reader.getBits(16);

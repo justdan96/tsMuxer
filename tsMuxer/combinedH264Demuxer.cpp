@@ -15,7 +15,7 @@ static const int MAX_TMP_BUFFER_SIZE = 128;
 
 // ------------------------ CombinedH264Reader -------------------------------
 
-CombinedH264Reader::CombinedH264Reader()
+CombinedH264Reader::CombinedH264Reader() : m_demuxedPID(0), m_state(ReadState_Primary)
 {
     m_firstDemuxCall = true;
     m_mvcSPS = -1;
