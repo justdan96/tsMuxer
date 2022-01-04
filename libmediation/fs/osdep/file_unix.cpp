@@ -137,13 +137,13 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     int sWhence = 0;
     switch (whence)
     {
-    case smBegin:
+    case SeekMethod::smBegin:
         sWhence = SEEK_SET;
         break;
-    case smCurrent:
+    case SeekMethod::smCurrent:
         sWhence = SEEK_CUR;
         break;
-    case smEnd:
+    case SeekMethod::smEnd:
         sWhence = SEEK_END;
         break;
     }
