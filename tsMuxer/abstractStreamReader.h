@@ -74,7 +74,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual void setDemuxMode(bool value) { m_demuxMode = value; }
     virtual bool isPriorityData(AVPacket* packet) { return false; }
     virtual bool needSPSForSplit() const { return false; }
-    bool isSecondary() const { return m_secondary; }
+    virtual bool isSecondary() { return m_secondary; }
     void setIsSecondary(bool value) { m_secondary = value; }
     void setPipParams(const PIPParams& params) { m_pipParams = params; }
     PIPParams getPipParams() { return m_pipParams; }

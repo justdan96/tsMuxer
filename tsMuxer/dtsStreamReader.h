@@ -64,7 +64,7 @@ class DTSStreamReader : public SimplePacketizerReader
     bool isPriorityData(AVPacket* packet) override;
     bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
     void setTestMode(bool value) override { m_testMode = value; }
-    bool isSecondary();
+    bool isSecondary() override;
 
    protected:
     int getHeaderLen() override { return DTS_HEADER_SIZE; };

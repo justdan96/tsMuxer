@@ -36,7 +36,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
     int getChannels() override { return AC3Codec::m_channels; }
     bool isPriorityData(AVPacket* packet) override;
     bool isIFrame(AVPacket* packet) override { return isPriorityData(packet); }
-    bool isSecondary();
+    bool isSecondary() override;
 
    protected:
     int getHeaderLen() override { return AC3Codec::getHeaderLen(); }
