@@ -8,11 +8,11 @@
 
 void throwFileError()
 {
-    char msgBuf[32 * 1024];
+    char msgBuf[12 * 1024];
     memset(msgBuf, 0, sizeof(msgBuf));
     DWORD dw = GetLastError();
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf,
-                  sizeof(msgBuf), NULL);
+                  sizeof(msgBuf) >> 1, NULL);
     throw std::runtime_error(msgBuf);
 }
 
