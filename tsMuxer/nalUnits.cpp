@@ -196,7 +196,7 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
 
 unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, bufEnd);
     return extractUEGolombCode(reader);
 }
@@ -601,10 +601,10 @@ int SPSUnit::deserialize()
             int seq_scaling_matrix_present_flag = bitReader.getBits(1);
             if (seq_scaling_matrix_present_flag != 0)
             {
-                int ScalingList4x4[6][16];
-                int ScalingList8x8[2][64];
-                bool UseDefaultScalingMatrix4x4Flag[6];
-                bool UseDefaultScalingMatrix8x8Flag[2];
+                int ScalingList4x4[6][16]{};
+                int ScalingList8x8[2][64]{};
+                bool UseDefaultScalingMatrix4x4Flag[6]{};
+                bool UseDefaultScalingMatrix8x8Flag[2]{};
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -900,9 +900,9 @@ void SPSUnit::updateTimingInfo()
     int beforeBytes = bitPos >> 3;
     memcpy(newNalBuffer, m_nalBuffer, m_nalBufferLen);
 
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(m_nalBuffer + beforeBytes, m_nalBuffer + m_nalBufferLen);
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(newNalBuffer + beforeBytes, newNalBuffer + m_nalBufferLen + EXTRA_SPACE);
     int tmpVal = reader.getBits(bitPos & 7);
     writer.putBits(bitPos & 7, tmpVal);
@@ -958,9 +958,9 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool a
     int beforeBytes = bitPos >> 3;
     memcpy(newNalBuffer, m_nalBuffer, m_nalBufferLen);
 
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(m_nalBuffer + beforeBytes, m_nalBuffer + m_nalBufferLen);
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(newNalBuffer + beforeBytes, newNalBuffer + m_nalBufferLen + EXTRA_SPACE);
     int tmpVal = reader.getBits(bitPos & 7);
     writer.putBits(bitPos & 7, tmpVal);
@@ -1447,7 +1447,7 @@ void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 {
     // uint8_t* ptr = m_getbitContextBuffer + (bitOffset/8);
     uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
@@ -2071,7 +2071,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
 {
     uint8_t* nalEnd = m_nalBuffer + m_nalBufferLen;
     uint8_t* curBuff = m_nalBuffer + 1;
-    uint8_t tmpBuffer[1024 * 4];
+    uint8_t tmpBuffer[1024 * 4]{};
     tmpBuffer[0] = m_nalBuffer[0];
     int tmpBufferLen = 1;
 

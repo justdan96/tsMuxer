@@ -25,7 +25,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             }
             else if (nal[3] == EXT_START_SHORT_CODE)
             {
-                BitStreamReader bitReader;
+                BitStreamReader bitReader{};
                 bitReader.setBuffer(nal + 4, m_bufEnd);
                 int extType = bitReader.getBits(4);
                 if (extType == SEQUENCE_EXT)
@@ -65,7 +65,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
 {
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     uint8_t* nextNal = 0;
     bool spsFound = false;
     bool iFrameFound = false;
@@ -226,7 +226,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
 
 int MPEG2StreamReader::processExtStartCode(uint8_t* buff)
 {
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         bitReader.setBuffer(buff + 1, m_bufEnd);
@@ -325,7 +325,7 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
     {
         if (nal[3] == EXT_START_SHORT_CODE)
         {
-            BitStreamReader bitReader;
+            BitStreamReader bitReader{};
             try
             {
                 bitReader.setBuffer(nal + 4, m_bufEnd);

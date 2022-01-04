@@ -173,7 +173,7 @@ class BitStreamWriter : public BitStream
     inline void skipBits(unsigned cnt)
     {
         assert(m_bitWrited % INT_BIT == 0);
-        BitStreamReader reader;
+        BitStreamReader reader{};
         reader.setBuffer((uint8_t*)m_buffer, (uint8_t*)(m_buffer + 1));
         putBits(cnt, reader.getBits(cnt));
     }

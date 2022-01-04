@@ -633,7 +633,7 @@ void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
 {
     int64_t curDts = nanoClockToPts(avPacket.dts) + m_timeOffset;
     int64_t curPts = nanoClockToPts(avPacket.pts) + m_timeOffset;
-    uint8_t tmpBuffer[2048];
+    uint8_t tmpBuffer[2048]{0};
     PESPacket* pesPacket = (PESPacket*)tmpBuffer;
     if (curDts != curPts)
         pesPacket->serialize(curPts, curDts, pesStreamID);

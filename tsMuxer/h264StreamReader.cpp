@@ -82,7 +82,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
     std::string tmpDescr;
     bool pulldownInserted = false;
     bool offsetsInserted = false;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
 
     m_last_mb_num = -1;
     for (uint8_t* nal = NALUnit::findNextNAL(buffer, end); nal < end - 4; nal = NALUnit::findNextNAL(nal, end))
@@ -225,7 +225,7 @@ int H264StreamReader::writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUn
         THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
 
     uint8_t tmpBuffer[256];
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     curPos = writeNalPrefix(curPos);
     writer.setBuffer(tmpBuffer, tmpBuffer + sizeof(tmpBuffer));
 
@@ -1068,7 +1068,7 @@ bool H264StreamReader::findPPSForward(uint8_t* buff)
 
 int H264StreamReader::deserializeSliceHeader(SliceUnit& slice, uint8_t* buff, uint8_t* sliceEnd)
 {
-    int nalRez;
+    int nalRez{};
     int maxHeaderSize = sliceEnd - buff;
     int toDecode = 0;
     do

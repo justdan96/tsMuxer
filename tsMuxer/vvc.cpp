@@ -64,7 +64,7 @@ int VvcUnit::deserialize()
 void VvcUnit::updateBits(int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = (uint8_t*)m_reader.getBuffer() + bitOffset / 8;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 

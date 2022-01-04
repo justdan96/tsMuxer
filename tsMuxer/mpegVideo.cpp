@@ -68,7 +68,7 @@ MPEGSequenceHeader::MPEGSequenceHeader(int bufferSize) : MPEGRawDataHeader(buffe
 
 uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
 {
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
 
     width = bitReader.getBits(12);
@@ -308,7 +308,7 @@ void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 // --------------- gop header ------------------
 uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int buf_size)
 {
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
 
     drop_frame_flag = bitReader.getBit();
@@ -336,7 +336,7 @@ if(s->avctx->debug & FF_DEBUG_PICT_INFO)
 
 uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
 {
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     // init_bitWriter.putBits(buffer, 8*8); // 8*8 maximum gop header buffer size at bits
     bitWriter.setBuffer(buffer, buffer + 8);
     bitWriter.putBits(1, drop_frame_flag);
@@ -371,7 +371,7 @@ MPEGPictureHeader::MPEGPictureHeader(int bufferSize)
 
 void MPEGPictureHeader::buildHeader()
 {
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     // init_bitWriter.putBits(m_data_buffer, m_max_data_len*8);
     bitWriter.setBuffer(m_data_buffer, m_data_buffer + m_max_data_len);
 
@@ -400,7 +400,7 @@ void MPEGPictureHeader::buildHeader()
 
 void MPEGPictureHeader::buildCodingExtension()
 {
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     // init_bitWriter.putBits(m_data_buffer + m_data_buffer_len, (m_max_data_len - m_data_buffer_len)*8);
     uint8_t* bufPtr = m_data_buffer + m_data_buffer_len;
     bitWriter.setBuffer(bufPtr, bufPtr + m_max_data_len - m_data_buffer_len);
@@ -621,7 +621,7 @@ uint32_t MPEGPictureHeader::serialize(uint8_t* buffer)
 
 void MPEGSliceHeader::deserialize(uint8_t* buf, int buf_size)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buf, buf + buf_size);
     quantiser_scale_code = reader.getBits(5);
     if (reader.getBit())

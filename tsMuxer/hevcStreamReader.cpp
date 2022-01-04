@@ -332,7 +332,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     else if (width <= 7680 && pixelRate <= 3981312000)
         level = 13;
 
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     bitWriter.setBuffer(dstBuff, dstBuff + 128);
 
     bitWriter.putBits(8, 0xb0);            // DoVi descriptor tag

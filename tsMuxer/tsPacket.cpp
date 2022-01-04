@@ -42,7 +42,7 @@ bool isAudioStreamType(int stream_coding_type)
 bool PS_stream_pack::deserialize(uint8_t* buffer, int buf_size)
 {
     m_pts = 0;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     bitReader.setBuffer(buffer, buffer + buf_size);
     if (bitReader.getBits(2) != 1)
         return false;  // 0b01 required
@@ -96,7 +96,7 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, int buf_size)
 {
     m_nitPID = -1;
     buffer++;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         bitReader.setBuffer(buffer, buffer + buf_size);
@@ -151,7 +151,7 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
 {
     buffer[0] = 0;
     buffer++;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
 
     // init_bitWriter.putBits(buffer, buf_size*8);
     bitWriter.setBuffer(buffer, buffer + buf_size);
@@ -200,7 +200,7 @@ bool TS_program_map_section::isFullBuff(uint8_t* buffer, int buf_size)
 {
     uint8_t pointerField = *buffer;
     uint8_t* bufEnd = buffer + buf_size;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         bitReader.setBuffer(buffer + 1 + pointerField, buffer + buf_size);
@@ -250,7 +250,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
         return false;
     uint8_t pointerField = *buffer;
     uint8_t* bufferEnd = buffer + buf_size;
-    BitStreamReader bitReader;
+    BitStreamReader bitReader{};
     try
     {
         bitReader.setBuffer(buffer + 1 + pointerField, buffer + buf_size);
@@ -374,7 +374,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 {
     buffer[0] = 0;
     buffer++;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
     bitWriter.putBits(8, 2);  // table id
 
@@ -626,7 +626,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
 void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
                                   std::map<int, CLPIStreamInfo>& streamInfoMap)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
     reader.skipBits(8);  // reserved_for_word_align
@@ -777,7 +777,7 @@ void CLPIParser::composeClipInfo(BitStreamWriter& writer)
 
 void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
     reader.skipBits(8);                                   // reserved_for_word_align 8 bslbf
@@ -823,7 +823,7 @@ void CLPIParser::composeSequenceInfo(BitStreamWriter& writer)
 
 void CLPIParser::parseCPI(uint8_t* buffer, uint8_t* end)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
     if (length != 0)
@@ -1019,7 +1019,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 
 void CLPIParser::parseClipMark(uint8_t* buffer, uint8_t* end)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
 }
@@ -1057,7 +1057,7 @@ void CLPIParser::HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, int dataLength)
 
 void CLPIParser::Extent_Start_Point(uint8_t* buffer, int dataLength)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, buffer + dataLength);
     uint32_t length = reader.getBits(32);
 
@@ -1171,7 +1171,7 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
 void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
 {
     // added for 3D compatibility
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
     if (length == 0)
@@ -1212,7 +1212,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
 
 void CLPIParser::parse(uint8_t* buffer, int len)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     try
     {
         reader.setBuffer(buffer, buffer + len);
@@ -1247,7 +1247,7 @@ void CLPIParser::parse(uint8_t* buffer, int len)
 
 int CLPIParser::compose(uint8_t* buffer, int bufferSize)
 {
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     CLPIStreamInfo::writeString("HDMV", writer, 4);
     CLPIStreamInfo::writeString(version_number, writer, 4);
@@ -1348,7 +1348,7 @@ bool MPLSParser::parse(const char* fileName)
 
 void MPLSParser::parse(uint8_t* buffer, int len)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     try
     {
         reader.setBuffer(buffer, buffer + len);
@@ -1415,7 +1415,7 @@ void MPLSParser::SubPath_extension(BitStreamWriter& writer)
 
 int MPLSParser::composeSubPathEntryExtension(uint8_t* buffer, int bufferSize)
 {
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     try
     {
@@ -1442,7 +1442,7 @@ int MPLSParser::composeSubPathEntryExtension(uint8_t* buffer, int bufferSize)
 
 int MPLSParser::composeSTN_tableSS(uint8_t* buffer, int bufferSize)
 {
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     try
     {
@@ -1463,7 +1463,7 @@ int MPLSParser::composeSTN_tableSS(uint8_t* buffer, int bufferSize)
 
 int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
 {
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     try
     {
@@ -1500,7 +1500,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
         }
     }
 
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
 
     std::string type_indicator = "MPLS";
@@ -1628,7 +1628,7 @@ void MPLSParser::UO_mask_table(BitStreamReader& reader)
 
 void MPLSParser::parsePlayList(uint8_t* buffer, int len)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, buffer + len);
     uint32_t length = reader.getBits(32);
     reader.skipBits(16);                           // reserved_for_future_use 16 bslbf
@@ -1819,7 +1819,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, in
 int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList)
 {
     // The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     uint32_t* lengthPos = (uint32_t*)buffer;
     writer.putBits(32, 0);  // int length = reader.getBits(8); //8 uimsbf
@@ -1930,7 +1930,7 @@ void MPLSParser::parseStnTableSS(uint8_t* data, int dataLength)
 {
     try
     {
-        BitStreamReader reader;
+        BitStreamReader reader{};
         reader.setBuffer(data, data + dataLength);
         int len = reader.getBits(16);
         bool fixedOffsetDuringPopup = reader.getBit();
@@ -1999,7 +1999,7 @@ void MPLSParser::parseStnTableSS(uint8_t* data, int dataLength)
 
 void MPLSParser::parseSubPathEntryExtension(uint8_t* data, int dataLen)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(data, data + dataLen);
     try
     {
@@ -2056,7 +2056,7 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
 {
     try
     {
-        BitStreamReader reader;
+        BitStreamReader reader{};
         reader.setBuffer(data, dataEnd);
         uint32_t length = reader.getBits(32);
         if (length == 0)
@@ -2225,7 +2225,7 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
 
 void MPLSParser::parsePlayListMark(uint8_t* buffer, int len)
 {
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(buffer, buffer + len);
     uint32_t length = reader.getBits(32);               //
     int number_of_PlayList_marks = reader.getBits(16);  // 16 uimsbf

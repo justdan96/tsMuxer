@@ -13,7 +13,7 @@ void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int
 void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = (uint8_t*)buffer + bitOffset / 8;
-    BitStreamWriter bitWriter;
+    BitStreamWriter bitWriter{};
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
@@ -38,10 +38,10 @@ void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
 void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
 {
     uint8_t* src = (uint8_t*)buffer + (oldBitOffset >> 3);
-    BitStreamReader reader;
+    BitStreamReader reader{};
     reader.setBuffer(src, src + len / 8 + 1);
     uint8_t* dst = (uint8_t*)buffer + (newBitOffset >> 3);
-    BitStreamWriter writer;
+    BitStreamWriter writer{};
     writer.setBuffer(dst, dst + len / 8 + 1);
     writer.skipBits(newBitOffset % 8);
     if (oldBitOffset % 8)

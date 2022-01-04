@@ -56,7 +56,7 @@ bool TSDemuxer::mvcContinueExpected() const
 
 void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 {
-    uint8_t pmtBuffer[4096];
+    uint8_t pmtBuffer[4096]{0};
     int pmtBufferLen = 0;
     uint32_t tmpBufferLen = 0;
     uint32_t readedBytes;
@@ -195,7 +195,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         m_firstDemuxCall = false;
     }
 
-    uint8_t pmtBuffer[4096];
+    uint8_t pmtBuffer[4096]{0};
     int pmtBufferLen = 0;
     MemoryBlock* vect = 0;
     int lastPid = -1;
@@ -561,7 +561,7 @@ int64_t getTSDuration(const char* fileName)
         }
         delete[] tmpBuffer;
 
-        int64_t lastPcrVal;
+        int64_t lastPcrVal{};
         bufferSize = 1024 * 256;
         bufferSize -= bufferSize % frameSize;
         do
