@@ -933,7 +933,7 @@ uint32_t IsoWriter::absoluteSectorNum() { return m_file.pos() / SECTOR_SIZE - m_
 void IsoWriter::sectorSeek(Partition partition, int pos)
 {
     int64_t offset = (partition == Partition::MetadataPartition) ? m_curMetadataPos : m_partitionStartAddress;
-    m_file.seek((offset + pos) * SECTOR_SIZE, File::smBegin);
+    m_file.seek((offset + pos) * SECTOR_SIZE, File::SeekMethod::smBegin);
 }
 
 void IsoWriter::writeEntity(FileEntryInfo* dir)

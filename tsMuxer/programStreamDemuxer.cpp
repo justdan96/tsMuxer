@@ -401,7 +401,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 
 int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
 {
-    file.seek(FFMAX(0, fileSize - bufferSize), File::smBegin);
+    file.seek(FFMAX(0, fileSize - bufferSize), File::SeekMethod::smBegin);
     uint8_t* tmpBuffer = new uint8_t[bufferSize];
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)

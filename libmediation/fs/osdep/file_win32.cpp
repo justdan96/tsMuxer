@@ -190,13 +190,13 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     DWORD moveMethod = 0;
     switch (whence)
     {
-    case smBegin:
+    case SeekMethod::smBegin:
         moveMethod = FILE_BEGIN;
         break;
-    case smCurrent:
+    case SeekMethod::smCurrent:
         moveMethod = FILE_CURRENT;
         break;
-    case smEnd:
+    case SeekMethod::smEnd:
         moveMethod = FILE_END;
         break;
     }

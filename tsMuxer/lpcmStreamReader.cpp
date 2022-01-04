@@ -726,11 +726,11 @@ bool LPCMStreamReader::beforeFileCloseEvent(File& file)
     if (fileSize <= 0xfffffffful)
     {
         uint32_t dataSize = (uint32_t)fileSize - 8;
-        if (file.seek(4, File::smBegin) == (int64_t)-1)
+        if (file.seek(4, File::SeekMethod::smBegin) == (int64_t)-1)
             return false;
         if (file.write(&dataSize, 4) != 4)
             return false;
-        if (file.seek(64, File::smBegin) == (int64_t)-1)
+        if (file.seek(64, File::SeekMethod::smBegin) == (int64_t)-1)
             return false;
         dataSize = (uint32_t)fileSize - 68;
         if (file.write(&dataSize, 4) != 4)

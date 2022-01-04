@@ -63,7 +63,7 @@ struct FileReaderData : public ReaderData
 
     bool openStream() override;
     bool closeStream() override { return m_file.close(); }
-    bool incSeek(int64_t offset) override { return m_file.seek(offset, File::smCurrent) != uint64_t(-1); }
+    bool incSeek(int64_t offset) override { return m_file.seek(offset, File::SeekMethod::smCurrent) != uint64_t(-1); }
 
    public:
     File m_file;

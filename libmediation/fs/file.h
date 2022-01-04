@@ -33,7 +33,7 @@ class AbstractOutputStream : public AbstractStream
 class File : public AbstractOutputStream
 {
    public:
-    enum SeekMethod
+    enum class SeekMethod
     {
         smBegin,
         smCurrent,
@@ -114,7 +114,7 @@ class File : public AbstractOutputStream
             \param whence
             \return Location of the cursor after relocating it, or uint64_t(-1) in case of an error.
     */
-    uint64_t seek(int64_t offset, SeekMethod whence = smBegin);
+    uint64_t seek(int64_t offset, SeekMethod whence = SeekMethod::smBegin);
 
     //! Change the size of the file
     /*!

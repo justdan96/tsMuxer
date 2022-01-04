@@ -1253,7 +1253,7 @@ bool TSMuxer::appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int*
 
     File* file = dynamic_cast<File*>(m_muxFile);
 
-    file->seek(curFileSize - 192, File::smBegin);
+    file->seek(curFileSize - 192, File::SeekMethod::smBegin);
     int readCnt = file->read(tmpBuff, 192);
     if (readCnt != 192)
         return false;

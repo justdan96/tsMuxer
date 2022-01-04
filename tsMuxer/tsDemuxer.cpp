@@ -499,7 +499,7 @@ int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
 {
     // pcr from end of file
     uint8_t* tmpBuffer = new uint8_t[bufferSize];
-    file.seek(FFMAX(fileSize - bufferSize, 0), File::smBegin);
+    file.seek(FFMAX(fileSize - bufferSize, 0), File::SeekMethod::smBegin);
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;  // read error

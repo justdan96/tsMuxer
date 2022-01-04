@@ -71,7 +71,7 @@ bool BufferedFileReader::gotoByte(uint32_t readerID, uint64_t seekDist)
     if (data)
     {
         data->m_blockSize = m_blockSize - (uint32_t)(seekDist % (uint64_t)m_blockSize);
-        uint64_t seekRez = data->m_file.seek(seekDist + data->m_fileHeaderSize, File::smBegin);
+        uint64_t seekRez = data->m_file.seek(seekDist + data->m_fileHeaderSize, File::SeekMethod::smBegin);
         bool rez = seekRez != (uint64_t)-1;
         if (rez)
         {
