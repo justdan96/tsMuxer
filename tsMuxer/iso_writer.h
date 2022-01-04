@@ -99,7 +99,7 @@ class ByteFileWriter
     uint8_t* m_tagPos;
 };
 
-class FileEntryInfo;
+struct FileEntryInfo;
 class IsoWriter;
 class ISOFile;
 
@@ -238,7 +238,7 @@ class IsoWriter
 
    private:
     friend class ByteFileWriter;
-    friend class FileEntryInfo;
+    friend struct FileEntryInfo;
     friend class ISOFile;
 
     std::string m_volumeLabel;
