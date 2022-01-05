@@ -23,16 +23,13 @@ bool FileReaderData::openStream()
     if (!rez)
     {
 #ifdef _WIN32
-        char msgBuf[32 * 1024];
-
-        memset(msgBuf, 0, sizeof(msgBuf));
-
+        LPVOID msgBuf = nullptr;
         DWORD dw = GetLastError();
 
-        FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf,
-                       sizeof(msgBuf), NULL);
+        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw,
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, NULL);
 
-        string str(msgBuf);
+        string str((char*)msgBuf);
         LTRACE(LT_ERROR, 0, msgBuf);
 #endif
     }
