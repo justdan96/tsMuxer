@@ -30,7 +30,7 @@ bool FileReaderData::openStream()
                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, NULL);
 
         string str((char*)msgBuf);
-        LTRACE(LT_ERROR, 0, msgBuf);
+        LTRACE(LT_ERROR, 0, str);
 #endif
     }
 
