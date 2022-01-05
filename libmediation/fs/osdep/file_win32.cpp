@@ -8,12 +8,14 @@
 
 void throwFileError()
 {
-    char msgBuf[12 * 1024];
-    memset(msgBuf, 0, sizeof(msgBuf));
+    LPVOID msgBuf = nullptr;
     DWORD dw = GetLastError();
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf,
-                  sizeof(msgBuf) >> 1, NULL);
-    throw std::runtime_error(msgBuf);
+
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw,
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf, 0, NULL);
+
+    std::string str((char*)msgBuf);
+    throw std::runtime_error(str);
 }
 
 void makeWin32OpenFlags(unsigned int oflag, DWORD* const dwDesiredAccess, DWORD* const dwCreationDisposition,
