@@ -53,7 +53,7 @@ int IOContextDemuxer::get_byte()
         uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez);  // blocked read mode
         if (readedBytes > 0 && readRez == 0)
             m_bufferedReader->notify(m_readerID, readedBytes);
-        // m_lastReadRez = readRez;
+        m_lastReadRez = readRez;
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
         if (m_curPos == m_bufEnd)
