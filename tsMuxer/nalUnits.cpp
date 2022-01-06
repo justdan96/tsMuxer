@@ -33,7 +33,7 @@ int NALUnit::calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end)
             data >>= 1;
             trailing++;
         }
-        return (end - nalBuffer) * 8 - trailing;
+        return (int)(end - nalBuffer) * 8 - trailing;
     }
     else
     {
@@ -135,7 +135,7 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
         return -1;
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return dstBuffer - initDstBuffer;
+    return (int)(dstBuffer - initDstBuffer);
 }
 
 int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize)
@@ -161,7 +161,7 @@ int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t*
     }
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return dstBuffer - initDstBuffer;
+    return (int)(dstBuffer - initDstBuffer);
 }
 
 int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
@@ -191,7 +191,7 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
     if (!*keepSrcBuffer)
         memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return dstBuffer - initDstBuffer;
+    return (int)(dstBuffer - initDstBuffer);
 }
 
 unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
@@ -221,15 +221,6 @@ void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value)
 
 void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value)
 {
-    /*
-    int maxVal = 0;
-    int x = 2;
-    int nBit = 0;
-    for (; maxVal < value; maxVal += x ) {
-            x <<= 1;
-            nBit++;
-    }
-    */
     uint32_t maxVal = 0;
     int x = 1;
     int nBit = 0;
@@ -367,60 +358,9 @@ int PPSUnit::deserialize()
         seq_parameter_set_id = extractUEGolombCode();
         if (seq_parameter_set_id >= 32)
             return 1;
-        // entropy_coding_mode_BitPos = bitReader.getBitsCount();
         entropy_coding_mode_flag = bitReader.getBit();
         pic_order_present_flag = bitReader.getBit();
 
-        /*
-                num_slice_groups_minus1 = extractUEGolombCode();
-                slice_group_map_type = 0;
-                if( num_slice_groups_minus1 > 0 ) {
-                        slice_group_map_type = extractUEGolombCode();
-                        if( slice_group_map_type  ==  0 )
-                        {
-                                if (num_slice_groups_minus1 >= 256)
-                                        THROW_BITSTREAM_ERR;
-                                for( int iGroup = 0; iGroup <= num_slice_groups_minus1; iGroup++ )
-                                        run_length_minus1[iGroup] = extractUEGolombCode();
-                        }
-                        else if( slice_group_map_type  ==  2)
-                        {
-                                if (num_slice_groups_minus1 >= 256)
-                                        THROW_BITSTREAM_ERR;
-                                for( int iGroup = 0; iGroup < num_slice_groups_minus1; iGroup++ ) {
-                                        top_left[ iGroup ] = extractUEGolombCode();
-                                        bottom_right[ iGroup ] = extractUEGolombCode();
-                                }
-                        }
-                        else if(  slice_group_map_type  ==  3  ||
-                                                slice_group_map_type  ==  4  ||
-                                                slice_group_map_type  ==  5 )
-                        {
-                                slice_group_change_direction_flag = bitReader.getBit();
-                                slice_group_change_rate = extractUEGolombCode() + 1;
-                        } else if( slice_group_map_type  ==  6 )
-                        {
-                                int pic_size_in_map_units_minus1 = extractUEGolombCode();
-                                if (pic_size_in_map_units_minus1 >= 256)
-                                        THROW_BITSTREAM_ERR;
-                                for( int i = 0; i <= pic_size_in_map_units_minus1; i++ ) {
-                                        int bits = ceil_log2( num_slice_groups_minus1 + 1 );
-                                        slice_group_id[i] = bitReader.getBit();
-                                }
-                        }
-                }
-                num_ref_idx_l0_active_minus1 = extractUEGolombCode();
-                num_ref_idx_l1_active_minus1 = extractUEGolombCode();
-                weighted_pred_flag = bitReader.getBit();
-                weighted_bipred_idc = bitReader.getBits(2);
-                pic_init_qp_minus26 = extractSEGolombCode();  // relative to 26
-                pic_init_qs_minus26 = extractSEGolombCode();  // relative to 26
-                chroma_qp_index_offset =  extractSEGolombCode();
-                deblocking_filter_control_present_flag = bitReader.getBit();
-                constrained_intra_pred_flag = bitReader.getBit();
-                redundant_pic_cnt_present_flag = bitReader.getBit();
-                m_ppsLenInMbit = bitReader.getBitsCount() + 8;
-        */
         m_ready = true;
         return 0;
     }
@@ -429,42 +369,6 @@ int PPSUnit::deserialize()
         return NOT_ENOUGH_BUFFER;
     }
 }
-
-/*
-void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
-{
-        delete m_nalBuffer;
-        memcpy(this, &oldPPS, sizeof(PPSUnit));
-        m_nalBuffer = new uint8_t[oldPPS.m_nalBufferLen + 400]; // 4 bytes reserved for new ppsID and cabac values
-        m_nalBuffer[0] = oldPPS.m_nalBuffer[0];
-
-        pic_parameter_set_id = ppsID;
-        entropy_coding_mode_flag = cabac;
-
-        BitStreamWriter bitWriter;
-        bitWriter.setBuffer(m_nalBuffer + 1, m_nalBuffer + m_nalBufferLen + 4);
-        writeUEGolombCode(bitWriter, ppsID);
-        writeUEGolombCode(bitWriter, seq_parameter_set_id);
-        bitWriter.putBit(cabac);
-        bitReader.setBuffer(oldPPS.m_nalBuffer+1, oldPPS.m_nalBuffer + oldPPS.m_nalBufferLen);
-        extractUEGolombCode();
-        extractUEGolombCode();
-        bitReader.skipBit(); // skip cabac field
-        int bitsToCopy = oldPPS.m_ppsLenInMbit - bitReader.getBitsCount();
-        for (; bitsToCopy >=32; bitsToCopy -=32) {
-                uint32_t value = bitReader.getBits(32);
-                bitWriter.putBits(32, value);
-        }
-        if (bitsToCopy > 0) {
-                uint32_t value = bitReader.getBits(bitsToCopy);
-                bitWriter.putBits(bitsToCopy, value);
-        }
-        if (bitWriter.getBitsCount() % 8 != 0)
-                bitWriter.putBits(8 - bitWriter.getBitsCount() % 8, 0);
-        m_nalBufferLen = bitWriter.getBitsCount() / 8 + 1;
-        assert(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
-}
-*/
 
 // -------------------- HRDParams -------------------------
 HRDParams::HRDParams()
@@ -514,6 +418,22 @@ void HRDParams::resetDefault(bool mvc)
 
 SPSUnit::SPSUnit()
     : NALUnit(),
+      aspect_ratio_idc(0),
+      aspect_ratio_info_present_flag(0),
+      delta_pic_order_always_zero_flag(0),
+      frame_mbs_only_flag(0),
+      level_idc(0),
+      log2_max_frame_num(0),
+      log2_max_pic_order_cnt_lsb(0),
+      num_ref_frames(0),
+      offset_for_non_ref_pic(0),
+      pic_height_in_map_units(0),
+      pic_order_cnt_type(0),
+      pic_width_in_mbs(0),
+      seq_parameter_set_id(0),
+      timing_info_present_flag(0),
+      vui_parameters_present_flag(0),
+      chroma_format_idc(1),
       m_ready(false),
       sar_width(0),
       sar_height(0),
@@ -522,7 +442,6 @@ SPSUnit::SPSUnit()
       fixed_frame_rate_flag(0),
       num_units_in_tick_bit_pos(0),
       pic_struct_present_flag(0),
-      mb_adaptive_frame_field_flag(0),
       frame_crop_left_offset(0),
       frame_crop_right_offset(0),
       frame_crop_top_offset(0),
@@ -534,7 +453,6 @@ SPSUnit::SPSUnit()
       num_views(0),
       vui_parameters_bit_pos(-1),
       hrdParamsBitPos(-1)
-// m_pulldown = false;
 {
 }
 
@@ -557,23 +475,12 @@ void SPSUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDef
 
 int SPSUnit::deserialize()
 {
-    /*
-    uint8_t* nextNal = findNALWithStartCode(buffer, end);
-    long bufSize = nextNal - buffer;
-    uint8_t* tmpBuff = new uint8_t[bufSize];
-    uint8_t* tmpBufferEnd = tmpBuff + bufSize;
-    int m_decodedBuffSize = decodeNAL(buffer, nextNal, tmpBuff, bufSize);
-    */
     if (m_nalBufferLen < 4)
         return NOT_ENOUGH_BUFFER;
     int rez = NALUnit::deserialize(m_nalBuffer, m_nalBuffer + m_nalBufferLen);
     if (rez != 0)
         return rez;
     profile_idc = m_nalBuffer[1];
-    constraint_set0_flag0 = m_nalBuffer[2] >> 7;
-    constraint_set0_flag1 = m_nalBuffer[2] >> 6 & 1;
-    constraint_set0_flag2 = m_nalBuffer[2] >> 5 & 1;
-    constraint_set0_flag3 = m_nalBuffer[2] >> 4 & 1;
     level_idc = m_nalBuffer[3];
     chroma_format_idc = 1;  // by default format is 4:2:0
     try
@@ -591,15 +498,12 @@ int SPSUnit::deserialize()
                 return 1;
             if (chroma_format_idc == 3)
                 separate_colour_plane_flag = bitReader.getBit();
-            unsigned bit_depth_luma = extractUEGolombCode() + 8;
-            if (bit_depth_luma > 14)
+            if (extractUEGolombCode() > 6)  // bit_depth_luma - 8
                 return 1;
-            unsigned bit_depth_chroma = extractUEGolombCode() + 8;
-            if (bit_depth_chroma > 14)
+            if (extractUEGolombCode() > 6)  // bit_depth_chroma - 8
                 return 1;
-            int qpprime_y_zero_transform_bypass_flag = bitReader.getBit();
-            int seq_scaling_matrix_present_flag = bitReader.getBit();
-            if (seq_scaling_matrix_present_flag != 0)
+            bitReader.skipBit();     // qpprime_y_zero_transform_bypass_flag
+            if (bitReader.getBit())  // seq_scaling_matrix_present_flag
             {
                 int ScalingList4x4[6][16]{};
                 int ScalingList8x8[2][64]{};
@@ -608,9 +512,7 @@ int SPSUnit::deserialize()
 
                 for (int i = 0; i < 8; i++)
                 {
-                    // seq_scaling_list_present_flag[i] = bitReader.getBit();
-                    // if( seq_scaling_list_present_flag[i])
-                    if (bitReader.getBit())
+                    if (bitReader.getBit())  // seq_scaling_list_present_flag[i]
                     {
                         if (i < 6)
                             scaling_list(ScalingList4x4[i], 16, UseDefaultScalingMatrix4x4Flag[i]);
@@ -642,7 +544,7 @@ int SPSUnit::deserialize()
             delta_pic_order_always_zero_flag = bitReader.getBit();
             offset_for_non_ref_pic = extractSEGolombCode();
             extractSEGolombCode();  // offset_for_top_to_bottom_field
-            num_ref_frames_in_pic_order_cnt_cycle = extractUEGolombCode();
+            int num_ref_frames_in_pic_order_cnt_cycle = extractUEGolombCode();
             if (num_ref_frames_in_pic_order_cnt_cycle >= 256)
                 return 1;
 
@@ -656,17 +558,15 @@ int SPSUnit::deserialize()
         pic_height_in_map_units = extractUEGolombCode() + 1;
         frame_mbs_only_flag = bitReader.getBit();
         if (!frame_mbs_only_flag)
-            mb_adaptive_frame_field_flag = bitReader.getBit();
-        int direct_8x8_inference_flag = bitReader.getBit();
-        frame_cropping_flag = bitReader.getBit();
-        if (frame_cropping_flag)
+            bitReader.skipBit();  // mb_adaptive_frame_field_flag
+        bitReader.skipBit();      // direct_8x8_inference_flag
+        if (bitReader.getBit())   // frame_cropping_flag
         {
             frame_crop_left_offset = extractUEGolombCode();
             frame_crop_right_offset = extractUEGolombCode();
             frame_crop_top_offset = extractUEGolombCode();
             frame_crop_bottom_offset = extractUEGolombCode();
         }
-        pic_size_in_map_units = pic_width_in_mbs * pic_height_in_map_units;  // * (2 - frame_mbs_only_flag);
         vui_parameters_bit_pos = bitReader.getBitsCount() + 32;
         vui_parameters_present_flag = bitReader.getBit();
         if (vui_parameters_present_flag)
@@ -681,11 +581,7 @@ int SPSUnit::deserialize()
         }
 
         m_ready = true;
-        // full_sps_bit_len = bitReader.getBitsCount() + 32;
         full_sps_bit_len = calcNalLenInBits(m_nalBuffer, m_nalBuffer + m_nalBufferLen);
-
-        // m_pulldown = ((abs(getFPS() - 23.97) < FRAME_RATE_EPS) || (abs(getFPS() - 59.94) < FRAME_RATE_EPS)) &&
-        // pic_struct_present_flag;
 
         return 0;
     }
@@ -699,12 +595,6 @@ int SPSUnit::deserializeSubSPS()
 {
     if (profile_idc == 83 || profile_idc == 86)
     {
-        /*
-        seq_parameter_set_svc_extension();  // specified in Annex G
-        int svc_vui_parameters_present_flag = bitReader.getBit();
-        if( svc_vui_parameters_present_flag)
-            svc_vui_parameters_extension();  // specified in Annex G
-        */
     }
     else if (profile_idc == 118 || profile_idc == 128)
     {
@@ -718,7 +608,6 @@ int SPSUnit::deserializeSubSPS()
                 return 1;
     }
 
-    // int additional_extension2_flag = bitReader.getBit();
     return 0;
 }
 
@@ -734,30 +623,19 @@ int SPSUnit::deserializeVuiParameters()
             sar_height = bitReader.getBits(16);
         }
     }
-    int overscan_info_present_flag = bitReader.getBit();
-    if (overscan_info_present_flag)
-        int overscan_appropriate_flag = bitReader.getBit();
-    int video_signal_type_present_flag = bitReader.getBit();
-    if (video_signal_type_present_flag)
+    if (bitReader.getBit())   // overscan_info_present_flag
+        bitReader.skipBit();  // overscan_appropriate_flag
+    if (bitReader.getBit())   // video_signal_type_present_flag
     {
-        int video_format = bitReader.getBits(3);
-        int video_full_range_flag = bitReader.getBit();
-        int colour_description_present_flag = bitReader.getBit();
-        if (colour_description_present_flag)
-        {
-            int colour_primaries = bitReader.getBits(8);
-            int transfer_characteristics = bitReader.getBits(8);
-            int matrix_coefficients = bitReader.getBits(8);
-        }
+        bitReader.skipBits(4);       // video_format, video_full_range_flag
+        if (bitReader.getBit())      // colour_description_present_flag
+            bitReader.skipBits(24);  // colour_primaries, transfer_characteristics, matrix_coefficients
     }
-    int chroma_loc_info_present_flag = bitReader.getBit();
-    if (chroma_loc_info_present_flag)
+    if (bitReader.getBit())  // chroma_loc_info_present_flag
     {
-        unsigned chroma_sample_loc_type_top_field = extractUEGolombCode();
-        if (chroma_sample_loc_type_top_field > 5)
+        if (extractUEGolombCode() > 5)  // chroma_sample_loc_type_top_field
             return 1;
-        unsigned chroma_sample_loc_type_bottom_field = extractUEGolombCode();
-        if (chroma_sample_loc_type_bottom_field > 5)
+        if (extractUEGolombCode() > 5)  // chroma_sample_loc_type_bottom_field
             return 1;
     }
     timing_info_present_flag = bitReader.getBit();
@@ -791,25 +669,18 @@ int SPSUnit::deserializeVuiParameters()
     if (nalHrdParams.isPresent || vclHrdParams.isPresent)
         low_delay_hrd_flag = bitReader.getBit();
     pic_struct_present_flag = bitReader.getBit();
-    int bitstream_restriction_flag = bitReader.getBit();
-    if (bitstream_restriction_flag)
+    if (bitReader.getBit())  // bitstream_restriction_flag
     {
         int motion_vectors_over_pic_boundaries_flag = bitReader.getBit();
-        unsigned max_bytes_per_pic_denom = extractUEGolombCode();
-        if (max_bytes_per_pic_denom > 16)
+        if (extractUEGolombCode() > 16)  // max_bytes_per_pic_denom
             return 1;
-        unsigned max_bits_per_mb_denom = extractUEGolombCode();
-        if (max_bits_per_mb_denom > 16)
+        if (extractUEGolombCode() > 16)  // max_bits_per_mb_denom
             return 1;
-        unsigned log2_max_mv_length_horizontal = extractUEGolombCode();
-        if (log2_max_mv_length_horizontal > 16)
+        if (extractUEGolombCode() > 16)  // log2_max_mv_length_horizontal
             return 1;
-        unsigned log2_max_mv_length_vertical = extractUEGolombCode();
-        if (log2_max_mv_length_vertical > 16)
+        if (extractUEGolombCode() > 16)  // log2_max_mv_length_vertical
             return 1;
-        unsigned num_reorder_frames = extractUEGolombCode();
-        unsigned max_dec_frame_buffering = extractUEGolombCode();
-        if (num_reorder_frames > max_dec_frame_buffering)
+        if (extractUEGolombCode() > extractUEGolombCode())  // num_reorder_frames > max_dec_frame_buffering
             return 1;
     }
     return 0;
@@ -836,7 +707,7 @@ void SPSUnit::serializeHRDParameters(BitStreamWriter& writer, const HRDParams& p
 // insert HRD parameters to bitstream.
 void SPSUnit::insertHrdParameters()
 {
-    for (int i = mvcNalHrdParams.size() - 1; i >= 0; --i)
+    for (size_t i = mvcNalHrdParams.size(); i-- > 0;)
     {
         if (!mvcNalHrdParams[i].isPresent || !mvcVclHrdParams[i].isPresent)
         {
@@ -1125,7 +996,7 @@ void SPSUnit::setFps(double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
     // time_scale = (uint32_t)(fps+0.5) * 1000;
-    num_units_in_tick = time_scale / fps + 0.5;
+    num_units_in_tick = (uint32_t)(time_scale / fps + 0.5);
     time_scale *= 2;
 
     if (num_units_in_tick_bit_pos > 0)
@@ -1242,7 +1113,7 @@ int SPSUnit::seq_parameter_set_mvc_extension()
             return 1;
         for (size_t j = 0; j <= num_applicable_ops_minus1[i]; j++)
         {
-            bitReader.getBits(3);                    // applicable_op_temporal_id[ i ][ j ]
+            bitReader.skipBits(3);                   // applicable_op_temporal_id[ i ][ j ]
             unsigned dummy = extractUEGolombCode();  // applicable_op_num_target_views_minus1[ i ][ j ]
             if (dummy >= 1 << 10)
                 return 1;
@@ -1271,8 +1142,6 @@ int SPSUnit::mvc_vui_parameters_extension()
     mvcNalHrdParams.resize(vui_mvc_num_ops);
     mvcVclHrdParams.resize(vui_mvc_num_ops);
 
-    // vui_mvc_pic_struct_present_flag.resize(vui_mvc_num_ops);
-
     for (size_t i = 0; i < vui_mvc_num_ops; i++)
     {
         vui_mvc_temporal_id[i] = bitReader.getBits(3);
@@ -1283,12 +1152,11 @@ int SPSUnit::mvc_vui_parameters_extension()
             if (extractUEGolombCode() >= 1 << 10)  // vui_mvc_view_id[ i ][ j ]
                 return 1;
 
-        int vui_mvc_timing_info_present_flag = bitReader.getBit();  // vui_mvc_timing_info_present_flag[ i ]
-        if (vui_mvc_timing_info_present_flag)
+        if (bitReader.getBit())  // vui_mvc_timing_info_present_flag[ i ]
         {
-            int vui_mvc_num_units_in_tick = bitReader.getBits(32);  // vui_mvc_num_units_in_tick[i]
-            bitReader.getBits(32);                                  // vui_mvc_time_scale[ i ]
-            bitReader.getBit();                                     // vui_mvc_fixed_frame_rate_flag[ i ]
+            bitReader.skipBits(32);  // vui_mvc_num_units_in_tick[i]
+            bitReader.skipBits(32);  // vui_mvc_time_scale[ i ]
+            bitReader.skipBit();     // vui_mvc_fixed_frame_rate_flag[ i ]
         }
 
         mvcHrdParamsBitPos[i] = bitReader.getBitsCount() + 32;
@@ -1309,9 +1177,8 @@ int SPSUnit::mvc_vui_parameters_extension()
             mvcVclHrdParams[i].bitLen = bitReader.getBitsCount() - beforeCount;
         }
         if (mvcNalHrdParams[i].isPresent || mvcVclHrdParams[i].isPresent)
-            bitReader.getBit();                     // vui_mvc_low_delay_hrd_flag[i]
-        int picStructpresent = bitReader.getBit();  // vui_mvc_pic_struct_present_flag[i]
-        picStructpresent = picStructpresent;
+            bitReader.skipBit();  // vui_mvc_low_delay_hrd_flag[i]
+        bitReader.skipBit();      // vui_mvc_pic_struct_present_flag[i]
     }
     return 0;
 }
@@ -1320,39 +1187,34 @@ int SPSUnit::mvc_vui_parameters_extension()
 
 SliceUnit::SliceUnit()
     : NALUnit(),
-      m_frameNumBitPos(0),
-      m_frameNumBits(0),
-      m_field_pic_flag(0),
-      svc_extension_flag(0),
-      non_idr_flag(0),
       anchor_pic_flag(0),
-      memory_management_control_operation(0)
+      bottom_field_flag(0),
+      first_mb_in_slice(0),
+      frame_num(0),
+      m_field_pic_flag(0),
+      memory_management_control_operation(0),
+      non_idr_flag(0),
+      orig_slice_type(0),
+      pic_order_cnt_lsb(0),
+      pic_parameter_set_id(0),
+      pps(),
+      sps(),
+      slice_type(0)
 {
 }
 
 void SliceUnit::nal_unit_header_svc_extension()
 {
     non_idr_flag = !bitReader.getBit();  // idr_flag here, use same variable
-    int priority_id = bitReader.getBits(6);
-    int no_inter_layer_pred_flag = bitReader.getBit();
-    int dependency_id = bitReader.getBits(3);
-    int quality_id = bitReader.getBits(4);
-    int temporal_id = bitReader.getBits(3);
-    int use_ref_base_pic_flag = bitReader.getBit();
-    int discardable_flag = bitReader.getBit();
-    int output_flag = bitReader.getBit();
-    int reserved_three_2bits = bitReader.getBits(2);
+    bitReader.skipBits(22);
 }
 
 void SliceUnit::nal_unit_header_mvc_extension()
 {
     non_idr_flag = bitReader.getBit();
-    int priority_id = bitReader.getBits(6);
-    int view_id = bitReader.getBits(10);
-    int temporal_id = bitReader.getBits(3);
+    bitReader.skipBits(19);  // priority_id, view_id, temporal_id
     anchor_pic_flag = bitReader.getBit();
-    int inter_view_flag = bitReader.getBit();
-    int reserved_one_bit = bitReader.getBit();
+    bitReader.skipBits(2);  // inter_view_flag, reserved_one_bit
 }
 
 bool SliceUnit::isIDR() const { return nal_unit_type == nuSliceIDR || nal_unit_type == nuSliceExt && !non_idr_flag; }
@@ -1379,7 +1241,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
             if (end - buffer < 5)
                 return NOT_ENOUGH_BUFFER;
             offset += 3;
-            if (buffer[1] == 0 && buffer[2] == 0 && buffer[3] == 03)
+            if (buffer[1] == 0 && buffer[2] == 0 && buffer[3] == 3)
                 offset++;  // inplace decode header
             non_idr_flag = buffer[1] & 0x40;
             anchor_pic_flag = buffer[offset - 1] & 0x04;
@@ -1410,7 +1272,6 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
     int rez = NALUnit::deserialize(buffer, end);
     if (rez != 0)
         return rez;
-    // init_bitReader.getBits( buffer+1, (end - buffer) * 8);
 
     try
     {
@@ -1419,8 +1280,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
 
         if (nal_unit_type == nuSliceExt)
         {
-            svc_extension_flag = bitReader.getBit();
-            if (svc_extension_flag)
+            if (bitReader.getBit())               // svc_extension_flag
                 nal_unit_header_svc_extension();  // specified in Annex G
             else
                 nal_unit_header_mvc_extension();
@@ -1436,12 +1296,6 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
         return NOT_ENOUGH_BUFFER;
     }
 }
-
-/*
-int SliceUnit::extractCABAC()
-{
-}
-*/
 
 void NALUnit::updateBits(int bitOffset, int bitLen, int value)
 {
@@ -1492,11 +1346,9 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
     sps = itr2->second;
 
     if (sps->separate_colour_plane_flag)
-        bitReader.getBits(2);  // colour_plane_id
+        bitReader.skipBits(2);  // colour_plane_id
 
-    m_frameNumBitPos = bitReader.getBitsCount();  // getBitContext.buffer
-    m_frameNumBits = sps->log2_max_frame_num;
-    frame_num = bitReader.getBits(m_frameNumBits);
+    frame_num = bitReader.getBits(sps->log2_max_frame_num);
     bottom_field_flag = 0;
     m_field_pic_flag = 0;
     if (sps->frame_mbs_only_flag == 0)
@@ -1507,481 +1359,17 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
     }
     if (isIDR())
     {
-        idr_pic_id = extractUEGolombCode();
-        if (idr_pic_id >= 1 << 16)
+        if (extractUEGolombCode() >= 1 << 16)  // idr_pic_id
             return 1;
     }
-    m_picOrderBitPos = -1;
     if (sps->pic_order_cnt_type == 0)
     {
-        m_picOrderBitPos = bitReader.getBitsCount();  // getBitContext.buffer
-        m_picOrderNumBits = sps->log2_max_pic_order_cnt_lsb;
         pic_order_cnt_lsb = bitReader.getBits(sps->log2_max_pic_order_cnt_lsb);
         if (pps->pic_order_present_flag && !m_field_pic_flag)
-            delta_pic_order_cnt_bottom = extractSEGolombCode();
+            extractSEGolombCode();  // delta_pic_order_cnt_bottom
     }
-#if 0
-		if (m_shortDeserializeMode)
-			return 0;
-
-		if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag) 
-		{
-			delta_pic_order_cnt[0] = extractSEGolombCode();
-			if( pps->pic_order_present_flag && !m_field_pic_flag)
-				delta_pic_order_cnt[1] = extractSEGolombCode();
-		}
-		if(pps->redundant_pic_cnt_present_flag)
-			redundant_pic_cnt = extractUEGolombCode();
-
-
-		if( slice_type  ==  B_TYPE )
-			direct_spatial_mv_pred_flag = bitReader.getBit();
-		num_ref_idx_l0_active_minus1 = pps->num_ref_idx_l0_active_minus1;
-		num_ref_idx_l1_active_minus1 = pps->num_ref_idx_l1_active_minus1;
-		if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE ) 
-		{
-			num_ref_idx_active_override_flag = bitReader.getBit();
-			if( num_ref_idx_active_override_flag ) {
-				num_ref_idx_l0_active_minus1 = extractUEGolombCode();
-				if( slice_type == B_TYPE)
-					num_ref_idx_l1_active_minus1 = extractUEGolombCode();
-			}
-		}
-		ref_pic_list_reordering();
-		if( ( pps->weighted_pred_flag  &&  ( slice_type == P_TYPE  ||  slice_type == SP_TYPE ) )  ||
-			( pps->weighted_bipred_idc  ==  1  &&  slice_type  ==  B_TYPE ) )
-			pred_weight_table();
-		if( nal_ref_idc != 0 )
-			dec_ref_pic_marking();
-		if( pps->entropy_coding_mode_flag  &&  slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE ) {
-			cabac_init_idc = extractUEGolombCode();
-			//assert(cabac_init_idc >=0 &&  cabac_init_idc <= 2);
-		}
-		slice_qp_delta = extractSEGolombCode();
-		if( slice_type  ==  SP_TYPE  ||  slice_type  ==  SI_TYPE ) {
-			if( slice_type  ==  SP_TYPE )
-				sp_for_switch_flag = bitReader.getBit();
-			slice_qs_delta = extractSEGolombCode();
-		}
-		if( pps->deblocking_filter_control_present_flag ) {
-			disable_deblocking_filter_idc = extractUEGolombCode();
-			if( disable_deblocking_filter_idc != 1 ) {
-				slice_alpha_c0_offset_div2 = extractSEGolombCode();
-				slice_beta_offset_div2 = extractSEGolombCode();
-			}
-		}
-		if( pps->num_slice_groups_minus1 > 0  &&
-			pps->slice_group_map_type >= 3  &&  pps->slice_group_map_type <= 5) {
-			int bits = ceil_log2( sps->pic_size_in_map_units / (double)pps->slice_group_change_rate + 1 );
-			slice_group_change_cycle = bitReader.getBits(bits);
-		}
-
-#endif
     return 0;
 }
-
-#if 0
-
-void SliceUnit::pred_weight_table()
-{
-	luma_log2_weight_denom = extractUEGolombCode();
-	if( sps->chroma_format_idc  !=  0 )
-		chroma_log2_weight_denom = extractUEGolombCode();
-	for(int i = 0; i <= num_ref_idx_l0_active_minus1; i++ ) {
-		int luma_weight_l0_flag = bitReader.getBit();
-		if( luma_weight_l0_flag ) {
-			luma_weight_l0.push_back(extractSEGolombCode());
-			luma_offset_l0.push_back(extractSEGolombCode());
-		}
-		else {
-			luma_weight_l0.push_back(INT_MAX);
-			luma_offset_l0.push_back(INT_MAX);
-		}
-		if ( sps->chroma_format_idc  !=  0 ) {
-			int chroma_weight_l0_flag = bitReader.getBit();
-			if( chroma_weight_l0_flag ) {
-				for(int j =0; j < 2; j++ ) {
-					chroma_weight_l0.push_back(extractSEGolombCode());
-					chroma_offset_l0.push_back(extractSEGolombCode());
-				}
-			}
-			else {
-				for(int j =0; j < 2; j++ ) {
-					chroma_weight_l0.push_back(INT_MAX);
-					chroma_offset_l0.push_back(INT_MAX);
-				}
-			}
-		}
-	}
-	if( slice_type  ==  B_TYPE )
-		for(int i = 0; i <= num_ref_idx_l1_active_minus1; i++ ) {
-			int luma_weight_l1_flag = bitReader.getBit();
-			if( luma_weight_l1_flag ) {
-				luma_weight_l1.push_back(extractSEGolombCode());
-				luma_offset_l1.push_back(extractSEGolombCode());
-			}
-			else {
-				luma_weight_l1.push_back(INT_MAX);
-				luma_offset_l1.push_back(INT_MAX);
-			}
-			if( sps->chroma_format_idc  !=  0 ) {
-				int chroma_weight_l1_flag = bitReader.getBit();
-				if( chroma_weight_l1_flag ) {
-					for(int j = 0; j < 2; j++ ) {
-						chroma_weight_l1.push_back(extractSEGolombCode());
-						chroma_offset_l1.push_back(extractSEGolombCode());
-					}
-				}
-				else {
-					for(int j = 0; j < 2; j++ ) {
-						chroma_weight_l1.push_back(INT_MAX);
-						chroma_offset_l1.push_back(INT_MAX);
-					}
-				}
-			}
-		}
-}
-
-void SliceUnit::dec_ref_pic_marking()
-{
-	if( nal_unit_type  ==  nuSliceIDR ) {
-		no_output_of_prior_pics_flag = bitReader.getBit();
-		long_term_reference_flag = bitReader.getBit();
-	} else 
-	{
-		adaptive_ref_pic_marking_mode_flag =  bitReader.getBit();
-		if( adaptive_ref_pic_marking_mode_flag )
-			do {
-				memory_management_control_operation = extractUEGolombCode();
-				dec_ref_pic_vector.push_back(memory_management_control_operation);
-				if (memory_management_control_operation != 0) {
-					uint32_t tmp = extractUEGolombCode();
-					if( memory_management_control_operation  ==  1  ||
-						memory_management_control_operation  ==  3 )
-						int difference_of_pic_nums_minus1 = tmp;
-					if(memory_management_control_operation  ==  2  )
-						int long_term_pic_num = tmp;
-			 		if( memory_management_control_operation  ==  3  ||
-						memory_management_control_operation  ==  6 )
-						int long_term_frame_idx = tmp;
-					if( memory_management_control_operation  ==  4 )
-						int max_long_term_frame_idx_plus1 = tmp;
-					dec_ref_pic_vector.push_back(tmp);
-				}
-			} while( memory_management_control_operation  !=  0 );
-	}
-}
-
-void SliceUnit::ref_pic_list_reordering()
-{
-	int reordering_of_pic_nums_idc;
-	if( slice_type != I_TYPE && slice_type !=  SI_TYPE ) {
-		ref_pic_list_reordering_flag_l0 = bitReader.getBit();
-		if( ref_pic_list_reordering_flag_l0 )
-			do {
-				reordering_of_pic_nums_idc = extractUEGolombCode();
-				if( reordering_of_pic_nums_idc  ==  0  || reordering_of_pic_nums_idc  ==  1 )
-				{
-					int tmp = extractUEGolombCode();
-					abs_diff_pic_num_minus1 = tmp;
-					m_ref_pic_vect.push_back(reordering_of_pic_nums_idc);
-					m_ref_pic_vect.push_back(tmp);
-				}
-				else if( reordering_of_pic_nums_idc  ==  2 ) {
-					int tmp = extractUEGolombCode();
-					long_term_pic_num = tmp;
-					m_ref_pic_vect.push_back(reordering_of_pic_nums_idc);
-					m_ref_pic_vect.push_back(tmp);
-				}
-			} while(reordering_of_pic_nums_idc  !=  3);
-	}
-	if( slice_type  ==  B_TYPE ) {
-		ref_pic_list_reordering_flag_l1 = bitReader.getBit();
-		if( ref_pic_list_reordering_flag_l1 )
-			do {
-				int reordering_of_pic_nums_idc2 = extractUEGolombCode();
-				uint32_t tmp = extractUEGolombCode();
-				if( reordering_of_pic_nums_idc  ==  0  ||
-					reordering_of_pic_nums_idc  ==  1 )
-					abs_diff_pic_num_minus1 = tmp;
-				else if( reordering_of_pic_nums_idc  ==  2 )
-					long_term_pic_num = tmp;
-				m_ref_pic_vect2.push_back(reordering_of_pic_nums_idc2);
-				m_ref_pic_vect2.push_back(tmp);
-			} while(reordering_of_pic_nums_idc  !=  3);
-	}
-}
-
-int SliceUnit::NextMbAddress(int n)
-{
-	int FrameHeightInMbs = ( 2 - sps->frame_mbs_only_flag ) * sps->pic_height_in_map_units;
-	int FrameWidthInMbs = ( 2 - sps->frame_mbs_only_flag ) * sps->pic_width_in_mbs;
-	int PicHeightInMbs = FrameHeightInMbs / ( 1 + m_field_pic_flag );
-	int PicWidthInMbs = FrameWidthInMbs / ( 1 + m_field_pic_flag );
-	int PicSizeInMbs = PicWidthInMbs * PicHeightInMbs;
-	int i = n + 1;
-	//while( i < PicSizeInMbs  &&  MbToSliceGroupMap[ i ]  !=  MbToSliceGroupMap[ n ] )
-	//	i++;
-	return i;
-}
-
-void SliceUnit::setFrameNum(int frameNum)
-{
-	assert(m_frameNumBitPos != 0);
-	updateBits(m_frameNumBitPos, m_frameNumBits, frameNum);
-	if (m_picOrderBitPos > 0)
-		updateBits(m_picOrderBitPos, m_picOrderNumBits, frameNum*2 + bottom_field_flag);
-}
-
-int SliceUnit::deserializeSliceData()
-{
-	//if (nal_unit_type != P_TYPE && nal_unit_type != I_TYPE && nal_unit_type != B_TYPE)
-	if (nal_unit_type != nuSliceIDR && nal_unit_type != nuSliceNonIDR)
-		return 0; // deserialize other nal types are not supported now
-	if( pps->entropy_coding_mode_flag) {
-		int bitOffs = bitReader.getBitsCount() % 8;
-		if (bitOffs > 0)
-			bitReader.skipBits(8 - bitOffs);
-	}
-	int MbaffFrameFlag = ( sps->mb_adaptive_frame_field_flag!=0  &&  m_field_pic_flag==0);
-	int CurrMbAddr = first_mb_in_slice * ( 1 + MbaffFrameFlag );
-	int moreDataFlag = 1;
-	int mb_skip_run = 0;
-	int mb_skip_flag = 0;
-	int prevMbSkipped = 0;
-	int mb_field_decoding_flag = 0;
-	do {
-		if( slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE )
-			if( !pps->entropy_coding_mode_flag ) {
-				mb_skip_run = extractUEGolombCode(); // !!!!!!!!!!!!!
-				int prevMbSkipped = ( mb_skip_run > 0 );
-				for(int i = 0; i<mb_skip_run; i++ )
-					CurrMbAddr = NextMbAddress( CurrMbAddr );
-				moreDataFlag = bitReader.getBitsLeft() >= 8;
-			} else {
-				/*
-				mb_skip_flag = extractCABAC();
-				moreDataFlag = mb_skip_flag == 0;
-				*/
-			}
-		if( moreDataFlag ) {
-			if( MbaffFrameFlag && ( CurrMbAddr % 2  ==  0  ||  
-				( CurrMbAddr % 2  ==  1  &&  prevMbSkipped ) ) ) {
-					mb_field_decoding_flag = bitReader.getBit(); // || ae(v) for CABAC
-			}
-			macroblock_layer();
-		}
-		if( !pps->entropy_coding_mode_flag )
-			moreDataFlag = bitReader.getBitsLeft() >= 8; //more_rbsp_data();
-		else {
-			/*
-			if( slice_type  !=  I  &&  slice_type  !=  SI )
-				prevMbSkipped = mb_skip_flag
-			if( MbaffFrameFlag  &&  CurrMbAddr % 2  ==  0 )
-				moreDataFlag = 1
-			else {
-				end_of_slice_flag
-				moreDataFlag = !end_of_slice_flag
-			}
-			*/
-		}
-		CurrMbAddr = NextMbAddress( CurrMbAddr );
-	} while( moreDataFlag);
-	return 0;
-}
-
-void SliceUnit::macroblock_layer()
-{
-}
-
-int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const std::map<uint32_t, SPSUnit*>& spsMap,
-                                    const std::map<uint32_t, PPSUnit*>& ppsMap, uint8_t* dstBuffer, int dstBufferLen)
-{
-	try 
-	{
-		dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = 0;
-		dstBuffer[3] = 1;
-		dstBuffer[4] = (nal_ref_idc << 5) + nal_unit_type;
-		bitWriter.setBuffer(dstBuffer + 5, dstBuffer + dstBufferLen);
-		bitReader.setBuffer(dstBuffer + 5, dstBuffer + dstBufferLen);
-		writeUEGolombCode(bitWriter, first_mb_in_slice);
-		writeUEGolombCode(bitWriter, orig_slice_type);
-		writeUEGolombCode(bitWriter, pic_parameter_set_id);
-		std::map<uint32_t, PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
-		if (itr == ppsMap.end())
-			return SPS_OR_PPS_NOT_READY;
-		pps = itr->second;
-
-		std::map<uint32_t, SPSUnit*>::const_iterator itr2 = spsMap.find(pps->seq_parameter_set_id);
-		if (itr2 == spsMap.end())
-			return SPS_OR_PPS_NOT_READY;
-		sps = itr2->second;
-		m_frameNumBitPos = bitWriter.getBitsCount(); //getBitContext.buffer
-		m_frameNumBits = sps->log2_max_frame_num;
-		bitWriter.putBits(m_frameNumBits, frame_num);
-		if( sps->frame_mbs_only_flag == 0) {
-			bitWriter.putBit(m_field_pic_flag);
-			if( m_field_pic_flag )
-				bitWriter.putBit(bottom_field_flag);
-		}
-		if( isIDR())
-			writeUEGolombCode(bitWriter, idr_pic_id);
-		if( sps->pic_order_cnt_type ==  0) 
-		{
-			m_picOrderBitPos = bitWriter.getBitsCount(); //getBitContext.buffer
-			m_picOrderNumBits = sps->log2_max_pic_order_cnt_lsb;
-			bitWriter.putBits( sps->log2_max_pic_order_cnt_lsb, pic_order_cnt_lsb);
-			if( pps->pic_order_present_flag &&  !m_field_pic_flag)
-				writeUEGolombCode(bitWriter, delta_pic_order_cnt_bottom);
-		}
-		assert (m_shortDeserializeMode == false);
-
-
-		if(sps->pic_order_cnt_type == 1 && !sps->delta_pic_order_always_zero_flag) 
-		{
-			writeSEGolombCode(bitWriter, delta_pic_order_cnt[0]);
-			if( pps->pic_order_present_flag && !m_field_pic_flag)
-				writeSEGolombCode(bitWriter, delta_pic_order_cnt[1]);
-		}
-		if(pps->redundant_pic_cnt_present_flag)
-			writeSEGolombCode(bitWriter, redundant_pic_cnt);
-
-
-		if( slice_type  ==  B_TYPE ) {
-			bitWriter.putBit(direct_spatial_mv_pred_flag);
-		}
-		if( slice_type == P_TYPE || slice_type == SP_TYPE || slice_type == B_TYPE ) 
-		{
-			bitWriter.putBit(num_ref_idx_active_override_flag);
-			if( num_ref_idx_active_override_flag ) {
-				writeUEGolombCode(bitWriter, num_ref_idx_l0_active_minus1);
-				if( slice_type == B_TYPE)
-					writeUEGolombCode(bitWriter, num_ref_idx_l1_active_minus1);
-			}
-		}
-		write_ref_pic_list_reordering(bitWriter);
-		if( ( pps->weighted_pred_flag  &&  ( slice_type == P_TYPE  ||  slice_type == SP_TYPE ) )  ||
-			( pps->weighted_bipred_idc  ==  1  &&  slice_type  ==  B_TYPE ) )
-			write_pred_weight_table(bitWriter);
-		if( nal_ref_idc != 0 )
-			write_dec_ref_pic_marking(bitWriter);
-		// ------------------------
-
-		if( pps->entropy_coding_mode_flag  &&  slice_type  !=  I_TYPE  &&  slice_type  !=  SI_TYPE ) {
-			writeUEGolombCode(bitWriter, cabac_init_idc);
-		}
-		writeSEGolombCode(bitWriter, slice_qp_delta);
-		if( slice_type  ==  SP_TYPE  ||  slice_type  ==  SI_TYPE ) {
-			if( slice_type  ==  SP_TYPE )
-				bitWriter.putBit(sp_for_switch_flag);
-			writeSEGolombCode(bitWriter, slice_qs_delta);
-		}
-		if( pps->deblocking_filter_control_present_flag ) {
-			writeUEGolombCode(bitWriter, disable_deblocking_filter_idc); 
-			if( disable_deblocking_filter_idc != 1 ) {
-				writeSEGolombCode(bitWriter, slice_alpha_c0_offset_div2);
-				writeSEGolombCode(bitWriter, slice_beta_offset_div2);
-			}
-		}
-		if( pps->num_slice_groups_minus1 > 0  &&
-			pps->slice_group_map_type >= 3  &&  pps->slice_group_map_type <= 5) {
-			int bits = ceil_log2( sps->pic_size_in_map_units / (double)pps->slice_group_change_rate + 1 );
-			bitWriter.putBits(bits, slice_group_change_cycle);
-		}
-
-		return 0;
-	} catch(BitStreamException& e) {
-		return NOT_ENOUGH_BUFFER;
-	}
-}
-
-
-void SliceUnit::write_dec_ref_pic_marking(BitStreamWriter& bitWriter)
-{
-	if( nal_unit_type  ==  5 ) {
-		bitWriter.putBit(no_output_of_prior_pics_flag);
-		bitWriter.putBit(long_term_reference_flag);
-	} else 
-	{
-		bitWriter.putBit(adaptive_ref_pic_marking_mode_flag);
-		if( adaptive_ref_pic_marking_mode_flag )
-			for (int i = 0; i < dec_ref_pic_vector.size(); i++)
-				writeUEGolombCode(bitWriter, dec_ref_pic_vector[i]);
-	}
-}
-
-
-void SliceUnit::write_pred_weight_table(BitStreamWriter& bitWriter)
-{
-	writeUEGolombCode(bitWriter, luma_log2_weight_denom);
-	if( sps->chroma_format_idc  !=  0 )
-		writeUEGolombCode(bitWriter, chroma_log2_weight_denom);
-	for(int i = 0; i <= num_ref_idx_l0_active_minus1; i++ ) 
-	{
-		if (luma_weight_l0[i] != INT_MAX) {
-			bitWriter.putBit(1);
-			writeSEGolombCode(bitWriter, luma_weight_l0[i]);
-			writeSEGolombCode(bitWriter, luma_offset_l0[i]);
-		}
-		else
-			bitWriter.putBit(0);
-		if ( sps->chroma_format_idc  !=  0 ) {
-			if (chroma_weight_l0[i*2] != INT_MAX) {
-				bitWriter.putBit(1);
-				for(int j =0; j < 2; j++ ) {
-					writeSEGolombCode(bitWriter, chroma_weight_l0[i*2+j]);
-					writeSEGolombCode(bitWriter, chroma_offset_l0[i*2+j]);
-				}
-			}
-			else {
-				bitWriter.putBit(0);
-			}
-		}
-	}
-
-	if( slice_type  ==  B_TYPE )
-		for(int i = 0; i <= num_ref_idx_l1_active_minus1; i++ ) {
-			if (luma_weight_l1[i] != INT_MAX) {
-				bitWriter.putBit(1);
-				writeSEGolombCode(bitWriter, luma_weight_l1[i]);
-				writeSEGolombCode(bitWriter, luma_offset_l1[i]);
-			}
-			else
-				bitWriter.putBit(0);
-
-			if( sps->chroma_format_idc  !=  0 ) {
-				if (chroma_weight_l1[i*2] != INT_MAX) {
-					bitWriter.putBit(1);
-					for(int j = 0; j < 2; j++ ) {
-						writeSEGolombCode(bitWriter, chroma_weight_l1[i*2+j]);
-						writeSEGolombCode(bitWriter, chroma_offset_l1[i*2+j]);
-					}
-				}
-				else
-					bitWriter.putBit(0);
-				// -------------
-			}
-		}
-}
-
-void SliceUnit::write_ref_pic_list_reordering(BitStreamWriter& bitWriter)
-{
-
-	if( slice_type != I_TYPE && slice_type !=  SI_TYPE ) {
-		bitWriter.putBit(ref_pic_list_reordering_flag_l0);
-		for (int i = 0; i < m_ref_pic_vect.size(); i++)
-			writeUEGolombCode(bitWriter, m_ref_pic_vect[i]);
-	}
-
-	if( slice_type  ==  B_TYPE ) {
-		bitWriter.putBit(ref_pic_list_reordering_flag_l1);
-		if( ref_pic_list_reordering_flag_l1 )
-			for (int i = 0; i < m_ref_pic_vect2.size(); i++)
-				writeUEGolombCode(bitWriter, m_ref_pic_vect2[i]);
-	}
-}
-
-#endif
 
 // --------------- SEI UNIT ------------------------
 void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
@@ -2132,61 +1520,80 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
 void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
                           int orig_hrd_parameters_present_flag)
 {
-    if (payloadType == 0)
+    switch (payloadType)
+    {
+    case 0:
         buffering_period(payloadSize);
-    else if (payloadType == 1)
+        break;
+    case 1:
         pic_timing(sps, curBuff, payloadSize, orig_hrd_parameters_present_flag);
-    else if (payloadType == 2)
+        break;
+    case 2:
         pan_scan_rect(payloadSize);
-    else if (payloadType == 3)
+        break;
+    case 3:
         filler_payload(payloadSize);
-    else if (payloadType == 4)
+        break;
+    case 4:
         user_data_registered_itu_t_t35(payloadSize);
-    else if (payloadType == 5)
+        break;
+    case 5:
         user_data_unregistered(payloadSize);
-    else if (payloadType == 6)
+        break;
+    case 6:
         recovery_point(payloadSize);
-    else if (payloadType == 7)
+        break;
+    case 7:
         dec_ref_pic_marking_repetition(payloadSize);
-    else if (payloadType == 8)
+        break;
+    case 8:
         spare_pic(payloadSize);
-    else if (payloadType == 9)
+        break;
+    case 9:
         scene_info(payloadSize);
-    else if (payloadType == 10)
+        break;
+    case 10:
         sub_seq_info(payloadSize);
-    else if (payloadType == 11)
+        break;
+    case 11:
         sub_seq_layer_characteristics(payloadSize);
-    else if (payloadType == 12)
+        break;
+    case 12:
         sub_seq_characteristics(payloadSize);
-    else if (payloadType == 13)
+        break;
+    case 13:
         full_frame_freeze(payloadSize);
-    else if (payloadType == 14)
-        full_frame_freeze_release(payloadSize);
-    else if (payloadType == 15)
+        break;
+    case 14:
+        // full_frame_freeze_release
+        break;
+    case 15:
         full_frame_snapshot(payloadSize);
-    else if (payloadType == 16)
+        break;
+    case 16:
         progressive_refinement_segment_start(payloadSize);
-    else if (payloadType == 17)
+        break;
+    case 17:
         progressive_refinement_segment_end(payloadSize);
-    else if (payloadType == 18)
+        break;
+    case 18:
         motion_constrained_slice_group_set(payloadSize);
-    else if (payloadType == 19)
+        break;
+    case 19:
         film_grain_characteristics(payloadSize);
-    else if (payloadType == 20)
+        break;
+    case 20:
         deblocking_filter_display_preference(payloadSize);
-    else if (payloadType == 21)
+        break;
+    case 21:
         stereo_video_info(payloadSize);
-    else if (payloadType == 37)
+        break;
+    case 37:
         mvc_scalable_nesting(sps, curBuff, payloadSize, orig_hrd_parameters_present_flag);
-    else
+        break;
+    default:
         reserved_sei_message(payloadSize);
-    /*
-    if( !byte_aligned( ) ) {
-    bit_equal_to_one  // equal to 1
-    while( !byte_aligned( ) )
-    bit_equal_to_zero  // equal to 0
     }
-    */
 }
 
 void SEIUnit::buffering_period(int payloadSize) {}
@@ -2222,19 +1629,15 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
         writer.putBits(8, nuSEI);
         writer.putBits(8, SEI_MSG_PIC_TIMING);
     }
-    uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
     writer.putBits(8, 0);
     int beforeMessageLen = writer.getBitsCount();
     // pic timing
     if (sps.nalHrdParams.isPresent || sps.vclHrdParams.isPresent)
     {
-        m_cpb_removal_delay_baseaddr = writer.getBuffer();
-        m_cpb_removal_delay_bitpos = writer.getBitsCount();
         writer.putBits(sps.nalHrdParams.cpb_removal_delay_length_minus1 + 1, cpb_removal_delay);
         writer.putBits(sps.nalHrdParams.dpb_output_delay_length_minus1 + 1, dpb_output_delay);
     }
 
-    // if (sps.isPictStructExist())
     if (sps.pic_struct_present_flag)
     {
         writer.putBits(4, pic_struct);
@@ -2244,13 +1647,9 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
             writer.putBits(sps.nalHrdParams.time_offset_length, 0);
     }
     write_byte_align_bits(writer);
-    // ---------
-    int msgLen = writer.getBitsCount() - beforeMessageLen;
-    *size = msgLen / 8;
+
     if (seiHeader)
-    {
         write_rbsp_trailing_bits(writer);
-    }
 }
 
 void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader)
@@ -2260,7 +1659,6 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         writer.putBits(8, nuSEI);
         writer.putBits(8, SEI_MSG_BUFFERING_PERIOD);
     }
-    uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
     writer.putBits(8, 0);
     int beforeMessageLen = writer.getBitsCount();
     // buffering period
@@ -2276,7 +1674,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         }
     }
     if (sps.vclHrdParams.isPresent)
-    {  // NalHrdBpPresentFlag
+    {  // vclHrdBpPresentFlag
         for (size_t SchedSelIdx = 0; SchedSelIdx <= sps.vclHrdParams.cpb_cnt_minus1; SchedSelIdx++)
         {
             writer.putBits(sps.vclHrdParams.initial_cpb_removal_delay_length_minus1 + 1,
@@ -2286,13 +1684,8 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         }
     }
     write_byte_align_bits(writer);
-    // ---------
-    int msgLen = writer.getBitsCount() - beforeMessageLen;
-    *size = msgLen / 8;
     if (seiHeader)
-    {
         write_rbsp_trailing_bits(writer);
-    }
 }
 
 void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag)
@@ -2309,8 +1702,6 @@ void SEIUnit::pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag)
     {
         cpb_removal_delay = bitReader.getBits(sps.nalHrdParams.cpb_removal_delay_length_minus1 + 1);
         dpb_output_delay = bitReader.getBits(sps.nalHrdParams.dpb_output_delay_length_minus1 + 1);
-
-        // LTRACE(LT_INFO, 2, "got PicTimings " << cpb_removal_delay << "x" << dpb_output_delay);
     }
     if (sps.pic_struct_present_flag)
     {
@@ -2319,56 +1710,10 @@ void SEIUnit::pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag)
 
         for (int i = 0; i < numClockTS; i++)
         {
-            int Clock_timestamp_flag = bitReader.getBit();
+            bitReader.skipBit();  // Clock_timestamp_flag
         }
-
-        /*
-
-        for( int i = 0; i < numClockTS; i++ ) {
-                Clock_timestamp_flag[i] = bitReader.getBit();
-                if( clock_timestamp_flag[i] ) {
-                        Ct_type	= bitReader.getBits(2);
-                        nuit_field_based_flag = bitReader.getBit();
-                        counting_type bitReader.getBits(5);
-                        full_timestamp_flag	= bitReader.getBit();
-                        discontinuity_flag	= bitReader.getBit();
-                        cnt_dropped_flag = bitReader.getBit();
-                        n_frames = bitReader.getBits(8);
-                        if( full_timestamp_flag ) {
-                                seconds_value = bitReader.getBits(6);
-                                minutes_value = bitReader.getBits(6);
-                                hours_value = bitReader.getBits(5);
-                        } else {
-                                seconds_flag = bitReader.getBit();
-                                if( seconds_flag ) {
-                                        seconds_value = bitReader.getBits(6);
-                                        minutes_flag = bitReader.getBit();
-                                        if( minutes_flag ) {
-                                                minutes_value = bitReader.getBits(6);
-                                                hours_flag = bitReader.getBit();
-                                                if( hours_flag )
-                                                        hours_value = bitReader.getBits(5);
-                                        }
-                                }
-                        }
-                        if( time_offset_length > 0 ) {
-                                //time_offset	= bitReader.getBits(time_offset_length); // signed bits!
-                        }
-                }
-        }
-        */
     }
 }
-
-/*
-int getNumClockTS()
-{
-        if (field_pic_flag == 0)
-                return 0;
-        if (field_pic_flag == 0 && bottom_field_flag == 0)
-                return 1;
-}
-*/
 
 void SEIUnit::pan_scan_rect(int payloadSize) {}
 void SEIUnit::filler_payload(int payloadSize) {}
@@ -2400,8 +1745,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
         int operation_point_flag = bitReader.getBit();
         if (!operation_point_flag)
         {
-            int all_view_components_in_au_flag = bitReader.getBit();
-            if (!all_view_components_in_au_flag)
+            if (!bitReader.getBit())  // all_view_components_in_au_flag
             {
                 unsigned num_view_components_minus1 = extractUEGolombCode();
                 if (num_view_components_minus1 >= 1 << 10)
@@ -2416,9 +1760,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
                 return 1;
             for (size_t i = 0; i <= num_view_components_op_minus1; i++)
             {
-                int sei_op_view_id = bitReader.getBits(10);     // sei_op_view_id[ i ]
-                int sei_op_temporal_id = bitReader.getBits(3);  // sei_op_temporal_id
-                sei_op_temporal_id = sei_op_temporal_id;
+                bitReader.getBits(13);  // sei_op_view_id[ i ], sei_op_temporal_id
             }
         }
         int byteBits = bitReader.getBitsCount() % 8;
@@ -2435,7 +1777,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
         {
             sizePart = bitReader.getBits(8);
             payloadSize += sizePart;
-        } while (sizePart == 255);
+        } while (sizePart == 0xff);
 
         if (payloadType == 5)  // user unregister SEI payload data
         {
@@ -2461,13 +1803,6 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int o
         }
         if (payloadType == 0)
         {
-            /*
-        int seq_parameter_set_id = extractUEGolombCode();
-        int initialDelay = bitReader.getBits(24);
-        int initialDelayOffset = bitReader.getBits(24);
-
-        LTRACE(LT_INFO, 2, "got BufferingPeriod " << initialDelay << "x" << initialDelayOffset);
-            */
             buffering_period(payloadSize);
             m_processedMessages.insert(payloadType);
         }
@@ -2489,9 +1824,9 @@ void SEIUnit::processBlurayOffsetMetadata()
 {
     bitReader.skipBits(8);
     uint8_t* ptr = bitReader.getBuffer() + bitReader.getBitsCount() / 8;
-    metadataPtsOffset = ptr - m_nalBuffer;
+    metadataPtsOffset = (int)(ptr - m_nalBuffer);
     bitReader.skipBits(24);  // PTS[32..30], marker_bit, PTS[29..15]
-    bitReader.skipBits(18);  // skip: marker_bit, PTS[14..0], marker_bit, reserved_for_future_use bit
+    bitReader.skipBits(18);  // marker_bit, PTS[14..0], marker_bit, reserved_for_future_use bit
     number_of_offset_sequences = bitReader.getBits(6);
 }
 

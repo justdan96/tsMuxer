@@ -150,27 +150,6 @@ class PPSUnit : public NALUnit
     unsigned seq_parameter_set_id;
     int entropy_coding_mode_flag;
     int pic_order_present_flag;
-    /*
-        int num_slice_groups;
-        int num_ref_idx_l0_active_minus1;
-        int num_ref_idx_l1_active_minus1;
-        int weighted_pred_flag;
-        int weighted_bipred_idc;
-        int pic_init_qp_minus26;
-        int pic_init_qs_minus26;
-        int chroma_qp_index_offset;
-        int deblocking_filter_control_present_flag;
-        int constrained_intra_pred_flag;
-        int redundant_pic_cnt_present_flag;
-        int run_length_minus1[256];
-        int top_left[256];
-        int bottom_right[256];
-        int slice_group_id[256];
-        int slice_group_change_direction_flag;
-        int slice_group_change_rate;
-        int num_slice_groups_minus1;
-        int slice_group_map_type;
-    */
 
     PPSUnit()
         : NALUnit(),
@@ -184,8 +163,6 @@ class PPSUnit : public NALUnit
     ~PPSUnit() override {}
     bool isReady() { return m_ready; }
     int deserialize();
-    // duplicate PPS and change ppsID and cabac parameter for new PPS
-    // void duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac);
 };
 
 struct HRDParams
@@ -221,7 +198,6 @@ class SPSUnit : public NALUnit
     int fixed_frame_rate_flag;
     int num_units_in_tick_bit_pos;
     int pic_struct_present_flag;
-    int mb_adaptive_frame_field_flag;
     unsigned frame_crop_left_offset;
     unsigned frame_crop_right_offset;
     unsigned frame_crop_top_offset;
@@ -233,10 +209,6 @@ class SPSUnit : public NALUnit
     int profile_idc;
     int num_views;
 
-    int constraint_set0_flag0;
-    int constraint_set0_flag1;
-    int constraint_set0_flag2;
-    int constraint_set0_flag3;
     int level_idc;
     std::vector<int> level_idc_ext;
     unsigned seq_parameter_set_id;
@@ -246,17 +218,12 @@ class SPSUnit : public NALUnit
     unsigned log2_max_pic_order_cnt_lsb;
     int delta_pic_order_always_zero_flag;
     int offset_for_non_ref_pic;
-    unsigned num_ref_frames_in_pic_order_cnt_cycle;
     // int offset_for_ref_frame[256];
     unsigned num_ref_frames;
     unsigned pic_width_in_mbs;
     unsigned pic_height_in_map_units;
     int frame_mbs_only_flag;
-    int frame_cropping_flag;
     int vui_parameters_present_flag;
-    // int field_pic_flag;
-    unsigned pic_size_in_map_units;
-    // int orig_hrd_parameters_present_flag;
 
     int timing_info_present_flag;
     int aspect_ratio_info_present_flag;
@@ -268,21 +235,6 @@ class SPSUnit : public NALUnit
     std::vector<int> mvcHrdParamsBitPos;
     std::vector<HRDParams> mvcNalHrdParams;
     std::vector<HRDParams> mvcVclHrdParams;
-
-    /*
-    int nal_hrd_parameters_bit_pos;
-    int nal_hrd_parameters_present_flag;
-    int vcl_hrd_parameters_present_flag;
-    std::vector<int> vui_mvc_nal_hrd_parameters_present_flag;
-    std::vector<int> vui_mvc_vcl_hrd_parameters_present_flag;
-    std::vector<int> vui_mvc_nal_hrd_parameters_bit_pos;
-    std::vector<int> vui_mvc_nal_hrd_len;
-    std::vector<int> vui_mvc_vcl_hrd_len;
-    int nal_hrd_len;
-    int vcl_hrd_len;
-    */
-
-    // bool m_pulldown;
 
     // subSPS (SVC/MVC) extension
     std::vector<unsigned> view_id;
@@ -325,8 +277,6 @@ class SEIUnit : public NALUnit
     SEIUnit()
         : NALUnit(),
           pic_struct(0),
-          m_cpb_removal_delay_baseaddr(0),
-          m_cpb_removal_delay_bitpos(0),
           number_of_offset_sequences(-1),
           metadataPtsOffset(0),
           m_mvcHeaderLen(0),
@@ -349,8 +299,6 @@ class SEIUnit : public NALUnit
 
    public:
     int pic_struct;
-    uint8_t* m_cpb_removal_delay_baseaddr;
-    int m_cpb_removal_delay_bitpos;
     std::unordered_set<int> m_processedMessages;
 
     int cpb_removal_delay;
@@ -399,10 +347,6 @@ class SEIUnit : public NALUnit
 
 class SliceUnit : public NALUnit
 {
-   private:
-    int m_frameNumBitPos;
-    int m_frameNumBits;
-
    public:
     enum SliceType
     {
@@ -415,7 +359,6 @@ class SliceUnit : public NALUnit
     };
 
     int m_field_pic_flag;
-    int svc_extension_flag;
     int non_idr_flag;
     int memory_management_control_operation;
 
@@ -425,11 +368,7 @@ class SliceUnit : public NALUnit
     unsigned pic_parameter_set_id;
     int frame_num;
     int bottom_field_flag;
-    unsigned idr_pic_id;
     int pic_order_cnt_lsb;
-    int delta_pic_order_cnt_bottom;
-    int m_picOrderBitPos;
-    int m_picOrderNumBits;
     int anchor_pic_flag;
 
     SliceUnit();
@@ -442,124 +381,6 @@ class SliceUnit : public NALUnit
     bool isIDR() const;
     bool isIFrame() const;
     int deserializeSliceType(uint8_t* buffer, uint8_t* end);
-#if 0
-
-	int slice_qp_delta;
-	int disable_deblocking_filter_idc;
-	int slice_alpha_c0_offset_div2;
-	int slice_beta_offset_div2;
-	int delta_pic_order_cnt[2];
-	int slice_qs_delta;
-	int redundant_pic_cnt;
-	int slice_group_change_cycle;
-	int num_ref_idx_l0_active_minus1;
-	int num_ref_idx_l1_active_minus1;
-	int direct_spatial_mv_pred_flag;
-	int num_ref_idx_active_override_flag;
-	int sp_for_switch_flag;
-	int ref_pic_list_reordering_flag_l0;
-	int abs_diff_pic_num_minus1;
-	int cabac_init_idc;
-	int no_output_of_prior_pics_flag;
-	int long_term_reference_flag;
-	int adaptive_ref_pic_marking_mode_flag;
-
-	int ref_pic_list_reordering_flag_l1;
-	int long_term_pic_num;
-	int luma_log2_weight_denom;
-	int chroma_log2_weight_denom;
-
-	std::vector<int> m_ref_pic_vect;
-	std::vector<int> m_ref_pic_vect2;
-	std::vector<int> dec_ref_pic_vector;
-	std::vector<int> luma_weight_l0;
-	std::vector<int> luma_offset_l0;
-	std::vector<int> chroma_weight_l0;
-	std::vector<int> chroma_offset_l0;
-	std::vector<int> luma_weight_l1;
-	std::vector<int> luma_offset_l1;
-	std::vector<int> chroma_weight_l1;
-	std::vector<int> chroma_offset_l1;
-
-	bool m_shortDeserializeMode;
-
-	void copyFrom(const SliceUnit& other) {
-		delete m_nalBuffer;
-		//memcpy(this, &other, sizeof(SliceUnit));
-		m_nalBuffer = 0;
-		m_nalBufferLen = 0;
-
-		nal_ref_idc = other.nal_ref_idc;
-		nal_unit_type = other.nal_unit_type;
-
-		slice_qp_delta = other.slice_qp_delta;
-		disable_deblocking_filter_idc = other.disable_deblocking_filter_idc;
-		slice_alpha_c0_offset_div2 = other.slice_alpha_c0_offset_div2;
-		slice_beta_offset_div2 = other.slice_beta_offset_div2;
-		delta_pic_order_cnt[0] = other.delta_pic_order_cnt[0];
-		delta_pic_order_cnt[1] = other.delta_pic_order_cnt[1];
-		slice_qs_delta = other.slice_qs_delta;
-		redundant_pic_cnt = other.redundant_pic_cnt;
-		slice_group_change_cycle = other.slice_group_change_cycle;
-		num_ref_idx_l0_active_minus1 = other.num_ref_idx_l0_active_minus1;
-		num_ref_idx_l1_active_minus1 = other.num_ref_idx_l1_active_minus1;
-		direct_spatial_mv_pred_flag = other.direct_spatial_mv_pred_flag;
-		num_ref_idx_active_override_flag = other.num_ref_idx_active_override_flag;
-		sp_for_switch_flag = other.sp_for_switch_flag;
-		ref_pic_list_reordering_flag_l0 = other.ref_pic_list_reordering_flag_l0;
-		abs_diff_pic_num_minus1 = other.abs_diff_pic_num_minus1;
-		cabac_init_idc = other.cabac_init_idc;
-		no_output_of_prior_pics_flag = other.no_output_of_prior_pics_flag;
-		long_term_reference_flag = other.long_term_reference_flag;
-		adaptive_ref_pic_marking_mode_flag = other.adaptive_ref_pic_marking_mode_flag;
-
-		ref_pic_list_reordering_flag_l1 = other.ref_pic_list_reordering_flag_l1;
-		long_term_pic_num = other.long_term_pic_num;
-		luma_log2_weight_denom = other.luma_log2_weight_denom;
-		chroma_log2_weight_denom = other.chroma_log2_weight_denom;
-		m_ref_pic_vect = other.m_ref_pic_vect;
-		m_ref_pic_vect2 = other.m_ref_pic_vect2;
-		dec_ref_pic_vector = other.dec_ref_pic_vector;
-		luma_weight_l0 = other.luma_weight_l0;
-		luma_offset_l0 = other.luma_offset_l0;
-		chroma_weight_l0 = other.chroma_weight_l0;
-		chroma_offset_l0 = other.chroma_offset_l0;
-		luma_weight_l1 = other.luma_weight_l1;
-		luma_offset_l1 = other.luma_offset_l1;
-		chroma_weight_l1 = other.chroma_weight_l1;
-		chroma_offset_l1 = other.chroma_offset_l1;
-		m_shortDeserializeMode = other.m_shortDeserializeMode;
-
-		first_mb_in_slice = other.first_mb_in_slice;
-		slice_type = other.slice_type;
-		orig_slice_type = other.orig_slice_type;
-		pic_parameter_set_id = other.pic_parameter_set_id;
-
-		frame_num = other.frame_num;
-		bottom_field_flag = other.bottom_field_flag;
-		idr_pic_id = other.idr_pic_id;
-		pic_order_cnt_lsb = other.pic_order_cnt_lsb;
-		delta_pic_order_cnt_bottom = other.delta_pic_order_cnt_bottom;
-		m_picOrderBitPos = other.m_picOrderBitPos;
-		m_picOrderNumBits = other.m_picOrderNumBits;
-		m_field_pic_flag = other.m_field_pic_flag;
-		memory_management_control_operation = other.memory_management_control_operation;
-
-	}
-	void setFrameNum(int num);
-	int deserializeSliceData();
-	int serializeSliceHeader(BitStreamWriter& bitWriter, const std::map<uint32_t, SPSUnit*>& spsMap,
-                                    const std::map<uint32_t, PPSUnit*>& ppsMap, uint8_t* dstBuffer, int dstBufferLen);
-private:
-	void write_pred_weight_table(BitStreamWriter& bitWriter);
-	void write_dec_ref_pic_marking(BitStreamWriter& bitWriter);
-	void write_ref_pic_list_reordering(BitStreamWriter& bitWriter);
-	void macroblock_layer();
-	void pred_weight_table();
-	void dec_ref_pic_marking();
-	void ref_pic_list_reordering();
-	int NextMbAddress(int n);
-#endif
     int deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap, const std::map<uint32_t, PPSUnit*>& ppsMap);
     void nal_unit_header_svc_extension();
     void nal_unit_header_mvc_extension();

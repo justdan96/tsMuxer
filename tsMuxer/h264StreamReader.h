@@ -81,7 +81,6 @@ class H264StreamReader : public MPEGStreamReader
 
     int m_spsCounter;
     bool m_h264SPSCont;
-    int m_last_mb_num;
     bool m_lastSliceIDR;
     int m_lastSliceSPS;
     int m_lastSlicePPS;
@@ -97,7 +96,6 @@ class H264StreamReader : public MPEGStreamReader
     int m_forceLsbDiv;
     int m_lastMessageLen;
     bool m_isFirstFrame;
-    bool m_lastFullFrame;
     SeiMethod m_insertSEIMethod;
     bool m_needSeiCorrection;
     int number_of_offset_sequences;
@@ -113,19 +111,16 @@ class H264StreamReader : public MPEGStreamReader
     std::vector<uint8_t> m_lastSeiMvcHeader;
     int m_lastPicStruct;
     int64_t m_lastDtsInc;
-    // uint8_t* m_cpb_removal_delay_baseaddr;
-    // int m_cpb_removal_delay_bitpos;
-    int orig_hrd_parameters_present_flag;
-    int orig_vcl_parameters_present_flag;
+    bool orig_hrd_parameters_present_flag;
+    bool orig_vcl_parameters_present_flag;
     bool m_mvcSubStream;
     bool m_mvcPrimaryStream;
     bool m_blurayMode;
     int64_t m_startPts;
 
-    void updateSpsFps(SPSUnit* sps, uint8_t* buff, uint8_t* nextNal, int oldSpsLen);
     void additionalStreamCheck(uint8_t* buff, uint8_t* end);
     int calcPicOrder(SliceUnit& slice);
-    int64_t getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd);
+    int getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd);
     int processSliceNal(uint8_t* buff);
     int processSPS(uint8_t* buff);
     int processPPS(uint8_t* buff);
@@ -137,8 +132,6 @@ class H264StreamReader : public MPEGStreamReader
     int processSEI(uint8_t* buff);
     int getNalHrdLen(uint8_t* nal);
     int writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUnit& sei, uint8_t payloadType);
-
-    uint8_t* m_nextFrameAddr;
 
     std::vector<uint8_t> m_bdRomMetaDataMsg;  // copy metadata to buffer, then isert during sei rebuild process
     int m_bdRomMetaDataMsgPtsPos;
