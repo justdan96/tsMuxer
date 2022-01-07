@@ -85,9 +85,6 @@ struct HevcUnitWithProfile : public HevcUnit
     int profile_idc;
     int level_idc;
     int interlaced_source_flag;
-    bool sub_layer_profile_present_flag[16];
-    bool sub_layer_level_present_flag[16];
-    uint8_t sub_layer_profile_space[16];
 
    protected:
     int profile_tier_level(int subLayers);
@@ -103,8 +100,6 @@ struct HevcVpsUnit : public HevcUnitWithProfile
 
    public:
     int vps_id;
-    int vps_max_layers;
-    int vps_max_sub_layers;
     unsigned num_units_in_tick;
     unsigned time_scale;
     int num_units_in_tick_bit_pos;
@@ -160,7 +155,6 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     */
     std::vector<ShortTermRPS> st_rps;
 
-    int video_full_range_flag;
     int colour_primaries;
     int transfer_characteristics;
     int matrix_coeffs;

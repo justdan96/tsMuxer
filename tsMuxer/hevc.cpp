@@ -18,7 +18,7 @@ int ceilDiv(int a, int b) { return (a / b) + (a % b ? 1 : 0); }
 unsigned HevcUnit::extractUEGolombCode()
 {
     int cnt = 0;
-    for (; m_reader.getBits(1) == 0; cnt++)
+    for (; m_reader.getBit() == 0; cnt++)
         ;
     if (cnt > INT_BIT)
         THROW_BITSTREAM_ERR;
@@ -57,18 +57,19 @@ int HevcUnit::deserialize()
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
 
 void HevcUnit::updateBits(int bitOffset, int bitLen, int value)
 {
-    uint8_t* ptr = (uint8_t*)m_reader.getBuffer() + bitOffset / 8;
+    uint8_t* ptr = m_reader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
     int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
-    uint8_t* ptr_end = (uint8_t*)m_reader.getBuffer() + (bitOffset + bitLen) / 8;
+    uint8_t* ptr_end = m_reader.getBuffer() + (bitOffset + bitLen) / 8;
     int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
     if (byteOffset > 0)
@@ -99,27 +100,22 @@ int HevcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
 
 // ------------------------- HevcUnitWithProfile  -------------------
 
-HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), interlaced_source_flag(0)
-{
-    memset(sub_layer_profile_present_flag, 0, sizeof(sub_layer_profile_present_flag));
-    memset(sub_layer_level_present_flag, 0, sizeof(sub_layer_level_present_flag));
-    memset(sub_layer_profile_space, 0, sizeof(sub_layer_profile_space));
-}
+HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), interlaced_source_flag(0) {}
 
 int HevcUnitWithProfile::profile_tier_level(int subLayers)
 {
     try
     {
-        int profile_space = m_reader.getBits(2);
-        int tier_flag = m_reader.getBit();
+        bool sub_layer_profile_present_flag[7]{0};
+        bool sub_layer_level_present_flag[7]{0};
+
+        m_reader.skipBits(3);  // profile_space, tier_flag
         profile_idc = m_reader.getBits(5);
         m_reader.skipBits(32);  // general_profile_compatibility_flag
-        int progressive_source_flag = m_reader.getBit();
+        m_reader.skipBit();     // progressive_source_flag
         interlaced_source_flag = m_reader.getBit();
-        int non_packed_constraint_flag = m_reader.getBit();
-        int frame_only_constraint_flag = m_reader.getBit();
-        m_reader.skipBits(32);  // reserved_zero_44bits
-        m_reader.skipBits(12);  // reserved_zero_44bits
+        m_reader.skipBits(32);  // unused flags
+        m_reader.skipBits(14);  // unused flags
         level_idc = m_reader.getBits(8);
 
         for (int i = 0; i < subLayers - 1; i++)
@@ -136,16 +132,9 @@ int HevcUnitWithProfile::profile_tier_level(int subLayers)
         {
             if (sub_layer_profile_present_flag[i])
             {
-                sub_layer_profile_space[i] = m_reader.getBits(2);
-                bool sub_layer_tier_flag = m_reader.getBit();
-                int sub_layer_profile_idc = m_reader.getBits(5);
-                for (int j = 0; j < 32; j++) m_reader.skipBit();  // sub_layer_profile_compatibility_flag[ i ][ j ] u(1)
-                m_reader.skipBit();                               // sub_layer_progressive_source_flag[ i ] u(1)
-                m_reader.skipBit();                               // sub_layer_interlaced_source_flag[ i ] u(1)
-                m_reader.skipBit();                               // sub_layer_non_packed_constraint_flag[ i ] u(1)
-                m_reader.skipBit();                               // sub_layer_frame_only_constraint_flag[ i ] u(1)
-                m_reader.skipBits(32);                            // sub_layer_reserved_zero_44bits
-                m_reader.skipBits(12);                            // sub_layer_reserved_zero_44bits
+                m_reader.skipBits(32);  // unused flags
+                m_reader.skipBits(32);  // unused flags
+                m_reader.skipBits(24);  // unused flags
             }
             if (sub_layer_level_present_flag[i])
                 m_reader.skipBits(8);  // sub_layer_level_idc[ i ]
@@ -154,6 +143,7 @@ int HevcUnitWithProfile::profile_tier_level(int subLayers)
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -184,13 +174,7 @@ std::string HevcUnitWithProfile::getProfileString() const
 // ------------------------- HevcVpsUnit -------------------
 
 HevcVpsUnit::HevcVpsUnit()
-    : HevcUnitWithProfile(),
-      vps_id(0),
-      vps_max_layers(0),
-      vps_max_sub_layers(0),
-      num_units_in_tick(0),
-      time_scale(0),
-      num_units_in_tick_bit_pos(-1)
+    : HevcUnitWithProfile(), vps_id(0), num_units_in_tick(0), time_scale(0), num_units_in_tick_bit_pos(-1)
 {
 }
 
@@ -202,14 +186,11 @@ int HevcVpsUnit::deserialize()
 
     try
     {
-        vps_id = m_reader.getBits(4);
-        m_reader.skipBits(2);  // reserved
-        vps_max_layers = m_reader.getBits(6) + 1;
-        vps_max_sub_layers = m_reader.getBits(3) + 1;
+        m_reader.skipBits(12);  // vps_id, reserved, vps_max_layers
+        int vps_max_sub_layers = m_reader.getBits(3) + 1;
         if (vps_max_sub_layers > 7)
             return 1;
-        int vps_temporal_id_nesting_flag = m_reader.getBit();
-        m_reader.skipBits(16);  // reserved
+        m_reader.skipBits(17);  // vps_temporal_id_nesting_flag, vps_reserved_0xffff_16bits
         if (profile_tier_level(vps_max_sub_layers) != 0)
             return 1;
 
@@ -218,23 +199,20 @@ int HevcVpsUnit::deserialize()
              i <= vps_max_sub_layers - 1; i++)
         {
             unsigned vps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
-            unsigned vps_max_num_reorder_pics = extractUEGolombCode();
-            if (vps_max_num_reorder_pics > vps_max_dec_pic_buffering_minus1)
+            if (extractUEGolombCode() > vps_max_dec_pic_buffering_minus1)  // vps_max_num_reorder_pics
                 return 1;
-            unsigned vps_max_latency_increase_plus1 = extractUEGolombCode();
-            if (vps_max_latency_increase_plus1 == 0xffffffff)
+            if (extractUEGolombCode() == 0xffffffff)  // vps_max_latency_increase_plus1
                 return 1;
         }
         int vps_max_layer_id = m_reader.getBits(6);
         unsigned vps_num_layer_sets_minus1 = extractUEGolombCode();
         if (vps_num_layer_sets_minus1 > 1023)
             return 1;
-        for (size_t i = 1; i <= vps_num_layer_sets_minus1; i++)
+        for (unsigned i = 1; i <= vps_num_layer_sets_minus1; i++)
         {
             for (int j = 0; j <= vps_max_layer_id; j++) m_reader.skipBit();  // layer_id_included_flag[ i ][ j ] u(1)
         }
-        bool vps_timing_info_present_flag = m_reader.getBit();
-        if (vps_timing_info_present_flag)
+        if (m_reader.getBit())  // vps_timing_info_present_flag
         {
             num_units_in_tick_bit_pos = m_reader.getBitsCount();
             num_units_in_tick = m_reader.getBits(32);
@@ -245,6 +223,7 @@ int HevcVpsUnit::deserialize()
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -252,9 +231,8 @@ int HevcVpsUnit::deserialize()
 void HevcVpsUnit::setFPS(double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
-    num_units_in_tick = time_scale / fps + 0.5;
+    num_units_in_tick = (unsigned)(time_scale / fps + 0.5);
 
-    // num_units_in_tick = time_scale/2 / fps;
     assert(num_units_in_tick_bit_pos > 0);
     updateBits(num_units_in_tick_bit_pos, 32, num_units_in_tick);
     updateBits(num_units_in_tick_bit_pos + 32, 32, time_scale);
@@ -292,7 +270,6 @@ HevcSpsUnit::HevcSpsUnit()
       vcl_hrd_parameters_present_flag(false),
       sub_pic_hrd_params_present_flag(false),
       num_short_term_ref_pic_sets(0),
-      video_full_range_flag(0),
       colour_primaries(2),
       transfer_characteristics(2),
       matrix_coeffs(2),
@@ -315,18 +292,12 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
             sub_pic_hrd_params_present_flag = m_reader.getBit();
             if (sub_pic_hrd_params_present_flag)
             {
-                m_reader.skipBits(8);  // tick_divisor_minus2 u(8)
-                m_reader.skipBits(5);  // du_cpb_removal_delay_increment_length_minus1 u(5)
-                m_reader.skipBit();    // sub_pic_cpb_params_in_pic_timing_sei_flag u(1)
-                m_reader.skipBits(5);  // dpb_output_delay_du_length_minus1 u(5)
+                m_reader.skipBits(19);
             }
-            m_reader.skipBits(4);  // bit_rate_scale u(4)
-            m_reader.skipBits(4);  // cpb_size_scale u(4)
+            m_reader.skipBits(8);  // bit_rate_scale, cpb_size_scale
             if (sub_pic_hrd_params_present_flag)
                 m_reader.skipBits(4);  // cpb_size_du_scale u(4)
-            m_reader.skipBits(5);      // initial_cpb_removal_delay_length_minus1 u(5)
-            m_reader.skipBits(5);      // au_cpb_removal_delay_length_minus1 u(5)
-            m_reader.skipBits(5);      // dpb_output_delay_length_minus1 u(5)
+            m_reader.skipBits(15);
         }
     }
 
@@ -334,14 +305,10 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
     for (int i = 0; i <= maxNumSubLayersMinus1; i++)
     {
         bool low_delay_hrd_flag = false;
-        bool fixed_pic_rate_general_flag = m_reader.getBit();
-        bool fixed_pic_rate_within_cvs_flag = true;
-        if (!fixed_pic_rate_general_flag)
-            fixed_pic_rate_within_cvs_flag = m_reader.getBit();
+        bool fixed_pic_rate_within_cvs_flag = m_reader.getBit() ? true : m_reader.getBit();
         if (fixed_pic_rate_within_cvs_flag)
         {
-            unsigned elemental_duration_in_tc_minus1 = extractUEGolombCode();
-            if (elemental_duration_in_tc_minus1 > 2047)
+            if (extractUEGolombCode() > 2047)  // elemental_duration_in_tc_minus1
                 return 1;
         }
         else
@@ -366,19 +333,15 @@ int HevcSpsUnit::sub_layer_hrd_parameters(int subLayerId)
 {
     for (size_t i = 0; i <= cpb_cnt_minus1[subLayerId]; i++)
     {
-        unsigned bit_rate_value_minus1 = extractUEGolombCode();
-        if (bit_rate_value_minus1 == 0xffffffff)
+        if (extractUEGolombCode() == 0xffffffff)  // bit_rate_value_minus1
             return 1;
-        unsigned cpb_size_value_minus1 = extractUEGolombCode();
-        if (cpb_size_value_minus1 == 0xffffffff)
+        if (extractUEGolombCode() == 0xffffffff)  // cpb_size_value_minus1
             return 1;
         if (sub_pic_hrd_params_present_flag)
         {
-            unsigned cpb_size_du_value_minus1 = extractUEGolombCode();
-            if (cpb_size_du_value_minus1 == 0xffffffff)
+            if (extractUEGolombCode() == 0xffffffff)  // cpb_size_du_value_minus1
                 return 1;
-            unsigned bit_rate_du_value_minus1 = extractUEGolombCode();
-            if (cpb_size_du_value_minus1 == 0xffffffff)
+            if (extractUEGolombCode() == 0xffffffff)  // bit_rate_du_value_minus1
                 return 1;
         }
         m_reader.skipBit();  // cbr_flag[ i ] u(1)
@@ -391,23 +354,16 @@ int HevcSpsUnit::vui_parameters()
     bool aspect_ratio_info_present_flag = m_reader.getBit();
     if (aspect_ratio_info_present_flag)
     {
-        if (m_reader.getBits(8) == EXTENDED_SAR)  // // aspect_ratio_idc
-        {
-            int sar_width = m_reader.getBits(16);
-            int sar_height = m_reader.getBits(16);
-        }
+        if (m_reader.getBits(8) == EXTENDED_SAR)  // aspect_ratio_idc
+            m_reader.skipBits(32);                // sar_width, sar_height
     }
 
-    bool overscan_info_present_flag = m_reader.getBit();
-    if (overscan_info_present_flag)
+    if (m_reader.getBit())   // overscan_info_present_flag
         m_reader.skipBit();  // overscan_appropriate_flag u(1)
-    bool video_signal_type_present_flag = m_reader.getBit();
-    if (video_signal_type_present_flag)
+    if (m_reader.getBit())   // video_signal_type_present_flag
     {
-        m_reader.skipBits(3);  // video_format u(3)
-        video_full_range_flag = m_reader.getBit();
-        bool colour_description_present_flag = m_reader.getBit();
-        if (colour_description_present_flag)
+        m_reader.skipBits(4);   // video_format, video_full_range_flag
+        if (m_reader.getBit())  // colour_description_present_flag
         {
             colour_primaries = m_reader.getBits(8);
             transfer_characteristics = m_reader.getBits(8);
@@ -415,8 +371,7 @@ int HevcSpsUnit::vui_parameters()
         }
     }
 
-    bool chroma_loc_info_present_flag = m_reader.getBit();
-    if (chroma_loc_info_present_flag)
+    if (m_reader.getBit())  // chroma_loc_info_present_flag
     {
         chroma_sample_loc_type_top_field = extractUEGolombCode();
         if (chroma_sample_loc_type_top_field > 5)
@@ -426,11 +381,9 @@ int HevcSpsUnit::vui_parameters()
             return 1;
     }
 
-    m_reader.skipBit();  // neutral_chroma_indication_flag u(1)
-    m_reader.skipBit();  // field_seq_flag u(1)
-    m_reader.skipBit();  // frame_field_info_present_flag u(1)
-    bool default_display_window_flag = m_reader.getBit();
-    if (default_display_window_flag)
+    m_reader.skipBits(3);  // unused flags
+
+    if (m_reader.getBit())  // default_display_window_flag
     {
         extractUEGolombCode();  // def_disp_win_left_offset ue(v)
         extractUEGolombCode();  // def_disp_win_right_offset ue(v)
@@ -438,43 +391,35 @@ int HevcSpsUnit::vui_parameters()
         extractUEGolombCode();  // def_disp_win_bottom_offset ue(v)
     }
 
-    bool vui_timing_info_present_flag = m_reader.getBit();
-    if (vui_timing_info_present_flag)
+    if (m_reader.getBit())  // vui_timing_info_present_flag
     {
         num_units_in_tick = m_reader.getBits(32);
         time_scale = m_reader.getBits(32);
-        bool vui_poc_proportional_to_timing_flag = m_reader.getBit();
-        if (vui_poc_proportional_to_timing_flag)
+
+        if (m_reader.getBit())  // vui_poc_proportional_to_timing_flag
         {
-            unsigned vui_num_ticks_poc_diff_one_minus1 = extractUEGolombCode();
-            if (vui_num_ticks_poc_diff_one_minus1 == 0xffffffff)
+            if (extractUEGolombCode() == 0xffffffff)  // vui_num_ticks_poc_diff_one_minus1
                 return 1;
         }
-        bool vui_hrd_parameters_present_flag = m_reader.getBit();
-        if (vui_hrd_parameters_present_flag)
+        if (m_reader.getBit())  // vui_hrd_parameters_present_flag
+        {
             if (hrd_parameters(1, max_sub_layers - 1) != 0)
                 return 1;
+        }
     }
-    bool bitstream_restriction_flag = m_reader.getBit();
-    if (bitstream_restriction_flag)
+    if (m_reader.getBit())  // bitstream_restriction_flag
     {
-        m_reader.skipBit();  // m_readtiles_fixed_structure_flag u(1)
-        m_reader.skipBit();  // motion_vectors_over_pic_boundaries_flag u(1)
-        m_reader.skipBit();  // restricted_ref_pic_lists_flag u(1)
-        unsigned min_spatial_segmentation_idc = extractUEGolombCode();
-        if (min_spatial_segmentation_idc > 4095)
+        m_reader.skipBits(3);  //  unused flags
+
+        if (extractUEGolombCode() > 4095)  // min_spatial_segmentation_idc
             return 1;
-        unsigned max_bytes_per_pic_denom = extractUEGolombCode();
-        if (max_bytes_per_pic_denom > 16)
+        if (extractUEGolombCode() > 16)  // max_bytes_per_pic_denom
             return 1;
-        unsigned max_bits_per_min_cu_denom = extractUEGolombCode();
-        if (max_bits_per_min_cu_denom > 16)
+        if (extractUEGolombCode() > 16)  // max_bits_per_min_cu_denom
             return 1;
-        unsigned log2_max_mv_length_horizontal = extractUEGolombCode();
-        if (log2_max_mv_length_horizontal > 15)
+        if (extractUEGolombCode() > 15)  // log2_max_mv_length_horizontal
             return 1;
-        unsigned log2_max_mv_length_vertical = extractUEGolombCode();
-        if (log2_max_mv_length_vertical > 15)
+        if (extractUEGolombCode() > 15)  // log2_max_mv_length_vertical
             return 1;
     }
     return 0;
@@ -559,7 +504,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
             int used;
             k = rps->num_negative_pics - 1;
             // flip the negative values to largest first
-            for (size_t i = 0; i < (rps->num_negative_pics >> 1); i++)
+            for (unsigned i = 0; i < (rps->num_negative_pics >> 1); i++)
             {
                 delta_poc = rps->delta_poc[i];
                 used = rps->used[i];
@@ -575,18 +520,15 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
     {
         unsigned int prev, nb_positive_pics;
         rps->num_negative_pics = extractUEGolombCode();
-        if (rps->num_negative_pics > 64)
-            return 1;
         nb_positive_pics = extractUEGolombCode();
-        if (nb_positive_pics > 64)
-            return 1;
         rps->num_delta_pocs = rps->num_negative_pics + nb_positive_pics;
         if (rps->num_delta_pocs > 64)
             return 1;
-        if (rps->num_delta_pocs)
+
+        if (rps->num_delta_pocs > 0)
         {
             prev = 0;
-            for (size_t i = 0; i < rps->num_negative_pics; i++)
+            for (unsigned i = 0; i < rps->num_negative_pics; i++)
             {
                 delta_poc = extractUEGolombCode() + 1;
                 if (delta_poc > 0x8000)
@@ -596,7 +538,7 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
                 rps->used[i] = m_reader.getBit();
             }
             prev = 0;
-            for (size_t i = 0; i < nb_positive_pics; i++)
+            for (unsigned i = 0; i < nb_positive_pics; i++)
             {
                 delta_poc = extractUEGolombCode() + 1;
                 if (delta_poc > 0x8000)
@@ -610,120 +552,13 @@ int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
     return 0;
 }
 
-/*
-void HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx )
-{
-    bool inter_ref_pic_set_prediction_flag = false;
-    if( stRpsIdx != 0 )
-        inter_ref_pic_set_prediction_flag = m_reader.getBit();
-    if( inter_ref_pic_set_prediction_flag )
-    {
-        int delta_idx_minus1 = 0;
-        if( stRpsIdx == num_short_term_ref_pic_sets )
-            delta_idx_minus1 = extractUEGolombCode();
-        int delta_rps_sign = m_reader.getBit();
-        int abs_delta_rps_minus1 = extractUEGolombCode();
-
-        int RefRpsIdx = stRpsIdx - ( delta_idx_minus1 + 1 );
-        int deltaRps = (1 - 2 * delta_rps_sign) * (abs_delta_rps_minus1 + 1);
-
-
-        int NumDeltaPocs = NumNegativePics[ RefRpsIdx ] + NumPositivePics[ RefRpsIdx ];
-
-        int i = 0;
-        for(int j = NumPositivePics[ RefRpsIdx ] - 1; j >= 0; j-- )
-        {
-            int dPoc = DeltaPocS1[ RefRpsIdx ][ j ] + deltaRps;
-            if( dPoc < 0 && use_delta_flag[ NumNegativePics[ RefRpsIdx ] + j ] ) {
-                DeltaPocS0[ stRpsIdx ][ i ] = dPoc;
-                UsedByCurrPicS0[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ NumNegativePics[ RefRpsIdx ] + j ];
-            }
-        }
-        if( deltaRps < 0 && use_delta_flag[ NumDeltaPocs ] )
-        {
-            DeltaPocS0[ stRpsIdx ][ i ] = deltaRps;
-            UsedByCurrPicS0[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ NumDeltaPocs ];
-        }
-        for(int j = 0; j < NumNegativePics[ RefRpsIdx ]; j++ )
-        {
-            int dPoc = DeltaPocS0[ RefRpsIdx ][ j ] + deltaRps;
-            if( dPoc < 0 && use_delta_flag[ j ] ) {
-                DeltaPocS0[ stRpsIdx ][ i ] = dPoc;
-                UsedByCurrPicS0[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ j ];
-            }
-        }
-        NumNegativePics[ stRpsIdx ] = i;
-
-        i = 0;
-        for(int j = NumNegativePics[ RefRpsIdx ] - 1; j >= 0; j-- ) {
-            int dPoc = DeltaPocS0[ RefRpsIdx ][ j ] + deltaRps;
-            if( dPoc > 0 && use_delta_flag[ j ] ) {
-                DeltaPocS1[ stRpsIdx ][ i ] = dPoc;
-                UsedByCurrPicS1[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ j ];
-            }
-        }
-        if( deltaRps > 0 && use_delta_flag[ NumDeltaPocs ] )
-        {
-            DeltaPocS1[ stRpsIdx ][ i ] = deltaRps;
-            UsedByCurrPicS1[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ NumDeltaPocs ];
-        }
-        for(int j = 0; j < NumPositivePics[ RefRpsIdx ]; j++) {
-            int dPoc = DeltaPocS1[ RefRpsIdx ][ j ] + deltaRps;
-            if( dPoc > 0 && use_delta_flag[ NumNegativePics[ RefRpsIdx ] + j ] ) {
-                DeltaPocS1[ stRpsIdx ][ i ] = dPoc;
-                    UsedByCurrPicS1[ stRpsIdx ][ i++ ] = used_by_curr_pic_flag[ NumNegativePics[ RefRpsIdx ] + j ];
-            }
-        }
-        NumPositivePics[ stRpsIdx ] = i;
-
-        for(int j = 0; j <= NumDeltaPocs; j++ )
-        {
-            used_by_curr_pic_flag[j] = m_reader.getBit();
-            if( !used_by_curr_pic_flag[ j ] )
-                use_delta_flag[j] = m_reader.getBit();
-            else
-                use_delta_flag[j] = 1;
-        }
-    }
-    else {
-        NumNegativePics[stRpsIdx] = extractUEGolombCode();
-        NumPositivePics[stRpsIdx] = extractUEGolombCode();
-
-        for(int i = 0; i < NumNegativePics[ stRpsIdx ]; i++ ) {
-            int delta_poc_s0_minus1 = extractUEGolombCode();
-            UsedByCurrPicS0[ stRpsIdx ][ i ] = m_reader.getBit();
-            if (i > 0)
-                DeltaPocS0[ stRpsIdx ][ i ] = DeltaPocS0[ stRpsIdx ][ i - 1 ] - ( delta_poc_s0_minus1 + 1 );
-            else
-                DeltaPocS0[ stRpsIdx ][ i ] = -( delta_poc_s0_minus1 + 1 );
-        }
-
-        for(int i = 0; i < NumPositivePics[ stRpsIdx ]; i++ ) {
-            int delta_poc_s1_minus1 = extractUEGolombCode();
-            UsedByCurrPicS1[ stRpsIdx ][ i ] = m_reader.getBit();
-            if (i > 0)
-                DeltaPocS1[ stRpsIdx ][ i ] = DeltaPocS1[ stRpsIdx ][ i - 1 ] - ( delta_poc_s1_minus1 + 1 );
-            else
-                DeltaPocS1[ stRpsIdx ][ i ] = -( delta_poc_s1_minus1 + 1 );
-        }
-
-        int pics = NumNegativePics[ stRpsIdx ] + NumPositivePics[stRpsIdx];
-        use_delta_flag.resize(pics+2);
-        used_by_curr_pic_flag.resize(pics+2);
-        for (int i = 0; i < use_delta_flag.size(); ++i)
-            use_delta_flag[i] = 1;
-    }
-}
-*/
-
 int HevcSpsUnit::scaling_list_data()
 {
     for (int sizeId = 0; sizeId < 4; sizeId++)
     {
         for (int matrixId = 0; matrixId < 6; matrixId += (sizeId == 3) ? 3 : 1)
         {
-            bool flag = m_reader.getBit();
-            if (!flag)
+            if (!m_reader.getBit())
             {
                 unsigned scaling_list_pred_matrix_id_delta = extractUEGolombCode();
                 if (scaling_list_pred_matrix_id_delta > 5)
@@ -746,7 +581,6 @@ int HevcSpsUnit::scaling_list_data()
                     if (scaling_list_delta_coef < -128 || scaling_list_delta_coef > 127)
                         return 1;
                     nextCoef = (nextCoef + scaling_list_delta_coef + 256) % 256;
-                    // ScalingList[ sizeId ][ matrixId ][ i ] = nextCoef;
                 }
             }
         }
@@ -762,11 +596,10 @@ int HevcSpsUnit::deserialize()
     try
     {
         vps_id = m_reader.getBits(4);
-        int max_sub_layers_minus1 = m_reader.getBits(3);
-        if (max_sub_layers_minus1 > 6)
+        max_sub_layers = m_reader.getBits(3) + 1;
+        if (max_sub_layers > 7)
             return 1;
-        max_sub_layers = max_sub_layers_minus1 + 1;
-        int temporal_id_nesting_flag = m_reader.getBit();
+        m_reader.skipBit();  // temporal_id_nesting_flag
         if (profile_tier_level(max_sub_layers) != 0)
             return 1;
         sps_id = extractUEGolombCode();
@@ -786,8 +619,7 @@ int HevcSpsUnit::deserialize()
         if (pic_width_in_luma_samples >= 3840)
             V3_flags |= FOUR_K;
 
-        bool conformance_window_flag = m_reader.getBit();
-        if (conformance_window_flag)
+        if (m_reader.getBit())  // conformance_window_flag
         {
             extractUEGolombCode();  // conf_win_left_offset ue(v)
             extractUEGolombCode();  // conf_win_right_offset ue(v)
@@ -831,7 +663,7 @@ int HevcSpsUnit::deserialize()
         int PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
         PicSizeInCtbsY_bits = 0;
         int count1bits = 0;
-        while (PicSizeInCtbsY)
+        while (PicSizeInCtbsY)  // Ceil( Log2( PicSizeInCtbsY ) )
         {
             count1bits += PicSizeInCtbsY & 1;
             PicSizeInCtbsY_bits++;
@@ -840,79 +672,57 @@ int HevcSpsUnit::deserialize()
         if (count1bits == 1)
             PicSizeInCtbsY_bits -= 1;  // in case PicSizeInCtbsY is power of 2
 
-        bool scaling_list_enabled_flag = m_reader.getBit();
-        if (scaling_list_enabled_flag)
+        if (m_reader.getBit())  // scaling_list_enabled_flag
         {
-            bool sps_scaling_list_data_present_flag = m_reader.getBit();
-            if (sps_scaling_list_data_present_flag)
+            if (m_reader.getBit())  // sps_scaling_list_data_present_flag
+            {
                 if (scaling_list_data())
                     return 1;
+            }
         }
 
-        m_reader.skipBit();  // amp_enabled_flag u(1)
-        m_reader.skipBit();  // sample_adaptive_offset_enabled_flag u(1)
-        bool pcm_enabled_flag = m_reader.getBit();
-        if (pcm_enabled_flag)
+        m_reader.skipBits(2);   // unused flags
+        if (m_reader.getBit())  // pcm_enabled_flag
         {
-            m_reader.skipBits(4);  // pcm_sample_bit_depth_luma_minus1 u(4)
-            m_reader.skipBits(4);  // pcm_sample_bit_depth_chroma_minus1 u(4)
-            unsigned log2_min_pcm_luma_coding_block_size_minus3 = extractUEGolombCode();
-            if (log2_min_pcm_luma_coding_block_size_minus3 > 2)
+            m_reader.skipBits(8);           // pcm_sample_bit_depth_luma_minus1, pcm_sample_bit_depth_chroma_minus1
+            if (extractUEGolombCode() > 2)  // log2_min_pcm_luma_coding_block_size_minus3
                 return 1;
-            unsigned log2_diff_max_min_pcm_luma_coding_block_size = extractUEGolombCode();
-            if (log2_diff_max_min_pcm_luma_coding_block_size > 2)
+            if (extractUEGolombCode() > 2)  // log2_diff_max_min_pcm_luma_coding_block_size
                 return 1;
-            m_reader.skipBit();  // m_rpcm_loop_filter_disabled_flag u(1)
+            m_reader.skipBit();  // m_rpcm_loop_filter_disabled_flag
         }
         num_short_term_ref_pic_sets = extractUEGolombCode();
         if (num_short_term_ref_pic_sets > 64)
             return 1;
-        /*
-        NumNegativePics.resize(num_short_term_ref_pic_sets);
-        NumPositivePics.resize(num_short_term_ref_pic_sets);
-        UsedByCurrPicS0.resize(num_short_term_ref_pic_sets);
-        UsedByCurrPicS1.resize(num_short_term_ref_pic_sets);
-        DeltaPocS0.resize(num_short_term_ref_pic_sets);
-        DeltaPocS1.resize(num_short_term_ref_pic_sets);
-        for (int i = 0; i < num_short_term_ref_pic_sets; ++i) {
-            UsedByCurrPicS0[i].resize(MAX_REFS);
-            DeltaPocS0[i].resize(MAX_REFS);
-            UsedByCurrPicS1[i].resize(MAX_REFS);
-            DeltaPocS1[i].resize(MAX_REFS);
-        }
-        */
+
         st_rps.resize(num_short_term_ref_pic_sets);
 
-        for (size_t i = 0; i < num_short_term_ref_pic_sets; i++)
+        for (unsigned i = 0; i < num_short_term_ref_pic_sets; i++)
             if (short_term_ref_pic_set(i) != 0)
                 return 1;
-        bool long_term_ref_pics_present_flag = m_reader.getBit();
-        if (long_term_ref_pics_present_flag)
+        if (m_reader.getBit())  // long_term_ref_pics_present_flag
         {
             unsigned num_long_term_ref_pics_sps = extractUEGolombCode();
             if (num_long_term_ref_pics_sps > 32)
                 return 1;
-            for (size_t i = 0; i < num_long_term_ref_pics_sps; i++)
+            for (unsigned i = 0; i < num_long_term_ref_pics_sps; i++)
             {
-                m_reader.skipBits(log2_max_pic_order_cnt_lsb);  // lt_ref_pic_poc_lsb_sps[ i ] u(v)
-                m_reader.skipBit();                             // used_by_curr_pic_lt_sps_flag[ i ] u(1)
+                m_reader.skipBits(log2_max_pic_order_cnt_lsb + 1);  // lt_ref_pic_poc_lsb_sps[ i ] u(v)
             }
         }
-        m_reader.skipBit();  // sps_temporal_mvp_enabled_flag u(1)
-        m_reader.skipBit();  // strong_intra_smoothing_enabled_flag u(1)
-        bool vui_parameters_present_flag = m_reader.getBit();
-        if (vui_parameters_present_flag)
+        m_reader.skipBits(2);   // unused flags
+        if (m_reader.getBit())  // vui_parameters_present_flag
+        {
             if (vui_parameters())
                 return 1;
-        bool sps_extension_flag = m_reader.getBit();
-
-        int gg = m_reader.getBitsLeft();
-        gg = gg;
+        }
+        m_reader.skipBit();
 
         return 0;
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -934,8 +744,8 @@ string HevcSpsUnit::getDescription() const
 
 // ----------------------- HevcPpsUnit ------------------------
 HevcPpsUnit::HevcPpsUnit()
-    : pps_id(-1),
-      sps_id(-1),
+    : pps_id(0),
+      sps_id(0),
       dependent_slice_segments_enabled_flag(false),
       output_flag_present_flag(false),
       num_extra_slice_header_bits(0)
@@ -964,6 +774,7 @@ int HevcPpsUnit::deserialize()
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -981,7 +792,7 @@ int HevcHdrUnit::deserialize()
         do
         {
             int payloadType = 0;
-            int payloadSize = 0;
+            unsigned payloadSize = 0;
             int nbyte = 0xFF;
             while (nbyte == 0xFF)
             {
@@ -1035,16 +846,17 @@ int HevcHdrUnit::deserialize()
                     V3_flags |= HDR10PLUS;
                 }
                 payloadSize -= 8;
-                for (int i = 0; i < payloadSize; i++) m_reader.skipBits(8);
+                for (unsigned i = 0; i < payloadSize; i++) m_reader.skipBits(8);
             }
             else
-                for (int i = 0; i < payloadSize; i++) m_reader.skipBits(8);
+                for (unsigned i = 0; i < payloadSize; i++) m_reader.skipBits(8);
         } while (m_reader.getBitsLeft() > 16);
 
         return 0;
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -1073,7 +885,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
         {
             if (pps->dependent_slice_segments_enabled_flag)
                 dependent_slice_segment_flag = m_reader.getBit();
-            int slice_segment_address = m_reader.getBits(sps->PicSizeInCtbsY_bits);  // Ceil( Log2( PicSizeInCtbsY ) )
+            int slice_segment_address = m_reader.getBits(sps->PicSizeInCtbsY_bits);
         }
         if (!dependent_slice_segment_flag)
         {
@@ -1086,8 +898,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
                 m_reader.skipBit();  // pic_output_flag u(1)
             if (sps->separate_colour_plane_flag == 1)
             {
-                int colour_plane_id = m_reader.getBits(2);
-                if (colour_plane_id > 2)
+                if (m_reader.getBits(2) > 2)  // colour_plane_id
                     return 1;
             }
             if (!isIDR())
@@ -1095,12 +906,12 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
                 pic_order_cnt_lsb = m_reader.getBits(sps->log2_max_pic_order_cnt_lsb);
             }
         }
-        // LTRACE(LT_INFO, 2, pic_order_cnt_lsb);
 
         return 0;
     }
     catch (VodCoreException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }

@@ -136,7 +136,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     if (m_firstFrame)
-        CheckStreamRez rez = checkStream(m_buffer, m_bufEnd - m_buffer);
+        CheckStreamRez rez = checkStream(m_buffer, (int)(m_bufEnd - m_buffer));
 
     int lenDoviDesc = 0;
     if (!blurayMode && m_hdr->isDVRPU)
@@ -174,7 +174,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
             if (nalType == NAL_SPS)
             {
-                int toDecode = FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
+                int toDecode = FFMIN(sizeof(tmpBuffer) - 8, (unsigned)(nextNal - nal));
                 int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
                 break;
             }
@@ -230,7 +230,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    uint32_t pixelRate = width * getStreamHeight() * getFPS();
+    uint32_t pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
 
     if (!isDVBL && V3_flags & FOUR_K)
     {
@@ -248,9 +248,8 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     {
         if (m_hdr->isDVEL)
         {
-            switch (m_sps->transfer_characteristics)
+            if (m_sps->transfer_characteristics == 16)  // PQ
             {
-            case 16:                                               // PQ
                 if (m_sps->chroma_sample_loc_type_top_field == 2)  // Blu-ray
                 {
                     profile = 7;
@@ -261,8 +260,9 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
                     profile = 6;
                     compatibility = 1;
                 }
-                break;
-            default:  // unspecified, assumed DV IPT
+            }
+            else  // unspecified, assumed DV IPT
+            {
                 profile = 4;
                 compatibility = 2;
             }
@@ -292,13 +292,13 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
     }
     else  // 8-bit
     {
-        switch (m_sps->transfer_characteristics)
+        if (m_sps->transfer_characteristics == 1)  // SDR
         {
-        case 1:  // SDR
             profile = 2;
             compatibility = 2;
-            break;
-        default:  // unspecified, assumed DV IPT
+        }
+        else  // unspecified, assumed DV IPT
+        {
             profile = 3;
             compatibility = 0;
         }
@@ -358,12 +358,12 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
 {
-    int oldNalSize = nextNal - buff;
+    int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
     HevcVpsUnit* vps = (HevcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
     uint8_t* tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
-    long newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
+    int newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");
 
@@ -462,7 +462,7 @@ void HEVCStreamReader::storeBuffer(MemoryBlock& dst, const uint8_t* data, const 
     while (dataEnd > data && dataEnd[-1] == 0) dataEnd--;
     if (dataEnd > data)
     {
-        dst.resize(dataEnd - data);
+        dst.resize((int)(dataEnd - data));
         memcpy(dst.data(), data, dataEnd - data);
     }
 }
@@ -597,8 +597,8 @@ uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer,
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    int bytesLeft = dstEnd - dstBuffer;
-    int requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
+    int bytesLeft = (int)(dstEnd - dstBuffer);
+    int requiredBytes = (int)srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
 
@@ -638,5 +638,5 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     }
 
     m_firstFileFrame = false;
-    return curPos - dstBuffer;
+    return (int)(curPos - dstBuffer);
 }
