@@ -449,7 +449,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         CLPIStreamInfo streamInfo(itr->second);
         clpiParser.m_streamInfo.insert(make_pair(streamInfo.streamPID, streamInfo));
     }
-    vector<uint64_t> packetCount = muxer->getMuxedPacketCnt();
+    vector<int64_t> packetCount = muxer->getMuxedPacketCnt();
     vector<int64_t> firstPts = muxer->getFirstPts();
     vector<int64_t> lastPts = muxer->getLastPts();
 

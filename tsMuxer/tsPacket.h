@@ -193,9 +193,9 @@ struct BluRayCoarseInfo
 
 struct PMTIndexData
 {
-    uint32_t m_pktCnt;
-    uint32_t m_frameLen;
-    PMTIndexData(uint32_t pktCnt, uint32_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
+    int64_t m_pktCnt;
+    int64_t m_frameLen;
+    PMTIndexData(int64_t pktCnt, int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;

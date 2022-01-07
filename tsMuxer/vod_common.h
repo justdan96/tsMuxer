@@ -50,7 +50,7 @@ const static unsigned LT_ERR_MPEG = 1;
 const static unsigned LT_MUXER = 2;
 const static unsigned LT_TRAFFIC = 3;
 
-const unsigned TS_FRAME_SIZE = 188;
+const size_t TS_FRAME_SIZE = 188;
 
 const unsigned DEFAULT_FILE_BLOCK_SIZE = 1024 * 1024 * 2;
 const unsigned TS188_ROUND_BLOCK_SIZE = DEFAULT_FILE_BLOCK_SIZE / TS_FRAME_SIZE * TS_FRAME_SIZE;

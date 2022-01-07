@@ -43,7 +43,7 @@ class TSMuxer : public AbstractMuxer
     bool doFlush() override;
     bool close() override;
 
-    int getVBVLength() { return m_vbvLen / 90; }
+    int64_t getVBVLength() { return m_vbvLen / 90; }
     void setNewStyleAudioPES(bool val) { m_useNewStyleAudioPES = val; }
     void setM2TSMode(bool val) { m_m2tsMode = val; }
     void setPCROnVideoPID(bool val) { m_pcrOnVideo = val; }
@@ -55,10 +55,10 @@ class TSMuxer : public AbstractMuxer
     std::vector<int64_t> getFirstPts();
     void alignPTS(TSMuxer* otherMuxer);
     std::vector<int64_t> getLastPts();
-    const std::vector<uint64_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
+    const std::vector<int64_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
     size_t splitFileCnt() const { return m_fileNames.size(); }
-    void setSplitDuration(uint64_t value) { m_splitDuration = value; }
-    void setSplitSize(uint64_t value) { m_splitSize = value; }
+    void setSplitDuration(int64_t value) { m_splitDuration = value; }
+    void setSplitSize(int64_t value) { m_splitSize = value; }
     void parseMuxOpt(const std::string& opts) override;
 
     void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
@@ -80,7 +80,7 @@ class TSMuxer : public AbstractMuxer
    private:
     bool doFlush(uint64_t newPCR, int64_t pcrGAP);
     void flushTSFrame();
-    int writeTSFrames(int pid, uint8_t* buffer, int len, bool priorityData, bool payloadStart);
+    int writeTSFrames(int pid, uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
     void writeSIT();
     void writePMT();
     void writePAT();
@@ -133,8 +133,8 @@ class TSMuxer : public AbstractMuxer
     int m_curFileNum;
     bool m_bluRayMode;
     bool m_hdmvDescriptors;
-    uint64_t m_splitSize;
-    uint64_t m_splitDuration;
+    int64_t m_splitSize;
+    int64_t m_splitDuration;
 
     bool m_useNewStyleAudioPES;
 
@@ -194,11 +194,11 @@ class TSMuxer : public AbstractMuxer
     int64_t m_lastMuxedDts;
     MemoryBlock m_pesData;
     int m_pesPID;
-    std::vector<uint64_t> m_muxedPacketCnt;
+    std::vector<int64_t> m_muxedPacketCnt;
     bool m_pesIFrame;
     bool m_pesSpsPps;
     bool m_computeMuxStats;
-    int m_pmtFrames;
+    int64_t m_pmtFrames;
     int64_t m_curFileStartPts;
     int64_t m_vbvLen;
     int m_mainStreamIndex;
