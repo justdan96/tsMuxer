@@ -21,7 +21,6 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
                 uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
                 m_sequence.deserialize(nal + 4, nextNal - nal - 4);
                 m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
-                // break;
             }
             else if (nal[3] == EXT_START_SHORT_CODE)
             {
@@ -111,8 +110,6 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                 case PICTURE_START_SHORT_CODE:
                     if (frame.deserialize(nal + 4, end - nal - 4) == 0)
                         return rez;
-                    // if (frame.pict_type == PCT_I_FRAME)
-                    //	iFrameFound = true;
                     pictureFound = true;
                     break;
                 case SEQ_START_SHORT_CODE:
@@ -131,7 +128,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
             // return rez;
         }
     }
-    if (spsFound && pictureFound /*&& gopFound*/ && sliceFound /*&& seqExtFound*/)
+    if (spsFound && pictureFound && sliceFound)
     {
         rez.codecInfo = mpeg2CodecInfo;
         rez.streamDescr = m_sequence.getStreamDescr();
@@ -196,6 +193,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
     }
     catch (BitStreamException& e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -270,7 +268,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
     if (rez == NOT_ENOUGH_BUFFER)
         return rez;
 
-    if (m_frame.pict_type == PCT_I_FRAME)
+    if (m_frame.pict_type == PictureCodingType::PCT_I_FRAME)
     {
         m_framesAtGop = -1;
         m_lastRef = -1;
@@ -282,9 +280,6 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
         m_lastRef = m_frame.ref;
         m_totalFrameNum++;
 
-        // if (!m_isFirstFrame)
-        // m_curDts += m_pcrIncPerFrame; // not right!
-        // more careful handling of top_field_first, repeat_first_field and progressive_frame
         m_curDts += m_prevFrameDelay;
 
         if (m_frame.repeat_first_field)
@@ -310,11 +305,8 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
     m_isFirstFrame = false;
     int refDif = m_frame.ref - m_framesAtGop;
     m_curPts = m_curDts + refDif * m_pcrIncPerFrame;
-    m_lastIFrame = m_frame.pict_type == PCT_I_FRAME;
-    /*
-    LTRACE(LT_INFO, 0, "frame num: " << m_totalFrameNum << " type=" << frameTypeDescr[m_frame.pict_type] <<
-            " ps=" << m_frame.progressive_frame << " rf=" << m_frame.repeat_first_field);
-    */
+    m_lastIFrame = m_frame.pict_type == PictureCodingType::PCT_I_FRAME;
+
     return 0;
 }
 
@@ -357,10 +349,4 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
 void MPEG2StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
     m_sequence.setFrameRate(buff + 1, m_fps);
-}
-
-void MPEG2StreamReader::updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
-{
-    if (m_ar != VideoAspectRatio::AR_KEEP_DEFAULT)
-        m_sequence.setAspectRatio(buff + 1, m_ar);  // todo: delete this line! debug only
 }

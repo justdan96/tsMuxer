@@ -125,7 +125,6 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
 
     // sequence display extension
     int video_format;
-    int color_description;
 
     int color_primaries;
     int transfer_characteristics;
@@ -135,7 +134,7 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     int pan_scan_height;
     MPEGSequenceHeader(int bufferSize);
     ~MPEGSequenceHeader() override{};
-    uint8_t* deserialize(uint8_t* buf, int buf_size);
+    uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeExtension(BitStreamReader& bitContext);
     uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
@@ -157,11 +156,11 @@ class MPEGGOPHeader : public MPEGHeader
     // int close_gop;
     int close_gop;
     int broken_link;
-    uint8_t* deserialize(uint8_t* buf, int buf_size);
+    uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint32_t serialize(uint8_t* buffer);
 };
 
-enum PictureCodingType
+enum class PictureCodingType
 {
     PCT_FORBIDDEN,
     PCT_I_FRAME,
@@ -170,13 +169,11 @@ enum PictureCodingType
     PCT_D_FRAME
 };
 
-const static char* frameTypeDescr[5] = {"FORBIDDEN", "I_FRAME", "P_FRAME", "B_FRAME", "D_FRAME"};
-
 class MPEGPictureHeader : public MPEGRawDataHeader
 {
    public:
     uint16_t ref;
-    uint8_t pict_type;
+    PictureCodingType pict_type;
     uint16_t vbv_delay;  // stop before reflecting the frame
 
     // used only for b-frame and p-frames
@@ -224,9 +221,8 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     MPEGPictureHeader(int bufferSize);
     ~MPEGPictureHeader() override{};
 
-    uint8_t* deserialize(uint8_t* buf, int buf_size);
+    uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeCodingExtension(BitStreamReader& bitContext);
-    uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
 
     uint32_t serialize(uint8_t* buffer) override;
     uint32_t getPictureSize();
@@ -236,20 +232,11 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     bool addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader) override;
     void buildHeader();
     void buildCodingExtension();
-    const char* getPictTypeStr() const
-    {
-        if (pict_type < sizeof(frameTypeDescr))
-            return frameTypeDescr[pict_type];
-        else
-            return frameTypeDescr[0];
-    }
 };
 
 class MPEGSliceHeader : public MPEGHeader
 {
    public:
-    int quantiser_scale_code;  // 5 bits
-    int extra_bit_slice;       // == 0
     void deserialize(uint8_t* buf, int buf_size);
 
    private:

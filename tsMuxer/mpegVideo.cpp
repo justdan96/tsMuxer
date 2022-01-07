@@ -11,10 +11,6 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-// static double MPEGSequenceHeader::frame_rates[] = {
-// 0.0, 23.97602397602397, 24.0, 25.0, 29.97002997002997, 30, 50.0, 59.94005994005994, 60.0
-//};
-
 static const double FRAME_RATE_EPS = 3e-5;
 static const int MB_ESCAPE_CODE = -1;
 
@@ -41,8 +37,7 @@ uint32_t MPEGRawDataHeader::serialize(uint8_t* buffer)
     // the buffer includes everything - the pictureHeader as well
     memcpy(buffer, m_data_buffer, m_data_buffer_len);
 
-    uint32_t rez = m_data_buffer_len;
-    return rez;
+    return m_data_buffer_len;
 }
 
 bool MPEGRawDataHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader)
@@ -59,14 +54,38 @@ bool MPEGRawDataHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded
 
 // --------------------- MPEGSequenceHeader --------------------
 
-MPEGSequenceHeader::MPEGSequenceHeader(int bufferSize) : MPEGRawDataHeader(bufferSize)
+MPEGSequenceHeader::MPEGSequenceHeader(int bufferSize)
+    : MPEGRawDataHeader(bufferSize),
+      aspect_ratio_info(0),
+      bit_rate(0),
+      bit_rate_ext(0),
+      chroma_format(0),
+      color_primaries(0),
+      constParameterFlag(0),
+      frame_rate_index(0),
+      height(0),
+      horiz_size_ext(0),
+      intra_matrix(),
+      load_intra_matrix(false),
+      load_non_intra_matrix(false),
+      low_delay(0),
+      matrix_coefficients(0),
+      non_intra_matrix(),
+      pan_scan_height(0),
+      pan_scan_width(0),
+      rc_buffer_size(0),
+      transfer_characteristics(0),
+      vbv_buffer_size(0),
+      vert_size_ext(0),
+      video_format(0),
+      width(0)
 {
     progressive_sequence = false;
     profile = -1;
     level = -1;
 }
 
-uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
+uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int64_t buf_size)
 {
     BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
@@ -91,16 +110,16 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
         return 0;
 
     rc_buffer_size = bitReader.getBits(10) * 1024 * 16;
-    bitReader.skipBits(1);  // constrained_parameter_flag
+    bitReader.skipBit();  // constrained_parameter_flag
 
     /* get matrix */
     load_intra_matrix = bitReader.getBit() != 0;
     if (load_intra_matrix)
     {
-        for (int i = 0; i < 64; i++)
+        for (auto& i : intra_matrix)
         {
-            intra_matrix[i] = bitReader.getBits(8);
-            if (intra_matrix[i] == 0)
+            i = bitReader.getBits(8);
+            if (i == 0)
             {
                 LTRACE(LT_ERROR, 1, "mpeg sequence header: intra matrix damaged");
                 return 0;
@@ -111,10 +130,10 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
     load_non_intra_matrix = bitReader.getBit() != 0;
     if (load_non_intra_matrix)
     {
-        for (int i = 0; i < 64; i++)
+        for (auto& i : non_intra_matrix)
         {
-            non_intra_matrix[i] = bitReader.getBits(8);
-            if (non_intra_matrix[i] == 0)
+            i = bitReader.getBits(8);
+            if (i == 0)
             {
                 LTRACE(LT_ERROR, 1, "mpeg sequence header: non-intra matrix damaged");
                 return 0;
@@ -127,11 +146,7 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int buf_size)
 
 uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
 {
-    // MpegEncContext *s= &s1->mpeg_enc_ctx;
-    // int horiz_size_ext, vert_size_ext;
-    // int bit_rate_ext;
-
-    bitReader.skipBits(1); /* profil and level esc*/
+    bitReader.skipBit(); /* profile and level esc*/
     profile = bitReader.getBits(3);
     level = bitReader.getBits(4);
 
@@ -154,14 +169,6 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
     frame_rate_ext.num = bitReader.getBits(2) + 1;
     frame_rate_ext.den = bitReader.getBits(5) + 1;
 
-    /*
-s->codec_id= s->avctx->codec_id= CODEC_ID_MPEG2VIDEO;
-s->avctx->sub_id = 2; // indicates mpeg2 found
-
-if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-    av_log(s->avctx, AV_LOG_DEBUG, "profile: %d, level: %d vbv buffer: %d, bitrate:%d\n",
-           s->avctx->profile, s->avctx->level, s->avctx->rc_buffer_size, s->bit_rate);
-    */
     // return bitContext.buffer_ptr;
     return skipProcessedBytes(bitReader);
 }
@@ -169,68 +176,24 @@ if(s->avctx->debug & FF_DEBUG_PICT_INFO)
 uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(BitStreamReader& bitReader)
 {
     return (uint8_t*)bitReader.getBuffer();
-
-    /*
-if (get_bits1(&s->gb)) {
-    for(i=0;i<64;i++) {
-        v = get_bits(&s->gb, 8);
-        j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
-        s->intra_matrix[j] = v;
-        s->chroma_intra_matrix[j] = v;
-    }
-}
-if (get_bits1(&s->gb)) {
-    for(i=0;i<64;i++) {
-        v = get_bits(&s->gb, 8);
-        j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
-        s->inter_matrix[j] = v;
-        s->chroma_inter_matrix[j] = v;
-    }
-}
-if (get_bits1(&s->gb)) {
-    for(i=0;i<64;i++) {
-        v = get_bits(&s->gb, 8);
-        j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
-        s->chroma_intra_matrix[j] = v;
-    }
-}
-if (get_bits1(&s->gb)) {
-    for(i=0;i<64;i++) {
-        v = get_bits(&s->gb, 8);
-        j= s->dsp.idct_permutation[ ff_zigzag_direct[i] ];
-        s->chroma_inter_matrix[j] = v;
-    }
-}
-    */
 }
 
 uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitReader)
 {
     // MpegEncContext *s= &s1->mpeg_enc_ctx;
-    int color_description, w, h;
-
     video_format = bitReader.getBits(3); /* video format */
 
-    color_description = bitReader.getBit();
-    if (color_description)
+    if (bitReader.getBit())  // color_description
     {
         color_primaries = bitReader.getBits(8);          /* color primaries */
         transfer_characteristics = bitReader.getBits(8); /* transfer_characteristics */
         matrix_coefficients = bitReader.getBits(8);      /* matrix_coefficients */
     }
 
-    w = bitReader.getBits(14);
-    bitReader.skipBits(1);  // marker
-    h = bitReader.getBits(14);
-    bitReader.skipBits(1);  // marker
-
-    pan_scan_width = 16 * w;
-    pan_scan_height = 16 * h;
-
-    /*
-if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-    av_log(s->avctx, AV_LOG_DEBUG, "sde w:%d, h:%d\n", w, h);
-    */
+    pan_scan_width = bitReader.getBits(14) << 4;
+    bitReader.skipBit();  // marker
+    pan_scan_height = bitReader.getBits(14) << 4;
+    bitReader.skipBit();  // marker
 
     // return bitContext.buffer_ptr;
     return skipProcessedBytes(bitReader);
@@ -287,7 +250,6 @@ double MPEGSequenceHeader::getFrameRate()
 
 void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
 {
-    // return; // todo delete this!!!
     for (int i = 1; i < sizeof(frame_rates) / sizeof(double); i++)
         if (std::abs(frame_rates[i] - fps) < FRAME_RATE_EPS)
         {
@@ -301,12 +263,11 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
 
 void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 {
-    // return; // todo delete this!!!
     buff[3] = (buff[3] & 0x0f) + ((int)ar << 4);
 }
 
 // --------------- gop header ------------------
-uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int buf_size)
+uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int64_t buf_size)
 {
     BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
@@ -325,26 +286,18 @@ uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int buf_size)
       are missing (open gop)*/
     broken_link = bitReader.getBit();
 
-    /*
-if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-    av_log(s->avctx, AV_LOG_DEBUG, "GOP (%2d:%02d:%02d.[%02d]) broken_link=%d\n",
-        time_code_hours, time_code_minutes, time_code_seconds,
-        time_code_pictures, broken_link);
-    */
     return skipProcessedBytes(bitReader);
 }
 
 uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
 {
     BitStreamWriter bitWriter{};
-    // init_bitWriter.putBits(buffer, 8*8); // 8*8 maximum gop header buffer size at bits
     bitWriter.setBuffer(buffer, buffer + 8);
     bitWriter.putBits(1, drop_frame_flag);
 
     bitWriter.putBits(5, time_code_hours);
     bitWriter.putBits(6, time_code_minutes);
-    // skip_bits1(&pBitContext);//marker bit
-    bitWriter.putBits(1, 1);
+    bitWriter.putBits(1, 1);  // marker bit
     bitWriter.putBits(6, time_code_seconds);
     bitWriter.putBits(6, time_code_pictures);
 
@@ -354,7 +307,6 @@ uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
   are missing (open gop)*/
     bitWriter.putBits(1, broken_link);
     bitWriter.flushBits();
-    // return ((bitWriter.getBitsCount() | 7) + 1) >> 3;
     uint32_t bitCnt = bitWriter.getBitsCount();
     return (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
@@ -362,7 +314,35 @@ uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
 // ----------------- picture headers -----------
 
 MPEGPictureHeader::MPEGPictureHeader(int bufferSize)
-    : MPEGRawDataHeader(bufferSize), m_headerSize(0), m_picture_data_len(0)
+    : MPEGRawDataHeader(bufferSize),
+      m_headerSize(0),
+      m_picture_data_len(0),
+      alternate_scan(0),
+      bitReader(),
+      burst_amplitude(0),
+      chroma_420_type(0),
+      composite_display_flag(0),
+      concealment_motion_vectors(0),
+      extra_bit(0),
+      f_code(0),
+      field_sequence(0),
+      frame_pred_frame_dct(0),
+      full_pel(),
+      horizontal_offset(0),
+      intra_dc_precision(0),
+      intra_vlc_format(0),
+      mpeg_f_code(),
+      pict_type(PictureCodingType::PCT_FORBIDDEN),
+      picture_structure(0),
+      progressive_frame(0),
+      q_scale_type(0),
+      ref(0),
+      sub_carrier(0),
+      sub_carrier_phase(0),
+      top_field_first(0),
+      v_axis(0),
+      vbv_delay(0),
+      vertical_offset(0)
 {
     repeat_first_field = 0;
     repeat_first_field_bitpos = 0;
@@ -372,28 +352,26 @@ MPEGPictureHeader::MPEGPictureHeader(int bufferSize)
 void MPEGPictureHeader::buildHeader()
 {
     BitStreamWriter bitWriter{};
-    // init_bitWriter.putBits(m_data_buffer, m_max_data_len*8);
     bitWriter.setBuffer(m_data_buffer, m_data_buffer + m_max_data_len);
 
     bitWriter.putBits(16, 0);
     bitWriter.putBits(16, PICTURE_START_CODE);
 
     bitWriter.putBits(10, ref);
-    bitWriter.putBits(3, pict_type);
+    bitWriter.putBits(3, (int)pict_type);
     bitWriter.putBits(16, vbv_delay);
 
-    if (pict_type == PCT_P_FRAME || pict_type == PCT_B_FRAME)
+    if (pict_type == PictureCodingType::PCT_P_FRAME || pict_type == PictureCodingType::PCT_B_FRAME)
     {
         bitWriter.putBits(1, full_pel[0]);
         bitWriter.putBits(3, mpeg_f_code[0][0]);
     }
-    if (pict_type == PCT_B_FRAME)
+    if (pict_type == PictureCodingType::PCT_B_FRAME)
     {
         bitWriter.putBits(1, full_pel[1]);
         bitWriter.putBits(3, mpeg_f_code[1][0]);
     }
     bitWriter.flushBits();
-    // m_data_buffer_len =  ((bitWriter.getBitsCount() | 7) + 1) >> 3;
     uint32_t bitCnt = bitWriter.getBitsCount();
     m_data_buffer_len = (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
@@ -401,7 +379,6 @@ void MPEGPictureHeader::buildHeader()
 void MPEGPictureHeader::buildCodingExtension()
 {
     BitStreamWriter bitWriter{};
-    // init_bitWriter.putBits(m_data_buffer + m_data_buffer_len, (m_max_data_len - m_data_buffer_len)*8);
     uint8_t* bufPtr = m_data_buffer + m_data_buffer_len;
     bitWriter.setBuffer(bufPtr, bufPtr + m_max_data_len - m_data_buffer_len);
 
@@ -410,8 +387,8 @@ void MPEGPictureHeader::buildCodingExtension()
 
     bitWriter.putBits(4, PICTURE_CODING_EXT);
 
-    bitWriter.putBits(4, mpeg_f_code[0][1]);
     bitWriter.putBits(4, mpeg_f_code[0][0]);
+    bitWriter.putBits(4, mpeg_f_code[0][1]);
     bitWriter.putBits(4, mpeg_f_code[1][0]);
     bitWriter.putBits(4, mpeg_f_code[1][1]);
 
@@ -442,43 +419,37 @@ void MPEGPictureHeader::buildCodingExtension()
     m_data_buffer_len += (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
 
-uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, int buf_size)
+uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, int64_t buf_size)
 {
     bitReader.setBuffer(buf, buf + buf_size);
 
     ref = bitReader.getBits(10); /* temporal ref */
-    pict_type = bitReader.getBits(3);
-    if (pict_type == 0 || pict_type > 3)
+    pict_type = (PictureCodingType)bitReader.getBits(3);
+    if (pict_type == PictureCodingType::PCT_FORBIDDEN || pict_type == PictureCodingType::PCT_D_FRAME)
         return 0;
 
     vbv_delay = bitReader.getBits(16);
 
-    if (pict_type == PCT_P_FRAME || pict_type == PCT_B_FRAME)
+    if (pict_type == PictureCodingType::PCT_P_FRAME || pict_type == PictureCodingType::PCT_B_FRAME)
     {
         full_pel[0] = bitReader.getBit();
         f_code = bitReader.getBits(3);
-        // if (f_code == 0 && avctx->error_resilience >= FF_ER_COMPLIANT)
-        //    return 0;
         mpeg_f_code[0][0] = f_code;
         mpeg_f_code[0][1] = f_code;
     }
-    if (pict_type == PCT_B_FRAME)
+    if (pict_type == PictureCodingType::PCT_B_FRAME)
     {
         full_pel[1] = bitReader.getBit();
         f_code = bitReader.getBits(3);
-        // if (f_code == 0 && avctx->error_resilience >= FF_ER_COMPLIANT)
-        //    return -1;
         mpeg_f_code[1][0] = f_code;
         mpeg_f_code[1][1] = f_code;
     }
-    // return bitContext.buffer_ptr;
     uint8_t* new_buff = skipProcessedBytes(bitReader);
     m_headerSize = (int)(new_buff - buf);
     return new_buff;
 }
 
 // static void mpeg_decode_picture_coding_extension(MpegEncContext *s)
-// int gg = 0;
 uint8_t* MPEGPictureHeader::deserializeCodingExtension(BitStreamReader& bitReader)
 {
     full_pel[0] = full_pel[1] = 0;
@@ -501,10 +472,8 @@ uint8_t* MPEGPictureHeader::deserializeCodingExtension(BitStreamReader& bitReade
     repeat_first_field = bitReader.getBit();
     chroma_420_type = bitReader.getBit();
     progressive_frame = bitReader.getBit();
-
     composite_display_flag = bitReader.getBit();
-    // if (progressive_frame == 0)
-    //	gg++;
+
     if (composite_display_flag)
     {
         v_axis = bitReader.getBit();
@@ -514,64 +483,6 @@ uint8_t* MPEGPictureHeader::deserializeCodingExtension(BitStreamReader& bitReade
         sub_carrier_phase = bitReader.getBits(8);
     }
 
-    /*
-if(s->picture_structure == PICT_FRAME){
-    s->first_field=0;
-    s->v_edge_pos= 16*s->mb_height;
-}else{
-    s->first_field ^= 1;
-    s->v_edge_pos=  8*s->mb_height;
-    memset(s->mbskip_table, 0, s->mb_stride*s->mb_height);
-}
-
-if(s->alternate_scan){
-    ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_alternate_vertical_scan);
-    ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_alternate_vertical_scan);
-}else{
-    ff_init_scantable(s->dsp.idct_permutation, &s->inter_scantable  , ff_zigzag_direct);
-    ff_init_scantable(s->dsp.idct_permutation, &s->intra_scantable  , ff_zigzag_direct);
-}
-
-
-    //return bitContext.buffer_ptr;
-    return skipProcessedBytes(bitReader);
-}
-uint8_t* MPEGPictureHeader::deserializeDisplayExtension(BitStreamReader& bitReader)
-{
-    horizontal_offset = bitReader.getBits(16);
-    vertical_offset = bitReader.getBits(16);
-//MpegEncContext *s= &s1->mpeg_enc_ctx;
-
-int i,nofco;
-nofco = 1;
-if(s->progressive_sequence){
-    if(s->repeat_first_field){
-        nofco++;
-        if(s->top_field_first)
-            nofco++;
-    }
-}else{
-    if(s->picture_structure == PICT_FRAME){
-        nofco++;
-        if(s->repeat_first_field)
-            nofco++;
-    }
-}
-for(i=0; i<nofco; i++){
-    s1->pan_scan.position[i][0]= get_sbits(&s->gb, 16);
-    skip_bits(&s->gb, 1); //marker
-    s1->pan_scan.position[i][1]= get_sbits(&s->gb, 16);
-    skip_bits(&s->gb, 1); //marker
-}
-
-if(s->avctx->debug & FF_DEBUG_PICT_INFO)
-    av_log(s->avctx, AV_LOG_DEBUG, "pde (%d,%d) (%d,%d) (%d,%d)\n",
-        s1->pan_scan.position[0][0], s1->pan_scan.position[0][1],
-        s1->pan_scan.position[1][0], s1->pan_scan.position[1][1],
-        s1->pan_scan.position[2][0], s1->pan_scan.position[2][1]
-    );
-    */
-    // return bitContext.buffer_ptr;
     return skipProcessedBytes(bitReader);
 }
 
@@ -623,14 +534,12 @@ void MPEGSliceHeader::deserialize(uint8_t* buf, int buf_size)
 {
     BitStreamReader reader{};
     reader.setBuffer(buf, buf + buf_size);
-    quantiser_scale_code = reader.getBits(5);
+    reader.skipBits(5);  // quantiser_scale_code
     if (reader.getBit())
     {
-        int intra_slice_flag = reader.getBit();
-        int intra_slice = reader.getBit();
-        reader.skipBits(7);  // reserved_bits
+        reader.skipBits(9);  // intra_slice_flag, intra_slice, reserved_bits
     }
-    int extra_bit_slice = reader.getBit();
+    reader.skipBit();  // extra_bit_slice
     macroblocks(reader);
 }
 
@@ -649,7 +558,7 @@ void MPEGSliceHeader::macroblocks(BitStreamReader& reader)
 int MPEGSliceHeader::readMacroblockAddressIncrement(BitStreamReader& reader)
 {
     int cnt = 0;
-    for (; reader.getBits(1) == 0; cnt++)
+    for (; reader.getBit() == 0; cnt++)
         ;
     if (cnt > INT_BIT)
         THROW_BITSTREAM_ERR;
@@ -702,9 +611,3 @@ int MPEGSliceHeader::readMacroblockAddressIncrement(BitStreamReader& reader)
         return 0;
     }
 }
-
-/*
-void MPEGSliceHeader::macroblock_modes(BitStreamReader& reader)
-{
-}
-*/
