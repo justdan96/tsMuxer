@@ -27,8 +27,8 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     int64_t getTrackDelay(uint32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
-            return (m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS)) / 90.0 +
-                   0.5;  // convert to ms
+            return (int64_t)((m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS)) / 90.0 +
+                             0.5);  // convert to ms
         else
             return 0;
     }
@@ -40,13 +40,10 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     uint32_t m_lastPesLen;
     uint32_t m_lastPID;
     const BufferedReaderManager& m_readManager;
-    int m_readCnt;
     uint64_t m_dataProcessed;
-    bool m_notificated;
     std::string m_streamName;
     int m_readerID;
     int m_lastReadRez;
-    // BufferedReader* m_bufferedReader;
     AbstractReader* m_bufferedReader;
     uint8_t m_psm_es_type[256];
 
@@ -59,7 +56,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
    private:
     bool isVideoPID(uint32_t pid);
     int mpegps_psm_parse(uint8_t* buff, uint8_t* end);
-    long processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
+    uint8_t processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
 };
 
 #endif

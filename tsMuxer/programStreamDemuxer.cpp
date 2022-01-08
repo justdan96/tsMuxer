@@ -47,9 +47,7 @@ void ProgramStreamDemuxer::openFile(const std::string& streamName)
     // BufferedFileReader* fileReader = dynamic_cast <BufferedFileReader*> (m_bufferedReader);
     if (!m_bufferedReader->openStream(m_readerID, m_streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName);
-    m_readCnt = 0;
     m_dataProcessed = 0;
-    m_notificated = false;
 }
 
 int ProgramStreamDemuxer::mpegps_psm_parse(uint8_t* buff, uint8_t* end)
@@ -88,38 +86,18 @@ int ProgramStreamDemuxer::mpegps_psm_parse(uint8_t* buff, uint8_t* end)
     return 6 + psm_length;
 }
 
-long ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader)
+uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader)
 {
     afterPesHeader = 0;
     uint32_t pstart_code = 0;
-    long startcode = 0;
-    // c, flags, header_len;
-    // int pes_ext, ext2_len, id_ext, skip;
-    // int64_t pts, dts;
+    uint8_t startcode = 0;
 
     PESPacket* pesPacket = (PESPacket*)buff;
     startcode = buff[3];
 
-    if (startcode == PACK_START_CODE)
-        return 0;
-    if (startcode == SYSTEM_HEADER_START_CODE)
-        return 0;
-    if (startcode == PADDING_STREAM || startcode == PES_PRIVATE_DATA2)
-    {
-        // skip them
-        // len = get_be16(&s->pb);
-        // url_fskip(&s->pb, len);
-        return 0;
-    }
-    if (startcode == PES_PROGRAM_STREAM_MAP)
-    {
-        // mpegps_psm_parse(m, &s->pb);
-        return 0;
-    }
-
-    /* find matching stream */
-    if (!((startcode >= 0xc0 && startcode <= 0xdf) || (startcode >= 0xe0 && startcode <= 0xef) || (startcode == 0xbd) ||
-          (startcode == 0xfd)))
+    // find matching stream
+    if (!((startcode >= 0xc0 && startcode <= 0xef) /* audio or video */ || (startcode == PES_PRIVATE_DATA1) ||
+          (startcode == PES_VC1_ID)))
         return 0;
 
     uint8_t* curBuf = buff + 9;
@@ -172,9 +150,6 @@ long ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPes
 
             MemoryBlock& waveHeader = m_lpcmWaveHeader[startcode - 0xa0];
 
-            // header[0] emphasis (1), muse(1), reserved(1), frame number(5)
-            // header[1] quant (2), freq(2), reserved(1), channels(3)
-            // header[2] dynamic range control (0x80 = off)
             int bitdepth = 16 + (curBuf[4] >> 6 & 3) * 4;
 
             if (waveHeader.isEmpty())
@@ -184,9 +159,6 @@ long ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPes
                 wave_format::buildWaveHeader(waveHeader, samplerate, channels, channels >= 6, bitdepth);
             }
 
-            // uint16_t dataLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - 7;
-            // AV_WB16(curBuf+1, dataLen);
-            // afterPesHeader++;
             afterPesHeader += 6;
 
             uint8_t* payloadData = curBuf + afterPesHeader - 1;
@@ -197,12 +169,6 @@ long ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPes
         {
             // audio: skip header
             afterPesHeader += 3;
-            /*
-if (startcode >= 0xb0 && startcode <= 0xbf) {
-                    // MLP/TrueHD audio has a 4-byte header
-                    afterPesHeader++;
-}
-            */
         }
     }
 
@@ -225,13 +191,16 @@ bool ProgramStreamDemuxer::isVideoPID(uint32_t pid)
 {
     return pid >= 0x55 && pid <= 0x5f ||  // vc1
            pid >= 0xe0 && pid <= 0xef ||  // mpeg video
-           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H264 || m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_MVC;
+           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H264 ||
+           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_MVC ||
+           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H265 ||
+           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H266;
 }
 
 int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
 {
     discardSize = 0;
-    uint32_t readedBytes;
+    uint32_t readedBytes = 0;
     int readRez = 0;
     uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez);  // blocked read mode
     if (readRez == BufferedFileReader::DATA_NOT_READY)
@@ -287,7 +256,6 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
     curBuf = MPEGHeader::findNextMarker(curBuf, end);
     discardSize += curBuf - prevBuf;
 
-    // while (curBuf <= end - TS_FRAME_SIZE)
     while (curBuf <= end - 9)
     {
         PESPacket* pesPacket = (PESPacket*)curBuf;
@@ -312,20 +280,6 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                         m_firstPtsTime[startcode] = curPts;
                     else if (curPts < m_firstPtsTime[startcode])
                         m_firstPtsTime[startcode] = curPts;
-
-                    /*
-                    if (startcode == 85)
-                    {
-                            uint64_t tmpDts = ((pesPacket->flagsLo & 0xc0) == 0xc0) ? pesPacket->getDts() :
-                                    pesPacket->getPts();
-                            int32_t dtsDif = (int64_t)tmpDts - prevDts;
-                            uint8_t* afterPesData = curBuf + pesPacket->getHeaderLength();
-                            LTRACE(LT_INFO, 2, "Cnt=" << ++ggCnt << "  PTS: " << pesPacket->getPts() <<
-                                    " DTS:" << tmpDts << "  dtsDif:" << dtsDif <<
-                                    " after pes 0x" << int32ToStr(afterPesData[0],16) << int32ToStr(afterPesData[1],16)
-                    << int32ToStr(afterPesData[2],16) << int32ToStr(afterPesData[3],16)); prevDts = tmpDts;
-                    }
-                    */
                 }
 
                 StreamData& vect = demuxedData[startcode];
@@ -333,13 +287,13 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 int idx = startcode - 0xa0;
                 if (idx >= 0 && idx <= 15 && !m_lpcpHeaderAdded[idx])
                 {
-                    vect.append(m_lpcmWaveHeader[idx].data(), m_lpcmWaveHeader[idx].size());
+                    vect.append(m_lpcmWaveHeader[idx].data(), (int)m_lpcmWaveHeader[idx].size());
                     m_lpcpHeaderAdded[idx] = true;
                 }
 
                 uint8_t* payloadData = curBuf + pesPacket->getHeaderLength() + afterPesHeader;
                 int pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
-                int copyLen = FFMIN(pesPayloadLen, end - payloadData);
+                int copyLen = FFMIN(pesPayloadLen, (int)(end - payloadData));
                 vect.append(payloadData, copyLen);
                 m_dataProcessed += copyLen;
                 discardSize += payloadData - curBuf;
@@ -358,7 +312,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 {
                     discardSize += end - curBuf;
                     m_lastPID = 0;
-                    m_lastPesLen = tmpLen - (end - curBuf);
+                    m_lastPesLen = tmpLen - (int)(end - curBuf);
                     return 0;
                 }
                 curBuf += tmpLen;
@@ -374,7 +328,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
             {
                 discardSize += end - curBuf;
                 m_lastPID = 0;
-                m_lastPesLen = psmLen - (end - curBuf);
+                m_lastPesLen = psmLen - (int)(end - curBuf);
                 return 0;
             }
             discardSize += psmLen;
@@ -382,7 +336,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
         }
         else
         {
-            uint32_t rest = FFMIN(end - curBuf, 4);
+            int64_t rest = FFMIN(end - curBuf, 4);
             curBuf += rest;
             discardSize += rest;
         }
@@ -390,7 +344,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
         curBuf = MPEGHeader::findNextMarker(curBuf, end);
         discardSize += curBuf - prevBuf;
     }
-    m_tmpBufferLen = end - curBuf;
+    m_tmpBufferLen = (uint32_t)(end - curBuf);
     if (m_tmpBufferLen > 0)
         memmove(m_tmpBuffer, curBuf, end - curBuf);
     return 0;
