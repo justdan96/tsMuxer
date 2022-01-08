@@ -55,7 +55,7 @@ class TSMuxer : public AbstractMuxer
     std::vector<int64_t> getFirstPts();
     void alignPTS(TSMuxer* otherMuxer);
     std::vector<int64_t> getLastPts();
-    const std::vector<int64_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
+    const std::vector<uint32_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
     size_t splitFileCnt() const { return m_fileNames.size(); }
     void setSplitDuration(int64_t value) { m_splitDuration = value; }
     void setSplitSize(int64_t value) { m_splitSize = value; }
@@ -194,7 +194,7 @@ class TSMuxer : public AbstractMuxer
     int64_t m_lastMuxedDts;
     MemoryBlock m_pesData;
     int m_pesPID;
-    std::vector<int64_t> m_muxedPacketCnt;
+    std::vector<uint32_t> m_muxedPacketCnt;
     bool m_pesIFrame;
     bool m_pesSpsPps;
     bool m_computeMuxStats;

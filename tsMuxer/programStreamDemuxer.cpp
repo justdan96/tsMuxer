@@ -214,7 +214,7 @@ void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList
     for (int i = 0x20; i < 0xff; i++)
     {
         if (i >= 0xa0 && i <= 0xaf)
-            trackList.insert(std::make_pair(i, TrackInfo(STREAM_TYPE_AUDIO_LPCM, "", 0)));  // set track hint
+            trackList.insert(std::make_pair(i, TrackInfo((int)StreamType::AUDIO_LPCM, "", 0)));  // set track hint
         else
             trackList.insert(std::make_pair(i, TrackInfo(0, "", 0)));  // autodetect
     }
@@ -225,11 +225,8 @@ bool ProgramStreamDemuxer::isVideoPID(uint32_t pid)
 {
     return pid >= 0x55 && pid <= 0x5f ||  // vc1
            pid >= 0xe0 && pid <= 0xef ||  // mpeg video
-           m_psm_es_type[pid & 0xff] == STREAM_TYPE_VIDEO_H264 || m_psm_es_type[pid & 0xff] == STREAM_TYPE_VIDEO_MVC;
+           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H264 || m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_MVC;
 }
-
-// static uint64_t prevDts = 0;
-// static int ggCnt = 0;
 
 int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
 {

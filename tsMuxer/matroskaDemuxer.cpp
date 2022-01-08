@@ -2538,7 +2538,7 @@ int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
     else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_ACM))
         return TRACKTYPE_WAV;
     else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SUBTITLE_PGS))
-        return STREAM_TYPE_SUB_PGS;
+        return TRACKTYPE_PGS;
     else
         return 0;
 }

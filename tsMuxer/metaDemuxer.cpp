@@ -354,7 +354,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             }
 
             MPLSStreamInfo streamInfo = mplsInfo.getStreamByPID(pid);
-            if (streamInfo.stream_coding_type == 0x90 && streamInfo.isSSPG)
+            if (streamInfo.stream_coding_type == StreamType::SUB_PGS && streamInfo.isSSPG)
             {
                 // add refs to addition tracks for stereo subtitles
                 leftEyeSubStreamIdx = addPGSubStream(codec, unquotedStreamName, addParams, streamInfo.leftEye);

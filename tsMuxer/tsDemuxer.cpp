@@ -48,11 +48,7 @@ TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* strea
     memset(m_acceptedPidCache, 0, sizeof(m_acceptedPidCache));
 }
 
-bool TSDemuxer::mvcContinueExpected() const
-{
-    // return  m_pmt.video_type == STREAM_TYPE_VIDEO_MVC && strEndWith(m_streamNameLow, "ssif");
-    return !m_nonMVCVideoFound && strEndWith(m_streamNameLow, "ssif");
-}
+bool TSDemuxer::mvcContinueExpected() const { return !m_nonMVCVideoFound && strEndWith(m_streamNameLow, "ssif"); }
 
 void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 {
@@ -123,12 +119,12 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                     if (m_pmt.isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
-                        if (m_pmt.video_type != STREAM_TYPE_VIDEO_MVC)
+                        if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
                             m_nonMVCVideoFound = true;
                         pmtBufferLen = 0;
                         for (PIDListMap::const_iterator itr = m_pmt.pidList.begin(); itr != m_pmt.pidList.end(); ++itr)
                             trackList.insert(std::make_pair(
-                                itr->second.m_pid, TrackInfo(itr->second.m_streamType, itr->second.m_lang, 0)));
+                                itr->second.m_pid, TrackInfo((int)itr->second.m_streamType, itr->second.m_lang, 0)));
                         nonProcPMTPid.erase(pid);
                         if (nonProcPMTPid.size() == 0 && !mvcContinueExpected())
                         {  // all pmt pids processed
@@ -161,12 +157,22 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 // static int64_t prevPCR = -1;
 // static int pcrFrames = 0;
 
-bool TSDemuxer::isVideoPID(uint32_t streamType)
+bool TSDemuxer::isVideoPID(StreamType streamType)
 {
-    return streamType == STREAM_TYPE_VIDEO_MPEG1 || streamType == STREAM_TYPE_VIDEO_MPEG2 ||
-           streamType == STREAM_TYPE_VIDEO_MPEG4 || streamType == STREAM_TYPE_VIDEO_H264 ||
-           streamType == STREAM_TYPE_VIDEO_MVC || streamType == STREAM_TYPE_VIDEO_VC1 ||
-           streamType == STREAM_TYPE_VIDEO_H265;
+    switch (streamType)
+    {
+    case StreamType::VIDEO_MPEG1:
+    case StreamType::VIDEO_MPEG2:
+    case StreamType::VIDEO_MPEG4:
+    case StreamType::VIDEO_H264:
+    case StreamType::VIDEO_MVC:
+    case StreamType::VIDEO_VC1:
+    case StreamType::VIDEO_H265:
+    case StreamType::VIDEO_H266:
+        return true;
+    default:
+        return false;
+    }
 }
 
 // static uint64_t prevDts = 0;
@@ -294,7 +300,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                     if (m_pmt.isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
-                        if (m_pmt.video_type != STREAM_TYPE_VIDEO_MVC)
+                        if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
                             m_nonMVCVideoFound = true;
                         pmtBufferLen = 0;
                     }
@@ -406,7 +412,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
             }
 
             if (streamInfo != m_pmt.pidList.end() &&
-                streamInfo->second.m_streamType != STREAM_TYPE_SUB_PGS)  // demux PGS with PES headers
+                streamInfo->second.m_streamType != StreamType::SUB_PGS)  // demux PGS with PES headers
                 frameData += pesPacket->getHeaderLength();
             else
             {

@@ -294,22 +294,22 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         H264StreamReader* h264Reader = (H264StreamReader*)codecReader;
         // h264Reader->setH264SPSCont(m_h264SPSCont);
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_H264, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_H264, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MPEG4/ISO/MVC")
     {
         H264StreamReader* h264Reader = (H264StreamReader*)codecReader;
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_MVC, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_MVC, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MPEGH/ISO/HEVC")
     {
-        int stream_type = STREAM_TYPE_VIDEO_H265;
+        StreamType stream_type = StreamType::VIDEO_H265;
         // For non-bluray, second Dolby Vision track must be stream_type 06 = private data
         if (!m_bluRayMode && tsStreamIndex == 0x1015 && (V3_flags & NON_DV_TRACK))
-            stream_type = STREAM_TYPE_PRIVATE_DATA;
+            stream_type = StreamType::PRIVATE_DATA;
         m_pmt.pidList.insert(std::make_pair(
             tsStreamIndex,
             PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary)));
@@ -317,53 +317,53 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     else if (codecName == "V_MPEGI/ISO/VVC")
     {
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_H266, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_H266, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MS/VFW/WVC1")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_VC1, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_VC1, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "V_MPEG-2")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_VIDEO_MPEG2, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_MPEG2, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "A_AAC")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_AAC, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_AAC, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     else if (codecName == "S_SUP")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
                                                         codecReader, lang, isSecondary)));
     else if (codecName == "S_HDMV/PGS")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
                                                         codecReader, lang, isSecondary)));
     else if (codecName == "S_TEXT/UTF8")
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
                                                         codecReader, lang, isSecondary)));
     else if (codecName == "A_AC3")
     {
         AC3StreamReader* ac3Reader = (AC3StreamReader*)codecReader;
         ac3Reader->setNewStyleAudioPES(m_useNewStyleAudioPES);
 
-        int streamType = 0;
+        StreamType streamType = StreamType::RESERVED;
 
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
-            streamType = STREAM_TYPE_AUDIO_EAC3_TRUE_HD;
+            streamType = StreamType::AUDIO_EAC3_TRUE_HD;
         else if (ac3Reader->isEAC3() && !ac3Reader->getDownconvertToAC3())
         {
             if (ac3Reader->isSecondary())
-                streamType = STREAM_TYPE_AUDIO_EAC3_SECONDARY;
+                streamType = StreamType::AUDIO_EAC3_SECONDARY;
             else if (ac3Reader->isAC3())
-                streamType = STREAM_TYPE_AUDIO_EAC3;
+                streamType = StreamType::AUDIO_EAC3;
             else
-                streamType = STREAM_TYPE_AUDIO_EAC3_ATSC;
+                streamType = StreamType::AUDIO_EAC3_ATSC;
         }
         else
-            streamType = STREAM_TYPE_AUDIO_AC3;
+            streamType = StreamType::AUDIO_AC3;
 
         m_pmt.pidList.insert(std::make_pair(
             tsStreamIndex,
@@ -374,38 +374,38 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         MpegAudioStreamReader* mp3Reader = (MpegAudioStreamReader*)codecReader;
         if (mp3Reader->getLayer() >= 2)
             m_pmt.pidList.insert(
-                std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_MPEG2, tsStreamIndex, descrBuffer,
+                std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_MPEG2, tsStreamIndex, descrBuffer,
                                                             descriptorLen, codecReader, lang, isSecondary)));
         else
             m_pmt.pidList.insert(
-                std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_MPEG1, tsStreamIndex, descrBuffer,
+                std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_MPEG1, tsStreamIndex, descrBuffer,
                                                             descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "A_LPCM")
     {
         m_pmt.pidList.insert(
-            std::make_pair(tsStreamIndex, PMTStreamInfo(STREAM_TYPE_AUDIO_LPCM, tsStreamIndex, descrBuffer,
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_LPCM, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "A_DTS")
     {
         DTSStreamReader* dtsReader = (DTSStreamReader*)codecReader;
         dtsReader->setNewStyleAudioPES(m_useNewStyleAudioPES);
-        int audioType = 0;
+        StreamType audioType = StreamType::RESERVED;
         if (dtsReader->getDTSHDMode() != DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED &&
             !dtsReader->getDownconvertToDTS())
         {
             // if (dtsReader->getDTSHDMode() == DTSStreamReader::DTS_SUBTYPE_EXPRESS)
             if (dtsReader->isSecondary())
-                audioType = STREAM_TYPE_AUDIO_DTS_HD_SECONDARY;
+                audioType = StreamType::AUDIO_DTS_HD_SECONDARY;
             else if (dtsReader->getDTSHDMode() == DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                audioType = STREAM_TYPE_AUDIO_DTS_HD_MASTER_AUDIO;
+                audioType = StreamType::AUDIO_DTS_HD_MASTER_AUDIO;
             else
-                audioType = STREAM_TYPE_AUDIO_DTS_HD;
+                audioType = StreamType::AUDIO_DTS_HD;
         }
         else
         {
-            audioType = STREAM_TYPE_AUDIO_DTS;
+            audioType = StreamType::AUDIO_DTS;
         }
         m_pmt.pidList.insert(std::make_pair(
             tsStreamIndex,
@@ -1070,8 +1070,6 @@ int TSMuxer::writeTSFrames(int pid, uint8_t* buffer, int64_t len, bool priorityD
 
     uint8_t* curPos = buffer;
     uint8_t* end = buffer + len;
-
-    int streamType = m_pmt.pidList[pid].m_streamType;
 
     bool tsPriority = priorityData;
     StreamInfo& streamInfo = m_streamInfo[pid];

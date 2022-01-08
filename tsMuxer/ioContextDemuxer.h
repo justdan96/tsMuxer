@@ -11,6 +11,8 @@
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"
 
+const static int TRACKTYPE_PCM = 0x080;
+const static int TRACKTYPE_PGS = 0x090;
 const static int TRACKTYPE_SRT = 0x190;
 const static int TRACKTYPE_WAV = 0x180;
 

@@ -11,31 +11,51 @@
 #include "bitStream.h"
 #include "crc32.h"
 #include "h264StreamReader.h"
-//#include "hevc.h"
 #include "math.h"
 #include "mpegStreamReader.h"
 #include "simplePacketizerReader.h"
 #include "tsMuxer.h"
 #include "vodCoreException.h"
-//#include "vvc.h"
 
 using namespace std;
 
-bool isVideoStreamType(int stream_coding_type)
+bool isVideoStreamType(StreamType stream_coding_type)
 {
-    return stream_coding_type == STREAM_TYPE_VIDEO_MPEG2 || stream_coding_type == STREAM_TYPE_VIDEO_H264 ||
-           stream_coding_type == STREAM_TYPE_VIDEO_VC1 || stream_coding_type == STREAM_TYPE_VIDEO_MVC ||
-           stream_coding_type == STREAM_TYPE_VIDEO_H265 || stream_coding_type == STREAM_TYPE_VIDEO_H266;
+    switch (stream_coding_type)
+    {
+    case StreamType::VIDEO_MPEG2:
+    case StreamType::VIDEO_H264:
+    case StreamType::VIDEO_VC1:
+    case StreamType::VIDEO_MVC:
+    case StreamType::VIDEO_H265:
+    case StreamType::VIDEO_H266:
+        return true;
+    default:
+        return false;
+    }
 }
 
-bool isAudioStreamType(int stream_coding_type)
+bool isAudioStreamType(StreamType stream_coding_type)
 {
-    return stream_coding_type == 0x80 || stream_coding_type == 0x81 || stream_coding_type == 0x82 ||
-           stream_coding_type == 0x83 || stream_coding_type == 0x84 || stream_coding_type == 0x85 ||
-           stream_coding_type == 0x86 || stream_coding_type == 0xA1 || stream_coding_type == 0xA2 ||
-
-           stream_coding_type == STREAM_TYPE_AUDIO_AAC || stream_coding_type == STREAM_TYPE_AUDIO_AAC_RAW ||
-           stream_coding_type == STREAM_TYPE_AUDIO_MPEG1 || stream_coding_type == STREAM_TYPE_AUDIO_MPEG2;
+    switch (stream_coding_type)
+    {
+    case StreamType::AUDIO_LPCM:
+    case StreamType::AUDIO_AC3:
+    case StreamType::AUDIO_DTS:
+    case StreamType::AUDIO_EAC3_TRUE_HD:
+    case StreamType::AUDIO_EAC3:
+    case StreamType::AUDIO_DTS_HD:
+    case StreamType::AUDIO_DTS_HD_MASTER_AUDIO:
+    case StreamType::AUDIO_EAC3_SECONDARY:
+    case StreamType::AUDIO_DTS_HD_SECONDARY:
+    case StreamType::AUDIO_AAC:
+    case StreamType::AUDIO_AAC_RAW:
+    case StreamType::AUDIO_MPEG1:
+    case StreamType::AUDIO_MPEG2:
+        return true;
+    default:
+        return false;
+    }
 }
 
 // ------------ PS PACK -------------------
@@ -116,7 +136,7 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, int buf_size)
         transport_stream_id = bitReader.getBits(16);
         bitReader.skipBits(2);  // reserved
         bitReader.getBits(5);   // int version_number
-        bitReader.getBit();   // int current_next_indicator
+        bitReader.getBit();     // int current_next_indicator
 
         bitReader.getBits(8);  // int section_number
         bitReader.getBits(8);  // int last_section_number
@@ -160,7 +180,7 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
     bitWriter.putBits(2, 2);  // indicator
     bitWriter.putBits(2, 3);  // reserved
 
-    unsigned section_length = 9 + pmtPids.size() * 4;
+    unsigned section_length = (unsigned)(9 + pmtPids.size() * 4);
     bitWriter.putBits(12, section_length);
     bitWriter.putBits(16, transport_stream_id);
     bitWriter.putBits(2, 3);  // reserved
@@ -190,8 +210,6 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
 TS_program_map_section::TS_program_map_section()
     : video_pid(0), audio_pid(0), sub_pid(0), pcr_pid(0), program_number(0), casID(0), casPID(0)
 {
-    // av_crc_init(tmpAvCrc, 0, 32, 0x04C11DB7L, sizeof(AVCRC)*257);
-
     video_type = -1;
     audio_type = -1;
 }
@@ -277,7 +295,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
         program_number = bitReader.getBits(16);
         bitReader.skipBits(2);                         // reserved
         bitReader.getBits(5);                          // int version_number
-        int nextIndicator = bitReader.getBit();      // int current_next_indicator
+        int nextIndicator = bitReader.getBit();        // int current_next_indicator
         int sectionNumber = bitReader.getBits(8);      // int section_number
         int lastSectionNumber = bitReader.getBits(8);  // int last_section_number
         bitReader.skipBits(3);                         // reserved
@@ -295,33 +313,35 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
         curPos += program_info_len;
         while (curPos < crcPos)
         {
-            int stream_type = *curPos++;
+            StreamType stream_type = (StreamType)*curPos++;
             int elementary_pid = get16(&curPos) & 0x1fff;
             switch (stream_type)
             {
-            case STREAM_TYPE_VIDEO_MPEG1:
-            case STREAM_TYPE_VIDEO_MPEG2:
-            case STREAM_TYPE_VIDEO_MPEG4:
-            case STREAM_TYPE_VIDEO_H264:
-            case STREAM_TYPE_VIDEO_H265:
-            case STREAM_TYPE_VIDEO_MVC:
-            case STREAM_TYPE_VIDEO_VC1:
+            case StreamType::VIDEO_MPEG1:
+            case StreamType::VIDEO_MPEG2:
+            case StreamType::VIDEO_MPEG4:
+            case StreamType::VIDEO_H264:
+            case StreamType::VIDEO_H265:
+            case StreamType::VIDEO_MVC:
+            case StreamType::VIDEO_VC1:
                 video_pid = elementary_pid;
-                video_type = stream_type;
+                video_type = (int)stream_type;
                 break;
 
-            case STREAM_TYPE_AUDIO_MPEG1:
-            case STREAM_TYPE_AUDIO_MPEG2:
-            case STREAM_TYPE_AUDIO_AAC:
-            case STREAM_TYPE_AUDIO_AC3:
-            case STREAM_TYPE_AUDIO_EAC3:
-            case STREAM_TYPE_AUDIO_EAC3_ATSC:
-            case STREAM_TYPE_AUDIO_DTS:
+            case StreamType::AUDIO_MPEG1:
+            case StreamType::AUDIO_MPEG2:
+            case StreamType::AUDIO_AAC:
+            case StreamType::AUDIO_AC3:
+            case StreamType::AUDIO_EAC3:
+            case StreamType::AUDIO_EAC3_ATSC:
+            case StreamType::AUDIO_DTS:
                 audio_pid = elementary_pid;
-                audio_type = stream_type;
+                audio_type = (int)stream_type;
                 break;
-            case STREAM_TYPE_SUBTITLE_DVB:
+            case StreamType::SUB_DVB:
                 sub_pid = elementary_pid;
+                break;
+            default:
                 break;
             }
             PMTStreamInfo pmtStreamInfo(stream_type, elementary_pid, 0, 0, 0, "", false);
@@ -431,7 +451,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     if (audio_pid)
     {
-        // bitWriter.putBits( 8, 0x04);
         bitWriter.putBits(8, audio_type);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, audio_pid);
@@ -441,7 +460,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     if (sub_pid)
     {
-        bitWriter.putBits(8, STREAM_TYPE_SUBTITLE_DVB);
+        bitWriter.putBits(8, (int)StreamType::SUB_DVB);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, sub_pid);
         bitWriter.putBits(4, 15);  // reserved
@@ -450,10 +469,10 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
-        if (itr->second.m_streamType == 0x90 && !hdmvDescriptors)
+        if (itr->second.m_streamType == StreamType::SUB_PGS && !hdmvDescriptors)
             LTRACE(LT_WARN, 2, "Warning: PGS might not work without HDMV descriptors.");
 
-        bitWriter.putBits(8, itr->second.m_streamType);
+        bitWriter.putBits(8, (int)itr->second.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, itr->second.m_pid);
 
@@ -477,7 +496,6 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     *LengthPos1 = my_htons(0xb000 + bitWriter.getBitsCount() / 8 - beforeCount1 + 4);
     bitWriter.flushBits();
 
-    // uint32_t crc = av_crc(tmpAvCrc, 0xffffffff, buffer, bitWriter.getBitsCount()/8);
     uint32_t crc = calculateCRC32(buffer, bitWriter.getBitsCount() / 8);
 
     uint32_t* crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
@@ -498,32 +516,27 @@ void CLPIStreamInfo::ISRC(BitStreamReader& reader)
 
 void CLPIStreamInfo::composeISRC(BitStreamWriter& writer) const
 {
-    /*
-    writeString(country_code, writer, 2);
-    writeString(copyright_holder, writer, 3);
-    writeString(recording_year, writer, 2);
-    writeString(recording_number, writer, 5);*/
-    writeString("\x30\x30", writer, 2);
-    writeString("\x30\x30\x30", writer, 3);
-    writeString("\x30\x30", writer, 2);
-    writeString("\x30\x30\x30\x30\x30", writer, 5);
+    writeString("\x30\x30", writer, 2);              // country_code
+    writeString("\x30\x30\x30", writer, 3);          // copyright_holder
+    writeString("\x30\x30", writer, 2);              // recording_year
+    writeString("\x30\x30\x30\x30\x30", writer, 5);  // recording_number
 }
 
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 {
     int length = reader.getBits(8);
-    stream_coding_type = reader.getBits(8);
+    stream_coding_type = (StreamType)reader.getBits(8);
 
     if (isVideoStreamType(stream_coding_type))
     {
         video_format = reader.getBits(4);
         frame_rate_index = reader.getBits(4);
         aspect_ratio_index = reader.getBits(4);
-        reader.skipBits(2);  // reserved_for_future_use 2 bslbf
+        reader.skipBits(2);  // reserved_for_future_use
         bool cc_flag = reader.getBit();
-        reader.skipBits(17);  // reserved_for_future_use 17 bslbf
+        reader.skipBits(17);  // reserved_for_future_use
         ISRC(reader);
-        reader.skipBits(32);  // reserved_for_future_use 32 bslbf
+        reader.skipBits(32);  // reserved_for_future_use
     }
     else if (isAudioStreamType(stream_coding_type))
     {
@@ -533,29 +546,29 @@ void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
         ISRC(reader);
         reader.skipBits(32);
     }
-    else if (stream_coding_type == 0x90)
+    else if (stream_coding_type == StreamType::SUB_PGS)
     {
         // Presentation Graphics stream
         readString(language_code, reader, 3);
-        reader.skipBits(8);  // reserved_for_future_use 8 bslbf
+        reader.skipBits(8);  // reserved_for_future_use
         ISRC(reader);
-        reader.skipBits(32);  // reserved_for_future_use 32 bslbf
+        reader.skipBits(32);  // reserved_for_future_use
     }
-    else if (stream_coding_type == 0x91)
+    else if (stream_coding_type == StreamType::SUB_IGS)
     {
         // Interactive Graphics stream
         readString(language_code, reader, 3);
-        reader.skipBits(8);  // reserved_for_future_use 8 bslbf
+        reader.skipBits(8);  // reserved_for_future_use
         ISRC(reader);
-        reader.skipBits(32);  // reserved_for_future_use 32 bslbf
+        reader.skipBits(32);  // reserved_for_future_use
     }
-    else if (stream_coding_type == 0x92)
+    else if (stream_coding_type == StreamType::SUB_TGS)
     {
         // Text subtitle stream
         character_code = reader.getBits(8);
         readString(language_code, reader, 3);
         ISRC(reader);
-        reader.skipBits(32);  // reserved_for_future_use 32 bslbf
+        reader.skipBits(32);  // reserved_for_future_use
     }
 }
 
@@ -565,7 +578,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
     writer.putBits(8, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(8, stream_coding_type);
+    writer.putBits(8, (int)stream_coding_type);
 
     if (isVideoStreamType(stream_coding_type))
     {
@@ -596,7 +609,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         composeISRC(writer);
         writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
     }
-    else if (stream_coding_type == 0x90)
+    else if (stream_coding_type == StreamType::SUB_PGS)
     {
         // Presentation Graphics stream
         writeString(language_code, writer, 3);
@@ -604,7 +617,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         composeISRC(writer);
         writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
     }
-    else if (stream_coding_type == 0x91)
+    else if (stream_coding_type == StreamType::SUB_IGS)
     {
         // Interactive Graphics stream
         writeString(language_code, writer, 3);
@@ -612,7 +625,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         composeISRC(writer);
         writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
     }
-    else if (stream_coding_type == 0x92)
+    else if (stream_coding_type == StreamType::SUB_TGS)
     {
         // Text subtitle stream
         writer.putBits(8, character_code);
@@ -667,7 +680,8 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
         for (std::map<int, CLPIStreamInfo>::const_iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
         {
             const CLPIStreamInfo& si = itr->second;
-            bool streamOK = isSsExt && si.stream_coding_type == 0x20 || !isSsExt && si.stream_coding_type != 0x20;
+            bool streamOK = isSsExt && si.stream_coding_type == StreamType::VIDEO_MVC ||
+                            !isSsExt && si.stream_coding_type != StreamType::VIDEO_MVC;
             if (streamOK)
                 streams++;
         }
@@ -678,7 +692,8 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
         for (std::map<int, CLPIStreamInfo>::const_iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
         {
             const CLPIStreamInfo& si = itr->second;
-            bool streamOK = isSsExt && si.stream_coding_type == 0x20 || !isSsExt && si.stream_coding_type != 0x20;
+            bool streamOK = isSsExt && si.stream_coding_type == StreamType::VIDEO_MVC ||
+                            !isSsExt && si.stream_coding_type != StreamType::VIDEO_MVC;
             if (!streamOK)
                 continue;
             writer.putBits(16, itr->first);  // pid
@@ -731,26 +746,6 @@ void CLPIParser::parseClipInfo(BitStreamReader& reader)
     number_of_source_packets = reader.getBits(32);  // number of TS packets?
     for (int i = 0; i < 32; i++) reader.skipBits(32);
     TS_type_info_block(reader);
-    /*
-    if (is_ATC_delta==1b) {
-            reserved_for_future_use 8 bslbf
-            number_of_ATC_delta_entries 8 uimsbf
-            for (i=0; i<number_of_ATC_delta_entries; i++) {
-                    ATC_delta[i] 32 uimsbf
-                    following_Clip_Information_file_name[i] 8*5 bslbf
-                    Clip_codec_identifier 8*4 bslbf
-                    reserved_for_future_use 8 bslbf
-            }
-    }
-    if (application_type==6){
-            reserved_for_future_use 8 bslbf
-            number_of_font_files 8 uimsbf
-            for (font_id=0; font_id<number_of_font_files; font_id++) {
-                    font_file_name[font_id] 8*5 bslbf
-                    reserved_for_future_use 8 bslbf
-            }
-    }
-    */
 }
 
 void CLPIParser::composeClipInfo(BitStreamWriter& writer)
@@ -759,11 +754,11 @@ void CLPIParser::composeClipInfo(BitStreamWriter& writer)
     writer.putBits(32, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(16, 0);                               // reserved_for_future_use 16 bslbf
-    writer.putBits(8, clip_stream_type);                 // 1 - AV stream
-    writer.putBits(8, application_type);                 // 1 - Main TS for a main-path of Movie
-    writer.putBits(31, 0);                               // reserved_for_future_use 31 bslbf
-    writer.putBit(is_ATC_delta);                         // 1 bslbf
+    writer.putBits(16, 0);                // reserved_for_future_use
+    writer.putBits(8, clip_stream_type);  // 1 - AV stream
+    writer.putBits(8, application_type);  // 1 - Main TS for a main-path of Movie
+    writer.putBits(31, 0);                // reserved_for_future_use
+    writer.putBit(is_ATC_delta);
     writer.putBits(32, TS_recording_rate);               // kbps in bytes/sec
     writer.putBits(32, number_of_source_packets);        // number of TS packets?
     for (int i = 0; i < 32; i++) writer.putBits(32, 0);  // reserved
@@ -803,7 +798,7 @@ void CLPIParser::composeSequenceInfo(BitStreamWriter& writer)
     writer.putBits(32, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(8, 0);  // reserved_for_word_align 8 bslbf
+    writer.putBits(8, 0);  // reserved_for_word_align
     writer.putBits(8, 1);  // number_of_ATC_sequences
     // for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++)
     {
@@ -868,22 +863,22 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
     int EP_stream_type = 1;  //[k] 4 bslbf
     for (std::map<int, CLPIStreamInfo>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
     {
-        int coding_type = itr->second.stream_coding_type;
+        StreamType coding_type = itr->second.stream_coding_type;
         if (isSSExt)
         {
-            if (coding_type == 0x20)
+            if (coding_type == StreamType::VIDEO_MVC)
                 processStream.push_back(itr->second);
         }
         else
         {
-            if (coding_type != 0x20 && isVideoStreamType(coding_type))
+            if (coding_type != StreamType::VIDEO_MVC && isVideoStreamType(coding_type))
                 processStream.push_back(itr->second);
         }
     }
     if (processStream.size() == 0)
         for (std::map<int, CLPIStreamInfo>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
         {
-            int coding_type = itr->second.stream_coding_type;
+            StreamType coding_type = itr->second.stream_coding_type;
             if (isAudioStreamType(coding_type))
             {
                 processStream.push_back(itr->second);
@@ -897,8 +892,8 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
     if (processStream.size() == 0)
         THROW(ERR_COMMON, "Can't create EP map. One audio or video stream is needed.");
     // ------------------
-    writer.putBits(8, 0);                     // reserved_for_word_align 8 bslbf
-    writer.putBits(8, processStream.size());  // number_of_stream_PID_entries 8 uimsbf
+    writer.putBits(8, 0);                          // reserved_for_word_align 8 bslbf
+    writer.putBits(8, (int)processStream.size());  // number_of_stream_PID_entries 8 uimsbf
     std::vector<uint32_t*> epStartAddrPos;
 
     for (auto& i : processStream)
@@ -907,9 +902,9 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
         writer.putBits(10, 0);            // reserved_for_word_align 10 bslbf
         writer.putBits(4, EP_stream_type);
         std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(i);
-        writer.putBits(16, coarseInfo.size());  // number_of_EP_coarse_entries[k] 16 uimsbf
+        writer.putBits(16, (int)coarseInfo.size());  // number_of_EP_coarse_entries[k] 16 uimsbf
         if (i.m_index.size() > 0)
-            writer.putBits(18, i.m_index[m_clpiNum].size());  // number_of_EP_fine_entries[k] 18 uimsbf
+            writer.putBits(18, (int)i.m_index[m_clpiNum].size());  // number_of_EP_fine_entries[k] 18 uimsbf
         else
             writer.putBits(18, 0);
         epStartAddrPos.push_back((uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8));
@@ -931,13 +926,13 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
     if (streamInfo.m_index.size() == 0)
         return rez;
     uint32_t cnt = 0;
-    uint32_t lastPktCnt = 0;
-    uint32_t lastCoarsePts = 0;
+    int64_t lastPktCnt = 0;
+    int64_t lastCoarsePts = 0;
     PMTIndex& curIndex = streamInfo.m_index[m_clpiNum];
     for (PMTIndex::const_iterator itr = curIndex.begin(); itr != curIndex.end(); ++itr)
     {
         const PMTIndexData& indexData = itr->second;
-        uint32_t newCoarsePts = itr->first >> 19;
+        uint32_t newCoarsePts = (uint32_t)(itr->first >> 19);
         uint32_t lastCoarseSPN = lastPktCnt & 0xfffe0000;
         uint32_t newCoarseSPN = indexData.m_pktCnt & 0xfffe0000;
         if (rez.size() == 0 || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
@@ -1035,7 +1030,7 @@ bool CLPIParser::parse(const char* fileName)
     if (!file.size(&fileSize))
         return false;
     uint8_t* buffer = new uint8_t[fileSize];
-    if (!file.read(buffer, fileSize))
+    if (!file.read(buffer, (uint32_t)fileSize))
     {
         delete[] buffer;
         return false;
@@ -1084,7 +1079,7 @@ void CLPIParser::composeExtentStartPoint(BitStreamWriter& writer)
     int beforeCount = writer.getBitsCount() / 8;
 
     writer.putBits(16, 0);  // reserved
-    writer.putBits(16, interleaveInfo.size());
+    writer.putBits(16, (unsigned)interleaveInfo.size());
 
     uint32_t sum = 0;
     for (auto& i : interleaveInfo)
@@ -1210,7 +1205,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
     }
 }
 
-void CLPIParser::parse(uint8_t* buffer, int len)
+void CLPIParser::parse(uint8_t* buffer, int64_t len)
 {
     BitStreamReader reader{};
     try
@@ -1328,14 +1323,14 @@ bool MPLSParser::parse(const char* fileName)
     if (!file.size(&fileSize))
         return false;
     uint8_t* buffer = new uint8_t[fileSize];
-    if (!file.read(buffer, fileSize))
+    if (!file.read(buffer, (uint32_t)fileSize))
     {
         delete[] buffer;
         return false;
     }
     try
     {
-        parse(buffer, fileSize);
+        parse(buffer, (int)fileSize);
         delete[] buffer;
         return true;
     }
@@ -1362,31 +1357,12 @@ void MPLSParser::parse(uint8_t* buffer, int len)
         for (int i = 0; i < 5; i++) reader.skipBits(32);  // reserved_for_future_use 160 bslbf
         AppInfoPlayList(reader);
         parsePlayList(buffer + playList_start_address, len - playList_start_address);
-        /*
-        for (int i=0; i<N1; i++) {
-                padding_word 16 bslbf
-        }
-        PlayList();
-        for (int i=0; i<N2; i++) {
-                padding_word 16 bslbf
-        }
-        */
         parsePlayListMark(buffer + playListMark_start_address, len - playListMark_start_address);
 
         if (extensionData_start_address)
         {
             parseExtensionData(buffer + extensionData_start_address, buffer + len);
         }
-
-        /*
-        for (i=0; i<N3; i++) {
-                padding_word 16 bslbf
-        }
-        ExtensionData();
-        for (i=0; i<N4; i++) {
-                padding_word 16 bslbf
-        }
-        */
     }
     catch (BitStreamException&)
     {
@@ -1407,7 +1383,7 @@ void MPLSParser::SubPath_extension(BitStreamWriter& writer)
     writer.putBits(8, 0);   // reserved
 
     std::vector<PMTIndex> pmtIndexList = getMVCDependStream().m_index;
-    writer.putBits(8, pmtIndexList.size());  // number_of_SubPlayItems
+    writer.putBits(8, (unsigned)pmtIndexList.size());  // number_of_SubPlayItems
     for (size_t i = 0; i < pmtIndexList.size(); ++i) composeSubPlayItem(writer, i, 0, pmtIndexList);
 
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
@@ -1484,7 +1460,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 {
     for (auto& i : m_streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isVideoStreamType(stream_coding_type))
         {
             if (i.isSecondary)
@@ -1648,13 +1624,13 @@ MPLSStreamInfo& MPLSParser::getMainStream()
 {
     for (auto& i : m_streamInfo)
     {
-        int coding_type = i.stream_coding_type;
+        StreamType coding_type = i.stream_coding_type;
         if (isVideoStreamType(coding_type))
             return i;
     }
     for (auto& i : m_streamInfo)
     {
-        int coding_type = i.stream_coding_type;
+        StreamType coding_type = i.stream_coding_type;
         if (isAudioStreamType(coding_type))
             return i;
     }
@@ -1664,9 +1640,9 @@ MPLSStreamInfo& MPLSParser::getMainStream()
 int MPLSParser::pgIndexToFullIndex(int value)
 {
     int cnt = 0;
-    for (size_t i = 0; i < m_streamInfo.size(); ++i)
+    for (int i = 0; i < (int)m_streamInfo.size(); ++i)
     {
-        if (m_streamInfo[i].stream_coding_type == 0x90)
+        if (m_streamInfo[i].stream_coding_type == StreamType::SUB_PGS)
         {
             if (cnt++ == value)
                 return i;
@@ -1690,8 +1666,8 @@ std::vector<MPLSStreamInfo> MPLSParser::getPgStreams() const
     std::vector<MPLSStreamInfo> pgStreams;
     for (auto& i : m_streamInfo)
     {
-        int coding_type = i.stream_coding_type;
-        if (coding_type == 0x90)
+        StreamType coding_type = i.stream_coding_type;
+        if (coding_type == StreamType::SUB_PGS)
             pgStreams.push_back(i);
     }
     return pgStreams;
@@ -1701,8 +1677,8 @@ MPLSStreamInfo& MPLSParser::getMVCDependStream()
 {
     for (auto& i : m_streamInfoMVC)
     {
-        int coding_type = i.stream_coding_type;
-        if (coding_type == 0x20)
+        StreamType coding_type = i.stream_coding_type;
+        if (coding_type == StreamType::VIDEO_MVC)
             return i;
     }
     THROW(ERR_COMMON, "Can't find stream index. One audio or video stream is needed.");
@@ -1716,8 +1692,8 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     int beforeCount = writer.getBitsCount() / 8;
     writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
     MPLSStreamInfo& mainStreamInfo = getMainStream();
-    writer.putBits(16, mainStreamInfo.m_index.size());  // 16 uimsbf number_of_PlayItems
-    writer.putBits(16, number_of_SubPaths);             // number_of_SubPaths
+    writer.putBits(16, (unsigned)mainStreamInfo.m_index.size());  // 16 uimsbf number_of_PlayItems
+    writer.putBits(16, number_of_SubPaths);                       // number_of_SubPaths
     // connection_condition = 1;
     for (size_t PlayItem_id = 0; PlayItem_id < mainStreamInfo.m_index.size(); PlayItem_id++)
     {
@@ -1735,29 +1711,21 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void MPLSParser::composeSubPath(BitStreamWriter& writer, int subPathNum, std::vector<PMTIndex>& pmtIndexList, int type)
+void MPLSParser::composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList,
+                                int type)
 {
     uint32_t* lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(8, 0);  // reserved_for_future_use
-    writer.putBits(
-        8, type);  // SubPath_type = 7 (In-mux and Synchronous type of Picture-in-Picture), 5 - MVC depend stream
-    writer.putBits(15, 0);  // reserved_for_future_use
-    writer.putBits(1, 0);   // is_repeat_SubPath = false
-    writer.putBits(8, 0);   // reserved_for_future_use
+    writer.putBits(8, 0);     // reserved_for_future_use
+    writer.putBits(8, type);  // SubPath_type = 7 (In-mux and Synchronous type of Picture-in-Picture), 5
+                              // - MVC depend stream
+    writer.putBits(15, 0);    // reserved_for_future_use
+    writer.putBits(1, 0);     // is_repeat_SubPath = false
+    writer.putBits(8, 0);     // reserved_for_future_use
 
-    /*
-    vector<StreamInfo*> secondary;
-    for (int i = 0; i < m_streamInfo.size(); i++)
-    {
-            int stream_coding_type = m_streamInfo[i].stream_coding_type;
-            if (m_streamInfo[i].isSecondary && (stream_coding_type==0x02 || stream_coding_type==0x1B ||
-    stream_coding_type==0xEA)) secondary.push_back(m_streamInfo[i]);
-    }
-    */
-    writer.putBits(8, pmtIndexList.size());  // number_of_SubPlayItems
+    writer.putBits(8, (unsigned)pmtIndexList.size());  // number_of_SubPlayItems
     for (size_t i = 0; i < pmtIndexList.size(); i++)
     {
         composeSubPlayItem(writer, i, subPathNum, pmtIndexList);
@@ -1765,14 +1733,14 @@ void MPLSParser::composeSubPath(BitStreamWriter& writer, int subPathNum, std::ve
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, int subPathNum,
+void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum, size_t subPathNum,
                                     std::vector<PMTIndex>& pmtIndexList)
 {
     uint16_t* lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    int fileNum = playItemNum;
+    int fileNum = (int)playItemNum;
     if (isDependStreamExist)
     {
         fileNum *= 2;
@@ -1792,23 +1760,23 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, int playItemNum, in
     if (playItemNum == 0)
         writer.putBits(32, IN_time);  // 32 uimsbf
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
     else
         writer.putBits(32, IN_time);  // 32 uimsbf
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);  // 32 uimsbf
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
+        writer.putBits(32, (unsigned)pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
     else
         writer.putBits(32, OUT_time);  // 32 uimsbf
 
-    writer.putBits(16, playItemNum);  // sync_PlayItem_id. reference to play_item id.
+    writer.putBits(16, (unsigned)playItemNum);  // sync_PlayItem_id. reference to play_item id.
     // sync_start_PTS_of_PlayItem
     if (playItemNum == 0)
         writer.putBits(32, IN_time);  // 32 uimsbf
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
     else
         writer.putBits(32, IN_time);  // 32 uimsbf
 
@@ -1829,7 +1797,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
     int mainHSize = 0;
     for (auto& i : m_streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isVideoStreamType(stream_coding_type))
         {
             if (i.isSecondary)
@@ -1844,7 +1812,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
         }
     }
 
-    writer.putBits(16, pipStreams.size() * pmtIndexList.size());
+    writer.putBits(16, (unsigned)(pipStreams.size() * pmtIndexList.size()));
     vector<uint32_t*> blockDataAddressPos;
     for (size_t i = 0; i < pmtIndexList.size(); ++i)
     {
@@ -1852,15 +1820,16 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
         {
             PIPParams pipParams = pipStreams[k].pipParams;
             // metadata_block_header[k]() {
-            writer.putBits(16, i);  // ref_to_PlayItem_id
-            writer.putBits(8, k);   // ref_to_secondary_video_stream_id
-            writer.putBits(8, 0);   // reserved_for_future_use
+            writer.putBits(16, (unsigned)i);  // ref_to_PlayItem_id
+            writer.putBits(8, (unsigned)k);   // ref_to_secondary_video_stream_id
+            writer.putBits(8, 0);             // reserved_for_future_use
             writer.putBits(
-                4, pipParams.lumma >= 0 ? 1 : 0);  // pip_timeline_type == 1. Synchronous type of Picture-in-Picture
-            writer.putBit(1);                      // is_luma_key = 0
-            writer.putBit(1);                      // trick_playing_flag. keep PIP windows when tricking
-            writer.putBits(10, 0);                 // reserved_for_word_align
-            writer.putBits(8, 0);                  // reserved_for_future_use 8 bslbf
+                4,
+                pipParams.lumma >= 0 ? 1 : 0);  // pip_timeline_type == 1. Synchronous type of Picture-in-Picture
+            writer.putBit(1);                   // is_luma_key = 0
+            writer.putBit(1);                   // trick_playing_flag. keep PIP windows when tricking
+            writer.putBits(10, 0);              // reserved_for_word_align
+            writer.putBits(8, 0);               // reserved_for_future_use 8 bslbf
             if (pipParams.lumma >= 0)
             {                                        // is_luma_key==1b
                 writer.putBits(8, pipParams.lumma);  // transparent Y pixels
@@ -1888,7 +1857,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
                 if (i == 0)
                     writer.putBits(32, IN_time);  // 32 uimsbf
                 else if (pmtIndexList[i - 1].size() > 0)
-                    writer.putBits(32, pmtIndexList[i].begin()->first / 2);
+                    writer.putBits(32, (unsigned)pmtIndexList[i].begin()->first / 2);
                 else
                     writer.putBits(32, IN_time);  // 32 uimsbf
 
@@ -1900,8 +1869,8 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
                     hPos = pipParams.hOffset;
                     vPos = pipParams.vOffset;
 
-                    int pipWidth = pipStreams[k].width * pipParams.getScaleCoeff();
-                    int pipHeight = pipStreams[k].height * pipParams.getScaleCoeff();
+                    int pipWidth = (int)(pipStreams[k].width * pipParams.getScaleCoeff());
+                    int pipHeight = (int)(pipStreams[k].height * pipParams.getScaleCoeff());
 
                     if (pipParams.corner == PIPParams::PipCorner::TopRight ||
                         pipParams.corner == PIPParams::PipCorner::BottomRight)
@@ -2110,14 +2079,14 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
     {
         writer.putBits(32, 0);  // data_block_start_address
         writer.putBits(24, 0);  // reserved_for_word_align
-        writer.putBits(8, extDataBlockInfo.size());
+        writer.putBits(8, (unsigned)extDataBlockInfo.size());
         for (size_t i = 0; i < extDataBlockInfo.size(); ++i)
         {
             writer.putBits(16, extDataBlockInfo[i].id1);
             writer.putBits(16, extDataBlockInfo[i].id2);
             extDataStartAddrPos[i] = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
-            writer.putBits(32, 0);                                // ext_data_start_address
-            writer.putBits(32, extDataBlockInfo[i].data.size());  // ext_data_length
+            writer.putBits(32, 0);                                          // ext_data_start_address
+            writer.putBits(32, (unsigned)extDataBlockInfo[i].data.size());  // ext_data_length
         }
         while ((writer.getBitsCount() / 8 - initPos) % 4 != 0) writer.putBits(16, 0);
         *(lengthPos + 1) = my_htonl(writer.getBitsCount() / 8 - initPos + 4);  // data_block_start_address
@@ -2178,15 +2147,15 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
     STN_table(reader, PlayItem_id);
 }
 
-void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::vector<PMTIndex>& pmtIndexList)
+void MPLSParser::composePlayItem(BitStreamWriter& writer, size_t playItemNum, std::vector<PMTIndex>& pmtIndexList)
 {
     uint16_t* lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
-    int fileNum = playItemNum;
+    int fileNum = (int)playItemNum;
     if (isDependStreamExist)
         fileNum *= 2;
-    std::string clip_Information_file_name = strPadLeft(int32ToStr(fileNum + m_m2tsOffset), 5, '0');
+    std::string clip_Information_file_name = strPadLeft(int32ToStr(fileNum + m_m2tsOffset), 5u, '0');
     CLPIStreamInfo::writeString(clip_Information_file_name.c_str(), writer, 5);
     char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
@@ -2198,14 +2167,14 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, int playItemNum, std::
     if (playItemNum == 0)
         writer.putBits(32, IN_time);  // 32 uimsbf
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
     else
         writer.putBits(32, IN_time);  // 32 uimsbf
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);  // 32 uimsbf
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
+        writer.putBits(32, (unsigned)pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
     else
         writer.putBits(32, OUT_time);  // 32 uimsbf
 
@@ -2249,10 +2218,10 @@ int MPLSParser::calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts)
         if (streamInfo.m_index[i].size() > 0)
         {
             if (streamInfo.m_index[i].begin()->first > pts)
-                return FFMAX(i, 1) - 1;
+                return FFMAX((int)i, 1) - 1;
         }
     }
-    return streamInfo.m_index.size() - 1;
+    return (int)streamInfo.m_index.size() - 1;
 }
 
 void MPLSParser::composePlayListMark(BitStreamWriter& writer)
@@ -2267,11 +2236,11 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
             m_marks.push_back(PlayListMark(-1, IN_time));
         else
         {
-            for (size_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.push_back(PlayListMark(-1, i));
+            for (uint32_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.push_back(PlayListMark(-1, i));
         }
     }
-    writer.putBits(16, m_marks.size());  // 16 uimsbf
-    for (auto& i : m_marks)
+    writer.putBits(16, (unsigned)m_marks.size());  // 16 uimsbf
+    for (auto i : m_marks)
     {
         writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
         writer.putBits(8, 1);  // mark_type 0x01 = Chapter search
@@ -2286,30 +2255,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-/*
-void MPLSParser::composePlayListMark(BitStreamWriter& writer)
-{
-        uint32_t* lengthPos = (uint32_t*) (writer.getBuffer() + writer.getBitsCount()/8);
-        writer.putBits(32,0); // skip lengthField
-        int beforeCount = writer.getBitsCount()/8;
-
-        writer.putBits(16, 1); // number_of_PlayList_marks
-        //for(int PL_mark_id=0; PL_mark_id<number_of_PlayList_marks; PL_mark_id++)
-        //{
-                writer.putBits(8, 0 ); //reserved_for_future_use 8 bslbf
-                writer.putBits(8, 1); // mark_type
-
-                writer.putBits(16, 0); // ref_to_PlayItem_id
-                writer.putBits(32, IN_time); // mark_time_stamp
-                writer.putBits(16, 0xffff); // entry_ES_PID
-                writer.putBits(32, 0); // duration
-
-        //}
-        *lengthPos = my_ntohl(writer.getBitsCount()/8 - beforeCount);
-}
-*/
-
-void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool isSSEx)
+void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, bool isSSEx)
 {
     uint16_t* lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // skip lengthField
@@ -2328,7 +2274,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isVideoStreamType(stream_coding_type))
         {
             if (i.isSecondary)
@@ -2345,9 +2291,9 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
             else
                 number_of_secondary_audio_stream_entries++;
         }
-        else if (stream_coding_type == 0x90)
+        else if (stream_coding_type == StreamType::SUB_PGS)
             number_of_PG_textST_stream_entries++;
-        else if (stream_coding_type == 0x87)
+        else if (stream_coding_type == StreamType::AUDIO_EAC3_ATSC)
         {
             LTRACE(LT_ERROR, 2, "Pure E-AC3 is not supported by AVCHD/Blu-ray. Aborting...");
             THROW(ERR_COMMON, "");
@@ -2355,7 +2301,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
         else
         {
             LTRACE(LT_ERROR, 2,
-                   "Unsupported media type " << stream_coding_type << " for AVCHD/Blu-ray muxing. Aborting...");
+                   "Unsupported media type " << (int)stream_coding_type << " for AVCHD/Blu-ray muxing. Aborting...");
             THROW(ERR_COMMON, "");
         }
     }
@@ -2367,24 +2313,23 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
         writer.putBits(8, number_of_PG_textST_stream_entries);
         writer.putBits(8, 0);  // int number_of_IG_stream_entries = reader.getBits(8); //8 uimsbf
         writer.putBits(8, number_of_secondary_audio_stream_entries);
-        writer.putBits(8, number_of_secondary_video_stream_entries);  // int number_of_secondary_video_stream_entries.
-                                                                      // Now subpath used for second video stream
-        writer.putBits(8, 0);                                         // number_of_PiP_PG_textST_stream_entries_plus
+        writer.putBits(8,
+                       number_of_secondary_video_stream_entries);  // int number_of_secondary_video_stream_entries.
+                                                                   // Now subpath used for second video stream
+        writer.putBits(8, 0);                                      // number_of_PiP_PG_textST_stream_entries_plus
         writer.putBits(8, number_of_DolbyVision_video_stream_entries);
         writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
     }
 
-    // if (number_of_SubPaths == 0)
-
     // video
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isVideoStreamType(stream_coding_type) && !i.isSecondary && i.HDR != 4)
         {
             i.composeStreamEntry(writer, PlayItem_id);
             i.composeStreamAttributes(writer);
-            if (stream_coding_type == 0x20)  // MVC
+            if (stream_coding_type == StreamType::VIDEO_MVC)
             {
                 writer.putBits(10, 0);  // reserved_for_future_use
                 writer.putBits(6, FFMAX(1, i.number_of_offset_sequences));
@@ -2395,7 +2340,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
     // primary audio
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isAudioStreamType(stream_coding_type) && !i.isSecondary)
         {
             i.composeStreamEntry(writer, PlayItem_id);
@@ -2406,8 +2351,8 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
     // PG
     for (auto& i : m_streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
-        if (stream_coding_type == 0x90)
+        StreamType stream_coding_type = i.stream_coding_type;
+        if (stream_coding_type == StreamType::SUB_PGS)
         {
             if (isSSEx)
             {
@@ -2424,7 +2369,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
     // secondary audio
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isAudioStreamType(stream_coding_type) && i.isSecondary)
         {
             i.composeStreamEntry(writer, PlayItem_id);
@@ -2437,7 +2382,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
                 uint8_t primaryAudioNum = 0;
                 for (auto& j : streamInfo)
                 {
-                    int stream_coding_type = j.stream_coding_type;
+                    StreamType stream_coding_type = j.stream_coding_type;
                     if (isAudioStreamType(stream_coding_type) && !j.isSecondary)
                         writer.putBits(8, primaryAudioNum++);
                 }
@@ -2455,7 +2400,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
     int secondaryVNum = 0;
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (i.isSecondary && isVideoStreamType(stream_coding_type))
         {
             i.type = 3;
@@ -2470,12 +2415,10 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
                 writer.putBits(8, secondaryVNum);
                 writer.putBits(8, 0);  // word align
             }
-            //}
 
             // comb_info_Secondary_video_PiP_PG_textST(){
             writer.putBits(8, 0);  // number_of_PiP_PG_textST_ref_entries
             writer.putBits(8, 0);  // reserved_for_word_align
-                                   //}
             secondaryVNum++;
         }
     }
@@ -2483,7 +2426,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
     // DV video
     for (auto& i : streamInfo)
     {
-        int stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = i.stream_coding_type;
         if (isVideoStreamType(stream_coding_type) && i.HDR == 4)
         {
             i.type = 4;
@@ -2500,17 +2443,17 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool
 
 void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 {
-    int length = reader.getBits(16);                                  // 16 uimsbf
-    reader.skipBits(16);                                              // reserved_for_future_use 16 bslbf
-    number_of_primary_video_stream_entries = reader.getBits(8);       // 8 uimsbf
-    number_of_primary_audio_stream_entries = reader.getBits(8);       // 8 uimsbf
-    number_of_PG_textST_stream_entries = reader.getBits(8);           // 8 uimsbf
-    number_of_IG_stream_entries = reader.getBits(8);                  // 8 uimsbf
-    number_of_secondary_audio_stream_entries = reader.getBits(8);     // 8 uimsbf
-    number_of_secondary_video_stream_entries = reader.getBits(8);     // 8 uimsbf
-    number_of_PiP_PG_textST_stream_entries_plus = reader.getBits(8);  // 8 uimsbf
-    number_of_DolbyVision_video_stream_entries = reader.getBits(8);   // 8 uimsbf
-    reader.skipBits(32);                                              // reserved_for_future_use 32 bslbf
+    int length = reader.getBits(16);
+    reader.skipBits(16);  // reserved_for_future_use
+    number_of_primary_video_stream_entries = reader.getBits(8);
+    number_of_primary_audio_stream_entries = reader.getBits(8);
+    number_of_PG_textST_stream_entries = reader.getBits(8);
+    number_of_IG_stream_entries = reader.getBits(8);
+    number_of_secondary_audio_stream_entries = reader.getBits(8);
+    number_of_secondary_video_stream_entries = reader.getBits(8);
+    number_of_PiP_PG_textST_stream_entries_plus = reader.getBits(8);
+    number_of_DolbyVision_video_stream_entries = reader.getBits(8);
+    reader.skipBits(32);  // reserved_for_future_use
 
     for (int primary_video_stream_id = 0; primary_video_stream_id < number_of_primary_video_stream_entries;
          primary_video_stream_id++)
@@ -2838,7 +2781,7 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
     }
 }
 
-void MPLSStreamInfo::composePGS_SS_StreamEntry(BitStreamWriter& writer, int entryNum)
+void MPLSStreamInfo::composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum)
 {
     writer.putBits(8, offsetId);
     writer.putBits(4, 0);   // reserved
@@ -2855,7 +2798,7 @@ void MPLSStreamInfo::composePGS_SS_StreamEntry(BitStreamWriter& writer, int entr
     }
 }
 
-void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, int subPathID)
+void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, size_t entryNum, int subPathID)
 {
     uint8_t* lengthPos = writer.getBuffer() + writer.getBitsCount() / 8;
     writer.putBits(8, 0);  // int length = reader.getBits(8); //8 uimsbf
@@ -2895,8 +2838,8 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, int entryNum, i
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 {
-    int length = reader.getBits(8);          // 8 uimsbf
-    stream_coding_type = reader.getBits(8);  // 8 bslbf
+    int length = reader.getBits(8);                      // 8 uimsbf
+    stream_coding_type = (StreamType)reader.getBits(8);  // 8 bslbf
     if (isVideoStreamType(stream_coding_type))
     {
         video_format = reader.getBits(4);      // 4 bslbf
@@ -2905,23 +2848,23 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
     }
     else if (isAudioStreamType(stream_coding_type))
     {
-        audio_presentation_type = reader.getBits(4);       // 4 bslbf
-        int sampling_frequency_index = reader.getBits(4);  // 4 bslbf
+        audio_presentation_type = reader.getBits(4);
+        int sampling_frequency_index = reader.getBits(4);
         CLPIStreamInfo::readString(language_code, reader, 3);
     }
-    else if (stream_coding_type == 0x90)
+    else if (stream_coding_type == StreamType::SUB_PGS)
     {
         // Presentation Graphics stream
         CLPIStreamInfo::readString(language_code, reader, 3);
-        reader.skipBits(8);  // reserved_for_future_use 8 bslbf
+        reader.skipBits(8);  // reserved_for_future_use
     }
-    else if (stream_coding_type == 0x91)
+    else if (stream_coding_type == StreamType::SUB_IGS)
     {
         // Interactive Graphics stream
         CLPIStreamInfo::readString(language_code, reader, 3);
         reader.skipBits(8);  // reserved_for_future_use 8 bslbf
     }
-    else if (stream_coding_type == 0x92)
+    else if (stream_coding_type == StreamType::SUB_TGS)
     {
         // Text subtitle stream
         character_code = reader.getBits(8);  // 8 bslbf
@@ -2935,11 +2878,11 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
     writer.putBits(8, 0);  // int length = reader.getBits(8); //8 uimsbf
     int initPos = writer.getBitsCount() / 8;
 
-    writer.putBits(8, stream_coding_type);  // 8 bslbf
+    writer.putBits(8, (int)stream_coding_type);
     if (isVideoStreamType(stream_coding_type))
     {
-        writer.putBits(4, video_format);      // 4 bslbf
-        writer.putBits(4, frame_rate_index);  // 4 bslbf
+        writer.putBits(4, video_format);
+        writer.putBits(4, frame_rate_index);
         if (HDR & 18)
             writer.putBits(8, 0x12);  // HDR10 or HDR10plus
         else if (HDR == 4)
@@ -2950,19 +2893,19 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
             writer.putBits(8, 0x40);  // HDR10plus
         else
             writer.putBits(8, 0);
-        writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);  // reserved_for_future_use
     }
     else if (isAudioStreamType(stream_coding_type))
     {
-        writer.putBits(4, audio_presentation_type);   // 4 bslbf
-        writer.putBits(4, sampling_frequency_index);  // 4 bslbf
+        writer.putBits(4, audio_presentation_type);
+        writer.putBits(4, sampling_frequency_index);
         CLPIStreamInfo::writeString(language_code, writer, 3);
     }
-    else if (stream_coding_type == 0x90)
+    else if (stream_coding_type == StreamType::SUB_PGS)
     {
         // Presentation Graphics stream
         CLPIStreamInfo::writeString(language_code, writer, 3);
-        writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);  // reserved_for_future_use
     }
     else
         THROW(ERR_COMMON, "Unsupported media type for AVCHD/Blu-ray muxing");

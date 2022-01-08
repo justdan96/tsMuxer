@@ -693,7 +693,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int len)
         return true;
     }
 
-    if (m_testMode && m_containerType != ContainerType::ctLPCM && m_containerDataType != STREAM_TYPE_AUDIO_LPCM)
+    if (m_testMode && m_containerType != ContainerType::ctLPCM && m_containerDataType != TRACKTYPE_PCM)
         return false;  // LPCM definition has too few bytes. We can't detect LPCM without hints from source container
 
     // 2. test for M2TS LPCM headers

@@ -35,44 +35,55 @@ static const uint8_t PES_VC1_ID = 0xfd;
 
 static const uint8_t DVB_SUBT_DESCID = 0x59;
 
-static const uint8_t STREAM_TYPE_VIDEO_MPEG1 = 0x01;
-static const uint8_t STREAM_TYPE_VIDEO_MPEG2 = 0x02;
-static const uint8_t STREAM_TYPE_PRIVATE_SECTION = 0x05;
-static const uint8_t STREAM_TYPE_PRIVATE_DATA = 0x06;
-static const uint8_t STREAM_TYPE_VIDEO_MPEG4 = 0x10;
-static const uint8_t STREAM_TYPE_VIDEO_H264 = 0x1b;
-static const uint8_t STREAM_TYPE_VIDEO_MVC = 0x20;
-static const uint8_t STREAM_TYPE_VIDEO_H265 = 0x24;
-static const uint8_t STREAM_TYPE_VIDEO_H266 = 0x33;
-static const uint8_t STREAM_TYPE_VIDEO_VC1 = 0xea;
+enum class StreamType
+{
+    // Blu-ray Disk Specifiction Table 5-22 - stream_coding_type
+    VIDEO_MPEG2 = 0x02,                // MPEG-2 video stream for Primary / Secondary video
+    VIDEO_H264 = 0x1b,                 // MPEG-4 AVC video stream for Primary / Secondary video
+    VIDEO_MVC = 0x20,                  // forbidden (Used for ProgramInfo_SS() in 5.4.7.6)
+    VIDEO_H265 = 0x24,                 // MPEG-H HEVC video stream for Primary / Secondary video
+    VIDEO_VC1 = 0xea,                  // SMPTE VC-1 video stream for Primary / Secondary video
+    AUDIO_LPCM = 0x80,                 // HDMV LPCM audio stream for Primary audio
+    AUDIO_AC3 = 0x81,                  // Dolby Digital (AC-3) audio stream for Primary audio
+    AUDIO_DTS = 0x82,                  // DTS audio stream for Primary audio
+    AUDIO_EAC3_TRUE_HD = 0x83,         // Dolby Lossless audio stream for Primary audio
+    AUDIO_EAC3 = 0x84,                 // Dolby Digital Plus audio stream for Primary audio
+    AUDIO_DTS_HD = 0x85,               // DTS-HD audio stream except XLL for Primary audio
+    AUDIO_DTS_HD_MASTER_AUDIO = 0x86,  // DTS-HD audio stream XLL for Primary audio
+    AUDIO_DRA = 0x87,                  // DRA audio stream for Primary audio
+    AUDIO_DRA_EXT = 0x88,              // DRA Extension audio stream for Primary audio
+    AUDIO_EAC3_SECONDARY = 0xA1,       // Dolby Digital Plus audio stream for Secondary audio
+    AUDIO_DTS_HD_SECONDARY = 0xA2,     // DTS-HD audio stream for Secondary audio stream
+    SUB_PGS = 0x90,                    // Presentation Graphics stream
+    SUB_IGS = 0x91,                    // Interactive Graphics stream
+    SUB_TGS = 0x92,                    // Text subtitle stream
 
-static const uint8_t STREAM_TYPE_AUDIO_MPEG1 = 0x03;
-static const uint8_t STREAM_TYPE_AUDIO_MPEG2 = 0x04;
-static const uint8_t STREAM_TYPE_AUDIO_AAC = 0x0f;
-static const uint8_t STREAM_TYPE_AUDIO_AAC_RAW = 0x11;
-static const uint8_t STREAM_TYPE_AUDIO_DTS = 0x82;  // 0x8a
+    // IUT-T REC. H.222 | ISO/IEC 13818-1 Table 2-34 - Stream type assignments
+    RESERVED = 0x00,         // ITU-T | ISO/IEC Reserved
+    VIDEO_MPEG1 = 0x01,      // ISO/IEC 11172-2 Video
+    AUDIO_MPEG1 = 0x03,      // ISO/IEC 11172-3 Audio
+    AUDIO_MPEG2 = 0x04,      // ISO/IEC 13818-3 Audio
+    PRIVATE_SECTION = 0x05,  // private_sections
+    PRIVATE_DATA = 0x06,     // PES packets containing private data
+    AUDIO_AAC = 0x0f,        // ISO/IEC 13818-7 Audio with ADTS transport syntax
+    VIDEO_MPEG4 = 0x10,      // ISO/IEC 14496-2 Visual
+    AUDIO_AAC_RAW = 0x11,    // ISO/IEC 14496-3 Audio with the LATM transport syntax
+    VIDEO_SUB_H265 = 0x25,   // HEVC temporal video subset, profile as per of H265 Annex A
+    AUDIO_MHAS_MAIN = 0x2d,  // ISO/IEC 23008-3 Audio with MHAS transport syntax _ main stream
+    AUDIO_MHAS_AUX = 0x2e,   // ISO/IEC 23008-3 Audio with MHAS transport syntax - auxiliary stream
+    VIDEO_H266 = 0x33,       // VVC video stream, profile as per H266 Annex A
 
-static const uint8_t STREAM_TYPE_AUDIO_LPCM = 0x80;
-static const uint8_t STREAM_TYPE_AUDIO_AC3 = 0x81;
-static const uint8_t STREAM_TYPE_AUDIO_EAC3 = 0x84;
-static const uint8_t STREAM_TYPE_AUDIO_EAC3_ATSC = 0x87;
-static const uint8_t STREAM_TYPE_AUDIO_EAC3_TRUE_HD = 0x83;
-static const uint8_t STREAM_TYPE_AUDIO_DTS_HD = 0x85;
-static const uint8_t STREAM_TYPE_AUDIO_DTS_HD_MASTER_AUDIO = 0x86;
+    // ATSC
+    VIDEO_DCII_ATSC = 0x80,  // DigiCipher II video, identical to ITU-T Rec. H.262
+    AUDIO_AC3_ATSC = 0x81,   // E-AC-3 A/52:2018
+    SUB_SCTE27_ATSC = 0x82,  // SCTE-27 Subtitling
+    DATA_ISOCH_ATSC = 0x83,  // SCTE-19 Isochronous data | Reserved
+    AUDIO_EAC3_ATSC = 0x87,  // E-AC-3 A/52:2018
+    AUDIO_DTS_ATSC = 0x88,   // E-AC-3 A / 107(ATSC 2.0)
 
-static const uint8_t STREAM_TYPE_AUDIO_EAC3_SECONDARY = 0xA1;
-static const uint8_t STREAM_TYPE_AUDIO_DTS_HD_SECONDARY = 0xA2;
-
-static const uint8_t STREAM_TYPE_AUDIO_VC9 = 0x88;
-
-static const uint8_t STREAM_TYPE_SUB_PGS = 0x90;
-
-static const uint8_t STREAM_TYPE_SUBTITLE_DVB = 0x00;
-
-// PES extension codes
-// static const uint8_t UNDEPEND_AC3_STREAM_EXT = 0x71;
-// static const uint8_t DEEPEND_AC3_STREAM_EXT = 0x71;
-// static const uint8_t UNDEPEND_AC_TRUE_HD_STREAM_EXT = 0x76;
+    // DVB
+    SUB_DVB = 0x06,  // DVB Subtitles
+};
 
 struct AdaptiveField
 {
@@ -193,9 +204,9 @@ struct BluRayCoarseInfo
 
 struct PMTIndexData
 {
-    int64_t m_pktCnt;
+    uint32_t m_pktCnt;
     int64_t m_frameLen;
-    PMTIndexData(int64_t pktCnt, int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
+    PMTIndexData(uint32_t pktCnt, int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;
@@ -203,7 +214,7 @@ typedef std::map<uint64_t, PMTIndexData> PMTIndex;
 struct PMTStreamInfo
 {
     PMTStreamInfo()
-        : m_streamType(0),
+        : m_streamType(),
           m_esInfoLen(0),
           m_pid(0),
           m_pmtPID(-1),
@@ -214,7 +225,7 @@ struct PMTStreamInfo
     {
     }
 
-    PMTStreamInfo(int streamType, int pid, uint8_t* esInfoData, int esInfoLen, AbstractStreamReader* codecReader,
+    PMTStreamInfo(StreamType streamType, int pid, uint8_t* esInfoData, int esInfoLen, AbstractStreamReader* codecReader,
                   const std::string& lang, bool secondary)
     {
         m_streamType = streamType;
@@ -230,7 +241,7 @@ struct PMTStreamInfo
     }
     virtual ~PMTStreamInfo() {}
 
-    int m_streamType;
+    StreamType m_streamType;
     int m_pid;
     int m_esInfoLen;
     int m_pmtPID;
@@ -320,14 +331,14 @@ struct M2TSStreamInfo
           language_code(),
           number_of_offset_sequences(0),
           sampling_frequency_index(0),
-          stream_coding_type(0)
+          stream_coding_type()
     {
     }
     M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
     M2TSStreamInfo(const M2TSStreamInfo& other);
 
     int streamPID;
-    int stream_coding_type;  // ts type
+    StreamType stream_coding_type;  // ts type
     int video_format;
     int frame_rate_index;
     int number_of_offset_sequences;
@@ -420,7 +431,7 @@ class CLPIParser
     {
     }
 
-    void parse(uint8_t* buffer, int len);
+    void parse(uint8_t* buffer, int64_t len);
     bool parse(const char* fileName);
     int compose(uint8_t* buffer, int bufferSize);
 
@@ -484,8 +495,8 @@ struct MPLSStreamInfo : public M2TSStreamInfo
     void parseStreamAttributes(BitStreamReader& reader);
     void parseStreamEntry(BitStreamReader& reader);
     void composeStreamAttributes(BitStreamWriter& reader);
-    void composeStreamEntry(BitStreamWriter& reader, int entryNum, int subPathID = 0);
-    void composePGS_SS_StreamEntry(BitStreamWriter& writer, int entryNum);
+    void composeStreamEntry(BitStreamWriter& reader, size_t entryNum, int subPathID = 0);
+    void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum);
 
    public:
     int type;
@@ -573,9 +584,9 @@ struct MPLSParser
     std::vector<std::string> m_mvcFiles;
 
    private:
-    void composeSubPlayItem(BitStreamWriter& writer, int playItemNum, int subPathNum,
+    void composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum, size_t subPathNum,
                             std::vector<PMTIndex>& pmtIndexList);
-    void composeSubPath(BitStreamWriter& writer, int subPathNum, std::vector<PMTIndex>& pmtIndexList, int type);
+    void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList, int type);
     int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList);
     void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, uint8_t* dataEnd);
@@ -592,9 +603,9 @@ struct MPLSParser
 
     void composePlayList(BitStreamWriter& writer);
     // void composePlayItem(BitStreamWriter& writer);
-    void composePlayItem(BitStreamWriter& writer, int playItemNum, std::vector<PMTIndex>& pmtIndexList);
+    void composePlayItem(BitStreamWriter& writer, size_t playItemNum, std::vector<PMTIndex>& pmtIndexList);
     void composePlayListMark(BitStreamWriter& writer);
-    void composeSTN_table(BitStreamWriter& writer, int PlayItem_id, bool isSSEx);
+    void composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, bool isSSEx);
     int composeSTN_tableSS(uint8_t* buffer, int bufferSize);
     int composeSubPathEntryExtension(uint8_t* buffer, int bufferSize);
     int composeUHD_metadata(uint8_t* buffer, int bufferSize);

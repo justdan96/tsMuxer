@@ -86,7 +86,7 @@ class TSDemuxer : public AbstractDemuxer
     uint8_t m_acceptedPidCache[8192];
     bool m_firstDemuxCall;
 
-    bool isVideoPID(uint32_t streamType);
+    bool isVideoPID(StreamType streamType);
     bool checkForRealM2ts(uint8_t* buffer, uint8_t* end);
 };
 

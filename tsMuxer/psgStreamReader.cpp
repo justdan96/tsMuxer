@@ -7,6 +7,7 @@
 #include <string>
 
 #include "avCodecs.h"
+#include "ioContextDemuxer.h"
 #include "math.h"
 #include "tsMuxer.h"
 #include "tsPacket.h"
@@ -753,7 +754,7 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
 {
     CheckStreamRez rez;
     if ((containerType == ContainerType::ctM2TS || containerType == ContainerType::ctTS) &&
-        containerDataType == STREAM_TYPE_SUB_PGS)
+        containerDataType == TRACKTYPE_PGS)
     {
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
@@ -761,7 +762,7 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
             rez.streamDescr +=
                 std::string(" #") + int32ToStr(containerStreamIndex - (V3_flags & 0x1e ? 0x12A0 : 0x1200));
     }
-    else if (containerType == ContainerType::ctMKV && containerDataType == STREAM_TYPE_SUB_PGS)
+    else if (containerType == ContainerType::ctMKV && containerDataType == TRACKTYPE_PGS)
     {
         rez.codecInfo = pgsCodecInfo;
         rez.streamDescr = "Presentation Graphic Stream";
@@ -849,14 +850,3 @@ void PGSStreamReader::setVideoInfo(int width, int height, double fps)
         m_render->enlargeCrop(width, height, &m_scaled_width, &m_scaled_height);
     m_render->setVideoInfo(m_scaled_width, m_scaled_height, m_newFps);
 }
-
-/*
-void PGSStreamReader::setVideoHeight(int value) {
-        m_scaled_height = value;
-        m_render->setVideoInfo(m_scaled_width, m_scaled_height, m_newFps);
-}
-void PGSStreamReader::setFPS(double value) {
-        m_newFps = value;
-        m_render->setVideoInfo(m_scaled_width, m_scaled_height, m_newFps);
-}
-*/
