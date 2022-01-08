@@ -881,7 +881,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
         int64_t samplesRest = m_frameRest / m_channels;
         m_frameRest = samplesRest * ((m_channels + 1) & 0xfe);
         m_frameRest -= avPacket.size - (m_needPCMHdr ? 4 : 0);
-        if (m_frameRest > 0 && (avPacket.data + avPacket.size > 0))
+        if (m_frameRest > 0)
         {
             memset(avPacket.data + avPacket.size, 0, m_frameRest);
             avPacket.size += (int)m_frameRest;
