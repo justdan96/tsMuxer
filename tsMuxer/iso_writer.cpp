@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include <ctime>
+#include <time.h>
 
 #include "convertUTF.h"
 #include "utf8Converter.h"
