@@ -82,15 +82,15 @@ class ByteFileWriter
 
     void writeIcbTag(uint8_t fileType);
     void writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id);
-    void writeDString(const char* value, int len = -1);
-    void writeDString(const std::string& value, int len = -1);
+    void writeDString(const char* value, int64_t len = -1);
+    void writeDString(const std::string& value, int64_t len = -1);
     void writeCharSpecString(const char* value, int len);
     void writeUDFString(const char* value, int len);
     void skipBytes(int value);
     void doPadding(int padSize);
     void writeTimestamp(time_t t);
 
-    int size() const;
+    int64_t size() const;
 
    private:
     uint8_t* m_buffer;
@@ -108,7 +108,7 @@ struct Extent
     Extent() : lbnPos(0), size(0) {}
     Extent(int lbn, int64_t _size) : lbnPos(lbn), size(_size) {}
     int lbnPos;  // absolute logic block number
-    int size;
+    int64_t size;
 };
 typedef std::vector<Extent> ExtentList;
 

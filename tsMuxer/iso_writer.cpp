@@ -119,7 +119,7 @@ bool canUse8BitUnicode(const std::string& utf8Str)
     return rv;
 }
 
-std::vector<std::uint8_t> serializeDString(const std::string& str, int fieldLen)
+std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldLen)
 {
     if (str.empty())
     {
@@ -128,52 +128,56 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, int fieldLen)
     std::vector<std::uint8_t> rv;
 #ifdef _WIN32
     auto str_u8 = reinterpret_cast<const std::uint8_t*>(str.c_str());
-    auto utf8Str = convertUTF::isLegalUTF8String(str_u8, str.length())
-                       ? str
-                       : UtfConverter::toUtf8(str_u8, str.length(), UtfConverter::SourceFormat::sfANSI);
+    std::string utf8Str = convertUTF::isLegalUTF8String(str_u8, (int)str.length())
+                              ? str
+                              : UtfConverter::toUtf8(str_u8, str.length(), UtfConverter::SourceFormat::sfANSI);
 #else
     auto& utf8Str = str;
 #endif
     using namespace convertUTF;
-    const unsigned maxHeaderAndContentLength = fieldLen - 1;
+    const size_t maxHeaderAndContentLength = fieldLen - 1;
     rv.reserve(fieldLen);
     if (canUse8BitUnicode(utf8Str))
     {
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str, [&](auto c) {
-            rv.push_back(c);
-            return rv.size() < maxHeaderAndContentLength;
-        });
+        IterateUTF8Chars(utf8Str,
+                         [&](auto c)
+                         {
+                             rv.push_back(c);
+                             return rv.size() < maxHeaderAndContentLength;
+                         });
     }
     else
     {
         rv.push_back(16);
-        IterateUTF8Chars(utf8Str, [&](auto c) {
-            UTF16 high_surrogate, low_surrogate;
-            std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
-            auto spaceLeft = maxHeaderAndContentLength - rv.size();
-            if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
-            {
-                return false;
-            }
-            rv.push_back(high_surrogate >> 8);
-            rv.push_back(high_surrogate);
-            if (low_surrogate)
-            {
-                rv.push_back(low_surrogate >> 8);
-                rv.push_back(low_surrogate);
-            }
-            return true;
-        });
+        IterateUTF8Chars(utf8Str,
+                         [&](auto c)
+                         {
+                             UTF16 high_surrogate, low_surrogate;
+                             std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
+                             auto spaceLeft = maxHeaderAndContentLength - rv.size();
+                             if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
+                             {
+                                 return false;
+                             }
+                             rv.push_back((uint8_t)(high_surrogate >> 8));
+                             rv.push_back((uint8_t)high_surrogate);
+                             if (low_surrogate)
+                             {
+                                 rv.push_back((uint8_t)(low_surrogate >> 8));
+                                 rv.push_back((uint8_t)low_surrogate);
+                             }
+                             return true;
+                         });
     }
-    auto contentLength = rv.size();
+    auto contentLength = (uint8_t)rv.size();
     auto paddingSize = maxHeaderAndContentLength - rv.size();
     std::fill_n(std::back_inserter(rv), paddingSize, 0);
     rv.push_back(contentLength);
     return rv;
 }
 
-void writeDString(uint8_t* buffer, const char* value, int fieldLen)
+void writeDString(uint8_t* buffer, const char* value, int64_t fieldLen)
 {
     auto content = serializeDString(value, fieldLen);
     assert(content.size() == fieldLen);
@@ -237,7 +241,7 @@ void ByteFileWriter::writeDescriptorTag(DescriptorTag tag, uint32_t tagLocation)
 void ByteFileWriter::closeDescriptorTag(int dataSize)
 {
     if (dataSize == -1)
-        dataSize = m_curPos - m_tagPos;
+        dataSize = (uint16_t)(m_curPos - m_tagPos);
     calcDescriptorCRC(m_tagPos, dataSize);
 }
 
@@ -265,16 +269,16 @@ void ByteFileWriter::writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t parti
     m_curPos += 16;
 }
 
-void ByteFileWriter::writeDString(const char* value, int len)
+void ByteFileWriter::writeDString(const char* value, int64_t len)
 {
-    int writeLen = len;
+    int64_t writeLen = len;
     if (writeLen == -1)
         writeLen = strlen(value) + 2;
     ::writeDString(m_curPos, value, writeLen);
     m_curPos += writeLen;
 }
 
-void ByteFileWriter::writeDString(const std::string& value, int len) { writeDString(value.c_str(), len); }
+void ByteFileWriter::writeDString(const std::string& value, int64_t len) { writeDString(value.c_str(), len); }
 
 void ByteFileWriter::doPadding(int padSize)
 {
@@ -307,7 +311,7 @@ void ByteFileWriter::writeTimestamp(time_t time)
     m_curPos += 12;
 };
 
-int ByteFileWriter::size() const { return m_curPos - m_buffer; }
+int64_t ByteFileWriter::size() const { return m_curPos - m_buffer; }
 
 // ------------------------------ FileEntryInfo ------------------------------------
 
@@ -358,7 +362,7 @@ void FileEntryInfo::writeEntity(ByteFileWriter& writer, FileEntryInfo* subDir)
     writer.writeLE16(0x01);  // File Version Number
     writer.writeLE8(!subDir->isFile() ? 0x02
                                       : (isSystemFile ? 0x10 : 0));  // File Characteristics, 'directory' bit (1-th)
-    writer.writeLE8(subDir->m_name.length() + 1);                    // Length of File Identifier (=L_FI)
+    writer.writeLE8((uint8_t)subDir->m_name.length() + 1);           // Length of File Identifier (=L_FI)
     writer.writeLongAD(0x800, subDir->m_sectorNum, 0x01, subDir->m_objectId);  // ICB
     writer.writeLE16(0);                                                       // Length of Implementation Use
     writer.writeDString(subDir->m_name);
@@ -385,7 +389,7 @@ int FileEntryInfo::allocateEntity(int sectorNum)
         m_sectorsUsed = 1;
     else
     {
-        int sz = m_extents.size() - 1 - MAX_EXTENTS_IN_EXTFILE;
+        int sz = (int)m_extents.size() - 1 - MAX_EXTENTS_IN_EXTFILE;
         m_sectorsUsed = 1 + (sz + MAX_EXTENTS_IN_EXTCONT - 1) / MAX_EXTENTS_IN_EXTCONT;
     }
     return m_sectorsUsed;
@@ -431,7 +435,8 @@ void FileEntryInfo::serializeDir()
     for (auto& i : m_subDirs) writeEntity(writer, i);
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
-    m_owner->writeExtentFileDescriptor(0, m_objectId, m_fileType, writer.size(), m_sectorNum + 1, m_subDirs.size() + 1);
+    m_owner->writeExtentFileDescriptor(0, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
+                                       (int)m_subDirs.size() + 1);
     m_owner->writeSector(buffer);
 }
 
@@ -443,7 +448,7 @@ void FileEntryInfo::addExtent(const Extent& extent)
     }
     else
     {
-        int lastLBN = m_extents.rbegin()->lbnPos + m_extents.rbegin()->size / SECTOR_SIZE;
+        int lastLBN = m_extents.rbegin()->lbnPos + (int)(m_extents.rbegin()->size / SECTOR_SIZE);
         if (lastLBN == extent.lbnPos && m_extents.rbegin()->size + extent.size < MAX_EXTENT_SIZE)
             m_extents.rbegin()->size += extent.size;
         else
@@ -480,7 +485,7 @@ int FileEntryInfo::write(const uint8_t* data, uint32_t len)
 
     if (m_sectorBufferSize)
     {
-        int toCopy = FFMIN(SECTOR_SIZE - m_sectorBufferSize, writeLen);
+        uint32_t toCopy = FFMIN(SECTOR_SIZE - m_sectorBufferSize, writeLen);
         memcpy(m_sectorBuffer + m_sectorBufferSize, data, toCopy);
         m_sectorBufferSize += toCopy;
         if (m_sectorBufferSize == SECTOR_SIZE)
@@ -511,7 +516,7 @@ void FileEntryInfo::close()
 {
     if (m_sectorBufferSize)
     {
-        int delta = m_fileSize / SECTOR_SIZE;
+        auto delta = (int)(m_fileSize / SECTOR_SIZE);
         m_owner->sectorSeek(IsoWriter::Partition::MainPartition, m_extents.rbegin()->lbnPos + delta);
         memset(m_sectorBuffer + m_sectorBufferSize, 0, SECTOR_SIZE - m_sectorBufferSize);
         m_owner->writeRawData(m_sectorBuffer, SECTOR_SIZE);
@@ -625,7 +630,7 @@ bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISO
 
     if (diskSize > 0)
     {
-        int blocks = 2 + extraISOBlocks + roundUp64(diskSize, META_BLOCK_PER_DATA) / META_BLOCK_PER_DATA;
+        int blocks = 2 + extraISOBlocks + (int)(roundUp64(diskSize, META_BLOCK_PER_DATA) / META_BLOCK_PER_DATA);
         setMetaPartitionSize(ALLOC_BLOCK_SIZE * blocks);
     }
 
@@ -656,7 +661,7 @@ bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISO
     memset(m_buffer, 0, SECTOR_SIZE);
     while (m_file.size() < 1024 * 576) m_file.write(m_buffer, SECTOR_SIZE);
 
-    m_partitionStartAddress = m_file.size() / SECTOR_SIZE;
+    m_partitionStartAddress = (int)(m_file.size() / SECTOR_SIZE);
     m_tagLocationBaseAddr = m_partitionStartAddress;
     m_partitionEndAddress = 0;
 
@@ -665,7 +670,7 @@ bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISO
     for (int i = 0; i < 64 / 2; ++i) m_file.write(m_buffer, SECTOR_SIZE);
 
     // -------------- start main volume --------------------------
-    m_metadataLBN = m_file.size() / SECTOR_SIZE;
+    m_metadataLBN = (int)(m_file.size() / SECTOR_SIZE);
 
     // create root
     m_rootDirInfo = new FileEntryInfo(this, 0, 0, FileTypes::FileType_Directory);
@@ -681,7 +686,7 @@ bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISO
     memset(m_buffer, 0, sizeof(m_buffer));
     int64_t requiredFileSizeLBN = METADATA_START_ADDR + m_metadataFileLen / SECTOR_SIZE;
     int64_t currentFileSizeLBN = m_file.size() / SECTOR_SIZE;
-    for (int i = currentFileSizeLBN; i < requiredFileSizeLBN; ++i) m_file.write(m_buffer, SECTOR_SIZE);
+    for (int64_t i = currentFileSizeLBN; i < requiredFileSizeLBN; ++i) m_file.write(m_buffer, SECTOR_SIZE);
 
     // reserve space for metadata mapping file
 
@@ -765,8 +770,8 @@ FileEntryInfo* IsoWriter::getEntryByName(const std::string& name, FileTypes file
     if (!entry)
         return 0;
     bool isDir = fileType == FileTypes::FileType_Directory || fileType == FileTypes::FileType_SystemStreamDirectory;
-    int idxMax = isDir ? parts.size() : parts.size() - 1;
-    for (int i = 0; i < idxMax; ++i)
+    size_t idxMax = isDir ? parts.size() : parts.size() - 1;
+    for (size_t i = 0; i < idxMax; ++i)
     {
         FileEntryInfo* nextEntry = entry->subDirByName(parts[i]);
         if (!nextEntry)
@@ -824,7 +829,7 @@ void IsoWriter::allocateMetadata()
 
     writer.writeCharSpecString(m_impId.c_str(), 32);
     writer.writeLE32(0);  // flags
-    writer.writeLE32(m_mappingEntries.size());
+    writer.writeLE32((uint16_t)m_mappingEntries.size());
     writer.writeLE32(0);  // reserved
     writer.writeLE32(0);  // reserved
 
@@ -838,7 +843,7 @@ void IsoWriter::allocateMetadata()
         writer.writeLE16(1);  // object partition
     }
 
-    m_metadataMappingFile->write(buffer, writer.size());
+    m_metadataMappingFile->write(buffer, (uint32_t)writer.size());
     m_metadataMappingFile->close();
     delete[] buffer;
 }
@@ -853,16 +858,16 @@ void IsoWriter::close()
 
     // mirror metadata file location and length
     int64_t sz = m_file.size();
-    m_metadataMirrorLBN = m_file.size() / SECTOR_SIZE + 1;
+    m_metadataMirrorLBN = (int)(m_file.size() / SECTOR_SIZE + 1);
     m_tagLocationBaseAddr = m_partitionStartAddress;
     writeExtentFileDescriptor(0, 0, FileTypes::FileType_MetadataMirror, m_metadataFileLen,
                               m_metadataMirrorLBN - m_partitionStartAddress, 0);
 
     // allocate space for metadata mirror file
     memset(m_buffer, 0, sizeof(m_buffer));
-    for (int i = 0; i < m_metadataFileLen / SECTOR_SIZE; ++i) m_file.write(m_buffer, SECTOR_SIZE);
+    for (size_t i = 0; i < m_metadataFileLen / SECTOR_SIZE; ++i) m_file.write(m_buffer, SECTOR_SIZE);
 
-    m_partitionEndAddress = m_file.size() / SECTOR_SIZE;
+    m_partitionEndAddress = (int)(m_file.size() / SECTOR_SIZE);
 
     // reserve 64K for EOF anchor volume
     memset(m_buffer, 0, sizeof(m_buffer));
@@ -875,10 +880,10 @@ void IsoWriter::close()
 
     m_file.seek(1024 * 576);
     // metadata file location and length (located at 576K, point to 640K address)
-    m_tagLocationBaseAddr = m_partitionStartAddress;  //(1024 * 576)/SECTOR_SIZE;
+    m_tagLocationBaseAddr = m_partitionStartAddress;
     writeExtentFileDescriptor(0, 0, FileTypes::FileType_Metadata, m_metadataFileLen,
                               m_metadataLBN - m_partitionStartAddress, 0);
-    m_tagLocationBaseAddr = m_metadataLBN;  // I don't know why. I doing just as scenarist does
+    m_tagLocationBaseAddr = m_metadataLBN;  // Don't know why. Doing just as scenarist does
     writeMetadata(m_metadataLBN);
 
     writeDescriptors();
@@ -927,7 +932,7 @@ void IsoWriter::writeDescriptors()
     writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
 }
 
-uint32_t IsoWriter::absoluteSectorNum() { return m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr; }
+uint32_t IsoWriter::absoluteSectorNum() { return (uint32_t)(m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr); }
 
 void IsoWriter::sectorSeek(Partition partition, int pos)
 {
@@ -968,7 +973,7 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t star
     uint8_t* curPos = m_buffer + 24;
     for (size_t i = start; i < indexEnd; ++i)
     {
-        writeLongAD(curPos, extents->at(i).size, extents->at(i).lbnPos, 0, 0);
+        writeLongAD(curPos, (uint32_t)extents->at(i).size, extents->at(i).lbnPos, 0, 0);
         curPos += 16;
     }
     if (indexEnd < extents->size())
@@ -977,8 +982,8 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t star
         writeLongAD(curPos, SECTOR_SIZE + NEXT_EXTENT, absoluteSectorNum() + 1, 1, 0);
         curPos += 16;
     }
-    buff32[5] = curPos - m_buffer - 24;  // length
-    calcDescriptorCRC(m_buffer, curPos - m_buffer);
+    buff32[5] = (uint32_t)(curPos - m_buffer - 24);  // length
+    calcDescriptorCRC(m_buffer, (uint16_t)(curPos - m_buffer));
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
@@ -1024,8 +1029,8 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
     buff64[56 / 8] = len;   // Information Length
     buff64[64 / 8] = len;   // Object Size
 
-    buff32[72 / 4] = roundUp64(len, SECTOR_SIZE) / SECTOR_SIZE;  // blocks recorded (matched to bytes)
-    buff32[76 / 4] = 0x00;                                       // high part of blocks recorded
+    buff32[72 / 4] = (uint32_t)(roundUp64(len, SECTOR_SIZE) / SECTOR_SIZE);  // blocks recorded (matched to bytes)
+    buff32[76 / 4] = 0x00;                                                   // high part of blocks recorded
 
     writeTimestamp(m_buffer + 80, m_currentTime);   // access datetime
     writeTimestamp(m_buffer + 92, m_currentTime);   // modification datetime
@@ -1042,9 +1047,9 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
     if (fileType != FileTypes::FileType_File && fileType != FileTypes::FileType_RealtimeFile)
     {
         // metadata object (metadata file, directory e.t.c). Using short extent
-        buff32[212 / 4] = 0x08;  // Length of Allocation Descriptors
-        buff32[216 / 4] = len;   // Allocation descriptors, data len in bytes
-        buff32[220 / 4] = pos;   // Allocation descriptors, start logical block number inside volume
+        buff32[212 / 4] = 0x08;           // Length of Allocation Descriptors
+        buff32[216 / 4] = (uint32_t)len;  // Allocation descriptors, data len in bytes
+        buff32[220 / 4] = pos;            // Allocation descriptors, start logical block number inside volume
         calcDescriptorCRC(m_buffer, 224);
         m_file.write(m_buffer, SECTOR_SIZE);
         sectorsWrited++;
@@ -1053,7 +1058,7 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
     {
         // file object. using long AD
         buff32[212 / 4] = 0x10;  // long AD size
-        writeLongAD(m_buffer + 216, len, pos, 0, 0);
+        writeLongAD(m_buffer + 216, (uint32_t)len, pos, 0, 0);
         calcDescriptorCRC(m_buffer, 232);
         m_file.write(m_buffer, SECTOR_SIZE);
         sectorsWrited++;
@@ -1063,11 +1068,11 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
         size_t indexEnd = FFMIN(MAX_EXTENTS_IN_EXTFILE, extents->size());
         if (extents->size() - indexEnd == 1)
             indexEnd++;  // continue record may be replaced by payload data
-        buff32[212 / 4] = 0x10 * indexEnd;
+        buff32[212 / 4] = (uint32_t)(0x10 * indexEnd);
         uint8_t* curPos = m_buffer + 216;
         for (size_t i = 0; i < indexEnd; ++i)
         {
-            writeLongAD(curPos, extents->at(i).size, extents->at(i).lbnPos, 0, 0);
+            writeLongAD(curPos, (uint32_t)extents->at(i).size, extents->at(i).lbnPos, 0, 0);
             curPos += 16;
         }
         if (indexEnd < extents->size())
@@ -1076,7 +1081,7 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
             writeLongAD(curPos, SECTOR_SIZE + NEXT_EXTENT, absoluteSectorNum() + 1, 1, 0);  // continue expected
             curPos += 16;
         }
-        calcDescriptorCRC(m_buffer, curPos - m_buffer);
+        calcDescriptorCRC(m_buffer, (uint16_t)(curPos - m_buffer));
         m_file.write(m_buffer, SECTOR_SIZE);
         sectorsWrited++;
 
@@ -1355,7 +1360,7 @@ void IsoWriter::writeLogicalVolumeIntegrityDescriptor()
     buff32[11] = 0;  // uniq ID hi
 
     buff32[72 / 4] = 0x02;                                             // Number of Partitions
-    buff32[76 / 4] = 46 + m_appId.size();                              // Length of Implementation Use
+    buff32[76 / 4] = (uint32_t)(46 + m_appId.size());                  // Length of Implementation Use
     buff32[80 / 4] = buff32[84 / 4] = 0;                               // Free Space Table
     buff32[88 / 4] = m_partitionEndAddress - m_partitionStartAddress;  // main partition size
     buff32[92 / 4] = m_metadataFileLen / SECTOR_SIZE;
@@ -1370,7 +1375,7 @@ void IsoWriter::writeLogicalVolumeIntegrityDescriptor()
 
     strcpy((char*)m_buffer + 142, m_appId.c_str());
 
-    calcDescriptorCRC(m_buffer, 142 + m_appId.size());
+    calcDescriptorCRC(m_buffer, (uint16_t)(142 + m_appId.size()));
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
