@@ -91,20 +91,20 @@ void calcDescriptorCRC(uint8_t* buffer, uint16_t len)
 void writeTimestamp(uint8_t* buffer, time_t time)
 {
     uint16_t* buff16 = (uint16_t*)buffer;
+    struct tm partsl, partsg;
 
-    const tm* parts = localtime(&time);
+    localtime_s(&partsl, &time);
+    gmtime_s(&partsg, &time);
 
-    time_t lt = mktime(localtime(&time));
-    time_t gt = mktime(gmtime(&time));
-    int16_t timeZone = (lt - gt) / 60;
+    int16_t timeZone = partsl.tm_hour - partsg.tm_hour;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
-    buff16[1] = parts->tm_year + 1900;
-    buffer[4] = parts->tm_mon + 1;
-    buffer[5] = parts->tm_mday;
-    buffer[6] = parts->tm_hour;
-    buffer[7] = parts->tm_min;
-    buffer[8] = parts->tm_sec;
+    buff16[1] = partsl.tm_year + 1900;
+    buffer[4] = partsl.tm_mon + 1;
+    buffer[5] = partsl.tm_mday;
+    buffer[6] = partsl.tm_hour;
+    buffer[7] = partsl.tm_min;
+    buffer[8] = partsl.tm_sec;
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
