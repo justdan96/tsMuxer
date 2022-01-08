@@ -71,7 +71,7 @@ class MPEGStreamReader : public AbstractStreamReader
     int64_t m_pcrIncPerFrame;
     int64_t m_pcrIncPerField;
     const uint8_t* m_lastDecodedPos;
-    uint64_t m_totalFrameNum;
+    int m_totalFrameNum;
     virtual double getStreamFPS(void* curNalUnit) = 0;
     void updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, int oldSPSLen);
     virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) = 0;

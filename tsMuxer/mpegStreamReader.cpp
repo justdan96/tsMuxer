@@ -64,7 +64,7 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
         if (decodeRez == 0)
         {
             avPacket.data = m_tmpBuffer;
-            avPacket.size = m_tmpBufferLen;
+            avPacket.size = (int)m_tmpBufferLen;
         }
     }
 
@@ -77,16 +77,16 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
     LTRACE(LT_DEBUG, 0, message);
     LTRACE(LT_INFO, 2, message);
     m_processedBytes += avPacket.size;
-    return m_tmpBufferLen;
+    return (int)m_tmpBufferLen;
 }
 
 void MPEGStreamReader::onShiftBuffer(int offset) {}
 
 void MPEGStreamReader::storeBufferRest()
 {
-    onShiftBuffer(m_curPos - m_tmpBuffer);
+    onShiftBuffer((int)(m_curPos - m_tmpBuffer));
     memmove(m_tmpBuffer, m_curPos, m_bufEnd - m_curPos);
-    m_tmpBufferLen = m_bufEnd - m_curPos;
+    m_tmpBufferLen = (int)(m_bufEnd - m_curPos);
     if (m_lastDecodedPos > m_curPos)
         m_lastDecodedPos = m_tmpBuffer + (m_lastDecodedPos - m_curPos);
     else
@@ -118,7 +118,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
         else
             m_curPos = m_bufEnd;
-        int bytesProcessed = m_curPos - prevPos;
+        int bytesProcessed = (int)(m_curPos - prevPos);
         m_processedBytes += bytesProcessed;
         prevPos = m_curPos;
         if (!m_syncToStream)
@@ -198,7 +198,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
     }
 
-    int bytesProcessed = nal - prevPos;
+    int bytesProcessed = (int)(nal - prevPos);
     avPacket.data = m_curPos;
     avPacket.size = bytesProcessed;
     avPacket.pts = m_curPts + m_timeOffset;
@@ -323,16 +323,16 @@ void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextN
 void MPEGStreamReader::checkPulldownSync()
 {
     int64_t asyncValue;
-    if (m_testPulldownDts / 1.25 > m_curDts)
-        asyncValue = m_testPulldownDts / 1.25 - m_curDts;
-    else
-        asyncValue = m_curDts - m_testPulldownDts / 1.25;
-    if (m_testPulldownDts != 0 && asyncValue > MAX_PULLDOWN_ASYNC * m_pulldownWarnCnt)
+    asyncValue = m_curDts * 5 - m_testPulldownDts * 4;
+    if (asyncValue < 0)
+        asyncValue = -asyncValue;
+
+    if (m_testPulldownDts != 0 && asyncValue > 5 * MAX_PULLDOWN_ASYNC * m_pulldownWarnCnt)
     {
         LTRACE(LT_ERROR, 2,
                "Warning! Source stream contain irregular pulldown marks. Mistiming between original fps and "
-               "fps/1.25(without pulldown) exceed "
-                   << (int64_t)(asyncValue / 1000000ll) << "ms.");
+               "fps/1.25 (without pulldown) exceeds "
+                   << (int64_t)(asyncValue / 5000000ll) << "ms.");
         m_pulldownWarnCnt *= 2;
     }
 }
