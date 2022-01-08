@@ -65,7 +65,7 @@ class TSMuxer : public AbstractMuxer
     std::string getFileNameByIdx(size_t idx);
     int getFirstFileNum() const;
     bool isInterleaveMode() const;
-    std::vector<int32_t> getInterleaveInfo(int idx) const;
+    std::vector<int32_t> getInterleaveInfo(size_t idx) const;
     bool isSubStream() const { return m_subMode; }
 
     void setPtsOffset(int64_t value);

@@ -1507,4 +1507,4 @@ void TSMuxer::setMuxFormat(const std::string& format)
 
 bool TSMuxer::isInterleaveMode() const { return m_masterMode || m_subMode; }
 
-std::vector<int32_t> TSMuxer::getInterleaveInfo(int idx) const { return m_interleaveInfo[idx]; }
+std::vector<int32_t> TSMuxer::getInterleaveInfo(size_t idx) const { return m_interleaveInfo[idx]; }

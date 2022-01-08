@@ -451,7 +451,7 @@ class CLPIParser
     char format_identifier[5];
     uint32_t presentation_start_time;
     uint32_t presentation_end_time;
-    int m_clpiNum;
+    size_t m_clpiNum;
     std::vector<uint32_t> SPN_extent_start;
     std::vector<int32_t> interleaveInfo;
     bool isDependStream;

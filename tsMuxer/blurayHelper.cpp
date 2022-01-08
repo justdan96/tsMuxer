@@ -139,7 +139,7 @@ std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
 
     for (auto&& movieObj : movieObjects)
     {
-        payload_length += movieObj.serializedSize();
+        payload_length += (uint32_t)movieObj.serializedSize();
     }
 
     rv.reserve(header_size + payload_length);
@@ -472,8 +472,8 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
         }
 
         clpiParser.number_of_source_packets = packetCount[i];
-        clpiParser.presentation_start_time = firstPts[i] / 2;
-        clpiParser.presentation_end_time = lastPts[i] / 2;
+        clpiParser.presentation_start_time = (uint32_t)(firstPts[i] / 2);
+        clpiParser.presentation_end_time = (uint32_t)(lastPts[i] / 2);
         clpiParser.m_clpiNum = i;
 
         int fileLen = clpiParser.compose(clpiBuffer, CLPI_BUFFER_SIZE);
@@ -538,8 +538,8 @@ const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
 bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
                                   vector<double> customChapters, DiskType dt, int mplsOffset, bool isMvcBaseViewR)
 {
-    uint32_t firstPts = *(mainMuxer->getFirstPts().begin());
-    uint32_t lastPts = *(mainMuxer->getLastPts().rbegin());
+    int64_t firstPts = *(mainMuxer->getFirstPts().begin());
+    int64_t lastPts = *(mainMuxer->getLastPts().rbegin());
 
     int bufSize = 1024 * 100;
     uint8_t* mplsBuffer = new uint8_t[bufSize];
@@ -559,7 +559,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     {
         for (auto& i : customChapters)
         {
-            int64_t mark = i * 45000.0;
+            uint32_t mark = (uint32_t)(i * 45000.0);
             if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }
