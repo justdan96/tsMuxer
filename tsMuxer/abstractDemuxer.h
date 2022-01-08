@@ -34,16 +34,16 @@ class MemoryBlock
             m_data.resize(m_size);
     }
 
-    void grow(int num)
+    void grow(int64_t num)
     {
         m_size += num;
-        if ((int)m_data.size() < m_size)
+        if (m_data.size() < m_size)
         {
             m_data.resize(FFMIN(m_size * 2, m_size + 1024 * 1024));
         }
     }
 
-    void append(const uint8_t* data, int num)
+    void append(const uint8_t* data, int64_t num)
     {
         if (num > 0)
         {

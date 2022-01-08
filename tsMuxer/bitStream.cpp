@@ -58,7 +58,7 @@ void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
         src++;
     }
 
-    for (; len >= INT_BIT; len -= INT_BIT)
+    for (; len >= (int)INT_BIT; len -= INT_BIT)
     {
         writer.putBits(INT_BIT, *((unsigned*)src));
         src += sizeof(unsigned);

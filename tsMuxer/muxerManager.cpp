@@ -339,9 +339,11 @@ void MuxerManager::parseMuxOpt(const string& opts)
         {
             uint64_t coeff = 1;
             string postfix;
-            for (int i = paramPair[1].size() - 1; i >= 0; i--)
-                if (!(paramPair[1][i] >= '0' && paramPair[1][i] <= '9' || paramPair[1][i] == '.'))
-                    postfix = paramPair[1][i] + postfix;
+            for (auto i : paramPair[1])
+            {
+                if (!(i >= '0' && i <= '9' || i == '.'))
+                    postfix += i;
+            }
 
             postfix = strToUpperCase(postfix);
 

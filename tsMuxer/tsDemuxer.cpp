@@ -141,7 +141,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
         }
         if (curPos < data + readedBytes)
         {
-            tmpBufferLen = data + readedBytes - curPos;
+            tmpBufferLen = (uint32_t)(data + readedBytes - curPos);
             memmove(m_tmpBuffer, curPos, tmpBufferLen);
         }
     }
@@ -231,7 +231,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     {
         memcpy(data - m_tmpBufferLen, m_tmpBuffer, m_tmpBufferLen);
         data -= m_tmpBufferLen;
-        readedBytes += m_tmpBufferLen;
+        readedBytes += (uint32_t)m_tmpBufferLen;
         m_tmpBufferLen = 0;
     }
 
@@ -435,7 +435,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         if (!m_acceptedPidCache[pid])
             continue;
 
-        int payloadLen = TS_FRAME_SIZE - (frameData - m_curPos);
+        int64_t payloadLen = TS_FRAME_SIZE - (frameData - m_curPos);
         if (payloadLen > 0)
         {
             if (pid != lastPid)

@@ -231,7 +231,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
     {
         return NOT_ENOUGH_BUFFER;
     }
-    size_t oldSpsLen = (size_t)(nextNal - buff - 1);
+    int64_t oldSpsLen = nextNal - buff - 1;
     m_sequence.vc1_unescape_buffer(buff + 1, oldSpsLen);
     int rez = m_sequence.decode_sequence_header();
     if (rez != 0)
@@ -239,7 +239,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
 
     fillAspectBySAR(m_sequence.sample_aspect_ratio.num / (double)m_sequence.sample_aspect_ratio.den);
 
-    updateFPS(0, buff, nextNal, oldSpsLen);
+    updateFPS(0, buff, nextNal, (int)oldSpsLen);
     if (m_spsFound == 0)
     {
         LTRACE(LT_INFO, 2, "Decoding VC-1 stream (track " << m_streamIndex << "): " << m_sequence.getStreamDescr());
@@ -418,10 +418,10 @@ void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nex
 {
     m_sequence.setFPS(m_fps);
     uint8_t* tmpBuffer = new uint8_t[oldSpsLen + 16];
-    long newSpsLen = m_sequence.vc1_escape_buffer(tmpBuffer);
+    int64_t newSpsLen = m_sequence.vc1_escape_buffer(tmpBuffer);
     if (newSpsLen != oldSpsLen)
     {
-        int sizeDiff = newSpsLen - oldSpsLen;
+        int64_t sizeDiff = newSpsLen - oldSpsLen;
         memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
         m_bufEnd += sizeDiff;
     }

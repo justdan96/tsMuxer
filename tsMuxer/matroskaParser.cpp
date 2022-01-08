@@ -289,7 +289,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
 
 void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 {
-    pkt->size = size + m_waveBuffer.size();
+    pkt->size = size + (int)m_waveBuffer.size();
     pkt->data = new uint8_t[pkt->size];
     uint8_t* dst = pkt->data;
     if (!m_waveBuffer.isEmpty())

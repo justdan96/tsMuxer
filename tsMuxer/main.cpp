@@ -224,13 +224,13 @@ string getBlurayStreamDir(const string& mplsName)
 {
     string dirName = extractFileDir(mplsName);
     dirName = toNativeSeparators(dirName);
-    int tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
+    size_t tmp = dirName.substr(0, (size_t)(dirName.size() - 1)).find_last_of(getDirSeparator());
     if (tmp != string::npos)
     {
         dirName = dirName.substr(0, tmp + 1);
         if (strEndWith(dirName, string("BACKUP") + getDirSeparator()))
         {
-            tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
+            tmp = dirName.substr(0, (size_t)(dirName.size() - 1)).find_last_of(getDirSeparator());
             if (tmp == string::npos)
                 return "";
             dirName = dirName.substr(0, tmp + 1);
@@ -657,7 +657,7 @@ int main(int argc, char** argv)
                         itemName = streamDir + item.fileName + mediaExt;  // 2d mode
 
                     LTRACE(LT_INFO, 2, "");
-                    LTRACE(LT_INFO, 2, "File #" << strPadLeft(int32ToStr(i), 5, '0') << " name=" << itemName);
+                    LTRACE(LT_INFO, 2, "File #" << strPadLeft(int64ToStr(i), 5, '0') << " name=" << itemName);
                     LTRACE(LT_INFO, 2,
                            "Duration: " << floatToTime(
                                (mplsParser.m_playItems[i].OUT_time - mplsParser.m_playItems[i].IN_time) /

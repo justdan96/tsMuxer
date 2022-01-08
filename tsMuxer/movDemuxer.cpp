@@ -695,7 +695,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
         {
             MemoryBlock& vect = demuxedData[trackId + 1ll];
             MOVStreamContext* st = (MOVStreamContext*)tracks[trackId];
-            int oldSize = vect.size();
+            int64_t oldSize = vect.size();
             if (st->parsed_priv_data)
             {
                 if (chunkSize > (int)m_tmpChunkBuffer.size())
@@ -738,7 +738,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                     if (readed == 0)
                         break;
                     m_deliveredPacket.data = m_filterBuffer.data();
-                    m_deliveredPacket.size = m_filterBuffer.size();
+                    m_deliveredPacket.size = (int)m_filterBuffer.size();
                     int demuxed = filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
                     discardSize += (int64_t)chunkSize - demuxed;
                 }

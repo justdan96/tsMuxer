@@ -29,7 +29,7 @@ class TSDemuxer : public AbstractDemuxer
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
         {
             int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
-            return clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5);  // convert to ms
+            return (int64_t)(clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5));  // convert to ms
         }
 
         else
@@ -68,7 +68,7 @@ class TSDemuxer : public AbstractDemuxer
     bool m_notificated;
     TS_program_map_section m_pmt;
     uint8_t m_tmpBuffer[TS_FRAME_SIZE + 4];
-    int m_tmpBufferLen;
+    int64_t m_tmpBufferLen;
     // int64_t m_firstDTS;
     int64_t m_firstPTS;
     int64_t m_lastPTS;

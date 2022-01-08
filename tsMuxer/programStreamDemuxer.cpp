@@ -287,7 +287,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 int idx = startcode - 0xa0;
                 if (idx >= 0 && idx <= 15 && !m_lpcpHeaderAdded[idx])
                 {
-                    vect.append(m_lpcmWaveHeader[idx].data(), (int)m_lpcmWaveHeader[idx].size());
+                    vect.append(m_lpcmWaveHeader[idx].data(), m_lpcmWaveHeader[idx].size());
                     m_lpcpHeaderAdded[idx] = true;
                 }
 

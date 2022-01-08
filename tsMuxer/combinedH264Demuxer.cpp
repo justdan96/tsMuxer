@@ -287,5 +287,5 @@ int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acce
         nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     }
 
-    return avPacket.size - discardSize;
+    return avPacket.size - (int)discardSize;
 }

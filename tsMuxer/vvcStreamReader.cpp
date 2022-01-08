@@ -382,8 +382,8 @@ uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, 
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    int bytesLeft = (int)(dstEnd - dstBuffer);
-    int requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
+    int64_t bytesLeft = dstEnd - dstBuffer;
+    int64_t requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
 

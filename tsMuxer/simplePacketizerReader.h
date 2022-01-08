@@ -31,7 +31,7 @@ class SimplePacketizerReader : public AbstractStreamReader
         if (m_mplsInfo.size() > 0)
         {
             m_curMplsIndex = 0;
-            m_lastMplsTime = (int64_t)((m_mplsInfo[0].OUT_time - m_mplsInfo[0].IN_time) * (1000000000.0 / 45000.0));
+            m_lastMplsTime = (m_mplsInfo[0].OUT_time - m_mplsInfo[0].IN_time) * (1000000000.0 / 45000.0);
         }
         else
             m_curMplsIndex = -1;

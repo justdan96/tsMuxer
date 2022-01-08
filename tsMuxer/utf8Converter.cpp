@@ -79,7 +79,7 @@ std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat
 #ifdef _WIN32
     case SourceFormat::sfANSI:
     {
-        return ::toUtf8(fromAcp(reinterpret_cast<const char *>(start), numBytes).data());
+        return ::toUtf8(fromAcp(reinterpret_cast<const char *>(start), (int)numBytes).data());
     }
 #endif
     default:

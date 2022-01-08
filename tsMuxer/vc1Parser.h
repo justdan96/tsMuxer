@@ -84,18 +84,18 @@ class VC1Unit
         }
         return end;
     }
-    inline size_t vc1_unescape_buffer(uint8_t* src, size_t size)
+    inline int64_t vc1_unescape_buffer(uint8_t* src, int64_t size)
     {
         delete[] m_nalBuffer;
         m_nalBuffer = new uint8_t[size];
-        size_t dsize = 0;
         if (size < 4)
         {
             std::copy(src, src + size, m_nalBuffer);
             m_nalBufferLen = size;
             return size;
         }
-        for (size_t i = 0; i < size; i++, src++)
+        int64_t dsize = 0;
+        for (int64_t i = 0; i < size; i++, src++)
         {
             if (src[0] == 3 && i >= 2 && !src[-1] && !src[-2] && i < size - 1 && src[1] < 4)
             {
@@ -109,7 +109,7 @@ class VC1Unit
         m_nalBufferLen = dsize;
         return dsize;
     }
-    inline int vc1_escape_buffer(uint8_t* dst)
+    inline int64_t vc1_escape_buffer(uint8_t* dst)
     {
         uint8_t* srcStart = m_nalBuffer;
         uint8_t* initDstBuffer = dst;
@@ -137,7 +137,7 @@ class VC1Unit
         }
         memcpy(dst, srcStart, srcEnd - srcStart);
         dst += srcEnd - srcStart;
-        return (int)(dst - initDstBuffer);
+        return dst - initDstBuffer;
     }
     const BitStreamReader& getBitReader() { return bitReader; }
 

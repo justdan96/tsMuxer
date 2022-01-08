@@ -512,7 +512,7 @@ void MatroskaDemuxer::decompressData(const uint8_t *data, int size)
         curSize *= 3;
         m_tmpBuffer.resize(curSize);
 
-        zstream.avail_out = m_tmpBuffer.size() - zstream.total_out;
+        zstream.avail_out = (unsigned)(m_tmpBuffer.size() - zstream.total_out);
         zstream.next_out = m_tmpBuffer.data() + zstream.total_out;
         err = inflate(&zstream, Z_NO_FLUSH);
     } while (err == Z_OK && curSize < 10000000);
@@ -711,7 +711,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 {
                     decompressData(curPtr, slice_size);
                     curPtr = m_tmpBuffer.data();
-                    slice_size = m_tmpBuffer.size();
+                    slice_size = (int)m_tmpBuffer.size();
                 }
 
                 if (tracks[track]->parsed_priv_data != 0)

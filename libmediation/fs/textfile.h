@@ -37,7 +37,7 @@ class TextFile : public File
     }
     bool writeLine(const std::string& line)
     {
-        if (write(line.c_str(), line.size()) != line.size())
+        if (write(line.c_str(), (uint32_t)line.size()) != line.size())
             return false;
         return write("\r\n", 2) == 2;
     }
