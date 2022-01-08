@@ -113,7 +113,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
     uint8_t* dstEnd = dst + size;
     if (m_curPos < m_bufEnd)
     {
-        int copyLen = min(m_bufEnd - m_curPos, size);
+        int copyLen = min((int)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -128,7 +128,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
 
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        int copyLen = min(m_bufEnd - m_curPos, size);
+        int copyLen = min((int)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -137,7 +137,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
         if (readedBytes == 0)
             break;
     }
-    return dst - binary;
+    return (uint32_t)(dst - binary);
 }
 
 void IOContextDemuxer::skip_bytes(uint64_t size)
@@ -147,7 +147,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
     uint64_t skipLeft = size;
     if (m_curPos < m_bufEnd)
     {
-        uint64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
+        uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
         skipLeft -= copyLen;
         m_curPos += copyLen;
         m_processedBytes += copyLen;
@@ -159,7 +159,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
             m_bufferedReader->notify(m_readerID, readedBytes);
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        uint64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
+        uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
         m_curPos += copyLen;
         m_processedBytes += copyLen;
         skipLeft -= copyLen;
