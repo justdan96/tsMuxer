@@ -80,12 +80,12 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
-    avPacket.dts = avPacket.pts = m_curPts * m_stretch + m_timeOffset;
+    avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
     if (m_tmpBufferLen > 0)
     {
         avPacket.data = &m_tmpBuffer[0];
         avPacket.data += skipBeforeBytes;
-        avPacket.size = m_tmpBufferLen;
+        avPacket.size = (int)m_tmpBufferLen;
         if (isPriorityData(&avPacket))
             avPacket.flags |= AVPacket::PRIORITY_DATA;
         if (isIFrame(&avPacket))
@@ -93,7 +93,7 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
     }
     LTRACE(LT_DEBUG, 0, "Processed " << m_frameNum << " " << getCodecInfo().displayName << " frames");
     m_processedBytes += avPacket.size + skipBytes + skipBeforeBytes;
-    return m_tmpBufferLen;
+    return (int)m_tmpBufferLen;
 }
 
 int SimplePacketizerReader::readPacket(AVPacket& avPacket)
@@ -107,7 +107,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         avPacket.data = 0;
         avPacket.size = 0;
         avPacket.duration = 0;
-        avPacket.dts = avPacket.pts = m_curPts * m_stretch + m_timeOffset;
+        avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
         assert(m_curPos <= m_bufEnd);
         if (m_curPos == m_bufEnd)
             return NEED_MORE_DATA;
@@ -146,7 +146,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             m_curPos = frame;
             m_needSync = false;
         }
-        avPacket.dts = avPacket.pts = m_curPts * m_stretch + m_timeOffset;
+        avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
         if (m_bufEnd - m_curPos < getHeaderLen())
         {
             memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
@@ -196,7 +196,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         if (m_halfFrameLen == 0)
             m_halfFrameLen = getFrameDurationNano() / 2.0;
         m_curPts += getFrameDurationNano();
-        int64_t nextDts = m_curPts * m_stretch + m_timeOffset;
+        int64_t nextDts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
         avPacket.duration = nextDts - avPacket.dts;
         // doMplsCorrection();
         m_frameNum++;
