@@ -209,7 +209,7 @@ uint64_t roundUp64(const uint64_t& value, const uint64_t& roundVal)
 
 string strPadLeft(const string& str, size_t newSize, char filler)
 {
-    int cnt = newSize - str.size();
+    size_t cnt = newSize - str.size();
     string prefix = "";
     for (int i = 0; i < cnt; i++) prefix += filler;
     return prefix + str;
@@ -217,7 +217,7 @@ string strPadLeft(const string& str, size_t newSize, char filler)
 
 string strPadRight(const string& str, size_t newSize, char filler)
 {
-    int cnt = newSize - str.size();
+    size_t cnt = newSize - str.size();
     string postfix = "";
     for (int i = 0; i < cnt; i++) postfix += filler;
     return str + postfix;
@@ -228,7 +228,7 @@ bool strEndWith(const string& str, const string& substr)
     if (str.size() == 0)
         return false;
     size_t idx = str.size();
-    for (int i = substr.size() - 1; i >= 0; i--)
+    for (size_t i = substr.size(); i-- > 0;)
         if (substr[i] != str[--idx])
             return false;
     return true;
@@ -318,8 +318,8 @@ string extractFileExt(const string& src)
 
 string extractFileName(const string& src)
 {
-    int endPos = src.size();
-    for (size_t i = src.size() - 1; i > 0; i--)
+    size_t endPos = src.size();
+    for (size_t i = src.size(); i-- > 0;)
         if (src[i] == '.')
         {
             if (endPos == src.size())
@@ -357,7 +357,7 @@ string extractFileName2(const string& src, bool withExt)
 
 string extractFilePath(const string& src)
 {
-    for (int i = src.size() - 1; i >= 0; i--)
+    for (size_t i = src.size(); i-- > 0;)
         if (src[i] == '/' || src[i] == '\\')
         {
             string rez = src.substr(0, i);
@@ -425,7 +425,7 @@ string strToUpperCase(const string& src)
 {
     string res = src;
 
-    transform(res.begin(), res.end(), res.begin(), CaseChanger<string>(ctUpper));
+    transform(res.begin(), res.end(), res.begin(), CaseChanger<string>(CaseType::ctUpper));
 
     return res;
 }
@@ -434,7 +434,7 @@ string strToLowerCase(const string& src)
 {
     string res = src;
 
-    transform(res.begin(), res.end(), res.begin(), CaseChanger<string>(ctLower));
+    transform(res.begin(), res.end(), res.begin(), CaseChanger<string>(CaseType::ctLower));
 
     return res;
 }
@@ -499,7 +499,7 @@ std::vector<wchar_t> fromAcp(const char* acpStr, int sz)
     return mbtwc_wrapper(CP_ACP, acpStr, sz, requiredSiz);
 }
 
-std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.c_str(), utf8Str.size()); }
+std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.c_str(), (int)utf8Str.size()); }
 
 std::vector<wchar_t> toWide(const char* utf8Str, int sz)
 {

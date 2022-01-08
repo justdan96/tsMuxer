@@ -75,9 +75,9 @@ std::string boolToStr(const bool&);
 std::string strToUpperCase(const std::string& src);
 std::string strToLowerCase(const std::string& src);
 
-enum CaseType
+enum class CaseType
 {
-    ctLower = 0,
+    ctLower,
     ctUpper
 };
 
@@ -85,11 +85,11 @@ template <typename Type>
 class CaseChanger
 {
    public:
-    CaseChanger(CaseType caseType = ctLower) : m_case(caseType) {}
+    CaseChanger(CaseType caseType = CaseType::ctLower) : m_case(caseType) {}
 
     int operator()(Type& elem) const { return 0; }
 
-    int operator()(char& elem) const { return m_case == ctLower ? tolower(elem) : toupper(elem); }
+    int operator()(char& elem) const { return m_case == CaseType::ctLower ? tolower(elem) : toupper(elem); }
 
    private:
     CaseType m_case;
