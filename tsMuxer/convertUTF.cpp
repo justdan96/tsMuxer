@@ -297,12 +297,15 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
         case 4:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 3:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 2:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 1:
             *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
@@ -338,13 +341,14 @@ static Boolean isLegalUTF8(const UTF8* source, int length)
     case 4:
         if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
             return false;
+        [[fallthrough]];
     case 3:
         if ((a = (*--srcptr)) < 0x80 || a > 0xBF)
             return false;
+        [[fallthrough]];
     case 2:
         if ((a = (*--srcptr)) > 0xBF)
             return false;
-
         switch (*source)
         {
         /* no fall-through in this inner switch */
@@ -368,7 +372,7 @@ static Boolean isLegalUTF8(const UTF8* source, int length)
             if (a < 0x80)
                 return false;
         }
-
+        [[fallthrough]];
     case 1:
         if (*source >= 0x80 && *source < 0xC2)
             return false;
@@ -443,18 +447,23 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
         case 5:
             ch += *source++;
             ch <<= 6; /* remember, illegal UTF-8 */
+            [[fallthrough]];
         case 4:
             ch += *source++;
             ch <<= 6; /* remember, illegal UTF-8 */
+            [[fallthrough]];
         case 3:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 2:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 1:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 0:
             ch += *source++;
         }
@@ -584,12 +593,15 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
         case 4:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 3:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 2:
             *--target = (UTF8)((ch | byteMark) & byteMask);
             ch >>= 6;
+            [[fallthrough]];
         case 1:
             *--target = (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
@@ -631,18 +643,23 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
         case 5:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 4:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 3:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 2:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 1:
             ch += *source++;
             ch <<= 6;
+            [[fallthrough]];
         case 0:
             ch += *source++;
         }
