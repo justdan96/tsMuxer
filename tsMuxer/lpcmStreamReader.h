@@ -24,7 +24,7 @@ class LPCMStreamReader : public SimplePacketizerReader
         m_firstFrame = true;
         m_demuxMode = false;
         // m_waveHeaderParsed = false;
-        m_curChankLen = 0;
+        m_curChunkLen = 0;
         m_channels = 0;
         m_frameRest = 0;
         m_needPCMHdr = true;
@@ -64,18 +64,18 @@ class LPCMStreamReader : public SimplePacketizerReader
     // bool m_demuxMode;
     // bool m_waveHeaderParsed;
     uint8_t m_tmpFrameBuffer[17280 + 4];  // max PCM frame size
-    uint32_t m_frameRest;
+    int64_t m_frameRest;
     bool m_needPCMHdr;
 
     int m_bitsPerSample;
     int m_freq;
     int m_channels;
     bool m_lfeExists;
-    int64_t m_curChankLen;
+    int64_t m_curChunkLen;
     bool m_openSizeWaveFormat;
     uint8_t* m_lastChannelRemapPos;
 
-    bool detectLPCMType(uint8_t* buffer, int len);
+    bool detectLPCMType(uint8_t* buffer, int64_t len);
     int decodeLPCMHeader(uint8_t* buff);
     uint32_t convertLPCMToWAV(uint8_t* start, uint8_t* end);
     uint32_t convertWavToPCM(uint8_t* start, uint8_t* end);

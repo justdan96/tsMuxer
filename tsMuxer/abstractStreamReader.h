@@ -87,7 +87,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     uint8_t* m_bufEnd;
     // int m_dataLen;
     int m_streamIndex;
-    int m_tmpBufferLen;
+    int64_t m_tmpBufferLen;
     bool m_demuxMode;
     bool m_secondary;
 
