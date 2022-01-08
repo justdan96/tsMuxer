@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include <time.h>
+#include <ctime>
 
 #include "convertUTF.h"
 #include "utf8Converter.h"
@@ -91,20 +91,19 @@ void calcDescriptorCRC(uint8_t* buffer, uint16_t len)
 void writeTimestamp(uint8_t* buffer, time_t time)
 {
     uint16_t* buff16 = (uint16_t*)buffer;
-    struct tm partsl, partsg;
 
-    localtime_s(&partsl, &time);
-    gmtime_s(&partsg, &time);
+    struct tm* partsl = localtime(&time);
+    struct tm* partsg = gmtime(&time);
 
-    int16_t timeZone = partsl.tm_hour - partsg.tm_hour;
+    int16_t timeZone = partsl->tm_hour - partsg->tm_hour;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
-    buff16[1] = partsl.tm_year + 1900;
-    buffer[4] = partsl.tm_mon + 1;
-    buffer[5] = partsl.tm_mday;
-    buffer[6] = partsl.tm_hour;
-    buffer[7] = partsl.tm_min;
-    buffer[8] = partsl.tm_sec;
+    buff16[1] = partsg->tm_year + 1900;
+    buffer[4] = partsg->tm_mon + 1;
+    buffer[5] = partsg->tm_mday;
+    buffer[6] = partsg->tm_hour;
+    buffer[7] = partsg->tm_min;
+    buffer[8] = partsg->tm_sec;
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
