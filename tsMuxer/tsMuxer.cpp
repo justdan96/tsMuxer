@@ -101,7 +101,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_firstPts.push_back(-1);
     m_lastPts.push_back(-1);
     m_muxedPacketCnt.push_back(0);
-    m_interliaveInfo.push_back(std::vector<int32_t>());
+    m_interleaveInfo.push_back(std::vector<int32_t>());
     m_pesIFrame = false;
     m_pesSpsPps = false;
     m_computeMuxStats = false;
@@ -776,8 +776,8 @@ void TSMuxer::gotoNextFile(uint64_t newPts)
     }
 
     m_muxedPacketCnt.push_back(0);
-    m_interliaveInfo.push_back(std::vector<int32_t>());
-    m_interliaveInfo.rbegin()->push_back(0);
+    m_interleaveInfo.push_back(std::vector<int32_t>());
+    m_interleaveInfo.rbegin()->push_back(0);
 
     m_lastPts[m_lastPts.size() - 1] = newPts;  //(curPts-FIXED_PTS_OFFSET)*INT_FREQ_TO_TS_FREQ;
     m_firstPts.push_back(newPts);              //((curPts-FIXED_PTS_OFFSET)*INT_FREQ_TO_TS_FREQ);
@@ -924,7 +924,7 @@ void TSMuxer::finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFil
         int64_t gapForPATPMT = (int64_t)((192 * 4.0) / 35000000.0 * 27000000.0);
         doFlush(newPCR, gapForPATPMT);
         if (!doChangeFile)
-            m_interliaveInfo.rbegin()->push_back((int32_t)(m_processedBlockSize / 192));
+            m_interleaveInfo.rbegin()->push_back((int32_t)(m_processedBlockSize / 192));
         m_processedBlockSize = 0;
         m_owner->muxBlockFinished(this);
         if (m_m2tsMode)
@@ -1419,7 +1419,7 @@ void TSMuxer::setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock)
     m_sublingMuxer = dynamic_cast<TSMuxer*>(mainMuxer);
     m_subMode = true;
     m_canSwithBlock = flushInterleavedBlock;
-    m_interliaveInfo.rbegin()->push_back(0);
+    m_interleaveInfo.rbegin()->push_back(0);
 }
 
 void TSMuxer::joinToMasterFile()
@@ -1433,7 +1433,7 @@ void TSMuxer::setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock)
     m_sublingMuxer = dynamic_cast<TSMuxer*>(subMuxer);
     m_masterMode = true;
     m_canSwithBlock = flushInterleavedBlock;
-    m_interliaveInfo.rbegin()->push_back(0);
+    m_interleaveInfo.rbegin()->push_back(0);
 }
 
 void TSMuxer::openDstFile()
@@ -1507,4 +1507,4 @@ void TSMuxer::setMuxFormat(const std::string& format)
 
 bool TSMuxer::isInterleaveMode() const { return m_masterMode || m_subMode; }
 
-std::vector<int32_t> TSMuxer::getInterleaveInfo(int idx) const { return m_interliaveInfo[idx]; }
+std::vector<int32_t> TSMuxer::getInterleaveInfo(int idx) const { return m_interleaveInfo[idx]; }

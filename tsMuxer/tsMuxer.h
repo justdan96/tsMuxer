@@ -208,7 +208,7 @@ class TSMuxer : public AbstractMuxer
     int m_frameSize;
     int64_t m_processedBlockSize;
     TSMuxer* m_sublingMuxer;
-    std::vector<std::vector<int32_t>> m_interliaveInfo;  // ssif interliave info, should be written to CLPI
+    std::vector<std::vector<int32_t>> m_interleaveInfo;  // ssif interliave info, should be written to CLPI
     bool m_masterMode;
     bool m_subMode;
     PriorityDataInfo m_priorityData;
