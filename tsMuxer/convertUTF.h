@@ -181,18 +181,23 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
         case 5:
             ch += get_as_uchar();
             ch <<= 6;
+            [[fallthrough]];
         case 4:
             ch += get_as_uchar();
             ch <<= 6;
+            [[fallthrough]];
         case 3:
             ch += get_as_uchar();
             ch <<= 6;
+            [[fallthrough]];
         case 2:
             ch += get_as_uchar();
             ch <<= 6;
+            [[fallthrough]];
         case 1:
             ch += get_as_uchar();
             ch <<= 6;
+            [[fallthrough]];
         case 0:
             ch += get_as_uchar();
         }
