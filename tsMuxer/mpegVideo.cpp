@@ -267,6 +267,20 @@ void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 }
 
 // --------------- gop header ------------------
+
+MPEGGOPHeader::MPEGGOPHeader()
+    : MPEGHeader(),
+      time_code_hours(0),
+      time_code_minutes(0),
+      time_code_seconds(0),
+      broken_link(0),
+      close_gop(0),
+      drop_frame_flag(0)
+{
+}
+
+MPEGGOPHeader::~MPEGGOPHeader() {}
+
 uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int64_t buf_size)
 {
     BitStreamReader bitReader{};

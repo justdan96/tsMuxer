@@ -147,6 +147,8 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
 class MPEGGOPHeader : public MPEGHeader
 {
    public:
+    MPEGGOPHeader();
+    ~MPEGGOPHeader();
     int drop_frame_flag;
     uint8_t time_code_hours;
     uint8_t time_code_minutes;
