@@ -203,12 +203,12 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        int nalUnitType = (curPos[m_nalSize] >> 1) & 0x3f;
-        if (nalUnitType == NAL_VPS)
+        auto nalUnitType = (HevcUnit::NalType)((curPos[m_nalSize] >> 1) & 0x3f);
+        if (nalUnitType == HevcUnit::NalType::VPS)
             vpsFound = true;
-        else if (nalUnitType == NAL_SPS)
+        else if (nalUnitType == HevcUnit::NalType::SPS)
             spsFound = true;
-        else if (nalUnitType == NAL_PPS)
+        else if (nalUnitType == HevcUnit::NalType::PPS)
             ppsFound = true;
         curPos += elSize + m_nalSize;
     }

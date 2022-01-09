@@ -47,11 +47,12 @@ int HevcUnit::deserialize()
     try
     {
         m_reader.skipBit();
-        nal_unit_type = m_reader.getBits(6);
+        nal_unit_type = (NalType)m_reader.getBits(6);
         nuh_layer_id = m_reader.getBits(6);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
-        if (nuh_temporal_id_plus1 == 0 || (nuh_temporal_id_plus1 != 1 && (nal_unit_type == 32 || nal_unit_type == 33 ||
-                                                                          nal_unit_type == 36 || nal_unit_type == 37)))
+        if (nuh_temporal_id_plus1 == 0 || (nuh_temporal_id_plus1 != 1 && (nal_unit_type == HevcUnit::NalType::VPS ||
+                                                                          nal_unit_type == HevcUnit::NalType::SPS ||
+              nal_unit_type == HevcUnit::NalType::EOS || nal_unit_type == HevcUnit::NalType::EOB)))
             return 1;
         return 0;
     }
@@ -875,7 +876,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
     {
         pic_order_cnt_lsb = 0;
         first_slice = m_reader.getBit();
-        if (nal_unit_type >= NAL_BLA_W_LP && nal_unit_type <= NAL_RSV_IRAP_VCL23)
+        if (nal_unit_type >= NalType::BLA_W_LP && nal_unit_type <= NalType::RSV_IRAP_VCL23)
             m_reader.skipBit();  // no_output_of_prior_pics_flag u(1)
         pps_id = extractUEGolombCode();
         if (pps_id > 63)
@@ -916,7 +917,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
     }
 }
 
-bool HevcSliceHeader::isIDR() const { return nal_unit_type == NAL_IDR_W_RADL || nal_unit_type == NAL_IDR_N_LP; }
+bool HevcSliceHeader::isIDR() const { return nal_unit_type == NalType::IDR_W_RADL || nal_unit_type == NalType::IDR_N_LP; }
 
 vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size)
 {

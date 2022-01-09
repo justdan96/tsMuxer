@@ -52,12 +52,12 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
     {
         if (*nal & 0x80)
             return rez;  // invalid nal
-        int nalType = (*nal >> 1) & 0x3f;
+        auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
 
         switch (nalType)
         {
-        case NAL_VPS:
+        case HevcUnit::NalType::VPS:
             if (!m_vps)
                 m_vps = new HevcVpsUnit();
             m_vps->decodeBuffer(nal, nextNal);
@@ -67,7 +67,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             if (m_vps->num_units_in_tick)
                 updateFPS(m_vps, nal, nextNal, 0);
             break;
-        case NAL_SPS:
+        case HevcUnit::NalType::SPS:
             if (!m_sps)
                 m_sps = new HevcSpsUnit();
             m_sps->decodeBuffer(nal, nextNal);
@@ -76,23 +76,23 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             m_spsPpsFound = true;
             updateFPS(m_sps, nal, nextNal, 0);
             break;
-        case NAL_PPS:
+        case HevcUnit::NalType::PPS:
             if (!m_pps)
                 m_pps = new HevcPpsUnit();
             m_pps->decodeBuffer(nal, nextNal);
             if (m_pps->deserialize() != 0)
                 return rez;
             break;
-        case NAL_SEI_PREFIX:
+        case HevcUnit::NalType::SEI_PREFIX:
             m_hdr->decodeBuffer(nal, nextNal);
             if (m_hdr->deserialize() != 0)
                 return rez;
             break;
-        case NAL_DVRPU:
-        case NAL_DVEL:
+        case HevcUnit::NalType::DVRPU:
+        case HevcUnit::NalType::DVEL:
             if (nal[1] == 1)
             {
-                if (nalType == NAL_DVEL)
+                if (nalType == HevcUnit::NalType::DVEL)
                     m_hdr->isDVEL = true;
                 else
                     m_hdr->isDVRPU = true;
@@ -169,10 +169,10 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
              nal = NALUnit::findNextNAL(nal, m_bufEnd))
         {
-            uint8_t nalType = (*nal >> 1) & 0x3f;
+            auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
             uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
 
-            if (nalType == NAL_SPS)
+            if (nalType == HevcUnit::NalType::SPS)
             {
                 int toDecode = FFMIN(sizeof(tmpBuffer) - 8, (unsigned)(nextNal - nal));
                 int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
@@ -349,7 +349,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         bitWriter.putBits(13, 0x1011);  // dependency_pid
         bitWriter.putBits(3, 7);        // reserved
     }
-    bitWriter.putBits(4, compatibility);  // dv_bl_signal_compatibility_id
+    bitWriter.putBits(4, compatibility);  // dv_bl_sigHevcUnit::NalType::compatibility_id
     bitWriter.putBits(4, 15);             // reserved
 
     bitWriter.flushBits();
@@ -399,21 +399,21 @@ double HEVCStreamReader::getStreamFPS(void* curNalUnit)
     return fps;
 }
 
-bool HEVCStreamReader::isSlice(int nalType) const
+bool HEVCStreamReader::isSlice(HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
-    return (nalType >= NAL_TRAIL_N && nalType <= NAL_RASL_R) ||
-           (nalType >= NAL_BLA_W_LP && nalType <= NAL_RSV_IRAP_VCL23);
+    return (nalType >= HevcUnit::NalType::TRAIL_N && nalType <= HevcUnit::NalType::RASL_R) ||
+           (nalType >= HevcUnit::NalType::BLA_W_LP && nalType <= HevcUnit::NalType::RSV_IRAP_VCL23);
 }
 
-bool HEVCStreamReader::isSuffix(int nalType) const
+bool HEVCStreamReader::isSuffix(HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
-    return (nalType == NAL_FD_NUT || nalType == NAL_SEI_SUFFIX || nalType == NAL_RSV_NVCL45 ||
-            (nalType >= NAL_RSV_NVCL45 && nalType <= NAL_RSV_NVCL47) ||
-            (nalType >= NAL_UNSPEC56 && nalType <= NAL_DVEL));
+    return (nalType == HevcUnit::NalType::FD || nalType == HevcUnit::NalType::SEI_SUFFIX || nalType == HevcUnit::NalType::RSV_NVCL45 ||
+            (nalType >= HevcUnit::NalType::RSV_NVCL45 && nalType <= HevcUnit::NalType::RSV_NVCL47) ||
+            (nalType >= HevcUnit::NalType::UNSPEC56 && nalType <= HevcUnit::NalType::DVEL));
 }
 
 void HEVCStreamReader::incTimings()
@@ -485,7 +485,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
 
     while (curPos < m_bufEnd)
     {
-        int nalType = (*curPos >> 1) & 0x3f;
+        auto nalType = (HevcUnit::NalType)((*curPos >> 1) & 0x3f);
         if (isSlice(nalType))
         {
             if (curPos[2] & 0x80)  // slice.first_slice
@@ -504,7 +504,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     if (rez)
                         return rez;  // not enough buffer or error
                     // if (slice.slice_type == HEVC_IFRAME_SLICE)
-                    if (nalType >= NAL_BLA_W_LP)
+                    if (nalType >= HevcUnit::NalType::BLA_W_LP)
                         m_lastIFrame = true;
                     m_fullPicOrder = toFullPicOrder(&slice, m_sps->log2_max_pic_order_cnt_lsb);
                 }
@@ -524,7 +524,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
 
             switch (nalType)
             {
-            case NAL_VPS:
+            case HevcUnit::NalType::VPS:
                 if (!m_vps)
                     m_vps = new HevcVpsUnit();
                 m_vps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -539,7 +539,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 nextNal += m_vpsSizeDiff;
                 storeBuffer(m_vpsBuffer, curPos, nextNalWithStartCode);
                 break;
-            case NAL_SPS:
+            case HevcUnit::NalType::SPS:
                 if (!m_sps)
                     m_sps = new HevcSpsUnit();
                 m_sps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -550,7 +550,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 updateFPS(m_sps, curPos, nextNalWithStartCode, 0);
                 storeBuffer(m_spsBuffer, curPos, nextNalWithStartCode);
                 break;
-            case NAL_PPS:
+            case HevcUnit::NalType::PPS:
                 if (!m_pps)
                     m_pps = new HevcPpsUnit();
                 m_pps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -560,7 +560,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 m_spsPpsFound = true;
                 storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
                 break;
-            case NAL_SEI_PREFIX:
+            case HevcUnit::NalType::SEI_PREFIX:
                 m_hdr->decodeBuffer(curPos, nextNal);
                 if (m_hdr->deserialize() != 0)
                     return rez;
@@ -616,8 +616,8 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     if (avPacket.size > 4 && avPacket.size < dstEnd - dstBuffer)
     {
         int offset = avPacket.data[2] == 1 ? 3 : 4;
-        uint8_t nalType = (avPacket.data[offset] >> 1) & 0x3f;
-        if (nalType == NAL_AUD)
+        auto nalType = (HevcUnit::NalType)((avPacket.data[offset] >> 1) & 0x3f);
+        if (nalType == HevcUnit::NalType::AUD)
         {
             // place delimiter at first place
             memcpy(curPos, avPacket.data, avPacket.size);

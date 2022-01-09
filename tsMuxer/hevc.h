@@ -3,56 +3,51 @@
 
 #include "nalUnits.h"
 
-enum HevcSliceTypes
-{
-    HEVC_BFRAME_SLICE = 0,
-    HEVC_PFRAME_SLICE = 1,
-    HEVC_IFRAME_SLICE = 2
-};
-
-enum HEVCUnitType
-{
-    NAL_TRAIL_N = 0,  // first slice
-    NAL_TRAIL_R = 1,
-    NAL_TSA_N = 2,
-    NAL_TSA_R = 3,
-    NAL_STSA_N = 4,
-    NAL_STSA_R = 5,
-    NAL_RADL_N = 6,
-    NAL_RADL_R = 7,
-    NAL_RASL_N = 8,
-    NAL_RASL_R = 9,
-    NAL_BLA_W_LP = 16,
-    NAL_BLA_W_RADL = 17,
-    NAL_BLA_N_LP = 18,
-    NAL_IDR_W_RADL = 19,
-    NAL_IDR_N_LP = 20,
-    NAL_CRA_NUT = 21,
-    NAL_RSV_IRAP_VCL22 = 22,  // reserved
-    NAL_RSV_IRAP_VCL23 = 23,  // reserved, last slice
-
-    NAL_VPS = 32,
-    NAL_SPS = 33,
-    NAL_PPS = 34,
-    NAL_AUD = 35,
-    NAL_EOS_NUT = 36,
-    NAL_EOB_NUT = 37,
-    NAL_FD_NUT = 38,
-    NAL_SEI_PREFIX = 39,
-    NAL_SEI_SUFFIX = 40,
-    NAL_RSV_NVCL45 = 45,
-    NAL_RSV_NVCL47 = 47,
-    NAL_UNSPEC56 = 56,
-    NAL_DVRPU = 62,
-    NAL_DVEL = 63,
-};
-
 struct HevcUnit
 {
     HevcUnit()
-        : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
+        : nal_unit_type(), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
     {
     }
+
+   public:
+    enum class NalType
+    {
+        TRAIL_N = 0,  // first slice
+        TRAIL_R = 1,
+        TSA_N = 2,
+        TSA_R = 3,
+        STSA_N = 4,
+        STSA_R = 5,
+        RADL_N = 6,
+        RADL_R = 7,
+        RASL_N = 8,
+        RASL_R = 9,
+        BLA_W_LP = 16,
+        BLA_W_RADL = 17,
+        BLA_N_LP = 18,
+        IDR_W_RADL = 19,
+        IDR_N_LP = 20,
+        CRA = 21,
+        RSV_IRAP_VCL22 = 22,  // reserved
+        RSV_IRAP_VCL23 = 23,  // reserved, last slice
+
+        VPS = 32,
+        SPS = 33,
+        PPS = 34,
+        AUD = 35,
+        EOS = 36,
+        EOB = 37,
+        FD = 38,
+        SEI_PREFIX = 39,
+        SEI_SUFFIX = 40,
+        RSV_NVCL45 = 45,
+        RSV_NVCL47 = 47,
+        UNSPEC56 = 56,
+        DVRPU = 62,
+        DVEL = 63,
+    };
+
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     virtual int deserialize();
@@ -61,7 +56,7 @@ struct HevcUnit
     int nalBufferLen() const { return m_nalBufferLen; }
 
    public:
-    int nal_unit_type;
+    NalType nal_unit_type;
     int nuh_layer_id;
     int nuh_temporal_id_plus1;
 
