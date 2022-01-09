@@ -37,27 +37,11 @@ static const int COMPRESSION_ZLIB = 0;
 const static int MAX_TRACK_SIZE =
     (MAX(MAX(sizeof(MatroskaVideoTrack), sizeof(MatroskaAudioTrack)), sizeof(MatroskaSubtitleTrack)));
 
-enum AVDiscard
-{
-    /* We leave some space between them for extensions (drop some
-     * keyframes for intra-only or drop just some bidir frames). */
-    AVDISCARD_NONE = -16,   ///< discard nothing
-    AVDISCARD_DEFAULT = 0,  ///< discard useless packets like 0 size packets in avi
-    AVDISCARD_NONREF = 8,   ///< discard all non reference
-    AVDISCARD_BIDIR = 16,   ///< discard all bidirectional frames
-    AVDISCARD_NONKEY = 32,  ///< discard all frames except keyframes
-    AVDISCARD_ALL = 48,     ///< discard allle
-};
-
 int MatroskaDemuxer::matroska_parse_index()
 {
     int res = 0;
     uint32_t id;
     MatroskaDemuxIndex idx{};
-
-    // return 0;
-
-    // av_log(matroska->ctx, AV_LOG_DEBUG, "parsing index...\n");
 
     while (res == 0)
     {
@@ -364,29 +348,19 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
     return 0;
 }
 
-void MatroskaDemuxer::matroska_queue_packet(AVPacket *pkt)
-{
-    // packets = av_realloc(matroska->packets, (num_packets + 1) * sizeof(AVPacket *));
-    // packets[matroska->num_packets] = pkt;
-    // num_packets++;
-    packets.push(pkt);
-}
+void MatroskaDemuxer::matroska_queue_packet(AVPacket *pkt) { packets.push(pkt); }
 
 int MatroskaDemuxer::rv_offset(uint8_t *data, int slice, int slices)
 {
     return AV_RL32(data + 8 * slice + 4) + 8 * slices;
 }
 
-/*
- * Read signed/unsigned "EBML" numbers.
+/* Read signed/unsigned "EBML" numbers.
  * Return: number of bytes processed, < 0 on error.
- * XXX: use ebml_read_num().
- */
-
+ * XXX: use ebml_read_num(). */
 int MatroskaDemuxer::matroska_find_track_by_num(uint64_t num)
 {
-    int i;
-    for (i = 0; i < num_tracks; i++)
+    for (int i = 0; i < num_tracks; i++)
         if (tracks[i]->num == num)
             return i;
     return -1;
@@ -451,15 +425,6 @@ int MatroskaDemuxer::matroska_deliver_packet(AVPacket *&avPacket)
 {
     if (packets.size() > 0)
     {
-        /*
-        avPacket.data = packets[0]->data;
-        avPacket.size = packets[0]->size;
-        avPacket.stream_index = packets[0]->stream_index;
-        if (packets.size() > 0) {
-                //memmove(&packets[0], &packets[1], packets.size()*sizeof(AVPacket));
-                //packets.er
-        }
-        */
         avPacket = packets.front();
         packets.pop();
         return 0;
@@ -827,11 +792,8 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
     return res;
 }
 
-/*
- * Read the next element as an unsigned int.
- * 0 is success, < 0 is failure.
- */
-
+/* Read the next element as an unsigned int.
+ * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
 {
     int n = 0, res;
@@ -851,11 +813,8 @@ int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
     return 0;
 }
 
-/*
- * Read: the element content data ID.
- * Return: the number of bytes read or < 0 on error.
- */
-
+/* Read: the element content data ID.
+ * Return: the number of bytes read or < 0 on error. */
 int MatroskaDemuxer::ebml_read_element_id(uint32_t *id, int *level_up)
 {
     int read;
@@ -882,11 +841,8 @@ int MatroskaDemuxer::ebml_read_element_id(uint32_t *id, int *level_up)
     return read;
 }
 
-/*
- * Skip the next element.
- * 0 is success, -1 is failure.
- */
-
+/* Skip the next element.
+ * 0 is success, -1 is failure. */
 int MatroskaDemuxer::ebml_read_skip()
 {
     uint32_t id;
@@ -899,12 +855,9 @@ int MatroskaDemuxer::ebml_read_skip()
     return 0;
 }
 
-/*
- * Read the next element, but only the header. The contents
+/* Read the next element, but only the header. The contents
  * are supposed to be sub-elements which can be read separately.
- * 0 is success, < 0 is failure.
- */
-
+ * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_master(uint32_t *id)
 {
     uint64_t length;
@@ -927,10 +880,8 @@ int MatroskaDemuxer::ebml_read_master(uint32_t *id)
     return 0;
 }
 
-/*
- * Read: element content length.
- * Return: the number of bytes read or < 0 on error.
- */
+/* Read: element content length.
+ * Return: the number of bytes read or < 0 on error. */
 
 int MatroskaDemuxer::ebml_read_element_length(uint64_t *length)
 {
@@ -1247,10 +1198,6 @@ int MatroskaDemuxer::matroska_read_header()
             return -BufferedReader::DATA_EOF;
         if (id == MATROSKA_ID_SEGMENT)
             break;
-
-        /* oi! */
-        // av_log(matroska->ctx, AV_LOG_INFO, "Expected a Segment ID (0x%x), but received 0x%x!\n", MATROSKA_ID_SEGMENT,
-        // id);
         if ((res = ebml_read_skip()) < 0)
             return res;
     }
@@ -1335,11 +1282,6 @@ int MatroskaDemuxer::matroska_read_header()
         case MATROSKA_ID_SEEKHEAD:
         {
             ebml_read_skip();
-            /*
-if ((res = ebml_read_master(&id)) < 0)
-break;
-res = matroska_parse_seekhead();
-            */
             break;
         }
 
@@ -1439,9 +1381,7 @@ res = matroska_parse_seekhead();
     return res;
 }
 
-/*
- * From here on, it's all XML-style DTD stuff... Needs no comments.
- */
+/* From here on, it's all XML-style DTD stuff... Needs no comments. */
 
 int MatroskaDemuxer::matroska_parse_info()
 {
@@ -1539,18 +1479,12 @@ int MatroskaDemuxer::matroska_parse_info()
     return res;
 }
 
-/*
- * Read the next element as a date (nanoseconds since 1/1/2000).
- * 0 is success, < 0 is failure.
- */
-
+/* Read the next element as a date (nanoseconds since 1/1/2000).
+ * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_date(uint32_t *id, int64_t *date) { return ebml_read_sint(id, date); }
 
-/*
- * Read the next element as a float.
- * 0 is success, < 0 is failure.
- */
-
+/* Read the next element as a float.
+ * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
 {
     int res;
@@ -1576,11 +1510,8 @@ int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
     return 0;
 }
 
-/*
- * Read the next element as a UTF-8 string.
- * 0 is success, < 0 is failure.
- */
-
+/* Read the next element as a UTF-8 string.
+ * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_utf8(uint32_t *id, char **str) { return ebml_read_ascii(id, str); }
 
 int MatroskaDemuxer::matroska_parse_metadata()
@@ -1603,7 +1534,6 @@ int MatroskaDemuxer::matroska_parse_metadata()
 
         switch (id)
         {
-        /* Hm, this is unsupported... */
         case EBML_ID_VOID:
             res = ebml_read_skip();
             break;
@@ -1622,11 +1552,8 @@ int MatroskaDemuxer::matroska_parse_metadata()
     return res;
 }
 
-/*
- * Seek to a given offset.
- * 0 is success, -1 is failure.
- */
-
+/* Seek to a given offset.
+ * 0 is success, -1 is failure. */
 int MatroskaDemuxer::ebml_read_seek(int64_t offset)
 {
     /* clear ID cache, if any */
@@ -2009,8 +1936,6 @@ int MatroskaDemuxer::matroska_add_stream()
     int res = 0;
     uint32_t id;
     MatroskaTrack *track;
-
-    // av_log(matroska->ctx, AV_LOG_DEBUG, "parsing track, adding stream..,\n");
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
     track = (MatroskaTrack *)new char[MAX_TRACK_SIZE];
