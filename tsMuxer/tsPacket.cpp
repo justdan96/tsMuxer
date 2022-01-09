@@ -142,7 +142,7 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, int buf_size)
         bitReader.getBits(8);  // int last_section_number
 
         pmtPids.clear();
-        // while(get_bits_count(&bitContext) < crcBit)
+
         while (bitReader.getBitsCount() < crcBit)
         {
             int program_number = bitReader.getBits(16);
@@ -180,7 +180,7 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
     bitWriter.putBits(2, 2);  // indicator
     bitWriter.putBits(2, 3);  // reserved
 
-    unsigned section_length = (unsigned)(9 + pmtPids.size() * 4);
+    auto section_length = (unsigned)(9 + pmtPids.size() * 4);
     bitWriter.putBits(12, section_length);
     bitWriter.putBits(16, transport_stream_id);
     bitWriter.putBits(2, 3);  // reserved
@@ -194,14 +194,11 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
         bitWriter.putBits(3, 7);             // current next indicator
         bitWriter.putBits(13, itr->first);   // pid
     }
-    // uint32_t crc = av_crc(tmpAvCrc, 0xffffffff, buffer, bitWriter.getBitsCount()/8);
     bitWriter.flushBits();
     uint32_t crc = calculateCRC32(buffer, bitWriter.getBitsCount() / 8);
-    // bitWriter.putBits(32, my_htonl(crc));
     uint32_t* crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
     *crcPtr = my_htonl(crc);
-    // flush_put_bits(&bitContext);
-    // return put_bits_count(&bitContext)/8 + 1;
+
     return bitWriter.getBitsCount() / 8 + 5;
 }
 
@@ -272,8 +269,6 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
     try
     {
         bitReader.setBuffer(buffer + 1 + pointerField, buffer + buf_size);
-
-        // bitReader.skipBits(8); // skip zero byte?
 
         int table_id = bitReader.getBits(8);
         if (table_id != 0x02)
@@ -585,7 +580,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         writer.putBits(4, video_format);
         writer.putBits(4, frame_rate_index);
         writer.putBits(4, aspect_ratio_index);
-        writer.putBits(2, 0);  // reserved_for_future_use 2 bslbf
+        writer.putBits(2, 0);  // reserved_for_future_use
         writer.putBit(0);      // cc_flag
         writer.putBit(0);      // reserved
         if (HDR & 18)
@@ -599,7 +594,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         else
             writer.putBits(8, 0);
         composeISRC(writer);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
     else if (isAudioStreamType(stream_coding_type))
     {
@@ -607,23 +602,23 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         writer.putBits(4, sampling_frequency_index);
         writeString(language_code, writer, 3);
         composeISRC(writer);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
     else if (stream_coding_type == StreamType::SUB_PGS)
     {
         // Presentation Graphics stream
         writeString(language_code, writer, 3);
-        writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);  // reserved_for_future_use
         composeISRC(writer);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
     else if (stream_coding_type == StreamType::SUB_IGS)
     {
         // Interactive Graphics stream
         writeString(language_code, writer, 3);
-        writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);  // reserved_for_future_use
         composeISRC(writer);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
     else if (stream_coding_type == StreamType::SUB_TGS)
     {
@@ -631,7 +626,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
         writer.putBits(8, character_code);
         writeString(language_code, writer, 3);
         composeISRC(writer);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
     *lengthPos = writer.getBitsCount() / 8 - beforeCount;
 }
@@ -672,7 +667,6 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
     writer.putBits(8, 1);  // number_of_program_sequences
     // for (int i=0; i < number_of_program_sequences; i++)
     {
-        // m_programInfo.push_back(CLPIProgramInfo());
         writer.putBits(32, 0);                // m_programInfo[i].SPN_program_sequence_start
         writer.putBits(16, DEFAULT_PMT_PID);  // m_programInfo[i].program_map_PID =
 
@@ -687,7 +681,7 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
         }
 
         writer.putBits(8, streams);  // m_programInfo[i].number_of_streams_in_ps
-        writer.putBits(8, 0);        // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);        // reserved_for_future_use
         // for (int i=0; i < m_streamInfo.size(); i++)
         for (std::map<int, CLPIStreamInfo>::const_iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
         {
@@ -712,10 +706,10 @@ void CLPIParser::TS_type_info_block(BitStreamReader& reader)
     uint16_t length = reader.getBits(16);
     uint8_t Validity_flags = reader.getBits(8);                // 1000 0000b is tipical value
     CLPIStreamInfo::readString(format_identifier, reader, 4);  // HDMV
-    // Network_information 8*9 bslbf zero
+    // Network_information 8*9
     for (int i = 0; i < 9; i++) reader.skipBits(8);
-    // Stream_format_name 8*16 bslbf zero
-    for (int i = 0; i < 16; i++) reader.skipBits(8);
+    // Stream_format_name 8*16
+    for (int i = 0; i < 4; i++) reader.skipBits(32);
 }
 
 void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
@@ -727,21 +721,21 @@ void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
 
     writer.putBits(8, 0x80);  // Validity_flags
     CLPIStreamInfo::writeString("HDMV", writer, 4);
-    // Network_information 8*9 bslbf zero
+    // Network_information 8*9
     for (int i = 0; i < 9; i++) writer.putBits(8, 0);
-    // Stream_format_name 8*16 bslbf zero
-    for (int i = 0; i < 16; i++) writer.putBits(8, 0);
+    // Stream_format_name 8*16
+    for (int i = 0; i < 4; i++) writer.putBits(32, 0);
     *lengthPos = my_ntohs(writer.getBitsCount() / 8 - beforeCount);
 }
 
 void CLPIParser::parseClipInfo(BitStreamReader& reader)
 {
     uint32_t length = reader.getBits(32);
-    reader.skipBits(16);                            // reserved_for_future_use 16 bslbf
-    clip_stream_type = reader.getBits(8);           // 1 - AV stream
-    application_type = reader.getBits(8);           // 1 - Main TS for a main-path of Movie
-    reader.skipBits(31);                            // reserved_for_future_use 31 bslbf
-    is_ATC_delta = reader.getBit();                 // 1 bslbf
+    reader.skipBits(16);                   // reserved_for_future_use
+    clip_stream_type = reader.getBits(8);  // 1 - AV stream
+    application_type = reader.getBits(8);  // 1 - Main TS for a main-path of Movie
+    reader.skipBits(31);                   // reserved_for_future_use
+    is_ATC_delta = reader.getBit();
     TS_recording_rate = reader.getBits(32);         // kbps in bytes/sec
     number_of_source_packets = reader.getBits(32);  // number of TS packets?
     for (int i = 0; i < 32; i++) reader.skipBits(32);
@@ -775,7 +769,7 @@ void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
     uint32_t length = reader.getBits(32);
-    reader.skipBits(8);                                   // reserved_for_word_align 8 bslbf
+    reader.skipBits(8);                                   // reserved_for_word_align
     uint8_t number_of_ATC_sequences = reader.getBits(8);  // 1 is tipical value
     for (int atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++)
     {
@@ -823,11 +817,9 @@ void CLPIParser::parseCPI(uint8_t* buffer, uint8_t* end)
     uint32_t length = reader.getBits(32);
     if (length != 0)
     {
-        // reserved_for_word_align 12 bslbf
-        reader.skipBits(12);
+        reader.skipBits(12);               // reserved_for_word_align
         int CPI_type = reader.getBits(4);  // 1 is tipical value
         CPI_type = CPI_type;
-        // EP_map(reader);
     }
 }
 
@@ -842,13 +834,10 @@ void CLPIParser::composeCPI(BitStreamWriter& writer, bool isCPIExt)
         return;  // CPI_SS for MVC depend stream only and vice versa: standard CPI for standard video stream
 
     int beforeCount = writer.getBitsCount() / 8;
-    // if (length != 0)
-    {
-        // reserved_for_word_align 12 bslbf
-        writer.putBits(12, 0);
-        writer.putBits(4, 1);  // CPI_type
-        composeEP_map(writer, isCPIExt);
-    }
+
+    writer.putBits(12, 0);  // reserved_for_word_align
+    writer.putBits(4, 1);   // CPI_type
+    composeEP_map(writer, isCPIExt);
 
     if (isCPIExt && writer.getBitsCount() % 32 != 0)
         writer.putBits(16, 0);
@@ -860,7 +849,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
 {
     uint32_t beforeCount = writer.getBitsCount() / 8;
     std::vector<CLPIStreamInfo> processStream;
-    int EP_stream_type = 1;  //[k] 4 bslbf
+    int EP_stream_type = 1;
     for (std::map<int, CLPIStreamInfo>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
     {
         StreamType coding_type = itr->second.stream_coding_type;
@@ -892,31 +881,33 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
     if (processStream.size() == 0)
         THROW(ERR_COMMON, "Can't create EP map. One audio or video stream is needed.");
     // ------------------
-    writer.putBits(8, 0);                          // reserved_for_word_align 8 bslbf
-    writer.putBits(8, (int)processStream.size());  // number_of_stream_PID_entries 8 uimsbf
+    writer.putBits(8, 0);                          // reserved_for_word_align
+    writer.putBits(8, (int)processStream.size());  // number_of_stream_PID_entries
     std::vector<uint32_t*> epStartAddrPos;
 
     for (auto& i : processStream)
     {
-        writer.putBits(16, i.streamPID);  // stream_PID[k] 16 bslbf
-        writer.putBits(10, 0);            // reserved_for_word_align 10 bslbf
+        writer.putBits(16, i.streamPID);  // stream_PID[k]
+        writer.putBits(10, 0);            // reserved_for_word_align
         writer.putBits(4, EP_stream_type);
         std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(i);
-        writer.putBits(16, (int)coarseInfo.size());  // number_of_EP_coarse_entries[k] 16 uimsbf
+        writer.putBits(16, (int)coarseInfo.size());  // number_of_EP_coarse_entries[k]
         if (i.m_index.size() > 0)
-            writer.putBits(18, (int)i.m_index[m_clpiNum].size());  // number_of_EP_fine_entries[k] 18 uimsbf
+            writer.putBits(18, (int)i.m_index[m_clpiNum].size());  // number_of_EP_fine_entries[k]
         else
             writer.putBits(18, 0);
         epStartAddrPos.push_back((uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8));
-        writer.putBits(32, 0);  // EP_map_for_one_stream_PID_start_address[k] 32 uimsbf
+        writer.putBits(32, 0);  // EP_map_for_one_stream_PID_start_address[k]
     }
-    while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);  // padding_word 16 bslbf
+    if (writer.getBitsCount() % 16 != 0)
+        writer.putBits(8, 0);  // padding_word
 
     for (size_t i = 0; i < processStream.size(); ++i)
     {
         *epStartAddrPos[i] = my_htonl(writer.getBitsCount() / 8 - beforeCount);
         composeEP_map_for_one_stream_PID(writer, processStream[i]);
-        while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);  // padding_word 16 bslbf
+        if (writer.getBitsCount() % 16 != 0)
+            writer.putBits(8, 0);  // padding_word
     }
 }
 
@@ -950,15 +941,16 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
 {
     uint32_t* epFineStartAddr = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     uint32_t beforePos = writer.getBitsCount() / 8;
-    writer.putBits(32, 0);  // EP_fine_table_start_address 32 uimsbf
+    writer.putBits(32, 0);  // EP_fine_table_start_address
     std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(streamInfo);
     for (auto& i : coarseInfo)
     {
-        writer.putBits(18, i.m_fineRefID);  // ref_to_EP_fine_id[i] 18 uimsbf
-        writer.putBits(14, i.m_coarsePts);  // PTS_EP_coarse[i] 14 uimsbf
-        writer.putBits(32, i.m_pktCnt);     // SPN_EP_coarse[i] 32 uimsbf
+        writer.putBits(18, i.m_fineRefID);  // ref_to_EP_fine_id[i]
+        writer.putBits(14, i.m_coarsePts);  // PTS_EP_coarse[i]
+        writer.putBits(32, i.m_pktCnt);     // SPN_EP_coarse[i]
     }
-    while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);  // padding_word 16 bslbf
+    if (writer.getBitsCount() % 16 != 0)
+        writer.putBits(8, 0);  // padding_word
     *epFineStartAddr = my_htonl(writer.getBitsCount() / 8 - beforePos);
     if (streamInfo.m_index.size() > 0)
     {
@@ -966,7 +958,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
         for (PMTIndex::const_iterator itr = curIndex.begin(); itr != curIndex.end(); ++itr)
         {
             const PMTIndexData& indexData = itr->second;
-            writer.putBit(0);  // is_angle_change_point[EP_fine_id] 1 bslbf
+            writer.putBit(0);  // is_angle_change_point[EP_fine_id]
             int endCode = 0;
             if (indexData.m_frameLen > 0)
             {
@@ -1005,9 +997,9 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
                         endCode = 7;
                 }
             }
-            writer.putBits(3, endCode);                            // I_end_position_offset[EP_fine_id] 3 bslbf
-            writer.putBits(11, (itr->first >> 9) % 2048);          // PTS_EP_fine[EP_fine_id] 11 uimsbf
-            writer.putBits(17, indexData.m_pktCnt % (65536 * 2));  // SPN_EP_fine[EP_fine_id] 17 uimsbf
+            writer.putBits(3, endCode);                            // I_end_position_offset[EP_fine_id]
+            writer.putBits(11, (itr->first >> 9) % 2048);          // PTS_EP_fine[EP_fine_id]
+            writer.putBits(17, indexData.m_pktCnt % (65536 * 2));  // SPN_EP_fine[EP_fine_id]
         }
     }
 }
@@ -1102,7 +1094,7 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
         return;
 
     writer.putBits(32, 0);  // skip data block start address
-    writer.putBits(24, 0);  // reserved for world align. not used
+    writer.putBits(24, 0);  // reserved for world align
 
     int entries = isDependStream ? 3 : 1;
     writer.putBits(8, entries);
@@ -1134,7 +1126,8 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
         writer.putBits(32, 0);  // skip extent dataLen
     }
 
-    while (writer.getBitsCount() % 32) writer.putBits(16, 0);
+    if (writer.getBitsCount() % 32)
+        writer.putBits(16, 0);
 
     lengthPos[1] =
         my_htonl(writer.getBitsCount() / 8 - beforeCount);  // data_block_start_address, same as extentStart point start
@@ -1219,20 +1212,14 @@ void CLPIParser::parse(uint8_t* buffer, int64_t len)
         uint32_t CPI_start_address = reader.getBits(32);
         uint32_t clipMark_start_address = reader.getBits(32);
         uint32_t extensionData_start_address = reader.getBits(32);
-        for (int i = 0; i < 3; i++) reader.skipBits(32);  // reserved_for_future_use 96 bslbf
+        for (int i = 0; i < 3; i++) reader.skipBits(32);  // reserved_for_future_use
         parseClipInfo(reader);
-        // for (int i=0; i<N1; i++) padding_word 16 bslbf
         parseSequenceInfo(buffer + sequenceInfo_start_address, buffer + len);
-        // for (i=0; i<N2; i++) { padding_word 16 bslbf
         parseProgramInfo(buffer + programInfo_start_address, buffer + len, m_programInfo, m_streamInfo);
-        // for (i=0; i<N3; i++) padding_word 16 bslbf
         parseCPI(buffer + CPI_start_address, buffer + len);
-        // for (i=0; i<N4; i++) padding_word 16 bslbf
         parseClipMark(buffer + clipMark_start_address, buffer + len);
-        // for (i=0; i<N5; i++) padding_word 16 bslbf
         if (extensionData_start_address)
             parseExtensionData(buffer + extensionData_start_address, buffer + len);
-        // for (i=0; i<N6; i++) padding_word 16 bslbf
     }
     catch (BitStreamException&)
     {
@@ -1256,7 +1243,7 @@ int CLPIParser::compose(uint8_t* buffer, int bufferSize)
     writer.putBits(32, 0);  // clipMark
     uint32_t* extentInfo_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extent info
-    for (int i = 0; i < 3; i++) writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+    for (int i = 0; i < 3; i++) writer.putBits(32, 0);  // reserved_for_future_use
 
     composeClipInfo(writer);
     while (writer.getBitsCount() % 32 != 0) writer.putBits(8, 0);
@@ -1354,7 +1341,7 @@ void MPLSParser::parse(uint8_t* buffer, int len)
         int playList_start_address = reader.getBits(32);
         int playListMark_start_address = reader.getBits(32);
         int extensionData_start_address = reader.getBits(32);
-        for (int i = 0; i < 5; i++) reader.skipBits(32);  // reserved_for_future_use 160 bslbf
+        for (int i = 0; i < 5; i++) reader.skipBits(32);  // reserved_for_future_use
         AppInfoPlayList(reader);
         parsePlayList(buffer + playList_start_address, len - playList_start_address);
         parsePlayListMark(buffer + playListMark_start_address, len - playListMark_start_address);
@@ -1399,7 +1386,6 @@ int MPLSParser::composeSubPathEntryExtension(uint8_t* buffer, int bufferSize)
         writer.putBits(32, 0);  // skip lengthField
         int beforeCount = writer.getBitsCount() / 8;
 
-        // composeSubPath(writer, 0, dependStreamInfo.m_index, 5); // MVC dep stream type
         writer.putBits(16, 1);  // one subpath
         SubPath_extension(writer);
 
@@ -1493,17 +1479,20 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
     writer.putBits(32, 0);
     uint32_t* extDataStartAddr = (uint32_t*)(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extension data start address
-    for (int i = 0; i < 5; i++) writer.putBits(32, 0);  // reserved_for_future_use 160 bslbf
+    for (int i = 0; i < 5; i++) writer.putBits(32, 0);  // reserved_for_future_use
     composeAppInfoPlayList(writer);
-    while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
+    if (writer.getBitsCount() % 16 != 0)
+        writer.putBits(8, 0);
     *playList_bit_pos = my_htonl(writer.getBitsCount() / 8);
     composePlayList(writer);
 
-    while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
+    if (writer.getBitsCount() % 16 != 0)
+        writer.putBits(8, 0);
     *playListMark_bit_pos = my_htonl(writer.getBitsCount() / 8);
     composePlayListMark(writer);
 
-    while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
+    if (writer.getBitsCount() % 16 != 0)
+        writer.putBits(8, 0);
 
     if (number_of_SubPaths > 0 || isDependStreamExist || isV3())
     {
@@ -1539,7 +1528,8 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
         }
 
         composeExtensionData(writer, blockVector);
-        while (writer.getBitsCount() % 16 != 0) writer.putBits(8, 0);
+        if (writer.getBitsCount() % 16 != 0)
+            writer.putBits(8, 0);
     }
 
     writer.flushBits();
@@ -1549,22 +1539,22 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 void MPLSParser::AppInfoPlayList(BitStreamReader& reader)
 {
     uint32_t length = reader.getBits(32);
-    reader.skipBits(8);                          // reserved_for_future_use 8 bslbf
-    PlayList_playback_type = reader.getBits(8);  // 8 bslbf
+    reader.skipBits(8);  // reserved_for_future_use
+    PlayList_playback_type = reader.getBits(8);
     if (PlayList_playback_type == 2 || PlayList_playback_type == 3)
-    {                                         // 1 == Sequential playback of PlayItems
-        playback_count = reader.getBits(16);  // 16 uimsbf
+    {  // 1 == Sequential playback of PlayItems
+        playback_count = reader.getBits(16);
     }
     else
     {
-        reader.skipBits(16);  // reserved_for_future_use 16 bslbf
+        reader.skipBits(16);  // reserved_for_future_use
     }
     UO_mask_table(reader);
-    bool PlayList_random_access_flag = reader.getBit();  // 1 bslbf
+    bool PlayList_random_access_flag = reader.getBit();
     bool audio_mix_app_flag = reader.getBits(1);
-    bool lossless_may_bypass_mixer_flag = reader.getBit();  // 1 bslbf
+    bool lossless_may_bypass_mixer_flag = reader.getBit();
     mvc_base_view_r = reader.getBit();
-    reader.skipBits(12);  // reserved_for_future_use 13 bslbf
+    reader.skipBits(12);  // reserved_for_future_use
 }
 
 void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
@@ -1573,15 +1563,15 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
     writer.putBits(32, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(8, 0);                       // reserved_for_future_use 8 bslbf
-    writer.putBits(8, PlayList_playback_type);  // 8 bslbf
+    writer.putBits(8, 0);  // reserved_for_future_use
+    writer.putBits(8, PlayList_playback_type);
     if (PlayList_playback_type == 2 || PlayList_playback_type == 3)
-    {                                        // 1 == Sequential playback of PlayItems
-        writer.putBits(16, playback_count);  // 16 uimsbf
+    {  // 1 == Sequential playback of PlayItems
+        writer.putBits(16, playback_count);
     }
     else
     {
-        writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
+        writer.putBits(16, 0);  // reserved_for_future_use
     }
     writer.putBits(28, 0);               // UO_mask_table;
     writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
@@ -1592,7 +1582,7 @@ void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer)
     writer.putBit(1);  // audio_mix_app_flag. 0 == no secondary audio, 1- allow secondary audio if exist
     writer.putBit(0);  // lossless_may_bypass_mixer_flag
     writer.putBit(mvc_base_view_r);
-    writer.putBits(12, 0);  // reserved_for_future_use 13 bslbf
+    writer.putBits(12, 0);  // reserved_for_future_use
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
@@ -1607,9 +1597,9 @@ void MPLSParser::parsePlayList(uint8_t* buffer, int len)
     BitStreamReader reader{};
     reader.setBuffer(buffer, buffer + len);
     uint32_t length = reader.getBits(32);
-    reader.skipBits(16);                           // reserved_for_future_use 16 bslbf
-    int number_of_PlayItems = reader.getBits(16);  // 16 uimsbf
-    number_of_SubPaths = reader.getBits(16);       // 16 uimsbf
+    reader.skipBits(16);  // reserved_for_future_use
+    int number_of_PlayItems = reader.getBits(16);
+    number_of_SubPaths = reader.getBits(16);
     for (int PlayItem_id = 0; PlayItem_id < number_of_PlayItems; PlayItem_id++)
     {
         parsePlayItem(reader, PlayItem_id);
@@ -1690,9 +1680,9 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     uint32_t* lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
-    writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
+    writer.putBits(16, 0);  // reserved_for_future_use
     MPLSStreamInfo& mainStreamInfo = getMainStream();
-    writer.putBits(16, (unsigned)mainStreamInfo.m_index.size());  // 16 uimsbf number_of_PlayItems
+    writer.putBits(16, (unsigned)mainStreamInfo.m_index.size());  // number_of_PlayItems
     writer.putBits(16, number_of_SubPaths);                       // number_of_SubPaths
     // connection_condition = 1;
     for (size_t PlayItem_id = 0; PlayItem_id < mainStreamInfo.m_index.size(); PlayItem_id++)
@@ -1752,33 +1742,33 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum,
     char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
     int connection_condition = playItemNum == 0 ? 1 : 6;
-    writer.putBits(27, 0);                    // reserved_for_future_use
-    writer.putBits(4, connection_condition);  // 4 bslbf
-    writer.putBit(0);                         // is_multi_Clip_entries
-    writer.putBits(8, ref_to_STC_id);         // 8 uimsbf
+    writer.putBits(27, 0);  // reserved_for_future_use
+    writer.putBits(4, connection_condition);
+    writer.putBit(0);  // is_multi_Clip_entries
+    writer.putBits(8, ref_to_STC_id);
 
     if (playItemNum == 0)
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum].begin()->first / 2));
     else
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
-        writer.putBits(32, OUT_time);  // 32 uimsbf
+        writer.putBits(32, OUT_time);
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, (unsigned)pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
+        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
-        writer.putBits(32, OUT_time);  // 32 uimsbf
+        writer.putBits(32, OUT_time);
 
     writer.putBits(16, (unsigned)playItemNum);  // sync_PlayItem_id. reference to play_item id.
     // sync_start_PTS_of_PlayItem
     if (playItemNum == 0)
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
         writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
     else
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
 
     // writer.flushBits();
     *lengthPos = my_htons(writer.getBitsCount() / 8 - beforeCount);
@@ -1790,7 +1780,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
     BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
     uint32_t* lengthPos = (uint32_t*)buffer;
-    writer.putBits(32, 0);  // int length = reader.getBits(8); //8 uimsbf
+    writer.putBits(32, 0);  // int length = reader.getBits(8);
 
     vector<MPLSStreamInfo> pipStreams;
     int mainVSize = 0;
@@ -1812,33 +1802,35 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
         }
     }
 
-    writer.putBits(16, (unsigned)(pipStreams.size() * pmtIndexList.size()));
+    auto pipStreamsSize = (unsigned)pipStreams.size();
+    auto pmtIndexListSize = (unsigned)pmtIndexList.size();
+
+    writer.putBits(16, pipStreamsSize * pmtIndexListSize);
     vector<uint32_t*> blockDataAddressPos;
-    for (size_t i = 0; i < pmtIndexList.size(); ++i)
+    for (size_t i = 0; i < pmtIndexListSize; ++i)
     {
-        for (size_t k = 0; k < pipStreams.size(); k++)
+        for (size_t k = 0; k < pipStreamsSize; k++)
         {
             PIPParams pipParams = pipStreams[k].pipParams;
             // metadata_block_header[k]() {
-            writer.putBits(16, (unsigned)i);  // ref_to_PlayItem_id
-            writer.putBits(8, (unsigned)k);   // ref_to_secondary_video_stream_id
-            writer.putBits(8, 0);             // reserved_for_future_use
-            writer.putBits(
-                4,
-                pipParams.lumma >= 0 ? 1 : 0);  // pip_timeline_type == 1. Synchronous type of Picture-in-Picture
-            writer.putBit(1);                   // is_luma_key = 0
-            writer.putBit(1);                   // trick_playing_flag. keep PIP windows when tricking
-            writer.putBits(10, 0);              // reserved_for_word_align
-            writer.putBits(8, 0);               // reserved_for_future_use 8 bslbf
+            writer.putBits(16, i);  // ref_to_PlayItem_id
+            writer.putBits(8, k);   // ref_to_secondary_video_stream_id
+            writer.putBits(8, 0);   // reserved_for_future_use
+            // pip_timeline_type == 1. Synchronous type of Picture-in-Picture
+            writer.putBits(4, pipParams.lumma >= 0 ? 1 : 0);
+            writer.putBit(1);       // is_luma_key = 0
+            writer.putBit(1);       // trick_playing_flag. keep PIP windows when tricking
+            writer.putBits(10, 0);  // reserved_for_word_align
+            writer.putBits(8, 0);   // reserved_for_future_use
             if (pipParams.lumma >= 0)
             {                                        // is_luma_key==1b
                 writer.putBits(8, pipParams.lumma);  // transparent Y pixels
             }
             else
             {
-                writer.putBits(8, 0);  // reserved_for_future_use 16 bslbf
+                writer.putBits(8, 0);  // reserved_for_future_use
             }
-            writer.putBits(16, 0);  // reserved_for_future_use 16 bslbf
+            writer.putBits(16, 0);  // reserved_for_future_use
             blockDataAddressPos.push_back((uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8));
             writer.putBits(32, 0);  // metadata_block_data_start_address
         }
@@ -1855,11 +1847,11 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
             writer.putBits(16, 1);  // number_of_pip_metadata_entries
             {
                 if (i == 0)
-                    writer.putBits(32, IN_time);  // 32 uimsbf
+                    writer.putBits(32, IN_time);
                 else if (pmtIndexList[i - 1].size() > 0)
-                    writer.putBits(32, (unsigned)pmtIndexList[i].begin()->first / 2);
+                    writer.putBits(32, (unsigned)(pmtIndexList[i].begin()->first / 2));
                 else
-                    writer.putBits(32, IN_time);  // 32 uimsbf
+                    writer.putBits(32, IN_time);
 
                 int hPos = 0;
                 int vPos = 0;
@@ -1883,8 +1875,8 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, int bufferSize, std::vector
                 writer.putBits(12, hPos);
                 writer.putBits(12, vPos);
 
-                writer.putBits(4, pipParams.scaleIndex);  // pip_scale[i] 4 uimsbf. 1 == no_scale
-                writer.putBits(4, 0);                     // reserved_for_future_use 4 bslbf
+                writer.putBits(4, pipParams.scaleIndex);  // pip_scale[i]. 1 == no_scale
+                writer.putBits(4, 0);                     // reserved_for_future_use
             }
             while (writer.getBitsCount() % 16 != 0) writer.putBit(0);
         }
@@ -2073,20 +2065,21 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
     vector<uint32_t*> extDataStartAddrPos;
     extDataStartAddrPos.resize(extDataBlockInfo.size());
     uint32_t* lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
-    writer.putBits(32, 0);  // int length = reader.getBits(8); //8 uimsbf
+    writer.putBits(32, 0);  // int length = reader.getBits(8);
     int initPos = writer.getBitsCount() / 8;
     if (extDataBlockInfo.size() > 0)
     {
         writer.putBits(32, 0);  // data_block_start_address
         writer.putBits(24, 0);  // reserved_for_word_align
-        writer.putBits(8, (unsigned)extDataBlockInfo.size());
-        for (size_t i = 0; i < extDataBlockInfo.size(); ++i)
+        auto extDataBlockInfoSize = (unsigned)extDataBlockInfo.size();
+        writer.putBits(8, extDataBlockInfoSize);
+        for (size_t i = 0; i < extDataBlockInfoSize; ++i)
         {
             writer.putBits(16, extDataBlockInfo[i].id1);
             writer.putBits(16, extDataBlockInfo[i].id2);
             extDataStartAddrPos[i] = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
-            writer.putBits(32, 0);                                          // ext_data_start_address
-            writer.putBits(32, (unsigned)extDataBlockInfo[i].data.size());  // ext_data_length
+            writer.putBits(32, 0);                                // ext_data_start_address
+            writer.putBits(32, extDataBlockInfo[i].data.size());  // ext_data_length
         }
         while ((writer.getBitsCount() / 8 - initPos) % 4 != 0) writer.putBits(16, 0);
         *(lengthPos + 1) = my_htonl(writer.getBitsCount() / 8 - initPos + 4);  // data_block_start_address
@@ -2109,39 +2102,39 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, int PlayItem_id)
     CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
     newItem.fileName = clip_Information_file_name;
     CLPIStreamInfo::readString(clip_codec_identifier, reader, 4);
-    reader.skipBits(11);  // reserved_for_future_use 11 bslbf
+    reader.skipBits(11);  // reserved_for_future_use
     is_multi_angle = reader.getBit();
-    newItem.connection_condition = reader.getBits(4);  // 4 bslbf
-    ref_to_STC_id = reader.getBits(8);                 // 8 uimsbf
+    newItem.connection_condition = reader.getBits(4);
+    ref_to_STC_id = reader.getBits(8);
 
-    newItem.IN_time = reader.getBits(32);   // 32 uimsbf
-    newItem.OUT_time = reader.getBits(32);  // 32 uimsbf
+    newItem.IN_time = reader.getBits(32);
+    newItem.OUT_time = reader.getBits(32);
     m_playItems.push_back(newItem);
 
     UO_mask_table(reader);
-    PlayItem_random_access_flag = reader.getBit();  // 1 bslbf
-    reader.skipBits(7);                             // reserved_for_future_use 7 bslbf
-    uint8_t still_mode = reader.getBits(8);         // 8 bslbf
+    PlayItem_random_access_flag = reader.getBit();
+    reader.skipBits(7);  // reserved_for_future_use
+    uint8_t still_mode = reader.getBits(8);
     if (still_mode == 0x01)
     {
-        int still_time = reader.getBits(16);  // 16 uimsbf
+        int still_time = reader.getBits(16);
     }
     else
     {
-        reader.skipBits(16);  // reserved_for_future_use 16 bslbf
+        reader.skipBits(16);  // reserved_for_future_use
     }
     if (is_multi_angle == 1)
     {
-        number_of_angles = reader.getBits(8);        // uimsbf
-        reader.skipBits(6);                          // reserved_for_future_use 6 bslbf
-        is_different_audios = reader.getBit();       // 1 bslbf
-        is_seamless_angle_change = reader.getBit();  // 1 bslbf
-        for (int angle_id = 1;                       // angles except angle_id=0
+        number_of_angles = reader.getBits(8);
+        reader.skipBits(6);  // reserved_for_future_use
+        is_different_audios = reader.getBit();
+        is_seamless_angle_change = reader.getBit();
+        for (int angle_id = 1;  // angles except angle_id=0
              angle_id < number_of_angles; angle_id++)
         {
-            CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);  // 8*5 bslbf
-            CLPIStreamInfo::readString(clip_codec_identifier, reader, 4);       // 8*4 bslbf
-            ref_to_STC_id = reader.getBits(8);                                  // 8 uimsbf
+            CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
+            CLPIStreamInfo::readString(clip_codec_identifier, reader, 4);
+            ref_to_STC_id = reader.getBits(8);
         }
     }
     STN_table(reader, PlayItem_id);
@@ -2159,24 +2152,24 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, size_t playItemNum, st
     CLPIStreamInfo::writeString(clip_Information_file_name.c_str(), writer, 5);
     char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
-    writer.putBits(11, 0);  // reserved_for_future_use 11 bslbf
+    writer.putBits(11, 0);  // reserved_for_future_use
     writer.putBit(0);       // is_multi_angle
     int connection_condition = playItemNum == 0 ? 1 : 6;
-    writer.putBits(4, connection_condition);  // 4 bslbf
-    writer.putBits(8, ref_to_STC_id);         // 8 uimsbf
+    writer.putBits(4, connection_condition);
+    writer.putBits(8, ref_to_STC_id);
     if (playItemNum == 0)
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
         writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
     else
-        writer.putBits(32, IN_time);  // 32 uimsbf
+        writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
-        writer.putBits(32, OUT_time);  // 32 uimsbf
+        writer.putBits(32, OUT_time);
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, (unsigned)pmtIndexList[playItemNum + 1].begin()->first / 2);  // 32 uimsbf
+        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
-        writer.putBits(32, OUT_time);  // 32 uimsbf
+        writer.putBits(32, OUT_time);
 
     writer.putBits(28, 0);               // UO_mask_table;
     writer.putBits(4, isV3() ? 15 : 0);  // UO_mask_table;
@@ -2184,10 +2177,10 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, size_t playItemNum, st
     writer.putBit(isV3() ? 1 : 0);       // UO_mask_table: SecondaryPGStreamNumberChange
     writer.putBits(30, 0);               // UO_mask_table cont;
 
-    writer.putBit(PlayItem_random_access_flag);  // 1 bslbf
-    writer.putBits(7, 0);                        // reserved_for_future_use 7 bslbf
-    writer.putBits(8, 0);                        // still_mode
-    writer.putBits(16, 0);                       // reserved after stillMode != 0x01
+    writer.putBit(PlayItem_random_access_flag);
+    writer.putBits(7, 0);   // reserved_for_future_use
+    writer.putBits(8, 0);   // still_mode
+    writer.putBits(16, 0);  // reserved after stillMode != 0x01
     composeSTN_table(writer, playItemNum, false);
     *lengthPos = my_htons(writer.getBitsCount() / 8 - beforeCount);
 }
@@ -2196,17 +2189,17 @@ void MPLSParser::parsePlayListMark(uint8_t* buffer, int len)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, buffer + len);
-    uint32_t length = reader.getBits(32);               //
-    int number_of_PlayList_marks = reader.getBits(16);  // 16 uimsbf
+    uint32_t length = reader.getBits(32);
+    int number_of_PlayList_marks = reader.getBits(16);
     for (int PL_mark_id = 0; PL_mark_id < number_of_PlayList_marks; PL_mark_id++)
     {
-        reader.skipBits(8);                 // reserved_for_future_use 8 bslbf
-        int mark_type = reader.getBits(8);  // 8 bslbf
+        reader.skipBits(8);  // reserved_for_future_use
+        int mark_type = reader.getBits(8);
         int ref_to_PlayItem_id = reader.getBits(16);
-        uint32_t mark_time_stamp = reader.getBits(32);  // 32 uimsbf
-        int entry_ES_PID = reader.getBits(16);          // 16 uimsbf
-        uint32_t duration = reader.getBits(32);         // 32 uimsbf
-        if (mark_type == 1)                             // mark_type 0x01 = Chapter search
+        uint32_t mark_time_stamp = reader.getBits(32);
+        reader.skipBits(16);  // entry_ES_PID
+        uint32_t duration = reader.getBits(32);
+        if (mark_type == 1)  // mark_type 0x01 = Chapter search
             m_marks.push_back(PlayListMark(ref_to_PlayItem_id, mark_time_stamp));
     }
 }
@@ -2239,16 +2232,16 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
             for (uint32_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.push_back(PlayListMark(-1, i));
         }
     }
-    writer.putBits(16, (unsigned)m_marks.size());  // 16 uimsbf
+    writer.putBits(16, (unsigned)m_marks.size());
     for (auto i : m_marks)
     {
-        writer.putBits(8, 0);  // reserved_for_future_use 8 bslbf
+        writer.putBits(8, 0);  // reserved_for_future_use
         writer.putBits(8, 1);  // mark_type 0x01 = Chapter search
         if (i.m_playItemID >= 0)
             writer.putBits(16, i.m_playItemID);  // play item ID
         else
             writer.putBits(16, calcPlayItemID(streamInfo, i.m_markTime * 2));  // play item ID
-        writer.putBits(32, i.m_markTime);                                      // 32 uimsbf
+        writer.putBits(32, i.m_markTime);
         writer.putBits(16, 0xffff);  // entry_ES_PID always 0xffff for mark_type 1
         writer.putBits(32, 0);       // duration always 0 for mark_type 1
     }
@@ -2261,7 +2254,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, b
     writer.putBits(16, 0);  // skip lengthField
     int beforeCount = writer.getBitsCount() / 8;
     writer.putBit(0);       // Fixed_offset_during_PopUp_flag for ext mode
-    writer.putBits(15, 0);  // reserved_for_future_use 16 bslbf
+    writer.putBits(15, 0);  // reserved_for_future_use
 
     number_of_primary_video_stream_entries = 0;
     number_of_secondary_video_stream_entries = 0;
@@ -2308,17 +2301,17 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, b
 
     if (!isSSEx)
     {
-        writer.putBits(8, number_of_primary_video_stream_entries);  // 8 uimsbf // test subpath
+        writer.putBits(8, number_of_primary_video_stream_entries);  // test subpath
         writer.putBits(8, number_of_primary_audio_stream_entries);
         writer.putBits(8, number_of_PG_textST_stream_entries);
-        writer.putBits(8, 0);  // int number_of_IG_stream_entries = reader.getBits(8); //8 uimsbf
+        writer.putBits(8, 0);  // int number_of_IG_stream_entries = reader.getBits(8);
         writer.putBits(8, number_of_secondary_audio_stream_entries);
         writer.putBits(8,
                        number_of_secondary_video_stream_entries);  // int number_of_secondary_video_stream_entries.
                                                                    // Now subpath used for second video stream
         writer.putBits(8, 0);                                      // number_of_PiP_PG_textST_stream_entries_plus
         writer.putBits(8, number_of_DolbyVision_video_stream_entries);
-        writer.putBits(32, 0);  // reserved_for_future_use 32 bslbf
+        writer.putBits(32, 0);  // reserved_for_future_use
     }
 
     // video
@@ -2505,11 +2498,11 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
             m_streamInfo.push_back(streamInfo);
 
         // comb_info_Secondary_audio_Primary_audio(){
-        int number_of_primary_audio_ref_entries = reader.getBits(8);  // 8 uimsbf
-        reader.skipBits(8);                                           // reserved_for_word_align  8 bslbf
+        int number_of_primary_audio_ref_entries = reader.getBits(8);
+        reader.skipBits(8);  // reserved_for_word_align
         for (int i = 0; i < number_of_primary_audio_ref_entries; i++)
         {
-            int primary_audio_stream_id_ref = reader.getBits(8);  // 8 uimsbf
+            int primary_audio_stream_id_ref = reader.getBits(8);
         }
         if (number_of_primary_audio_ref_entries % 2 == 1)
         {
@@ -2528,27 +2521,27 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
             m_streamInfo.push_back(streamInfo);
 
         // comb_info_Secondary_video_Secondary_audio(){
-        int number_of_secondary_audio_ref_entries = reader.getBits(8);  // 8 uimsbf
-        reader.skipBits(8);                                             // reserved_for_word_align 8 bslbf
+        int number_of_secondary_audio_ref_entries = reader.getBits(8);
+        reader.skipBits(8);  // reserved_for_word_align
         for (int i = 0; i < number_of_secondary_audio_ref_entries; i++)
         {
-            int secondary_audio_stream_id_ref = reader.getBits(8);  // 8 uimsbf
+            int secondary_audio_stream_id_ref = reader.getBits(8);
         }
         if (number_of_secondary_audio_ref_entries % 2 == 1)
         {
-            reader.skipBits(8);  // reserved_for_word_align 8 bslbf
+            reader.skipBits(8);  // reserved_for_word_align
         }
         //}
         // comb_info_Secondary_video_PiP_PG_textST(){
-        int number_of_PiP_PG_textST_ref_entries = reader.getBits(8);  // 8 uimsbf
-        reader.skipBits(8);                                           // reserved_for_word_align 8 bslbf
+        int number_of_PiP_PG_textST_ref_entries = reader.getBits(8);
+        reader.skipBits(8);  // reserved_for_word_align
         for (int i = 0; i < number_of_PiP_PG_textST_ref_entries; i++)
         {
-            int PiP_PG_textST_stream_id_ref = reader.getBits(8);  // 8 uimsbf
+            int PiP_PG_textST_stream_id_ref = reader.getBits(8);
         }
         if (number_of_PiP_PG_textST_ref_entries % 2 == 1)
         {
-            reader.skipBits(8);  // reserved_for_word_align 8 bslbf
+            reader.skipBits(8);  // reserved_for_word_align
         }
         //}
     }
@@ -2750,33 +2743,33 @@ MPLSStreamInfo::~MPLSStreamInfo()
 
 void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
 {
-    int length = reader.getBits(8);  // 8 uimsbf
-    type = reader.getBits(8);        // 8 bslbf
+    int length = reader.getBits(8);
+    type = reader.getBits(8);
     if (type == 1)
     {
-        streamPID = reader.getBits(16);  // 16 uimsbf
-        reader.skipBits(32);             // reserved_for_future_use 48 bslbf
+        streamPID = reader.getBits(16);
+        reader.skipBits(32);
         reader.skipBits(16);
     }
     else if (type == 2)
     {
-        int ref_to_SubPath_id = reader.getBits(8);        // 8 uimsbf
-        int ref_to_subClip_entry_id = reader.getBits(8);  // 8 uimsbf
-        streamPID = reader.getBits(16);                   // 16 uimsbf
-        reader.skipBits(32);                              // reserved_for_future_use 32 bslbf
+        int ref_to_SubPath_id = reader.getBits(8);
+        int ref_to_subClip_entry_id = reader.getBits(8);
+        streamPID = reader.getBits(16);
+        reader.skipBits(32);
     }
     else if (type == 3)
     {
-        int ref_to_SubPath_id = reader.getBits(8);  // 8 uimsbf
-        streamPID = reader.getBits(16);             // 16 uimsbf
-        reader.skipBits(32);                        // reserved_for_future_use 40 bslbf
+        int ref_to_SubPath_id = reader.getBits(8);
+        streamPID = reader.getBits(16);
+        reader.skipBits(32);
         reader.skipBits(8);
     }
     else if (type == 4)
     {
         reader.skipBits(8);
-        streamPID = reader.getBits(16);  // 16 uimsbf
-        reader.skipBits(32);             // reserved_for_future_use 40 bslbf
+        streamPID = reader.getBits(16);
+        reader.skipBits(32);
         reader.skipBits(8);
     }
 }
@@ -2801,13 +2794,13 @@ void MPLSStreamInfo::composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t e
 void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, size_t entryNum, int subPathID)
 {
     uint8_t* lengthPos = writer.getBuffer() + writer.getBitsCount() / 8;
-    writer.putBits(8, 0);  // int length = reader.getBits(8); //8 uimsbf
+    writer.putBits(8, 0);  // int length = reader.getBits(8);
     int initPos = writer.getBitsCount() / 8;
-    writer.putBits(8, type);  // 8 bslbf
+    writer.putBits(8, type);
     if (type == 1)
     {
-        writer.putBits(16, streamPID);  // 16 uimsbf
-        writer.putBits(32, 0);          // reserved_for_future_use 48 bslbf
+        writer.putBits(16, streamPID);
+        writer.putBits(32, 0);
         writer.putBits(16, 0);
     }
     else if (type == 2)
@@ -2815,20 +2808,20 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, size_t entryNum
         writer.putBits(8, 0);  // ref_to_SubPath_id
         writer.putBits(8, 0);  // entryNum - ref_to_subClip_entry_id
         writer.putBits(16, streamPID);
-        writer.putBits(32, 0);  // reserved
+        writer.putBits(32, 0);
     }
     else if (type == 3)
     {
-        writer.putBits(8, subPathID);   // ref_to_SubPath_id. constant subPathID == 0
-        writer.putBits(16, streamPID);  // 16 uimsbf
-        writer.putBits(32, 0);          // reserved_for_future_use 40 bslbf
+        writer.putBits(8, subPathID);  // ref_to_SubPath_id. constant subPathID == 0
+        writer.putBits(16, streamPID);
+        writer.putBits(32, 0);
         writer.putBits(8, 0);
     }
     else if (type == 4)
     {
         writer.putBits(8, 0);
-        writer.putBits(16, streamPID);  // 16 uimsbf
-        writer.putBits(32, 0);          // reserved_for_future_use 40 bslbf
+        writer.putBits(16, streamPID);
+        writer.putBits(32, 0);
         writer.putBits(8, 0);
     }
     else
@@ -2838,13 +2831,13 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, size_t entryNum
 
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 {
-    int length = reader.getBits(8);                      // 8 uimsbf
-    stream_coding_type = (StreamType)reader.getBits(8);  // 8 bslbf
+    int length = reader.getBits(8);
+    stream_coding_type = (StreamType)reader.getBits(8);
     if (isVideoStreamType(stream_coding_type))
     {
-        video_format = reader.getBits(4);      // 4 bslbf
-        frame_rate_index = reader.getBits(4);  // 4 bslbf
-        reader.skipBits(24);                   // reserved_for_future_use 24 bslbf
+        video_format = reader.getBits(4);
+        frame_rate_index = reader.getBits(4);
+        reader.skipBits(24);  // reserved_for_future_use
     }
     else if (isAudioStreamType(stream_coding_type))
     {
@@ -2862,12 +2855,12 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
     {
         // Interactive Graphics stream
         CLPIStreamInfo::readString(language_code, reader, 3);
-        reader.skipBits(8);  // reserved_for_future_use 8 bslbf
+        reader.skipBits(8);  // reserved_for_future_use
     }
     else if (stream_coding_type == StreamType::SUB_TGS)
     {
         // Text subtitle stream
-        character_code = reader.getBits(8);  // 8 bslbf
+        character_code = reader.getBits(8);
         CLPIStreamInfo::readString(language_code, reader, 3);
     }
 }
@@ -2875,7 +2868,7 @@ void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
 {
     uint8_t* lengthPos = writer.getBuffer() + writer.getBitsCount() / 8;
-    writer.putBits(8, 0);  // int length = reader.getBits(8); //8 uimsbf
+    writer.putBits(8, 0);  // int length = reader.getBits(8);
     int initPos = writer.getBitsCount() / 8;
 
     writer.putBits(8, (int)stream_coding_type);
