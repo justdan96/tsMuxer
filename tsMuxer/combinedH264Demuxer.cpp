@@ -15,7 +15,7 @@ static const int MAX_TMP_BUFFER_SIZE = 128;
 
 // ------------------------ CombinedH264Reader -------------------------------
 
-CombinedH264Reader::CombinedH264Reader() : m_demuxedPID(0), m_state(ReadState_Primary)
+CombinedH264Reader::CombinedH264Reader() : m_demuxedPID(0), m_state(ReadState::Primary)
 {
     m_firstDemuxCall = true;
     m_mvcSPS = -1;
@@ -63,31 +63,31 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     uint8_t nalType = *data & 0x1f;
     if (nalType == nuEOSeq)
     {
-        return ReadState_Both;
+        return ReadState::Both;
     }
     else if (nalType == nuDRD || nalType == nuSliceExt)
     {
-        return ReadState_Secondary;
+        return ReadState::Secondary;
     }
     else if (nalType == nuSubSPS)
     {
         SPSUnit sps;
         sps.decodeBuffer(data, dataEnd);
         if (sps.deserialize() == NOT_ENOUGH_BUFFER)
-            return ReadState_NeedMoreData;
+            return ReadState::NeedMoreData;
         m_mvcSPS = sps.seq_parameter_set_id;
-        return ReadState_Secondary;
+        return ReadState::Secondary;
     }
     else if (nalType == nuPPS)
     {
         PPSUnit pps;
         pps.decodeBuffer(data, dataEnd);
         if (pps.deserialize() == NOT_ENOUGH_BUFFER)
-            return ReadState_NeedMoreData;
+            return ReadState::NeedMoreData;
         if (pps.seq_parameter_set_id == m_mvcSPS)
-            return ReadState_Secondary;
+            return ReadState::Secondary;
         else
-            return ReadState_Primary;
+            return ReadState::Primary;
     }
     else if (nalType == nuSEI)
     {
@@ -95,15 +95,14 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
         sei.decodeBuffer(data, dataEnd);
         int rez = sei.isMVCSEI();
         if (rez == NOT_ENOUGH_BUFFER)
-            return ReadState_NeedMoreData;
+            return ReadState::NeedMoreData;
         else if (rez == 0)
-            return ReadState_Primary;
+            return ReadState::Primary;
         else
-            return ReadState_Secondary;
+            return ReadState::Secondary;
     }
     else
-        return ReadState_Primary;
-    // return ReadState_Unknown;
+        return ReadState::Primary;
 }
 
 void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, int pid)
@@ -183,7 +182,7 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
         if (prefixLen != 0)
         {
             m_state = detectStreamByNal(curNal + prefixLen, nextNal);
-            if (m_state == ReadState_NeedMoreData)
+            if (m_state == ReadState::NeedMoreData)
             {
                 if (dataEnd - curNal < MAX_TMP_BUFFER_SIZE)
                 {
@@ -193,16 +192,16 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
                 else
                 {
                     // some error in a stream, just ignore
-                    m_state = ReadState_Primary;
+                    m_state = ReadState::Primary;
                 }
             }
         }
-        if (m_state == ReadState_Both)
+        if (m_state == ReadState::Both)
         {
             addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
             addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
         }
-        else if (m_state == ReadState_Primary)
+        else if (m_state == ReadState::Primary)
             addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
         else
             addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
@@ -214,7 +213,7 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
     {
         if (m_lastReadRez == BufferedReader::DATA_EOF)
         {
-            if (m_state == ReadState_Primary)
+            if (m_state == ReadState::Primary)
                 addDataToPrimary(curNal, dataEnd, demuxedData, discardSize);
             else
                 addDataToSecondary(curNal, dataEnd, demuxedData, discardSize);
@@ -274,12 +273,12 @@ int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acce
         int prefixLen = getPrefixLen(curNal, dataEnd);
         if (prefixLen != 0)
             m_state = detectStreamByNal(curNal + prefixLen, nextNal);
-        if (m_state == ReadState_Both)
+        if (m_state == ReadState::Both)
         {
             addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
             addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
         }
-        else if (m_state == ReadState_Primary)
+        else if (m_state == ReadState::Primary)
             addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
         else
             addDataToSecondary(curNal, nextNal, demuxedData, discardSize);

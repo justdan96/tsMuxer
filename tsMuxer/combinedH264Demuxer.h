@@ -18,12 +18,12 @@ class CombinedH264Reader
     virtual ~CombinedH264Reader() {}
 
    protected:
-    enum ReadState
+    enum class ReadState
     {
-        ReadState_NeedMoreData,
-        ReadState_Primary,
-        ReadState_Secondary,
-        ReadState_Both
+        NeedMoreData,
+        Primary,
+        Secondary,
+        Both
     };
 
     int getPrefixLen(const uint8_t* pos, const uint8_t* end);
