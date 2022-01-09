@@ -263,7 +263,7 @@ int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
     }
 
     nal_ref_idc = (*buffer >> 5) & 0x3;
-    nal_unit_type = *buffer & 0x1f;
+    nal_unit_type = (NALType)( * buffer & 0x1f);
     return 0;
 }
 
@@ -299,7 +299,7 @@ int NALUnit::serialize(uint8_t* dstBuffer)
     *dstBuffer++ = 0;
     *dstBuffer++ = 0;
     *dstBuffer++ = 1;
-    *dstBuffer = ((nal_ref_idc & 3) << 5) + (nal_unit_type & 0x1f);
+    *dstBuffer = ((nal_ref_idc & 3) << 5) + (int)nal_unit_type;
     return 4;
 }
 
@@ -573,7 +573,7 @@ int SPSUnit::deserialize()
             if (deserializeVuiParameters() != 0)
                 return 1;
 
-        if (nal_unit_type == nuSubSPS)
+        if (nal_unit_type == NALType::nuSubSPS)
         {
             int rez = deserializeSubSPS();
             if (rez != 0)
@@ -1010,7 +1010,7 @@ std::string SPSUnit::getStreamDescr()
 {
     std::ostringstream rez;
 
-    if (nal_unit_type == nuSubSPS)
+    if (nal_unit_type == NALType::nuSubSPS)
     {
         if (profile_idc == 83 || profile_idc == 86)
             rez << "SVC part ";
@@ -1217,11 +1217,15 @@ void SliceUnit::nal_unit_header_mvc_extension()
     bitReader.skipBits(2);  // inter_view_flag, reserved_one_bit
 }
 
-bool SliceUnit::isIDR() const { return nal_unit_type == nuSliceIDR || nal_unit_type == nuSliceExt && !non_idr_flag; }
+bool SliceUnit::isIDR() const
+{
+    return nal_unit_type == NALType::nuSliceIDR ||
+           nal_unit_type == NALType::nuSliceExt && !non_idr_flag;
+}
 
 bool SliceUnit::isIFrame() const
 {
-    return nal_unit_type == nuSliceExt ? anchor_pic_flag : slice_type == SliceUnit::I_TYPE;
+    return nal_unit_type == NALType::nuSliceExt ? anchor_pic_flag : slice_type == SliceUnit::I_TYPE;
 }
 
 int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
@@ -1236,7 +1240,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
     try
     {
         int offset = 1;
-        if (nal_unit_type == nuSliceExt)
+        if (nal_unit_type == NALType::nuSliceExt)
         {
             if (end - buffer < 5)
                 return NOT_ENOUGH_BUFFER;
@@ -1278,7 +1282,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
         bitReader.setBuffer(buffer + 1, end);
         // m_getbitContextBuffer = buffer+1;
 
-        if (nal_unit_type == nuSliceExt)
+        if (nal_unit_type == NALType::nuSliceExt)
         {
             if (bitReader.getBit())               // svc_extension_flag
                 nal_unit_header_svc_extension();  // specified in Annex G
@@ -1626,7 +1630,7 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
 {
     if (seiHeader)
     {
-        writer.putBits(8, nuSEI);
+        writer.putBits(8, (int)NALType::nuSEI);
         writer.putBits(8, SEI_MSG_PIC_TIMING);
     }
     writer.putBits(8, 0);
@@ -1656,7 +1660,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
 {
     if (seiHeader)
     {
-        writer.putBits(8, nuSEI);
+        writer.putBits(8, (int)NALType::nuSEI);
         writer.putBits(8, SEI_MSG_BUFFERING_PERIOD);
     }
     writer.putBits(8, 0);

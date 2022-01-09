@@ -16,42 +16,6 @@ const static double h264_ar_coeff[] = {0.0,         1.0,          12.0 / 11.0, 1
                                        24.0 / 11.0, 20.0 / 11.0,  32.0 / 11.0, 80.0 / 33.0, 18.0 / 11.0, 15.0 / 11.0,
                                        64.0 / 33.0, 160.0 / 99.0, 4.0 / 3.0,   3.0 / 2.0,   2.0 / 1.0};
 
-enum NALUnitType
-{
-    nuUnspecified,
-    nuSliceNonIDR,
-    nuSliceA,
-    nuSliceB,
-    nuSliceC,  // 0..4
-    nuSliceIDR,
-    nuSEI,
-    nuSPS,
-    nuPPS,
-    nuDelimiter,  // 5..9
-    nuEOSeq,
-    nuEOStream,
-    nuFillerData,
-    nuSPSExt,  // 10..13
-    nuNalPrefix,
-    nuSubSPS,  // 14.. 15 (new)
-    nuReserved3,
-    nuReserved4,
-    nuReserved5,
-    nuSliceWithoutPartitioning,  // 16..19
-    nuSliceExt,                  // 20 (new)
-    nuReserved7,
-    nuReserved8,
-    nuReserved9,  // 21..23
-    STAP_A = 24,
-    nuDRD = 24,  // blu-ray delimiter for MVC part instead of 0x09
-    STAP_B,
-    MTAP16,
-    MTAP24,
-    FU_A,
-    FU_B,
-    nuDummy
-};
-
 const static int SEI_MSG_BUFFERING_PERIOD = 0;
 const static int SEI_MSG_PIC_TIMING = 1;
 const static int SEI_MSG_MVC_SCALABLE_NESTING = 37;
@@ -72,22 +36,60 @@ const static char* NALUnitDescr[30] =
 class NALUnit
 {
    public:
+    enum class NALType
+    {
+        nuUnspecified,
+        nuSliceNonIDR,
+        nuSliceA,
+        nuSliceB,
+        nuSliceC,  // 0..4
+        nuSliceIDR,
+        nuSEI,
+        nuSPS,
+        nuPPS,
+        nuDelimiter,  // 5..9
+        nuEOSeq,
+        nuEOStream,
+        nuFillerData,
+        nuSPSExt,  // 10..13
+        nuNalPrefix,
+        nuSubSPS,  // 14.. 15 (new)
+        nuReserved3,
+        nuReserved4,
+        nuReserved5,
+        nuSliceWithoutPartitioning,  // 16..19
+        nuSliceExt,                  // 20 (new)
+        nuReserved7,
+        nuReserved8,
+        nuReserved9,  // 21..23
+        STAP_A = 24,
+        nuDRD = 24,  // blu-ray delimiter for MVC part instead of 0x09
+        STAP_B,
+        MTAP16,
+        MTAP24,
+        FU_A,
+        FU_B,
+        nuDummy
+    };
+
+   public:
     const static int SPS_OR_PPS_NOT_READY = 1;
     // const static int NOT_ENOUGH_BUFFER = 2;
     const static int UNSUPPORTED_PARAM = 3;
     const static int NOT_FOUND = 4;
 
-    int nal_unit_type;
+
+    NALType nal_unit_type;
     int nal_ref_idc;
 
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
 
     NALUnit(uint8_t nalUnitType)
-        : nal_unit_type(nalUnitType), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader()
+        : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader()
     {
     }
-    NALUnit() : nal_unit_type(0), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
+    NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
     // NALUnit(const NALUnit& other);
     virtual ~NALUnit() { delete[] m_nalBuffer; }
     static uint8_t* findNextNAL(uint8_t* buffer, uint8_t* end);
@@ -112,7 +114,6 @@ class NALUnit
     void write_byte_align_bits(BitStreamWriter& writer);
 
     int calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end);  // for NAL with rbspTrailingBits only
-    int deserializeSliceType(uint8_t* buff, uint8_t* bufEnd);
 
    protected:
     // GetBitContext getBitContext;
@@ -134,7 +135,7 @@ class NALDelimiter : public NALUnit
     const static int PCT_I_SI_P_SP_FRAMES = 6;
     const static int PCT_I_SI_P_SP_B_FRAMES = 7;
     int primary_pic_type;
-    NALDelimiter() : NALUnit(nuDelimiter), primary_pic_type(0) {}
+    NALDelimiter() : NALUnit(), primary_pic_type(0) {}
     int deserialize(uint8_t* buffer, uint8_t* end) override;
     int serialize(uint8_t* dstBuffer) override;
 };

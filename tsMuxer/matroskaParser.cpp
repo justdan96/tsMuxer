@@ -101,10 +101,10 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        int nalUnitType = curPos[m_nalSize] & 0x1f;
-        if (nalUnitType == nuSPS)
+        auto nalUnitType = (NALUnit::NALType)(curPos[m_nalSize] & 0x1f);
+        if (nalUnitType == NALUnit::NALType::nuSPS)
             spsFound = true;
-        else if (nalUnitType == nuPPS)
+        else if (nalUnitType == NALUnit::NALType::nuPPS)
             ppsFound = true;
         curPos += elSize + m_nalSize;
     }
