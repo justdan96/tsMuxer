@@ -1329,48 +1329,51 @@ int MatroskaDemuxer::matroska_read_header()
 
             track->stream_index = num_streams++;
 
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_HEVC_FOURCC) && (track->codec_priv != NULL))
-            {
-                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
-                track->parsed_priv_data = new ParsedH265TrackData(track->codec_priv, track->codec_priv_size);
-            }
             if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AVC_FOURCC) && (track->codec_priv != NULL))
             {
                 MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedH264TrackData(track->codec_priv, track->codec_priv_size);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC) && (track->codec_priv != NULL))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_HEVC_FOURCC) && (track->codec_priv != NULL))
+            {
+                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
+                track->parsed_priv_data = new ParsedH265TrackData(track->codec_priv, track->codec_priv_size);
+            }
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VVC_FOURCC) && (track->codec_priv != NULL))
+            {
+                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
+                track->parsed_priv_data = new ParsedH266TrackData(track->codec_priv, track->codec_priv_size);
+            }
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC) && (track->codec_priv != NULL))
             {
                 MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedVC1TrackData(track->codec_priv, track->codec_priv_size);
             }
-
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_AC3))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_AC3))
             {
                 track->parsed_priv_data = new ParsedAC3TrackData(track->codec_priv, track->codec_priv_size);
             }
-
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_AAC))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_AAC))
             {
                 track->parsed_priv_data = new ParsedAACTrackData(track->codec_priv, track->codec_priv_size);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
             {
                 track->parsed_priv_data = new ParsedLPCMTrackData(track);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_LIT))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_LIT))
             {
                 track->parsed_priv_data = new ParsedLPCMTrackData(track);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_ACM))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_ACM))
             {
                 track->parsed_priv_data = new ParsedLPCMTrackData(track);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
             {
                 track->parsed_priv_data = new ParsedSRTTrackData(track->codec_priv, track->codec_priv_size);
             }
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SUBTITLE_PGS))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SUBTITLE_PGS))
             {
                 track->parsed_priv_data = new ParsedPGTrackData();
             }
@@ -2130,14 +2133,13 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    if (num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_MONO &&
-                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_LEFT &&
-                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_RIGHT &&
-                        num != (uint64_t)MatroskaEyeMode::MATROSKA_EYE_MODE_BOTH)
-                    {
-                        LTRACE(LT_INFO, 0, "Ignoring unknown eye mode " << (uint32_t)num);
-                        break;
-                    }
+
+                        if (num != (uint64_t)MatroskaEyeMode::MONO && num != (uint64_t)MatroskaEyeMode::LEFT &&
+                            num != (uint64_t)MatroskaEyeMode::RIGHT && num != (uint64_t)MatroskaEyeMode::BOTH)
+                        {
+                            LTRACE(LT_INFO, 0, "Ignoring unknown eye mode " << (uint32_t)num);
+                            break;
+                        }
                     videotrack->eye_mode = (MatroskaEyeMode)num;
                     break;
                 }

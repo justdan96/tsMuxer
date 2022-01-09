@@ -150,10 +150,10 @@ const static uint8_t MATROSKA_ID_BLOCKREFERENCE = 0xFB;
 
 enum class MatroskaEyeMode
 {
-    MATROSKA_EYE_MODE_MONO = 0x0,
-    MATROSKA_EYE_MODE_RIGHT = 0x1,
-    MATROSKA_EYE_MODE_LEFT = 0x2,
-    MATROSKA_EYE_MODE_BOTH = 0x3
+    MONO = 0x0,
+    RIGHT = 0x1,
+    LEFT = 0x2,
+    BOTH = 0x3
 };
 
 enum class MatroskaAspectRatioMode
@@ -189,24 +189,23 @@ typedef enum
 struct CodecTags
 {
     const char* str;
-    // enum CodecID id;
     int id;
 };
 
-#define MATROSKA_CODEC_ID_HEVC_FOURCC "V_MPEGH/ISO/HEVC"
-#define MATROSKA_CODEC_ID_AVC_FOURCC "V_MPEG4/ISO/AVC"
-#define MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC "V_MS/VFW/FOURCC"
-#define MATROSKA_CODEC_ID_AUDIO_ACM "A_MS/ACM"
-#define MATROSKA_CODEC_ID_AUDIO_AC3 "A_AC3"
-#define MATROSKA_CODEC_ID_SRT "S_TEXT/UTF8"
-#define MATROSKA_CODEC_ID_AUDIO_AAC "A_AAC"
-#define MATROSKA_CODEC_ID_AUDIO_PCM_BIG "A_PCM/INT/BIG"
-#define MATROSKA_CODEC_ID_AUDIO_PCM_LIT "A_PCM/INT/LIT"
-#define MATROSKA_CODEC_ID_AUDIO_ACM "A_MS/ACM"
-#define MATROSKA_CODEC_ID_SUBTITLE_PGS "S_HDMV/PGS"
+constexpr auto MATROSKA_CODEC_ID_VVC_FOURCC = "V_MPEGI/ISO/VVC";
+constexpr auto MATROSKA_CODEC_ID_HEVC_FOURCC = "V_MPEGH/ISO/HEVC";
+constexpr auto MATROSKA_CODEC_ID_AVC_FOURCC = "V_MPEG4/ISO/AVC";
+constexpr auto MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC = "V_MS/VFW/FOURCC";
+constexpr auto MATROSKA_CODEC_ID_AUDIO_ACM = "A_MS/ACM";
+constexpr auto MATROSKA_CODEC_ID_AUDIO_AC3 = "A_AC3";
+constexpr auto MATROSKA_CODEC_ID_SRT = "S_TEXT/UTF8";
+constexpr auto MATROSKA_CODEC_ID_AUDIO_AAC = "A_AAC";
+constexpr auto MATROSKA_CODEC_ID_AUDIO_PCM_BIG = "A_PCM/INT/BIG";
+constexpr auto MATROSKA_CODEC_ID_AUDIO_PCM_LIT = "A_PCM/INT/LIT";
+constexpr auto MATROSKA_CODEC_ID_SUBTITLE_PGS = "S_HDMV/PGS";
 
 /* max. depth in the EBML tree structure */
-#define EBML_MAX_DEPTH 16
+constexpr auto EBML_MAX_DEPTH = 16;
 
 // extern CodecTags ff_mkv_codec_tags[];
 
@@ -233,6 +232,15 @@ class ParsedH265TrackData : public ParsedH264TrackData
    public:
     ParsedH265TrackData(uint8_t* buff, int size);
     ~ParsedH265TrackData() override {}
+
+    bool spsppsExists(uint8_t* buff, int size) override;
+};
+
+class ParsedH266TrackData : public ParsedH264TrackData
+{
+   public:
+    ParsedH266TrackData(uint8_t* buff, int size);
+    ~ParsedH266TrackData() override {}
 
     bool spsppsExists(uint8_t* buff, int size) override;
 };

@@ -8,6 +8,7 @@
 #include "nalUnits.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
+#include "vvc.h"
 #include "wave.h"
 
 static const int LPCM_HEADER_LEN = 4;
@@ -209,6 +210,41 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
         else if (nalUnitType == HevcUnit::NalType::SPS)
             spsFound = true;
         else if (nalUnitType == HevcUnit::NalType::PPS)
+            ppsFound = true;
+        curPos += elSize + m_nalSize;
+    }
+    return vpsFound && spsFound && ppsFound;
+}
+
+// ----------- H.266 -----------------
+ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264TrackData(0, 0)
+{
+    m_spsPpsList = hevc_extract_priv_data(buff, size, &m_nalSize);
+}
+
+bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
+{
+    uint8_t* curPos = buff;
+    uint8_t* end = buff + size;
+    bool vpsFound = false;
+    bool spsFound = false;
+    bool ppsFound = false;
+    while (curPos < end - m_nalSize)
+    {
+        uint32_t elSize = 0;
+        if (m_nalSize == 4)
+        {
+            uint32_t* cur32 = (uint32_t*)curPos;
+            elSize = my_ntohl(*cur32);
+        }
+        else
+            elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
+        auto nalUnitType = (VvcUnit::NalType)(curPos[m_nalSize + 1] >> 3);
+        if (nalUnitType == VvcUnit::NalType::VPS)
+            vpsFound = true;
+        else if (nalUnitType == VvcUnit::NalType::SPS)
+            spsFound = true;
+        else if (nalUnitType == VvcUnit::NalType::PPS)
             ppsFound = true;
         curPos += elSize + m_nalSize;
     }
