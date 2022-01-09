@@ -301,7 +301,9 @@ bool SingleFileMuxer::close()
             if (streamInfo->m_part > 1)
             {
                 std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
-                rename(streamInfo->m_fileName.c_str(), newName.c_str());
+                deleteFile(newName.c_str());
+                if (rename(streamInfo->m_fileName.c_str(), newName.c_str()) != 0)
+                    THROW(ERR_COMMON, "Can't rename file " << streamInfo->m_fileName << " to " << newName);
             }
         }
     }
