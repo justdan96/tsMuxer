@@ -270,6 +270,7 @@ void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 
 MPEGGOPHeader::MPEGGOPHeader()
     : MPEGHeader(),
+      time_code_pictures(0),
       time_code_hours(0),
       time_code_minutes(0),
       time_code_seconds(0),
