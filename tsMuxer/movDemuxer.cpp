@@ -13,6 +13,7 @@
 #include "math.h"
 #include "subTrackFilter.h"
 #include "vodCoreException.h"
+#include "vvc.h"
 
 using namespace std;
 
@@ -371,6 +372,17 @@ class MovParsedH265TrackData : public MovParsedH264TrackData
     void setPrivData(uint8_t* buff, int size) override
     {
         spsPpsList = hevc_extract_priv_data(buff, size, &nal_length_size);
+    }
+};
+
+class MovParsedH266TrackData : public MovParsedH264TrackData
+{
+   public:
+    MovParsedH266TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : MovParsedH264TrackData(demuxer, sc) {}
+
+    void setPrivData(uint8_t* buff, int size) override
+    {
+        spsPpsList = vvc_extract_priv_data(buff, size, &nal_length_size);
     }
 };
 
