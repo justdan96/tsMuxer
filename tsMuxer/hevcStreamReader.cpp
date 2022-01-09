@@ -98,6 +98,9 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                     m_hdr->isDVRPU = true;
                 V3_flags |= DV;
             }
+            break;
+        default:
+            break;
         }
 
         // check Frame Depth on first slices
@@ -564,6 +567,8 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 m_hdr->decodeBuffer(curPos, nextNal);
                 if (m_hdr->deserialize() != 0)
                     return rez;
+                break;
+            default:
                 break;
             }
         }

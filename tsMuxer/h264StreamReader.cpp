@@ -194,6 +194,8 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
         case NALUnit::NALType::STAP_A:
             // unknown blu-ray nal before subSps
             break;
+        default:
+            break;
         }
     }
     if (m_mvcSubStream && m_mvcPrimaryStream)
@@ -614,6 +616,8 @@ void H264StreamReader::additionalStreamCheck(uint8_t* buff, uint8_t* end)
                 }
             }
             break;
+        default:
+            break;
         }
     }
 
@@ -688,6 +692,8 @@ void H264StreamReader::additionalStreamCheck(uint8_t* buff, uint8_t* end)
                     frameNum = -1;
                 checkPyramid(++frameNum, &picOrder, true);
             }
+            break;
+        default:
             break;
         }
     }
@@ -765,6 +771,9 @@ int H264StreamReader::getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd)
             }
             else
                 return prevPicCnt;
+            break;
+        default:
+            break;
         }
     }
     if (m_eof)
@@ -860,6 +869,8 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
                     m_lastDecodedPos = nextNal;
                 }
                 return nalRez;
+            default:
+                break;
             }
             nextNal = NALUnit::findNextNAL(nextNal, m_bufEnd);
         }
@@ -873,6 +884,8 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
         nalRez = processSliceNal(buff);
         if (nalRez != 0)
             return nalRez;
+        break;
+    default:
         break;
     }
     return 0;
@@ -1055,6 +1068,8 @@ bool H264StreamReader::findPPSForward(uint8_t* buff)
         case NALUnit::NALType::nuPPS:
             processPPS(nal);
             ppsFound = true;
+            break;
+        default:
             break;
         }
     return spsFound && ppsFound;
@@ -1271,6 +1286,8 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff)
                 return 0;  // next frame found
             }
             m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(slice.slice_type));
+            break;
+        default:
             break;
         }
         nextSlice = NALUnit::findNextNAL(nextSlice, m_bufEnd);
