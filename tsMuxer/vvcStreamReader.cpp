@@ -50,12 +50,12 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
     {
         if (*nal & 0x80)
             return rez;  // invalid nal
-        int nalType = (nal[1] >> 3);
+        auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
 
         switch (nalType)
         {
-        case V_VPS:
+        case VvcUnit::NalType::VPS:
             if (!m_vps)
                 m_vps = new VvcVpsUnit();
             m_vps->decodeBuffer(nal, nextNal);
@@ -65,7 +65,7 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
             if (m_vps->num_units_in_tick)
                 updateFPS(m_vps, nal, nextNal, 0);
             break;
-        case V_SPS:
+        case VvcUnit::NalType::SPS:
             if (!m_sps)
                 m_sps = new VvcSpsUnit();
             m_sps->decodeBuffer(nal, nextNal);
@@ -74,12 +74,15 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
             m_spsPpsFound = true;
             updateFPS(m_sps, nal, nextNal, 0);
             break;
-        case V_PPS:
+        case VvcUnit::NalType::PPS:
             if (!m_pps)
                 m_pps = new VvcPpsUnit();
             m_pps->decodeBuffer(nal, nextNal);
             if (m_pps->deserialize() != 0)
                 return rez;
+            break;
+        default:
+            break;
         }
 
         // check Frame Depth on first slices
@@ -193,18 +196,48 @@ double VVCStreamReader::getStreamFPS(void* curNalUnit)
     return fps;
 }
 
-bool VVCStreamReader::isSlice(int nalType) const
+bool VVCStreamReader::isSlice(VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_pps)
         return false;
-    return (nalType >= V_TRAIL && nalType <= V_RASL) || (nalType >= V_IDR_W_RADL && nalType <= V_GDR);
+
+    switch (nalType)
+    {
+    case VvcUnit::NalType::TRAIL:
+    case VvcUnit::NalType::STSA:
+    case VvcUnit::NalType::RADL:
+    case VvcUnit::NalType::RASL:
+    case VvcUnit::NalType::IDR_W_RADL:
+    case VvcUnit::NalType::IDR_N_LP:
+    case VvcUnit::NalType::CRA:
+    case VvcUnit::NalType::GDR:
+        return true;
+    default:
+        return false;
+    }
 }
 
-bool VVCStreamReader::isSuffix(int nalType) const
+bool VVCStreamReader::isSuffix(VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
-    return (nalType == V_FD || nalType == V_SUFFIX_APS);
+
+    switch (nalType)
+    {
+    case VvcUnit::NalType::SUFFIX_APS:
+    case VvcUnit::NalType::SUFFIX_SEI:
+    case VvcUnit::NalType::EOS:
+    case VvcUnit::NalType::EOB:
+    case VvcUnit::NalType::FD:
+    case VvcUnit::NalType::RSV_NVCL_27:
+    case VvcUnit::NalType::UNSPEC_30:
+    case VvcUnit::NalType::UNSPEC_31:
+        return true;
+    default:
+        return false;
+    }
+
+    return (nalType == VvcUnit::NalType::FD || nalType == VvcUnit::NalType::SUFFIX_APS);
 }
 
 void VVCStreamReader::incTimings()
@@ -276,7 +309,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
 
     while (curPos < m_bufEnd)
     {
-        int nalType = (*curPos >> 1) & 0x3f;
+        auto nalType = (VvcUnit::NalType)((*curPos >> 1) & 0x3f);
         if (isSlice(nalType))
         {
             if (curPos[2] & 0x80)  // slice.first_slice
@@ -295,7 +328,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                     if (rez)
                         return rez;  // not enough buffer or error
                     // if (slice.slice_type == VVC_IFRAME_SLICE)
-                    if (nalType >= NAL_BLA_W_LP)
+                    if (nalType >= VvcUnit::NalType::IDR_W_RADL)
                         m_lastIFrame = true;
                     m_fullPicOrder = toFullPicOrder(&slice, m_sps->log2_max_pic_order_cnt_lsb);
                 }
@@ -315,7 +348,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
 
             switch (nalType)
             {
-            case NAL_VPS:
+            case VvcUnit::NalType::VPS:
                 if (!m_vps)
                     m_vps = new VvcVpsUnit();
                 m_vps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -330,7 +363,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                 nextNal += m_vpsSizeDiff;
                 storeBuffer(m_vpsBuffer, curPos, nextNalWithStartCode);
                 break;
-            case NAL_SPS:
+            case VvcUnit::NalType::SPS:
                 if (!m_sps)
                     m_sps = new VvcSpsUnit();
                 m_sps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -341,7 +374,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                 updateFPS(m_sps, curPos, nextNalWithStartCode, 0);
                 storeBuffer(m_spsBuffer, curPos, nextNalWithStartCode);
                 break;
-            case NAL_PPS:
+            case VvcUnit::NalType::PPS:
                 if (!m_pps)
                     m_pps = new VvcPpsUnit();
                 m_pps->decodeBuffer(curPos, nextNalWithStartCode);
@@ -350,6 +383,9 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                     return rez;
                 m_spsPpsFound = true;
                 storeBuffer(m_ppsBuffer, curPos, nextNalWithStartCode);
+                break;
+            default:
+                break;
             }
         }
         prevPos = curPos;
@@ -401,8 +437,8 @@ int VVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     if (avPacket.size > 4 && avPacket.size < dstEnd - dstBuffer)
     {
         int offset = avPacket.data[2] == 1 ? 3 : 4;
-        uint8_t nalType = (avPacket.data[offset] >> 1) & 0x3f;
-        if (nalType == NAL_AUD)
+        auto nalType = (VvcUnit::NalType)((avPacket.data[offset] >> 1) & 0x3f);
+        if (nalType == VvcUnit::NalType::AUD)
         {
             // place delimiter at first place
             memcpy(curPos, avPacket.data, avPacket.size);

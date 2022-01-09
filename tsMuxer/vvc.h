@@ -3,40 +3,6 @@
 
 #include "nalUnits.h"
 
-enum VvcSliceTypes
-{
-    VVC_BFRAME_SLICE = 0,
-    VVC_PFRAME_SLICE = 1,
-    VVC_IFRAME_SLICE = 2
-};
-
-enum VVCUnitType
-{
-    V_TRAIL = 0,  // first slice
-    V_STSA = 1,
-    V_RADL = 2,
-    V_RASL = 3,
-    V_IDR_W_RADL = 7,
-    V_IDR_N_LP = 8,
-    V_CRA = 9,
-    V_GDR = 10,
-    V_RSV_IRAP_11 = 11,
-    V_OPI = 12,
-    V_DCI = 13,
-    V_VPS = 14,
-    V_SPS = 15,
-    V_PPS = 16,
-    V_PREFIX_APS = 17,
-    V_SUFFIX_APS = 18,
-    V_PH = 19,
-    V_AUD = 20,
-    V_EOS = 21,
-    V_EOB = 22,
-    V_PREFIX_SEI = 23,
-    V_SUFFIX_SEI = 24,
-    V_FD = 25
-};
-
 struct VvcHrdUnit
 {
     VvcHrdUnit();
@@ -53,9 +19,35 @@ struct VvcHrdUnit
 struct VvcUnit
 {
     VvcUnit()
-        : nal_unit_type(0), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
+        : nal_unit_type(), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
     {
     }
+
+   public:
+    enum class NalType
+    {
+        TRAIL = 0,
+        STSA = 1,
+        RADL = 2,
+        RASL = 3,
+        IDR_W_RADL = 7,
+        IDR_N_LP = 8,
+        CRA = 9,
+        GDR = 10,
+        OPI = 12,
+        VPS = 14,
+        SPS = 15,
+        PPS = 16,
+        SUFFIX_APS = 18,
+        AUD = 20,
+        EOS = 21,
+        EOB = 22,
+        SUFFIX_SEI = 24,
+        FD = 25,
+        RSV_NVCL_27 = 27,
+        UNSPEC_30 = 30,
+        UNSPEC_31 = 31
+    };
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     virtual int deserialize();
@@ -64,7 +56,7 @@ struct VvcUnit
     int nalBufferLen() const { return m_nalBufferLen; }
 
    public:
-    int nal_unit_type;
+    NalType nal_unit_type;
     int nuh_layer_id;
     int nuh_temporal_id_plus1;
 

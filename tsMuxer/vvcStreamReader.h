@@ -33,8 +33,8 @@ class VVCStreamReader : public MPEGStreamReader
     void onSplitEvent() override { m_firstFileFrame = true; }
 
    private:
-    bool isSlice(int nalType) const;
-    bool isSuffix(int nalType) const;
+    bool isSlice(VvcUnit::NalType nalType) const;
+    bool isSuffix(VvcUnit::NalType nalType) const;
     void incTimings();
     int toFullPicOrder(VvcSliceHeader* slice, int pic_bits);
     void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);

@@ -47,10 +47,12 @@ int VvcUnit::deserialize()
     {
         m_reader.skipBits(2);  // forbidden_zero_bit, nuh_reserved_zero_bit
         nuh_layer_id = m_reader.getBits(6);
-        nal_unit_type = m_reader.getBits(5);
+        nal_unit_type = (NalType)m_reader.getBits(5);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
-        if (nuh_temporal_id_plus1 == 0 || (nuh_temporal_id_plus1 != 1 && ((nal_unit_type >= 7 && nal_unit_type <= 15) ||
-                                                                          nal_unit_type == 21 || nal_unit_type == 22)))
+        if (nuh_temporal_id_plus1 == 0 ||
+            (nuh_temporal_id_plus1 != 1 &&
+             ((nal_unit_type >= NalType::OPI && nal_unit_type <= NalType::SPS) ||
+              nal_unit_type == NalType::EOS || nal_unit_type == NalType::EOB)))
             return 1;
         return 0;
     }
@@ -1063,7 +1065,10 @@ int VvcSliceHeader::deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps)
     }
 }
 
-bool VvcSliceHeader::isIDR() const { return nal_unit_type == V_IDR_W_RADL || nal_unit_type == V_IDR_N_LP; }
+bool VvcSliceHeader::isIDR() const
+{
+    return nal_unit_type == NalType::IDR_W_RADL || nal_unit_type == NalType::IDR_N_LP;
+}
 
 vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int* nal_size)
 {
