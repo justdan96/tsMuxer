@@ -14,20 +14,22 @@ const unsigned WRITE_QUEUE_MAX_SIZE = 400 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZ
 
 struct WriterData
 {
-    uint8_t* m_buffer;
-    int m_bufferLen;
-    AbstractOutputStream* m_mainFile;
-    int m_command;
-
-   public:
-    WriterData() : m_buffer(0), m_bufferLen(0), m_mainFile(), m_command(0) {}
-    enum Commands
+    enum class Commands
     {
         wdNone,
         wdWrite,
         wdDelete,
         wdCloseFile
     };
+
+    uint8_t* m_buffer;
+    int m_bufferLen;
+    AbstractOutputStream* m_mainFile;
+    Commands m_command;
+
+   public:
+    WriterData() : m_buffer(0), m_bufferLen(0), m_mainFile(), m_command() {}
+
     void execute();
 };
 

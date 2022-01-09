@@ -288,7 +288,7 @@ void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len
     data.m_buffer = buff;
     data.m_bufferLen = len;
     data.m_mainFile = dstFile;
-    data.m_command = WriterData::wdWrite;
+    data.m_command = WriterData::Commands::wdWrite;
 
     if (m_interleave && muxer == m_mainMuxer)
     {

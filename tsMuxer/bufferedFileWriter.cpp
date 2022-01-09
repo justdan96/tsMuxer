@@ -7,12 +7,14 @@ void WriterData::execute()
 {
     switch (m_command)
     {
-    case wdWrite:
+    case Commands::wdWrite:
         if (m_mainFile)
         {
             m_mainFile->write(m_buffer, m_bufferLen);
         }
         delete[] m_buffer;
+        break;
+    default:
         break;
     };
 }
@@ -71,7 +73,7 @@ void BufferedFileWriter::terminate()
         return;
     m_terminated = true;
     WriterData data;
-    data.m_command = WriterData::wdNone;
+    data.m_command = WriterData::Commands::wdNone;
     m_writeQueue.push(data);
     join();
 }
