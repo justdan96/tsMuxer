@@ -29,14 +29,14 @@ class ParsedTrackPrivData
 
 enum class IOContextTrackType
 {
-    TRACK_TYPE_UNDEFINED = 0x0,
-    TRACK_TYPE_VIDEO = 0x1,
-    TRACK_TYPE_AUDIO = 0x2,
-    TRACK_TYPE_COMPLEX = 0x3,
-    TRACK_TYPE_LOGO = 0x10,
-    TRACK_TYPE_SUBTITLE = 0x11,
-    TRACK_TYPE_CONTROL = 0x20,
-    TRACK_TYPE_DATA = 0x40
+    UNDEFINED = 0x0,
+    VIDEO = 0x1,
+    AUDIO = 0x2,
+    COMPLEX = 0x3,
+    LOGO = 0x10,
+    SUBTITLE = 0x11,
+    CONTROL = 0x20,
+    DATA = 0x40
 };
 
 double av_int2dbl(int64_t v);
@@ -52,7 +52,7 @@ struct Track
         memset(language, 0, sizeof(language));
         default_duration = 0;
         encodingAlgo = 0;
-        type = IOContextTrackType::TRACK_TYPE_UNDEFINED;
+        type = IOContextTrackType::UNDEFINED;
     }
     ~Track()
     {

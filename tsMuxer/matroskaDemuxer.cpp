@@ -1995,7 +1995,7 @@ int MatroskaDemuxer::matroska_add_stream()
             uint64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            if (track->type != IOContextTrackType::TRACK_TYPE_UNDEFINED && (uint64_t)track->type != num)
+            if (track->type != IOContextTrackType::UNDEFINED && (uint64_t)track->type != num)
             {
                 LTRACE(LT_INFO, 0, "More than one tracktype in an entry - skip");
                 break;
@@ -2004,13 +2004,13 @@ int MatroskaDemuxer::matroska_add_stream()
 
             switch (track->type)
             {
-            case IOContextTrackType::TRACK_TYPE_VIDEO:
-            case IOContextTrackType::TRACK_TYPE_AUDIO:
-            case IOContextTrackType::TRACK_TYPE_SUBTITLE:
+            case IOContextTrackType::VIDEO:
+            case IOContextTrackType::AUDIO:
+            case IOContextTrackType::SUBTITLE:
                 break;
-            case IOContextTrackType::TRACK_TYPE_COMPLEX:
-            case IOContextTrackType::TRACK_TYPE_LOGO:
-            case IOContextTrackType::TRACK_TYPE_CONTROL:
+            case IOContextTrackType::COMPLEX:
+            case IOContextTrackType::LOGO:
+            case IOContextTrackType::CONTROL:
             default:
                 LTRACE(LT_INFO, 0, "Unknown or unsupported track type " << (uint64_t)track->type);
                 track->type = (MatroskaTrackType)0;
@@ -2023,9 +2023,9 @@ int MatroskaDemuxer::matroska_add_stream()
         case MATROSKA_ID_TRACKVIDEO:
         {
             MatroskaVideoTrack *videotrack;
-            if (track->type == IOContextTrackType::TRACK_TYPE_UNDEFINED)
-                track->type = IOContextTrackType::TRACK_TYPE_VIDEO;
-            if (track->type != IOContextTrackType::TRACK_TYPE_VIDEO)
+            if (track->type == IOContextTrackType::UNDEFINED)
+                track->type = IOContextTrackType::VIDEO;
+            if (track->type != IOContextTrackType::VIDEO)
             {
                 LTRACE(LT_INFO, 0, "video data in non-video track - ignoring");
                 res = AVERROR_INVALIDDATA;
@@ -2192,9 +2192,9 @@ int MatroskaDemuxer::matroska_add_stream()
         case MATROSKA_ID_TRACKAUDIO:
         {
             MatroskaAudioTrack *audiotrack;
-            if (track->type == IOContextTrackType::TRACK_TYPE_UNDEFINED)
-                track->type = IOContextTrackType::TRACK_TYPE_AUDIO;
-            if (track->type != IOContextTrackType::TRACK_TYPE_AUDIO)
+            if (track->type == IOContextTrackType::UNDEFINED)
+                track->type = IOContextTrackType::AUDIO;
+            if (track->type != IOContextTrackType::AUDIO)
             {
                 LTRACE(LT_INFO, 0, "audio data in non-audio track - ignoring");
                 res = AVERROR_INVALIDDATA;

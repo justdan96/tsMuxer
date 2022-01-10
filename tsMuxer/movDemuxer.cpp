@@ -793,9 +793,9 @@ void MovDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 {
     for (int i = 0; i < num_tracks; i++)
     {
-        if (tracks[i]->type != IOContextTrackType::TRACK_TYPE_CONTROL)
+        if (tracks[i]->type != IOContextTrackType::CONTROL)
             trackList.insert(std::make_pair(
-                i + 1, TrackInfo(tracks[i]->type == IOContextTrackType::TRACK_TYPE_SUBTITLE ? TRACKTYPE_SRT : 0,
+                i + 1, TrackInfo(tracks[i]->type == IOContextTrackType::SUBTITLE ? TRACKTYPE_SRT : 0,
                                  tracks[i]->language, 0)));
     }
 }
@@ -1052,7 +1052,7 @@ int MovDemuxer::mov_read_trak(MOVAtom atom)
     MOVStreamContext* sc = new MOVStreamContext();
     Track* st = tracks[num_tracks] = sc;
     num_tracks++;
-    st->type = IOContextTrackType::TRACK_TYPE_DATA;
+    st->type = IOContextTrackType::DATA;
     sc->ffindex = num_tracks;  // st->index;
     return mov_read_default(atom);
 }
@@ -1297,14 +1297,14 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         get_be16();  // dref_id
 
         st->pseudo_stream_id = pseudo_stream_id;
-        st->type = IOContextTrackType::TRACK_TYPE_DATA;
+        st->type = IOContextTrackType::DATA;
         switch (format)
         {
         case MKTAG('a', 'v', 'c', '1'):
         case MKTAG('a', 'v', 'c', '3'):
         case MKTAG('d', 'v', 'a', 'v'):
         case MKTAG('d', 'v', 'a', '1'):
-            st->type = IOContextTrackType::TRACK_TYPE_VIDEO;
+            st->type = IOContextTrackType::VIDEO;
             st->parsed_priv_data = new MovParsedH264TrackData(this, st);
             break;
         case MKTAG('h', 'v', 'c', '1'):
@@ -1312,23 +1312,23 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         case MKTAG('d', 'v', 'h', 'e'):
         case MKTAG('d', 'v', 'h', '1'):
             st->parsed_priv_data = new MovParsedH265TrackData(this, st);
-            st->type = IOContextTrackType::TRACK_TYPE_VIDEO;
+            st->type = IOContextTrackType::VIDEO;
             break;
         case MKTAG('m', 'p', '4', 'a'):
         case MKTAG('a', 'c', '-', '3'):
-            st->type = IOContextTrackType::TRACK_TYPE_AUDIO;
+            st->type = IOContextTrackType::AUDIO;
             st->parsed_priv_data = new MovParsedAudioTrackData(this, st);
             break;
         case MKTAG('t', 'x', '3', 'g'):
-            st->type = IOContextTrackType::TRACK_TYPE_SUBTITLE;
+            st->type = IOContextTrackType::SUBTITLE;
             st->parsed_priv_data = new MovParsedSRTTrackData(this, st);
             break;
         case MKTAG('t', 'm', 'c', 'd'):
-            st->type = IOContextTrackType::TRACK_TYPE_CONTROL;
+            st->type = IOContextTrackType::CONTROL;
             break;
         }
 
-        if (st->type == IOContextTrackType::TRACK_TYPE_VIDEO)
+        if (st->type == IOContextTrackType::VIDEO)
         {
             get_be16();                              // version
             get_be16();                              // revision level
@@ -1345,7 +1345,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
             st->bits_per_coded_sample = get_be16();  // depth
             get_be16();                              // colortable id
         }
-        else if (st->type == IOContextTrackType::TRACK_TYPE_AUDIO)
+        else if (st->type == IOContextTrackType::AUDIO)
         {
             uint16_t version = get_be16();
             get_be16();                              // revision level
@@ -1423,7 +1423,7 @@ if (bits_per_sample) {
 }
             */
         }
-        else if (st->type == IOContextTrackType::TRACK_TYPE_SUBTITLE)
+        else if (st->type == IOContextTrackType::SUBTITLE)
         {
             MOVAtom fake_atom(0, 0, size - (m_processedBytes - start_pos));
             mov_read_glbl(fake_atom);
