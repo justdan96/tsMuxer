@@ -52,7 +52,7 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
     TextFile file(metaFileName, File::ofRead);
     string str;
     file.readLine(str);
-    DiskType result = DiskType::DT_NONE;
+    DiskType result = DiskType::NONE;
     while (str.length() > 0)
     {
         if (strStartWith(str, "MUXOPT"))
@@ -101,11 +101,11 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
                 V3_flags |= HDMV_V3;
 
             if (str.find("--blu-ray") != string::npos)
-                result = DiskType::DT_BLURAY;
+                result = DiskType::BLURAY;
             else if (str.find("--avchd") != string::npos)
-                result = DiskType::DT_AVCHD;
+                result = DiskType::AVCHD;
             else
-                result = DiskType::DT_NONE;
+                result = DiskType::NONE;
         }
         else if (strStartWith(str, "V_MPEG4/ISO/MVC"))
             stereoMode = true;
@@ -725,16 +725,16 @@ int main(int argc, char** argv)
                                      insertBlankPL, blankNum, stereoMode, isoDiskLabel);
         std::string fileExt2 = unquoteStr(fileExt);
         bool muxMode = fileExt2 == "M2TS" || fileExt2 == "TS" || fileExt2 == "SSIF" || fileExt2 == "ISO" ||
-                       dt != DiskType::DT_NONE;
+                       dt != DiskType::NONE;
 
         if (muxMode)
         {
             BlurayHelper blurayHelper;
 
             MuxerManager muxerManager(readManager, tsMuxerFactory);
-            muxerManager.setAllowStereoMux(fileExt2 == "SSIF" || dt != DiskType::DT_NONE);
+            muxerManager.setAllowStereoMux(fileExt2 == "SSIF" || dt != DiskType::NONE);
             muxerManager.openMetaFile(argv[1]);
-            if (!isV3() && dt == DiskType::DT_BLURAY && muxerManager.getHevcFound())
+            if (!isV3() && dt == DiskType::BLURAY && muxerManager.getHevcFound())
             {
                 LTRACE(LT_INFO, 2, "HEVC stream detected: changing Blu-Ray version to V3.");
                 V3_flags |= HDMV_V3;
@@ -746,7 +746,7 @@ int main(int argc, char** argv)
             if (!isValidFileName(dstFile))
                 throw runtime_error(string("Output filename is invalid: ") + dstFile);
 
-            if (dt != DiskType::DT_NONE)
+            if (dt != DiskType::NONE)
             {
                 if (!blurayHelper.open(dstFile, dt, muxerManager.totalSize(), muxerManager.getExtraISOBlocks(),
                                        muxerManager.useReproducibleIsoHeader()))
@@ -757,8 +757,8 @@ int main(int argc, char** argv)
             }
             if (muxerManager.getTrackCnt() == 0)
                 THROW(ERR_COMMON, "No tracks selected");
-            muxerManager.doMux(dstFile, dt != DiskType::DT_NONE ? &blurayHelper : 0);
-            if (dt != DiskType::DT_NONE)
+            muxerManager.doMux(dstFile, dt != DiskType::NONE ? &blurayHelper : 0);
+            if (dt != DiskType::NONE)
             {
                 blurayHelper.writeBluRayFiles(muxerManager, insertBlankPL, firstMplsOffset, blankNum, stereoMode);
                 TSMuxer* mainMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());

@@ -342,7 +342,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
     // composition segment. pts=x,  dts = x-0.0648 (pts alignment to video grid) (I get constant value from real PGS
     // track as example)
     int rLen =
-        m_render->composePresentationSegment(curPos, CompositionMode::CM_Start, inTime, inTime - PRESENTATION_DTS_DELTA,
+        m_render->composePresentationSegment(curPos, CompositionMode::Start, inTime, inTime - PRESENTATION_DTS_DELTA,
                                              m_objectWindowTop, m_demuxMode, m_forced_on_flag);
     m_renderedBlocks.push_back(PGSRenderedBlock(inTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
     curPos += rLen;
@@ -387,7 +387,7 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
     uint8_t* curPos = m_renderedData;
     // composition segment. pts=x,       dts = x-0.001 (pts alignment to video grid)
     int rLen =
-        m_render->composePresentationSegment(curPos, CompositionMode::CM_Finish, outTime,
+        m_render->composePresentationSegment(curPos, CompositionMode::Finish, outTime,
                                              outTime - windowsTransferTime - 90, m_objectWindowTop, m_demuxMode, false);
     m_renderedBlocks.push_back(PGSRenderedBlock(outTime, outTime - windowsTransferTime - 90, rLen, curPos));
     curPos += rLen;

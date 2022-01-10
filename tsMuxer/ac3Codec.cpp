@@ -87,12 +87,12 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     gbc.setBuffer(buf, end);
 
     if (gbc.getBits(16) != 0x0B77)  // sync_word
-        return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+        return AC3ParseError::SYNC;
 
     // read ahead to bsid to make sure this is AC-3, not E-AC-3
     int id = gbc.showBits(29) & 0x1F;
     if (id > 16)
-        return AC3ParseError::AC3_PARSE_ERROR_BSID;
+        return AC3ParseError::BSID;
 
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
@@ -103,13 +103,13 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 
         strmtyp = gbc.getBits(2);
         if (strmtyp == 3)
-            return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // invalid stream type
+            return AC3ParseError::SYNC;  // invalid stream type
 
         substreamid = gbc.getBits(3);
 
         m_frame_size = (gbc.getBits(11) + 1) * 2;
         if (m_frame_size < AC3_HEADER_SIZE)
-            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;  // invalid header size
+            return AC3ParseError::FRAME_SIZE;  // invalid header size
 
         fscod = gbc.getBits(2);
 
@@ -117,7 +117,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         {
             int m_fscod2 = gbc.getBits(2);
             if (m_fscod2 == 3)
-                return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+                return AC3ParseError::SYNC;
 
             numblkscod = 3;
             m_sample_rate = ff_ac3_freqs[m_fscod2] / 2;
@@ -266,11 +266,11 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         gbc.skipBits(16);  // m_crc1
         m_fscod = gbc.getBits(2);
         if (m_fscod == 3)
-            return AC3ParseError::AC3_PARSE_ERROR_SAMPLE_RATE;
+            return AC3ParseError::SAMPLE_RATE;
 
         m_frmsizecod = gbc.getBits(6);
         if (m_frmsizecod > 37)
-            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3ParseError::FRAME_SIZE;
 
         gbc.skipBits(5);  // skip bsid, already got it
 
@@ -290,7 +290,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_channels = ff_ac3_channels[m_acmod] + m_lfeon;
         m_frame_size = ff_ac3_frame_sizes[m_frmsizecod][m_fscod] * 2;
     }
-    return AC3ParseError::AC3_PARSE_NO_ERROR;
+    return AC3ParseError::NO_ERROR;
 }
 
 bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
@@ -372,7 +372,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             skipBytes = 0;
             err = parseHeader(buf, end);
 
-            if (err != AC3ParseError::AC3_PARSE_NO_ERROR)
+            if (err != AC3ParseError::NO_ERROR)
                 return 0;  // parse error
 
             m_frameDurationNano = (1000000000ull * m_samples) / m_sample_rate;
@@ -459,7 +459,7 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 
     int test_sync_word = gbc.getBits(16);
     if (test_sync_word != 0x0B77)
-        return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+        return AC3ParseError::SYNC;
 
     // read ahead to bsid to make sure this is AC-3, not E-AC-3
     int test_bsid = gbc.showBits(29) & 0x1F;
@@ -470,22 +470,22 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 
     if (test_bsid > 16)
     {
-        return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // invalid stream type
+        return AC3ParseError::SYNC;  // invalid stream type
     }
     else if (m_bsid > 10)
     {
-        return AC3ParseError::AC3_PARSE_ERROR_SYNC;  // doesn't used for EAC3
+        return AC3ParseError::SYNC;  // doesn't used for EAC3
     }
     else
     {
         int test_crc1 = gbc.getBits(16);
         int test_fscod = gbc.getBits(2);
         if (test_fscod == 3)
-            return AC3ParseError::AC3_PARSE_ERROR_SAMPLE_RATE;
+            return AC3ParseError::SAMPLE_RATE;
 
         int test_frmsizecod = gbc.getBits(6);
         if (test_frmsizecod > 37)
-            return AC3ParseError::AC3_PARSE_ERROR_FRAME_SIZE;
+            return AC3ParseError::FRAME_SIZE;
 
         gbc.skipBits(5);  // skip bsid, already got it
 
@@ -494,7 +494,7 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
 
         if (test_fscod != m_fscod || /*(test_frmsizecod>>1) != (m_frmsizecod>>1) ||*/
             test_bsmod != m_bsmod /*|| test_acmod != m_acmod*/)
-            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::SYNC;
 
         if ((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO)
         {
@@ -509,12 +509,12 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
         {
             int test_dsurmod = gbc.getBits(2);
             if (test_dsurmod != m_dsurmod)
-                return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+                return AC3ParseError::SYNC;
         }
         int test_lfeon = gbc.getBit();
 
         if (test_lfeon != m_lfeon)
-            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::SYNC;
 
         int test_halfratecod = max(test_bsid, 8) - 8;
         int test_sample_rate = ff_ac3_freqs[test_fscod] >> test_halfratecod;
@@ -523,14 +523,14 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
         int test_frame_size = ff_ac3_frame_sizes[test_frmsizecod][test_fscod] * 2;
         if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
             test_channels != m_channels /*|| test_frame_size != m_frame_size*/)
-            return AC3ParseError::AC3_PARSE_ERROR_SYNC;
+            return AC3ParseError::SYNC;
     }
-    return AC3ParseError::AC3_PARSE_NO_ERROR;
+    return AC3ParseError::NO_ERROR;
 }
 
 bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
 {
-    return testParseHeader(buf, end) == AC3ParseError::AC3_PARSE_NO_ERROR;
+    return testParseHeader(buf, end) == AC3ParseError::NO_ERROR;
 }
 
 uint64_t AC3Codec::getFrameDurationNano()

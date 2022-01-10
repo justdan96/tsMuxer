@@ -389,7 +389,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     m_paletteID = 0;
     m_paletteVersion = 0;
 
-    curPos += composePresentationSegment(curPos, CompositionMode::CM_Start, inTimePTS,
+    curPos += composePresentationSegment(curPos, CompositionMode::Start, inTimePTS,
                                          inTimePTS - PRESENTATION_DTS_DELTA, objectWindowTop, true, forced);
     curPos += composeWindowDefinition(curPos, inTimePTS - windowsTransferTime, inTimePTS - PRESENTATION_DTS_DELTA,
                                       objectWindowTop, objectWindowHeight);
@@ -409,7 +409,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     {
         palette_update_flag = 1;
         m_paletteVersion++;
-        curPos += composePresentationSegment(curPos, CompositionMode::CM_Update, updateTime,
+        curPos += composePresentationSegment(curPos, CompositionMode::Update, updateTime,
                                              updateTime - windowsTransferTime, objectWindowTop, true, forced);
         curPos += composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, updateTime - windowsTransferTime,
                                            updateTime - windowsTransferTime);
@@ -426,7 +426,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     {
         palette_update_flag = 1;
         m_paletteVersion++;
-        curPos += composePresentationSegment(curPos, CompositionMode::CM_Update, (int64_t)updateTime,
+        curPos += composePresentationSegment(curPos, CompositionMode::Update, (int64_t)updateTime,
                                              (int64_t)updateTime - windowsTransferTime, objectWindowTop, true, forced);
         curPos +=
             composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, (int64_t)updateTime - windowsTransferTime,
@@ -440,7 +440,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     // 3. hide text
 
     palette_update_flag = 0;
-    curPos += composePresentationSegment(curPos, CompositionMode::CM_Finish, outTimePTS,
+    curPos += composePresentationSegment(curPos, CompositionMode::Finish, outTimePTS,
                                          outTimePTS - windowsTransferTime - 90, objectWindowTop, true, false);
     curPos += composeWindowDefinition(curPos, outTimePTS - windowsTransferTime, outTimePTS - windowsTransferTime - 90,
                                       objectWindowTop, objectWindowHeight);
@@ -464,12 +464,12 @@ long TextToPGSConverter::composePresentationSegment(uint8_t* buff, CompositionMo
 
     curPos += composeVideoDescriptor(curPos);
     curPos += composeCompositionDescriptor(curPos, m_composition_number++,
-                                           mode == CompositionMode::CM_Start ? EPOTH_START : EPOTH_NORMAL);
+                                           mode == CompositionMode::Start ? EPOTH_START : EPOTH_NORMAL);
     *curPos++ = palette_update_flag << 7;                    // palette_update_flag = 0 and 7 reserved bits
     *curPos++ = m_paletteID;                                 // paletteID ref
-    *curPos++ = mode != CompositionMode::CM_Finish ? 1 : 0;  // number_of_composition_objects
+    *curPos++ = mode != CompositionMode::Finish ? 1 : 0;  // number_of_composition_objects
     // composition object
-    if (mode != CompositionMode::CM_Finish)
+    if (mode != CompositionMode::Finish)
     {
         *curPos++ = 0;  // objectID ref
         *curPos++ = 0;  // objectID ref

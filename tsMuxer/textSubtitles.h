@@ -17,9 +17,9 @@ namespace text_subtitles
 {
 enum class CompositionMode
 {
-    CM_Start,
-    CM_Update,
-    CM_Finish
+    Start,
+    Update,
+    Finish
 };
 
 struct TextAnimation

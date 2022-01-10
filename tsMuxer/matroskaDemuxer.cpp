@@ -2150,9 +2150,9 @@ int MatroskaDemuxer::matroska_add_stream()
                     uint64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    if (num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_FREE &&
-                        num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_KEEP &&
-                        num != (uint64_t)MatroskaAspectRatioMode::MATROSKA_ASPECT_RATIO_MODE_FIXED)
+                    if (num != (uint64_t)MatroskaAspectRatioMode::FREE &&
+                        num != (uint64_t)MatroskaAspectRatioMode::KEEP &&
+                        num != (uint64_t)MatroskaAspectRatioMode::FIXED)
                     {
                         LTRACE(LT_INFO, 0, "Ignoring unknown aspect ratio " << (uint32_t)num);
                         break;

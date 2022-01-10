@@ -66,16 +66,16 @@ string VC1SequenceHeader::getStreamDescr()
     rez << "Profile: ";
     switch (profile)
     {
-    case Profile::PROFILE_SIMPLE:
+    case Profile::SIMPLE:
         rez << "Simple";
         break;
-    case Profile::PROFILE_MAIN:
+    case Profile::MAIN:
         rez << "Main";
         break;
-    case Profile::PROFILE_COMPLEX:
+    case Profile::COMPLEX:
         rez << "Complex";
         break;
-    case Profile::PROFILE_ADVANCED:
+    case Profile::ADVANCED:
         rez << "Advanced@" << level;
         break;
     default:
@@ -158,10 +158,10 @@ int VC1SequenceHeader::decode_sequence_header()
     {
         bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen);  // skip 00 00 01 xx marker
         profile = (Profile)bitReader.getBits(2);
-        if (profile == Profile::PROFILE_COMPLEX)
+        if (profile == Profile::COMPLEX)
             LTRACE(LT_WARN, 0, "WMV3 Complex Profile is not fully supported");
 
-        else if (profile == Profile::PROFILE_ADVANCED)
+        else if (profile == Profile::ADVANCED)
             return decode_sequence_header_adv();
         else
         {
@@ -174,7 +174,7 @@ int VC1SequenceHeader::decode_sequence_header()
         }
 
         bitReader.skipBits(8);                                         // frmrtq_postproc, bitrtq_postproc
-        if (bitReader.getBit() && profile == Profile::PROFILE_SIMPLE)  // loop_filter
+        if (bitReader.getBit() && profile == Profile::SIMPLE)  // loop_filter
             LTRACE(LT_WARN, 0, "LOOPFILTER shell not be enabled in simple profile");
         if (bitReader.getBit())  // reserved res_x8
             LTRACE(LT_WARN, 0, "1 for reserved RES_X8 is forbidden");
@@ -182,12 +182,12 @@ int VC1SequenceHeader::decode_sequence_header()
         int res_fasttx = bitReader.getBit();  // reserved
         if (!res_fasttx)
             LTRACE(LT_WARN, 0, "0 for reserved RES_FASTTX is forbidden");
-        if (profile == Profile::PROFILE_SIMPLE && !bitReader.getBit())  // fastuvmc
+        if (profile == Profile::SIMPLE && !bitReader.getBit())  // fastuvmc
         {
             LTRACE(LT_ERROR, 0, "FASTUVMC unavailable in Simple Profile");
             return NALUnit::UNSUPPORTED_PARAM;
         }
-        if (profile == Profile::PROFILE_SIMPLE && bitReader.getBit())  // extended_mv
+        if (profile == Profile::SIMPLE && bitReader.getBit())  // extended_mv
         {
             LTRACE(LT_ERROR, 0, "Extended MVs unavailable in Simple Profile");
             return NALUnit::UNSUPPORTED_PARAM;
@@ -202,7 +202,7 @@ int VC1SequenceHeader::decode_sequence_header()
         bitReader.skipBits(2);  // overlap, resync_marker
 
         rangered = bitReader.getBit();
-        if (rangered && profile == Profile::PROFILE_SIMPLE)
+        if (rangered && profile == Profile::SIMPLE)
             LTRACE(LT_WARN, 0, "RANGERED should be set to 0 in simple profile");
         max_b_frames = bitReader.getBits(3);
         bitReader.skipBits(2);  // quantizer_mode
@@ -348,7 +348,7 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
     try
     {
         bitReader.setBuffer(buffer, end);  // skip 00 00 01 xx marker
-        if (sequenceHdr.profile < Profile::PROFILE_ADVANCED)
+        if (sequenceHdr.profile < Profile::ADVANCED)
             return vc1_parse_frame_header(sequenceHdr);
         else
             return vc1_parse_frame_header_adv(sequenceHdr);

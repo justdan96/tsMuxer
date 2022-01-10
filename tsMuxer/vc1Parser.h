@@ -11,26 +11,26 @@
 
 enum class VC1Code
 {
-    VC1_CODE_ENDOFSEQ = 0x0A,
-    VC1_CODE_SLICE,
-    VC1_CODE_FIELD,
-    VC1_CODE_FRAME,
-    VC1_CODE_ENTRYPOINT,
-    VC1_CODE_SEQHDR,
+    ENDOFSEQ = 0x0A,
+    SLICE,
+    FIELD,
+    FRAME,
+    ENTRYPOINT,
+    SEQHDR,
 
-    VC1_USER_CODE_SLICE = 0x1B,  // user-defined slice
-    VC1_USER_CODE_FIELD,
-    VC1_USER_CODE_FRAME,
-    VC1_USER_CODE_ENTRYPOINT,
-    VC1_USER_CODE_SEQHDR
+    USER_SLICE = 0x1B,  // user-defined slice
+    USER_FIELD,
+    USER_FRAME,
+    USER_ENTRYPOINT,
+    USER_SEQHDR
 };
 
 enum class Profile
 {
-    PROFILE_SIMPLE,
-    PROFILE_MAIN,
-    PROFILE_COMPLEX,  ///< TODO: WMV9 specific
-    PROFILE_ADVANCED
+    SIMPLE,
+    MAIN,
+    COMPLEX,  ///< TODO: WMV9 specific
+    ADVANCED
 };
 
 const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
@@ -153,7 +153,7 @@ class VC1SequenceHeader : public VC1Unit
    public:
     VC1SequenceHeader()
         : VC1Unit(),
-          profile(Profile::PROFILE_SIMPLE),
+          profile(Profile::SIMPLE),
           level(0),
           interlace(0),
           time_base_num(0),

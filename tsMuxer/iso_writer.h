@@ -27,45 +27,45 @@ static const int MAX_SUBMUXER_RATE = 35000000;
 
 enum class DescriptorTag
 {
-    DESC_TYPE_SpoaringTable = 0,  // UDF
-    DESC_TYPE_PrimVol = 1,
-    DESC_TYPE_AnchorVolPtr = 2,
-    DESC_TYPE_VolPtr = 3,
-    DESC_TYPE_ImplUseVol = 4,
-    DESC_TYPE_Partition = 5,
-    DESC_TYPE_LogicalVol = 6,
-    DESC_TYPE_UnallocSpace = 7,
-    DESC_TYPE_Terminating = 8,
-    DESC_TYPE_LogicalVolIntegrity = 9,
+    SpoaringTable = 0,  // UDF
+    PrimVol = 1,
+    AnchorVolPtr = 2,
+    VolPtr = 3,
+    ImplUseVol = 4,
+    Partition = 5,
+    LogicalVol = 6,
+    UnallocSpace = 7,
+    Terminating = 8,
+    LogicalVolIntegrity = 9,
 
-    DESC_TYPE_FileSet = 256,
-    DESC_TYPE_FileId = 257,
-    DESC_TYPE_AllocationExtent = 258,
-    DESC_TYPE_Indirect = 259,
-    DESC_TYPE_Terminal = 260,
-    DESC_TYPE_File = 261,
-    DESC_TYPE_ExtendedAttrHeader = 262,
-    DESC_TYPE_UnallocatedSpace = 263,
-    DESC_TYPE_SpaceBitmap = 264,
-    DESC_TYPE_PartitionIntegrity = 265,
-    DESC_TYPE_ExtendedFile = 266
+    FileSet = 256,
+    FileId = 257,
+    AllocationExtent = 258,
+    Indirect = 259,
+    Terminal = 260,
+    File = 261,
+    ExtendedAttrHeader = 262,
+    UnallocatedSpace = 263,
+    SpaceBitmap = 264,
+    PartitionIntegrity = 265,
+    ExtendedFile = 266
 };
 
 enum class FileTypes
 {
-    FileType_Unspecified = 0,
-    FileType_UnallocatedSpace = 1,
-    FileType_PartitionIntegrityEntry = 2,
-    FileType_IndirectEntry = 3,
-    FileType_Directory = 4,
-    FileType_File = 5,
+    Unspecified = 0,
+    UnallocatedSpace = 1,
+    PartitionIntegrityEntry = 2,
+    IndirectEntry = 3,
+    Directory = 4,
+    File = 5,
 
-    FileType_SystemStreamDirectory = 13,
+    SystemStreamDirectory = 13,
 
-    FileType_RealtimeFile = 249,
-    FileType_Metadata = 250,
-    FileType_MetadataMirror = 251,
-    FileType_MetadataBitmap = 252,
+    RealtimeFile = 249,
+    Metadata = 250,
+    MetadataMirror = 251,
+    MetadataBitmap = 252,
 };
 
 class ByteFileWriter

@@ -164,11 +164,11 @@ class MPEGGOPHeader : public MPEGHeader
 
 enum class PictureCodingType
 {
-    PCT_FORBIDDEN,
-    PCT_I_FRAME,
-    PCT_P_FRAME,
-    PCT_B_FRAME,
-    PCT_D_FRAME
+    FORBIDDEN,
+    I_FRAME,
+    P_FRAME,
+    B_FRAME,
+    D_FRAME
 };
 
 class MPEGPictureHeader : public MPEGRawDataHeader

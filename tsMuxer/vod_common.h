@@ -103,9 +103,9 @@ typedef std::vector<std::pair<int, int>> PriorityDataInfo;  // mark some data as
 
 enum class DiskType
 {
-    DT_NONE,
-    DT_BLURAY,
-    DT_AVCHD
+    NONE,
+    BLURAY,
+    AVCHD
 };
 
 uint16_t AV_RB16(const uint8_t* buffer);

@@ -158,9 +158,9 @@ enum class MatroskaEyeMode
 
 enum class MatroskaAspectRatioMode
 {
-    MATROSKA_ASPECT_RATIO_MODE_FREE = 0x0,
-    MATROSKA_ASPECT_RATIO_MODE_KEEP = 0x1,
-    MATROSKA_ASPECT_RATIO_MODE_FIXED = 0x2
+    FREE = 0x0,
+    KEEP = 0x1,
+    FIXED = 0x2
 };
 
 /*

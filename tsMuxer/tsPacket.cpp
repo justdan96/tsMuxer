@@ -1467,7 +1467,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
     std::string type_indicator = "MPLS";
     std::string version_number;
-    if (dt == DiskType::DT_BLURAY)
+    if (dt == DiskType::BLURAY)
         version_number = (isV3() ? "0300" : "0200");
     else
         version_number = "0100";

@@ -41,11 +41,11 @@ class AC3Codec
 
     enum class AC3ParseError
     {
-        AC3_PARSE_NO_ERROR = 0,
-        AC3_PARSE_ERROR_SYNC = -1,
-        AC3_PARSE_ERROR_BSID = -2,
-        AC3_PARSE_ERROR_SAMPLE_RATE = -3,
-        AC3_PARSE_ERROR_FRAME_SIZE = -4
+        NO_ERROR = 0,
+        SYNC = -1,
+        BSID = -2,
+        SAMPLE_RATE = -3,
+        FRAME_SIZE = -4
     };
 
     AC3Codec()

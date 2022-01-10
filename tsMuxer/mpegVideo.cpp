@@ -347,7 +347,7 @@ MPEGPictureHeader::MPEGPictureHeader(int bufferSize)
       intra_dc_precision(0),
       intra_vlc_format(0),
       mpeg_f_code(),
-      pict_type(PictureCodingType::PCT_FORBIDDEN),
+      pict_type(PictureCodingType::FORBIDDEN),
       picture_structure(0),
       progressive_frame(0),
       q_scale_type(0),
@@ -376,12 +376,12 @@ void MPEGPictureHeader::buildHeader()
     bitWriter.putBits(3, (int)pict_type);
     bitWriter.putBits(16, vbv_delay);
 
-    if (pict_type == PictureCodingType::PCT_P_FRAME || pict_type == PictureCodingType::PCT_B_FRAME)
+    if (pict_type == PictureCodingType::P_FRAME || pict_type == PictureCodingType::B_FRAME)
     {
         bitWriter.putBits(1, full_pel[0]);
         bitWriter.putBits(3, mpeg_f_code[0][0]);
     }
-    if (pict_type == PictureCodingType::PCT_B_FRAME)
+    if (pict_type == PictureCodingType::B_FRAME)
     {
         bitWriter.putBits(1, full_pel[1]);
         bitWriter.putBits(3, mpeg_f_code[1][0]);
@@ -440,19 +440,19 @@ uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, int64_t buf_size)
 
     ref = bitReader.getBits(10); /* temporal ref */
     pict_type = (PictureCodingType)bitReader.getBits(3);
-    if (pict_type == PictureCodingType::PCT_FORBIDDEN || pict_type == PictureCodingType::PCT_D_FRAME)
+    if (pict_type == PictureCodingType::FORBIDDEN || pict_type == PictureCodingType::D_FRAME)
         return 0;
 
     vbv_delay = bitReader.getBits(16);
 
-    if (pict_type == PictureCodingType::PCT_P_FRAME || pict_type == PictureCodingType::PCT_B_FRAME)
+    if (pict_type == PictureCodingType::P_FRAME || pict_type == PictureCodingType::B_FRAME)
     {
         full_pel[0] = bitReader.getBit();
         f_code = bitReader.getBits(3);
         mpeg_f_code[0][0] = f_code;
         mpeg_f_code[0][1] = f_code;
     }
-    if (pict_type == PictureCodingType::PCT_B_FRAME)
+    if (pict_type == PictureCodingType::B_FRAME)
     {
         full_pel[1] = bitReader.getBit();
         f_code = bitReader.getBits(3);

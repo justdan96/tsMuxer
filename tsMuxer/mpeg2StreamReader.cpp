@@ -268,7 +268,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
     if (rez == NOT_ENOUGH_BUFFER)
         return rez;
 
-    if (m_frame.pict_type == PictureCodingType::PCT_I_FRAME)
+    if (m_frame.pict_type == PictureCodingType::I_FRAME)
     {
         m_framesAtGop = -1;
         m_lastRef = -1;
@@ -305,7 +305,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
     m_isFirstFrame = false;
     int refDif = m_frame.ref - m_framesAtGop;
     m_curPts = m_curDts + refDif * m_pcrIncPerFrame;
-    m_lastIFrame = m_frame.pict_type == PictureCodingType::PCT_I_FRAME;
+    m_lastIFrame = m_frame.pict_type == PictureCodingType::I_FRAME;
 
     return 0;
 }
