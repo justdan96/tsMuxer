@@ -89,11 +89,9 @@ int ProgramStreamDemuxer::mpegps_psm_parse(uint8_t* buff, uint8_t* end)
 uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader)
 {
     afterPesHeader = 0;
-    uint32_t pstart_code = 0;
-    uint8_t startcode = 0;
 
     PESPacket* pesPacket = (PESPacket*)buff;
-    startcode = buff[3];
+    uint8_t startcode = buff[3];
 
     // find matching stream
     if (!((startcode >= 0xc0 && startcode <= 0xef) /* audio or video */ || (startcode == PES_PRIVATE_DATA1) ||
@@ -101,9 +99,9 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
         return 0;
 
     uint8_t* curBuf = buff + 9;
-    if ((pesPacket->flagsLo & 0xc0) == 0xc0)
+    if ((pesPacket->flagsLo & 0xc0) == 0xc0)  // PTS and DTS
         curBuf += 10;
-    else if ((pesPacket->flagsLo & 0xc0) == 0x80)
+    else if ((pesPacket->flagsLo & 0xc0) == 0x80)  // PTS only
         curBuf += 5;
     if ((pesPacket->flagsLo & 0x20))  // ESCR_flag
         curBuf += 6;
@@ -113,15 +111,15 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
         curBuf++;
     if ((pesPacket->flagsLo & 0x04))  // additional_copy_info_flag
         curBuf++;
-    if (pesPacket->flagsLo & 0x02)  // PES_CRC_flag 1 bslbf
+    if (pesPacket->flagsLo & 0x02)  // PES_CRC_flag
         curBuf += 2;
-    if (pesPacket->flagsLo & 0x01)
-    {  // PES_extension_flag 1 bslbf
+    if (pesPacket->flagsLo & 0x01)  // PES_extension_flag
+    {
         uint8_t extFlag = *curBuf++;
         if (extFlag & 0x80)  // PES_private_data_flag
-            curBuf += 128;
-        if (extFlag & 0x40)
-        {  // pack_header_field_flag
+            curBuf += 16;
+        if (extFlag & 0x40)  // pack_header_field_flag
+        {
             int pack_field_length = *curBuf++;
             curBuf += pack_field_length;
         }
@@ -129,9 +127,9 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
             curBuf += 2;
         if (extFlag & 0x10)  // P-STD_buffer_flag
             curBuf += 2;
-        if (extFlag & 0x01)
-        {  // PES_extension_flag_2
-            int ext2_len = *curBuf++ & 0x7f;
+        if (extFlag & 0x01)  // PES_extension_flag_2
+        {
+            int ext2_len = *curBuf++ & 0x7f;  // PES_extension_field_length
             if (ext2_len > 0)
                 startcode = (startcode << 8) + *curBuf;
             curBuf += ext2_len;

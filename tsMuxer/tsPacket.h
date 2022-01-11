@@ -17,7 +17,7 @@ enum class TSDescriptorTag
 
     // IUT Rec. H.222
     REGISTRATION = 0x05,  // registration_descriptor
-    CAS = 0x09,            // CA_descriptor
+    CAS = 0x09,           // CA_descriptor
     LANG = 0x0A,          // ISO_639_language_descriptor
     AVC = 0x28,
     AAC2 = 0x2B,  // MPEG-2_AAC_audio_descriptor
@@ -35,22 +35,24 @@ const static int SYSTEM_START_CODE = 0xb9;
 static const int DEFAULT_PCR_PID = 4097;
 static const int DEFAULT_PMT_PID = 256;
 
-static const uint8_t SEQUENCE_END_CODE = 0xb7;
-static const uint8_t ISO_11172_END_CODE = 0xb9;
-static const uint8_t PACK_START_CODE = 0xba;
-static const uint8_t SYSTEM_HEADER_START_CODE = 0xbb;
-static const uint8_t PES_PROGRAM_STREAM_MAP = 0xbc;
-static const uint8_t PES_PRIVATE_DATA1 = 0xbd;
-static const uint8_t PADDING_STREAM = 0xbe;
-static const uint8_t PES_PRIVATE_DATA2 = 0xbf;
-static const uint8_t PROGRAM_STREAM_DIRECTORY = 0xff;
-
-static const uint8_t PES_AUDIO_ID = 0xc0;
-static const uint8_t PES_VIDEO_ID = 0xe0;
-static const uint8_t PES_HEVC_ID = 0xe1;
-static const uint8_t PES_VC1_ID = 0xfd;
-
-static const uint8_t DVB_SUBT_DESCID = 0x59;
+// IUT Rec. H.222 Table 2-22 - Stream_id assignments
+enum PesStreamId
+{
+    PES_INT_SUB_ID = 0x20,
+    PES_INT_AC3_ID = 0x80,
+    PES_INT_DTS_ID = 0x8a,
+    PES_PROGRAM_STREAM_MAP = 0xbc,
+    PES_PRIVATE_DATA1 = 0xbd,
+    PADDING_STREAM = 0xbe,
+    PES_PRIVATE_DATA2 = 0xbf,
+    LPCM_ID = 0xa0,
+    PES_AUDIO_ID = 0xc0,
+    PES_VIDEO_ID = 0xe0,
+    PES_HEVC_ID = 0xe1,
+    PES_VVC_ID = 0xe1,
+    PES_VC1_ID = 0xfd,
+    PROGRAM_STREAM_DIRECTORY = 0xff
+};
 
 enum class StreamType
 {

@@ -32,21 +32,9 @@ bool is4K() { return V3_flags & FOUR_K; }
 
 const static uint64_t M_PCR_DELTA = 7000;
 const static uint64_t SIT_INTERVAL = 76900;
-// const static uint64_t M_CBR_PCR_DELTA = 2250;
 const static uint64_t M_CBR_PCR_DELTA = 7000;
 
-static const uint8_t PES_INT_AC3_ID = 0x80;
-static const uint8_t PES_INT_DTS_ID = 0x8a;
-// static const uint8_t PES_INT_LPCM_ID  = 0xa0;
-static const uint8_t PES_INT_SUB_ID = 0x20;
-
-// static const int64_t FIXED_PTS_OFFSET = 27593l;
-
-// static const int64_t FIXED_PCR_OFFSET = 45000;
 static const int64_t DEFAULT_VBV_BUFFER_LEN = 500;  // default 500 ms vbv buffer
-// static const int64_t FIXED_PCR_OFFSET = 8589934592ll - 90000ll*10ll;
-
-// static const uint64_t FIXED_PCR_OFFSET = 0;
 
 static const int PAT_PID = 0;
 static const int SIT_PID = 0x1f;
@@ -263,6 +251,10 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         else if (codecName == "V_MPEGH/ISO/HEVC")
         {
             m_pesType[tsStreamIndex] = PES_HEVC_ID;
+        }
+        else if (codecName == "V_MPEGI/ISO/VVC")
+        {
+            m_pesType[tsStreamIndex] = PES_VVC_ID;
         }
         else
         {
