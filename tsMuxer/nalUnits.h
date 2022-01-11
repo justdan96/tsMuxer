@@ -78,17 +78,13 @@ class NALUnit
     const static int UNSUPPORTED_PARAM = 3;
     const static int NOT_FOUND = 4;
 
-
     NALType nal_unit_type;
     int nal_ref_idc;
 
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
 
-    NALUnit(uint8_t nalUnitType)
-        : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader()
-    {
-    }
+    NALUnit(uint8_t nalUnitType) : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
     NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
     // NALUnit(const NALUnit& other);
     virtual ~NALUnit() { delete[] m_nalBuffer; }
@@ -144,8 +140,7 @@ class PPSUnit : public NALUnit
 {
    private:
     bool m_ready;
-    // int m_ppsLenInMbit;
-    // int entropy_coding_mode_BitPos;
+
    public:
     unsigned pic_parameter_set_id;
     unsigned seq_parameter_set_id;
@@ -155,10 +150,10 @@ class PPSUnit : public NALUnit
     PPSUnit()
         : NALUnit(),
           m_ready(false),
-          entropy_coding_mode_flag(true),
-          pic_order_present_flag(true),
           pic_parameter_set_id(0),
-          seq_parameter_set_id(0)
+          seq_parameter_set_id(0),
+          entropy_coding_mode_flag(true),
+          pic_order_present_flag(true)
     {
     }
     ~PPSUnit() override {}
@@ -278,14 +273,14 @@ class SEIUnit : public NALUnit
     SEIUnit()
         : NALUnit(),
           pic_struct(0),
-          number_of_offset_sequences(-1),
-          metadataPtsOffset(0),
-          m_mvcHeaderLen(0),
-          m_mvcHeaderStart(0),
           cpb_removal_delay(0),
           dpb_output_delay(0),
           initial_cpb_removal_delay(),
-          initial_cpb_removal_delay_offset()
+          initial_cpb_removal_delay_offset(),
+          number_of_offset_sequences(-1),
+          metadataPtsOffset(0),
+          m_mvcHeaderLen(0),
+          m_mvcHeaderStart(0)
     {
     }
     ~SEIUnit() override {}

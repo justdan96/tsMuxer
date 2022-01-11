@@ -31,7 +31,7 @@ class BaseAbstractStreamReader;
 struct AVPacket
 {
     AVPacket()
-        : pts(0), dts(0), data(0), size(0), stream_index(0), flags(0), duration(0), pos(0), pcr(0), codecID(0), codec()
+        : pts(0), dts(0), data(0), size(0), stream_index(0), flags(0), duration(0), pos(0), pcr(0), codec(), codecID(0)
     {
     }
     int64_t pts;  // presentation time stamp in time_base units

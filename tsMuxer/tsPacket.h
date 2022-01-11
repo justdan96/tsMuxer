@@ -215,13 +215,13 @@ struct PMTStreamInfo
 {
     PMTStreamInfo()
         : m_streamType(),
-          m_esInfoLen(0),
           m_pid(0),
+          m_esInfoLen(0),
           m_pmtPID(-1),
-          isSecondary(false),
-          m_codecReader(),
           m_esInfoData(),
-          m_lang()
+          m_lang(),
+          isSecondary(false),
+          m_codecReader()
     {
     }
 
@@ -234,7 +234,6 @@ struct PMTStreamInfo
         m_esInfoLen = esInfoLen;
         m_codecReader = codecReader;
         memset(m_lang, 0, sizeof(m_lang));
-        // memcpy(m_lang, lang.c_str(), min(3, lang.size()));
         memcpy(m_lang, lang.c_str(), lang.size() < 3 ? lang.size() : 3);
         m_pmtPID = -1;
         isSecondary = secondary;
@@ -305,33 +304,23 @@ struct PS_stream_pack
     uint32_t m_pack_stuffing_length;
 };
 
-struct PS_system_header
-{
-    // bool deserialize(uint8_t* buffer, int buf_size);
-};
-
-struct PS_stream_map
-{
-    bool deserialize(uint8_t* buffer, int buf_size);
-};
-
 struct M2TSStreamInfo
 {
     M2TSStreamInfo()
         : streamPID(0),
-          character_code(0),
+          stream_coding_type(),
+          video_format(0),
+          frame_rate_index(3),
+          number_of_offset_sequences(0),
           width(0),
           height(0),
           HDR(0),
-          frame_rate_index(3),
-          video_format(0),
-          isSecondary(false),
           aspect_ratio_index(0),
           audio_presentation_type(0),
-          language_code(),
-          number_of_offset_sequences(0),
           sampling_frequency_index(0),
-          stream_coding_type()
+          character_code(0),
+          language_code(),
+          isSecondary(false)
     {
     }
     M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
@@ -416,18 +405,18 @@ class CLPIParser
 {
    public:
     CLPIParser()
-        : isDependStream(false),
-          TS_recording_rate(0),
-          application_type(0),
+        : type_indicator(),
+          version_number(),
           clip_stream_type(0),
-          format_identifier(),
+          application_type(0),
           is_ATC_delta(false),
-          m_clpiNum(0),
+          TS_recording_rate(0),
           number_of_source_packets(0),
+          format_identifier(),
           presentation_start_time(0),
           presentation_end_time(0),
-          type_indicator(),
-          version_number()
+          m_clpiNum(0),
+          isDependStream(false)
     {
     }
 

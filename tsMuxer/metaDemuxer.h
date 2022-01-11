@@ -113,7 +113,7 @@ class ContainerToReaderWrapper : public AbstractReader
     };
 
     ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
-        : m_owner(owner), m_readManager(readManager), m_readBuffOffset(0)
+        : m_readBuffOffset(0), m_readManager(readManager), m_owner(owner)
     {
         BufferedReaderManager& brm = const_cast<BufferedReaderManager&>(readManager);
 

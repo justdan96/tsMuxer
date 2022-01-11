@@ -34,20 +34,21 @@ class AbstractStreamReader : public BaseAbstractStreamReader
         ctMultiH264,
         ctExternal
     };
+
     const static int NEED_MORE_DATA = 1;
     const static int INTERNAL_READ_ERROR = 2;
     AbstractStreamReader()
         : BaseAbstractStreamReader(),
           m_flags(0),
-          m_timeOffset(0),
           m_containerType(ContainerType::ctNone),
-          m_demuxMode(false),
-          m_secondary(false),
-          m_curPos(0),
+          m_timeOffset(0),
           m_buffer(0),
+          m_curPos(0),
           m_bufEnd(0),
           m_streamIndex(0),
-          m_tmpBufferLen(0)
+          m_tmpBufferLen(0),
+          m_demuxMode(false),
+          m_secondary(false)
     {
     }
     virtual ~AbstractStreamReader() {}
