@@ -5,6 +5,7 @@
 
 #include "avPacket.h"
 #include "nalUnits.h"
+#include "tsPacket.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 
@@ -47,17 +48,17 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
     {
     }
 
-    // put 'HDMV' registration descriptor
-    *dstBuff++ = 0x05;  // registration descriptor tag
-    *dstBuff++ = 8;     // descriptor length
+    // HDMV registration descriptor
+    *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // registration descriptor tag
+    *dstBuff++ = 8;                           // descriptor length
     memcpy(dstBuff, "HDMV\xff", 5);
     dstBuff += 5;
 
-    *dstBuff++ = 0x02;
+    *dstBuff++ = (uint8_t)StreamType::VIDEO_MPEG2;  // stream_coding_type
     *dstBuff++ = (m_sequence.video_format << 4) + m_sequence.frame_rate_index;
     *dstBuff++ = (m_sequence.aspect_ratio_info << 4) + 0xf;
 
-    return 10;
+    return 10;  // total descriptor length
 }
 
 CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)

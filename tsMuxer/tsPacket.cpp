@@ -243,10 +243,10 @@ void TS_program_map_section::extractPMTDescriptors(uint8_t* curPos, int es_info_
     uint8_t* end = curPos + es_info_len;
     while (curPos < end)
     {
-        uint8_t tag = *curPos;
+        auto tag = static_cast<TSDescriptorTag>(*curPos);
         uint8_t len = curPos[1];
         curPos += 2;
-        if (tag == TS_CAS_DESCRIPTOR_TAG && len >= 4)
+        if (tag == TSDescriptorTag::CAS && len >= 4)
         {
             casID = (curPos[0] << 8) + curPos[1];
             casPID = ((curPos[2] & 0x0f) << 8) + curPos[3];
@@ -359,15 +359,15 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, int es_info_len
     uint8_t* end = curPos + es_info_len;
     while (curPos < end)
     {
-        uint8_t tag = *curPos;
+        auto tag = static_cast<TSDescriptorTag>(*curPos);
         uint8_t len = curPos[1];
         curPos += 2;
         uint8_t* descrBuf = curPos;
-        if (tag == TS_REGISTRATION_DESCRIPTOR_TAG)
+        if (tag == TSDescriptorTag::REGISTRATION)
         {
             descrBuf += 4;
         }
-        else if (tag == TS_LANG_DESCRIPTOR_TAG)
+        else if (tag == TSDescriptorTag::LANG)
         {
             for (int i = 0; i < 3; i++) pmtInfo.m_lang[i] = descrBuf[i];
         }
@@ -405,12 +405,12 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     if (hdmvDescriptors)
     {
         // put 'HDMV' registration descriptor
-        bitWriter.putBits(8, 0x05);
+        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::HDMV);
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(32, 0x48444d56);
 
         // put DTCP descriptor
-        bitWriter.putBits(8, 0x88);
+        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::COPY_CONTROL);
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(32, 0x0ffffcfc);
     }
@@ -418,7 +418,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
     if (casPID)
     {
         // put CAS descriptor
-        bitWriter.putBits(8, TS_CAS_DESCRIPTOR_TAG);
+        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::CAS);
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(16, casID);
         bitWriter.putBits(16, casPID);
@@ -445,7 +445,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
     if (sub_pid)
     {
-        bitWriter.putBits(8, (int)StreamType::SUB_DVB);
+        bitWriter.putBits(8, (uint8_t)StreamType::SUB_DVB);
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, sub_pid);
         bitWriter.putBits(4, 15);  // reserved
@@ -471,7 +471,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
 
         if (*itr->second.m_lang && !blurayMode)
         {
-            bitWriter.putBits(8, TS_LANG_DESCRIPTOR_TAG);                             // lang descriptor ID
+            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);                    // lang descriptor ID
             bitWriter.putBits(8, 4);                                                  // lang descriptor len
             for (int k = 0; k < 3; k++) bitWriter.putBits(8, itr->second.m_lang[k]);  // lang code[i]
             bitWriter.putBits(8, 0);
@@ -744,9 +744,9 @@ void CLPIParser::composeClipInfo(BitStreamWriter& writer)
     for (int i = 0; i < 32; i++) writer.putBits(32, 0);  // reserved
     composeTS_type_info_block(writer);
     if (is_ATC_delta)
-        THROW(ERR_COMMON, "CLPI is_ATC_delta is not implemented now.");
+        THROW(ERR_COMMON, "CLPI is_ATC_delta is not implemented yet.");
     if (application_type == 6)
-        THROW(ERR_COMMON, "CLPI application_type==6 is not implemented now.");
+        THROW(ERR_COMMON, "CLPI application_type==6 is not implemented yet.");
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 

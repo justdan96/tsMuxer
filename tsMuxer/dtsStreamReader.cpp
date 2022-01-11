@@ -42,8 +42,6 @@ static const int64_t NAVI_TBL = 0x4E4156492D54424Cll;
 static const int64_t STRMDATA = 0x5354524D44415441ll;
 static const int64_t TIMECODE = 0x54494D45434F4445ll;
 
-static const int DTS_DESCRIPTOR_TAG = 0x7b;
-
 static const int AOUT_CHAN_CENTER = 0x1;
 static const int AOUT_CHAN_LEFT = 0x2;
 static const int AOUT_CHAN_RIGHT = 0x4;
@@ -73,29 +71,38 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
     m_state = DTSDecodeState::stDecodeDTS;
 
-    return 0;
-    // TODO: fix DTS descriptor
+    // no DTS descriptor in Blu-ray
+    if (hdmvDescriptors)
+        return 0;
 
-    *dstBuff++ = 0x05;  // dts registration descriptor tag
-    *dstBuff++ = 4;
+    // ETSI TS 101 154 F.4.2 DTS registration descriptor
+    *dstBuff++ = (int)TSDescriptorTag::REGISTRATION;  // descriptor tag
+    *dstBuff++ = 4;  // descriptor length
     *dstBuff++ = 'D';
     *dstBuff++ = 'T';
     *dstBuff++ = 'S';
-    if (pi_frame_length == 512)
+
+    switch (pi_frame_length)
+    {
+    case 512:
         *dstBuff++ = '1';
-    else if (pi_frame_length == 1024)
+        break;
+    case 1024:
         *dstBuff++ = '2';
-    else if (pi_frame_length == 2048)
+        break;
+    case 2048:
         *dstBuff++ = '3';
-    else
+        break;
+    default:
         *dstBuff++ = ' ';
+    }
 
-    return 6;
-
+    // ETSI TS 101 154 F.4.3 DTS audio descriptor
     BitStreamWriter bitWriter{};
 
-    dstBuff[0] = DTS_DESCRIPTOR_TAG;
-    bitWriter.setBuffer(dstBuff + 2, dstBuff + 1024);
+    *dstBuff++ = (uint8_t)TSDescriptorTag::DTS;  // descriptor tag;
+    *dstBuff++ = 5; // descriptor length
+    bitWriter.setBuffer(dstBuff, dstBuff + 5);
     bitWriter.putBits(4, pi_sample_rate_index);
     bitWriter.putBits(6, pi_bit_rate_index);
     bitWriter.putBits(7, nblks);
@@ -104,8 +111,8 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     bitWriter.putBits(1, (pi_channels_conf & AOUT_CHAN_LFE) ? 1 : 0);
     bitWriter.putBits(2, m_dtsEsChannels ? 1 : 0);  // DTS-EX flag
     bitWriter.flushBits();
-    dstBuff[1] = bitWriter.getBitsCount() / 8;
-    return dstBuff[1] + 2 + 6;
+
+    return 13;  // descriptor length
 }
 
 void DTSStreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket)

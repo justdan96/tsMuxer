@@ -8,6 +8,7 @@
 #include "avCodecs.h"
 #include "nalUnits.h"
 #include "pesPacket.h"
+#include "tsPacket.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 
@@ -65,13 +66,13 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
             if (sequence.decode_sequence_header() != 0)
                 return 0;
 
-            dstBuff[0] = 0x05;  // registration descriptor tag
-            dstBuff[1] = 0x06;  // descriptor len
-            dstBuff[2] = 0x56;  // format identifier 0
-            dstBuff[3] = 0x43;  // format identifier 1
-            dstBuff[4] = 0x2D;  // format identifier 2
-            dstBuff[5] = 0x31;  // format identifier 3
-            dstBuff[6] = 0x01;  // profile and level subdescriptor
+            dstBuff[0] = (int)TSDescriptorTag::REGISTRATION;  // descriptor tag
+            dstBuff[1] = 0x06;                                // descriptor len
+            dstBuff[2] = 0x56;                                // "V"
+            dstBuff[3] = 0x43;                                // "C"
+            dstBuff[4] = 0x2D;                                // "-"
+            dstBuff[5] = 0x31;                                // "1"
+            dstBuff[6] = 0x01;                                // profile and level subdescriptor
 
             int profile = (int)sequence.profile << 4;
             switch (sequence.profile)
@@ -86,8 +87,8 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
                 dstBuff[7] = profile + 0x61 + sequence.level;
                 break;
             default:
-                dstBuff[1] -= 2;  // remove profile and level descriptor
-                return 6;
+                dstBuff[1] = 0x04;  // remove profile and level descriptor
+                return 6;           // total descriptor length
             }
             return 8;
         }

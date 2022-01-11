@@ -27,3 +27,18 @@ int AACStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         return getFrameSize(buff);
     return 0;
 }
+
+int AACStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
+{
+    return 0;
+    // TODO: fix AAC descriptor
+
+    // H.222 Table 2-94 - MPEG-2 AAC_audio_descriptor
+    *dstBuff++ = (uint8_t)TSDescriptorTag::AAC2;  // MPEG-2 AAC descriptor tag;
+    *dstBuff++ = 3;                              // descriptor length
+    *dstBuff++ = m_profile;
+    *dstBuff++ = m_channels_index;
+    *dstBuff++ = 0;  // MPEG-2_AAC_additional_information
+
+    return 5;  // total descriptor length
+}

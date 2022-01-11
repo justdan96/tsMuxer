@@ -9,11 +9,28 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
+// H.222 Table 2-45 - Program and program element descriptor
+enum class TSDescriptorTag
+{
+    // Bu-ray specifications
+    HDMV = 0x05,  // HDMV registration descriptor
+
+    // IUT Rec. H.222
+    REGISTRATION = 0x05,  // registration_descriptor
+    CAS = 0x09,            // CA_descriptor
+    LANG = 0x0A,          // ISO_639_language_descriptor
+    AVC = 0x28,
+    AAC2 = 0x2B,  // MPEG-2_AAC_audio_descriptor
+    HEVC = 0x38,
+    VVC = 0x39,
+    DTS = 0x73,
+    LPCM = 0x80,
+    AC3 = 0x81,
+    COPY_CONTROL = 0x88,
+    EAC3 = 0xCC
+};
+
 const static int SYSTEM_START_CODE = 0xb9;
-const static int TS_REGISTRATION_DESCRIPTOR_TAG = 5;
-const static int TS_CAS_DESCRIPTOR_TAG = 9;
-const static int TS_LANG_DESCRIPTOR_TAG = 10;
-const static int TS_COPY_CONTROL_DESCRIPTOR_TAG = 136;
 
 static const int DEFAULT_PCR_PID = 4097;
 static const int DEFAULT_PMT_PID = 256;
@@ -99,8 +116,6 @@ struct AdaptiveField
     unsigned int priorityIndicator : 1;
     unsigned int randomAccessIndicator : 1;
     unsigned int discontinuityIndicator : 1;
-
-    // uint8_t __pcr;
 
     inline unsigned getPCR32()
     {

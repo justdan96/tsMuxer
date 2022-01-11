@@ -11,7 +11,6 @@
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
-static const int VVC_DESCRIPTOR_TAG = 0x39;
 
 VVCStreamReader::VVCStreamReader()
     : MPEGStreamReader(),
@@ -119,12 +118,12 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
     if (hdmvDescriptors)
     {
-        // 'HDMV' registration descriptor
-        *dstBuff++ = 0x05;
-        *dstBuff++ = 8;
-        memcpy(dstBuff, "HDMV\xff\x33", 6);
-        dstBuff += 6;
+        *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // descriptor tag
+        *dstBuff++ = 8;                           // descriptor length
+        memcpy(dstBuff, "HDMV\xff", 5);
+        dstBuff += 5;
 
+        *dstBuff++ = (int)StreamType::VIDEO_H266;  // stream_coding_type
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
                                            (int)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
@@ -132,14 +131,14 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         *dstBuff++ = (video_format << 4) + frame_rate_index;
         *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
 
-        return 10;
+        return 10;  // total descriptor length
     }
 
     uint8_t* descStart = dstBuff;
 
     // ITU-T Rec.H.222 Table 2-133 - VVC video descriptor
-    *dstBuff++ = VVC_DESCRIPTOR_TAG;
-    uint8_t* descLength = dstBuff++;
+    *dstBuff++ = (uint8_t)TSDescriptorTag::VVC;
+    uint8_t* descLength = dstBuff++;  // descriptor length, filled at the end
     *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
     *dstBuff++ = m_sps->ptl_num_sub_profiles;
     uint32_t* bufPos = (uint32_t*)dstBuff;
@@ -152,8 +151,8 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     *dstBuff++ = 0xc0;
 
     uint8_t* descEnd = dstBuff;
-    int descSize = (int)(descEnd - descStart);
-    *descLength = descSize - 2;
+    auto descSize = (int)(descEnd - descStart);
+    *descLength = descSize - 2;  // fill descriptor length
 
     return descSize;
 }

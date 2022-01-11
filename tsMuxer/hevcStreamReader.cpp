@@ -11,7 +11,6 @@
 using namespace std;
 
 static const int MAX_SLICE_HEADER = 64;
-static const int HEVC_DESCRIPTOR_TAG = 0x38;
 
 HEVCStreamReader::HEVCStreamReader()
     : MPEGStreamReader(),
@@ -145,19 +144,24 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     if (!blurayMode && m_hdr->isDVRPU)
     {
         // 'DOVI' registration descriptor
-        memcpy(dstBuff, "\x05\x04\x44\x4f\x56\x49", 6);
-        dstBuff += 6;
+        *dstBuff++ = (uint8_t)TSDescriptorTag::REGISTRATION;
+        *dstBuff++ = 4;  // descriptor length
+        *dstBuff++ = 'D';
+        *dstBuff++ = 'O';
+        *dstBuff++ = 'V';
+        *dstBuff++ = 'I';
         lenDoviDesc += 6;
     }
 
     if (hdmvDescriptors)
     {
         // 'HDMV' registration descriptor
-        *dstBuff++ = 0x05;
-        *dstBuff++ = 8;
-        memcpy(dstBuff, "HDMV\xff\x24", 6);
-        dstBuff += 6;
+        *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // descriptor tag
+        *dstBuff++ = 8;                               // descriptor length
+        memcpy(dstBuff, "HDMV\xff", 5);               // HDMV + stuffing byte
+        dstBuff += 5;
 
+        *dstBuff++ = (uint8_t)StreamType::VIDEO_H265;  // stream_conding_type
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
                                            (int)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
@@ -183,7 +187,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
             }
         }
 
-        *dstBuff++ = HEVC_DESCRIPTOR_TAG;
+        *dstBuff++ = (int)TSDescriptorTag::HEVC;
         *dstBuff++ = 13;  // descriptor length
         memcpy(dstBuff, tmpBuffer + 3, 12);
         dstBuff += 12;
@@ -414,7 +418,8 @@ bool HEVCStreamReader::isSuffix(HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
-    return (nalType == HevcUnit::NalType::FD || nalType == HevcUnit::NalType::SEI_SUFFIX || nalType == HevcUnit::NalType::RSV_NVCL45 ||
+    return (nalType == HevcUnit::NalType::FD || nalType == HevcUnit::NalType::SEI_SUFFIX ||
+            nalType == HevcUnit::NalType::RSV_NVCL45 ||
             (nalType >= HevcUnit::NalType::RSV_NVCL45 && nalType <= HevcUnit::NalType::RSV_NVCL47) ||
             (nalType >= HevcUnit::NalType::UNSPEC56 && nalType <= HevcUnit::NalType::DVEL));
 }

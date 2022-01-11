@@ -32,28 +32,22 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
     if (len < 1)
         return 0;
+
+    // Blu-ray core specifications Table 9-11 - HDMV LPCM audio registration descriptor
     uint8_t* curPos = dstBuff;
-    *curPos++ = 0x05;  // registration descriptor code
-    *curPos++ = 0x08;  // length of registration descriptor
+    *curPos++ = (uint8_t)TSDescriptorTag::REGISTRATION;  // descriptor tag
+    *curPos++ = 8;                                       // descriptor length
     *curPos++ = 'H';
     *curPos++ = 'D';
     *curPos++ = 'M';
     *curPos++ = 'V';
-    *curPos++ = 0xff;  // reserved
-    *curPos++ = 0x80;  // stream_coding_type 8 uimsbf
+    *curPos++ = 0xff;  // stuffing_bits
 
-    int audio_presentation_type = 1;
-    if (m_channels == 2)
-        audio_presentation_type = 3;
-    else if (m_channels > 2)
-        audio_presentation_type = 6;
-    int sampling_frequency = 1;
-    if (m_freq == 96000)
-        sampling_frequency = 4;
-    else if (m_freq == 192000)
-        sampling_frequency = 5;
+    *curPos++ = (uint8_t)TSDescriptorTag::LPCM;  // descriptor tag
+    int audio_presentation_type = (m_channels > 2) ? 6 : (m_channels == 2) ? 3 : 1;
+    int sampling_frequency = (m_freq == 192000) ? 5 : (m_freq == 96000) ? 4 : 1;
     *curPos++ = (audio_presentation_type << 4) + sampling_frequency;
-    *curPos++ = (((m_bitsPerSample - 12) / 4) << 6) + 0x3f;  // bits_per_sample 2 uimsbf
+    *curPos++ = ((m_bitsPerSample - 12) << 4) + 0x3f;  // bits_per_sample (2 bits), stuffing_bits
 
     return (int)(curPos - dstBuff);
 }

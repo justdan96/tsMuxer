@@ -10,8 +10,6 @@
 
 using namespace std;
 
-const static int H264_DESCRIPTOR_TAG = 0x28;
-
 H264StreamReader::H264StreamReader() : MPEGStreamReader()
 {
     m_frameNum = 0;
@@ -449,23 +447,25 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
     if (hdmvDescriptors)
     {
-        // put 'HDMV' registration descriptor
-        *dstBuff++ = 0x05;  // registration descriptor tag
-        *dstBuff++ = 8;     // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);
+        // Blu-ray core specifications Table 9-10 - HDMV_video_registration_descriptor
+        *dstBuff++ = (int)TSDescriptorTag::REGISTRATION;  // descriptor tag
+        *dstBuff++ = 8;                                   // descriptor length
+        memcpy(dstBuff, "HDMV\xff", 5);                   // HDMV + stuffing byte
         dstBuff += 5;
 
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
                                            (int)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+        *dstBuff++ =
+            !m_mvcSubStream ? (uint8_t)StreamType::VIDEO_H264 : (uint8_t)StreamType::VIDEO_MVC;  // stream_coding_type
+        *dstBuff++ = (video_format << 4) + frame_rate_index;  // video_format + frame_rate
+        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;         // aspect ratio + stuffing_bits
 
-        *dstBuff++ = !m_mvcSubStream ? 0x1b : 0x20;
-        *dstBuff++ = (video_format << 4) + frame_rate_index;
-        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
-
-        return 10;
+        return 10;  // total descriptor length
     }
 
+    // Not HDMV => AVC video descriptor according to H.222 Table 2-92
+    // find SPS
     for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = NALUnit::findNextNAL(nal, m_bufEnd))
     {
@@ -473,18 +473,18 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         if (nalType == NALUnit::NALType::nuSPS || nalType == NALUnit::NALType::nuSubSPS)
         {
             processSPS(nal);
-            dstBuff[0] = H264_DESCRIPTOR_TAG;
-            dstBuff[1] = 4;
-            dstBuff[2] = nal[1];                                       // profile
-            dstBuff[3] = nal[2];                                       // flags
-            dstBuff[4] = m_forcedLevel == 0 ? nal[3] : m_forcedLevel;  // level
-            dstBuff[5] = 0xbf;  // still present, avc_24_hour flag, Frame_Packing_SEI_not_present_flag
+            *dstBuff = (uint8_t)TSDescriptorTag::AVC;                  // descriptor tag
+            *dstBuff++ = 4;                                            // descriptor length
+            *dstBuff++ = nal[1];                                       // profile_idc
+            *dstBuff++ = nal[2];                                       // constraint flags
+            *dstBuff++ = m_forcedLevel == 0 ? nal[3] : m_forcedLevel;  // level_idc
+            *dstBuff++ = 0xbf;  // AVC_still_present, AVC_24_hour flag, Frame_Packing_SEI_not_present_flag, reserved
 
             return 6;
         }
     }
     // avoid compiler warning: control reaches end of non-void function
-    assert(0);
+    assert(0);  // no SPS nal: exit
     return 0;
 }
 
