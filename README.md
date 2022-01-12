@@ -61,7 +61,7 @@ The ZIP file for Windows can just be unzipped and the executables can be used st
 
 ### Linux
 
-The ZIP file for Linux from Bintray can just be unzipped and the executables can be used straight away - there are no dependencies.
+The ZIP file for Linux can just be unzipped and the executables can be used straight away - there are no dependencies.
 
 The following are packages created specifically for each distribution. To update, please uninstall the package and then install it again.
 
