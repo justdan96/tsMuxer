@@ -12,7 +12,7 @@ export LD_LIBRARY_PATH=/usr/lib/osxcross/lib:$LD_LIBRARY_PATH:/usr/lib/osxcross/
 rm -rf build
 mkdir build
 cd build
-$OSXCROSS_TRIPLE-cmake ../  -DTSMUXER_STATIC_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=/usr/lib/osxcross/toolchain.cmake 
+$OSXCROSS_TRIPLE-cmake ../  -DTSMUXER_STATIC_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=/usr/lib/osxcross/toolchain.cmake '-DFREETYPE_LDFLAGS=png;bz2;brotlidec'
 make
 cp tsMuxer/tsmuxer ../bin/tsMuxeR
 cd ..

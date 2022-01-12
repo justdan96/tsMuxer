@@ -111,7 +111,6 @@ if(TSMUXER_STATIC_BUILD)
     SET(THREADSLIB -pthread -Wl,--whole-archive -lpthread -Wl,--no-whole-archive)
   endif()
 endif()
-target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
 
 if (WIN32)
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
@@ -120,10 +119,12 @@ else()
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderFT.cpp)
   # on osxcross use the static freetype library explicitly
   if(DEFINED OSXCROSS_SDK)
-    list(TRANSFORM FREETYPE2_LDFLAGS REPLACE "(-lfreetype)" "-lfreetype-static")
+    list(TRANSFORM FREETYPE_LDFLAGS REPLACE "(-lfreetype)" "-lfreetype-static")
   endif()
   target_link_libraries(tsmuxer ${FREETYPE_LIBRARIES} ${FREETYPE_LDFLAGS})
   target_include_directories(tsmuxer PRIVATE ${FREETYPE_INCLUDE_DIRS})
 endif()
+
+target_link_libraries(tsmuxer mediation ${THREADSLIB} ${ZLIB_LIBRARIES})
 
 install (TARGETS tsmuxer DESTINATION ${CMAKE_INSTALL_BINDIR})
