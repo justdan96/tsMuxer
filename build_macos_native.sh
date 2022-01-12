@@ -5,15 +5,14 @@ set -e
 
 export MACOSX_DEPLOYMENT_TARGET=10.15
 
-brew install pkg-config
 brew install freetype
-
-builddir=$PWD
 
 mkdir build
 
 pushd build
-cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_GUI=TRUE ..
+cmake -DCMAKE_BUILD_TYPE=Release -DTSMUXER_STATIC_BUILD=TRUE \
+  '-DFREETYPE_LDFLAGS=bz2;/usr/local/lib/libpng.a' -DTSMUXER_GUI=TRUE \
+  -DWITHOUT_PKGCONFIG=TRUE ..
 
 if ! num_cores=$(sysctl -n hw.logicalcpu); then
   num_cores=1
