@@ -115,7 +115,7 @@ brew install zlib
 
 The simplest thing to do is to use the tsMuxerGUI. A screenshot of that can be seen below:
 
-![tsMuxerGUI_Screenshot](https://user-images.githubusercontent.com/503722/69820496-209e5e00-11f9-11ea-81b2-8c130b6e0e89.png)
+![tsMuxerGUI_Screenshot](https://user-images.githubusercontent.com/122434/148913872-b7af9caa-c2ca-4892-8853-06fd6329a15a.png)
 
 ### Command Line
 
@@ -268,7 +268,7 @@ Parameter           | Description
 --custom-chapters   | A semicolon delimited list of hh:mm:ss.zzz strings, representing the chapters' start times. 
 --demux             | Run in demux mode : the selected audio and video tracks are stored as separate files. The output name must be a folder name. All selected effects (such as changing the level of a H264 stream) are processed. When demuxing, certain types of tracks are always changed : - Subtitles in a Presentation Graphic Stream are converted into sup format. - PCM audio is saved as WAV files. 
 --blu-ray           | Mux as a BD disc. If the output file name is a folder, a Blu-Ray folder structure is created inside that folder. SSIF files for BD3D discs are not created in this case. If the output name has an .iso extension, then the disc is created directly as an image file. 
---blu-ray-v3        | As above - except mux to UHD BD discs.
+--blu-ray-v3        | As above - except mux to UHD BD discs. If you're using the GUI, this will be automatically set if one of the streams is UHD.
 --avchd             | Mux to AVCHD disc.
 --cut-start         | Trim the beginning of the file. The value should be followed by the time unit : "ms" (milliseconds), "s" (seconds) or "min" (minutes). 
 --cut-end           | Trim the end of the file. Same rules as --cut-start apply. 
