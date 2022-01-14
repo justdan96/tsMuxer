@@ -232,7 +232,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 {
-    bool isDVBL = (V3_flags & NON_DV_TRACK);
+    bool isDVBL = (V3_flags & NON_DV_TRACK) == 0;
     if (!isDVBL)
         m_hdr->isDVEL = true;
 
