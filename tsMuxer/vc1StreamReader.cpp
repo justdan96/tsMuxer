@@ -205,21 +205,21 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
             case VC1Code::USER_FRAME:
                 rez = decodeFrame(nextNal);
                 if (rez == 0)
-                {
                     m_lastDecodedPos = nextNal;
-                }
                 m_decodedAfterSeq = true;
                 return rez;
+            default:
+                break;
             }
             nextNal = VC1Unit::findNextMarker(nextNal, m_bufEnd) + 3;
         }
-        // m_lastIFrame = true;
         break;
     case VC1Code::FRAME:
     case VC1Code::USER_FRAME:
         m_decodedAfterSeq = false;
         rez = decodeFrame(buff);
         return rez;
+    default:
         break;
     }
     return 0;
