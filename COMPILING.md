@@ -336,3 +336,41 @@ Or run the following to build the GUI as well:
 # build the project
 ./rebuild_osxcross_with_gui.sh
 ```
+
+## MacOS (Native)
+
+To use compile tsMuxer on Mac natively we must first use Homebrew to install some dependencies:
+
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+brew install freetype
+brew install zlib
+```
+
+Next we need to install Qt. Please note that Qt through Homebrew has issues with `macdeployqt` so is *not* supported. To ensure it is not installed at all run the commands below:
+
+```
+brew uninstall qt
+```
+
+We will use `aqtinstall` to download and install the offical Qt for Mac package. Qt 6.2.2 officially supports Apple silicon so this version is recommended. To install Qt6 for Mac we will need to install `pip`, use that to install `aqtinstall`, use `aqtinstall` to download the latest version of Qt for Mac before finally copying the installation and enabling it to be used system-wide.
+
+```
+# install pip
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3 get-pip.py
+# install aqtinstall and download Qt 6.2.2
+pip install aqtinstall
+aqt install-qt mac desktop 6.2.2 -m qtmultimedia
+# install Qt to /opt/qt
+sudo mkdir /opt/qt
+sudo cp -r ./6.2.2/macos/* /opt/qt/
+# make Qt bin folder available in PATH
+echo 'export PATH=/opt/qt/bin:$PATH' >> $HOME/.zprofile
+. $HOME/.zprofile
+# cleanup temporary files
+rm -f get-pip.py
+rm -rf ./6.2.2
+```
+
+With all of those requirements met we can now compile the programs. Simply run `./build_macos_native.sh` from the repository folder. Upon completion the executables will be available in the ./build/bin folder.
