@@ -77,7 +77,7 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
     // ETSI TS 101 154 F.4.2 DTS registration descriptor
     *dstBuff++ = (int)TSDescriptorTag::REGISTRATION;  // descriptor tag
-    *dstBuff++ = 4;  // descriptor length
+    *dstBuff++ = 4;                                   // descriptor length
     *dstBuff++ = 'D';
     *dstBuff++ = 'T';
     *dstBuff++ = 'S';
@@ -101,7 +101,7 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     BitStreamWriter bitWriter{};
 
     *dstBuff++ = (uint8_t)TSDescriptorTag::DTS;  // descriptor tag;
-    *dstBuff++ = 5; // descriptor length
+    *dstBuff++ = 5;                              // descriptor length
     bitWriter.setBuffer(dstBuff, dstBuff + 5);
     bitWriter.putBits(4, pi_sample_rate_index);
     bitWriter.putBits(6, pi_bit_rate_index);

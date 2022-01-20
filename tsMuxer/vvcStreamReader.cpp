@@ -119,7 +119,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     if (hdmvDescriptors)
     {
         *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // descriptor tag
-        *dstBuff++ = 8;                           // descriptor length
+        *dstBuff++ = 8;                               // descriptor length
         memcpy(dstBuff, "HDMV\xff", 5);
         dstBuff += 5;
 

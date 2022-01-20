@@ -107,188 +107,186 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     }
 }
 
-    void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, int pid)
+void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, int pid)
+{
+    m_mvcStreamIndex = SubTrackFilter::pidToSubPid(pid, MVC_STREAM_INDEX);
+    m_avcStreamIndex = SubTrackFilter::pidToSubPid(pid, AVC_STREAM_INDEX);
+    if (acceptedPIDs.find(m_mvcStreamIndex) == acceptedPIDs.end())
+        m_mvcStreamIndex = -1;
+    if (acceptedPIDs.find(m_avcStreamIndex) == acceptedPIDs.end())
+        m_avcStreamIndex = -1;
+}
+
+// --------------------------------------------- CombinedH264Demuxer ---------------------------
+
+CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
+    : CombinedH264Reader(), AbstractDemuxer(), m_readManager(readManager)
+{
+    m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
+    m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
+    if (m_bufferedReader == 0)
+        THROW(ERR_COMMON,
+              "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
+    m_lastReadRez = 0;
+    m_dataProcessed = 0;
+}
+
+CombinedH264Demuxer::~CombinedH264Demuxer() { m_bufferedReader->deleteReader(m_readerID); }
+
+void CombinedH264Demuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
+{
+    trackList.insert(std::make_pair(MVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264_DEP, "", 0)));
+    trackList.insert(std::make_pair(AVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264, "", 0)));
+}
+
+int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
+{
+    if (m_firstDemuxCall)
     {
-        m_mvcStreamIndex = SubTrackFilter::pidToSubPid(pid, MVC_STREAM_INDEX);
-        m_avcStreamIndex = SubTrackFilter::pidToSubPid(pid, AVC_STREAM_INDEX);
-        if (acceptedPIDs.find(m_mvcStreamIndex) == acceptedPIDs.end())
-            m_mvcStreamIndex = -1;
-        if (acceptedPIDs.find(m_avcStreamIndex) == acceptedPIDs.end())
-            m_avcStreamIndex = -1;
+        fillPids(acceptedPIDs, 0);
+        m_firstDemuxCall = false;
     }
 
-    // --------------------------------------------- CombinedH264Demuxer ---------------------------
+    discardSize = 0;
 
-    CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
-        : CombinedH264Reader(), AbstractDemuxer(), m_readManager(readManager)
+    uint32_t readedBytes;
+    int readRez = 0;
+    bool isFirstBlock = false;
+    uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez, &isFirstBlock);  // blocked read mode
+    if (readRez == BufferedFileReader::DATA_NOT_READY)
     {
-        m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
-        m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
-        if (m_bufferedReader == 0)
-            THROW(ERR_COMMON,
-                  "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
-        m_lastReadRez = 0;
-        m_dataProcessed = 0;
-    }
-
-    CombinedH264Demuxer::~CombinedH264Demuxer() { m_bufferedReader->deleteReader(m_readerID); }
-
-    void CombinedH264Demuxer::getTrackList(std::map<uint32_t, TrackInfo> & trackList)
-    {
-        trackList.insert(std::make_pair(MVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264_DEP, "", 0)));
-        trackList.insert(std::make_pair(AVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264, "", 0)));
-    }
-
-    int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData & demuxedData, const PIDSet& acceptedPIDs,
-                                              int64_t& discardSize)
-    {
-        if (m_firstDemuxCall)
-        {
-            fillPids(acceptedPIDs, 0);
-            m_firstDemuxCall = false;
-        }
-
-        discardSize = 0;
-
-        uint32_t readedBytes;
-        int readRez = 0;
-        bool isFirstBlock = false;
-        uint8_t* data =
-            m_bufferedReader->readBlock(m_readerID, readedBytes, readRez, &isFirstBlock);  // blocked read mode
-        if (readRez == BufferedFileReader::DATA_NOT_READY)
-        {
-            m_lastReadRez = readRez;
-            return BufferedFileReader::DATA_NOT_READY;
-        }
-
-        if (readedBytes + m_tmpBuffer.size() == 0 || (readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF))
-        {
-            m_lastReadRez = readRez;
-            return BufferedReader::DATA_EOF;
-        }
-        if (readedBytes > 0)
-            m_bufferedReader->notify(m_readerID, readedBytes);
         m_lastReadRez = readRez;
-        data += MAX_TMP_BUFFER_SIZE;
-        uint8_t* dataEnd = data + readedBytes;
-        if (m_tmpBuffer.size() > 0)
-        {
-            data -= m_tmpBuffer.size();
-            memcpy(data, m_tmpBuffer.data(), m_tmpBuffer.size());
-            m_tmpBuffer.clear();
-        }
-        const uint8_t* curNal = data;
+        return BufferedFileReader::DATA_NOT_READY;
+    }
 
-        const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
-        while (curNal < dataEnd - 4)
+    if (readedBytes + m_tmpBuffer.size() == 0 || (readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF))
+    {
+        m_lastReadRez = readRez;
+        return BufferedReader::DATA_EOF;
+    }
+    if (readedBytes > 0)
+        m_bufferedReader->notify(m_readerID, readedBytes);
+    m_lastReadRez = readRez;
+    data += MAX_TMP_BUFFER_SIZE;
+    uint8_t* dataEnd = data + readedBytes;
+    if (m_tmpBuffer.size() > 0)
+    {
+        data -= m_tmpBuffer.size();
+        memcpy(data, m_tmpBuffer.data(), m_tmpBuffer.size());
+        m_tmpBuffer.clear();
+    }
+    const uint8_t* curNal = data;
+
+    const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+    while (curNal < dataEnd - 4)
+    {
+        int prefixLen = getPrefixLen(curNal, dataEnd);
+        if (prefixLen != 0)
         {
-            int prefixLen = getPrefixLen(curNal, dataEnd);
-            if (prefixLen != 0)
+            m_state = detectStreamByNal(curNal + prefixLen, nextNal);
+            if (m_state == ReadState::NeedMoreData)
             {
-                m_state = detectStreamByNal(curNal + prefixLen, nextNal);
-                if (m_state == ReadState::NeedMoreData)
+                if (dataEnd - curNal < MAX_TMP_BUFFER_SIZE)
                 {
-                    if (dataEnd - curNal < MAX_TMP_BUFFER_SIZE)
-                    {
-                        m_tmpBuffer.append(curNal, dataEnd - curNal);
-                        return 0;
-                    }
-                    else
-                    {
-                        // some error in a stream, just ignore
-                        m_state = ReadState::Primary;
-                    }
+                    m_tmpBuffer.append(curNal, dataEnd - curNal);
+                    return 0;
+                }
+                else
+                {
+                    // some error in a stream, just ignore
+                    m_state = ReadState::Primary;
                 }
             }
-            if (m_state == ReadState::Both)
-            {
-                addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
-                addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
-            }
-            else if (m_state == ReadState::Primary)
-                addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
-            else
-                addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
-            curNal = nextNal;
-            nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
         }
-
-        if (curNal < dataEnd)
+        if (m_state == ReadState::Both)
         {
-            if (m_lastReadRez == BufferedReader::DATA_EOF)
-            {
-                if (m_state == ReadState::Primary)
-                    addDataToPrimary(curNal, dataEnd, demuxedData, discardSize);
-                else
-                    addDataToSecondary(curNal, dataEnd, demuxedData, discardSize);
-            }
-            else
-            {
-                m_tmpBuffer.append(curNal, dataEnd - curNal);
-            }
+            addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
+            addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
         }
-
-        return 0;
+        else if (m_state == ReadState::Primary)
+            addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
+        else
+            addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
+        curNal = nextNal;
+        nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     }
 
-    void CombinedH264Demuxer::openFile(const std::string& streamName)
+    if (curNal < dataEnd)
     {
-        readClose();
-
-        BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
-
-        if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
-            THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
-
-        m_dataProcessed = 0;
-    }
-
-    void CombinedH264Demuxer::readClose() {}
-
-    uint64_t CombinedH264Demuxer::getDemuxedSize() { return m_dataProcessed; }
-
-    void CombinedH264Demuxer::setFileIterator(FileNameIterator * itr)
-    {
-        BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
-        if (br)
-            br->setFileIterator(itr, m_readerID);
-        else if (itr != 0)
-            THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
-    }
-
-    // ------------------------------ CombinedH264Filter -----------------------------------
-
-    CombinedH264Filter::CombinedH264Filter(int demuxedPID) : CombinedH264Reader(), SubTrackFilter(demuxedPID) {}
-
-    int CombinedH264Filter::demuxPacket(DemuxedData & demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket)
-    {
-        if (m_firstDemuxCall)
+        if (m_lastReadRez == BufferedReader::DATA_EOF)
         {
-            fillPids(acceptedPIDs, m_srcPID);
-            m_firstDemuxCall = false;
-        }
-
-        const uint8_t* curNal = avPacket.data;
-        const uint8_t* dataEnd = avPacket.data + avPacket.size;
-        const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
-        int64_t discardSize = 0;
-        while (curNal < dataEnd - 4)
-        {
-            int prefixLen = getPrefixLen(curNal, dataEnd);
-            if (prefixLen != 0)
-                m_state = detectStreamByNal(curNal + prefixLen, nextNal);
-            if (m_state == ReadState::Both)
-            {
-                addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
-                addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
-            }
-            else if (m_state == ReadState::Primary)
-                addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
+            if (m_state == ReadState::Primary)
+                addDataToPrimary(curNal, dataEnd, demuxedData, discardSize);
             else
-                addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
-            curNal = nextNal;
-            nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+                addDataToSecondary(curNal, dataEnd, demuxedData, discardSize);
         }
-
-        return avPacket.size - (int)discardSize;
+        else
+        {
+            m_tmpBuffer.append(curNal, dataEnd - curNal);
+        }
     }
+
+    return 0;
+}
+
+void CombinedH264Demuxer::openFile(const std::string& streamName)
+{
+    readClose();
+
+    BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+
+    if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
+
+    m_dataProcessed = 0;
+}
+
+void CombinedH264Demuxer::readClose() {}
+
+uint64_t CombinedH264Demuxer::getDemuxedSize() { return m_dataProcessed; }
+
+void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
+{
+    BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    if (br)
+        br->setFileIterator(itr, m_readerID);
+    else if (itr != 0)
+        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
+}
+
+// ------------------------------ CombinedH264Filter -----------------------------------
+
+CombinedH264Filter::CombinedH264Filter(int demuxedPID) : CombinedH264Reader(), SubTrackFilter(demuxedPID) {}
+
+int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket)
+{
+    if (m_firstDemuxCall)
+    {
+        fillPids(acceptedPIDs, m_srcPID);
+        m_firstDemuxCall = false;
+    }
+
+    const uint8_t* curNal = avPacket.data;
+    const uint8_t* dataEnd = avPacket.data + avPacket.size;
+    const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+    int64_t discardSize = 0;
+    while (curNal < dataEnd - 4)
+    {
+        int prefixLen = getPrefixLen(curNal, dataEnd);
+        if (prefixLen != 0)
+            m_state = detectStreamByNal(curNal + prefixLen, nextNal);
+        if (m_state == ReadState::Both)
+        {
+            addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
+            addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
+        }
+        else if (m_state == ReadState::Primary)
+            addDataToPrimary(curNal, nextNal, demuxedData, discardSize);
+        else
+            addDataToSecondary(curNal, nextNal, demuxedData, discardSize);
+        curNal = nextNal;
+        nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+    }
+
+    return avPacket.size - (int)discardSize;
+}

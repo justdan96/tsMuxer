@@ -35,7 +35,7 @@ int AACStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
     // H.222 Table 2-94 - MPEG-2 AAC_audio_descriptor
     *dstBuff++ = (uint8_t)TSDescriptorTag::AAC2;  // MPEG-2 AAC descriptor tag;
-    *dstBuff++ = 3;                              // descriptor length
+    *dstBuff++ = 3;                               // descriptor length
     *dstBuff++ = m_profile;
     *dstBuff++ = m_channels_index;
     *dstBuff++ = 0;  // MPEG-2_AAC_additional_information

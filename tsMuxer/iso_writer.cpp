@@ -140,35 +140,31 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldL
     if (canUse8BitUnicode(utf8Str))
     {
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str,
-                         [&](auto c)
-                         {
-                             rv.push_back(c);
-                             return rv.size() < maxHeaderAndContentLength;
-                         });
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            rv.push_back(c);
+            return rv.size() < maxHeaderAndContentLength;
+        });
     }
     else
     {
         rv.push_back(16);
-        IterateUTF8Chars(utf8Str,
-                         [&](auto c)
-                         {
-                             UTF16 high_surrogate, low_surrogate;
-                             std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
-                             auto spaceLeft = maxHeaderAndContentLength - rv.size();
-                             if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
-                             {
-                                 return false;
-                             }
-                             rv.push_back((uint8_t)(high_surrogate >> 8));
-                             rv.push_back((uint8_t)high_surrogate);
-                             if (low_surrogate)
-                             {
-                                 rv.push_back((uint8_t)(low_surrogate >> 8));
-                                 rv.push_back((uint8_t)low_surrogate);
-                             }
-                             return true;
-                         });
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            UTF16 high_surrogate, low_surrogate;
+            std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
+            auto spaceLeft = maxHeaderAndContentLength - rv.size();
+            if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
+            {
+                return false;
+            }
+            rv.push_back((uint8_t)(high_surrogate >> 8));
+            rv.push_back((uint8_t)high_surrogate);
+            if (low_surrogate)
+            {
+                rv.push_back((uint8_t)(low_surrogate >> 8));
+                rv.push_back((uint8_t)low_surrogate);
+            }
+            return true;
+        });
     }
     auto contentLength = (uint8_t)rv.size();
     auto paddingSize = maxHeaderAndContentLength - rv.size();
@@ -332,10 +328,7 @@ FileEntryInfo::FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint32_t o
         m_sectorBuffer = 0;
 }
 
-bool FileEntryInfo::isFile() const
-{
-    return m_fileType == FileTypes::File || m_fileType == FileTypes::RealtimeFile;
-}
+bool FileEntryInfo::isFile() const { return m_fileType == FileTypes::File || m_fileType == FileTypes::RealtimeFile; }
 
 FileEntryInfo::~FileEntryInfo()
 {
@@ -881,8 +874,7 @@ void IsoWriter::close()
     m_file.seek(1024 * 576);
     // metadata file location and length (located at 576K, point to 640K address)
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtentFileDescriptor(0, 0, FileTypes::Metadata, m_metadataFileLen,
-                              m_metadataLBN - m_partitionStartAddress, 0);
+    writeExtentFileDescriptor(0, 0, FileTypes::Metadata, m_metadataFileLen, m_metadataLBN - m_partitionStartAddress, 0);
     m_tagLocationBaseAddr = m_metadataLBN;  // Don't know why. Doing just as scenarist does
     writeMetadata(m_metadataLBN);
 
@@ -949,8 +941,7 @@ void IsoWriter::writeEntity(FileEntryInfo* dir)
 
 int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
 {
-    if ((entity->m_fileType == FileTypes::File || entity->m_fileType == FileTypes::RealtimeFile) &&
-        entity->m_objectId)
+    if ((entity->m_fileType == FileTypes::File || entity->m_fileType == FileTypes::RealtimeFile) && entity->m_objectId)
         m_totalFiles++;
     else if (entity->m_fileType == FileTypes::Directory)
         m_totalDirectories++;

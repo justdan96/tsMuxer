@@ -50,8 +50,9 @@ int HevcUnit::deserialize()
         nal_unit_type = (NalType)m_reader.getBits(6);
         nuh_layer_id = m_reader.getBits(6);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
-        if (nuh_temporal_id_plus1 == 0 || (nuh_temporal_id_plus1 != 1 && (nal_unit_type == HevcUnit::NalType::VPS ||
-                                                                          nal_unit_type == HevcUnit::NalType::SPS ||
+        if (nuh_temporal_id_plus1 == 0 ||
+            (nuh_temporal_id_plus1 != 1 &&
+             (nal_unit_type == HevcUnit::NalType::VPS || nal_unit_type == HevcUnit::NalType::SPS ||
               nal_unit_type == HevcUnit::NalType::EOS || nal_unit_type == HevcUnit::NalType::EOB)))
             return 1;
         return 0;
@@ -917,7 +918,10 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
     }
 }
 
-bool HevcSliceHeader::isIDR() const { return nal_unit_type == NalType::IDR_W_RADL || nal_unit_type == NalType::IDR_N_LP; }
+bool HevcSliceHeader::isIDR() const
+{
+    return nal_unit_type == NalType::IDR_W_RADL || nal_unit_type == NalType::IDR_N_LP;
+}
 
 vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size)
 {
