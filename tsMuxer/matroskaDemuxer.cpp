@@ -2134,12 +2134,12 @@ int MatroskaDemuxer::matroska_add_stream()
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
 
-                        if (num != (uint64_t)MatroskaEyeMode::MONO && num != (uint64_t)MatroskaEyeMode::LEFT &&
-                            num != (uint64_t)MatroskaEyeMode::RIGHT && num != (uint64_t)MatroskaEyeMode::BOTH)
-                        {
-                            LTRACE(LT_INFO, 0, "Ignoring unknown eye mode " << (uint32_t)num);
-                            break;
-                        }
+                    if (num != (uint64_t)MatroskaEyeMode::MONO && num != (uint64_t)MatroskaEyeMode::LEFT &&
+                        num != (uint64_t)MatroskaEyeMode::RIGHT && num != (uint64_t)MatroskaEyeMode::BOTH)
+                    {
+                        LTRACE(LT_INFO, 0, "Ignoring unknown eye mode " << (uint32_t)num);
+                        break;
+                    }
                     videotrack->eye_mode = (MatroskaEyeMode)num;
                     break;
                 }

@@ -794,9 +794,9 @@ void MovDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
     for (int i = 0; i < num_tracks; i++)
     {
         if (tracks[i]->type != IOContextTrackType::CONTROL)
-            trackList.insert(std::make_pair(
-                i + 1, TrackInfo(tracks[i]->type == IOContextTrackType::SUBTITLE ? TRACKTYPE_SRT : 0,
-                                 tracks[i]->language, 0)));
+            trackList.insert(
+                std::make_pair(i + 1, TrackInfo(tracks[i]->type == IOContextTrackType::SUBTITLE ? TRACKTYPE_SRT : 0,
+                                                tracks[i]->language, 0)));
     }
 }
 

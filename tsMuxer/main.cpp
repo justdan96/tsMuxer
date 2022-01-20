@@ -724,8 +724,8 @@ int main(int argc, char** argv)
         DiskType dt = checkBluRayMux(argv[1], autoChapterLen, customChapterList, firstMplsOffset, firstM2tsOffset,
                                      insertBlankPL, blankNum, stereoMode, isoDiskLabel);
         std::string fileExt2 = unquoteStr(fileExt);
-        bool muxMode = fileExt2 == "M2TS" || fileExt2 == "TS" || fileExt2 == "SSIF" || fileExt2 == "ISO" ||
-                       dt != DiskType::NONE;
+        bool muxMode =
+            fileExt2 == "M2TS" || fileExt2 == "TS" || fileExt2 == "SSIF" || fileExt2 == "ISO" || dt != DiskType::NONE;
 
         if (muxMode)
         {

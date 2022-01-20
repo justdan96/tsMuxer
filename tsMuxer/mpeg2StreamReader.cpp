@@ -50,7 +50,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
 
     // HDMV registration descriptor
     *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // registration descriptor tag
-    *dstBuff++ = 8;                           // descriptor length
+    *dstBuff++ = 8;                               // descriptor length
     memcpy(dstBuff, "HDMV\xff", 5);
     dstBuff += 5;
 

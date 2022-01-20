@@ -263,7 +263,7 @@ int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
     }
 
     nal_ref_idc = (*buffer >> 5) & 0x3;
-    nal_unit_type = (NALType)( * buffer & 0x1f);
+    nal_unit_type = (NALType)(*buffer & 0x1f);
     return 0;
 }
 
@@ -1219,8 +1219,7 @@ void SliceUnit::nal_unit_header_mvc_extension()
 
 bool SliceUnit::isIDR() const
 {
-    return nal_unit_type == NALType::nuSliceIDR ||
-           nal_unit_type == NALType::nuSliceExt && !non_idr_flag;
+    return nal_unit_type == NALType::nuSliceIDR || nal_unit_type == NALType::nuSliceExt && !non_idr_flag;
 }
 
 bool SliceUnit::isIFrame() const

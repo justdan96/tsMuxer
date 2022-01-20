@@ -389,8 +389,8 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     m_paletteID = 0;
     m_paletteVersion = 0;
 
-    curPos += composePresentationSegment(curPos, CompositionMode::Start, inTimePTS,
-                                         inTimePTS - PRESENTATION_DTS_DELTA, objectWindowTop, true, forced);
+    curPos += composePresentationSegment(curPos, CompositionMode::Start, inTimePTS, inTimePTS - PRESENTATION_DTS_DELTA,
+                                         objectWindowTop, true, forced);
     curPos += composeWindowDefinition(curPos, inTimePTS - windowsTransferTime, inTimePTS - PRESENTATION_DTS_DELTA,
                                       objectWindowTop, objectWindowHeight);
     curPos += composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, inTimePTS - PRESENTATION_DTS_DELTA,
@@ -465,8 +465,8 @@ long TextToPGSConverter::composePresentationSegment(uint8_t* buff, CompositionMo
     curPos += composeVideoDescriptor(curPos);
     curPos += composeCompositionDescriptor(curPos, m_composition_number++,
                                            mode == CompositionMode::Start ? EPOTH_START : EPOTH_NORMAL);
-    *curPos++ = palette_update_flag << 7;                    // palette_update_flag = 0 and 7 reserved bits
-    *curPos++ = m_paletteID;                                 // paletteID ref
+    *curPos++ = palette_update_flag << 7;                 // palette_update_flag = 0 and 7 reserved bits
+    *curPos++ = m_paletteID;                              // paletteID ref
     *curPos++ = mode != CompositionMode::Finish ? 1 : 0;  // number_of_composition_objects
     // composition object
     if (mode != CompositionMode::Finish)

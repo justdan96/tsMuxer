@@ -173,7 +173,7 @@ int VC1SequenceHeader::decode_sequence_header()
             }
         }
 
-        bitReader.skipBits(8);                                         // frmrtq_postproc, bitrtq_postproc
+        bitReader.skipBits(8);                                 // frmrtq_postproc, bitrtq_postproc
         if (bitReader.getBit() && profile == Profile::SIMPLE)  // loop_filter
             LTRACE(LT_WARN, 0, "LOOPFILTER shell not be enabled in simple profile");
         if (bitReader.getBit())  // reserved res_x8
