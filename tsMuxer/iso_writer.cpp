@@ -141,9 +141,9 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldL
     {
         rv.push_back(8);
         IterateUTF8Chars(utf8Str, [&](auto c) {
-                             rv.push_back(c);
-                             return rv.size() < maxHeaderAndContentLength;
-                         });
+            rv.push_back(c);
+            return rv.size() < maxHeaderAndContentLength;
+        });
     }
     else
     {

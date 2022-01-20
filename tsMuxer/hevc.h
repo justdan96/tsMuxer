@@ -48,7 +48,6 @@ struct HevcUnit
         DVEL = 63,
     };
 
-
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     virtual int deserialize();
     int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const;
