@@ -646,10 +646,12 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
                     File::ofWrite))
     {
         delete[] mplsBuffer;
+        delete file;
         return false;
     }
     if (file->write(mplsBuffer, fileLen) != fileLen)
     {
+        file->close();
         delete[] mplsBuffer;
         delete file;
         return false;
@@ -667,6 +669,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     }
     if (file->write(mplsBuffer, fileLen) != fileLen)
     {
+        file->close();
         delete[] mplsBuffer;
         delete file;
         return false;
