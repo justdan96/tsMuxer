@@ -15,7 +15,10 @@ enum class MlpSubType
 class MLPCodec
 {
    public:
-    MLPCodec() : m_channels(0), m_samples(0), m_samplerate(0), m_bitrate(0), m_substreams(0), m_subType(MlpSubType::stUnknown) {}
+    MLPCodec()
+        : m_channels(0), m_samples(0), m_samplerate(0), m_bitrate(0), m_substreams(0), m_subType(MlpSubType::stUnknown)
+    {
+    }
     uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
     int getFrameSize(uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);

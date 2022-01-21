@@ -246,9 +246,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         m_bsmod = gbc.getBits(3);
         m_acmod = gbc.getBits(3);
         if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)  // 3 front channels
-            gbc.skipBits(2);  // m_cmixlev
-        if (m_acmod & 4)  // surround channel exists
-            gbc.skipBits(2);  // m_surmixlev
+            gbc.skipBits(2);                             // m_cmixlev
+        if (m_acmod & 4)                                 // surround channel exists
+            gbc.skipBits(2);                             // m_surmixlev
         if (m_acmod == AC3_ACMOD_STEREO)
             m_dsurmod = gbc.getBits(2);
         m_lfeon = gbc.getBit();
