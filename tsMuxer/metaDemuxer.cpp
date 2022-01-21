@@ -18,6 +18,7 @@
 #include "lpcmStreamReader.h"
 #include "math.h"
 #include "matroskaDemuxer.h"
+#include "mlpStreamReader.h"
 #include "movDemuxer.h"
 #include "mpeg2StreamReader.h"
 #include "mpegAudioStreamReader.h"
@@ -764,6 +765,12 @@ CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,
     if (rez.codecInfo.codecID)
         return rez;
 
+    MLPStreamReader* mlpcodec = new MLPStreamReader();
+    rez = mlpcodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
+    delete mlpcodec;
+    if (rez.codecInfo.codecID)
+        return rez;
+
     AACStreamReader* aaccodec = new AACStreamReader();
     rez = aaccodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete aaccodec;
@@ -976,9 +983,9 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
     else if (codecName == "S_SUP")
         rez = new DVBSubStreamReader();
     else if (codecName == "A_LPCM")
-    {
         rez = new LPCMStreamReader();
-    }
+    else if (codecName == "A_MLP")
+        rez = new MLPStreamReader();
     else if (codecName == "A_DTS")
     {
         rez = new DTSStreamReader();

@@ -13,20 +13,21 @@
 enum class TSDescriptorTag
 {
     // Bu-ray specifications
-    HDMV = 0x05,  // HDMV registration descriptor
+    HDMV = 0x05,          // HDMV registration descriptor
+    COPY_CONTROL = 0x88,  // ATSC_CA_descriptor
 
     // IUT Rec. H.222
     REGISTRATION = 0x05,  // registration_descriptor
     CAS = 0x09,           // CA_descriptor
     LANG = 0x0A,          // ISO_639_language_descriptor
-    AVC = 0x28,
-    AAC2 = 0x2B,  // MPEG-2_AAC_audio_descriptor
+    AAC4 = 0x1C,          // MPEG-4_AAC_audio_descriptor
+    AVC = 0x28,           //
+    AAC2 = 0x2B,          // MPEG-2_AAC_audio_descriptor
     HEVC = 0x38,
     VVC = 0x39,
     DTS = 0x73,
     LPCM = 0x80,
     AC3 = 0x81,
-    COPY_CONTROL = 0x88,
     EAC3 = 0xCC
 };
 
@@ -57,25 +58,25 @@ enum PesStreamId
 enum class StreamType
 {
     // Blu-ray Disk Specifiction Table 5-22 - stream_coding_type
-    VIDEO_MPEG2 = 0x02,                // MPEG-2 video stream for Primary / Secondary video
-    VIDEO_H264 = 0x1b,                 // MPEG-4 AVC video stream for Primary / Secondary video
-    VIDEO_MVC = 0x20,                  // forbidden (Used for ProgramInfo_SS() in 5.4.7.6)
-    VIDEO_H265 = 0x24,                 // MPEG-H HEVC video stream for Primary / Secondary video
-    VIDEO_VC1 = 0xea,                  // SMPTE VC-1 video stream for Primary / Secondary video
-    AUDIO_LPCM = 0x80,                 // HDMV LPCM audio stream for Primary audio
-    AUDIO_AC3 = 0x81,                  // Dolby Digital (AC-3) audio stream for Primary audio
-    AUDIO_DTS = 0x82,                  // DTS audio stream for Primary audio
-    AUDIO_EAC3_TRUE_HD = 0x83,         // Dolby Lossless audio stream for Primary audio
-    AUDIO_EAC3 = 0x84,                 // Dolby Digital Plus audio stream for Primary audio
-    AUDIO_DTS_HD = 0x85,               // DTS-HD audio stream except XLL for Primary audio
-    AUDIO_DTS_HD_MASTER_AUDIO = 0x86,  // DTS-HD audio stream XLL for Primary audio
-    AUDIO_DRA = 0x87,                  // DRA audio stream for Primary audio
-    AUDIO_DRA_EXT = 0x88,              // DRA Extension audio stream for Primary audio
-    AUDIO_EAC3_SECONDARY = 0xA1,       // Dolby Digital Plus audio stream for Secondary audio
-    AUDIO_DTS_HD_SECONDARY = 0xA2,     // DTS-HD audio stream for Secondary audio stream
-    SUB_PGS = 0x90,                    // Presentation Graphics stream
-    SUB_IGS = 0x91,                    // Interactive Graphics stream
-    SUB_TGS = 0x92,                    // Text subtitle stream
+    VIDEO_MPEG2 = 0x02,             // MPEG-2 video stream for Primary / Secondary video
+    VIDEO_H264 = 0x1b,              // MPEG-4 AVC video stream for Primary / Secondary video
+    VIDEO_MVC = 0x20,               // forbidden (Used for ProgramInfo_SS() in 5.4.7.6)
+    VIDEO_H265 = 0x24,              // MPEG-H HEVC video stream for Primary / Secondary video
+    VIDEO_VC1 = 0xea,               // SMPTE VC-1 video stream for Primary / Secondary video
+    AUDIO_LPCM = 0x80,              // HDMV LPCM audio stream for Primary audio
+    AUDIO_AC3 = 0x81,               // Dolby Digital (AC-3) audio stream for Primary audio
+    AUDIO_DTS = 0x82,               // DTS audio stream for Primary audio
+    AUDIO_TRUE_HD = 0x83,           // Dolby Lossless audio stream for Primary audio
+    AUDIO_EAC3 = 0x84,              // Dolby Digital Plus audio stream for Primary audio
+    AUDIO_DTS_HD = 0x85,            // DTS-HD audio stream except XLL for Primary audio
+    AUDIO_DTS_HD_MA = 0x86,         // DTS-HD audio stream XLL for Primary audio
+    AUDIO_DRA = 0x87,               // DRA audio stream for Primary audio
+    AUDIO_DRA_EXT = 0x88,           // DRA Extension audio stream for Primary audio
+    AUDIO_EAC3_SECONDARY = 0xA1,    // Dolby Digital Plus audio stream for Secondary audio
+    AUDIO_DTS_HD_SECONDARY = 0xA2,  // DTS-HD audio stream for Secondary audio stream
+    SUB_PGS = 0x90,                 // Presentation Graphics stream
+    SUB_IGS = 0x91,                 // Interactive Graphics stream
+    SUB_TGS = 0x92,                 // Text subtitle stream
 
     // IUT-T REC. H.222 | ISO/IEC 13818-1 Table 2-34 - Stream type assignments
     RESERVED = 0x00,         // ITU-T | ISO/IEC Reserved

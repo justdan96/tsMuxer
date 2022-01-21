@@ -145,7 +145,7 @@ int AC3StreamReader::flushPacket(AVPacket& avPacket)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
             avPacket.pts = avPacket.dts =
-                m_totalTHDSamples * 1000000000ll / mh.group1_samplerate;  // replace time to a next HD packet
+                m_totalTHDSamples * 1000000000ll / mlp.m_samplerate;  // replace time to a next HD packet
     }
     return rez;
 }
@@ -202,10 +202,10 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         else
         {
             // thg packet
-            avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mh.group1_samplerate;
+            avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mlp.m_samplerate;
 
-            m_totalTHDSamples += mh.access_unit_size;
-            m_demuxedTHDSamples += mh.access_unit_size;
+            m_totalTHDSamples += mlp.m_samples;
+            m_demuxedTHDSamples += mlp.m_samples;
             if (m_demuxedTHDSamples >= m_samples)
             {
                 m_demuxedTHDSamples -= m_samples;

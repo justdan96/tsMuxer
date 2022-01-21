@@ -344,7 +344,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         StreamType streamType = StreamType::RESERVED;
 
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
-            streamType = StreamType::AUDIO_EAC3_TRUE_HD;
+            streamType = StreamType::AUDIO_TRUE_HD;
         else if (ac3Reader->isEAC3() && !ac3Reader->getDownconvertToAC3())
         {
             if (ac3Reader->isSecondary())
@@ -379,6 +379,12 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_LPCM, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
+    else if (codecName == "A_MLP")
+    {
+        m_pmt.pidList.insert(
+            std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::AUDIO_TRUE_HD, tsStreamIndex, descrBuffer,
+                                                        descriptorLen, codecReader, lang, isSecondary)));
+    }
     else if (codecName == "A_DTS")
     {
         DTSStreamReader* dtsReader = (DTSStreamReader*)codecReader;
@@ -391,7 +397,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             if (dtsReader->isSecondary())
                 audioType = StreamType::AUDIO_DTS_HD_SECONDARY;
             else if (dtsReader->getDTSHDMode() == DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                audioType = StreamType::AUDIO_DTS_HD_MASTER_AUDIO;
+                audioType = StreamType::AUDIO_DTS_HD_MA;
             else
                 audioType = StreamType::AUDIO_DTS_HD;
         }

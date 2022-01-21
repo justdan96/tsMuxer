@@ -11,12 +11,9 @@
 static const int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
 static const int AC3_FRAME_SIZE = NB_BLOCKS * 256;
 
-const static int TRUE_HD_MAJOR_SYNC = 0xF8726FBA;  // 0xF8726FBB for DTS-HD
-static const int HD_SYNC_WORLD = 0xf8726f;
+bool isSyncWord(uint8_t* buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
 
-bool isSyncWorld(uint8_t* buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
-
-bool isHDSyncWorld(uint8_t* buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
+bool isHDSyncWord(uint8_t* buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
 
 static const uint8_t eac3_blocks[4] = {1, 2, 3, 6};
 
@@ -39,35 +36,6 @@ const uint16_t ff_ac3_frame_sizes[38][3] = {
     {896, 975, 1344},   {896, 976, 1344},   {1024, 1114, 1536}, {1024, 1115, 1536}, {1152, 1253, 1728},
     {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920}};
 
-static const uint8_t mlp_quants[16] = {
-    16, 20, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
-static const uint8_t mlp_channels[32] = {
-    1, 2, 3, 4, 3, 4, 5, 3, 4, 5, 4, 5, 6, 4, 5, 4, 5, 6, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-};
-
-static const uint8_t thd_chancount[13] = {
-    //  LR    C   LFE  LRs LRvh  LRc LRrs  Cs   Ts  LRsd  LRw  Cvh  LFE2
-    2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1};
-
-static int mlp_samplerate(int in)
-{
-    if (in == 0xF)
-        return 0;
-
-    return (in & 8 ? 44100 : 48000) << (in & 7);
-}
-
-static int truehd_channels(int chanmap)
-{
-    int channels = 0;
-
-    for (int i = 0; i < 13; i++) channels += thd_chancount[i] * ((chanmap >> i) & 1);
-
-    return channels;
-}
-
 static const int AC3_ACMOD_MONO = 1;
 static const int AC3_ACMOD_STEREO = 2;
 
@@ -81,6 +49,7 @@ const CodecInfo& AC3Codec::getCodecInfo()
         return ac3CodecInfo;
 }
 
+// returns NO_ERROR, or type of error
 AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 {
     BitStreamReader gbc{};
@@ -132,7 +101,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         lfeon = gbc.getBit();
 
         m_samples = eac3_blocks[numblkscod] << 8;
-        m_bit_rateExt = m_frame_size * (m_sample_rate)*8 / (m_samples);
+        m_bit_rateExt = m_frame_size * m_sample_rate * 8 / m_samples;
 
         gbc.skipBits(5);  // skip bsid, already got it
         for (int i = 0; i < (acmod ? 1 : 2); i++)
@@ -276,9 +245,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
 
         m_bsmod = gbc.getBits(3);
         m_acmod = gbc.getBits(3);
-        if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)
+        if ((m_acmod & 1) && m_acmod != AC3_ACMOD_MONO)  // 3 front channels
             gbc.skipBits(2);  // m_cmixlev
-        if (m_acmod & 4)
+        if (m_acmod & 4)  // surround channel exists
             gbc.skipBits(2);  // m_surmixlev
         if (m_acmod == AC3_ACMOD_STEREO)
             m_dsurmod = gbc.getBits(2);
@@ -293,65 +262,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     return AC3ParseError::NO_ERROR;
 }
 
-bool AC3Codec::decodeDtsHdFrame(uint8_t* buffer, uint8_t* end)
-{
-    if (end - buffer < 21)
-        return false;
-    BitStreamReader reader{};
-    reader.setBuffer(buffer + 4, end);
-    if (reader.getBits(24) != HD_SYNC_WORLD) /* Sync words */
-        return false;
-
-    int ratebits = 0;
-    int stream_type = reader.getBits(8);
-
-    mh.subType = MLPHeaderInfo::MlpSubType::stUnknown;
-    if (stream_type == 0xbb)  // MLP
-    {
-        mh.subType = MLPHeaderInfo::MlpSubType::stMLP;
-        reader.skipBits(8);  // group1_bits, group2_bits
-        ratebits = reader.getBits(4);
-        mh.group1_samplerate = mlp_samplerate(ratebits);
-        if (mh.group1_samplerate == 0)
-            return false;
-        reader.skipBits(4);  // group2_samplerate
-        reader.skipBits(11);
-        mh.channels = mlp_channels[reader.getBits(5)];
-    }
-    else if (stream_type == 0xba)  // True-HD
-    {
-        mh.subType = MLPHeaderInfo::MlpSubType::stTRUEHD;
-        ratebits = reader.getBits(4);
-        mh.group1_samplerate = mlp_samplerate(ratebits);
-        if (mh.group1_samplerate == 0)
-            return false;
-        reader.skipBits(8);
-        int channels_thd_stream1 = reader.getBits(5);
-        reader.skipBits(2);
-        int channels_thd_stream2 = reader.getBits(13);
-
-        if (channels_thd_stream2)
-            mh.channels = truehd_channels(channels_thd_stream2);
-        else
-            mh.channels = truehd_channels(channels_thd_stream1);
-    }
-    else
-        return false;
-
-    mh.access_unit_size = 40 << (ratebits & 7);
-    reader.skipBits(32);
-    reader.skipBits(16);
-
-    reader.skipBit();  // is_vbr
-    mh.peak_bitrate = (reader.getBits(15) * mh.group1_samplerate + 8) >> 4;
-    reader.skipBits(4);  // num_substreams
-    // for (int i = 0; i < 11; ++i)
-    //	reader.skipBits(8);
-    // reader.skipBits(4);
-    // skip_bits_long(gb, 4 + 11 * 8);
-    return true;
-}
-
+// returns frame length, or zero (error), or NOT_ENOUGH_BUFFER
 int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
 {
     try
@@ -384,11 +295,11 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             uint8_t* trueHDData = buf + rez;
             if (end - trueHDData < 8)
                 return NOT_ENOUGH_BUFFER;
-            if (!isSyncWorld(trueHDData) && isHDSyncWorld(trueHDData + 4))
+            if (!isSyncWord(trueHDData) && isHDSyncWord(trueHDData + 4))
             {
                 if (end - trueHDData < 21)
                     return NOT_ENOUGH_BUFFER;
-                m_true_hd_mode = decodeDtsHdFrame(trueHDData, trueHDData + 21);
+                m_true_hd_mode = mlp.decodeFrame(trueHDData, trueHDData + 21);
             }
         }
 
@@ -413,16 +324,15 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             int trueHDFrameLen = (trueHDData[0] & 0x0f) << 8;
             trueHDFrameLen += trueHDData[1];
             trueHDFrameLen *= 2;
-            if (end - trueHDData < (int64_t)(trueHDFrameLen) + 7)
+            if (end - trueHDData < (int64_t)trueHDFrameLen + 7)
                 return NOT_ENOUGH_BUFFER;
             if (!m_true_hd_mode)
             {
-                m_true_hd_mode = decodeDtsHdFrame(trueHDData, trueHDData + trueHDFrameLen);
+                m_true_hd_mode = mlp.decodeFrame(trueHDData, trueHDData + trueHDFrameLen);
             }
             uint8_t* nextFrame = trueHDData + trueHDFrameLen;
 
             if (nextFrame[0] == 0x0B && nextFrame[1] == 0x77 && testDecodeTestFrame(nextFrame, end))
-                // if (isSyncWorld(nextFrame) && !isHDSyncWorld(nextFrame+4))
                 m_waitMoreData = false;
 
             if (m_downconvertToAC3)
@@ -547,9 +457,9 @@ const std::string AC3Codec::getStreamInfo()
 {
     std::ostringstream str;
     std::string hd_type;
-    if (mh.subType == MLPHeaderInfo::MlpSubType::stTRUEHD)
+    if (mlp.m_subType == MlpSubType::stTRUEHD)
         hd_type = "TRUE-HD";
-    else if (mh.subType == MLPHeaderInfo::MlpSubType::stMLP)
+    else if (mlp.m_subType == MlpSubType::stMLP)
         hd_type = "MLP";
     else
         hd_type = "UNKNOWN";
@@ -562,9 +472,9 @@ const std::string AC3Codec::getStreamInfo()
         str << hd_type;
         str << ". ";
 
-        str << "Peak bitrate: " << mh.peak_bitrate / 1000 << "Kbps (core " << m_bit_rate / 1000 << "Kbps) ";
-        str << "Sample Rate: " << mh.group1_samplerate / 1000 << "KHz ";
-        if (m_sample_rate != mh.group1_samplerate)
+        str << "Peak bitrate: " << mlp.m_bitrate / 1000 << "Kbps (core " << m_bit_rate / 1000 << "Kbps) ";
+        str << "Sample Rate: " << mlp.m_samplerate / 1000 << "KHz ";
+        if (m_sample_rate != mlp.m_samplerate)
             str << " (core " << m_sample_rate / 1000 << "Khz) ";
     }
     else
@@ -579,8 +489,8 @@ const std::string AC3Codec::getStreamInfo()
     int channels = m_channels;
     if (m_extChannelsExists)
         channels += 2;
-    if (mh.channels)
-        channels = mh.channels;
+    if (mlp.m_channels)
+        channels = mlp.m_channels;
 
     if (m_lfeon)
         str << (int)(channels - 1) << ".1";

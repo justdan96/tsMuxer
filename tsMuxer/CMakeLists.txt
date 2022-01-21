@@ -29,6 +29,8 @@ add_executable (tsmuxer
   matroskaDemuxer.cpp
   matroskaParser.cpp
   metaDemuxer.cpp
+  mlpCodec.cpp
+  mlpStreamReader.cpp
   movDemuxer.cpp
   mp3Codec.cpp
   mpeg2StreamReader.cpp

@@ -2,29 +2,9 @@
 #define __AC3_CODEC_H
 
 #include "avPacket.h"
+#include "mlpCodec.h"
 
 struct CodecInfo;
-
-typedef struct MLPHeaderInfo
-{
-    MLPHeaderInfo()
-        : subType(MlpSubType::stUnknown), access_unit_size(0), channels(0), group1_samplerate(0), peak_bitrate(0)
-    {
-    }
-
-    enum class MlpSubType
-    {
-        stUnknown,
-        stTRUEHD,
-        stMLP
-    };
-
-    int group1_samplerate;  ///< Sample rate of first substream
-    int access_unit_size;   ///< Number of samples per coded frame
-    int peak_bitrate;       ///< Peak bitrate for VBR, actual bitrate (==peak) for CBR
-    int channels;
-    MlpSubType subType;
-} MLPHeaderInfo;
 
 class AC3Codec
 {
@@ -108,7 +88,7 @@ class AC3Codec
     uint16_t m_frame_size;
     bool m_mixinfoexists;
 
-    MLPHeaderInfo mh;
+    MLPCodec mlp;
 
     int m_samples;
 
@@ -119,7 +99,6 @@ class AC3Codec
 
     AC3ParseError testParseHeader(uint8_t* buf, uint8_t* end);
     bool testDecodeTestFrame(uint8_t* buf, uint8_t* end);
-    bool decodeDtsHdFrame(uint8_t* buffer, uint8_t* end);
 
    protected:
     bool m_testMode;
