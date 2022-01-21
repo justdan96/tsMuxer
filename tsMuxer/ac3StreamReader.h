@@ -31,7 +31,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         if (m_downconvertToAC3)
             return AC3Codec::m_sample_rate;
         else
-            return mh.subType == MLPHeaderInfo::MlpSubType::stUnknown ? AC3Codec::m_sample_rate : mh.group1_samplerate;
+            return mlp.m_subType == MlpSubType::stUnknown ? AC3Codec::m_sample_rate : mlp.m_samplerate;
     }
     int getChannels() override { return AC3Codec::m_channels; }
     bool isPriorityData(AVPacket* packet) override;

@@ -172,6 +172,7 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
     bool avcFound = false;
     bool mvcFound = false;
     bool aacFound = false;
+    bool mlpFound = false;
 
     for (vector<StreamInfo>::const_iterator itr = ci.begin(); itr != ci.end(); ++itr)
     {
@@ -182,12 +183,17 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
             mvcFound = true;
         else if (si.m_codec == aacCodecInfo.programName)
             aacFound = true;
+        else if (si.m_codec == mlpCodecInfo.programName)
+            mlpFound = true;
     }
 
     if (m_bluRayMode && aacFound)
-        LTRACE(LT_ERROR, 2, "Warning! AAC codec is not standard for BD disks!");
-
-    if (!avcFound && mvcFound)
+        LTRACE(LT_ERROR, 2,
+               "Warning! AAC codec is not standard for BD disks, the m2ts will not play on a Blu-ray player.");
+    else if (m_bluRayMode && mlpFound)
+        LTRACE(LT_ERROR, 2,
+               "Warning! MLP codec is not standard for BD disks, the m2ts will not play on a Blu-ray player.");
+    else if (!avcFound && mvcFound)
         THROW(ERR_INVALID_STREAMS_SELECTED,
               "Fatal error: MVC depended view track can't be muxed without AVC base view track");
 }

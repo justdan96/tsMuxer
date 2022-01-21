@@ -42,10 +42,10 @@ bool isAudioStreamType(StreamType stream_coding_type)
     case StreamType::AUDIO_LPCM:
     case StreamType::AUDIO_AC3:
     case StreamType::AUDIO_DTS:
-    case StreamType::AUDIO_EAC3_TRUE_HD:
+    case StreamType::AUDIO_TRUE_HD:
     case StreamType::AUDIO_EAC3:
     case StreamType::AUDIO_DTS_HD:
-    case StreamType::AUDIO_DTS_HD_MASTER_AUDIO:
+    case StreamType::AUDIO_DTS_HD_MA:
     case StreamType::AUDIO_EAC3_SECONDARY:
     case StreamType::AUDIO_DTS_HD_SECONDARY:
     case StreamType::AUDIO_AAC:
