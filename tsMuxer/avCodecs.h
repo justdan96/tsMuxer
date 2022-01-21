@@ -60,7 +60,7 @@ const static CodecInfo h264CodecInfo(CODEC_V_MPEG4_H264, "H.264", "V_MPEG4/ISO/A
 const static CodecInfo h264DepCodecInfo(CODEC_V_MPEG4_H264_DEP, "MVC",
                                         "V_MPEG4/ISO/MVC");  // H.264/MVC dependent stream
 const static CodecInfo aacCodecInfo(CODEC_A_AAC, "AAC", "A_AAC");
-const static CodecInfo mlpCodecInfo(CODEC_A_MLP, "MLP", "A_MLP");
+const static CodecInfo mlpCodecInfo(CODEC_A_MLP, "TRUE-HD", "A_MLP");
 const static CodecInfo dtsCodecInfo(CODEC_A_DTS, "DTS", "A_DTS");
 const static CodecInfo dtshdCodecInfo(CODEC_A_DTS, "DTS-HD", "A_DTS");
 const static CodecInfo ac3CodecInfo(CODEC_A_AC3, "AC3", "A_AC3");

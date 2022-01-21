@@ -14,8 +14,9 @@ int MLPStreamReader::getHeaderLen() { return MLP_HEADER_LEN; }
 const std::string MLPStreamReader::getStreamInfo()
 {
     std::ostringstream str;
-    str << "Sample Rate: " << m_samplerate / 1000 << "KHz  ";
-    str << "Channels: " << (int)m_channels;
+    str << "Peak bitrate: " << m_bitrate / 1000 << "Kbps ";
+    str << "Sample Rate: " << m_samplerate / 1000 << "KHz ";
+    str << "Channels: " << m_channels;
     return str.str();
 }
 
