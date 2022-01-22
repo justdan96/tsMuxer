@@ -40,6 +40,7 @@ HEVCStreamReader::~HEVCStreamReader()
     delete m_sps;
     delete m_pps;
     delete m_hdr;
+    delete m_slice;
 }
 
 CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
@@ -61,7 +62,10 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 m_vps = new HevcVpsUnit();
             m_vps->decodeBuffer(nal, nextNal);
             if (m_vps->deserialize())
+            {
+                delete m_vps;
                 return rez;
+            }
             m_spsPpsFound = true;
             if (m_vps->num_units_in_tick)
                 updateFPS(m_vps, nal, nextNal, 0);
