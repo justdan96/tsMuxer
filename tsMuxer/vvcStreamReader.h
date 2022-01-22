@@ -47,6 +47,7 @@ class VVCStreamReader : public MPEGStreamReader
     VvcVpsUnit* m_vps;
     VvcSpsUnit* m_sps;
     VvcPpsUnit* m_pps;
+    VvcSliceHeader* m_slice;
     bool m_firstFrame;
 
     int m_frameNum;
