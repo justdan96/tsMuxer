@@ -17,7 +17,8 @@ HEVCStreamReader::HEVCStreamReader()
       m_vps(0),
       m_sps(0),
       m_pps(0),
-      m_hdr(new HevcHdrUnit),
+      m_hdr(new HevcHdrUnit()),
+      m_slice(0),
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
@@ -44,7 +45,6 @@ HEVCStreamReader::~HEVCStreamReader()
 CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
 {
     CheckStreamRez rez;
-    HevcSliceHeader slice;
 
     uint8_t* end = buffer + len;
     for (uint8_t* nal = NALUnit::findNextNAL(buffer, end); nal < end - 4; nal = NALUnit::findNextNAL(nal, end))
@@ -105,10 +105,12 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         // check Frame Depth on first slices
         if (isSlice(nalType) && (nal[2] & 0x80))
         {
-            slice.decodeBuffer(nal, FFMIN(nal + MAX_SLICE_HEADER, nextNal));
-            if (slice.deserialize(m_sps, m_pps))
+            if (!m_slice)
+                m_slice = new HevcSliceHeader();
+            m_slice->decodeBuffer(nal, FFMIN(nal + MAX_SLICE_HEADER, nextNal));
+            if (m_slice->deserialize(m_sps, m_pps))
                 return rez;  // not enough buffer or error
-            m_fullPicOrder = toFullPicOrder(&slice, m_sps->log2_max_pic_order_cnt_lsb);
+            m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);
             incTimings();
         }
     }
@@ -506,15 +508,15 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 }
                 else
                 {  // first slice of current frame
-                    HevcSliceHeader slice;
-                    slice.decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
-                    rez = slice.deserialize(m_sps, m_pps);
+                    if (!m_slice)
+                        m_slice = new HevcSliceHeader();
+                    m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
+                    rez = m_slice->deserialize(m_sps, m_pps);
                     if (rez)
                         return rez;  // not enough buffer or error
-                    // if (slice.slice_type == HEVC_IFRAME_SLICE)
                     if (nalType >= HevcUnit::NalType::BLA_W_LP)
                         m_lastIFrame = true;
-                    m_fullPicOrder = toFullPicOrder(&slice, m_sps->log2_max_pic_order_cnt_lsb);
+                    m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);
                 }
             }
             sliceFound = true;

@@ -50,6 +50,7 @@ class HEVCStreamReader : public MPEGStreamReader
     HevcSpsUnit* m_sps;
     HevcPpsUnit* m_pps;
     HevcHdrUnit* m_hdr;
+    HevcSliceHeader* m_slice;
     bool m_firstFrame;
 
     int m_frameNum;
