@@ -18,7 +18,7 @@ HEVCStreamReader::HEVCStreamReader()
       m_sps(0),
       m_pps(0),
       m_hdr(new HevcHdrUnit()),
-      m_slice(0),
+      m_slice(new HevcSliceHeader()),
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
@@ -109,8 +109,6 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
         // check Frame Depth on first slices
         if (isSlice(nalType) && (nal[2] & 0x80))
         {
-            if (!m_slice)
-                m_slice = new HevcSliceHeader();
             m_slice->decodeBuffer(nal, FFMIN(nal + MAX_SLICE_HEADER, nextNal));
             if (m_slice->deserialize(m_sps, m_pps))
                 return rez;  // not enough buffer or error
@@ -512,8 +510,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 }
                 else
                 {  // first slice of current frame
-                    if (!m_slice)
-                        m_slice = new HevcSliceHeader();
                     m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
                     rez = m_slice->deserialize(m_sps, m_pps);
                     if (rez)
