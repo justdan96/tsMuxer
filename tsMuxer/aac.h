@@ -11,16 +11,16 @@ class AACCodec
     static const int aac_sample_rates[16];
     static const int aac_channels[8];
     AACCodec()
-        : m_sample_rate(48000),
-          m_channels(0),
-          m_bit_rate(0),
-          m_channels_index(0),
-          m_id(0),
+        : m_id(0),
           m_layer(0),
-          m_profile(0),
-          m_rdb(0),
+          m_channels(0),
+          m_sample_rate(48000),
+          m_samples(0),
+          m_bit_rate(0),
           m_sample_rates_index(0),
-          m_samples(0)
+          m_channels_index(0),
+          m_profile(0),
+          m_rdb(0)
     {
     }
     uint8_t* findAacFrame(uint8_t* buffer, uint8_t* end);
@@ -40,7 +40,6 @@ class AACCodec
     int m_sample_rates_index;
     int m_channels_index;
     int m_profile;
-    // int m_frameSize
     int m_rdb;  // ch, sr;
 };
 

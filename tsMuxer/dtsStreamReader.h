@@ -23,13 +23,13 @@ class DTSStreamReader : public SimplePacketizerReader
 
     DTSStreamReader()
         : SimplePacketizerReader(),
-          hd_pi_bit_rate_index(0),
-          hd_sample_rate(0),
-          i_frame_size(0),
           nblks(0),
+          i_frame_size(0),
           pi_audio_mode(0),
           pi_bit_rate_index(0),
-          pi_channels_conf(0)
+          hd_pi_bit_rate_index(0),
+          pi_channels_conf(0),
+          hd_sample_rate(0)
     {
         pi_sample_rate_index = 0;
         pi_bit_rate = 0;

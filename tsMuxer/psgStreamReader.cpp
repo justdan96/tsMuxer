@@ -24,14 +24,13 @@ double pgs_frame_rates[16] = {
 
 PGSStreamReader::PGSStreamReader()
     : m_avFragmentEnd(0),
-      m_firstRenderedPacket(true),
-      m_objectWindowHeight(0),
-      m_objectWindowTop(0),
-      m_paletteVersion(0),
-      m_palleteID(0),
-      m_ptsStart(0),
+      object_width(0),
       object_height(0),
-      object_width(0)
+      m_firstRenderedPacket(true),
+      m_palleteID(0),
+      m_paletteVersion(0),
+      m_objectWindowHeight(0),
+      m_objectWindowTop(0)
 {
     m_curPos = m_buffer = 0;
     m_tmpBufferLen = 0;
@@ -210,8 +209,7 @@ const static int Y_THRESHOLD = 33;
 
 int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
 {
-    pos += 3;  // skip object ID and version number
-    int seq = *pos++;
+    pos += 4;  // skip object ID and version number
     uint32_t objectSize = AV_RB24(pos);
     pos += 3;
     uint8_t* objEnd = pos + objectSize;
@@ -237,8 +235,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
             end = pos + AV_RB16(pos);
             pos += 2;
             object_id = AV_RB16(pos);
-            pos += 3;  // skip object ID and version number
-            seq = *pos++;
+            pos += 4;  // skip object ID and version number
         }
         size_t oldSize = m_dstRle.size();
         m_dstRle.resize(oldSize + end - pos);
@@ -374,11 +371,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
 void PGSStreamReader::renderTextHide(int64_t outTime)
 {
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
-    int64_t compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
     int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
-    const int64_t PLANEINITIALIZATIONTIME =
-        (int64_t)(90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999);
-    const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
     m_firstRenderedPacket = true;
     outTime = (int64_t)(outTime / INT_FREQ_TO_TS_FREQ);
@@ -462,7 +455,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         int tmpWidth;
         int tmpHeight;
         m_render->enlargeCrop(m_video_width, m_video_height, &tmpWidth, &tmpHeight);
-        m_needRescale = m_scaled_width && m_scaled_width != tmpWidth || m_scaled_height && m_scaled_height != tmpHeight;
+        m_needRescale = (m_scaled_width && m_scaled_width != tmpWidth) || (m_scaled_height && m_scaled_height != tmpHeight);
         // m_needRescale |= true;
         if (m_needRescale)
         {
@@ -612,7 +605,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     BitStreamReader bitReader{};
     try
     {
-        int number_of_composition_objects, palette_update_flag, palette_id_ref, number_of_windows;
+        int number_of_composition_objects, number_of_windows;
         switch (segment_type)
         {
         case PALETTE_DEF_SEGMENT:
@@ -649,9 +642,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             video_descriptor(bitReader);
             composition_descriptor(bitReader);
 
-            palette_update_flag = bitReader.getBit();
-            bitReader.skipBits(7);
-            palette_id_ref = bitReader.getBits(8);
+            bitReader.skipBits(16);  // palette_update_flag, palette_id_ref
             number_of_composition_objects = bitReader.getBits(8);
             for (int i = 0; i < number_of_composition_objects; i++)
             {

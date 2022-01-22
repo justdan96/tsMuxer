@@ -117,7 +117,6 @@ class PGSStreamReader : public AbstractStreamReader
     std::map<uint8_t, text_subtitles::YUVQuad> m_palette;
     int m_scaled_width;
     int m_scaled_height;
-    int64_t m_ptsStart;
     bool m_firstRenderedPacket;
 
     text_subtitles::TextToPGSConverter* m_render;

@@ -62,7 +62,7 @@ extern const char* pict_type_str[4];
 class VC1Unit
 {
    public:
-    VC1Unit() : m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
+    VC1Unit() : bitReader(), m_nalBuffer(0), m_nalBufferLen(0) {}
     ~VC1Unit() { delete[] m_nalBuffer; }
 
     inline static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
@@ -154,24 +154,24 @@ class VC1SequenceHeader : public VC1Unit
     VC1SequenceHeader()
         : VC1Unit(),
           profile(Profile::SIMPLE),
-          level(0),
-          interlace(0),
-          time_base_num(0),
-          time_base_den(0),
-          m_fpsFieldBitVal(0),
-          sample_aspect_ratio(1, 1),
-          coded_height(0),
-          coded_width(0),
-          display_height(0),
-          display_width(0),
-          finterpflag(false),
-          hrd_param_flag(false),
-          hrd_num_leaky_buckets(0),
-          psf(0),
-          pulldown(0),
           rangered(0),
           max_b_frames(0),
-          tfcntrflag(false)
+          finterpflag(false),
+          level(0),
+          coded_width(0),
+          coded_height(0),
+          display_width(0),
+          display_height(0),
+          pulldown(0),
+          interlace(0),
+          tfcntrflag(false),
+          psf(0),
+          time_base_num(0),
+          time_base_den(0),
+          hrd_param_flag(false),
+          hrd_num_leaky_buckets(0),
+          sample_aspect_ratio(1, 1),
+          m_fpsFieldBitVal(0)
     {
     }
     Profile profile;
@@ -210,7 +210,7 @@ class VC1SequenceHeader : public VC1Unit
 class VC1Frame : public VC1Unit
 {
    public:
-    VC1Frame() : VC1Unit(), rptfrm(0), fcm(0), rff(0), tff(0), rptfrmBitPos(0), pict_type(VC1PictType::I_TYPE) {}
+    VC1Frame() : VC1Unit(), fcm(0), pict_type(VC1PictType::I_TYPE), rptfrm(0), tff(0), rff(0), rptfrmBitPos(0) {}
     int fcm;
     VC1PictType pict_type;
     int rptfrm;

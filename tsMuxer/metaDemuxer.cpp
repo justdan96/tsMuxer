@@ -1344,7 +1344,6 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
     }
     else if (demuxerData.lastReadRez[pid] != AbstractReader::DATA_DELAYED || demuxerData.m_allFragmented)
     {
-        map<uint32_t, uint32_t> dataTypeMap;
         int demuxRez = 0;
         do
         {
