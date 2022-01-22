@@ -429,130 +429,51 @@ int HevcSpsUnit::vui_parameters()
     return 0;
 }
 
-int HevcSpsUnit::short_term_ref_pic_set(int stRpsIdx)
+int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
 {
-    uint8_t rps_predict = 0;
-    unsigned delta_poc;
-    int k0 = 0;
-    int k1 = 0;
-    int k = 0;
+    int numDeltaPocs = 0;
 
-    if (stRpsIdx != 0)
-        rps_predict = m_reader.getBit();
+    bool inter_ref_pic_set_prediction_flag = stRpsIdx ? m_reader.getBit() : false;
 
-    ShortTermRPS* rps = &st_rps[stRpsIdx];
-
-    if (rps_predict)
+    if (inter_ref_pic_set_prediction_flag)
     {
-        const ShortTermRPS* rps_ridx;
-        int delta_rps;
-        unsigned abs_delta_rps;
-        uint8_t use_delta_flag = 0;
-        uint8_t delta_rps_sign;
+        int refRpsIdx = stRpsIdx - 1;
 
-        // rps_ridx = &st_rps[rps - st_rps - 1];
-        rps_ridx = &st_rps[stRpsIdx - 1];
-
-        delta_rps_sign = m_reader.getBit();
-        abs_delta_rps = extractUEGolombCode() + 1;
-        if (abs_delta_rps > 0x8000)
-            return 1;
-        delta_rps = (1 - (delta_rps_sign << 1)) * abs_delta_rps;
-        for (int i = 0; i <= rps_ridx->num_delta_pocs; i++)
+        if (stRpsIdx == num_short_term_ref_pic_sets)
         {
-            int used = rps->used[k] = m_reader.getBit();
-
-            if (!used)
-                use_delta_flag = m_reader.getBit();
-
-            if (used || use_delta_flag)
-            {
-                if (i < rps_ridx->num_delta_pocs)
-                    delta_poc = delta_rps + rps_ridx->delta_poc[i];
-                else
-                    delta_poc = delta_rps;
-                rps->delta_poc[k] = delta_poc;
-                if (delta_poc < 0)
-                    k0++;
-                else
-                    k1++;
-                k++;
-            }
+            unsigned delta_idx_minus1 = extractUEGolombCode();
+            if (delta_idx_minus1 >= stRpsIdx)
+                return 1;
+            refRpsIdx -= delta_idx_minus1;
         }
 
-        rps->num_delta_pocs = k;
-        rps->num_negative_pics = k0;
-        // sort in increasing order (smallest first)
-        if (rps->num_delta_pocs != 0)
+        m_reader.skipBit();     // delta_rps_sign
+        extractUEGolombCode();  // abs_delta_rps_minus1
+
+        for (int j = 0; j <= num_delta_pocs[refRpsIdx]; j++)
         {
-            unsigned used, tmp;
-            for (int i = 1; i < rps->num_delta_pocs; i++)
-            {
-                delta_poc = rps->delta_poc[i];
-                used = rps->used[i];
-                for (k = i - 1; k >= 0; k--)
-                {
-                    tmp = rps->delta_poc[k];
-                    if (delta_poc < tmp)
-                    {
-                        rps->delta_poc[k + 1] = tmp;
-                        rps->used[k + 1] = rps->used[k];
-                        rps->delta_poc[k] = delta_poc;
-                        rps->used[k] = used;
-                    }
-                }
-            }
-        }
-        if ((rps->num_negative_pics >> 1) != 0)
-        {
-            int used;
-            k = rps->num_negative_pics - 1;
-            // flip the negative values to largest first
-            for (unsigned i = 0; i < (rps->num_negative_pics >> 1); i++)
-            {
-                delta_poc = rps->delta_poc[i];
-                used = rps->used[i];
-                rps->delta_poc[i] = rps->delta_poc[k];
-                rps->used[i] = rps->used[k];
-                rps->delta_poc[k] = delta_poc;
-                rps->used[k] = used;
-                k--;
-            }
+            bool used = m_reader.getBit();                          // used_by_curr_pic_flag[j]
+            bool use_delta_flag = used ? true : m_reader.getBit();  // use_delta_flag[j]
+            if (use_delta_flag)
+                numDeltaPocs++;
         }
     }
     else
     {
-        unsigned int prev, nb_positive_pics;
-        rps->num_negative_pics = extractUEGolombCode();
-        nb_positive_pics = extractUEGolombCode();
-        rps->num_delta_pocs = rps->num_negative_pics + nb_positive_pics;
-        if (rps->num_delta_pocs > 64)
+        // numDeltaPocs = num_negative_pics + num_positive_pics
+        numDeltaPocs = extractUEGolombCode() + extractUEGolombCode();
+        if (numDeltaPocs > 64)
             return 1;
 
-        if (rps->num_delta_pocs > 0)
+        for (int i = 0; i < numDeltaPocs; i++)
         {
-            prev = 0;
-            for (unsigned i = 0; i < rps->num_negative_pics; i++)
-            {
-                delta_poc = extractUEGolombCode() + 1;
-                if (delta_poc > 0x8000)
-                    return 1;
-                prev -= delta_poc;
-                rps->delta_poc[i] = prev;
-                rps->used[i] = m_reader.getBit();
-            }
-            prev = 0;
-            for (unsigned i = 0; i < nb_positive_pics; i++)
-            {
-                delta_poc = extractUEGolombCode() + 1;
-                if (delta_poc > 0x8000)
-                    return 1;
-                prev += delta_poc;
-                rps->delta_poc[rps->num_negative_pics + i] = prev;
-                rps->used[rps->num_negative_pics + i] = m_reader.getBit();
-            }
+            if (extractUEGolombCode() >= 0x8000)  // delta_poc_minus1[i]
+                return 1;
+            m_reader.skipBit();     // used_by_curr_pic_flag[i]
         }
     }
+    num_delta_pocs[stRpsIdx] = numDeltaPocs;
+
     return 0;
 }
 
@@ -564,19 +485,16 @@ int HevcSpsUnit::scaling_list_data()
         {
             if (!m_reader.getBit())
             {
-                unsigned scaling_list_pred_matrix_id_delta = extractUEGolombCode();
-                if (scaling_list_pred_matrix_id_delta > 5)
+                if (extractUEGolombCode() > 5)  // scaling_list_pred_matrix_id_delta
                     return 1;
             }
             else
             {
-                int nextCoef = 8;
                 int coefNum = FFMIN(64, (1 << (4 + (sizeId << 1))));
                 if (sizeId > 1)
                 {
-                    int scaling_list_dc_coef_minus8 = extractSEGolombCode();
-                    nextCoef = scaling_list_dc_coef_minus8 + 8;
-                    if (nextCoef < 1 || nextCoef > 255)
+                    int scaling_list_dc_coef = extractSEGolombCode() + 8;
+                    if (scaling_list_dc_coef < 1 || scaling_list_dc_coef > 255)
                         return 1;
                 }
                 for (int i = 0; i < coefNum; i++)
@@ -584,7 +502,6 @@ int HevcSpsUnit::scaling_list_data()
                     int scaling_list_delta_coef = extractSEGolombCode();
                     if (scaling_list_delta_coef < -128 || scaling_list_delta_coef > 127)
                         return 1;
-                    nextCoef = (nextCoef + scaling_list_delta_coef + 256) % 256;
                 }
             }
         }
@@ -667,7 +584,9 @@ int HevcSpsUnit::deserialize()
         int PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
         PicSizeInCtbsY_bits = 0;
         int count1bits = 0;
-        while (PicSizeInCtbsY)  // Ceil( Log2( PicSizeInCtbsY ) )
+
+        // Ceil( Log2( PicSizeInCtbsY ))
+        while (PicSizeInCtbsY)
         {
             count1bits += PicSizeInCtbsY & 1;
             PicSizeInCtbsY_bits++;
@@ -685,7 +604,7 @@ int HevcSpsUnit::deserialize()
             }
         }
 
-        m_reader.skipBits(2);   // unused flags
+        m_reader.skipBits(2);   // amp_enabled_flag, sample_adaptive_offset_enabled_flag
         if (m_reader.getBit())  // pcm_enabled_flag
         {
             m_reader.skipBits(8);           // pcm_sample_bit_depth_luma_minus1, pcm_sample_bit_depth_chroma_minus1
@@ -699,11 +618,13 @@ int HevcSpsUnit::deserialize()
         if (num_short_term_ref_pic_sets > 64)
             return 1;
 
-        st_rps.resize(num_short_term_ref_pic_sets);
+        num_delta_pocs.resize(num_short_term_ref_pic_sets);
 
         for (unsigned i = 0; i < num_short_term_ref_pic_sets; i++)
+        {
             if (short_term_ref_pic_set(i) != 0)
                 return 1;
+        }
         if (m_reader.getBit())  // long_term_ref_pics_present_flag
         {
             unsigned num_long_term_ref_pics_sps = extractUEGolombCode();
@@ -711,16 +632,15 @@ int HevcSpsUnit::deserialize()
                 return 1;
             for (unsigned i = 0; i < num_long_term_ref_pics_sps; i++)
             {
-                m_reader.skipBits(log2_max_pic_order_cnt_lsb + 1);  // lt_ref_pic_poc_lsb_sps[ i ] u(v)
+                m_reader.skipBits(log2_max_pic_order_cnt_lsb + 1);  // lt_ref_pic_poc_lsb_sps[i]
             }
         }
-        m_reader.skipBits(2);   // unused flags
+        m_reader.skipBits(2);   // sps_temporal_mvp_enabled_flag, strong_intra_smoothing_enabled_flag
         if (m_reader.getBit())  // vui_parameters_present_flag
         {
             if (vui_parameters())
                 return 1;
         }
-        m_reader.skipBit();
 
         return 0;
     }

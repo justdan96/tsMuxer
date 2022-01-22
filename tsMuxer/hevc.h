@@ -99,21 +99,6 @@ struct HevcVpsUnit : public HevcUnitWithProfile
     int num_units_in_tick_bit_pos;
 };
 
-static const int MAX_REFS = 64;
-
-struct ShortTermRPS
-{
-    ShortTermRPS() : num_negative_pics(0), num_delta_pocs(0)
-    {
-        memset(delta_poc, 0, sizeof(delta_poc));
-        memset(used, 0, sizeof(used));
-    }
-    unsigned num_negative_pics;
-    int num_delta_pocs;
-    int32_t delta_poc[MAX_REFS];
-    uint8_t used[MAX_REFS];
-};
-
 struct HevcSpsUnit : public HevcUnitWithProfile
 {
     HevcSpsUnit();
@@ -136,7 +121,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     bool vcl_hrd_parameters_present_flag;
     bool sub_pic_hrd_params_present_flag;
 
-    std::vector<ShortTermRPS> st_rps;
+    std::vector<int> num_delta_pocs;
 
     int colour_primaries;
     int transfer_characteristics;
@@ -152,7 +137,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
    private:
     int hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1);
     int sub_layer_hrd_parameters(int subLayerId);
-    int short_term_ref_pic_set(int stRpsIdx);
+    int short_term_ref_pic_set(unsigned stRpsIdx);
     int vui_parameters();
     int scaling_list_data();
 };
