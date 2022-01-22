@@ -271,18 +271,19 @@ HevcSpsUnit::HevcSpsUnit()
       nal_hrd_parameters_present_flag(false),
       vcl_hrd_parameters_present_flag(false),
       sub_pic_hrd_params_present_flag(false),
-      num_short_term_ref_pic_sets(0),
       colour_primaries(2),
       transfer_characteristics(2),
       matrix_coeffs(2),
       chroma_sample_loc_type_top_field(0),
       chroma_sample_loc_type_bottom_field(0),
+      num_short_term_ref_pic_sets(0),
       num_units_in_tick(0),
       time_scale(0),
       PicSizeInCtbsY_bits(0)
 {
 }
 
+// returns 0 on parse success, 1 on error
 int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1)
 {
     if (commonInfPresentFlag)
@@ -303,10 +304,10 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
         }
     }
 
-    cpb_cnt_minus1.resize(maxNumSubLayersMinus1 + 1);
     for (int i = 0; i <= maxNumSubLayersMinus1; i++)
     {
         bool low_delay_hrd_flag = false;
+        unsigned cpb_cnt_minus1 = 0;
         bool fixed_pic_rate_within_cvs_flag = m_reader.getBit() ? true : m_reader.getBit();
         if (fixed_pic_rate_within_cvs_flag)
         {
@@ -317,36 +318,37 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
             low_delay_hrd_flag = m_reader.getBit();
         if (!low_delay_hrd_flag)
         {
-            cpb_cnt_minus1[i] = extractUEGolombCode();
-            if (cpb_cnt_minus1[i] > 32)
+            cpb_cnt_minus1 = extractUEGolombCode();
+            if (cpb_cnt_minus1 > 32)
                 return 1;
         }
         if (nal_hrd_parameters_present_flag)
-            if (sub_layer_hrd_parameters(i) != 0)
+            if (sub_layer_hrd_parameters(cpb_cnt_minus1) != 0)
                 return 1;
         if (vcl_hrd_parameters_present_flag)
-            if (sub_layer_hrd_parameters(i) != 0)
+            if (sub_layer_hrd_parameters(cpb_cnt_minus1) != 0)
                 return 1;
     }
     return 0;
 }
 
-int HevcSpsUnit::sub_layer_hrd_parameters(int subLayerId)
+// returns 0 on parse success, 1 on error
+int HevcSpsUnit::sub_layer_hrd_parameters(int cpb_cnt_minus1)
 {
-    for (size_t i = 0; i <= cpb_cnt_minus1[subLayerId]; i++)
+    for (size_t i = 0; i <= cpb_cnt_minus1; i++)
     {
-        if (extractUEGolombCode() == 0xffffffff)  // bit_rate_value_minus1
+        if (extractUEGolombCode() == 0xffffffff)  // bit_rate_value_minus1[i]
             return 1;
-        if (extractUEGolombCode() == 0xffffffff)  // cpb_size_value_minus1
+        if (extractUEGolombCode() == 0xffffffff)  // cpb_size_value_minus1[i]
             return 1;
         if (sub_pic_hrd_params_present_flag)
         {
-            if (extractUEGolombCode() == 0xffffffff)  // cpb_size_du_value_minus1
+            if (extractUEGolombCode() == 0xffffffff)  // cpb_size_du_value_minus1[i]
                 return 1;
-            if (extractUEGolombCode() == 0xffffffff)  // bit_rate_du_value_minus1
+            if (extractUEGolombCode() == 0xffffffff)  // bit_rate_du_value_minus1[i]
                 return 1;
         }
-        m_reader.skipBit();  // cbr_flag[ i ] u(1)
+        m_reader.skipBit();  // cbr_flag[i]
     }
     return 0;
 }

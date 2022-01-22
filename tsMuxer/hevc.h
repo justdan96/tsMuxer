@@ -136,17 +136,6 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     bool vcl_hrd_parameters_present_flag;
     bool sub_pic_hrd_params_present_flag;
 
-    std::vector<unsigned> cpb_cnt_minus1;
-    /*
-    std::vector<int> NumNegativePics;
-    std::vector<int> NumPositivePics;
-    std::vector<std::vector<int> > UsedByCurrPicS0;
-    std::vector<std::vector<int> > UsedByCurrPicS1;
-    std::vector<std::vector<int> > DeltaPocS0;
-    std::vector<std::vector<int> > DeltaPocS1;
-    std::vector<int> used_by_curr_pic_flag;
-    std::vector<int> use_delta_flag;
-    */
     std::vector<ShortTermRPS> st_rps;
 
     int colour_primaries;
