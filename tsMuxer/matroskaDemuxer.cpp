@@ -2441,8 +2441,7 @@ int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &ac
 
 void MatroskaDemuxer::getTrackList(std::map<uint32_t, TrackInfo> &trackList)
 {
-    for (int i = 0; i < num_tracks; i++)
-        trackList[i + 1] = TrackInfo(getTrackType(tracks[i]), tracks[i]->language, 0);
+    for (int i = 0; i < num_tracks; i++) trackList[i + 1] = TrackInfo(getTrackType(tracks[i]), tracks[i]->language, 0);
 }
 
 int MatroskaDemuxer::getTrackType(MatroskaTrack *track)

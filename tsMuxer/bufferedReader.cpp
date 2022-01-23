@@ -98,8 +98,7 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
             m_started = true;
         }
     }
-    LTRACE(LT_INFO, 0,
-           "Reader #" << m_id << ". Start new stream " << newReaderID << ". stream(s): " << rSize);
+    LTRACE(LT_INFO, 0, "Reader #" << m_id << ". Start new stream " << newReaderID << ". stream(s): " << rSize);
 
     return newReaderID;
 }

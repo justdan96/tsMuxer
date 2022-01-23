@@ -351,20 +351,20 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         MpegAudioStreamReader* mp3Reader = (MpegAudioStreamReader*)codecReader;
         if (mp3Reader->getLayer() >= 2)
             m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_MPEG2, tsStreamIndex, descrBuffer,
-                                                            descriptorLen, codecReader, lang, isSecondary);
+                                                         descriptorLen, codecReader, lang, isSecondary);
         else
             m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_MPEG1, tsStreamIndex, descrBuffer,
-                                                            descriptorLen, codecReader, lang, isSecondary);
+                                                         descriptorLen, codecReader, lang, isSecondary);
     }
     else if (codecName == "A_LPCM")
     {
-        m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_LPCM, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary);
+        m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_LPCM, tsStreamIndex, descrBuffer, descriptorLen,
+                                                     codecReader, lang, isSecondary);
     }
     else if (codecName == "A_MLP")
     {
         m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_TRUE_HD, tsStreamIndex, descrBuffer,
-                                                        descriptorLen, codecReader, lang, isSecondary);
+                                                     descriptorLen, codecReader, lang, isSecondary);
     }
     else if (codecName == "A_DTS")
     {
