@@ -1697,8 +1697,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                     if (start != AV_NOPTS_VALUE && uidFound)
                     {
                         AVChapter chapter(start, title);
-                        // TODO:  uid should be stored with 64 bits
-                        chapters[(int)uid] = chapter;
+                        chapters[uid] = chapter;
                     }
                     // TODO: solve uninitialized memory 'title':
                     delete[] title;
@@ -2463,7 +2462,7 @@ int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
 std::vector<AVChapter> MatroskaDemuxer::getChapters()
 {
     std::vector<AVChapter> rez;
-    for (std::map<int, AVChapter>::const_iterator itr = chapters.begin(); itr != chapters.end(); ++itr)
+    for (std::map<uint64_t, AVChapter>::const_iterator itr = chapters.begin(); itr != chapters.end(); ++itr)
         rez.push_back(itr->second);
     std::sort(rez.begin(), rez.end());
     return rez;

@@ -107,7 +107,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int readEncodingCompression(MatroskaTrack *track);
     void decompressData(const uint8_t *data, int size);
 
-    std::map<int, AVChapter> chapters;
+    std::map<uint64_t, AVChapter> chapters;
     MemoryBlock m_tmpBuffer;
 };
 
