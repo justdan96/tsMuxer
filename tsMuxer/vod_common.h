@@ -119,11 +119,11 @@ std::string floatToTime(double time, char msSeparator = '.');
 double timeToFloat(const std::string& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
 
-static int64_t nanoClockToPts(int64_t value)
+static inline int64_t nanoClockToPts(int64_t value)
 {
     return int64_t(value / INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
 }
-static int64_t ptsToNanoClock(int64_t value)
+static inline int64_t ptsToNanoClock(int64_t value)
 {
     return int64_t(value * INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
 }
