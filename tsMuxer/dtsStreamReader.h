@@ -27,9 +27,7 @@ class DTSStreamReader : public SimplePacketizerReader
           i_frame_size(0),
           pi_audio_mode(0),
           pi_bit_rate_index(0),
-          hd_pi_bit_rate_index(0),
-          pi_channels_conf(0),
-          hd_sample_rate(0)
+          pi_channels_conf(0)
     {
         pi_sample_rate_index = 0;
         pi_bit_rate = 0;
@@ -112,7 +110,6 @@ class DTSStreamReader : public SimplePacketizerReader
     unsigned int hd_pi_sample_rate;
     unsigned int pi_sample_rate_index;
     unsigned int pi_bit_rate_index;
-    unsigned int hd_pi_bit_rate_index;
     unsigned int pi_bit_rate;
     unsigned int pi_frame_length;
     unsigned int pi_channels_conf;
@@ -123,7 +120,6 @@ class DTSStreamReader : public SimplePacketizerReader
     unsigned int hd_pi_channels;
     unsigned int hd_pi_lfeCnt;
 
-    unsigned int hd_sample_rate;
     unsigned int hd_bitDepth;
     unsigned int m_hdBitrate;
     bool m_isCoreExists;

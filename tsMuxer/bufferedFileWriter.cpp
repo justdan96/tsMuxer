@@ -19,7 +19,7 @@ void WriterData::execute()
     };
 }
 
-BufferedFileWriter::BufferedFileWriter() : m_started(false), m_terminated(false), m_writeQueue(WRITE_QUEUE_MAX_SIZE)
+BufferedFileWriter::BufferedFileWriter() : m_terminated(false), m_writeQueue(WRITE_QUEUE_MAX_SIZE)
 {
     m_lastErrorCode = 0;
     m_nothingToExecute = true;

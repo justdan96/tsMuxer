@@ -10,9 +10,9 @@ const uint16_t ff_mpa_bitrate_tab[2][3][15] = {{{0, 32, 64, 96, 128, 160, 192, 2
 
 const uint16_t ff_mpa_freq_tab[3] = {44100, 48000, 32000};
 
-const static int MPA_STEREO = 0;
-const static int MPA_JSTEREO = 1;
-const static int MPA_DUAL = 2;
+// const static int MPA_STEREO = 0;
+// const static int MPA_JSTEREO = 1;
+// const static int MPA_DUAL = 2;
 const static int MPA_MONO = 3;
 
 uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
@@ -43,7 +43,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
 {
     // int sample_rate, frame_size, mpeg25, padding;
     // int sample_rate_index, bitrate_index;
-    int mpeg25, padding, error_protection, lsf;
+    int mpeg25, padding, lsf;
     if (end - buff < 4)
         return 0;
     uint32_t header = my_ntohl(*((uint32_t*)buff));
@@ -67,7 +67,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
         return 0;  // invalid sample rate
     m_sample_rate = ff_mpa_freq_tab[m_sample_rate_index] >> (lsf + mpeg25);
     m_sample_rate_index += 3 * (lsf + mpeg25);
-    error_protection = ((header >> 16) & 1) ^ 1;
+    // error_protection = ((header >> 16) & 1) ^ 1;
 
     m_bitrate_index = (header >> 12) & 0xf;
     if (m_bitrate_index == 15)

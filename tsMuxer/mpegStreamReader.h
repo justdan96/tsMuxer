@@ -101,7 +101,6 @@ class MPEGStreamReader : public AbstractStreamReader
     int bufFromNAL();
     virtual int decodeNal(uint8_t* buff);
     void storeBufferRest();
-    uint8_t* m_frameStart;
 };
 
 #endif

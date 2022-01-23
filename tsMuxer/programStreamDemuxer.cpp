@@ -187,8 +187,8 @@ void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList
 
 bool ProgramStreamDemuxer::isVideoPID(uint32_t pid)
 {
-    return pid >= 0x55 && pid <= 0x5f ||  // vc1
-           pid >= 0xe0 && pid <= 0xef ||  // mpeg video
+    return (pid >= 0x55 && pid <= 0x5f) ||  // vc1
+           (pid >= 0xe0 && pid <= 0xef) ||  // mpeg video
            m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H264 ||
            m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_MVC ||
            m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H265 ||
@@ -206,7 +206,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
         m_lastReadRez = readRez;
         return BufferedFileReader::DATA_NOT_READY;
     }
-    if (readedBytes + m_tmpBufferLen == 0 || readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF)
+    if (readedBytes + m_tmpBufferLen == 0 || (readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF))
     {
         m_lastReadRez = readRez;
         return BufferedReader::DATA_EOF;

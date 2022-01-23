@@ -11,8 +11,6 @@
 #include "vvc.h"
 #include "wave.h"
 
-static const int LPCM_HEADER_LEN = 4;
-
 using namespace wave_format;
 
 // ------------ H-264 ---------------
@@ -26,11 +24,8 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackP
     try
     {
         bitReader.setBuffer(buff, buff + size);
-        bitReader.skipBits(8);  // reserved
-        int profile = bitReader.getBits(8);
-        bitReader.skipBits(8);  // reserved
-        int level = bitReader.getBits(8);
-        bitReader.skipBits(6);  // reserved
+        bitReader.skipBits(24);  // reserved 8, profile 8, reserved 8
+        bitReader.skipBits(14);  // level 8, reserved 6
         m_nalSize = bitReader.getBits(2) + 1;
         bitReader.skipBits(3);  // reserved
         int spsCnt = bitReader.getBits(5);

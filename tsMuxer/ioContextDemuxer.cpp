@@ -31,7 +31,7 @@ float av_int2flt(int32_t v)
 }
 
 IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
-    : m_readManager(readManager), m_lastReadRez(0), tracks()
+    : tracks(), m_readManager(readManager), m_lastReadRez(0)
 {
     m_lastProcessedBytes = 0;
     m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader("");

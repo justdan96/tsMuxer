@@ -78,11 +78,9 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
     uint8_t* nextNal = 0;
-    int pic_parameter_set_id = 0;
     std::string tmpDescr;
     bool pulldownInserted = false;
     bool offsetsInserted = false;
-    BitStreamReader bitReader{};
 
     for (uint8_t* nal = NALUnit::findNextNAL(buffer, end); nal < end - 4; nal = NALUnit::findNextNAL(nal, end))
     {
@@ -106,7 +104,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                 delete sps;
                 return rez;
             }
-            // m_spsMap.insert(make_pair<uint32_t, SPSUnit*>(sps->seq_parameter_set_id, sps));
             m_spsMap.insert(make_pair(sps->seq_parameter_set_id, sps));
             if (tmpDescr.empty())
                 tmpDescr = sps->getStreamDescr();
@@ -127,7 +124,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                 delete pps;
                 break;
             }
-            // m_ppsMap.insert(make_pair<uint32_t, PPSUnit*>(pps->pic_parameter_set_id, pps));
             m_ppsMap.insert(make_pair(pps->pic_parameter_set_id, pps));
             break;
         }
@@ -331,7 +327,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     bool srcSpsPpsFound = avPacket.flags & AVPacket::IS_SPS_PPS_IN_GOP;
     bool spsDiscontinue =
         m_h264SPSCont &&
-        ((m_spsCounter < 2 && (m_totalFrameNum > 1 && m_lastSliceIDR || m_totalFrameNum > 250 && isIFrame())) ||
+        ((m_spsCounter < 2 && ((m_totalFrameNum > 1 && m_lastSliceIDR) || (m_totalFrameNum > 250 && isIFrame()))) ||
          (m_firstFileFrame && !srcSpsPpsFound));
     bool needInsSpsPps = false;
     if (isIFrame() && m_lastSliceSPS != -1 && m_lastSlicePPS != -1)
@@ -383,8 +379,6 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
 
     if (needInsTimingSEI)
     {
-        SPSUnit* sps = m_spsMap.find(m_lastSliceSPS)->second;
-
         if (m_firstSEIWarn)
         {
             m_firstSEIWarn = false;
@@ -415,7 +409,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
                     curPos += NALUnit::encodeNAL(srcData, srcData + m_bdRomMetaDataMsg.size(), curPos, dstEnd - curPos);
                     if (priorityData)
                         priorityData->push_back(
-                            std::pair<int, int>((int)(prevPos - dstBuffer), (int)(curPos - prevPos)));
+                            std::make_pair<int, int>((int)(prevPos - dstBuffer), (int)(curPos - prevPos)));
                     m_bdRomMetaDataMsg.clear();
                 }
             }
@@ -786,7 +780,6 @@ int H264StreamReader::intDecodeNAL(uint8_t* buff)
 {
     auto nal_unit_type = (NALUnit::NALType)(*buff & 0x1f);
     uint8_t* nextNal = 0;
-    uint8_t* seiEnd = 0;
     int nalRez = 0;
     m_spsPpsFound = false;
 
@@ -1097,7 +1090,6 @@ int H264StreamReader::deserializeSliceHeader(SliceUnit& slice, uint8_t* buff, ui
 int H264StreamReader::processSliceNal(uint8_t* buff)
 {
     SliceUnit slice;
-    int nal_unit_type = *buff & 0x1f;
     uint8_t* sliceEnd = m_bufEnd;
 
     int nalRez = deserializeSliceHeader(slice, buff, sliceEnd);
@@ -1398,7 +1390,6 @@ int H264StreamReader::processSPS(uint8_t* buff)
 
     updateFPS(sps, buff, nextNal, oldSpsLen);
     nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
-    oldSpsLen = (int)(nextNal - buff);
     updateHRDParam(sps);
     if (sps->nalHrdParams.isPresent)
         updatedSPSList.insert(sps->seq_parameter_set_id);

@@ -1,10 +1,9 @@
 
 #include "tsMuxer.h"
 
+#include <fs/textfile.h>
 #include "pesPacket.h"
 #include "tsPacket.h"
-//#include "tsEncoder.h"
-#include <fs/textfile.h>
 
 #include "ac3StreamReader.h"
 #include "avCodecs.h"
@@ -283,15 +282,12 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
 
     if (codecName == "V_MPEG4/ISO/AVC")
     {
-        H264StreamReader* h264Reader = (H264StreamReader*)codecReader;
-        // h264Reader->setH264SPSCont(m_h264SPSCont);
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_H264, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
     }
     else if (codecName == "V_MPEG4/ISO/MVC")
     {
-        H264StreamReader* h264Reader = (H264StreamReader*)codecReader;
         m_pmt.pidList.insert(
             std::make_pair(tsStreamIndex, PMTStreamInfo(StreamType::VIDEO_MVC, tsStreamIndex, descrBuffer,
                                                         descriptorLen, codecReader, lang, isSecondary)));
@@ -1025,7 +1021,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         finishFileBlock(avPacket.pts, newPCR, true);  // goto next file
     }
     else if (newPES && m_interliaveBlockSize > 0 && m_canSwithBlock &&
-             (blockFull() || m_sublingMuxer && m_sublingMuxer->blockFull()))
+             (blockFull() || (m_sublingMuxer && m_sublingMuxer->blockFull())))
     {
         finishFileBlock(avPacket.pts, newPCR, false);  // interleave SSIF here
     }
@@ -1381,7 +1377,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             uint64_t coeff = 1;
             string postfix;
             for (auto& j : paramPair[1])
-                if (!(j >= '0' && j <= '9' || j == '.'))
+                if (!((j >= '0' && j <= '9') || j == '.'))
                     postfix += j;
             postfix = strToUpperCase(postfix);
             if (postfix == "GB")

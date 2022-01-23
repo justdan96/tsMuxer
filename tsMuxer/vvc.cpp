@@ -367,7 +367,7 @@ int VvcVpsUnit::deserialize()
 
             for (int i = 1; i < TotalNumOlss; i++)
             {
-                int NumLayersInOls;
+                int NumLayersInOls = 0;
                 if (vps_each_layer_is_an_ols_flag)
                     NumLayersInOls = 1;
                 else if (vps_ols_mode_idc == 0 || vps_ols_mode_idc == 1)
@@ -492,11 +492,11 @@ VvcSpsUnit::VvcSpsUnit()
       transfer_characteristics(2),
       matrix_coeffs(2),  // 2 = unspecified
       full_range_flag(0),
-      inter_layer_prediction_enabled_flag(0),
-      long_term_ref_pics_flag(0),
       sps_num_ref_pic_lists(0),
       weighted_pred_flag(0),
-      weighted_bipred_flag(0)
+      weighted_bipred_flag(0),
+      long_term_ref_pics_flag(0),
+      inter_layer_prediction_enabled_flag(0)
 {
 }
 
@@ -603,7 +603,6 @@ int VvcSpsUnit::deserialize()
         if (sps_log2_min_luma_coding_block_size_minus2 > (unsigned)min(4, (int)sps_log2_ctu_size_minus5 + 3))
             return 1;
         unsigned MinCbLog2SizeY = sps_log2_min_luma_coding_block_size_minus2 + 2;
-        unsigned MinCbSizeY = 1 << MinCbLog2SizeY;
         m_reader.skipBit();  // sps_partition_constraints_override_enabled_flag
         unsigned sps_log2_diff_min_qt_min_cb_intra_slice_luma = extractUEGolombCode();
         if (sps_log2_diff_min_qt_min_cb_intra_slice_luma > min(6, CtbLog2SizeY) - MinCbLog2SizeY)
@@ -957,12 +956,12 @@ int VvcPpsUnit::deserialize()
 
 // ----------------------- VvcHrdUnit ------------------------
 VvcHrdUnit::VvcHrdUnit()
-    : general_nal_hrd_params_present_flag(0),
-      general_du_hrd_params_present_flag(0),
+    : num_units_in_tick(0),
+      time_scale(0),
+      general_nal_hrd_params_present_flag(0),
       general_vcl_hrd_params_present_flag(0),
-      hrd_cpb_cnt_minus1(0),
-      num_units_in_tick(0),
-      time_scale(0)
+      general_du_hrd_params_present_flag(0),
+      hrd_cpb_cnt_minus1(0)
 {
 }
 
@@ -1086,7 +1085,7 @@ vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int
     {
         if (src + 3 > end)
             THROW(ERR_MOV_PARSE, "Invalid VVC extra data format");
-        int type = *src++;
+        src++;  // type
         int cnt = AV_RB16(src);
         src += 2;
 

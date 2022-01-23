@@ -13,7 +13,7 @@ using namespace std;
 
 using namespace text_subtitles;
 
-SRTStreamReader::SRTStreamReader() : m_lastBlock(false), m_long_N(0), m_long_R(0), m_short_N(0), m_short_R(0)
+SRTStreamReader::SRTStreamReader() : m_lastBlock(false), m_short_R(0), m_short_N(0), m_long_R(0), m_long_N(0)
 {
     // in future version here must be case for destination subtitle format (DVB sub, DVD sub e.t.c)
     m_dstSubCodec = new PGSStreamReader();
@@ -125,13 +125,13 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
     for (; cur < end; cur += m_charSize)
     {
         // if (cur[m_splitterOfs] == '\n')
-        if (m_charSize == 1 && *cur == '\n' || m_charSize == 2 && *((uint16_t*)cur) == m_short_N ||
-            m_charSize == 4 && *((uint32_t*)cur) == m_long_N)
+        if ((m_charSize == 1 && *cur == '\n') || (m_charSize == 2 && *((uint16_t*)cur) == m_short_N) ||
+            (m_charSize == 4 && *((uint32_t*)cur) == m_long_N))
         {
             int32_t x = 0;
             if (cur >= m_charSize + lastProcessedLine)
-                if (m_charSize == 1 && cur[-1] == '\r' || m_charSize == 2 && ((uint16_t*)cur)[-1] == m_short_R ||
-                    m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R)
+                if ((m_charSize == 1 && cur[-1] == '\r') || (m_charSize == 2 && ((uint16_t*)cur)[-1] == m_short_R) ||
+                    (m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R))
                     x = m_charSize;
 
             m_sourceText.emplace(UtfConverter::toUtf8(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
@@ -278,8 +278,8 @@ CheckStreamRez SRTStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
                                             int containerDataType, int containerStreamIndex)
 {
     CheckStreamRez rez;
-    if ((containerType == ContainerType::ctMKV || containerType == ContainerType::ctMOV) &&
-            containerDataType == TRACKTYPE_SRT ||
+    if (((containerType == ContainerType::ctMKV || containerType == ContainerType::ctMOV) &&
+         containerDataType == TRACKTYPE_SRT) ||
         containerType == ContainerType::ctSRT)
     {
         rez.codecInfo = srtCodecInfo;
