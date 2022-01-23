@@ -50,7 +50,7 @@ struct VvcUnit
     };
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
-    virtual int deserialize();
+    int deserialize();
     int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const;
 
     int nalBufferLen() const { return m_nalBufferLen; }
@@ -95,7 +95,7 @@ struct VvcUnitWithProfile : public VvcUnit
 struct VvcVpsUnit : public VvcUnitWithProfile
 {
     VvcVpsUnit();
-    int deserialize() override;
+    int deserialize();
     double getFPS() const;
     void setFPS(double value);
     std::string getDescription() const;
@@ -113,7 +113,7 @@ struct VvcVpsUnit : public VvcUnitWithProfile
 struct VvcSpsUnit : public VvcUnitWithProfile
 {
     VvcSpsUnit();
-    int deserialize() override;
+    int deserialize();
     double getFPS() const;
     std::string getDescription() const;
 
@@ -152,7 +152,7 @@ struct VvcSpsUnit : public VvcUnitWithProfile
 struct VvcPpsUnit : public VvcUnit
 {
     VvcPpsUnit();
-    int deserialize() override;
+    int deserialize();
 
    public:
     int pps_id;

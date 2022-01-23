@@ -242,7 +242,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedH264TrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_demuxer(demuxer), m_sc(sc), nal_length_size(4)
+        : ParsedTrackPrivData(), m_sc(sc), m_demuxer(demuxer), nal_length_size(4)
     {
     }
     void setPrivData(uint8_t* buff, int size) override

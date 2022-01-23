@@ -49,7 +49,7 @@ struct HevcUnit
     };
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
-    virtual int deserialize();
+    int deserialize();
     int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const;
 
     int nalBufferLen() const { return m_nalBufferLen; }
@@ -87,7 +87,7 @@ struct HevcUnitWithProfile : public HevcUnit
 struct HevcVpsUnit : public HevcUnitWithProfile
 {
     HevcVpsUnit();
-    int deserialize() override;
+    int deserialize();
     double getFPS() const;
     void setFPS(double value);
     std::string getDescription() const;
@@ -102,7 +102,7 @@ struct HevcVpsUnit : public HevcUnitWithProfile
 struct HevcSpsUnit : public HevcUnitWithProfile
 {
     HevcSpsUnit();
-    int deserialize() override;
+    int deserialize();
     double getFPS() const;
     std::string getDescription() const;
 
@@ -145,7 +145,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
 struct HevcPpsUnit : public HevcUnit
 {
     HevcPpsUnit();
-    int deserialize() override;
+    int deserialize();
 
    public:
     unsigned pps_id;
@@ -158,7 +158,7 @@ struct HevcPpsUnit : public HevcUnit
 struct HevcHdrUnit : public HevcUnit
 {
     HevcHdrUnit();
-    int deserialize() override;
+    int deserialize();
 
    public:
     bool isHDR10;

@@ -81,9 +81,9 @@ class NALUnit
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
                    bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
-    virtual int deserialize(uint8_t* buffer, uint8_t* end);
+    int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
-    virtual int serialize(uint8_t* dstBuffer);
+    int serialize(uint8_t* dstBuffer);
     // void setBuffer(uint8_t* buffer, uint8_t* end);
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     static uint8_t* addStartCode(uint8_t* buffer, uint8_t* boundStart);
@@ -119,8 +119,8 @@ class NALDelimiter : public NALUnit
     const static int PCT_I_SI_P_SP_B_FRAMES = 7;
     int primary_pic_type;
     NALDelimiter() : NALUnit(), primary_pic_type(0) {}
-    int deserialize(uint8_t* buffer, uint8_t* end) override;
-    int serialize(uint8_t* dstBuffer) override;
+    int deserialize(uint8_t* buffer, uint8_t* end);
+    int serialize(uint8_t* dstBuffer);
 };
 
 class PPSUnit : public NALUnit
