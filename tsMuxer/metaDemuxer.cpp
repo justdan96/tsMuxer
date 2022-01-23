@@ -197,7 +197,7 @@ void METADemuxer::openFile(const string& streamName)
         {
             // params[i] = strToLowerCase ( params[i] );
             vector<string> tmp = splitStr(params[i].c_str(), '=');
-            addParams.insert(std::make_pair(trimStr(tmp[0]), trimStr(tmp.size() > 1 ? tmp[1] : "")));
+            addParams[trimStr(tmp[0])] = trimStr(tmp.size() > 1 ? tmp[1] : "");
         }
         string codec = trimStr(params[0]);
         string codecStreamName = trimStr(params[1]);
@@ -1173,9 +1173,8 @@ const std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileNam
             MPLSParser parser;
             if (!parser.parse(unquoteStr(i).c_str()))
                 THROW(ERR_COMMON, "Can't parse play list file " << i);
-            pair<MPLSCache::iterator, bool> insRez = m_mplsStreamMap.insert(make_pair(i, parser));
-            m_mplsStreamMap.insert(make_pair(i, insRez.first->second));
-            result.push_back(insRez.first->second);
+            m_mplsStreamMap[i] = parser;
+            result.push_back(parser);
         }
     }
     return result;
@@ -1489,10 +1488,10 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
 
     if (codecInfo &&
         (codecInfo->codecID == CODEC_S_PGS || codecInfo->codecID == CODEC_S_SUP || codecInfo->codecID == CODEC_S_SRT))
-        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, DemuxerReadPolicy::drpFragmented));
+        m_demuxers[streamName].m_pids[pid] = DemuxerReadPolicy::drpFragmented;
     else
     {
-        m_demuxers[streamName].m_pids.insert(std::make_pair(pid, DemuxerReadPolicy::drpReadSequence));
+        m_demuxers[streamName].m_pids[pid] = DemuxerReadPolicy::drpReadSequence;
         m_demuxers[streamName].m_allFragmented = false;
     }
     m_demuxers[streamName].m_pidSet.insert(pid);

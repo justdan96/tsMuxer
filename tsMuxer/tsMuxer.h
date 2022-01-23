@@ -141,7 +141,7 @@ class TSMuxer : public AbstractMuxer
     int64_t m_lastPESDTS;
     int64_t m_fullPesDTS;
     int64_t m_fullPesPTS;
-    std::vector<std::pair<uint8_t*, int>>
+    std::map<uint8_t*, int>
         m_m2tsDelayBlocks;  // postpone M2TS PCR processing (fill previous data on next PCR after several PES packets)
     int m_prevM2TSPCROffset;
     int64_t m_prevM2TSPCR;

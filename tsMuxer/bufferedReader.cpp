@@ -90,7 +90,7 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
         newReaderID = createNewReaderID();
-        m_readers.insert(make_pair(newReaderID, data));
+        m_readers[newReaderID] = data;
         rSize = m_readers.size();
         if (!m_started)
         {
@@ -99,7 +99,7 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
         }
     }
     LTRACE(LT_INFO, 0,
-           "Reader #" << m_id << ". Start new stream " << newReaderID << ". stream(s): " << (uint32_t)rSize);
+           "Reader #" << m_id << ". Start new stream " << newReaderID << ". stream(s): " << rSize);
 
     return newReaderID;
 }

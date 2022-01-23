@@ -135,8 +135,8 @@ CombinedH264Demuxer::~CombinedH264Demuxer() { m_bufferedReader->deleteReader(m_r
 
 void CombinedH264Demuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 {
-    trackList.insert(std::make_pair(MVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264_DEP, "", 0)));
-    trackList.insert(std::make_pair(AVC_STREAM_INDEX, TrackInfo(CODEC_V_MPEG4_H264, "", 0)));
+    trackList[MVC_STREAM_INDEX] = TrackInfo(CODEC_V_MPEG4_H264_DEP, "", 0);
+    trackList[AVC_STREAM_INDEX] = TrackInfo(CODEC_V_MPEG4_H264, "", 0);
 }
 
 int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)

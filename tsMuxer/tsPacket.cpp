@@ -149,7 +149,7 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, int buf_size)
             bitReader.skipBits(3);  // reserved
             int program_pid = bitReader.getBits(13);
             if (program_number != 0)  // not a network pid
-                pmtPids.insert(std::make_pair(program_pid, program_number));
+                pmtPids[program_pid] = program_number;
             else
                 m_nitPID = program_pid;
         }
@@ -338,7 +338,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
                 return false;
             }
             extractDescriptors(curPos, es_info_len, pmtStreamInfo);
-            pidList.insert(std::make_pair(elementary_pid, pmtStreamInfo));
+            pidList[elementary_pid] = pmtStreamInfo;
             curPos += es_info_len;
         }
         if (curPos != crcPos)
@@ -639,7 +639,7 @@ void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLP
             int pid = reader.getBits(16);
             CLPIStreamInfo streamInfo;
             streamInfo.parseStreamCodingInfo(reader);
-            streamInfoMap.insert(std::make_pair(pid, streamInfo));
+            streamInfoMap[pid] = streamInfo;
         }
     }
 }

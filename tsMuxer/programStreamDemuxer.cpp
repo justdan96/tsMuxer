@@ -178,9 +178,9 @@ void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList
     for (int i = 0x20; i < 0xff; i++)
     {
         if (i >= 0xa0 && i <= 0xaf)
-            trackList.insert(std::make_pair(i, TrackInfo((int)StreamType::AUDIO_LPCM, "", 0)));  // set track hint
+            trackList[i] = TrackInfo((int)StreamType::AUDIO_LPCM, "", 0);  // set track hint
         else
-            trackList.insert(std::make_pair(i, TrackInfo(0, "", 0)));  // autodetect
+            trackList[i] = TrackInfo(0, "", 0);  // autodetect
     }
     return;
 }
