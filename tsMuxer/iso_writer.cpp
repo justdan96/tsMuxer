@@ -317,9 +317,9 @@ FileEntryInfo::FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint32_t o
       m_sectorNum(0),
       m_sectorsUsed(0),
       m_objectId(objectId),
+      m_fileType(fileType),
       m_fileSize(0),
       m_sectorBufferSize(0),
-      m_fileType(fileType),
       m_subMode(false)
 {
     if (isFile())
@@ -390,11 +390,6 @@ int FileEntryInfo::allocateEntity(int sectorNum)
 
 void FileEntryInfo::serializeFile()
 {
-    uint8_t dataSize = 0;
-    uint8_t buffer[SECTOR_SIZE];
-
-    memset(buffer, 0, sizeof(buffer));
-
     int writed = m_owner->writeExtentFileDescriptor(m_name == "*UDF Unique ID Mapping Data", m_objectId, m_fileType,
                                                     m_fileSize, m_sectorNum, 1, &m_extents);
     assert(writed == m_sectorsUsed);
@@ -402,7 +397,6 @@ void FileEntryInfo::serializeFile()
 
 void FileEntryInfo::serializeDir()
 {
-    uint8_t dataSize = 0;
     uint8_t buffer[SECTOR_SIZE];
 
     memset(buffer, 0, sizeof(buffer));
@@ -850,7 +844,6 @@ void IsoWriter::close()
     while (m_file.size() % ALLOC_BLOCK_SIZE != 62 * 1024) m_file.write(m_buffer, SECTOR_SIZE);
 
     // mirror metadata file location and length
-    int64_t sz = m_file.size();
     m_metadataMirrorLBN = (int)(m_file.size() / SECTOR_SIZE + 1);
     m_tagLocationBaseAddr = m_partitionStartAddress;
     writeExtentFileDescriptor(0, 0, FileTypes::MetadataMirror, m_metadataFileLen,
@@ -1204,7 +1197,6 @@ void IsoWriter::writeImpUseDescriptor()
     writeDescriptorTag(m_buffer, DescriptorTag::ImplUseVol, absoluteSectorNum());
 
     uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
     buff32[4] = 0x02;  // Descriptor Sequence Number
 
     std::string impId = std::string("*UDF LV Info");
@@ -1315,7 +1307,6 @@ void IsoWriter::writeUnallocatedSpaceDescriptor()
     writeDescriptorTag(m_buffer, DescriptorTag::UnallocSpace, absoluteSectorNum());
 
     uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
 
     buff32[4] = 0x05;  // sequence number
 
@@ -1327,9 +1318,6 @@ void IsoWriter::writeTerminationDescriptor()
 {
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::Terminating, absoluteSectorNum());
-
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
 
     calcDescriptorCRC(m_buffer, 512);
     m_file.write(m_buffer, SECTOR_SIZE);

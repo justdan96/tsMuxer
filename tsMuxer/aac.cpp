@@ -52,13 +52,11 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
         bits.skipBit(); /* home */
 
         /* adts_variable_header */
-        bits.skipBit(); /* copyright_identification_bit */
-        bits.skipBit(); /* copyright_identification_start */
-        // -- 32 bit getted
+        bits.skipBit();                   /* copyright_identification_bit */
+        bits.skipBit();                   /* copyright_identification_start */
         int frameSize = bits.getBits(13); /* aac_frame_length */
-        // LTRACE(LT_DEBUG, 0, "decodec frame size: " << m_size);
-        int adts_buffer_fullness = bits.getBits(11); /* adts_buffer_fullness */
-        m_rdb = bits.getBits(2);                     /* number_of_raw_data_blocks_in_frame */
+        bits.skipBits(11);                /* adts_buffer_fullness */
+        m_rdb = bits.getBits(2);          /* number_of_raw_data_blocks_in_frame */
 
         m_channels = aac_channels[m_channels_index];
         m_sample_rate = aac_sample_rates[m_sample_rates_index];

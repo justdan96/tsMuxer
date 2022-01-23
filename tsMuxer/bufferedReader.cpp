@@ -61,7 +61,6 @@ BufferedReader::~BufferedReader()
     join();
     for (std::map<uint32_t, ReaderData*>::iterator itr = m_readers.begin(); itr != m_readers.end(); ++itr)
     {
-        int i = 0;
         ReaderData* pData = itr->second;
         delete pData;
     }

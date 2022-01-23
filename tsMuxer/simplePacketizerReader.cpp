@@ -111,7 +111,6 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         assert(m_curPos <= m_bufEnd);
         if (m_curPos == m_bufEnd)
             return NEED_MORE_DATA;
-        uint8_t* prevPos = m_curPos;
         int skipBytes = 0;
         int skipBeforeBytes = 0;
         if (m_needSync)
@@ -274,7 +273,7 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
     for (int i = 0; i < CHECK_FRAMES_COUNT && frame < end;)
     {
         int frameLen = decodeFrame(frame, end, skipBytes, skipBeforeBytes);
-        if (frameLen <= 0 || getFreq() != freq || firstStep && frameLen > end - frame)
+        if (frameLen <= 0 || getFreq() != freq || (firstStep && frameLen > end - frame))
         {
             setTestMode(false);
             return rez;

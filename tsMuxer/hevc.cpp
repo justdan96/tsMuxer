@@ -469,7 +469,7 @@ int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
         {
             if (extractUEGolombCode() >= 0x8000)  // delta_poc_minus1[i]
                 return 1;
-            m_reader.skipBit();     // used_by_curr_pic_flag[i]
+            m_reader.skipBit();  // used_by_curr_pic_flag[i]
         }
     }
     num_delta_pocs[stRpsIdx] = numDeltaPocs;
@@ -809,7 +809,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
         {
             if (pps->dependent_slice_segments_enabled_flag)
                 dependent_slice_segment_flag = m_reader.getBit();
-            int slice_segment_address = m_reader.getBits(sps->PicSizeInCtbsY_bits);
+            m_reader.skipBits(sps->PicSizeInCtbsY_bits);  // slice_segment_address
         }
         if (!dependent_slice_segment_flag)
         {
@@ -862,7 +862,7 @@ vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, in
     {
         if (src + 3 > end)
             THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format");
-        int type = *src++;
+        src++;  // type
         int cnt = AV_RB16(src);
         src += 2;
 

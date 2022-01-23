@@ -62,7 +62,6 @@ class BufferedFileWriter : public TerminatableThread
     bool m_nothingToExecute;
     int m_lastErrorCode;
     std::string m_lastErrorStr;
-    bool m_started;
     bool m_terminated;
 
     WaitableSafeQueue<WriterData> m_writeQueue;

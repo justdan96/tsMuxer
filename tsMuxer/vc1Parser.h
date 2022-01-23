@@ -68,7 +68,6 @@ class VC1Unit
     inline static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
     inline static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
     {
-        uint8_t* bufStart = buffer;
         for (buffer += 2; buffer < end;)
         {
             if (*buffer > 1)

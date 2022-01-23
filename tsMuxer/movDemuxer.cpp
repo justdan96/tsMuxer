@@ -164,7 +164,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedAudioTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_demuxer(demuxer), m_sc(sc), m_buff(), m_size(0)
+        : ParsedTrackPrivData(), m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc), m_aacRaw()
     {
         isAAC = false;
     }
@@ -207,7 +207,6 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
     }
     int newBufferSize(uint8_t* buff, int size) override
     {
-        int frameCnt = 0;
         int left = size;
         int i = 0;
         for (; left > 4; ++i)
@@ -390,7 +389,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedSRTTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_demuxer(demuxer), m_sc(sc), m_buff(), m_size(0), sttsCnt(0)
+        : ParsedTrackPrivData(), m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc), sttsCnt(0)
     {
         m_packetCnt = 0;
         sttsPos = 0;
@@ -562,7 +561,7 @@ const MovDemuxer::MOVParseTableEntry MovDemuxer::mov_default_parse_table[] = {
     {0, 0}};
 
 MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager)
-    : IOContextDemuxer(readManager), fragment(), m_fileSize(0), m_mdat_size(0)
+    : IOContextDemuxer(readManager), m_mdat_size(0), m_fileSize(0), fragment()
 {
     found_moov = 0;
     found_moof = false;
@@ -599,7 +598,6 @@ void MovDemuxer::openFile(const std::string& streamName)
 
     readClose();
 
-    BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
 
@@ -659,7 +657,6 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
 {
     for (std::set<uint32_t>::const_iterator itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr)
         demuxedData[*itr];
-    uint32_t demuxedSize = 0;
     discardSize = m_firstHeaderSize;
     m_firstHeaderSize = 0;
     if (m_firstDemux)
@@ -757,7 +754,6 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 else
                 {
                     vect.grow(chunkSize);
-                    uint8_t* dst = vect.data() + oldSize;
                     int readed = get_buffer(vect.data() + oldSize, chunkSize);
                     if (readed < chunkSize)
                     {
@@ -1372,7 +1368,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
                     st->channels = get_be32();
                     get_be32();                              // always 0x7F000000
                     st->bits_per_coded_sample = get_be32();  // bits per channel if sound is uncompressed
-                    int flags = get_be32();                  // lcpm format specific flag
+                    get_be32();                              // lcpm format specific flag
                     st->bytes_per_frame = get_be32();        // bytes per audio packet if constant
                     st->samples_per_frame = get_be32();      // lpcm frames per audio packet if constant
                     // if (format == MKTAG('l','p','c','m'))
@@ -1487,18 +1483,15 @@ int MovDemuxer::mov_read_glbl(MOVAtom atom)
 
 int MovDemuxer::mov_read_hdlr(MOVAtom atom)
 {
-    MOVStreamContext* st = (MOVStreamContext*)tracks[num_tracks - 1];
-
     get_byte();  // version
     get_be24();  // flags
 
     // component type
     int ctype = get_le32();
-    int type = get_le32();  // component subtype
-
     if (!ctype)
         isom = 1;
 
+    get_le32();  // component subtype
     get_be32();  // component  manufacture
     get_be32();  // component flags
     get_be32();  // component flags mask
@@ -1544,7 +1537,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
     len = mp4_read_descr(&tag);
     if (tag == MP4DecConfigDescrTag)
     {
-        int object_type_id = get_byte();
+        get_byte();  // object_type_id
         get_byte();  // stream type
         get_be24();  // buffer size db
         get_be32();  // max bitrate
@@ -1612,7 +1605,6 @@ int MovDemuxer::mov_read_smi(MOVAtom atom) { return 0; }
 
 int MovDemuxer::mov_read_wave(MOVAtom atom)
 {
-    MOVStreamContext* st = (MOVStreamContext*)tracks[num_tracks - 1];
     if ((uint64_t)atom.size > (1 << 30))
         return -1;
     /*
@@ -1645,9 +1637,9 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
 
     for (int i = 0; i < edit_count; i++)
     {
-        uint32_t duration = get_be32();  // Track duration
-        int time = get_be32();           // Media time
-        int rate = get_be32();           // Media rate
+        get_be32();             // Track duration
+        int time = get_be32();  // Media time
+        get_be32();             // Media rate
         if (i == 0 && time != -1)
         {
             st->time_offset = time;

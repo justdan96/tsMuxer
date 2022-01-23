@@ -10,7 +10,7 @@ int MpegAudioStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bo
         return 0;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
-    int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
+    decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
     return 0;
 }
 

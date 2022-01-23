@@ -68,7 +68,6 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
     BitStreamReader bitReader{};
     uint8_t* nextNal = 0;
     bool spsFound = false;
-    bool iFrameFound = false;
     bool gopFound = false;
     bool sliceFound = false;
     bool seqExtFound = false;

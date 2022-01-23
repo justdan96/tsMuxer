@@ -347,7 +347,7 @@ void MuxerManager::parseMuxOpt(const string& opts)
             string postfix;
             for (auto i : paramPair[1])
             {
-                if (!(i >= '0' && i <= '9' || i == '.'))
+                if (!((i >= '0' && i <= '9') || i == '.'))
                     postfix += i;
             }
 

@@ -9,8 +9,6 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-static const double FRAME_RATE_EPS = 3e-5;
-
 uint8_t BDROM_METADATA_GUID[] = "\x17\xee\x8c\x60\xf8\x4d\x11\xd9\x8c\xd6\x08\x00\x20\x0c\x9a\x66";
 
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)
@@ -554,7 +552,7 @@ int SPSUnit::deserialize()
         }
 
         num_ref_frames = extractUEGolombCode();
-        int gaps_in_frame_num_value_allowed_flag = bitReader.getBit();
+        bitReader.skipBit();  // gaps_in_frame_num_value_allowed_flag
         pic_width_in_mbs = extractUEGolombCode() + 1;
         pic_height_in_map_units = extractUEGolombCode() + 1;
         frame_mbs_only_flag = bitReader.getBit();
@@ -672,7 +670,7 @@ int SPSUnit::deserializeVuiParameters()
     pic_struct_present_flag = bitReader.getBit();
     if (bitReader.getBit())  // bitstream_restriction_flag
     {
-        int motion_vectors_over_pic_boundaries_flag = bitReader.getBit();
+        bitReader.skipBit();             // motion_vectors_over_pic_boundaries_flag
         if (extractUEGolombCode() > 16)  // max_bytes_per_pic_denom
             return 1;
         if (extractUEGolombCode() > 16)  // max_bits_per_mb_denom
@@ -1188,19 +1186,19 @@ int SPSUnit::mvc_vui_parameters_extension()
 
 SliceUnit::SliceUnit()
     : NALUnit(),
-      anchor_pic_flag(0),
-      bottom_field_flag(0),
-      first_mb_in_slice(0),
-      frame_num(0),
       m_field_pic_flag(0),
-      memory_management_control_operation(0),
       non_idr_flag(0),
+      memory_management_control_operation(0),
+      first_mb_in_slice(0),
+      slice_type(0),
       orig_slice_type(0),
-      pic_order_cnt_lsb(0),
       pic_parameter_set_id(0),
+      frame_num(0),
+      bottom_field_flag(0),
+      pic_order_cnt_lsb(0),
+      anchor_pic_flag(0),
       pps(),
-      sps(),
-      slice_type(0)
+      sps()
 {
 }
 
@@ -1220,7 +1218,7 @@ void SliceUnit::nal_unit_header_mvc_extension()
 
 bool SliceUnit::isIDR() const
 {
-    return nal_unit_type == NALType::nuSliceIDR || nal_unit_type == NALType::nuSliceExt && !non_idr_flag;
+    return nal_unit_type == NALType::nuSliceIDR || (nal_unit_type == NALType::nuSliceExt && !non_idr_flag);
 }
 
 bool SliceUnit::isIFrame() const
@@ -1634,7 +1632,6 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
         writer.putBits(8, SEI_MSG_PIC_TIMING);
     }
     writer.putBits(8, 0);
-    int beforeMessageLen = writer.getBitsCount();
     // pic timing
     if (sps.nalHrdParams.isPresent || sps.vclHrdParams.isPresent)
     {
@@ -1664,7 +1661,6 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         writer.putBits(8, SEI_MSG_BUFFERING_PERIOD);
     }
     writer.putBits(8, 0);
-    int beforeMessageLen = writer.getBitsCount();
     // buffering period
     writeUEGolombCode(writer, sps.seq_parameter_set_id);
     if (sps.nalHrdParams.isPresent)

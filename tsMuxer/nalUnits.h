@@ -20,19 +20,6 @@ const static int SEI_MSG_BUFFERING_PERIOD = 0;
 const static int SEI_MSG_PIC_TIMING = 1;
 const static int SEI_MSG_MVC_SCALABLE_NESTING = 37;
 
-#if 0
-const static char* NALUnitDescr[30] =
-                   {"nuUnspecified", "nuSliceNonIDR", "nuSliceA", "nuSliceB", "nuSliceC", 
-                    "nuSliceIDR","nuSEI","nuSPS","nuPPS","nuAUD", 
-					"nuEOSeq","nuEOStream","nuFillerData","nuSPSExt","nuReserved1", 
-					"nuReserved2","nuReserved3","nuReserved4","nuReserved5","nuSliceWithoutPartitioning", 
-					"nuReserved6","nuReserved7","nuReserved8"," nuReserved9",
-					// ------------------- additional RTP nal units -------------
-					"STAP-A","STAP-B","MTAP16","MTAP24","FU-A","FU-B"
-                   };
-
-#endif
-
 class NALUnit
 {
    public:

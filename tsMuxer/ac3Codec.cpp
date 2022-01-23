@@ -314,7 +314,6 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
 
                 if (trueHDData[0] != 0x0B || trueHDData[1] != 0x77 || !testDecodeTestFrame(trueHDData, end))
                 {
-                    uint8_t* tmpNextFrame = findFrame(buf + 7, end);
                     m_waitMoreData = true;
                     m_state = AC3State::stateDecodeTrueHDFirst;
                 }
@@ -388,7 +387,7 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
     }
     else
     {
-        int test_crc1 = gbc.getBits(16);
+        gbc.skipBits(16);  // test_crc1
         int test_fscod = gbc.getBits(2);
         if (test_fscod == 3)
             return AC3ParseError::SAMPLE_RATE;
@@ -407,13 +406,10 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
             return AC3ParseError::SYNC;
 
         if ((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO)
-        {
-            int test_cmixlev = gbc.getBits(2);
-        }
+            gbc.skipBits(2);  // test_cmixlev
+
         if (m_acmod & 4)
-        {
-            int test_surmixlev = gbc.getBits(2);
-        }
+            gbc.skipBits(2);  // test_surmixlev
 
         if (m_acmod == AC3_ACMOD_STEREO)
         {
@@ -432,7 +428,7 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t* buf, uint8_t* end)
         int test_channels = ff_ac3_channels[test_acmod] + test_lfeon;
         int test_frame_size = ff_ac3_frame_sizes[test_frmsizecod][test_fscod] * 2;
         if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
-            test_channels != m_channels /*|| test_frame_size != m_frame_size*/)
+            test_channels != m_channels || test_frame_size != m_frame_size)
             return AC3ParseError::SYNC;
     }
     return AC3ParseError::NO_ERROR;

@@ -106,7 +106,6 @@ int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
 
 void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch)
 {
-    // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     int fullSampleSize = mch * ch1SampleSize;
     uint8_t* curPos = start + ch1SampleSize * (chNum - 1);
@@ -119,7 +118,6 @@ void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, int chNum,
 
 void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch)
 {
-    // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     int fullSampleSize = mch * ch1SampleSize;
     uint8_t* curPos = start + ch1SampleSize * (chNum - 1);
@@ -745,7 +743,6 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     assert(m_curPos <= m_bufEnd);
     if (m_curPos == m_bufEnd)
         return NEED_MORE_DATA;
-    uint8_t* prevPos = m_curPos;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
     if (m_needSync)

@@ -30,12 +30,13 @@ static const int PG_BUFFER_SIZE = 1024 * 1024 * 2;
 
 ///////////////////////////////////////////
 TextToPGSConverter::TextToPGSConverter(bool sourceIsText)
-    : /*TextSubtitlesRenderWin32(), */ m_composition_number(0),
-      m_imageBuffer(),
+    : /* TextSubtitlesRenderWin32(), */
       m_rleLen(0),
-      m_videoFps(0),
+      m_composition_number(0),
+      m_videoWidth(0),
       m_videoHeight(0),
-      m_videoWidth(0)
+      m_videoFps(0),
+      m_imageBuffer()
 {
     m_bottomOffset = 0;
     m_renderedData = 0;
@@ -226,11 +227,6 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
             while (srcData < srcLineEnd)
             {
                 int repCnt = getRepeatCnt(srcData, srcLineEnd, colorMask);
-
-                if (y > 435 && srcLineEnd - srcData == 412)
-                {
-                    int gg = 4;
-                }
 
                 if (repCnt == m_videoWidth)
                 {
@@ -567,7 +563,6 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, int64_t pts, int
     std::vector<uint8_t*> seqPos;
 
     const uint8_t* srcData = m_renderedData;
-    bool first = true;
     int srcProcessed = 0;
     int blocks = 0;
     uint8_t* curPos = buff;

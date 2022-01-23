@@ -189,7 +189,7 @@ int MatroskaDemuxer::matroska_parse_index()
 }
 
 MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
-    : IOContextDemuxer(readManager), created(0), fileDuration(0), levels(), title()
+    : IOContextDemuxer(readManager), levels(), title(), created(0), fileDuration(0)
 {
     m_lastDeliveryPacket = 0;
     num_levels = 0;
@@ -1010,7 +1010,6 @@ int MatroskaDemuxer::ebml_read_element_level_up()
 void MatroskaDemuxer::openFile(const std::string &streamName)
 {
     readClose();
-    BufferedFileReader *fileReader = dynamic_cast<BufferedFileReader *>(m_bufferedReader);
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
     m_curPos = m_bufEnd = 0;
@@ -1318,10 +1317,6 @@ int MatroskaDemuxer::matroska_read_header()
 
         for (i = 0; i < num_tracks; i++)
         {
-            int codec_id = -1;  // Enum CodecID codec_id = CODEC_ID_NONE;
-            uint8_t *extradata = NULL;
-            int extradata_size = 0;
-            int extradata_offset = 0;
             track = tracks[i];
             track->stream_index = -1;
             if (track->codec_id == NULL)
@@ -1331,22 +1326,18 @@ int MatroskaDemuxer::matroska_read_header()
 
             if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AVC_FOURCC) && (track->codec_priv != NULL))
             {
-                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedH264TrackData(track->codec_priv, track->codec_priv_size);
             }
             else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_HEVC_FOURCC) && (track->codec_priv != NULL))
             {
-                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedH265TrackData(track->codec_priv, track->codec_priv_size);
             }
             else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VVC_FOURCC) && (track->codec_priv != NULL))
             {
-                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedH266TrackData(track->codec_priv, track->codec_priv_size);
             }
             else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC) && (track->codec_priv != NULL))
             {
-                MatroskaVideoTrack *vtrack = (MatroskaVideoTrack *)track;
                 track->parsed_priv_data = new ParsedVC1TrackData(track->codec_priv, track->codec_priv_size);
             }
             else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_AC3))

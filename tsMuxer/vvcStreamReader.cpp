@@ -21,11 +21,10 @@ VVCStreamReader::VVCStreamReader()
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
+      m_picOrderBase(0),
       m_frameDepth(1),
-
       m_picOrderMsb(0),
       m_prevPicOrder(0),
-      m_picOrderBase(0),
       m_lastIFrame(false),
       m_firstFileFrame(false),
       m_vpsCounter(0),
@@ -300,7 +299,6 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
     uint8_t* nextNalWithStartCode;
-    long oldSpsLen = 0;
 
     if (!m_eof && nextNal == m_bufEnd)
         return NOT_ENOUGH_BUFFER;

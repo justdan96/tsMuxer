@@ -2,16 +2,16 @@
 
 #include <sstream>
 
-static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
-static const int DCA_EXT_XXCH = 0x002;       ///< XXCh channels extension in core substream
-static const int DCA_EXT_X96 = 0x004;        ///< 96/24 extension in core substream
-static const int DCA_EXT_XCH = 0x008;        ///< XCh channel extension in core substream
-static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
-static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
-static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
-static const int DCA_EXT_EXSS_X96 = 0x080;   ///< 96/24 extension in ExSS
-static const int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
-static const int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
+// static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
+static const int DCA_EXT_XXCH = 0x002;  ///< XXCh channels extension in core substream
+static const int DCA_EXT_X96 = 0x004;   ///< 96/24 extension in core substream
+static const int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core substream
+// static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
+// static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
+// static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
+// static const int DCA_EXT_EXSS_X96 = 0x080;   ///< 96/24 extension in ExSS
+// static const int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
+// static const int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
 
 static const int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
                                                -1,          -1, DCA_EXT_XXCH, -1};
@@ -51,10 +51,9 @@ static const int AOUT_CHAN_REARRIGHT = 0x40;
 static const int AOUT_CHAN_MIDDLELEFT = 0x100;
 static const int AOUT_CHAN_MIDDLERIGHT = 0x200;
 static const int AOUT_CHAN_LFE = 0x1000;
-
-static const int AOUT_CHAN_DOLBYSTEREO = 0x10000;
+// static const int AOUT_CHAN_DOLBYSTEREO = 0x10000;
 static const int AOUT_CHAN_DUALMONO = 0x20000;
-static const int AOUT_CHAN_REVERSESTEREO = 0x40000;
+// static const int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;
 
@@ -170,17 +169,16 @@ void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, uint8_t* end)
 
         BitStreamReader reader{};
         reader.setBuffer(buff + 5, end);  // skip 4 byte magic and 1 unknown byte
-        int headerSize;
         int hdFrameSize;
-        int nuSubStreamIndex = reader.getBits(2);
+        reader.skipBits(2);  // nuSubStreamIndex
         if (reader.getBit())
         {
-            headerSize = reader.getBits(12) + 1;
+            reader.skipBits(12);  // headerSize
             hdFrameSize = reader.getBits(20) + 1;
         }
         else
         {
-            headerSize = reader.getBits(8) + 1;
+            reader.skipBits(8);  // headerSize
             hdFrameSize = reader.getBits(16) + 1;
         }
         buff += hdFrameSize;
@@ -332,7 +330,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         bool bStaticFieldsPresent = reader.getBit();
         if (bStaticFieldsPresent)
         {
-            int nuRefClockCode = reader.getBits(2);
+            reader.skipBits(2);  // nuRefClockCode
             int nuExSSFrameDurationCode = reader.getBits(3) + 1;
             if (pi_frame_length == 0)
                 pi_frame_length = nuExSSFrameDurationCode << 9;
@@ -355,7 +353,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
             }
             if (reader.getBit())
             {
-                int nuMixMetadataAdjLevel = reader.getBits(2);
+                reader.skipBits(2);  // nuMixMetadataAdjLevel
                 int nuBits4MixOutMask = reader.getBits(2) * 4 + 4;
                 int nuNumMixOutConfigs = reader.getBits(2) + 1;
                 for (int i = 0; i < nuNumMixOutConfigs; i++) reader.skipBits(nuBits4MixOutMask);

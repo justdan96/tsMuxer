@@ -15,7 +15,7 @@ static const int MAX_TMP_BUFFER_SIZE = 128;
 
 // ------------------------ CombinedH264Reader -------------------------------
 
-CombinedH264Reader::CombinedH264Reader() : m_demuxedPID(0), m_state(ReadState::Primary)
+CombinedH264Reader::CombinedH264Reader() : m_state(ReadState::Primary), m_demuxedPID(0)
 {
     m_firstDemuxCall = true;
     m_mvcSPS = -1;
@@ -120,7 +120,7 @@ void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, int pid)
 // --------------------------------------------- CombinedH264Demuxer ---------------------------
 
 CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
-    : CombinedH264Reader(), AbstractDemuxer(), m_readManager(readManager)
+    : AbstractDemuxer(), CombinedH264Reader(), m_readManager(readManager)
 {
     m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
     m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
@@ -233,8 +233,6 @@ void CombinedH264Demuxer::openFile(const std::string& streamName)
 {
     readClose();
 
-    BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
-
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
 
@@ -256,7 +254,7 @@ void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
 
 // ------------------------------ CombinedH264Filter -----------------------------------
 
-CombinedH264Filter::CombinedH264Filter(int demuxedPID) : CombinedH264Reader(), SubTrackFilter(demuxedPID) {}
+CombinedH264Filter::CombinedH264Filter(int demuxedPID) : SubTrackFilter(demuxedPID), CombinedH264Reader() {}
 
 int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket)
 {

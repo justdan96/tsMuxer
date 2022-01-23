@@ -22,11 +22,11 @@ HEVCStreamReader::HEVCStreamReader()
       m_firstFrame(true),
       m_frameNum(0),
       m_fullPicOrder(0),
+      m_picOrderBase(0),
       m_frameDepth(1),
 
       m_picOrderMsb(0),
       m_prevPicOrder(0),
-      m_picOrderBase(0),
       m_lastIFrame(false),
       m_firstFileFrame(false),
       m_vpsCounter(0),
@@ -61,7 +61,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             if (!m_vps)
                 m_vps = new HevcVpsUnit();
             m_vps->decodeBuffer(nal, nextNal);
-            if (m_vps->deserialize())
+            if (m_vps->deserialize() != 0)
             {
                 delete m_vps;
                 return rez;
@@ -186,7 +186,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
             if (nalType == HevcUnit::NalType::SPS)
             {
                 int toDecode = FFMIN(sizeof(tmpBuffer) - 8, (unsigned)(nextNal - nal));
-                int decodedLen = NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
+                NALUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
                 break;
             }
         }
@@ -490,7 +490,6 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
     uint8_t* nextNalWithStartCode;
-    long oldSpsLen = 0;
 
     if (!m_eof && nextNal == m_bufEnd)
         return NOT_ENOUGH_BUFFER;

@@ -9,10 +9,6 @@
 
 using namespace std;
 
-const static uint64_t TS_FREQ_TO_INT_FREQ_COEFF = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
-
-const static int64_t MAX_PTS_DIFF = 90000ll * 15ll;
-
 bool isM2TSExt(const std::string& streamName)
 {
     string sName = strToLowerCase(unquoteStr(streamName));
@@ -218,7 +214,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         m_lastReadRez = readRez;
         return BufferedFileReader::DATA_NOT_READY;
     }
-    if (readedBytes + m_tmpBufferLen == 0 || readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF)
+    if (readedBytes + m_tmpBufferLen == 0 || (readedBytes == 0 && m_lastReadRez == BufferedReader::DATA_EOF))
     {
         m_lastReadRez = readRez;
         return BufferedReader::DATA_EOF;
@@ -352,34 +348,10 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         if (pesStartCode)
         {
             PESPacket* pesPacket = (PESPacket*)frameData;
-            int payloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength();
-
             PIDListMap::iterator streamInfo = m_pmt.pidList.find(pid);
 
             if ((pesPacket->flagsLo & 0x80) == 0x80)
-            {  // 2880 - ac3 frame len
-
-                /*
-                if (pid == 4114 || pid == 4113)
-                {
-    static int64_t prevDts = 0;
-
-                        uint64_t tmpDts = ((pesPacket->flagsLo & 0xc0) == 0xc0) ? pesPacket->getDts() :
-                                pesPacket->getPts();
-                        int32_t dtsDif = (int64_t)tmpDts - prevDts;
-                        uint8_t* afterPesData = frameData + pesPacket->getHeaderLength() - 1;
-                    LTRACE(LT_INFO, 2, "PID=" << pid << "  PTS: " << pesPacket->getPts() <<
-                                " DTS:" << tmpDts << "  dtsDif:" << dtsDif);
-
-                        prevDts = tmpDts;
-    static int lastPid;
-    if (lastPid != pid)
-    {
-        lastPid = pid;
-    }
-                }
-*/
-
+            {
                 int64_t curPts = pesPacket->getPts();
                 int64_t curDts = curPts;
 
@@ -473,8 +445,6 @@ void TSDemuxer::openFile(const std::string& streamName)
     m_lastPCRVal = -1;
 
     m_m2tsMode = isM2TSExt(streamName);
-
-    BufferedFileReader* fileReader = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
 
     if (!m_bufferedReader->openStream(m_readerID, m_streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName);

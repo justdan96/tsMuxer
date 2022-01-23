@@ -455,8 +455,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         int tmpWidth;
         int tmpHeight;
         m_render->enlargeCrop(m_video_width, m_video_height, &tmpWidth, &tmpHeight);
-        m_needRescale = (m_scaled_width && m_scaled_width != tmpWidth) || (m_scaled_height && m_scaled_height != tmpHeight);
-        // m_needRescale |= true;
+        m_needRescale =
+            (m_scaled_width && m_scaled_width != tmpWidth) || (m_scaled_height && m_scaled_height != tmpHeight);
         if (m_needRescale)
         {
             m_imgBuffer = new uint8_t[m_video_width * m_video_height];

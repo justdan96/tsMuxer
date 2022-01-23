@@ -266,7 +266,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
 
 // ------------------------- BlurayHelper ---------------------------
 
-BlurayHelper::BlurayHelper() : m_isoWriter(0), m_dt() {}
+BlurayHelper::BlurayHelper() : m_dt(), m_isoWriter(0) {}
 
 BlurayHelper::~BlurayHelper() { close(); }
 
@@ -457,9 +457,6 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     {
         if (muxer->isInterleaveMode())
             clpiParser.interleaveInfo = muxer->getInterleaveInfo(i);
-
-        double avDuration = (lastPts[i] - firstPts[i]) / 90000.0;
-        // clpiParser.TS_recording_rate = (packetCount[i] * 192) / avDuration; // avarage bitrate
 
         if (muxer->isSubStream())
             clpiParser.TS_recording_rate = MAX_SUBMUXER_RATE / 8;
