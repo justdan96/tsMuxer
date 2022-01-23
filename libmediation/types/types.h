@@ -106,11 +106,6 @@ uint64_t roundUp64(const uint64_t& value, const uint64_t& roundVal);
 
 uint32_t random32();
 
-static uint32_t FOUR_CC(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
-{
-    return my_ntohl((uint32_t(a) << 24) + (uint32_t(b) << 16) + (uint32_t(c) << 8) + uint32_t(d));
-}
-
 #ifdef _WIN32
 std::vector<wchar_t> fromAcp(const char*, int sz);
 std::vector<wchar_t> toWide(const char*, int sz = -1);

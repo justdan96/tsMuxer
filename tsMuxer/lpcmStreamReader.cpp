@@ -10,8 +10,13 @@
 #include "vod_common.h"
 #include "wave.h"
 
-const static int m2tsFreqs[] = {0, 48000, 0, 0, 96000, 192000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static const int m2tsFreqs[] = {0, 48000, 0, 0, 96000, 192000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static const int MAX_HEADER_SIZE = 192;
+
+static uint32_t FOUR_CC(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{
+    return my_ntohl((uint32_t(a) << 24) + (uint32_t(b) << 16) + (uint32_t(c) << 8) + uint32_t(d));
+}
 
 static const uint32_t RIFF_SMALL = FOUR_CC('r', 'i', 'f', 'f');
 static const uint32_t RIFF_LARGE = FOUR_CC('R', 'I', 'F', 'F');
