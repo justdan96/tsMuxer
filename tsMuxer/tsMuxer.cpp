@@ -335,10 +335,8 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         {
             if (ac3Reader->isSecondary())
                 streamType = StreamType::AUDIO_EAC3_SECONDARY;
-            else if (ac3Reader->isAC3())
-                streamType = StreamType::AUDIO_EAC3;
             else
-                streamType = StreamType::AUDIO_EAC3_ATSC;
+                streamType = StreamType::AUDIO_EAC3;
         }
         else
             streamType = StreamType::AUDIO_AC3;

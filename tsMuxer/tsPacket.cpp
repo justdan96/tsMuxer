@@ -319,7 +319,6 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
             case StreamType::AUDIO_AAC:
             case StreamType::AUDIO_AC3:
             case StreamType::AUDIO_EAC3:
-            case StreamType::AUDIO_EAC3_ATSC:
             case StreamType::AUDIO_DTS:
                 audio_pid = elementary_pid;
                 audio_type = (int)stream_type;
@@ -2239,11 +2238,6 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, b
         }
         else if (stream_coding_type == StreamType::SUB_PGS)
             number_of_PG_textST_stream_entries++;
-        else if (stream_coding_type == StreamType::AUDIO_EAC3_ATSC)
-        {
-            LTRACE(LT_ERROR, 2, "Pure E-AC3 is not supported by AVCHD/Blu-ray. Aborting...");
-            THROW(ERR_COMMON, "");
-        }
         else
         {
             LTRACE(LT_ERROR, 2,
