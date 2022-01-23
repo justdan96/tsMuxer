@@ -35,6 +35,7 @@ endif()
 
 if(MSVC)
   add_compile_options("/utf-8")
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 if(WIN32)
