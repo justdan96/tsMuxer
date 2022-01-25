@@ -650,7 +650,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             if (clpiParsed)
             {
                 map<int, CLPIStreamInfo>::const_iterator clpiStream = clpi.m_streamInfo.find(itr->first);
-                if (clpiStream != clpi.m_streamInfo.end() && trackRez.lang.size() == 0)
+                if (clpiStream != clpi.m_streamInfo.end())
                     trackRez.lang = clpiStream->second.language_code;
             }
 
