@@ -149,6 +149,14 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         fileName += "_";
         fileName += int32ToStr(cnt);
     }
+
+    itr = params.find("lang");
+    if (itr != params.end())
+    {
+        fileName += "_";
+        fileName += itr->second;
+    }
+
     StreamInfo* streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
     streamInfo->m_fileName = fileName + fileExt;
     if (streamInfo->m_fileName.size() > 254)
