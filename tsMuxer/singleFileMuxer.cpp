@@ -59,6 +59,10 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         else
             fileExt = ".mpa";
     }
+    else if (codecName == "A_MLP")
+    {
+        fileExt = ".thd";
+    }
     else if (codecName == "A_DTS")
     {
         fileExt = ".dts";
@@ -71,7 +75,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     {
         const auto ac3Reader = static_cast<AC3StreamReader*>(codecReader);
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
-            fileExt = ".trueHD";
+            fileExt = ".ac3+thd";
         else if (ac3Reader->isEAC3())
             fileExt = ".ec3";
         else
