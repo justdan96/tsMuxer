@@ -1294,7 +1294,7 @@ void TSMuxer::writeOutBuffer()
                     m_prevM2TSPCROffset -= toFileLen;
                 }
                 else
-                    m_m2tsDelayBlocks[m_outBuf] = toFileLen;
+                    m_m2tsDelayBlocks.push_back(std::make_pair(m_outBuf, toFileLen));
             }
             else
                 m_owner->asyncWriteBuffer(this, m_outBuf, toFileLen, m_muxFile);
@@ -1315,7 +1315,7 @@ void TSMuxer::writeOutBuffer()
                 {
                     uint8_t* newBuf = new uint8_t[toFileLen];
                     memcpy(newBuf, m_outBuf, toFileLen);
-                    m_m2tsDelayBlocks[newBuf] = toFileLen;
+                    m_m2tsDelayBlocks.push_back(std::make_pair(newBuf, toFileLen));
                 }
             }
             memmove(m_outBuf, m_outBuf + toFileLen, m_outBufLen - toFileLen);
