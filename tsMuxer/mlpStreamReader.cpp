@@ -14,6 +14,17 @@ int MLPStreamReader::getHeaderLen() { return MLP_HEADER_LEN; }
 const std::string MLPStreamReader::getStreamInfo()
 {
     std::ostringstream str;
+
+    if (m_subType == MlpSubType::stTRUEHD)
+        str << "TRUE-HD";
+    else if (m_subType == MlpSubType::stMLP)
+        str << "MLP";
+    else
+        str << "UNKNOWN";
+
+    if (m_substreams == 4)
+        str << " + ATMOS";
+    str << ". ";
     str << "Peak bitrate: " << m_bitrate / 1000 << "Kbps ";
     str << "Sample Rate: " << m_samplerate / 1000 << "KHz ";
     str << "Channels: " << m_channels;

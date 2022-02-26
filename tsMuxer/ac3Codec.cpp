@@ -464,8 +464,10 @@ const std::string AC3Codec::getStreamInfo()
     {
         if (isEAC3())
             str << "E-";
-        str << "AC3 core+";
+        str << "AC3 core + ";
         str << hd_type;
+        if (mlp.m_substreams == 4)
+            str << " + ATMOS";
         str << ". ";
 
         str << "Peak bitrate: " << mlp.m_bitrate / 1000 << "Kbps (core " << m_bit_rate / 1000 << "Kbps) ";
