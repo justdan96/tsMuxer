@@ -1029,7 +1029,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2465"/>
         <source>The output %1 &quot;%2&quot; already exists. Do you want to overwrite it?</source>
-        <translation>La sortie %1 &quot;%2&quot; existe déjà. Souhaitez-vous l&apos;écraser ?</translation>
+        <translation>Le %1 &quot;%2&quot; existe déjà. Souhaitez-vous l&apos;écraser ?</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="2482"/>
