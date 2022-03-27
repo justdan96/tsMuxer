@@ -133,8 +133,8 @@ class TSMuxer : public AbstractMuxer
     int m_curFileNum;
     bool m_bluRayMode;
     bool m_hdmvDescriptors;
-    int64_t m_splitSize;
-    int64_t m_splitDuration;
+    uint64_t m_splitSize;
+    uint64_t m_splitDuration;
 
     bool m_useNewStyleAudioPES;
 
@@ -199,7 +199,7 @@ class TSMuxer : public AbstractMuxer
     bool m_pesSpsPps;
     bool m_computeMuxStats;
     int64_t m_pmtFrames;
-    int64_t m_curFileStartPts;
+    uint64_t m_curFileStartPts;
     int64_t m_vbvLen;
     int m_mainStreamIndex;
 
