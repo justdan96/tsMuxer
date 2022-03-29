@@ -9,14 +9,14 @@ on:
 jobs:
   build-mac-native:
 
-    runs-on: macos-latest
+    runs-on: macos-10.15
     
     steps:
     - uses: actions/checkout@master
       name: checkout
       
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v2
       
     - run: ./build_macos_native.sh
       name: build-for-mac
