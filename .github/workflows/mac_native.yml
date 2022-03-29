@@ -16,7 +16,7 @@ jobs:
       name: checkout
       
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       
     - run: ./build_macos_native.sh
       name: build-for-mac
