@@ -10,7 +10,7 @@ jobs:
     
     outputs:
       status: ${{ steps.check.outputs.status }}
-      upload_url: ${{ steps.create.outputs.upload_url }}
+      version: ${{ steps.check.outputs.version }}
     
     steps:
     - uses: actions/checkout@v2
@@ -29,14 +29,13 @@ jobs:
     - name: create-release
       id: create
       if: steps.check.outputs.status == 0
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: nightly-${{ steps.check.outputs.version }}
-        release_name: Nightly build from ${{ steps.check.outputs.version }}
+        tag: nightly-${{ steps.check.outputs.version }}
+        name: Nightly build from ${{ steps.check.outputs.version }}
         prerelease: true
-        commitish: ${{ env.GITHUB_SHA }}
+        commit: ${{ env.GITHUB_SHA }}
+        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: obs-trigger
       id: obs
@@ -49,6 +48,7 @@ jobs:
   build-docker:
   
     needs: check
+
     if: needs.check.outputs.status == 0
   
     runs-on: ubuntu-latest
@@ -76,36 +76,39 @@ jobs:
     
     - name: Upload Linux Build
       id: upload-linux
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        upload_url: ${{ needs.check.outputs.upload_url }}
-        asset_path: ./bin/lnx.zip
-        asset_name: lnx.zip
-        asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./bin/lnx.zip
+        tag: nightly-${{ needs.check.outputs.version }}
+        allowUpdates: true
+        omitPrereleaseDuringUpdate: true
+        omitNameDuringUpdate: true
+        omitBodyDuringUpdate: true 
 
     - name: Upload Win64 Build
       id: upload-w64
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        upload_url: ${{ needs.check.outputs.upload_url }}
-        asset_path: ./bin/w64.zip
-        asset_name: w64.zip
-        asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./bin/w64.zip
+        tag: nightly-${{ needs.check.outputs.version }}
+        allowUpdates: true
+        omitPrereleaseDuringUpdate: true
+        omitNameDuringUpdate: true
+        omitBodyDuringUpdate: true 
 
     - name: Upload Win32 Build
       id: upload-w32
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        upload_url: ${{ needs.check.outputs.upload_url }}
-        asset_path: ./bin/w32.zip
-        asset_name: w32.zip
-        asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./bin/w32.zip
+        tag: nightly-${{ needs.check.outputs.version }}
+        allowUpdates: true
+        omitPrereleaseDuringUpdate: true
+        omitNameDuringUpdate: true
+        omitBodyDuringUpdate: true 
 
   build-macos:
   
@@ -130,11 +133,12 @@ jobs:
     
     - name: Upload Mac Build
       id: upload-mac
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
-        upload_url: ${{ needs.check.outputs.upload_url }}
-        asset_path: ./build/bin/mac.zip
-        asset_name: mac.zip
-        asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ./build/bin/mac.zip
+        tag: nightly-${{ needs.check.outputs.version }}
+        allowUpdates: true
+        omitPrereleaseDuringUpdate: true
+        omitNameDuringUpdate: true
+        omitBodyDuringUpdate: true        
