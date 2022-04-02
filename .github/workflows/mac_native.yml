@@ -22,7 +22,7 @@ jobs:
          setup-python: false
          py7zrversion: '==0.18.1'
       
-    - run: ./build_macos_native.sh
+    - run: ./scripts/build_macos_native.sh
       name: build-for-mac
 
     - uses: actions/upload-artifact@master

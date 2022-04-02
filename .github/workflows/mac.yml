@@ -21,7 +21,7 @@ jobs:
     - run: rm -f bin/.gitkeep
       name: clean-bin-folder
       
-    - run: ./rebuild_osxcross_docker.sh
+    - run: ./scripts/rebuild_osxcross_docker.sh
       name: build-for-mac
       
     - uses: actions/upload-artifact@master

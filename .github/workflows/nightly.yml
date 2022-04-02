@@ -65,13 +65,13 @@ jobs:
     - run: rm -f bin/.gitkeep
       name: clean-bin-folder
       
-    - run: ./rebuild_linux_with_gui_docker.sh
+    - run: ./scripts/rebuild_linux_with_gui_docker.sh
       name: build-for-linux
       
-    - run: ./rebuild_mxe_with_gui_docker.sh
+    - run: ./scripts/rebuild_mxe_with_gui_docker.sh
       name: build-for-win64
       
-    - run: ./rebuild_mxe32_with_gui_docker.sh
+    - run: ./scripts/rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
     
     - name: Upload Linux Build
@@ -128,7 +128,7 @@ jobs:
         setup-python: false
         py7zrversion: '==0.18.1'
       
-    - run: ./build_macos_native.sh
+    - run: ./scripts/build_macos_native.sh
       name: build-for-mac
     
     - name: Upload Mac Build

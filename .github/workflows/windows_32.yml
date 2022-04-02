@@ -21,7 +21,7 @@ jobs:
     - run: rm -f bin/.gitkeep
       name: clean-bin-folder
       
-    - run: ./rebuild_mxe32_docker.sh
+    - run: ./scripts/rebuild_mxe32_docker.sh
       name: build-for-windows
       
     - uses: actions/upload-artifact@master
