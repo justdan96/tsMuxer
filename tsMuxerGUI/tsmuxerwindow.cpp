@@ -56,12 +56,13 @@ QString makeFileFilter(const FileFilterVec &filters)
 
 QString fileDialogFilter()
 {
-    FileFilterVec filters = {{TsMuxerWindow::tr("AC3/E-AC3"), {"ac3", "ddp", "ec3"}},
+    FileFilterVec filters = {{TsMuxerWindow::tr("AC3/E-AC3"), {"ac3", "ddp", "ec3", "eac3"}},
                              {TsMuxerWindow::tr("AAC (advanced audio coding)"), {"aac"}},
                              {TsMuxerWindow::tr("AVC/MVC/H.264 elementary stream"), {"avc", "mvc", "264", "h264"}},
                              {TsMuxerWindow::tr("HEVC (High Efficiency Video Codec)"), {"hevc", "hvc", "265", "h265"}},
                              {TsMuxerWindow::tr("Digital Theater System"), {"dts"}},
                              {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd"}},
+                             {TsMuxerWindow::tr("TrueHD/AC3+TrueHD"), {"thd", "truehd", "ac3+thd"}},
                              {TsMuxerWindow::tr("Mpeg video elementary stream"), {"mpv", "m1v", "m2v"}},
                              {TsMuxerWindow::tr("Mpeg audio elementary stream"), {"mpa"}},
                              {TsMuxerWindow::tr("Transport Stream"), {"ts"}},
