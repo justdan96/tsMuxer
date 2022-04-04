@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@master
       name: checkout
 
-    - run: ./build_gui_winxp.bat
+    - run: ./scripts/build_gui_winxp.bat
       name: build-xp-gui
 
     - uses: actions/upload-artifact@master

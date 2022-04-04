@@ -24,17 +24,17 @@ docker build -t justdan96/tsmuxer_build .
 
 *Linux*
 ```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_linux_docker.sh"
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". scripts/rebuild_linux_docker.sh"
 ```
 
 *Windows*
 ```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_mxe_docker.sh"
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". scripts/rebuild_mxe_docker.sh"
 ```
 
 *OSX*
 ```
-docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". rebuild_osxcross_docker.sh"
+docker run -it --rm -v $(pwd):/workdir -w="/workdir" justdan96/tsmuxer_build bash -c ". scripts/rebuild_osxcross_docker.sh"
 ```
 
 The executable binary will be saved to the "\bin" folder.
@@ -98,14 +98,14 @@ Open the folder where the git repo is stored in a terminal and run the following
 
 ```
 # build the project
-./rebuild_linux.sh
+./scripts/rebuild_linux.sh
 ```
 
 Or run the following to build the GUI as well:
 
 ```
 # build the project
-./rebuild_linux_with_gui.sh
+./scripts/rebuild_linux_with_gui.sh
 ```
 
 Next run the below to create a DEB file:
@@ -186,14 +186,14 @@ Open the folder where the git repo is stored in a terminal and run the following
 
 ```
 # build the project
-./rebuild_mxe.sh
+./scripts/rebuild_mxe.sh
 ```
 
 Or run the following to build the GUI as well:
 
 ```
 # build the project
-./rebuild_mxe_with_gui.sh
+./scripts/rebuild_mxe_with_gui.sh
 ```
 
 ## Windows (Msys2)
@@ -211,7 +211,7 @@ git
 
 Or just run:
 ```
-./rebuild_msys2.sh
+./scripts/rebuild_msys2.sh
 ```
 
 Close the Msys2 prompt and then open either a Mingw32 or a Mingw64 prompt, depending on whether you want to build for 32 or 64 bit.
@@ -242,14 +242,14 @@ cd tsMuxer
 ```
 Compile tsMuxer by run:
 ```
-./rebuild_linux.sh
+./scripts/rebuild_linux.sh
 ```
 
 This will create in tsMuxer/bin statically compiled versions of tsMuxer - so no external DLL files are required.
 
 Or just run:
 ```
-./rebuild_msys2.sh
+./scripts/rebuild_msys2.sh
 ```
 
 This will create in tsMuxer/bin statically compiled versions of tsMuxer and tsMuxerGUI - so no external DLL files are required.
@@ -327,14 +327,14 @@ Open the folder where the git repo is stored in a terminal and run the following
 
 ```
 # build the project
-./rebuild_osxcross.sh
+./scripts/rebuild_osxcross.sh
 ```
 
 Or run the following to build the GUI as well:
 
 ```
 # build the project
-./rebuild_osxcross_with_gui.sh
+./scripts/rebuild_osxcross_with_gui.sh
 ```
 
 ## MacOS (Native)
@@ -373,4 +373,4 @@ rm -f get-pip.py
 rm -rf ./6.2.2
 ```
 
-With all of those requirements met we can now compile the programs. Simply run `./build_macos_native.sh` from the repository folder. Upon completion the executables will be available in the ./build/bin folder.
+With all of those requirements met we can now compile the programs. Simply run `./scripts/build_macos_native.sh` from the repository folder. Upon completion the executables will be available in the ./build/bin folder.
