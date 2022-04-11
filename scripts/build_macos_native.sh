@@ -12,4 +12,4 @@ if ! qtver=$(qmake -query QT_VERSION | cut -d'.' -f1); then
   qtver=5
 fi
 
-source macos_common_build.sh
+source scripts/macos_common_build.sh
