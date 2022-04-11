@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@master
       name: checkout
       
-    - run: ./scripts/build_macos_native.sh
+    - run: ./scripts/build_macos_arm64.sh
       name: build-for-mac
 
     - uses: actions/upload-artifact@master
