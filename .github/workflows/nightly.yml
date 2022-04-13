@@ -29,7 +29,7 @@ jobs:
     - name: create-release
       id: create
       if: steps.check.outputs.status == 0
-      uses: ncipollo/release-action@v1
+      uses: justdan96/release-action@main
       with:
         tag: nightly-${{ steps.check.outputs.version }}
         name: Nightly build from ${{ steps.check.outputs.version }}
@@ -73,37 +73,13 @@ jobs:
       
     - run: ./scripts/rebuild_mxe32_with_gui_docker.sh
       name: build-for-win32
-    
-    - name: Upload Linux Build
-      id: upload-linux
-      uses: ncipollo/release-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ./bin/lnx.zip
-        tag: nightly-${{ needs.check.outputs.version }}
-        allowUpdates: true
-        omitPrereleaseDuringUpdate: true
-        omitNameDuringUpdate: true
-        omitBodyDuringUpdate: true 
 
-    - name: Upload Win64 Build
-      id: upload-w64
-      uses: ncipollo/release-action@v1
+    - name: Upload Win32/Win64/Linux Builds
+      id: upload-builds
+      uses: justdan96/release-action@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ./bin/w64.zip
-        tag: nightly-${{ needs.check.outputs.version }}
-        allowUpdates: true
-        omitPrereleaseDuringUpdate: true
-        omitNameDuringUpdate: true
-        omitBodyDuringUpdate: true 
-
-    - name: Upload Win32 Build
-      id: upload-w32
-      uses: ncipollo/release-action@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ./bin/w32.zip
+        artifacts: ./bin/*.zip
         tag: nightly-${{ needs.check.outputs.version }}
         allowUpdates: true
         omitPrereleaseDuringUpdate: true
@@ -133,7 +109,7 @@ jobs:
     
     - name: Upload Mac Build
       id: upload-mac
-      uses: ncipollo/release-action@v1
+      uses: justdan96/release-action@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ./build/bin/mac.zip
