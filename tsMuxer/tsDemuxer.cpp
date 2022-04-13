@@ -475,7 +475,7 @@ int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
 {
     // pcr from end of file
     uint8_t* tmpBuffer = new uint8_t[bufferSize];
-    file.seek(FFMAX(fileSize - bufferSize - (fileSize - bufferSize) % frameSize, 0), File::SeekMethod::smBegin);
+    file.seek(FFMAX(fileSize - fileSize % frameSize - bufferSize, 0), File::SeekMethod::smBegin);
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;  // read error
@@ -507,6 +507,7 @@ int64_t getTSDuration(const char* fileName)
         if (!file.size(&fileSize))
             return -1;
         int bufferSize = 1024 * 256;
+        bufferSize -= bufferSize % frameSize;
         uint8_t* tmpBuffer = new uint8_t[bufferSize];
         // pcr from start of file
         int len = file.read(tmpBuffer, bufferSize);
