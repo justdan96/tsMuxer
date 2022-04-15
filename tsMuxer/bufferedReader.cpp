@@ -31,14 +31,14 @@ BufferedReader::BufferedReader(uint32_t blockSize, uint32_t allocSize, uint32_t 
 ReaderData* BufferedReader::getReader(uint32_t readerID)
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
-    map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
+    auto itr = m_readers.find(readerID);
     return itr != m_readers.end() ? itr->second : 0;
 }
 
 bool BufferedReader::incSeek(uint32_t readerID, int64_t offset)
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
-    map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
+    auto itr = m_readers.find(readerID);
     if (itr != m_readers.end())
     {
         ReaderData* data = itr->second;
@@ -59,7 +59,7 @@ BufferedReader::~BufferedReader()
     terminate();
     m_readQueue.push(0);
     join();
-    for (std::map<uint32_t, ReaderData*>::iterator itr = m_readers.begin(); itr != m_readers.end(); ++itr)
+    for (auto itr = m_readers.begin(); itr != m_readers.end(); ++itr)
     {
         ReaderData* pData = itr->second;
         delete pData;
@@ -108,7 +108,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
     size_t rSize;
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
-        std::map<uint32_t, ReaderData*>::iterator iterator = m_readers.find(readerID);
+        auto iterator = m_readers.find(readerID);
         if (iterator == m_readers.end())
             return;
         ReaderData* data = iterator->second;
@@ -129,7 +129,7 @@ uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& re
     ReaderData* data = 0;
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
-        map<uint32_t, ReaderData*>::iterator itr = m_readers.find(readerID);
+        auto itr = m_readers.find(readerID);
         if (itr != m_readers.end())
         {
             data = itr->second;
@@ -294,7 +294,7 @@ void BufferedReader::setFileIterator(FileNameIterator* itr, int readerID)
 {
     assert(readerID != -1);
     std::lock_guard<std::mutex> lock(m_readersMtx);
-    std::map<uint32_t, ReaderData*>::iterator reader = m_readers.find(readerID);
+    auto reader = m_readers.find(readerID);
     if (reader != m_readers.end())
         reader->second->itr = itr;
 }

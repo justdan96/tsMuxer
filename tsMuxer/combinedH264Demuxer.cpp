@@ -245,7 +245,7 @@ uint64_t CombinedH264Demuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
 {
-    BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != 0)

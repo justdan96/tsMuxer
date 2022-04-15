@@ -115,7 +115,7 @@ class ContainerToReaderWrapper : public AbstractReader
     ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
         : m_readBuffOffset(0), m_readManager(readManager), m_owner(owner)
     {
-        BufferedReaderManager& brm = const_cast<BufferedReaderManager&>(readManager);
+        auto& brm = const_cast<BufferedReaderManager&>(readManager);
 
         m_blockSize = brm.getBlockSize();
         m_allocSize = brm.getAllocSize();

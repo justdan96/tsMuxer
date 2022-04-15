@@ -176,7 +176,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
     // 1. convert byte order to little endian
     if (m_bitsPerSample == 16)
     {
-        for (uint16_t* curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_htons(*curPos);
+        for (auto curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_htons(*curPos);
     }
     else if (m_bitsPerSample > 16)
     {
@@ -190,7 +190,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
     // 2. Remap channels to Blu-ray standard
     if (m_channels == 6)
     {
-        uint8_t* tmpData = new uint8_t[ch1FullSize];
+        auto tmpData = new uint8_t[ch1FullSize];
         storeChannelData(start, end, 4, tmpData, m_channels);    // copy channel 6(LFE) to tmpData
         copyChannelData(start, end, 5, 4, m_channels);           // Shift RS
         copyChannelData(start, end, 6, 5, m_channels);           // Shift LS
@@ -199,7 +199,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
     }
     else if (m_channels == 7)
     {
-        uint8_t* tmpData = new uint8_t[ch1FullSize];
+        auto tmpData = new uint8_t[ch1FullSize];
 
         storeChannelData(start, end, 4, tmpData, m_channels);  // copy channel 8(LFE) to tmpData
         copyChannelData(start, end, 6, 4, m_channels);
@@ -210,7 +210,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
     }
     else if (m_channels == 8)
     {
-        uint8_t* lfeData = new uint8_t[ch1FullSize];
+        auto lfeData = new uint8_t[ch1FullSize];
 
         storeChannelData(start, end, 4, lfeData, m_channels);  // copy channel 8(LFE) to tmpData
         copyChannelData(start, end, 7, 4, m_channels);
@@ -290,7 +290,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
         // 1. convert byte order to little endian
         if (m_bitsPerSample == 16)
         {
-            for (uint16_t* curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_ntohs(*curPos);
+            for (auto curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_ntohs(*curPos);
         }
         else if (m_bitsPerSample > 16)
         {
@@ -316,7 +316,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
         }
         else if (m_channels == 6)
         {
-            uint8_t* tmpData = new uint8_t[ch1FullSize];
+            auto tmpData = new uint8_t[ch1FullSize];
             storeChannelData(start, end, 6, tmpData, mch);    // copy channel 6(LFE) to tmpData
             copyChannelData(start, end, 5, 6, mch);           // Shift RS
             copyChannelData(start, end, 4, 5, mch);           // Shift LS
@@ -325,7 +325,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
         }
         else if (m_channels == 7)
         {
-            uint8_t* tmpData = new uint8_t[ch1FullSize];
+            auto tmpData = new uint8_t[ch1FullSize];
 
             storeChannelData(start, end, 4, tmpData, mch);  // copy channel 8(LFE) to tmpData
             copyChannelData(start, end, 5, 4, mch);
@@ -336,7 +336,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
         }
         else if (m_channels == 8)
         {
-            uint8_t* lfeData = new uint8_t[ch1FullSize];
+            auto lfeData = new uint8_t[ch1FullSize];
 
             storeChannelData(start, end, 8, lfeData, mch);
             copyChannelData(start, end, 7, 8, mch);
@@ -535,7 +535,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
         if (end - buff < 4)
             return NOT_ENOUGH_BUFFER;
 
-        const uint32_t* curPtr32 = (const uint32_t*)buff;
+        const auto curPtr32 = (const uint32_t*)buff;
         if (m_curChunkLen == 0 && (*curPtr32 == RIFF_SMALL || *curPtr32 == RIFF_LARGE))
         {
             if (end - buff < 8)
@@ -633,10 +633,10 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             // memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt_\x00\x00\x00\x00", 20);
             memcpy(curPos, "RIFF\xff\xff\xff\xffWAVEfmt ", 16);
             curPos += 16;
-            uint32_t* fmtSize = (uint32_t*)curPos;
+            auto fmtSize = (uint32_t*)curPos;
             *fmtSize = sizeof(WAVEFORMATPCMEX);
             curPos += 4;
-            WAVEFORMATPCMEX* waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
+            auto waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
             waveFormatPCMEx->wFormatTag = WAVE_FORMAT_EXTENSIBLE;
             waveFormatPCMEx->nChannels = m_channels;
             waveFormatPCMEx->nSamplesPerSec = m_freq;
@@ -683,7 +683,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int64_t len)
         (curPos[0] == 'r' && curPos[1] == 'i' && curPos[2] == 'f' && curPos[3] == 'f'))
     {
         m_headerType = LPCMHeaderType::htWAVE;
-        wave_format::GUID* testWave64 = (wave_format::GUID*)curPos;
+        auto testWave64 = (wave_format::GUID*)curPos;
         if (*testWave64 == WAVE64GUID)
             m_headerType = LPCMHeaderType::htWAVE64;
         return true;

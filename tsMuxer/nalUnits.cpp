@@ -1337,12 +1337,12 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
     pic_parameter_set_id = extractUEGolombCode();
     if (pic_parameter_set_id >= 256)
         return 1;
-    std::map<uint32_t, PPSUnit*>::const_iterator itr = ppsMap.find(pic_parameter_set_id);
+    auto itr = ppsMap.find(pic_parameter_set_id);
     if (itr == ppsMap.end())
         return SPS_OR_PPS_NOT_READY;
     pps = itr->second;
 
-    std::map<uint32_t, SPSUnit*>::const_iterator itr2 = spsMap.find(pps->seq_parameter_set_id);
+    auto itr2 = spsMap.find(pps->seq_parameter_set_id);
     if (itr2 == spsMap.end())
         return SPS_OR_PPS_NOT_READY;
     sps = itr2->second;
@@ -1834,7 +1834,7 @@ void SEIUnit::updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts)
 {
     metadataPtsPtr[0] = (pts >> 30) & 0x07;
 
-    uint16_t val = (uint16_t)((pts >> 15) & 0x7fff);
+    auto val = (uint16_t)((pts >> 15) & 0x7fff);
     metadataPtsPtr[1] = 0x80 + (val >> 8);
     metadataPtsPtr[2] = val & 0xff;
 

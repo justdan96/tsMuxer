@@ -136,7 +136,7 @@ void PGSStreamReader::yuvToRgb(int minY)
     uint8_t* src = m_imgBuffer;
     uint8_t* end = src + m_video_width * m_video_height;
     // uint8_t* dst = m_rgbBuffer;
-    RGBQUAD* dst = (RGBQUAD*)m_rgbBuffer;
+    auto dst = (RGBQUAD*)m_rgbBuffer;
 
     RGBQUAD rgbPal[256]{};
     text_subtitles::YUVQuad yuvPal[256];
@@ -317,7 +317,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
     while (!m_render->rlePack(mask))
     {
         // reduce colors
-        uint8_t* tmp = (uint8_t*)&mask;
+        auto tmp = (uint8_t*)&mask;
         int idx = step++ % 4;
         tmp[idx] <<= 1;
         tmp[idx]++;
@@ -325,9 +325,9 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
     inTime = (int64_t)(inTime / INT_FREQ_TO_TS_FREQ);
 
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
-    int64_t compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
-    int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
-    const int64_t PLANEINITIALIZATIONTIME =
+    auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
+    const auto PLANEINITIALIZATIONTIME =
         (int64_t)(90000.0 * (m_scaled_width * m_scaled_height) / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
@@ -371,7 +371,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
 void PGSStreamReader::renderTextHide(int64_t outTime)
 {
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
-    int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
+    auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
     m_firstRenderedPacket = true;
     outTime = (int64_t)(outTime / INT_FREQ_TO_TS_FREQ);
@@ -397,7 +397,7 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
 
 int64_t getTimeValueNano(uint8_t* pos)
 {
-    int64_t pts = (int64_t)AV_RB32(pos);
+    auto pts = (int64_t)AV_RB32(pos);
     if (pts > 0xff000000u)
         return ptsToNanoClock(pts - 0x100000000ll);
     else
@@ -554,7 +554,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             memmove(&m_tmpBuffer[0], m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
-        PESPacket* pesPacket = (PESPacket*)m_curPos;
+        auto pesPacket = (PESPacket*)m_curPos;
         int pesHeaderLen = pesPacket->getHeaderLength();
         // if (m_bufEnd - m_curPos < pesHeaderLen+1) {
         if (m_bufEnd - m_curPos < pesHeaderLen)
@@ -594,7 +594,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         return NEED_MORE_DATA;
     }
     uint8_t segment_type = *m_curPos;
-    uint16_t segment_len = (uint16_t)AV_RB16(m_curPos + 1);
+    auto segment_len = (uint16_t)AV_RB16(m_curPos + 1);
     if (m_bufEnd - m_curPos < 3ll + segment_len)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
@@ -786,14 +786,14 @@ void PGSStreamReader::intDecodeStream(uint8_t* buffer, size_t len)
             curPos += 10;
         else if (curPos[0] == 0 && curPos[1] == 0 && curPos[2] == 1)
         {
-            PESPacket* pesPacket = (PESPacket*)curPos;
+            auto pesPacket = (PESPacket*)curPos;
             curPos += pesPacket->getHeaderLength();
             if (curPos >= bufEnd)
                 return;
         }
 
         uint8_t segment_type = *curPos;
-        uint16_t segment_len = (uint16_t)AV_RB16(curPos + 1);
+        auto segment_len = (uint16_t)AV_RB16(curPos + 1);
         if (bufEnd - curPos < 3ll + segment_len)
             return;
 
@@ -820,7 +820,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     {
         *dstBuffer++ = 'P';
         *dstBuffer++ = 'G';
-        uint32_t* data = (uint32_t*)dstBuffer;
+        auto data = (uint32_t*)dstBuffer;
         *data++ = my_htonl((uint32_t)nanoClockToPts(m_lastPTS));
         if (m_lastDTS != m_lastPTS)
             *data = my_htonl((uint32_t)nanoClockToPts(m_lastDTS));

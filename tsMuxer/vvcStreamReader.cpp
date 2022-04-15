@@ -139,7 +139,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     uint8_t* descLength = dstBuff++;  // descriptor length, filled at the end
     *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
     *dstBuff++ = m_sps->ptl_num_sub_profiles;
-    uint32_t* bufPos = (uint32_t*)dstBuff;
+    auto bufPos = (uint32_t*)dstBuff;
     for (auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
     dstBuff = (uint8_t*)bufPos;
     *dstBuff++ = (m_sps->progressive_source_flag << 7) | (m_sps->interlaced_source_flag << 6) |
@@ -159,9 +159,9 @@ void VVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nex
 {
     int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
-    VvcVpsUnit* vps = (VvcVpsUnit*)nalUnit;
+    auto vps = (VvcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
-    uint8_t* tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
+    auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
     long newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");

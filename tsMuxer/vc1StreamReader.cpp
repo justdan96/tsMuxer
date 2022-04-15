@@ -418,7 +418,7 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
 void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
     m_sequence.setFPS(m_fps);
-    uint8_t* tmpBuffer = new uint8_t[oldSpsLen + 16];
+    auto tmpBuffer = new uint8_t[oldSpsLen + 16];
     int64_t newSpsLen = m_sequence.vc1_escape_buffer(tmpBuffer);
     if (newSpsLen != oldSpsLen)
     {

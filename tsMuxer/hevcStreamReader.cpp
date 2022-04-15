@@ -238,7 +238,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    uint32_t pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
+    auto pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
 
     if (!isDVBL && V3_flags & FOUR_K)
     {
@@ -368,9 +368,9 @@ void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
 {
     int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
-    HevcVpsUnit* vps = (HevcVpsUnit*)nalUnit;
+    auto vps = (HevcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
-    uint8_t* tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
+    auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
     int newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");

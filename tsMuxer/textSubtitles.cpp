@@ -109,7 +109,7 @@ void TextToPGSConverter::setVideoInfo(int width, int height, double fps)
 
 double TextToPGSConverter::alignToGrid(double value)
 {
-    int64_t frameCnt =
+    auto frameCnt =
         (int64_t)(value * m_videoFps + 0.5);  // how many frames have passed until this moment in time (rounded)
     return frameCnt / m_videoFps;
 }
@@ -121,7 +121,7 @@ uint8_t TextToPGSConverter::color32To8(uint32_t* buff, uint32_t colorMask)
     // else
     {
         YUVQuad yuv = RGBAToYUVA(*buff | colorMask);
-        std::map<YUVQuad, uint8_t>::iterator itr = m_paletteYUV.find(yuv);
+        auto itr = m_paletteYUV.find(yuv);
         if (itr == m_paletteYUV.end())
         {
             if (m_paletteYUV.size() < 255)
@@ -174,7 +174,7 @@ int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, u
 
 YUVQuad TextToPGSConverter::RGBAToYUVA(uint32_t data)
 {
-    RGBQUAD* rgba = (RGBQUAD*)&data;
+    auto rgba = (RGBQUAD*)&data;
     YUVQuad rez;
     rez.Y = (int)(65.738 * rgba->rgbRed + 129.057 * rgba->rgbGreen + 25.064 * rgba->rgbBlue + 4224.0) >> 8;
     rez.Cr = (int)(112.439 * rgba->rgbRed - 94.154 * rgba->rgbGreen - 18.285 * rgba->rgbBlue + 32896.0) >> 8;
@@ -200,7 +200,7 @@ void TextToPGSConverter::reduceColors(uint8_t mask)
 {
     mask = ~mask;
     uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
-    uint32_t* dst = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
+    auto dst = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
     uint32_t* end = dst + m_videoWidth * m_videoHeight;
     for (; dst < end; ++dst) *dst &= val;
 }
@@ -214,7 +214,7 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
 
         uint8_t* curPtr = m_renderedData;
         uint8_t* trimPos = m_renderedData;
-        uint32_t* srcData = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
+        auto srcData = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
         assert(srcData);
         m_rleLen = 0;
         m_minLine = INT_MAX;
@@ -323,7 +323,7 @@ TextToPGSConverter::Palette TextToPGSConverter::buildPalette(float opacity)
     if (opacity == 1.0)
         return m_paletteByColor;
     Palette result = m_paletteByColor;
-    for (Palette::iterator itr = result.begin(); itr != result.end(); ++itr)
+    for (auto itr = result.begin(); itr != result.end(); ++itr)
         itr->second.alpha = FFMIN(255, uint8_t(float(itr->second.alpha) * opacity + 0.5));
     return result;
 }
@@ -342,15 +342,15 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     inTimeSec = alignToGrid(inTimeSec);
     outTimeSec = alignToGrid(outTimeSec);
 
-    int64_t inTimePTS = (int64_t)(inTimeSec * 90000);
-    int64_t outTimePTS = (int64_t)(outTimeSec * 90000);
+    auto inTimePTS = (int64_t)(inTimeSec * 90000);
+    auto outTimePTS = (int64_t)(outTimeSec * 90000);
 
     uint32_t mask = 0;
     int step = 0;
     while (!rlePack(mask))
     {
         // reduce colors
-        uint8_t* tmp = (uint8_t*)&mask;
+        auto tmp = (uint8_t*)&mask;
         int idx = step++ % 4;
         tmp[idx] <<= 1;
         tmp[idx]++;
@@ -372,10 +372,10 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     float opacity = opacityInDelta;
 
     double decodedObjectSize = (m_maxLine - m_minLine + 1) * m_videoWidth;
-    int64_t compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
-    int64_t windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
+    auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
-    const int64_t PLANEINITIALIZATIONTIME =
+    const auto PLANEINITIALIZATIONTIME =
         (int64_t)(90000.0 * (m_videoWidth * m_videoHeight) / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
@@ -397,9 +397,9 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
 
     // 2.1 fade in palette
     double fpsPts = 90000.0 / m_videoFps;
-    int64_t updateTime = (int64_t)alignToGrid(inTimePTS + fpsPts);
+    auto updateTime = (int64_t)alignToGrid(inTimePTS + fpsPts);
 
-    int64_t lastAnimateTime = (int64_t)alignToGrid(outTimePTS - fpsPts);
+    auto lastAnimateTime = (int64_t)alignToGrid(outTimePTS - fpsPts);
     opacity += opacityInDelta;
     while (updateTime <= lastAnimateTime + FLOAT_EPS && opacity <= 1.0 + FLOAT_EPS)
     {
@@ -545,7 +545,7 @@ long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_
     uint8_t* startPos = curPos;
     *curPos++ = m_paletteID;       // palette ID
     *curPos++ = m_paletteVersion;  // palette version number
-    for (Palette::const_iterator itr = palette.begin(); itr != palette.end(); ++itr)
+    for (auto itr = palette.begin(); itr != palette.end(); ++itr)
     {
         *curPos++ = itr->first;
         *curPos++ = itr->second.Y;
@@ -629,7 +629,7 @@ long TextToPGSConverter::writePGHeader(uint8_t* buff, int64_t pts, int64_t dts)
         dts = pts;
     *buff++ = 'P';
     *buff++ = 'G';
-    uint32_t* data = (uint32_t*)buff;
+    auto data = (uint32_t*)buff;
     *data++ = my_htonl((uint32_t)pts);
     if (dts != pts)
         *data = my_htonl((uint32_t)dts);

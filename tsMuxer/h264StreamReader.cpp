@@ -67,8 +67,8 @@ H264StreamReader::H264StreamReader() : MPEGStreamReader()
 
 H264StreamReader::~H264StreamReader()
 {
-    for (map<uint32_t, SPSUnit*>::iterator itr = m_spsMap.begin(); itr != m_spsMap.end(); ++itr) delete itr->second;
-    for (map<uint32_t, PPSUnit*>::iterator itr = m_ppsMap.begin(); itr != m_ppsMap.end(); ++itr) delete itr->second;
+    for (auto itr = m_spsMap.begin(); itr != m_spsMap.end(); ++itr) delete itr->second;
+    for (auto itr = m_ppsMap.begin(); itr != m_ppsMap.end(); ++itr) delete itr->second;
 }
 
 CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
@@ -97,7 +97,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
             if (nalType == NALUnit::NALType::nuSPS)
                 m_mvcPrimaryStream = true;
             nextNal = NALUnit::findNALWithStartCode(nal, end, true);
-            SPSUnit* sps = new SPSUnit();
+            auto sps = new SPSUnit();
             sps->decodeBuffer(nal, nextNal);
             if (sps->deserialize() != 0)
             {
@@ -111,7 +111,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
         }
         case NALUnit::NALType::nuPPS:
         {
-            PPSUnit* pps = new PPSUnit();
+            auto pps = new PPSUnit();
             nextNal = NALUnit::findNALWithStartCode(nal, end, true);
             pps->decodeBuffer(nal, nextNal);
             if (pps->deserialize() != 0)
@@ -400,7 +400,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
                 if (!m_bdRomMetaDataMsg.empty())
                 {
                     // we got slice. fill previous metadata SEI message
-                    int64_t pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
+                    auto pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
                     uint8_t* srcData = &m_bdRomMetaDataMsg[0];
                     SEIUnit::updateMetadataPts(srcData + m_bdRomMetaDataMsgPtsPos, pts90k);
 
@@ -484,9 +484,9 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
 void H264StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
-    SPSUnit* sps = (SPSUnit*)nalUnit;
+    auto sps = (SPSUnit*)nalUnit;
     sps->setFps(m_fps);
-    uint8_t* tmpBuffer = new uint8_t[oldSpsLen + 16];
+    auto tmpBuffer = new uint8_t[oldSpsLen + 16];
     long newSpsLen = sps->serializeBuffer(tmpBuffer, tmpBuffer + oldSpsLen + 16, false);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");
@@ -1200,7 +1200,7 @@ int H264StreamReader::processSliceNal(uint8_t* buff)
 
     if (m_OffsetMetadataPtsAddr)
     {
-        int64_t pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
+        auto pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
         SEIUnit::updateMetadataPts(m_OffsetMetadataPtsAddr, pts90k);
         m_OffsetMetadataPtsAddr = 0;
     }

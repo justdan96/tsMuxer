@@ -66,10 +66,10 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     vector<StreamInfo>& ci = m_metaDemuxer.getCodecInfo();
     bool mvcTrackFirst = false;
     bool firstH264Track = true;
-    for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr)
+    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
     {
         StreamInfo& si = *itr;
-        H264StreamReader* h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
+        auto h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
         if (h264Reader)
         {
             h264Reader->setStartPTS(m_ptsOffset);
@@ -85,7 +85,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
             if (!m_subMuxer)
             {
                 m_subMuxer = m_factory.newInstance(this);
-                TSMuxer* tsMuxer = dynamic_cast<TSMuxer*>(m_subMuxer);
+                auto tsMuxer = dynamic_cast<TSMuxer*>(m_subMuxer);
                 if (tsMuxer)
                     tsMuxer->setPtsOffset(m_ptsOffset);
                 m_subMuxer->parseMuxOpt(m_muxOpts);
@@ -96,7 +96,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
             if (!m_mainMuxer)
             {
                 m_mainMuxer = m_factory.newInstance(this);
-                TSMuxer* tsMuxer = dynamic_cast<TSMuxer*>(m_mainMuxer);
+                auto tsMuxer = dynamic_cast<TSMuxer*>(m_mainMuxer);
                 if (tsMuxer)
                     tsMuxer->setPtsOffset(m_ptsOffset);
                 m_mainMuxer->parseMuxOpt(m_muxOpts);
@@ -134,7 +134,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
         m_mainMuxer->setMasterMode(m_subMuxer, !mvcTrackFirst);
     }
 
-    for (vector<StreamInfo>::iterator itr = ci.begin(); itr != ci.end(); ++itr)
+    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
     {
         StreamInfo& si = *itr;
         si.read();
@@ -174,7 +174,7 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
     bool aacFound = false;
     bool mlpFound = false;
 
-    for (vector<StreamInfo>::const_iterator itr = ci.begin(); itr != ci.end(); ++itr)
+    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
     {
         const StreamInfo& si = *itr;
         if (si.m_codec == h264CodecInfo.programName)

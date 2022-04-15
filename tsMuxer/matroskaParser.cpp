@@ -92,7 +92,7 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            uint32_t* cur32 = (uint32_t*)curPos;
+            auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
@@ -125,7 +125,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            uint32_t* cur32 = (uint32_t*)curPos;
+            auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -158,7 +158,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            uint32_t* cur32 = (uint32_t*)curPos;
+            auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -194,7 +194,7 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            uint32_t* cur32 = (uint32_t*)curPos;
+            auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
@@ -229,7 +229,7 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            uint32_t* cur32 = (uint32_t*)curPos;
+            auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
@@ -308,7 +308,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
     : ParsedTrackPrivData(track->codec_priv, track->codec_priv_size)
 {
     m_convertBytes = strEndWith(track->codec_id, "/BIG");
-    MatroskaAudioTrack* audiotrack = (MatroskaAudioTrack*)track;
+    auto audiotrack = (MatroskaAudioTrack*)track;
     m_channels = audiotrack->channels;
     m_bitdepth = audiotrack->bitdepth;
 
@@ -419,7 +419,7 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 
         dst[0] = 'P';
         dst[1] = 'G';
-        uint32_t* ptsDts = (uint32_t*)(dst + 2);
+        auto ptsDts = (uint32_t*)(dst + 2);
         ptsDts[0] = my_htonl((uint32_t)((pkt->pts * 90000) / 1000000000));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;

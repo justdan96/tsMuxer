@@ -44,7 +44,7 @@ BufferedFileReader::BufferedFileReader(uint32_t blockSize, uint32_t allocSize, u
 
 bool BufferedFileReader::openStream(uint32_t readerID, const char* streamName, int pid, const CodecInfo* codecInfo)
 {
-    FileReaderData* data = (FileReaderData*)getReader(readerID);
+    auto data = (FileReaderData*)getReader(readerID);
 
     if (data == 0)
     {
@@ -64,7 +64,7 @@ bool BufferedFileReader::openStream(uint32_t readerID, const char* streamName, i
 }
 bool BufferedFileReader::gotoByte(uint32_t readerID, uint64_t seekDist)
 {
-    FileReaderData* data = (FileReaderData*)getReader(readerID);
+    auto data = (FileReaderData*)getReader(readerID);
     if (data)
     {
         data->m_blockSize = m_blockSize - (uint32_t)(seekDist % (uint64_t)m_blockSize);

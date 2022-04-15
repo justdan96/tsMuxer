@@ -2401,8 +2401,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
 int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize)
 {
-    for (std::set<uint32_t>::const_iterator itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr)
-        demuxedData[*itr];
+    for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
 
     AVPacket packet;
     uint32_t demuxedSize = 0;
@@ -2417,7 +2416,7 @@ int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &ac
             return readRez;
         }
 
-        PIDFilters::iterator itr = m_pidFilters.find(packet.stream_index);
+        auto itr = m_pidFilters.find(packet.stream_index);
         if (itr != m_pidFilters.end())
         {
             demuxedSize += itr->second->demuxPacket(demuxedData, acceptedPIDs, packet);

@@ -90,7 +90,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
 {
     afterPesHeader = 0;
 
-    PESPacket* pesPacket = (PESPacket*)buff;
+    auto pesPacket = (PESPacket*)buff;
     uint8_t startcode = buff[3];
 
     // find matching stream
@@ -256,7 +256,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 
     while (curBuf <= end - 9)
     {
-        PESPacket* pesPacket = (PESPacket*)curBuf;
+        auto pesPacket = (PESPacket*)curBuf;
         uint8_t startcode = curBuf[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -362,7 +362,7 @@ int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
     curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
     while (curPtr <= bufEnd - 9)
     {
-        PESPacket* pesPacket = (PESPacket*)curPtr;
+        auto pesPacket = (PESPacket*)curPtr;
         uint8_t startcode = curPtr[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -402,7 +402,7 @@ int64_t getPSDuration(const char* fileName)
         curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
         while (curPtr <= bufEnd - 9)
         {
-            PESPacket* pesPacket = (PESPacket*)curPtr;
+            auto pesPacket = (PESPacket*)curPtr;
             uint8_t startcode = curPtr[3];
             if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) ||
                 (startcode == PES_VC1_ID) || (startcode == PES_PRIVATE_DATA2))

@@ -417,7 +417,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
 bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
 {
     static const int CLPI_BUFFER_SIZE = 1024 * 1024;
-    uint8_t* clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
+    auto clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
     CLPIParser clpiParser;
     string version_number;
     if (m_dt == DiskType::BLURAY)
@@ -523,7 +523,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
 
 const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
 {
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (auto itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
         const PMTStreamInfo& stream = itr->second;
         if (stream.m_codecReader->getStreamIndex() == index)
@@ -539,7 +539,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     int64_t lastPts = *(mainMuxer->getLastPts().rbegin());
 
     int bufSize = 1024 * 100;
-    uint8_t* mplsBuffer = new uint8_t[bufSize];
+    auto mplsBuffer = new uint8_t[bufSize];
     MPLSParser mplsParser;
     mplsParser.m_m2tsOffset = mainMuxer->getFirstFileNum();
     mplsParser.PlayList_playback_type = 1;
@@ -556,7 +556,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     {
         for (auto& i : customChapters)
         {
-            uint32_t mark = (uint32_t)(i * 45000.0);
+            auto mark = (uint32_t)(i * 45000.0);
             if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }
@@ -571,7 +571,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     {
         mplsParser.m_streamInfo.push_back(MPLSStreamInfo(itr->second));
         MPLSStreamInfo& info = *(mplsParser.m_streamInfo.rbegin());
-        PGSStreamReader* pgStream = dynamic_cast<PGSStreamReader*>(itr->second.m_codecReader);
+        auto pgStream = dynamic_cast<PGSStreamReader*>(itr->second.m_codecReader);
         if (pgStream)
         {
             info.offsetId = pgStream->getOffsetId();
