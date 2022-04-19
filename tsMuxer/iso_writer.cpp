@@ -112,12 +112,10 @@ void writeTimestamp(uint8_t* buffer, time_t time)
 bool canUse8BitUnicode(const std::string& utf8Str)
 {
     bool rv = true;
-    convertUTF::IterateUTF8Chars(utf8Str,
-                                 [&](auto c)
-                                 {
-                                     rv = (c < 0x100);
-                                     return rv;
-                                 });
+    convertUTF::IterateUTF8Chars(utf8Str, [&](auto c) {
+        rv = (c < 0x100);
+        return rv;
+    });
     return rv;
 }
 
@@ -142,35 +140,31 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldL
     if (canUse8BitUnicode(utf8Str))
     {
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str,
-                         [&](auto c)
-                         {
-                             rv.push_back(c);
-                             return rv.size() < maxHeaderAndContentLength;
-                         });
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            rv.push_back(c);
+            return rv.size() < maxHeaderAndContentLength;
+        });
     }
     else
     {
         rv.push_back(16);
-        IterateUTF8Chars(utf8Str,
-                         [&](auto c)
-                         {
-                             UTF16 high_surrogate, low_surrogate;
-                             std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
-                             auto spaceLeft = maxHeaderAndContentLength - rv.size();
-                             if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
-                             {
-                                 return false;
-                             }
-                             rv.push_back((uint8_t)(high_surrogate >> 8));
-                             rv.push_back((uint8_t)high_surrogate);
-                             if (low_surrogate)
-                             {
-                                 rv.push_back((uint8_t)(low_surrogate >> 8));
-                                 rv.push_back((uint8_t)low_surrogate);
-                             }
-                             return true;
-                         });
+        IterateUTF8Chars(utf8Str, [&](auto c) {
+            UTF16 high_surrogate, low_surrogate;
+            std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
+            auto spaceLeft = maxHeaderAndContentLength - rv.size();
+            if ((spaceLeft < 2) || (low_surrogate && spaceLeft < 4))
+            {
+                return false;
+            }
+            rv.push_back((uint8_t)(high_surrogate >> 8));
+            rv.push_back((uint8_t)high_surrogate);
+            if (low_surrogate)
+            {
+                rv.push_back((uint8_t)(low_surrogate >> 8));
+                rv.push_back((uint8_t)low_surrogate);
+            }
+            return true;
+        });
     }
     auto contentLength = (uint8_t)rv.size();
     auto paddingSize = maxHeaderAndContentLength - rv.size();
