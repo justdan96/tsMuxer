@@ -61,7 +61,7 @@ QString fileDialogFilter()
                              {TsMuxerWindow::tr("AVC/MVC/H.264 elementary stream"), {"avc", "mvc", "264", "h264"}},
                              {TsMuxerWindow::tr("HEVC (High Efficiency Video Codec)"), {"hevc", "265", "h265"}},
                              {TsMuxerWindow::tr("Digital Theater System"), {"dts"}},
-                             {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd"}, {"dtsma"}},
+                             {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd", "dtsma"}},
                              {TsMuxerWindow::tr("TrueHD/AC3+TrueHD"), {"thd", "truehd", "ac3+thd", "thd+ac3"}},
                              {TsMuxerWindow::tr("Mpeg video elementary stream"), {"mpv", "m1v", "m2v"}},
                              {TsMuxerWindow::tr("Mpeg audio elementary stream"), {"mpa"}},
