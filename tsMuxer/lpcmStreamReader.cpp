@@ -694,24 +694,31 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int64_t len)
 
     // 2. test for M2TS LPCM headers
     curPos = buffer;
+    uint16_t frameLen;
     while (curPos < end)
     {
-        uint16_t frameLen = AV_RB16(curPos);
-        if (frameLen != 960 && frameLen != 1920 && frameLen != 2880 && frameLen != 3840 && frameLen != 1440 &&
-            frameLen != 4320 && frameLen != 5760 && frameLen != 7680 && frameLen != 8640 && frameLen != 11520 &&
-            frameLen != 17280)
+        frameLen = AV_RB16(curPos);
+        switch (frameLen)
         {
+        case 960:
+        case 1440:
+        case 1920:
+        case 2880:
+        case 3840:
+        case 4320:
+        case 5760:
+        case 7680:
+        case 8640:
+        case 11520:
+        case 17280:
+            curPos += frameLen + 4;
             break;
+        default:
+            return false;
         }
-        curPos += frameLen + 4;
     }
-    if (curPos >= end)
-    {
-        m_headerType = LPCMHeaderType::htM2TS;
-        return true;
-    }
-
-    return false;
+    m_headerType = LPCMHeaderType::htM2TS;
+    return true;
 }
 
 bool LPCMStreamReader::beforeFileCloseEvent(File& file)
