@@ -298,7 +298,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             memcpy(curPos, avPacket.data, avPacket.size);
             curPos += avPacket.size;
             avPacket.size = 0;
-            avPacket.data = 0;
+            avPacket.data = nullptr;
         }
     }
 

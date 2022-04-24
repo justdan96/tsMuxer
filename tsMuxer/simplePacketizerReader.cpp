@@ -66,7 +66,7 @@ uint64_t SimplePacketizerReader::getProcessedSize() { return m_processedBytes; }
 int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
 {
     avPacket.duration = 0;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.stream_index = m_streamIndex;
     avPacket.flags = m_flags + AVPacket::IS_COMPLETE_FRAME;
@@ -104,7 +104,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         avPacket.stream_index = m_streamIndex;
         avPacket.codecID = getCodecInfo().codecID;
         avPacket.codec = this;
-        avPacket.data = 0;
+        avPacket.data = nullptr;
         avPacket.size = 0;
         avPacket.duration = 0;
         avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;

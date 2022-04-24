@@ -418,7 +418,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     avPacket.codec = this;
     avPacket.codecID = CODEC_S_PGS;
     avPacket.stream_index = m_streamIndex;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.flags = 0;
     avPacket.duration = 0;

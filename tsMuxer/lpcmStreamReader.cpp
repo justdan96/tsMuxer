@@ -748,7 +748,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     avPacket.stream_index = m_streamIndex;
     avPacket.codecID = getCodecInfo().codecID;
     avPacket.codec = this;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.duration = 0;
     avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
@@ -846,7 +846,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
 int LPCMStreamReader::flushPacket(AVPacket& avPacket)
 {
     avPacket.duration = 0;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.stream_index = m_streamIndex;
     avPacket.flags = m_flags + AVPacket::IS_COMPLETE_FRAME;
@@ -864,7 +864,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
     if (m_tmpBuffer.size() > 0)
         avPacket.data = &m_tmpBuffer[0];
     else
-        avPacket.data = 0;
+        avPacket.data = nullptr;
     avPacket.data += skipBeforeBytes;
     if (m_tmpBufferLen > 0)
     {
@@ -884,7 +884,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
         int64_t samplesRest = m_frameRest / m_channels;
         m_frameRest = samplesRest * ((m_channels + 1) & 0xfe);
         m_frameRest -= avPacket.size - (m_needPCMHdr ? 4 : 0);
-        if (m_frameRest > 0)
+        if (avPacket.data != nullptr && m_frameRest > 0)
         {
             memset(avPacket.data + avPacket.size, 0, m_frameRest);
             avPacket.size += (int)m_frameRest;

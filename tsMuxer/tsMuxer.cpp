@@ -925,7 +925,7 @@ bool TSMuxer::blockFull() const { return m_processedBlockSize >= m_interliaveBlo
 
 bool TSMuxer::muxPacket(AVPacket& avPacket)
 {
-    if (avPacket.data == 0 || avPacket.size == 0)
+    if (avPacket.data == nullptr || avPacket.size == 0)
     {
         return true;
     }

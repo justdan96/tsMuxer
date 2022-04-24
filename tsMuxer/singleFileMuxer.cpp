@@ -237,7 +237,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
 
 bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
 {
-    if (avPacket.data == 0 || avPacket.size == 0)
+    if (avPacket.data == nullptr || avPacket.size == 0)
         return true;
     StreamInfo* streamInfo = m_streamInfo[avPacket.stream_index];
     if (avPacket.dts != streamInfo->m_dts || avPacket.pts != streamInfo->m_pts ||
