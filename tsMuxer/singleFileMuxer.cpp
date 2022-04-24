@@ -156,7 +156,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         fileName += itr->second;
     }
 
-    StreamInfo* streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
+    auto streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
     streamInfo->m_fileName = fileName + fileExt;
     if (streamInfo->m_fileName.size() > 254)
         LTRACE(LT_ERROR, 2, "Error: File name too long.");
@@ -190,7 +190,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         int toFileLen = blockSize & 0xffff0000;
         if (m_owner->isAsyncMode())
         {
-            uint8_t* newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
+            auto newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
             memcpy(newBuf, streamInfo->m_buffer + toFileLen, streamInfo->m_bufLen - toFileLen);
             m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, toFileLen, &streamInfo->m_file);
             streamInfo->m_buffer = newBuf;

@@ -765,7 +765,7 @@ void SPSUnit::updateTimingInfo()
 
     const int EXTRA_SPACE = 64;
 
-    uint8_t* newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
+    auto newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
 
     int beforeBytes = bitPos >> 3;
     memcpy(newNalBuffer, m_nalBuffer, m_nalBufferLen);
@@ -823,7 +823,7 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool a
     // replace hrd parameters not implemented. only insert
     const int EXTRA_SPACE = 64;
 
-    uint8_t* newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
+    auto newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
 
     int beforeBytes = bitPos >> 3;
     memcpy(newNalBuffer, m_nalBuffer, m_nalBufferLen);

@@ -437,7 +437,7 @@ bool TSMuxer::doFlush(uint64_t newPCR, int64_t pcrGAP)
         if (lastBlockSize > 0)
         {
             assert(m_sectorSize == 0);  // we should not be here in interleaved mode!
-            uint8_t* newBuff = new uint8_t[lastBlockSize];
+            auto newBuff = new uint8_t[lastBlockSize];
             memcpy(newBuff, m_outBuf + roundBufLen, lastBlockSize);
             m_owner->asyncWriteBuffer(this, m_outBuf, roundBufLen, m_muxFile);
             m_outBuf = newBuff;
@@ -1206,7 +1206,7 @@ bool TSMuxer::appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int*
     if (readCnt != 192)
         return false;
     memcpy(tmpBuff + 4, m_nullBuffer, TS_FRAME_SIZE);
-    TSPacket* tsPacket = (TSPacket*)(tmpBuff);
+    auto tsPacket = (TSPacket*)(tmpBuff);
     for (uint64_t newFileSize = curFileSize; newFileSize % (2048 * 3) != 0; newFileSize += 192)
     {
         tsPacket->counter = counter++;
@@ -1284,7 +1284,7 @@ void TSMuxer::writeOutBuffer()
         int toFileLen = m_writeBlockSize & ~(MuxerManager::PHYSICAL_SECTOR_SIZE - 1);
         if (m_owner->isAsyncMode())
         {
-            uint8_t* newBuf = new uint8_t[m_writeBlockSize + 1024];
+            auto newBuf = new uint8_t[m_writeBlockSize + 1024];
             memcpy(newBuf, m_outBuf + toFileLen, m_outBufLen - toFileLen);
             if (m_m2tsMode)
             {
@@ -1313,7 +1313,7 @@ void TSMuxer::writeOutBuffer()
                 }
                 else
                 {
-                    uint8_t* newBuf = new uint8_t[toFileLen];
+                    auto newBuf = new uint8_t[toFileLen];
                     memcpy(newBuf, m_outBuf, toFileLen);
                     m_m2tsDelayBlocks.push_back(std::make_pair(newBuf, toFileLen));
                 }

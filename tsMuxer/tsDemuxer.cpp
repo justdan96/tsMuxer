@@ -507,7 +507,7 @@ int64_t getTSDuration(const char* fileName)
             return -1;
         int bufferSize = 1024 * 256;
         bufferSize -= bufferSize % frameSize;
-        uint8_t* tmpBuffer = new uint8_t[bufferSize];
+        auto tmpBuffer = new uint8_t[bufferSize];
         // pcr from start of file
         int len = file.read(tmpBuffer, bufferSize);
         if (len < 1)

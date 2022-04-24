@@ -1044,7 +1044,7 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
 
 int MovDemuxer::mov_read_trak(MOVAtom atom)
 {
-    MOVStreamContext* sc = new MOVStreamContext();
+    auto sc = new MOVStreamContext();
     Track* st = tracks[num_tracks] = sc;
     num_tracks++;
     st->type = IOContextTrackType::DATA;
@@ -1168,7 +1168,7 @@ int MovDemuxer::mov_read_extradata(MOVAtom atom)
         return -1;
 
     int64_t oldSize = st->codec_priv_size;
-    uint8_t* tmp = new uint8_t[oldSize];
+    auto tmp = new uint8_t[oldSize];
     memcpy(tmp, st->codec_priv, oldSize);
     delete[] st->codec_priv;
     st->codec_priv = new uint8_t[newSize];
@@ -1650,7 +1650,7 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
 
 double MovDemuxer::getTrackFps(uint32_t trackId)
 {
-    MOVStreamContext* st = (MOVStreamContext*)tracks[trackId - 1];
+    auto st = (MOVStreamContext*)tracks[trackId - 1];
     return st->fps;
 }
 

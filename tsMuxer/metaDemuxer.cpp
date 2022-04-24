@@ -740,73 +740,73 @@ CheckStreamRez METADemuxer::detectTrackReader(uint8_t* tmpBuffer, int len,
     if (len == 0)
         return rez;
 
-    LPCMStreamReader* lpcmReader = new LPCMStreamReader();
+    auto lpcmReader = new LPCMStreamReader();
     rez = lpcmReader->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete lpcmReader;
     if (rez.codecInfo.codecID)
         return rez;
 
-    H264StreamReader* h264codec = new H264StreamReader();
+    auto h264codec = new H264StreamReader();
     rez = h264codec->checkStream(tmpBuffer, len);
     delete h264codec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    DTSStreamReader* dtscodec = new DTSStreamReader();
+    auto dtscodec = new DTSStreamReader();
     rez = dtscodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete dtscodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    AC3StreamReader* ac3codec = new AC3StreamReader();
+    auto ac3codec = new AC3StreamReader();
     rez = ac3codec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete ac3codec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    MLPStreamReader* mlpcodec = new MLPStreamReader();
+    auto mlpcodec = new MLPStreamReader();
     rez = mlpcodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete mlpcodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    AACStreamReader* aaccodec = new AACStreamReader();
+    auto aaccodec = new AACStreamReader();
     rez = aaccodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete aaccodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    VC1StreamReader* vc1ccodec = new VC1StreamReader();
+    auto vc1ccodec = new VC1StreamReader();
     rez = vc1ccodec->checkStream(tmpBuffer, len);
     delete vc1ccodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    HEVCStreamReader* hevcCodec = new HEVCStreamReader();
+    auto hevcCodec = new HEVCStreamReader();
     rez = hevcCodec->checkStream(tmpBuffer, len);
     delete hevcCodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    VVCStreamReader* vvcCodec = new VVCStreamReader();
+    auto vvcCodec = new VVCStreamReader();
     rez = vvcCodec->checkStream(tmpBuffer, len);
     delete vvcCodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    MPEG2StreamReader* mpeg2ccodec = new MPEG2StreamReader();
+    auto mpeg2ccodec = new MPEG2StreamReader();
     rez = mpeg2ccodec->checkStream(tmpBuffer, len);
     delete mpeg2ccodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    MpegAudioStreamReader* mpegAudioCodec = new MpegAudioStreamReader();
+    auto mpegAudioCodec = new MpegAudioStreamReader();
     rez = mpegAudioCodec->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete mpegAudioCodec;
     if (rez.codecInfo.codecID)
         return rez;
 
-    DVBSubStreamReader* supReader = new DVBSubStreamReader();
+    auto supReader = new DVBSubStreamReader();
     rez = supReader->checkStream(tmpBuffer, len, containerType, containerDataType, containerStreamIndex);
     delete supReader;
     if (rez.codecInfo.codecID)

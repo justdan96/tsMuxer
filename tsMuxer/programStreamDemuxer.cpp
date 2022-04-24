@@ -27,7 +27,7 @@ ProgramStreamDemuxer::ProgramStreamDemuxer(const BufferedReaderManager& readMana
 
 void ProgramStreamDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    BufferedReader* br = dynamic_cast<BufferedReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != 0)
@@ -351,7 +351,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
 {
     file.seek(FFMAX(0, fileSize - bufferSize), File::SeekMethod::smBegin);
-    uint8_t* tmpBuffer = new uint8_t[bufferSize];
+    auto tmpBuffer = new uint8_t[bufferSize];
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;
@@ -387,7 +387,7 @@ int64_t getPSDuration(const char* fileName)
         if (!file.size(&fileSize))
             return 0;
 
-        uint8_t* tmpBuffer = new uint8_t[BUF_SIZE];
+        auto tmpBuffer = new uint8_t[BUF_SIZE];
 
         // pcr from start of file
         int len = file.read(tmpBuffer, BUF_SIZE);
