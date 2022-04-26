@@ -198,7 +198,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 
     uint8_t pmtBuffer[4096]{0};
     int pmtBufferLen = 0;
-    MemoryBlock* vect = 0;
+    MemoryBlock* vect = nullptr;
     int lastPid = -1;
 
     for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
@@ -414,9 +414,12 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 vect = &demuxedData[pid];
                 lastPid = pid;
             }
-            vect->grow(payloadLen);
-            uint8_t* dst = vect->data() + vect->size() - payloadLen;
-            memcpy(dst, frameData, payloadLen);
+            if (vect != nullptr)
+            {
+                vect->grow(payloadLen);
+                uint8_t* dst = vect->data() + vect->size() - payloadLen;
+                memcpy(dst, frameData, payloadLen);            
+            }
         }
         discardSize -= payloadLen;
     }
