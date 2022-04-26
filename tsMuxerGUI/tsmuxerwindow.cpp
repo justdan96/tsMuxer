@@ -287,6 +287,7 @@ void initLanguageComboBox(QComboBox *comboBox)
     comboBox->addItem(QString::fromUtf8("Русский"), "ru");
     comboBox->addItem(QString::fromUtf8("Français"), "fr");
     comboBox->addItem(QString::fromUtf8("简体中文"), "zh");
+    comboBox->addItem(QString::fromUtf8("Deutsch"), "de");
     comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
 }
 
