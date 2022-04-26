@@ -125,20 +125,58 @@ string(CONFIGURE [[
   }
 ]] STD_FS_CODE @ONLY)
 
+string(CONFIGURE [[
+  #include <experimental/filesystem>
+  int main( int argc, char ** argv ) {
+    std::experimental::filesystem::path p( argv[ 0 ] );
+    return p.string().length();
+  }
+]] EXP_FS_CODE @ONLY)
+
+string(CONFIGURE [[
+  #include <ghc/filesystem.hpp>
+  int main( int argc, char ** argv ) {
+    ghc::filesystem::path p( argv[ 0 ] );
+    return p.string().length();
+  }
+]] GHC_FS_CODE @ONLY)
+
 # check that we have the standard filesystem installed
 check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NO_LIB_NEEDED)
 set(CMAKE_REQUIRED_LIBRARIES "stdc++fs")
 check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NEEDS_STDCXXFS)
 set(CMAKE_REQUIRED_LIBRARIES "c++fs")
-check_cxx_source_compiles("${STD_FS_CODE}"  STD_FS_NEEDS_CXXFS)
+check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NEEDS_CXXFS)
 unset(CMAKE_REQUIRED_LIBRARIES)
+# check that we have the experimental filesystem installed
+check_cxx_source_compiles("${EXP_FS_CODE}" EXP_FS_NO_LIB_NEEDED)
+set(CMAKE_REQUIRED_LIBRARIES "stdc++fs")
+check_cxx_source_compiles("${EXP_FS_CODE}" EXP_FS_NEEDS_STDCXXFS)
+set(CMAKE_REQUIRED_LIBRARIES "c++fs")
+check_cxx_source_compiles("${EXP_FS_CODE}" EXP_FS_NEEDS_CXXFS)
+# check that we have GHC filesystem installed
+unset(CMAKE_REQUIRED_LIBRARIES)
+check_cxx_source_compiles("${GHC_FS_CODE}" GHC_FS_NO_LIB_NEEDED)
 
+# make sure to use the correct link libraries and filesystem code
 if( ${STD_FS_NO_LIB_NEEDED} )
   set( FS_LIBRARIES "" )
 elseif( ${STD_FS_NEEDS_STDCXXFS} )
   set( FS_LIBRARIES stdc++fs )
 elseif( ${STD_FS_NEEDS_CXXFS} )
   set( FS_LIBRARIES c++fs )
+elseif( ${EXP_FS_NO_LIB_NEEDED} )
+  set( FS_LIBRARIES "" )
+  add_compile_definitions( FS_EXP )
+elseif( ${EXP_FS_NEEDS_STDCXXFS} )
+  set( FS_LIBRARIES stdc++fs )
+  add_compile_definitions( FS_EXP )
+elseif( ${EXP_FS_NEEDS_CXXFS} )
+  set( FS_LIBRARIES c++fs )
+  add_compile_definitions( FS_EXP )
+elseif( ${GHC_FS_NO_LIB_NEEDED} )
+  set( FS_LIBRARIES "" )
+  add_compile_definitions( FS_GHC )
 else()
   message( FATAL_ERROR "Unknown compiler - C++17 filesystem library missing" )
 endif()

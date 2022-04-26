@@ -27,7 +27,20 @@ const static char FONT_ROOT[] = "/System/Library/Fonts/";
 #include <freetype/ftstroke.h>
 #include <fs/systemlog.h>
 
+#if !defined(FS_EXP) && !defined(FS_GHC)
 #include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
+#ifdef FS_EXP
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+
+#ifdef FS_GHC
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
+#endif
 
 using namespace std;
 
@@ -105,7 +118,7 @@ void TextSubtitlesRenderFT::loadFontMap()
 
             if (itr == m_fontNameToFile.end() || fontFile.length() < itr->second.length())
             {
-                m_fontNameToFile[fontFamily] = std::filesystem::canonical(fontFile).string();
+                m_fontNameToFile[fontFamily] = fs::canonical(fontFile).string();
             }
             FT_Done_Face(font);
         }
