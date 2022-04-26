@@ -19,7 +19,7 @@ SOURCES += main.cpp tsmuxerwindow.cpp muxForm.cpp checkboxedheaderview.cpp \
 FORMS += tsmuxerwindow.ui muxForm.ui
 
 RESOURCES += images.qrc
-TRANSLATIONS = translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts translations/tsmuxergui_fr.ts translations/tsmuxergui_zh.ts
+TRANSLATIONS = translations/tsmuxergui_en.ts translations/tsmuxergui_ru.ts translations/tsmuxergui_fr.ts translations/tsmuxergui_zh.ts translations/tsmuxergui_de.ts
 win32 {
   RC_FILE += icon.rc
 }

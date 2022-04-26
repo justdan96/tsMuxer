@@ -4,5 +4,6 @@
 <file alias="tsmuxergui_ru.qm">tsmuxergui_ru.qm</file>
 <file alias="tsmuxergui_fr.qm">tsmuxergui_fr.qm</file>
 <file alias="tsmuxergui_zh.qm">tsmuxergui_zh.qm</file>
+<file alias="tsmuxergui_de.qm">tsmuxergui_de.qm</file>
 </qresource>
 </RCC>

@@ -11,5 +11,6 @@
   <file alias="about_ru.html">translations/about_ru.html</file>
   <file alias="about_fr.html">translations/about_fr.html</file>
   <file alias="about_zh.html">translations/about_zh.html</file>
+  <file alias="about_de.html">translations/about_de.html</file>
 </qresource>
 </RCC>
