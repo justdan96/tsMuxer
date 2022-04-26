@@ -141,6 +141,11 @@ string(CONFIGURE [[
   }
 ]] GHC_FS_CODE @ONLY)
 
+# required for MacOS, osxcross and LLVM Clang
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "-std=c++17")
+endif()
+
 # check that we have the standard filesystem installed
 check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NO_LIB_NEEDED)
 set(CMAKE_REQUIRED_LIBRARIES "stdc++fs")
