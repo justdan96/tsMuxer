@@ -116,6 +116,33 @@ if(TSMUXER_STATIC_BUILD)
   endif()
 endif()
 
+# we can try compiling this small C++ program to test std::filesystem is working
+string(CONFIGURE [[
+  #include <filesystem>
+  int main( int argc, char ** argv ) {
+    std::filesystem::path p( argv[ 0 ] );
+    return p.string().length();
+  }
+]] STD_FS_CODE @ONLY)
+
+# check that we have the standard filesystem installed
+check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NO_LIB_NEEDED)
+set(CMAKE_REQUIRED_LIBRARIES "stdc++fs")
+check_cxx_source_compiles("${STD_FS_CODE}" STD_FS_NEEDS_STDCXXFS)
+set(CMAKE_REQUIRED_LIBRARIES "c++fs")
+check_cxx_source_compiles("${STD_FS_CODE}"  STD_FS_NEEDS_CXXFS)
+unset(CMAKE_REQUIRED_LIBRARIES)
+
+if( ${STD_FS_NO_LIB_NEEDED} )
+  set( FS_LIBRARIES "" )
+elseif( ${STD_FS_NEEDS_STDCXXFS} )
+  set( FS_LIBRARIES stdc++fs )
+elseif( ${STD_FS_NEEDS_CXXFS} )
+  set( FS_LIBRARIES c++fs )
+else()
+  message( FATAL_ERROR "Unknown compiler - C++17 filesystem library missing" )
+endif()
+
 if (WIN32)
   target_sources(tsmuxer PRIVATE osdep/textSubtitlesRenderWin32.cpp)
   target_link_libraries(tsmuxer gdiplus)
@@ -125,7 +152,7 @@ else()
   if(DEFINED OSXCROSS_SDK)
     list(TRANSFORM FREETYPE_LDFLAGS REPLACE "(-lfreetype)" "-lfreetype-static")
   endif()
-  target_link_libraries(tsmuxer ${FREETYPE_LIBRARIES} ${FREETYPE_LDFLAGS})
+  target_link_libraries(tsmuxer ${FS_LIBRARIES} ${FREETYPE_LIBRARIES} ${FREETYPE_LDFLAGS})
   target_include_directories(tsmuxer PRIVATE ${FREETYPE_INCLUDE_DIRS})
 endif()
 
