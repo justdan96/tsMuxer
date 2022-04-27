@@ -95,7 +95,7 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     struct tm* partsl = localtime(&time);
     struct tm* partsg = gmtime(&time);
 
-    int16_t timeZone = partsl->tm_hour - partsg->tm_hour;
+    int16_t timeZone = 60 * (partsl->tm_hour - partsg->tm_hour) + (partsl->tm_min - partsg->tm_min);
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
     buff16[1] = partsg->tm_year + 1900;
