@@ -92,10 +92,11 @@ void writeTimestamp(uint8_t* buffer, time_t time)
 {
     auto buff16 = (uint16_t*)buffer;
 
-    struct tm* partsl = localtime(&time);
-    struct tm* partsg = gmtime(&time);
+    const tm* partsg = gmtime(&time);
 
-    int16_t timeZone = 60 * (partsl->tm_hour - partsg->tm_hour) + (partsl->tm_min - partsg->tm_min);
+    time_t lt = mktime(localtime(&time));
+    time_t gt = mktime(partsg);
+    int16_t timeZone = (lt - gt) / 60;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
     buff16[1] = partsg->tm_year + 1900;
