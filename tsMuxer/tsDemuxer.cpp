@@ -418,7 +418,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
             {
                 vect->grow(payloadLen);
                 uint8_t* dst = vect->data() + vect->size() - payloadLen;
-                memcpy(dst, frameData, payloadLen);            
+                memcpy(dst, frameData, payloadLen);
             }
         }
         discardSize -= payloadLen;
