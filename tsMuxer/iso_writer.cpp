@@ -95,7 +95,7 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     const tm* partsg = gmtime(&time);
 
     time_t lt = mktime(localtime(&time));
-    time_t gt = mktime(partsg);
+    time_t gt = mktime(gmtime(&time));
     int16_t timeZone = (lt - gt) / 60;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
