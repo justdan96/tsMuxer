@@ -27,9 +27,16 @@ const static char FONT_ROOT[] = "/System/Library/Fonts/";
 #include <freetype/ftstroke.h>
 #include <fs/systemlog.h>
 
-#include <filesystem>
-
 using namespace std;
+
+namespace tsmuxer
+{
+std::string realpath(const std::string& path)
+{
+    std::unique_ptr<char, decltype(::free)*> resolved{::realpath(path.c_str(), nullptr), ::free};
+    return resolved ? resolved.get() : std::string();
+}
+}  // namespace tsmuxer
 
 namespace text_subtitles
 {
@@ -105,7 +112,7 @@ void TextSubtitlesRenderFT::loadFontMap()
 
             if (itr == m_fontNameToFile.end() || fontFile.length() < itr->second.length())
             {
-                m_fontNameToFile[fontFamily] = std::filesystem::canonical(fontFile).string();
+                m_fontNameToFile[fontFamily] = tsmuxer::realpath(fontFile);
             }
             FT_Done_Face(font);
         }
