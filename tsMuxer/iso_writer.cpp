@@ -92,19 +92,19 @@ void writeTimestamp(uint8_t* buffer, time_t time)
 {
     auto buff16 = (uint16_t*)buffer;
 
-    const tm* partsg = gmtime(&time);
+    const tm* parts = localtime(&time);
 
     time_t lt = mktime(localtime(&time));
     time_t gt = mktime(gmtime(&time));
     int16_t timeZone = (lt - gt) / 60;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
-    buff16[1] = partsg->tm_year + 1900;
-    buffer[4] = partsg->tm_mon + 1;
-    buffer[5] = partsg->tm_mday;
-    buffer[6] = partsg->tm_hour;
-    buffer[7] = partsg->tm_min;
-    buffer[8] = partsg->tm_sec;
+    buff16[1] = parts->tm_year + 1900;
+    buffer[4] = parts->tm_mon + 1;
+    buffer[5] = parts->tm_mday;
+    buffer[6] = parts->tm_hour;
+    buffer[7] = parts->tm_min;
+    buffer[8] = parts->tm_sec;
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
