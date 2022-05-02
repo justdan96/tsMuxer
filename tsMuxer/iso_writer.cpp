@@ -1144,7 +1144,7 @@ void IsoWriter::writePrimaryVolumeDescriptor()
     writer.setBuffer(m_buffer, sizeof(m_buffer));
     writer.writeDescriptorTag(DescriptorTag::PrimVol, absoluteSectorNum());
 
-    writer.writeLE32(0x01);  // Volume Descriptor Sequence Number
+    writer.writeLE32(0x00);  // Volume Descriptor Sequence Number
     writer.writeLE32(0x00);  // Primary Volume Descriptor Number
     writer.writeDString(m_volumeLabel, 32);
 
@@ -1198,7 +1198,7 @@ void IsoWriter::writeImpUseDescriptor()
     writeDescriptorTag(m_buffer, DescriptorTag::ImplUseVol, absoluteSectorNum());
 
     auto buff32 = (uint32_t*)m_buffer;
-    buff32[4] = 0x02;  // Descriptor Sequence Number
+    buff32[4] = 0x01;  // Descriptor Sequence Number
 
     std::string impId = std::string("*UDF LV Info");
     m_buffer[20] = 0x00;
@@ -1225,7 +1225,7 @@ void IsoWriter::writePartitionDescriptor()
 
     auto buff32 = (uint32_t*)m_buffer;
     auto buff16 = (uint16_t*)m_buffer;
-    buff32[4] = 0x03;                        // Descriptor Sequence Number
+    buff32[4] = 0x02;                        // Descriptor Sequence Number
     buff16[10] = 0x01;                       // partition flags
     buff16[11] = 0x00;                       // Partition Number
     strcpy((char*)m_buffer + 25, "+NSR03");  // Partition Contents
@@ -1248,7 +1248,7 @@ void IsoWriter::writeLogicalVolumeDescriptor()
     auto buff32 = (uint32_t*)m_buffer;
     auto buff16 = (uint16_t*)m_buffer;
 
-    buff32[4] = 0x04;                                         // Volume Descriptor Sequence Number
+    buff32[4] = 0x03;                                         // Volume Descriptor Sequence Number
     strcpy((char*)m_buffer + 21, "OSTA Compressed Unicode");  // Descriptor Character Set
     // Logical Volume Identifier
     writeDString(m_buffer + 84, m_volumeLabel.c_str(), 128);
@@ -1309,7 +1309,7 @@ void IsoWriter::writeUnallocatedSpaceDescriptor()
 
     auto buff32 = (uint32_t*)m_buffer;
 
-    buff32[4] = 0x05;  // sequence number
+    buff32[4] = 0x04;  // sequence number
 
     calcDescriptorCRC(m_buffer, 24);
     m_file.write(m_buffer, SECTOR_SIZE);
