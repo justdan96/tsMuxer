@@ -607,7 +607,7 @@ void IsoWriter::setVolumeLabel(const std::string& value)
 {
     m_volumeLabel = value;
     if (m_volumeLabel.empty())
-        m_volumeLabel = " ";
+        m_volumeLabel = "Blu-Ray";
 }
 
 bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISOBlocks)
