@@ -1129,6 +1129,7 @@ void IsoWriter::writeFileSetDescriptor()
     writer.skipBytes(32);                                       // Abstract File Identifier
     writer.writeLongAD(0x0800, 1, 1, 0);                        // Root Directory ICB
     writer.writeUDFString("*OSTA UDF Compliant", 32);           // Domain Identifier
+    m_buffer[442] = 0x03;                                       // Domain Flags: Hard and Soft Write-Protect
     writer.writeLongAD(0, 0, 0, 0);                             // Next Extent
     writer.writeLongAD(0x0800, m_systemStreamLBN, 1, 0);
 
