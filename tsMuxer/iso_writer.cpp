@@ -909,8 +909,8 @@ void IsoWriter::writeDescriptors()
 
     int64_t eofPos = m_partitionEndAddress * (int64_t)SECTOR_SIZE;
     m_file.seek(eofPos + ALLOC_BLOCK_SIZE - SECTOR_SIZE);
-    // It seems preferable not to include the AVDP at (N - 256) for Rewritable media (ditto DVDFab and ImgBurn)
-    //writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
+    // TODO: It may be preferable not to include the AVDP at (N - 256) for Rewritable media (ditto DVDFab and ImgBurn)
+    writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
 
     writePrimaryVolumeDescriptor();
     writeImpUseDescriptor();
