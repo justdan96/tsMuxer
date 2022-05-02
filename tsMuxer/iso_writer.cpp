@@ -1255,6 +1255,9 @@ void IsoWriter::writeLogicalVolumeDescriptor()
     buff32[212 / 4] = SECTOR_SIZE;                              // Logical Block Size
     writeUDFString(m_buffer + 216, "*OSTA UDF Compliant", 32);  // Domain Identifier
 
+    // Domain Flags #03: Hard and Soft Write-Protect
+    m_buffer[242] = 0x03;
+
     // Logical Volume Contents Use
     m_buffer[249] = 0x08;
     m_buffer[256] = 0x01;
