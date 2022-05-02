@@ -113,8 +113,7 @@ void writeTimestamp(uint8_t* buffer, time_t time)
 bool canUse8BitUnicode(const std::string& utf8Str)
 {
     bool rv = true;
-    convertUTF::IterateUTF8Chars(utf8Str, [&](auto c)
-    {
+    convertUTF::IterateUTF8Chars(utf8Str, [&](auto c) {
         rv = (c < 0x100);
         return rv;
     });
@@ -142,8 +141,7 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldL
     if (canUse8BitUnicode(utf8Str))
     {
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str, [&](auto c)
-        {
+        IterateUTF8Chars(utf8Str, [&](auto c) {
             rv.push_back(c);
             return rv.size() < maxHeaderAndContentLength;
         });
@@ -151,8 +149,7 @@ std::vector<std::uint8_t> serializeDString(const std::string& str, size_t fieldL
     else
     {
         rv.push_back(16);
-        IterateUTF8Chars(utf8Str, [&](auto c)
-        {
+        IterateUTF8Chars(utf8Str, [&](auto c) {
             UTF16 high_surrogate, low_surrogate;
             std::tie(high_surrogate, low_surrogate) = ConvertUTF32toUTF16(c);
             auto spaceLeft = maxHeaderAndContentLength - rv.size();
