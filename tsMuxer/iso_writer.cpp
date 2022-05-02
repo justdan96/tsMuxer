@@ -56,7 +56,7 @@ void writeDescriptorTag(uint8_t* buffer, DescriptorTag tag, uint32_t tagLocation
     buff16[0] = (uint16_t)tag;
     buff16[1] = 0x03;  // version
     // skip check sum and reserved byte here
-    buff16[3] = 0x03;  // Tag Serial Number
+    buff16[3] = 0x01;  // Tag Serial Number
     // skip Descriptor CRC
     // Descriptor CRC Length
 
