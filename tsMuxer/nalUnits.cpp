@@ -574,7 +574,7 @@ int SPSUnit::deserialize()
 
         if (nal_unit_type == NALType::nuSubSPS)
         {
-            int rez = deserializeSubSPS();
+            rez = deserializeSubSPS();
             if (rez != 0)
                 return rez;
         }
@@ -774,7 +774,7 @@ void SPSUnit::updateTimingInfo()
     reader.setBuffer(m_nalBuffer + beforeBytes, m_nalBuffer + m_nalBufferLen);
     BitStreamWriter writer{};
     writer.setBuffer(newNalBuffer + beforeBytes, newNalBuffer + m_nalBufferLen + EXTRA_SPACE);
-    int tmpVal = reader.getBits(bitPos & 7);
+    unsigned tmpVal = reader.getBits(bitPos & 7);
     writer.putBits(bitPos & 7, tmpVal);
 
     if (!timing_info_present_flag)
@@ -799,12 +799,12 @@ void SPSUnit::updateTimingInfo()
     int bitRest = full_sps_bit_len - reader.getBitsCount() - beforeBytes * 8;
     for (; bitRest >= 8; bitRest -= 8)
     {
-        uint8_t tmpVal = reader.getBits(8);
+        tmpVal = reader.getBits(8);
         writer.putBits(8, tmpVal);
     }
     if (bitRest > 0)
     {
-        uint8_t tmpVal = reader.getBits(bitRest);
+        tmpVal = reader.getBits(bitRest);
         writer.putBits(bitRest, tmpVal);
     }
 
@@ -832,7 +832,7 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool a
     reader.setBuffer(m_nalBuffer + beforeBytes, m_nalBuffer + m_nalBufferLen);
     BitStreamWriter writer{};
     writer.setBuffer(newNalBuffer + beforeBytes, newNalBuffer + m_nalBufferLen + EXTRA_SPACE);
-    int tmpVal = reader.getBits(bitPos & 7);
+    unsigned tmpVal = reader.getBits(bitPos & 7);
     writer.putBits(bitPos & 7, tmpVal);
 
     if (addVuiHeader)
@@ -895,12 +895,12 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool a
     int bitRest = full_sps_bit_len - reader.getBitsCount() - beforeBytes * 8;
     for (; bitRest >= 8; bitRest -= 8)
     {
-        uint8_t tmpVal = reader.getBits(8);
+        tmpVal = reader.getBits(8);
         writer.putBits(8, tmpVal);
     }
     if (bitRest > 0)
     {
-        uint8_t tmpVal = reader.getBits(bitRest);
+        tmpVal = reader.getBits(bitRest);
         writer.putBits(bitRest, tmpVal);
     }
 
