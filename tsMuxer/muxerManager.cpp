@@ -345,10 +345,10 @@ void MuxerManager::parseMuxOpt(const string& opts)
         {
             uint64_t coeff = 1;
             string postfix;
-            for (auto i : paramPair[1])
+            for (auto j : paramPair[1])
             {
-                if (!((i >= '0' && i <= '9') || i == '.'))
-                    postfix += i;
+                if (!((j >= '0' && j <= '9') || j == '.'))
+                    postfix += j;
             }
 
             postfix = strToUpperCase(postfix);
