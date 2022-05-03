@@ -272,7 +272,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
 
     if (codecName[0] == 'V')
     {
-        auto itr = params.find("fps");
+        itr = params.find("fps");
         if (itr != params.end())
         {
             double fps = strToDouble(itr->second.c_str());
