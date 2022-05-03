@@ -31,8 +31,7 @@ SingleFileMuxer::SingleFileMuxer(MuxerManager* owner) : AbstractMuxer(owner), m_
 
 SingleFileMuxer::~SingleFileMuxer()
 {
-    for (map<int, StreamInfo*>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
-        delete itr->second;
+    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr) delete itr->second;
 }
 
 void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
@@ -133,7 +132,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     else
         fileName = extractFileName(fileList[0]) + "+___+" + extractFileName(fileList[fileList.size() - 1]);
 
-    map<string, string>::const_iterator itr = params.find("track");
+    auto itr = params.find("track");
     if (itr != params.end())
     {
         if (params.find("subClip") != params.end())
@@ -157,7 +156,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         fileName += itr->second;
     }
 
-    StreamInfo* streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
+    auto streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
     streamInfo->m_fileName = fileName + fileExt;
     if (streamInfo->m_fileName.size() > 254)
         LTRACE(LT_ERROR, 2, "Error: File name too long.");
@@ -175,7 +174,7 @@ void SingleFileMuxer::openDstFile()
     if (m_owner->isAsyncMode())
         systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif
-    for (map<int, StreamInfo*>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
     {
         itr->second->m_fileName = dir + itr->second->m_fileName;
         if (!itr->second->m_file.open(itr->second->m_fileName.c_str(), File::ofWrite, systemFlags))
@@ -191,7 +190,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         int toFileLen = blockSize & 0xffff0000;
         if (m_owner->isAsyncMode())
         {
-            uint8_t* newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
+            auto newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
             memcpy(newBuf, streamInfo->m_buffer + toFileLen, streamInfo->m_bufLen - toFileLen);
             m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, toFileLen, &streamInfo->m_file);
             streamInfo->m_buffer = newBuf;
@@ -205,7 +204,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_bufLen -= toFileLen;
     }
 
-    LPCMStreamReader* lpcmReader = dynamic_cast<LPCMStreamReader*>(streamInfo->m_codecReader);
+    auto lpcmReader = dynamic_cast<LPCMStreamReader*>(streamInfo->m_codecReader);
     if (lpcmReader && streamInfo->m_totalWrited >= 0xffff0000ul - blockSize)
     // if (lpcmReader && streamInfo->m_totalWrited >= 0x0ffffffful)
     {
@@ -238,7 +237,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
 
 bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
 {
-    if (avPacket.data == 0 || avPacket.size == 0)
+    if (avPacket.data == nullptr || avPacket.size == 0)
         return true;
     StreamInfo* streamInfo = m_streamInfo[avPacket.stream_index];
     if (avPacket.dts != streamInfo->m_dts || avPacket.pts != streamInfo->m_pts ||
@@ -261,7 +260,7 @@ bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
 
 bool SingleFileMuxer::doFlush()
 {
-    for (map<int, StreamInfo*>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
     {
         StreamInfo* streamInfo = itr->second;
         unsigned lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
@@ -270,7 +269,7 @@ bool SingleFileMuxer::doFlush()
         {
             if (lastBlockSize > 0)
             {
-                uint8_t* newBuff = new uint8_t[lastBlockSize];
+                auto newBuff = new uint8_t[lastBlockSize];
                 memcpy(newBuff, streamInfo->m_buffer + roundBufLen, lastBlockSize);
                 m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, roundBufLen, &streamInfo->m_file);
                 streamInfo->m_buffer = newBuff;
@@ -293,7 +292,7 @@ bool SingleFileMuxer::doFlush()
 
 bool SingleFileMuxer::close()
 {
-    for (map<int, StreamInfo*>::iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
     {
         StreamInfo* streamInfo = itr->second;
         if (!streamInfo->m_file.close())

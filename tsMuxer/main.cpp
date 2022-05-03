@@ -246,10 +246,10 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
     int videoWidth = 1920;
     int videoHeight = 1080;
     double fps = 23.976;
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (auto itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
         const PMTStreamInfo& streamInfo = itr->second;
-        const MPEGStreamReader* streamReader = dynamic_cast<const MPEGStreamReader*>(streamInfo.m_codecReader);
+        const auto streamReader = dynamic_cast<const MPEGStreamReader*>(streamInfo.m_codecReader);
         if (streamReader)
         {
             videoWidth = streamReader->getStreamWidth();
@@ -308,7 +308,7 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
         string dstFile = blurayHelper.m2tsFileName(blankNum);
         muxerManager.doMux(dstFile.c_str(), &blurayHelper);
 
-        TSMuxer* tsMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
+        auto tsMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
 
         blurayHelper.createMPLSFile(tsMuxer, 0, 0, vector<double>(), dt, blankNum, false);
         blurayHelper.createCLPIFile(tsMuxer, blankNum, true);
@@ -326,7 +326,7 @@ void doTruncatedFile(const char* fileName, int64_t offset)
     outFile.open(outName.c_str(), File::ofWrite);
 
     uint32_t bufSize = 1024 * 64;
-    uint8_t* buffer = new uint8_t[bufSize];
+    auto buffer = new uint8_t[bufSize];
     f.seek(offset);
     int readed = f.read(buffer, bufSize);
     while (readed > 0)
@@ -761,8 +761,8 @@ int main(int argc, char** argv)
             if (dt != DiskType::NONE)
             {
                 blurayHelper.writeBluRayFiles(muxerManager, insertBlankPL, firstMplsOffset, blankNum, stereoMode);
-                TSMuxer* mainMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
-                TSMuxer* subMuxer = dynamic_cast<TSMuxer*>(muxerManager.getSubMuxer());
+                auto mainMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
+                auto subMuxer = dynamic_cast<TSMuxer*>(muxerManager.getSubMuxer());
 
                 if (mainMuxer)
                     blurayHelper.createCLPIFile(mainMuxer, mainMuxer->getFirstFileNum(), true);

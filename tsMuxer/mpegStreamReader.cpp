@@ -39,7 +39,7 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
     m_eof = true;
     avPacket.codec = this;
     avPacket.duration = 0;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.flags = m_flags;
     avPacket.stream_index = m_streamIndex;
@@ -103,7 +103,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
     avPacket.codecID = getCodecInfo().codecID;
 
     avPacket.duration = 0;
-    avPacket.data = 0;
+    avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.pts = m_curPts + m_timeOffset;
     avPacket.dts = m_curDts + m_timeOffset - m_pcrIncPerFrame * getFrameDepth();  // shift dts back

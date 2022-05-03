@@ -62,10 +62,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
                 m_vps = new HevcVpsUnit();
             m_vps->decodeBuffer(nal, nextNal);
             if (m_vps->deserialize() != 0)
-            {
-                delete m_vps;
                 return rez;
-            }
             m_spsPpsFound = true;
             if (m_vps->num_units_in_tick)
                 updateFPS(m_vps, nal, nextNal, 0);
@@ -241,7 +238,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    uint32_t pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
+    auto pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
 
     if (!isDVBL && V3_flags & FOUR_K)
     {
@@ -371,9 +368,9 @@ void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
 {
     int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
-    HevcVpsUnit* vps = (HevcVpsUnit*)nalUnit;
+    auto vps = (HevcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
-    uint8_t* tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
+    auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
     int newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");
@@ -634,7 +631,7 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             memcpy(curPos, avPacket.data, avPacket.size);
             curPos += avPacket.size;
             avPacket.size = 0;
-            avPacket.data = 0;
+            avPacket.data = nullptr;
         }
     }
 

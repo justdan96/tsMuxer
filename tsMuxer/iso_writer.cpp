@@ -51,12 +51,12 @@ unsigned short crc16(unsigned char* pcBlock, unsigned short len)
 
 void writeDescriptorTag(uint8_t* buffer, DescriptorTag tag, uint32_t tagLocation)
 {
-    uint16_t* buff16 = (uint16_t*)buffer;
-    uint32_t* buff32 = (uint32_t*)buffer;
+    auto buff16 = (uint16_t*)buffer;
+    auto buff32 = (uint32_t*)buffer;
     buff16[0] = (uint16_t)tag;
     buff16[1] = 0x03;  // version
     // skip check sum and reserved byte here
-    buff16[3] = 0x03;  // Tag Serial Number
+    buff16[3] = 0x01;  // Tag Serial Number
     // skip Descriptor CRC
     // Descriptor CRC Length
 
@@ -76,7 +76,7 @@ std::string toIsoSeparator(const std::string& path)
 
 void calcDescriptorCRC(uint8_t* buffer, uint16_t len)
 {
-    uint16_t* buff16 = (uint16_t*)buffer;
+    auto buff16 = (uint16_t*)buffer;
 
     // calc crc
     buff16[4] = crc16(buffer + 16, len - 16);
@@ -90,20 +90,21 @@ void calcDescriptorCRC(uint8_t* buffer, uint16_t len)
 
 void writeTimestamp(uint8_t* buffer, time_t time)
 {
-    uint16_t* buff16 = (uint16_t*)buffer;
+    auto buff16 = (uint16_t*)buffer;
 
-    struct tm* partsl = localtime(&time);
-    struct tm* partsg = gmtime(&time);
+    const tm* parts = localtime(&time);
 
-    int16_t timeZone = partsl->tm_hour - partsg->tm_hour;
+    time_t lt = mktime(localtime(&time));
+    time_t gt = mktime(gmtime(&time));
+    int16_t timeZone = (lt - gt) / 60;
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
-    buff16[1] = partsg->tm_year + 1900;
-    buffer[4] = partsg->tm_mon + 1;
-    buffer[5] = partsg->tm_mday;
-    buffer[6] = partsg->tm_hour;
-    buffer[7] = partsg->tm_min;
-    buffer[8] = partsg->tm_sec;
+    buff16[1] = parts->tm_year + 1900;
+    buffer[4] = parts->tm_mon + 1;
+    buffer[5] = parts->tm_mday;
+    buffer[6] = parts->tm_hour;
+    buffer[7] = parts->tm_min;
+    buffer[8] = parts->tm_sec;
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
@@ -189,8 +190,8 @@ void writeUDFString(uint8_t* buffer, const char* str, int len)
 
 void writeLongAD(uint8_t* buffer, uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id)
 {
-    uint32_t* buff32 = (uint32_t*)buffer;
-    uint16_t* buff16 = (uint16_t*)buffer;
+    auto buff32 = (uint32_t*)buffer;
+    auto buff16 = (uint16_t*)buffer;
 
     buff32[0] = lenBytes;   // len
     buff32[1] = pos;        // location, block number
@@ -215,14 +216,14 @@ void ByteFileWriter::writeLE8(uint8_t value) { *m_curPos++ = value; }
 
 void ByteFileWriter::writeLE16(uint16_t value)
 {
-    uint16_t* pos16 = (uint16_t*)m_curPos;
+    auto pos16 = (uint16_t*)m_curPos;
     *pos16 = value;
     m_curPos += 2;
 }
 
 void ByteFileWriter::writeLE32(uint16_t value)
 {
-    uint32_t* pos32 = (uint32_t*)m_curPos;
+    auto pos32 = (uint32_t*)m_curPos;
     *pos32 = value;
     m_curPos += 4;
 }
@@ -243,8 +244,8 @@ void ByteFileWriter::closeDescriptorTag(int dataSize)
 
 void ByteFileWriter::writeIcbTag(uint8_t fileType)
 {
-    uint32_t* buff32 = (uint32_t*)m_curPos;
-    uint16_t* buff16 = (uint16_t*)m_curPos;
+    auto buff32 = (uint32_t*)m_curPos;
+    auto buff16 = (uint16_t*)m_curPos;
 
     // icb tag
     buff32[0] = 0;  // Prior Recorded Number of Direct Entries
@@ -606,7 +607,7 @@ void IsoWriter::setVolumeLabel(const std::string& value)
 {
     m_volumeLabel = value;
     if (m_volumeLabel.empty())
-        m_volumeLabel = " ";
+        m_volumeLabel = "Blu-Ray";
 }
 
 bool IsoWriter::open(const std::string& fileName, int64_t diskSize, int extraISOBlocks)
@@ -692,7 +693,7 @@ FileEntryInfo* IsoWriter::mkdir(const char* name, FileEntryInfo* parent)
     if (parent == 0)
         parent = m_rootDirInfo;
 
-    FileEntryInfo* dir = new FileEntryInfo(this, parent, m_objectUniqId++, FileTypes::Directory);
+    auto dir = new FileEntryInfo(this, parent, m_objectUniqId++, FileTypes::Directory);
     dir->setName(name);
     parent->addSubDir(dir);
     // m_sectorNum += 2;
@@ -745,7 +746,7 @@ FileEntryInfo* IsoWriter::createFileEntry(FileEntryInfo* parent, FileTypes fileT
     if (parent == 0)
         parent = m_rootDirInfo;
 
-    FileEntryInfo* file = new FileEntryInfo(this, parent, m_objectUniqId++, fileType);
+    auto file = new FileEntryInfo(this, parent, m_objectUniqId++, fileType);
     parent->addFile(file);
     return file;
 }
@@ -809,7 +810,7 @@ void IsoWriter::allocateMetadata()
     // write udf unique id mapping file
     m_file.seek((int64_t)METADATA_START_ADDR * SECTOR_SIZE + m_metadataFileLen);
 
-    uint8_t* buffer = new uint8_t[ALLOC_BLOCK_SIZE];
+    auto buffer = new uint8_t[ALLOC_BLOCK_SIZE];
     memset(buffer, 0, ALLOC_BLOCK_SIZE);
     ByteFileWriter writer;
     writer.setBuffer(buffer, ALLOC_BLOCK_SIZE);
@@ -902,6 +903,7 @@ void IsoWriter::writeDescriptors()
 
     int64_t eofPos = m_partitionEndAddress * (int64_t)SECTOR_SIZE;
     m_file.seek(eofPos + ALLOC_BLOCK_SIZE - SECTOR_SIZE);
+    // TODO: It may be preferable not to include the AVDP at (N - 256) for Rewritable media (ditto DVDFab and ImgBurn)
     writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
 
     writePrimaryVolumeDescriptor();
@@ -950,7 +952,7 @@ int IsoWriter::allocateEntity(FileEntryInfo* entity, int sectorNum)
 
 void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd)
 {
-    uint32_t* buff32 = (uint32_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::AllocationExtent, absoluteSectorNum());
 
@@ -979,9 +981,9 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::ExtendedFile, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
-    uint64_t* buff64 = (uint64_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
+    auto buff16 = (uint16_t*)m_buffer;
+    auto buff64 = (uint64_t*)m_buffer;
 
     writeIcbTag(namedStream, m_buffer + 16, fileType);
 
@@ -1086,8 +1088,8 @@ int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, Fi
 
 void IsoWriter::writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType)
 {
-    uint32_t* buff32 = (uint32_t*)buffer;
-    uint16_t* buff16 = (uint16_t*)buffer;
+    auto buff32 = (uint32_t*)buffer;
+    auto buff16 = (uint16_t*)buffer;
 
     // icb tag
     buff32[0] = 0;  // Prior Recorded Number of Direct Entries
@@ -1128,6 +1130,7 @@ void IsoWriter::writeFileSetDescriptor()
     writer.skipBytes(32);                                       // Abstract File Identifier
     writer.writeLongAD(0x0800, 1, 1, 0);                        // Root Directory ICB
     writer.writeUDFString("*OSTA UDF Compliant", 32);           // Domain Identifier
+    m_buffer[442] = 0x03;                                       // Domain Flags: Hard and Soft Write-Protect
     writer.writeLongAD(0, 0, 0, 0);                             // Next Extent
     writer.writeLongAD(0x0800, m_systemStreamLBN, 1, 0);
 
@@ -1143,7 +1146,7 @@ void IsoWriter::writePrimaryVolumeDescriptor()
     writer.setBuffer(m_buffer, sizeof(m_buffer));
     writer.writeDescriptorTag(DescriptorTag::PrimVol, absoluteSectorNum());
 
-    writer.writeLE32(0x01);  // Volume Descriptor Sequence Number
+    writer.writeLE32(0x00);  // Volume Descriptor Sequence Number
     writer.writeLE32(0x00);  // Primary Volume Descriptor Number
     writer.writeDString(m_volumeLabel, 32);
 
@@ -1196,8 +1199,8 @@ void IsoWriter::writeImpUseDescriptor()
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::ImplUseVol, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    buff32[4] = 0x02;  // Descriptor Sequence Number
+    auto buff32 = (uint32_t*)m_buffer;
+    buff32[4] = 0x01;  // Descriptor Sequence Number
 
     std::string impId = std::string("*UDF LV Info");
     m_buffer[20] = 0x00;
@@ -1222,9 +1225,9 @@ void IsoWriter::writePartitionDescriptor()
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::Partition, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
-    buff32[4] = 0x03;                        // Descriptor Sequence Number
+    auto buff32 = (uint32_t*)m_buffer;
+    auto buff16 = (uint16_t*)m_buffer;
+    buff32[4] = 0x02;                        // Descriptor Sequence Number
     buff16[10] = 0x01;                       // partition flags
     buff16[11] = 0x00;                       // Partition Number
     strcpy((char*)m_buffer + 25, "+NSR03");  // Partition Contents
@@ -1244,15 +1247,18 @@ void IsoWriter::writeLogicalVolumeDescriptor()
 {
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::LogicalVol, absoluteSectorNum());
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
+    auto buff16 = (uint16_t*)m_buffer;
 
-    buff32[4] = 0x04;                                         // Volume Descriptor Sequence Number
+    buff32[4] = 0x03;                                         // Volume Descriptor Sequence Number
     strcpy((char*)m_buffer + 21, "OSTA Compressed Unicode");  // Descriptor Character Set
     // Logical Volume Identifier
     writeDString(m_buffer + 84, m_volumeLabel.c_str(), 128);
     buff32[212 / 4] = SECTOR_SIZE;                              // Logical Block Size
     writeUDFString(m_buffer + 216, "*OSTA UDF Compliant", 32);  // Domain Identifier
+
+    // Domain Flags #03: Hard and Soft Write-Protect
+    m_buffer[242] = 0x03;
 
     // Logical Volume Contents Use
     m_buffer[249] = 0x08;
@@ -1306,9 +1312,9 @@ void IsoWriter::writeUnallocatedSpaceDescriptor()
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::UnallocSpace, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
 
-    buff32[4] = 0x05;  // sequence number
+    buff32[4] = 0x04;  // sequence number
 
     calcDescriptorCRC(m_buffer, 24);
     m_file.write(m_buffer, SECTOR_SIZE);
@@ -1328,8 +1334,8 @@ void IsoWriter::writeLogicalVolumeIntegrityDescriptor()
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::LogicalVolIntegrity, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
-    uint16_t* buff16 = (uint16_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
+    auto buff16 = (uint16_t*)m_buffer;
 
     writeTimestamp(m_buffer + 16, m_currentTime);
     buff32[7] = 0x01;              // Integrity Type
@@ -1363,7 +1369,7 @@ void IsoWriter::writeAnchorVolumeDescriptor(uint32_t endPartitionAddr)
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::AnchorVolPtr, absoluteSectorNum());
 
-    uint32_t* buff32 = (uint32_t*)m_buffer;
+    auto buff32 = (uint32_t*)m_buffer;
     buff32[4] = 0x8000;  // point of the main volume descriptor
     buff32[5] = 0x20;
     buff32[6] = 0x8000;
@@ -1383,7 +1389,7 @@ void IsoWriter::checkLayerBreakPoint(int maxExtentSize)
     if (lbn < m_layerBreakPoint && lbn + maxExtentSize > m_layerBreakPoint)
     {
         int rest = m_layerBreakPoint - lbn;
-        uint8_t* tmpBuffer = new uint8_t[rest * SECTOR_SIZE];
+        auto tmpBuffer = new uint8_t[rest * SECTOR_SIZE];
         memset(tmpBuffer, 0, rest * SECTOR_SIZE);
         m_file.write(tmpBuffer, rest * SECTOR_SIZE);
         delete[] tmpBuffer;

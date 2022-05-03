@@ -44,10 +44,10 @@ void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool
     uint8_t* curPos = waveBuffer.data();
     memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt ", 16);
     curPos += 16;
-    uint32_t* fmtSize = (uint32_t*)curPos;
+    auto fmtSize = (uint32_t*)curPos;
     *fmtSize = sizeof(WAVEFORMATPCMEX);
     curPos += 4;
-    WAVEFORMATPCMEX* waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
+    auto waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
 
     waveFormatPCMEx->wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     waveFormatPCMEx->nChannels = channels;
@@ -68,9 +68,9 @@ void toLittleEndian(uint8_t* dstData, const uint8_t* srcData, int size, int bitd
 {
     if (bitdepth == 16)
     {
-        uint16_t* dst = (uint16_t*)dstData;
-        const uint16_t* src = (const uint16_t*)srcData;
-        const uint16_t* srcEnd = (const uint16_t*)(srcData + size);
+        auto dst = (uint16_t*)dstData;
+        auto src = (uint16_t*)srcData;
+        const auto srcEnd = (const uint16_t*)(srcData + size);
         while (src < srcEnd) *dst++ = my_ntohs(*src++);
     }
     else if (bitdepth > 16)

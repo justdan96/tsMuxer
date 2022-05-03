@@ -51,7 +51,7 @@ class BitStreamReader : public BitStream
    private:
     inline unsigned getCurVal(unsigned* buff)
     {
-        uint8_t* tmpBuf = (uint8_t*)buff;
+        auto tmpBuf = (uint8_t*)buff;
         if (m_totalBits - m_bitLeft >= 32)
             return my_ntohl(*buff);
         else if (m_totalBits - m_bitLeft >= 24)

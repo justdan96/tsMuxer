@@ -93,7 +93,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                 break;
             }
             m2tsHdrDiscarded = false;
-            TSPacket* tsPacket = (TSPacket*)curPos;
+            auto tsPacket = (TSPacket*)curPos;
             int pid = tsPacket->getPID();
 
             if (pid == 0)
@@ -124,7 +124,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                         nonProcPMTPid.erase(pid);
                         if (nonProcPMTPid.size() == 0 && !mvcContinueExpected())
                         {  // all pmt pids processed
-                            BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+                            auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
                             if (br)
                                 br->incSeek(m_readerID, -(int64_t)totalReadedBytes);
                             else
@@ -142,7 +142,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
         }
     }
 
-    BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->incSeek(m_readerID, -(int64_t)totalReadedBytes);
     else
@@ -192,17 +192,16 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 {
     if (m_firstDemuxCall)
     {
-        for (set<uint32_t>::const_iterator itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr)
-            m_acceptedPidCache[*itr] = 1;
+        for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) m_acceptedPidCache[*itr] = 1;
         m_firstDemuxCall = false;
     }
 
     uint8_t pmtBuffer[4096]{0};
     int pmtBufferLen = 0;
-    MemoryBlock* vect = 0;
+    MemoryBlock* vect = nullptr;
     int lastPid = -1;
 
-    for (set<uint32_t>::const_iterator itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
+    for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
 
     discardSize = 0;
     uint32_t readedBytes;
@@ -280,7 +279,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 break;
             forpmtm2tsHdrDiscarded = false;
 
-            TSPacket* tsPacket = (TSPacket*)m_curPos;
+            auto tsPacket = (TSPacket*)m_curPos;
             int pid = tsPacket->getPID();
             if (pid == 0)
             {  // PAT
@@ -324,7 +323,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         }
         m_m2tsHdrDiscarded = false;
 
-        TSPacket* tsPacket = (TSPacket*)m_curPos;
+        auto tsPacket = (TSPacket*)m_curPos;
         int pid = tsPacket->getPID();
         discardSize += TS_FRAME_SIZE;
 
@@ -347,8 +346,8 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         bool pesStartCode = frameData[0] == 0 && frameData[1] == 0 && frameData[2] == 1 && tsPacket->payloadStart;
         if (pesStartCode)
         {
-            PESPacket* pesPacket = (PESPacket*)frameData;
-            PIDListMap::iterator streamInfo = m_pmt.pidList.find(pid);
+            auto pesPacket = (PESPacket*)frameData;
+            auto streamInfo = m_pmt.pidList.find(pid);
 
             if ((pesPacket->flagsLo & 0x80) == 0x80)
             {
@@ -415,9 +414,12 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 vect = &demuxedData[pid];
                 lastPid = pid;
             }
-            vect->grow(payloadLen);
-            uint8_t* dst = vect->data() + vect->size() - payloadLen;
-            memcpy(dst, frameData, payloadLen);
+            if (vect != nullptr)
+            {
+                vect->grow(payloadLen);
+                uint8_t* dst = vect->data() + vect->size() - payloadLen;
+                memcpy(dst, frameData, payloadLen);
+            }
         }
         discardSize -= payloadLen;
     }
@@ -464,7 +466,7 @@ uint64_t TSDemuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void TSDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    BufferedFileReader* br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != 0)
@@ -474,8 +476,8 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
 int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
 {
     // pcr from end of file
-    uint8_t* tmpBuffer = new uint8_t[bufferSize];
-    file.seek(FFMAX(fileSize - bufferSize, 0), File::SeekMethod::smBegin);
+    auto tmpBuffer = new uint8_t[bufferSize];
+    file.seek(FFMAX(fileSize - fileSize % frameSize - bufferSize, 0), File::SeekMethod::smBegin);
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;  // read error
@@ -484,7 +486,7 @@ int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
     int64_t lastPcrVal = -1;
     while (curPtr <= bufferEnd - frameSize)
     {
-        TSPacket* tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+        auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
         if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
         {
             lastPcrVal = tsPacket->adaptiveField.getPCR33();
@@ -506,15 +508,9 @@ int64_t getTSDuration(const char* fileName)
         File file(fileName, File::ofRead);
         if (!file.size(&fileSize))
             return -1;
-        /*
-        fileSize = fileSize / frameSize * frameSize;
-        fileSize -= frameSize * 2000;
-        if (fileSize < 0)
-            fileSize = 0;
-        */
         int bufferSize = 1024 * 256;
         bufferSize -= bufferSize % frameSize;
-        uint8_t* tmpBuffer = new uint8_t[bufferSize];
+        auto tmpBuffer = new uint8_t[bufferSize];
         // pcr from start of file
         int len = file.read(tmpBuffer, bufferSize);
         if (len < 1)
@@ -527,7 +523,7 @@ int64_t getTSDuration(const char* fileName)
         int64_t firstPcrVal = 0;
         while (curPtr <= bufferEnd - frameSize)
         {
-            TSPacket* tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+            auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
             if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
             {
                 firstPcrVal = tsPacket->adaptiveField.getPCR33();

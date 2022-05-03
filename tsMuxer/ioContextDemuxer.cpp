@@ -170,7 +170,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
 
 void IOContextDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    BufferedReader* br = dynamic_cast<BufferedReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != 0)

@@ -28,6 +28,8 @@ set(tsmuxer_ts_files
   translations/tsmuxergui_ru.ts
   translations/tsmuxergui_fr.ts
   translations/tsmuxergui_zh.ts
+  translations/tsmuxergui_de.ts
+  translations/tsmuxergui_he.ts
 )
 
 set(lang_qrc "translations.qrc")

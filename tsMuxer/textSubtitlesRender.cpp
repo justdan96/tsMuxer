@@ -221,7 +221,7 @@ string findFontArg(const string& text, size_t pos)
 
 uint32_t rgbSwap(uint32_t color)
 {
-    uint8_t* rgb = (uint8_t*)&color;
+    auto rgb = (uint8_t*)&color;
     uint8_t tmp = rgb[0];
     rgb[0] = rgb[2];
     rgb[2] = tmp;
@@ -447,7 +447,7 @@ void TextSubtitlesRender::addBorder(int borderWidth, uint8_t* data, int width, i
     // add black border
     for (int i = 0; i < borderWidth; ++i)
     {
-        uint32_t* dst = (uint32_t*)data;
+        auto dst = (uint32_t*)data;
         for (int y = 0; y < height; ++y)
         {
             for (int x = 0; x < width; ++x)

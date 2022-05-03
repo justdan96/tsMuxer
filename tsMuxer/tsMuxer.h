@@ -98,7 +98,7 @@ class TSMuxer : public AbstractMuxer
     inline int calcM2tsFrameCnt();
     inline void writeM2TSHeader(uint8_t* buffer, uint64_t m2tsPCR)
     {
-        uint32_t* cur = (uint32_t*)buffer;
+        auto cur = (uint32_t*)buffer;
         *cur = my_htonl(m2tsPCR & 0x3fffffff);
     }
     void writePATPMT(int64_t pcr, bool force = false);

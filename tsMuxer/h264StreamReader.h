@@ -46,7 +46,7 @@ class H264StreamReader : public MPEGStreamReader
     void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     double getStreamFPS(void* curNalUnit) override
     {
-        SPSUnit* sps = (SPSUnit*)curNalUnit;
+        auto sps = (SPSUnit*)curNalUnit;
         return sps->getFPS();
     };
 

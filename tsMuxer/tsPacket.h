@@ -122,23 +122,23 @@ struct AdaptiveField
 
     inline unsigned getPCR32()
     {
-        uint32_t* pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
+        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
         return my_ntohl(*pcr);
         // return my_ntohl(*pcr) * 0.95;
     }
 
     inline uint64_t getPCR33()
     {
-        uint32_t* pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
-        uint8_t* pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
+        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
+        auto pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
         return ((uint64_t)(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
     }
 
     inline void setPCR33(uint64_t value)
     {
-        uint32_t* pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
+        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
         *pcr = my_htonl((uint32_t)(value >> 1));
-        uint8_t* pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
+        auto pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
         pcrLo[0] = (((uint8_t)value & 1) << 7) + 0x7e;
         pcrLo[1] = 0;  // 41-42 bits of pcr
     }

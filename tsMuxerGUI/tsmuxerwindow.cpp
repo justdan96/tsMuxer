@@ -59,10 +59,10 @@ QString fileDialogFilter()
     FileFilterVec filters = {{TsMuxerWindow::tr("AC3/E-AC3"), {"ac3", "ddp", "ec3", "eac3"}},
                              {TsMuxerWindow::tr("AAC (advanced audio coding)"), {"aac"}},
                              {TsMuxerWindow::tr("AVC/MVC/H.264 elementary stream"), {"avc", "mvc", "264", "h264"}},
-                             {TsMuxerWindow::tr("HEVC (High Efficiency Video Codec)"), {"hevc", "hvc", "265", "h265"}},
+                             {TsMuxerWindow::tr("HEVC (High Efficiency Video Codec)"), {"hevc", "265", "h265"}},
                              {TsMuxerWindow::tr("Digital Theater System"), {"dts"}},
-                             {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd"}},
-                             {TsMuxerWindow::tr("TrueHD/AC3+TrueHD"), {"thd", "truehd", "ac3+thd"}},
+                             {TsMuxerWindow::tr("DTS-HD Master Audio"), {"dtshd", "dtsma"}},
+                             {TsMuxerWindow::tr("TrueHD/AC3+TrueHD"), {"thd", "truehd", "ac3+thd", "thd+ac3"}},
                              {TsMuxerWindow::tr("Mpeg video elementary stream"), {"mpv", "m1v", "m2v"}},
                              {TsMuxerWindow::tr("Mpeg audio elementary stream"), {"mpa"}},
                              {TsMuxerWindow::tr("Transport Stream"), {"ts"}},
@@ -287,6 +287,8 @@ void initLanguageComboBox(QComboBox *comboBox)
     comboBox->addItem(QString::fromUtf8("Русский"), "ru");
     comboBox->addItem(QString::fromUtf8("Français"), "fr");
     comboBox->addItem(QString::fromUtf8("简体中文"), "zh");
+    comboBox->addItem(QString::fromUtf8("Deutsch"), "de");
+    comboBox->addItem(QString::fromUtf8("עִברִית"), "he");
     comboBox->setCurrentIndex(-1);  // makes sure currentIndexChanged() is emitted when reading settings.
 }
 

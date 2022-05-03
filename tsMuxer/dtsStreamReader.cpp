@@ -191,7 +191,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
     // check for DTS-HD headers
     while (end - buff >= 16)
     {
-        int64_t* ptr = (int64_t*)buff;
+        auto ptr = (int64_t*)buff;
         uint64_t hdrType = my_ntohll(ptr[0]);
         uint64_t hdrSize = my_ntohll(ptr[1]) + 16;
 
@@ -299,7 +299,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         {
             if (buff + headerSize + 4 > end)
                 return NOT_ENOUGH_BUFFER;
-            uint32_t* hdAudioData = (uint32_t*)(buff + headerSize);
+            auto hdAudioData = (uint32_t*)(buff + headerSize);
             switch (my_ntohl(*hdAudioData))
             {
             case 0x41A29547:  // XLL
@@ -585,13 +585,13 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 
         if (m_testMode && m_dtsEsChannels == 0)
         {
-            uint32_t* curPtr32 = (uint32_t*)(buff + 16);
+            auto curPtr32 = (uint32_t*)(buff + 16);
             int findSize = FFMIN((int)(end - buff), i_frame_size) / 4 - 4;
             for (int i = 0; i < findSize; ++i)
             {
                 if (*curPtr32++ == 0x5a5a5a5a)
                 {
-                    uint8_t* exHeader = (uint8_t*)curPtr32;
+                    auto exHeader = (uint8_t*)curPtr32;
                     int dataRest = (int)(buff + i_frame_size - exHeader);
                     int frameSize = (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
                     if (dataRest - frameSize == 0 || dataRest - frameSize == 1)

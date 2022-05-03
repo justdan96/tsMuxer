@@ -5,5 +5,5 @@
 
 AbstractDemuxer::~AbstractDemuxer()
 {
-    for (PIDFilters::iterator itr = m_pidFilters.begin(); itr != m_pidFilters.end(); ++itr) delete itr->second;
+    for (auto itr = m_pidFilters.begin(); itr != m_pidFilters.end(); ++itr) delete itr->second;
 }

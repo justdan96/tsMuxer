@@ -27,7 +27,7 @@ ProgramStreamDemuxer::ProgramStreamDemuxer(const BufferedReaderManager& readMana
 
 void ProgramStreamDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    BufferedReader* br = dynamic_cast<BufferedReader*>(m_bufferedReader);
+    auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != 0)
@@ -90,7 +90,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
 {
     afterPesHeader = 0;
 
-    PESPacket* pesPacket = (PESPacket*)buff;
+    auto pesPacket = (PESPacket*)buff;
     uint8_t startcode = buff[3];
 
     // find matching stream
@@ -256,7 +256,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 
     while (curBuf <= end - 9)
     {
-        PESPacket* pesPacket = (PESPacket*)curBuf;
+        auto pesPacket = (PESPacket*)curBuf;
         uint8_t startcode = curBuf[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -351,7 +351,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
 {
     file.seek(FFMAX(0, fileSize - bufferSize), File::SeekMethod::smBegin);
-    uint8_t* tmpBuffer = new uint8_t[bufferSize];
+    auto tmpBuffer = new uint8_t[bufferSize];
     int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;
@@ -362,7 +362,7 @@ int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
     curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
     while (curPtr <= bufEnd - 9)
     {
-        PESPacket* pesPacket = (PESPacket*)curPtr;
+        auto pesPacket = (PESPacket*)curPtr;
         uint8_t startcode = curPtr[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -387,7 +387,7 @@ int64_t getPSDuration(const char* fileName)
         if (!file.size(&fileSize))
             return 0;
 
-        uint8_t* tmpBuffer = new uint8_t[BUF_SIZE];
+        auto tmpBuffer = new uint8_t[BUF_SIZE];
 
         // pcr from start of file
         int len = file.read(tmpBuffer, BUF_SIZE);
@@ -402,7 +402,7 @@ int64_t getPSDuration(const char* fileName)
         curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
         while (curPtr <= bufEnd - 9)
         {
-            PESPacket* pesPacket = (PESPacket*)curPtr;
+            auto pesPacket = (PESPacket*)curPtr;
             uint8_t startcode = curPtr[3];
             if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) ||
                 (startcode == PES_VC1_ID) || (startcode == PES_PRIVATE_DATA2))
