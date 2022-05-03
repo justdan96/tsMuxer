@@ -1100,7 +1100,7 @@ vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int
             if (nalSize > 0)
             {
                 spsPps.push_back(vector<uint8_t>());
-                for (int i = 0; i < nalSize; ++i, ++src) spsPps.rbegin()->push_back(*src);
+                for (int k = 0; k < nalSize; ++k, ++src) spsPps.rbegin()->push_back(*src);
             }
         }
     }
