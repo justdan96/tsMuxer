@@ -326,7 +326,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         for (size_t k = 0; k < mplsInfoList.size(); ++k)
         {
             MPLSParser& mplsInfo = mplsInfoList[k];
-            string unquotedStreamName = unquoteStr(mplsNames[k]);
+            unquotedStreamName = unquoteStr(mplsNames[k]);
             for (size_t i = 0; i < mplsInfo.m_playItems.size(); ++i)
             {
                 string playItemName;
@@ -1303,9 +1303,9 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
 
     if (demuxerData.m_firstRead)
     {
-        for (auto itr = demuxerData.m_pids.begin(); itr != demuxerData.m_pids.end(); ++itr)
+        for (auto itr1 = demuxerData.m_pids.begin(); itr1 != demuxerData.m_pids.end(); ++itr1)
         {
-            MemoryBlock& vect = demuxerData.demuxedData[itr->first];
+            MemoryBlock& vect = demuxerData.demuxedData[itr1->first];
             vect.reserve((int)(nFileBlockSize + m_readBuffOffset));
             vect.resize((int)(m_readBuffOffset));
         }
@@ -1347,10 +1347,10 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
             int64_t discardSize = 0;
             demuxRez =
                 demuxerData.m_demuxer->simpleDemuxBlock(demuxerData.demuxedData, demuxerData.m_pidSet, discardSize);
-            for (DemuxedData::const_iterator itr = demuxerData.demuxedData.begin();
-                 itr != demuxerData.demuxedData.end() && !m_terminated; ++itr)
+            for (auto itr1 = demuxerData.demuxedData.begin();
+                 itr1 != demuxerData.demuxedData.end() && !m_terminated; ++itr1)
             {
-                if (itr->second.size() > MAX_DEMUX_BUFFER_SIZE)
+                if (itr1->second.size() > MAX_DEMUX_BUFFER_SIZE)
                     THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
                           "Reading buffer overflow. Possible container streams are not syncronized. Please, verify "
                           "stream fps. File name: "
