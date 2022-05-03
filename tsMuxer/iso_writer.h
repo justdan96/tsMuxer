@@ -48,7 +48,7 @@ enum class DescriptorTag
     UnallocatedSpace = 263,
     SpaceBitmap = 264,
     PartitionIntegrity = 265,
-    ExtendedFile = 266
+    ExtendedFileEntry = 266
 };
 
 enum class FileTypes
@@ -214,7 +214,7 @@ class IsoWriter
     void writeUnallocatedSpaceDescriptor();
     void writeTerminationDescriptor();
     void writeLogicalVolumeIntegrityDescriptor();
-    int writeExtentFileDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len, uint32_t pos,
+    int writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len, uint32_t pos,
                                   int linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
