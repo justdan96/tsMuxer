@@ -1347,8 +1347,8 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
             int64_t discardSize = 0;
             demuxRez =
                 demuxerData.m_demuxer->simpleDemuxBlock(demuxerData.demuxedData, demuxerData.m_pidSet, discardSize);
-            for (auto itr1 = demuxerData.demuxedData.begin();
-                 itr1 != demuxerData.demuxedData.end() && !m_terminated; ++itr1)
+            for (auto itr1 = demuxerData.demuxedData.begin(); itr1 != demuxerData.demuxedData.end() && !m_terminated;
+                 ++itr1)
             {
                 if (itr1->second.size() > MAX_DEMUX_BUFFER_SIZE)
                     THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
