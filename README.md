@@ -92,7 +92,7 @@ You can report issues directly on Github, that would be a really useful contribu
 
 ## Building
 
-For full details on building tsMuxer for your platform please see the document on [COMPILING](COMPILING.md).
+For full details on building tsMuxer for your platform please see the document on [COMPILING](docs/COMPILING.md).
 
 ## Testing
 
