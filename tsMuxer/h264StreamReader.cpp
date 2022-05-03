@@ -165,7 +165,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                 break;
             try
             {
-                const uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+                nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 uint8_t tmpBuffer[512];
                 int toDecode = (int)FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
                 int decodedLen = slice.decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
@@ -370,7 +370,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             if (dstEnd - curPos < 4)
                 THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
             curPos = writeNalPrefix(curPos);
-            int sRez = pps->serializeBuffer(curPos, dstEnd, false);
+            sRez = pps->serializeBuffer(curPos, dstEnd, false);
             if (sRez == -1)
                 THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
             curPos += sRez;
