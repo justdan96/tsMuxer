@@ -1421,7 +1421,7 @@ int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
     }
 }
 
-int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
+int MPLSParser::compose(uint8_t* curPos, int bufferSize, DiskType dt)
 {
     for (auto& i : m_streamInfo)
     {
@@ -1442,7 +1442,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
     }
 
     BitStreamWriter writer{};
-    writer.setBuffer(buffer, buffer + bufferSize);
+    writer.setBuffer(curPos, curPos + bufferSize);
 
     std::string type_indicator = "MPLS";
     std::string version_number;
@@ -1452,11 +1452,11 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
         version_number = "0100";
     CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
     CLPIStreamInfo::writeString(version_number.c_str(), writer, 4);
-    auto playList_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    auto playList_bit_pos = (uint32_t*)(curPos + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    auto playListMark_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    auto playListMark_bit_pos = (uint32_t*)(curPos + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    auto extDataStartAddr = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    auto extDataStartAddr = (uint32_t*)(curPos + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extension data start address
     for (int i = 0; i < 5; i++) writer.putBits(32, 0);  // reserved_for_future_use
     composeAppInfoPlayList(writer);
@@ -1483,14 +1483,14 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
         if (number_of_SubPaths > 0 && subPath_type == 7)
         {
-            int bufferSize = composePip_metadata(buffer, sizeof(buffer), mainStreamInfo.m_index);
+            bufferSize = composePip_metadata(buffer, sizeof(buffer), mainStreamInfo.m_index);
             ExtDataBlockInfo extDataBlock(buffer, bufferSize, 1, 1);
             blockVector.push_back(extDataBlock);
         }
 
         if (isDependStreamExist)
         {
-            int bufferSize = composeSTN_tableSS(buffer, sizeof(buffer));
+            bufferSize = composeSTN_tableSS(buffer, sizeof(buffer));
             ExtDataBlockInfo extDataBlock(buffer, bufferSize, 2, 1);
             blockVector.push_back(extDataBlock);
 
@@ -1501,7 +1501,7 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, DiskType dt)
 
         if (isV3())
         {
-            int bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
+            bufferSize = composeUHD_metadata(buffer, sizeof(buffer));
             ExtDataBlockInfo extDataBlock(buffer, bufferSize, 3, 5);
             blockVector.push_back(extDataBlock);
         }
@@ -2309,8 +2309,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, b
     // secondary audio
     for (auto& i : streamInfo)
     {
-        StreamType stream_coding_type = i.stream_coding_type;
-        if (isAudioStreamType(stream_coding_type) && i.isSecondary)
+        if (isAudioStreamType(i.stream_coding_type) && i.isSecondary)
         {
             i.composeStreamEntry(writer, PlayItem_id);
             i.composeStreamAttributes(writer);
@@ -2322,8 +2321,7 @@ void MPLSParser::composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, b
                 uint8_t primaryAudioNum = 0;
                 for (auto& j : streamInfo)
                 {
-                    StreamType stream_coding_type = j.stream_coding_type;
-                    if (isAudioStreamType(stream_coding_type) && !j.isSecondary)
+                    if (isAudioStreamType(j.stream_coding_type) && !j.isSecondary)
                         writer.putBits(8, primaryAudioNum++);
                 }
                 if (number_of_primary_audio_stream_entries % 2 == 1)
