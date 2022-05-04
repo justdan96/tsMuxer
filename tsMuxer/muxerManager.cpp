@@ -187,13 +187,23 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
             mlpFound = true;
     }
 
-    if (m_bluRayMode && aacFound)
-        LTRACE(LT_ERROR, 2,
-               "Warning! AAC codec is not standard for BD disks, the m2ts will not play on a Blu-ray player.");
-    else if (m_bluRayMode && mlpFound)
-        LTRACE(LT_ERROR, 2,
-               "Warning! MLP codec is not standard for BD disks, the m2ts will not play on a Blu-ray player.");
-    else if (!avcFound && mvcFound)
+    if (m_bluRayMode)
+    {
+        if (aacFound)
+            LTRACE(
+                LT_ERROR, 2,
+                "Warning! AAC codec is not standard for BD disks, the Blu-ray disk will not play in a Blu-ray player.");
+        else if (m_bluRayMode && mlpFound)
+            LTRACE(
+                LT_ERROR, 2,
+                "Warning! MLP codec is not standard for BD disks, the Blu-ray disk will not play in a Blu-ray player.");
+        else if (m_bluRayMode && (V3_flags & DV) && !(V3_flags & NON_DV_TRACK))
+            LTRACE(
+                LT_ERROR, 2,
+                "Warning! Dolby Vision Double Layer Single Tracks are not standard for BD disks, the Blu-ray disk will "
+                "not play in a Blu-ray player.");
+    }
+    if (!avcFound && mvcFound)
         THROW(ERR_INVALID_STREAMS_SELECTED,
               "Fatal error: MVC depended view track can't be muxed without AVC base view track");
 }
