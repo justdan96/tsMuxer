@@ -391,8 +391,8 @@ int FileEntryInfo::allocateEntity(int sectorNum)
 
 void FileEntryInfo::serializeFile()
 {
-    int writed = m_owner->writeExtentFileDescriptor(m_name == "*UDF Unique ID Mapping Data", m_objectId, m_fileType,
-                                                    m_fileSize, m_sectorNum, 1, &m_extents);
+    int writed = m_owner->writeExtendedFileEntryDescriptor(m_name == "*UDF Unique ID Mapping Data", m_objectId,
+                                                           m_fileType, m_fileSize, m_sectorNum, 1, &m_extents);
     assert(writed == m_sectorsUsed);
 }
 
@@ -423,8 +423,8 @@ void FileEntryInfo::serializeDir()
     for (auto& i : m_subDirs) writeEntity(writer, i);
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
-    m_owner->writeExtentFileDescriptor(0, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
-                                       (int)m_subDirs.size() + 1);
+    m_owner->writeExtendedFileEntryDescriptor(0, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
+                                              (int)m_subDirs.size() + 1);
     m_owner->writeSector(buffer);
 }
 
@@ -789,6 +789,7 @@ void IsoWriter::writeMetadata(int lbn)
     m_file.seek(int64_t(lbn) * SECTOR_SIZE);
     m_curMetadataPos = lbn;
     writeFileSetDescriptor();
+    writeTerminationDescriptor();
     writeEntity(m_rootDirInfo);
 
     // write system stream file
@@ -797,7 +798,7 @@ void IsoWriter::writeMetadata(int lbn)
 
 void IsoWriter::allocateMetadata()
 {
-    int sectorNum = 1;  // reserve sector for file set descriptor
+    int sectorNum = 2;  // reserve sector for file set descriptor and terminating descriptor
     m_systemStreamLBN = allocateEntity(m_rootDirInfo, sectorNum);
     allocateEntity(m_systemStreamDir, m_systemStreamLBN);
 
@@ -847,8 +848,8 @@ void IsoWriter::close()
     // mirror metadata file location and length
     m_metadataMirrorLBN = (int)(m_file.size() / SECTOR_SIZE + 1);
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtentFileDescriptor(0, 0, FileTypes::MetadataMirror, m_metadataFileLen,
-                              m_metadataMirrorLBN - m_partitionStartAddress, 0);
+    writeExtendedFileEntryDescriptor(0, 0, FileTypes::MetadataMirror, m_metadataFileLen,
+                                     m_metadataMirrorLBN - m_partitionStartAddress, 0);
 
     // allocate space for metadata mirror file
     memset(m_buffer, 0, sizeof(m_buffer));
@@ -868,7 +869,8 @@ void IsoWriter::close()
     m_file.seek(1024 * 576);
     // metadata file location and length (located at 576K, point to 640K address)
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtentFileDescriptor(0, 0, FileTypes::Metadata, m_metadataFileLen, m_metadataLBN - m_partitionStartAddress, 0);
+    writeExtendedFileEntryDescriptor(0, 0, FileTypes::Metadata, m_metadataFileLen,
+                                     m_metadataLBN - m_partitionStartAddress, 0);
     m_tagLocationBaseAddr = m_metadataLBN;  // Don't know why. Doing just as scenarist does
     writeMetadata(m_metadataLBN);
 
@@ -973,13 +975,13 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList* extents, size_t star
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-int IsoWriter::writeExtentFileDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len,
-                                         uint32_t pos, int linkCount, ExtentList* extents)
+int IsoWriter::writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len,
+                                                uint32_t pos, int linkCount, ExtentList* extents)
 {
     int sectorsWrited = 0;
 
     memset(m_buffer, 0, sizeof(m_buffer));
-    writeDescriptorTag(m_buffer, DescriptorTag::ExtendedFile, absoluteSectorNum());
+    writeDescriptorTag(m_buffer, DescriptorTag::ExtendedFileEntry, absoluteSectorNum());
 
     auto buff32 = (uint32_t*)m_buffer;
     auto buff16 = (uint16_t*)m_buffer;
@@ -1115,7 +1117,7 @@ void IsoWriter::writeFileSetDescriptor()
     writer.setBuffer(m_buffer, sizeof(m_buffer));
     writer.writeDescriptorTag(DescriptorTag::FileSet, absoluteSectorNum());
 
-    writer.writeTimestamp(m_currentTime);  // Volume Descriptor Sequence Number
+    writer.writeTimestamp(m_currentTime);  // Recording Date and Time
     writer.writeLE16(0x03);                // Interchange Level
     writer.writeLE16(0x03);                // Maximum Interchange Level
     writer.writeLE32(0x01);                // Character Set List
@@ -1128,7 +1130,7 @@ void IsoWriter::writeFileSetDescriptor()
     writer.writeDString(m_volumeLabel, 32);                     // File Set Identifier
     writer.skipBytes(32);                                       // Copyright File Identifier
     writer.skipBytes(32);                                       // Abstract File Identifier
-    writer.writeLongAD(0x0800, 1, 1, 0);                        // Root Directory ICB
+    writer.writeLongAD(0x0800, 2, 1, 0);                        // Root Directory ICB
     writer.writeUDFString("*OSTA UDF Compliant", 32);           // Domain Identifier
     m_buffer[442] = 0x03;                                       // Domain Flags: Hard and Soft Write-Protect
     writer.writeLongAD(0, 0, 0, 0);                             // Next Extent
@@ -1261,7 +1263,7 @@ void IsoWriter::writeLogicalVolumeDescriptor()
     m_buffer[242] = 0x03;
 
     // Logical Volume Contents Use
-    m_buffer[249] = 0x08;
+    m_buffer[249] = 0x10;
     m_buffer[256] = 0x01;
 
     m_buffer[264] = 0x46;  // partition Map Table Length ( in bytes)

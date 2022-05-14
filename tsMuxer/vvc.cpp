@@ -706,7 +706,8 @@ int VvcSpsUnit::deserialize()
             for (size_t j = 0; j < sps_num_ref_pic_lists; j++) ref_pic_list_struct(j);
         }
         m_reader.skipBit();  // sps_ref_wraparound_enabled_flag
-        bool sps_sbtmvp_enabled_flag = (m_reader.getBit()) /* sps_temporal_mvp_enabled_flag */ ? m_reader.getBit() : 0;
+        unsigned sps_sbtmvp_enabled_flag =
+            (m_reader.getBit()) /* sps_temporal_mvp_enabled_flag */ ? m_reader.getBit() : 0;
         bool sps_amvr_enabled_flag = m_reader.getBit();
         if (m_reader.getBit())   // sps_bdof_enabled_flag
             m_reader.skipBit();  // sps_bdof_control_present_in_ph_flag
@@ -1100,7 +1101,7 @@ vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int
             if (nalSize > 0)
             {
                 spsPps.push_back(vector<uint8_t>());
-                for (int i = 0; i < nalSize; ++i, ++src) spsPps.rbegin()->push_back(*src);
+                for (int k = 0; k < nalSize; ++k, ++src) spsPps.rbegin()->push_back(*src);
             }
         }
     }

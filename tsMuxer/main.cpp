@@ -136,10 +136,10 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
         {
             if (mplsParser)
             {
-                MPLSStreamInfo streamInfo = mplsParser->getStreamByPID(streams[i].trackID);
-                if (streamInfo.streamPID)
+                MPLSStreamInfo mplsStreamInfo = mplsParser->getStreamByPID(streams[i].trackID);
+                if (mplsStreamInfo.streamPID)
                 {
-                    if (streamInfo.isSecondary)
+                    if (mplsStreamInfo.isSecondary)
                         streams[i].isSecondary = true;
                 }
                 else
@@ -163,27 +163,27 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
             if (streams[i].codecInfo.codecID == CODEC_S_PGS && mplsParser && mplsParser->isDependStreamExist)
             {
                 // PG stream
-                MPLSStreamInfo streamInfo = mplsParser->getStreamByPID(streams[i].trackID);
-                int pgTrackNum = streamInfo.streamPID - 0x1200;
+                MPLSStreamInfo mplsStreamInfo = mplsParser->getStreamByPID(streams[i].trackID);
+                int pgTrackNum = mplsStreamInfo.streamPID - 0x1200;
                 if (pgTrackNum >= 0)
                 {
-                    if (streamInfo.offsetId != 0xff)
+                    if (mplsStreamInfo.offsetId != 0xff)
                     {
                         descr += "   3d-plane: ";
-                        descr += int32ToStr(streamInfo.offsetId);
+                        descr += int32ToStr(mplsStreamInfo.offsetId);
                     }
                     else
                     {
                         descr += "   3d-plane: undefined";
                     }
-                    if (streamInfo.isSSPG)
+                    if (mplsStreamInfo.isSSPG)
                     {
                         descr += "   (stereo, right=";
-                        descr += (streamInfo.rightEye->type == 2 ? "dep-view " : "");
-                        descr += int32ToStr(streamInfo.rightEye->streamPID);
+                        descr += (mplsStreamInfo.rightEye->type == 2 ? "dep-view " : "");
+                        descr += int32ToStr(mplsStreamInfo.rightEye->streamPID);
                         descr += ", left=";
-                        descr += (streamInfo.leftEye->type == 2 ? "dep-view " : "");
-                        descr += int32ToStr(streamInfo.leftEye->streamPID);
+                        descr += (mplsStreamInfo.leftEye->type == 2 ? "dep-view " : "");
+                        descr += int32ToStr(mplsStreamInfo.leftEye->streamPID);
                         descr += ")";
                     }
                 }

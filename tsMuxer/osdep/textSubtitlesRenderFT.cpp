@@ -22,6 +22,8 @@ const static char FONT_ROOT[] = "c:/WINDOWS/Fonts";  // for debug only
 const static char FONT_ROOT[] = "/usr/share/fonts/";
 #elif defined(__APPLE__) && defined(__MACH__)
 const static char FONT_ROOT[] = "/System/Library/Fonts/";
+#elif defined(__NetBSD__)
+const static char FONT_ROOT[] = "/usr/X11R7/lib/X11/fonts/";
 #endif
 
 #include <freetype/ftstroke.h>

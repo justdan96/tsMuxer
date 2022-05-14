@@ -7,7 +7,7 @@
 #include "limits.h"
 #include "vod_common.h"
 
-const static int TMP_BUFFER_SIZE = 1024 * 1024 * 8;
+const static int TMP_BUFFER_SIZE = 1024 * 1024 * 10;
 
 class MPEGStreamReader : public AbstractStreamReader
 {
