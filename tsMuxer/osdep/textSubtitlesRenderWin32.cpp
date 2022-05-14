@@ -113,7 +113,7 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 
     auto text_wide = toWide(text);
     path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, m_font.m_opts & 0xf,
-                   (float)m_font.m_size, Gdiplus::Point(rect->left, rect->top), &strformat);
+                   static_cast<float>(m_font.m_size), Gdiplus::Point(rect->left, rect->top), &strformat);
 
     uint8_t alpha = m_font.m_color >> 24;
     uint8_t outColor = (alpha * 48 + 128) / 255;
@@ -145,8 +145,8 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     StringFormat strformat;
     Gdiplus::GraphicsPath path;
     auto text_wide = toWide(text);
-    path.AddString(text_wide.data(), (int)text_wide.size(), &fontFamily, opts, (float)m_font.m_size,
-                   Gdiplus::Point(0, 0), &strformat);
+    path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, opts,
+                   static_cast<float>(m_font.m_size), Gdiplus::Point(0, 0), &strformat);
     Gdiplus::RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
