@@ -50,6 +50,7 @@ set(tsmuxer_gui_sources
   main.cpp
   tsmuxerwindow.cpp
   muxForm.cpp
+  lang_codes.cpp
   tsmuxerwindow.ui
   muxForm.ui
   checkboxedheaderview.cpp

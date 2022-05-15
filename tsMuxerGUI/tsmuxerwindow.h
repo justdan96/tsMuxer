@@ -26,6 +26,7 @@ class TsMuxerWindow;
 
 class QnCheckBoxedHeaderView;
 class FontSettingsTableModel;
+class LangCodesModel;
 
 typedef QList<double> ChapterList;
 
@@ -204,6 +205,7 @@ class TsMuxerWindow : public QWidget
     bool isVideoCropped();
 
     FontSettingsTableModel* fontSettingsModel;
+    LangCodesModel* langCodesModel;
 };
 
 Q_DECLARE_METATYPE(ChapterList);
