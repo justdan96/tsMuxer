@@ -385,6 +385,9 @@ TsMuxerWindow::TsMuxerWindow()
         ui->fontSettingsTableView->setRowHeight(i, 20);
     }
 
+    langCodesModel = new LangCodesModel(this);
+    ui->langComboBox->setModel(langCodesModel);
+
     void (QSpinBox::*spinBoxValueChanged)(int) = &QSpinBox::valueChanged;
     void (QDoubleSpinBox::*doubleSpinBoxValueChanged)(double) = &QDoubleSpinBox::valueChanged;
     connect(&opacityTimer, &QTimer::timeout, this, &TsMuxerWindow::onOpacityTimer);
@@ -487,17 +490,6 @@ TsMuxerWindow::TsMuxerWindow()
 
     ui->label_Donate->installEventFilter(this);
 
-    ui->langComboBox->addItem("und (Undetermined)");
-    ui->langComboBox->addItem("--------- common ---------");
-    for (auto &&lang : shortLangList)
-    {
-        ui->langComboBox->addItem(QString("%1 (%2)").arg(lang.code).arg(lang.lang), QString::fromUtf8(lang.code));
-    }
-    ui->langComboBox->addItem("---------- all ----------");
-    for (auto &&lang : fullLangList)
-    {
-        ui->langComboBox->addItem(QString("%1 (%2)").arg(lang.code).arg(lang.lang), QString::fromUtf8(lang.code));
-    }
     trackLVItemSelectionChanged();
 
     ui->trackSplitter->setStretchFactor(0, 10);
@@ -2541,6 +2533,7 @@ void TsMuxerWindow::changeEvent(QEvent *event)
     {
         ui->retranslateUi(this);
         fontSettingsModel->onLanguageChanged();
+        langCodesModel->onLanguageChanged();
     }
     QWidget::changeEvent(event);
 }
