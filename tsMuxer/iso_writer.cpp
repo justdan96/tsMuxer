@@ -98,13 +98,13 @@ void writeTimestamp(uint8_t* buffer, time_t time)
     time_t gt = mktime(gmtime(&time));
     int16_t timeZone = -1;
 
-    buff16[0] = ((1 << 12) | (timeZone & 0x0fff));
-    buff16[1] = parts->tm_year + 1900;
-    buffer[4] = parts->tm_mon + 1;
-    buffer[5] = parts->tm_mday;
-    buffer[6] = parts->tm_hour;
-    buffer[7] = parts->tm_min;
-    buffer[8] = parts->tm_sec;
+    buff16[0] = 0;
+    buff16[1] = 0;
+    buffer[4] = 0;
+    buffer[5] = 0;
+    buffer[6] = 0;
+    buffer[7] = 0;
+    buffer[8] = 0;
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
