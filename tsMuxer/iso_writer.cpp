@@ -96,9 +96,9 @@ void writeTimestamp(uint8_t* buffer, time_t time)
 
     time_t lt = mktime(localtime(&time));
     time_t gt = mktime(gmtime(&time));
-    int16_t timeZone = (lt - gt) / 60;
+    int16_t timeZone = -1;
 
-    buff16[0] = (1 << 12) + (timeZone & 0x0fff);
+    buff16[0] = ((1 << 12) | (timeZone & 0x0fff));
     buff16[1] = parts->tm_year + 1900;
     buffer[4] = parts->tm_mon + 1;
     buffer[5] = parts->tm_mday;

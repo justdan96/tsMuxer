@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <types/types.h>
 
-const static unsigned INT_BIT = CHAR_BIT * sizeof(unsigned);
+constexpr static unsigned INT_BIT = CHAR_BIT * sizeof(unsigned);
 
 class BitStreamException : public std::exception
 {
@@ -31,19 +31,17 @@ class BitStream
         if (buffer >= end)
             THROW_BITSTREAM_ERR;
         m_totalBits = (unsigned)(end - buffer) * 8;
-        if (m_maskInitialized == 0)
-        {
-            for (unsigned i = 0; i < INT_BIT; i++) m_masks[i] = (1 << i) - 1;
-            m_masks[INT_BIT] = UINT_MAX;
-            m_maskInitialized = 1;
-        }
         m_initBuffer = m_buffer = (unsigned*)buffer;
     }
     unsigned m_totalBits;
     unsigned* m_buffer;
     unsigned* m_initBuffer;
-    static int m_maskInitialized;
-    static unsigned m_masks[INT_BIT + 1];
+
+    constexpr static unsigned int m_masks[] = {
+        0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f, 0x000000ff,
+        0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff, 0x0000ffff, 0x0001ffff,
+        0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff, 0x00ffffff, 0x01ffffff, 0x03ffffff,
+        0x07ffffff, 0x0fffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff, UINT_MAX};
 };
 
 class BitStreamReader : public BitStream
@@ -190,7 +188,10 @@ class BitStreamWriter : public BitStream
         }
         else
         {
-            m_curVal <<= (INT_BIT - m_bitWrited);
+            if (m_bitWrited != 0)
+            {
+                m_curVal <<= (INT_BIT - m_bitWrited);
+            }
             m_bitWrited = m_bitWrited + num - INT_BIT;
             m_curVal += value >> m_bitWrited;
             *m_buffer++ = my_htonl(m_curVal);
@@ -198,30 +199,13 @@ class BitStreamWriter : public BitStream
         }
         m_totalBits -= num;
     }
-    inline void putBit(unsigned value)
-    {
-        if (m_totalBits < 1)
-            THROW_BITSTREAM_ERR;
-        value &= m_masks[1];
-        if (m_bitWrited + 1 < INT_BIT)
-        {
-            m_bitWrited++;
-            m_curVal <<= 1;
-            m_curVal += value;
-        }
-        else
-        {
-            m_curVal <<= (INT_BIT - m_bitWrited);
-            m_bitWrited = m_bitWrited + 1 - INT_BIT;
-            m_curVal += value >> m_bitWrited;
-            *m_buffer++ = my_htonl(m_curVal);
-            m_curVal = value & m_masks[m_bitWrited];
-        }
-        m_totalBits--;
-    }
+    inline void putBit(unsigned value) { putBits(1, value); }
     inline void flushBits()
     {
-        m_curVal <<= INT_BIT - m_bitWrited;
+        if (m_bitWrited != 0)
+        {
+            m_curVal <<= (INT_BIT - m_bitWrited);
+        }
         unsigned prevVal = my_ntohl(*m_buffer);
         prevVal &= m_masks[INT_BIT - m_bitWrited];
         prevVal |= m_curVal;
