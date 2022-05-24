@@ -1357,7 +1357,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
                               << demuxerData.m_streamName);
             }
             m_discardedSize += discardSize;
-            readCnt = (uint32_t)(streamData.size() - m_readBuffOffset);
+            readCnt = (uint32_t)(FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset);
         } while (demuxRez == 0 && readCnt < MIN_READED_BLOCK && policy != DemuxerReadPolicy::drpFragmented &&
                  !m_terminated);
 
