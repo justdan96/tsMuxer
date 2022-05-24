@@ -214,7 +214,7 @@ class BitStreamWriter : public BitStream
     }
 
     inline void putBit(unsigned value) { putBits(1, value); }
-    
+
     inline void flushBits()
     {
         if (m_bitWrited != 0)
