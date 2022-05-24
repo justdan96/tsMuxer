@@ -17,11 +17,11 @@ class MovDemuxer : public IOContextDemuxer
     MovDemuxer(const BufferedReaderManager& readManager);
     ~MovDemuxer() override { readClose(); }
     void openFile(const std::string& streamName) override;
-    void readClose() override;
+    void readClose() override final;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
     double getTrackFps(uint32_t trackId) override;
-    virtual int readPacket(AVPacket&) { return 0; }
+    int readPacket(AVPacket&) { return 0; }
     void setFileIterator(FileNameIterator* itr) override;
     bool isPidFilterSupported() const override { return true; }
     int64_t getFileDurationNano() const override;

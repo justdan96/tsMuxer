@@ -284,8 +284,8 @@ class ISOFile : public AbstractOutputStream
     int write(const void* data, uint32_t len) override;
     bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0) override;
     void sync() override;
-    virtual bool close() override;
-    virtual int64_t size() const override;
+    bool close() override final;
+    int64_t size() const override;
     void setSubMode(bool value);
 
    private:
