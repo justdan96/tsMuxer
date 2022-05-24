@@ -70,6 +70,7 @@ class BitStreamReader : public BitStream
         m_curVal = getCurVal(m_buffer);
         m_bitLeft = INT_BIT;
     }
+
     inline unsigned getBits(unsigned num)
     {
         if (num > INT_BIT)
@@ -81,14 +82,18 @@ class BitStreamReader : public BitStream
             m_bitLeft -= num;
         else
         {
-            prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
+            if (!(num == INT_BIT && m_bitLeft == 0))
+            {
+                prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
+                m_bitLeft += INT_BIT - num;
+            }
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
-            m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
         return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
     }
+
     inline unsigned showBits(unsigned num)
     {
         assert(num <= INT_BIT);
@@ -101,13 +106,16 @@ class BitStreamReader : public BitStream
             bitLeft -= num;
         else
         {
-            prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
-            // curVal = my_ntohl(m_buffer[1]);
+            if (!(num == INT_BIT && bitLeft == 0))
+            {
+                prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
+                bitLeft += INT_BIT - num;
+            }
             curVal = getCurVal(m_buffer + 1);
-            bitLeft += INT_BIT - num;
         }
         return prevVal + (curVal >> bitLeft) & m_masks[num];
     }
+
     inline unsigned getBit()
     {
         if (m_totalBits < 1)
@@ -123,6 +131,7 @@ class BitStreamReader : public BitStream
         m_totalBits--;
         return (m_curVal >> m_bitLeft) & 1;
     }
+
     inline void skipBits(unsigned num)
     {
         if (m_totalBits < num)
@@ -138,6 +147,7 @@ class BitStreamReader : public BitStream
         }
         m_totalBits -= num;
     }
+
     inline void skipBit()
     {
         if (m_totalBits < 1)
@@ -152,6 +162,7 @@ class BitStreamReader : public BitStream
         }
         m_totalBits--;
     }
+
     inline unsigned getBitsCount() const { return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft; }
 
    private:
@@ -168,6 +179,7 @@ class BitStreamWriter : public BitStream
         m_curVal = 0;
         m_bitWrited = 0;
     }
+
     inline void skipBits(unsigned cnt)
     {
         assert(m_bitWrited % INT_BIT == 0);
@@ -175,6 +187,7 @@ class BitStreamWriter : public BitStream
         reader.setBuffer((uint8_t*)m_buffer, (uint8_t*)(m_buffer + 1));
         putBits(cnt, reader.getBits(cnt));
     }
+
     inline void putBits(unsigned num, unsigned value)
     {
         if (m_totalBits < num)
@@ -199,7 +212,9 @@ class BitStreamWriter : public BitStream
         }
         m_totalBits -= num;
     }
+
     inline void putBit(unsigned value) { putBits(1, value); }
+    
     inline void flushBits()
     {
         if (m_bitWrited != 0)
@@ -211,6 +226,7 @@ class BitStreamWriter : public BitStream
         prevVal |= m_curVal;
         *m_buffer = my_htonl(prevVal);
     }
+
     inline unsigned getBitsCount() { return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
 
    private:
