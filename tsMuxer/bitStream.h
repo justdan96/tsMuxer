@@ -204,8 +204,8 @@ class BitStreamWriter : public BitStream
             if (m_bitWrited != 0)
             {
                 m_curVal <<= (INT_BIT - m_bitWrited);
+                m_bitWrited += num - INT_BIT;
             }
-            m_bitWrited = m_bitWrited + num - INT_BIT;
             m_curVal += value >> m_bitWrited;
             *m_buffer++ = my_htonl(m_curVal);
             m_curVal = value & m_masks[m_bitWrited];
