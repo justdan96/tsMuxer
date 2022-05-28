@@ -11,7 +11,7 @@
 using namespace std;
 static const int EXTENDED_SAR = 255;
 
-int ceilDiv(int a, int b) { return (a / b) + (a % b ? 1 : 0); }
+int ceilDiv(int a, int b) { return (a / b) + ((a % b) ? 1 : 0); }
 
 // ------------------------- HevcUnit -------------------
 
