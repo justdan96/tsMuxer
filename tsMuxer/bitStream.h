@@ -85,10 +85,10 @@ class BitStreamReader : public BitStream
             if (!(num == INT_BIT && m_bitLeft == 0))
             {
                 prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
-                m_bitLeft += INT_BIT - num;
             }
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
+            m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
         return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
@@ -109,9 +109,9 @@ class BitStreamReader : public BitStream
             if (!(num == INT_BIT && bitLeft == 0))
             {
                 prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
-                bitLeft += INT_BIT - num;
             }
             curVal = getCurVal(m_buffer + 1);
+            bitLeft += INT_BIT - num;
         }
         return prevVal + (curVal >> bitLeft) & m_masks[num];
     }
