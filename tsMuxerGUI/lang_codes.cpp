@@ -97,7 +97,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"ain", LangCodesModel::tr("Ainu")},
             QtvLangCode{"aka", LangCodesModel::tr("Akan")},
             QtvLangCode{"akk", LangCodesModel::tr("Akkadian")},
-            QtvLangCode{"alb", LangCodesModel::tr("Albanian")},
             QtvLangCode{"sqi", LangCodesModel::tr("Albanian")},
             QtvLangCode{"ale", LangCodesModel::tr("Aleut")},
             QtvLangCode{"alg", LangCodesModel::tr("Algonquian languages")},
