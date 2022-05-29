@@ -372,7 +372,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"mni", LangCodesModel::tr("Manipuri")},
             QtvLangCode{"mno", LangCodesModel::tr("Manobo languages")},
             QtvLangCode{"glv", LangCodesModel::tr("Manx")},
-            QtvLangCode{"mao", LangCodesModel::tr("Maori")},
             QtvLangCode{"mri", LangCodesModel::tr("Maori")},
             QtvLangCode{"mar", LangCodesModel::tr("Marathi")},
             QtvLangCode{"chm", LangCodesModel::tr("Mari")},
