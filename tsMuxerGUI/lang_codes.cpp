@@ -134,7 +134,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"bas", LangCodesModel::tr("Basa")},
             QtvLangCode{"bak", LangCodesModel::tr("Bashkir")},
             QtvLangCode{"eus", LangCodesModel::tr("Basque")},
-            QtvLangCode{"eus", LangCodesModel::tr("Basque")},
             QtvLangCode{"btk", LangCodesModel::tr("Batak (Indonesia)")},
             QtvLangCode{"bej", LangCodesModel::tr("Beja")},
             QtvLangCode{"bel", LangCodesModel::tr("Belarusian")},
