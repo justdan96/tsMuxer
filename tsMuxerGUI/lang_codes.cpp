@@ -73,7 +73,7 @@ std::array<LangCodesModel::QtvLangCode, 13> LangCodesModel::getShortLangList()
             QtvLangCode{"nld", LangCodesModel::tr("Dutch; Flemish")},
             QtvLangCode{"eng", LangCodesModel::tr("English")},
             QtvLangCode{"fin", LangCodesModel::tr("Finnish")},
-            QtvLangCode{"fre", LangCodesModel::tr("French")},
+            QtvLangCode{"fra", LangCodesModel::tr("French")},
             QtvLangCode{"deu", LangCodesModel::tr("German")},
             QtvLangCode{"ita", LangCodesModel::tr("Italian")},
             QtvLangCode{"jpn", LangCodesModel::tr("Japanese")},
