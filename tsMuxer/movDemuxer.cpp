@@ -468,10 +468,17 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                 THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
             uint32_t unitSize = (buff[0] << 8) + buff[1];
             buff += 2;
+            if (unitSize == 0)  // text modifier, length on 4 bytes
+            {
+                // TODO: parse modifier and convert to SRT < /> modifier
+                unitSize = (buff[0] << 8) + buff[1] - 4;
+                buff += 2;
+            }
+            else  // another text follows
+                textLen += unitSize;
             if (buff + unitSize > end)
                 THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
             buff += unitSize;
-            textLen += unitSize;
         }
         sttsCnt = stored_sttsCnt;
         sttsPos = stored_sttsPos;
@@ -1307,6 +1314,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
             break;
         case MKTAG('m', 'p', '4', 'a'):
         case MKTAG('a', 'c', '-', '3'):
+        case MKTAG('e', 'c', '-', '3'):
             st->type = IOContextTrackType::AUDIO;
             st->parsed_priv_data = new MovParsedAudioTrackData(this, st);
             break;
