@@ -442,7 +442,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"pag", LangCodesModel::tr("Pangasinan")},
             QtvLangCode{"pap", LangCodesModel::tr("Papiamento")},
             QtvLangCode{"paa", LangCodesModel::tr("Papuan (Other)")},
-            QtvLangCode{"per", LangCodesModel::tr("Persian")},
             QtvLangCode{"fas", LangCodesModel::tr("Persian")},
             QtvLangCode{"peo", LangCodesModel::tr("Persian, Old (ca. 600-400 BC)")},
             QtvLangCode{"phi", LangCodesModel::tr("Philippine (Other)")},
