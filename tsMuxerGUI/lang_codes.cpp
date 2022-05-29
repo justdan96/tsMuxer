@@ -559,7 +559,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"wln", LangCodesModel::tr("Walloon")},
             QtvLangCode{"war", LangCodesModel::tr("Waray")},
             QtvLangCode{"was", LangCodesModel::tr("Washo")},
-            QtvLangCode{"wel", LangCodesModel::tr("Welsh")},
             QtvLangCode{"cym", LangCodesModel::tr("Welsh")},
             QtvLangCode{"wol", LangCodesModel::tr("Wolof")},
             QtvLangCode{"xho", LangCodesModel::tr("Xhosa")},
