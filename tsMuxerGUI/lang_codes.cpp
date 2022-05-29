@@ -450,7 +450,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"rap", LangCodesModel::tr("Rapanui")},
             QtvLangCode{"rar", LangCodesModel::tr("Rarotongan")},
             QtvLangCode{"roa", LangCodesModel::tr("Romance (Other)")},
-            QtvLangCode{"rum", LangCodesModel::tr("Romanian")},
             QtvLangCode{"ron", LangCodesModel::tr("Romanian")},
             QtvLangCode{"rom", LangCodesModel::tr("Romany")},
             QtvLangCode{"run", LangCodesModel::tr("Rundi")},
