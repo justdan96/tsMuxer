@@ -469,7 +469,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"gla", LangCodesModel::tr("Scottish Gaelic; Gaelic")},
             QtvLangCode{"sel", LangCodesModel::tr("Selkup")},
             QtvLangCode{"sem", LangCodesModel::tr("Semitic (Other)")},
-            QtvLangCode{"scc", LangCodesModel::tr("Serbian")},
             QtvLangCode{"srp", LangCodesModel::tr("Serbian")},
             QtvLangCode{"srr", LangCodesModel::tr("Serer")},
             QtvLangCode{"shn", LangCodesModel::tr("Shan")},
