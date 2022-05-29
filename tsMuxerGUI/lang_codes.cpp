@@ -152,7 +152,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"bug", LangCodesModel::tr("Buginese")},
             QtvLangCode{"bul", LangCodesModel::tr("Bulgarian")},
             QtvLangCode{"bua", LangCodesModel::tr("Buriat")},
-            QtvLangCode{"bur", LangCodesModel::tr("Burmese")},
             QtvLangCode{"mya", LangCodesModel::tr("Burmese")},
             QtvLangCode{"cad", LangCodesModel::tr("Caddo")},
             QtvLangCode{"car", LangCodesModel::tr("Carib")},
