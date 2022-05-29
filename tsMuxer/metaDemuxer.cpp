@@ -653,11 +653,13 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
                     trackRez.lang = clpiStream->second.language_code;
             }
             // correct ISO 639-2/B codes to ISO 639-2/T
-            std::string langB[20] = {"alb", "arm", "baq", "bur", "cze", "chi", "dut", "ger", "gre", "fre",
-                                     "geo", "ice", "mac", "mao", "may", "per", "rum", "slo", "tib", "wel"};
-            std::string langT[20] = {"sqi", "hye", "eus", "mya", "ces", "zho", "nld", "deu", "ell", "fra",
-                                     "kat", "isl", "mkd", "mri", "fas", "msa", "ron", "slk", "bod", "cym"};
-            for (int i = 0; i < 20; i++)
+            std::string langB[24] = {"alb", "arm", "baq", "bur", "cze", "chi", "dut", "ger",
+                                     "gre", "fre", "geo", "ice", "jaw", "mac", "mao", "may",
+                                     "mol", "per", "rum", "scc", "scr", "slo", "tib", "wel"};
+            std::string langT[24] = {"sqi", "hye", "eus", "mya", "ces", "zho", "nld", "deu",
+                                     "ell", "fra", "kat", "isl", "jav", "mkd", "mri", "fas",
+                                     "rom", "msa", "ron", "srp", "hrv", "slk", "bod", "cym"};
+            for (int i = 0; i < 24; i++)
                 if (trackRez.lang == langB[i])
                     trackRez.lang = langT[i];
 
