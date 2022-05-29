@@ -110,7 +110,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"arp", LangCodesModel::tr("Arapaho")},
             QtvLangCode{"arn", LangCodesModel::tr("Araucanian")},
             QtvLangCode{"arw", LangCodesModel::tr("Arawak")},
-            QtvLangCode{"arm", LangCodesModel::tr("Armenian")},
             QtvLangCode{"hye", LangCodesModel::tr("Armenian")},
             QtvLangCode{"rup", LangCodesModel::tr("Aromanian; Arumanian; Macedo-Romanian")},
             QtvLangCode{"art", LangCodesModel::tr("Artificial (Other)")},
