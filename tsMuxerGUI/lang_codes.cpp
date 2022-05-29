@@ -191,7 +191,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"scr", LangCodesModel::tr("Croatian")},
             QtvLangCode{"hrv", LangCodesModel::tr("Croatian")},
             QtvLangCode{"cus", LangCodesModel::tr("Cushitic (Other)")},
-            QtvLangCode{"cze", LangCodesModel::tr("Czech")},
             QtvLangCode{"ces", LangCodesModel::tr("Czech")},
             QtvLangCode{"dak", LangCodesModel::tr("Dakota")},
             QtvLangCode{"dan", LangCodesModel::tr("Danish")},
