@@ -31,7 +31,7 @@ static const int MP4DecSpecificDescrTag = 0x05;
 
 static const char* const mov_mdhd_language_map[] = {
     // 0-9
-    "eng", "fra", "ger", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "gre", "ice",
+    "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "gre", "ice",
     "mlt", "tur", "hr " /*scr*/, "chi" /*ace?*/, "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav", NULL,
     "fo ", NULL, "rus", "chi", NULL, "iri", "alb", "ron", "ces", "slk", "slv", "yid", "sr ", "mac", "bul", "ukr", "bel",
     "uzb", "kaz", "aze",
