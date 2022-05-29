@@ -274,7 +274,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"hun", LangCodesModel::tr("Hungarian")},
             QtvLangCode{"hup", LangCodesModel::tr("Hupa")},
             QtvLangCode{"iba", LangCodesModel::tr("Iban")},
-            QtvLangCode{"ice", LangCodesModel::tr("Icelandic")},
             QtvLangCode{"isl", LangCodesModel::tr("Icelandic")},
             QtvLangCode{"ido", LangCodesModel::tr("Ido")},
             QtvLangCode{"ibo", LangCodesModel::tr("Igbo")},
