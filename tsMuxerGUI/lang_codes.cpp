@@ -169,7 +169,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"chy", LangCodesModel::tr("Cheyenne")},
             QtvLangCode{"chb", LangCodesModel::tr("Chibcha")},
             QtvLangCode{"nya", LangCodesModel::tr("Chichewa; Chewa; Nyanja")},
-            QtvLangCode{"chi", LangCodesModel::tr("Chinese")},
             QtvLangCode{"zho", LangCodesModel::tr("Chinese")},
             QtvLangCode{"chn", LangCodesModel::tr("Chinook jargon")},
             QtvLangCode{"cho", LangCodesModel::tr("Choctaw")},
