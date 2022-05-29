@@ -203,7 +203,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"dgr", LangCodesModel::tr("Dogrib")},
             QtvLangCode{"dra", LangCodesModel::tr("Dravidian (Other)")},
             QtvLangCode{"dua", LangCodesModel::tr("Duala")},
-            QtvLangCode{"dut", LangCodesModel::tr("Dutch; Flemish")},
             QtvLangCode{"nld", LangCodesModel::tr("Dutch; Flemish")},
             QtvLangCode{"dum", LangCodesModel::tr("Dutch, Middle (ca. 1050-1350)")},
             QtvLangCode{"dyu", LangCodesModel::tr("Dyula")},
