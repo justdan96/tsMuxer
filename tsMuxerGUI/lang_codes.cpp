@@ -240,7 +240,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"gay", LangCodesModel::tr("Gayo")},
             QtvLangCode{"gba", LangCodesModel::tr("Gbaya")},
             QtvLangCode{"gez", LangCodesModel::tr("Ge'ez")},
-            QtvLangCode{"geo", LangCodesModel::tr("Georgian")},
             QtvLangCode{"kat", LangCodesModel::tr("Georgian")},
             QtvLangCode{"deu", LangCodesModel::tr("German")},
             QtvLangCode{"gsw", LangCodesModel::tr("German, Alemannic")},
