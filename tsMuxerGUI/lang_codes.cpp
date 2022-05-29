@@ -253,7 +253,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"got", LangCodesModel::tr("Gothic")},
             QtvLangCode{"grb", LangCodesModel::tr("Grebo")},
             QtvLangCode{"grc", LangCodesModel::tr("Greek, Ancient (to 1453)")},
-            QtvLangCode{"gre", LangCodesModel::tr("Greek, Modern (1453)")},
             QtvLangCode{"ell", LangCodesModel::tr("Greek, Modern (1453)")},
             QtvLangCode{"kal", LangCodesModel::tr("Greenlandic; Kalaallisut")},
             QtvLangCode{"grn", LangCodesModel::tr("Guarani")},
