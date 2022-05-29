@@ -227,7 +227,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"fin", LangCodesModel::tr("Finnish")},
             QtvLangCode{"fiu", LangCodesModel::tr("Finno-Ugrian (Other)")},
             QtvLangCode{"fon", LangCodesModel::tr("Fon")},
-            QtvLangCode{"fre", LangCodesModel::tr("French")},
             QtvLangCode{"fra", LangCodesModel::tr("French")},
             QtvLangCode{"frm", LangCodesModel::tr("French, Middle (ca. 1400-1600)")},
             QtvLangCode{"fro", LangCodesModel::tr("French, Old (842-ca. 1400)")},
