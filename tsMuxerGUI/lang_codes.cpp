@@ -485,7 +485,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"sms", LangCodesModel::tr("Skolt Sami")},
             QtvLangCode{"den", LangCodesModel::tr("Slave (Athapascan)")},
             QtvLangCode{"sla", LangCodesModel::tr("Slavic (Other)")},
-            QtvLangCode{"slo", LangCodesModel::tr("Slovak")},
             QtvLangCode{"slk", LangCodesModel::tr("Slovak")},
             QtvLangCode{"slv", LangCodesModel::tr("Slovenian")},
             QtvLangCode{"sog", LangCodesModel::tr("Sogdian")},
