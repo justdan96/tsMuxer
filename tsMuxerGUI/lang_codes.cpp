@@ -364,7 +364,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"mai", LangCodesModel::tr("Maithili")},
             QtvLangCode{"mak", LangCodesModel::tr("Makasar")},
             QtvLangCode{"mlg", LangCodesModel::tr("Malagasy")},
-            QtvLangCode{"may", LangCodesModel::tr("Malay")},
             QtvLangCode{"msa", LangCodesModel::tr("Malay")},
             QtvLangCode{"mal", LangCodesModel::tr("Malayalam")},
             QtvLangCode{"mlt", LangCodesModel::tr("Maltese")},
