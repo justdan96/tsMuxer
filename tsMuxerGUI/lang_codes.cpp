@@ -188,7 +188,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"cpf", LangCodesModel::tr("Creoles and Pidgins, French-based (Other)")},
             QtvLangCode{"cpp", LangCodesModel::tr("Creoles and Pidgins, Portuguese-based (Other)")},
             QtvLangCode{"crh", LangCodesModel::tr("Crimean Tatar (Crimean Turkish)")},
-            QtvLangCode{"scr", LangCodesModel::tr("Croatian")},
             QtvLangCode{"hrv", LangCodesModel::tr("Croatian")},
             QtvLangCode{"cus", LangCodesModel::tr("Cushitic (Other)")},
             QtvLangCode{"ces", LangCodesModel::tr("Czech")},
