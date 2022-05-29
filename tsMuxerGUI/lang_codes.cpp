@@ -356,7 +356,6 @@ std::array<LangCodesModel::QtvLangCode, 502> LangCodesModel::getFullLangList()
             QtvLangCode{"luo", LangCodesModel::tr("Luo (Kenya and Tanzania)")},
             QtvLangCode{"lus", LangCodesModel::tr("Lushai")},
             QtvLangCode{"ltz", LangCodesModel::tr("Luxembourgish; Letzeburgesch")},
-            QtvLangCode{"mac", LangCodesModel::tr("Macedonian")},
             QtvLangCode{"mkd", LangCodesModel::tr("Macedonian")},
             QtvLangCode{"mad", LangCodesModel::tr("Madurese")},
             QtvLangCode{"mag", LangCodesModel::tr("Magahi")},
