@@ -30,21 +30,17 @@ static const int MP4DecSpecificDescrTag = 0x05;
 #define MKTAG(a, b, c, d) (a | (b << 8) | (c << 16) | (d << 24))
 
 static const char* const mov_mdhd_language_map[] = {
-    // 0-9
-    "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "gre", "ice",
-    "mlt", "tur", "hr " /*scr*/, "chi" /*ace?*/, "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav", NULL,
-    "fo ", NULL, "rus", "chi", NULL, "iri", "alb", "ron", "ces", "slk", "slv", "yid", "sr ", "mac", "bul", "ukr", "bel",
-    "uzb", "kaz", "aze",
-    /*?*/
-    "aze", "arm", "geo", "mol", "kir", "tgk", "tuk", "mon", NULL, "pus", "kur", "kas", "snd", "tib", "nep", "san",
-    "mar", "ben", "asm", "guj", "pa ", "ori", "mal", "kan", "tam", "tel", NULL, "bur", "khm", "lao",
-    /*                   roman? arabic? */
-    "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa",
-    /*==rundi?*/
-    NULL, "run", NULL, "mlg", "epo", NULL, NULL, NULL, NULL, NULL,
+    // see https :  // developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap4/qtff4.html
+    "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "ell", "isl",
+    "mlt", "tur", "hrv", "zho", "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav", "smi", "fao", "fas",
+    "rus", "zho", "nld", "gle", "alb", "ron", "ces", "slk", "slv", "yid", "srp", "mkd", "bul", "ukr", "bel", "uzb",
+    "kaz", "aze", "aze", "arm", "geo", "ron", "kir", "tgk", "tuk", "mon", "mon", "pus", "kur", "kas", "snd", "tib",
+    "nep", "san", "mar", "ben", "asm", "guj", "pa ", "ori", "mal", "kan", "tam", "tel", "sin", "bur", "khm", "lao",
+    "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa", "kin", "run", "nya", "mlg", "epo", NULL, NULL,
+    NULL, NULL, NULL,
     /* 100 */
     NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "wel", "baq", "cat", "lat", "que", "grn", "aym", "tat", "uig",
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "cym", "eus", "cat", "lat", "que", "grn", "aym", "crh", "uig",
     "dzo", "jav"};
 
 struct MOVStts
