@@ -15,4 +15,5 @@ make
 mv ./tsMuxerGUI.exe ../bin/w64/tsMuxerGUI.exe
 cd ..
 rm -rf build
-ls ./bin/w64/tsMuxeR.exe && ls ./bin/w64/tsMuxerGUI.exe
+zip -jr ./bin/w64.zip ./bin/w64
+ls ./bin/w64/tsMuxeR.exe && ls ./bin/w64/tsMuxerGUI.exe && ls ./bin/w64.zip
