@@ -438,7 +438,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         dst += unitSize;
         buff += unitSize;
         // TODO: PARSE TEXT MODIFIERS
-        
+
         memcpy(dst, "\n\n", 2);
         m_timeOffset = endTime;
     }
@@ -472,7 +472,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
         buff += unitSize;
         // TODO: PARSE TEXT MODIFIERS
-        
+
         sttsCnt = stored_sttsCnt;
         sttsPos = stored_sttsPos;
         return (int)(prefix.length() + textLen + 2);
