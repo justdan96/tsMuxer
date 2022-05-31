@@ -431,14 +431,14 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         memcpy(dst, prefix.c_str(), prefix.length());
         dst += prefix.length();
-        while (buff < end)
-        {
-            uint32_t unitSize = (buff[0] << 8) + buff[1];
-            buff += 2;
-            memcpy(dst, buff, unitSize);
-            dst += unitSize;
-            buff += unitSize;
-        }
+
+        uint32_t unitSize = (buff[0] << 8) + buff[1];
+        buff += 2;
+        memcpy(dst, buff, unitSize);
+        dst += unitSize;
+        buff += unitSize;
+        // TODO: PARSE TEXT MODIFIERS
+        
         memcpy(dst, "\n\n", 2);
         m_timeOffset = endTime;
     }
@@ -462,24 +462,17 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         prefix += floatToTime(endTime / 1e3, ',');
         prefix += '\n';
         int textLen = 0;
-        while (buff < end)
-        {
-            if (buff + 2 > end)
-                THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
-            uint32_t unitSize = (buff[0] << 8) + buff[1];
-            buff += 2;
-            if (unitSize == 0)  // text modifier, length on 4 bytes
-            {
-                // TODO: parse modifier and convert to SRT < /> modifier
-                unitSize = (buff[0] << 8) + buff[1] - 4;
-                buff += 2;
-            }
-            else  // another text follows
-                textLen += unitSize;
-            if (buff + unitSize > end)
-                THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
-            buff += unitSize;
-        }
+
+        if (buff + 2 > end)
+            THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
+        uint32_t unitSize = (buff[0] << 8) + buff[1];
+        buff += 2;
+        textLen += unitSize;
+        if (buff + unitSize > end)
+            THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
+        buff += unitSize;
+        // TODO: PARSE TEXT MODIFIERS
+        
         sttsCnt = stored_sttsCnt;
         sttsPos = stored_sttsPos;
         return (int)(prefix.length() + textLen + 2);
