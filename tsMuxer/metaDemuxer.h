@@ -164,9 +164,8 @@ class METADemuxer : public AbstractDemuxer
    public:
     METADemuxer(const BufferedReaderManager& readManager);
     ~METADemuxer() override;
-    // virtual void initStream();
-    virtual int readPacket(AVPacket& avPacket);
-    void readClose() override;
+    int readPacket(AVPacket& avPacket);
+    void readClose() override final;
     uint64_t getDemuxedSize() override;
     int addStream(const std::string codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
