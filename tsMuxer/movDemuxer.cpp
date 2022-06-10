@@ -472,17 +472,17 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                         if (*buff & 1)
                         {
                             prefix += "<b>";
-                            suffix += "</b>";
+                            suffix = "</b>" + suffix;
                         }
                         if (*buff & 2)
                         {
                             prefix += "<i>";
-                            suffix += "</i>";
+                            suffix = "</i>" + suffix;
                         }
                         if (*buff & 4)
                         {
                             prefix += "<u>";
-                            suffix += "</u>";
+                            suffix = "</u>" + suffix;
                         }
                         tags.insert(tags.begin(), std::make_pair(startChar, prefix));
                         tags.push_back(std::make_pair(endChar, suffix));
