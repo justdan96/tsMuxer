@@ -418,6 +418,9 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
     {
         uint8_t* end = buff + size;
         std::string prefix;
+        std::string suffix;
+        std::string subtitleText;
+        std::vector<pair<int, string>> tags;
         if (m_packetCnt == 0)
             prefix = "\xEF\xBB\xBF";  // UTF-8 header
         int64_t startTime = m_timeOffset + getSttsVal();
@@ -431,13 +434,72 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         memcpy(dst, prefix.c_str(), prefix.length());
         dst += prefix.length();
+        prefix = "";
+        suffix = "";
 
-        uint32_t unitSize = (buff[0] << 8) + buff[1];
+        uint32_t unitSize = (buff[0] << 8) | buff[1];
         buff += 2;
-        memcpy(dst, buff, unitSize);
-        dst += unitSize;
+        subtitleText = std::string((char*)buff, unitSize);
         buff += unitSize;
-        // TODO: PARSE TEXT MODIFIERS
+
+        while (buff < end)
+        {
+            uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
+            uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
+            buff += 8;
+            modifierLen -= 8;
+            if (modifierLen == 1)  // 64-bit length
+            {
+                modifierLen = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    modifierLen <<= 8;
+                    modifierLen |= *buff++;
+                }
+                modifierLen -= 8;
+            }
+            if (modifierType == 0x7374796C)  // 'styl' box
+            {
+                uint16_t entry_count = (buff[0] << 8) | buff[1];
+                buff += 2;
+                for (size_t i = 0; i < entry_count; i++)
+                {
+                    uint16_t startChar = (buff[0] << 8) | buff[1];
+                    uint16_t endChar = (buff[2] << 8) | buff[3];
+                    buff += 6;  // startChar, endChar, font_ID
+                    if (startChar < endChar)
+                    {
+                        if (*buff & 1)
+                        {
+                            prefix += "<b>";
+                            suffix += "</b>";
+                        }
+                        if (*buff & 2)
+                        {
+                            prefix += "<i>";
+                            suffix += "</i>";
+                        }
+                        if (*buff & 4)
+                        {
+                            prefix += "<u>";
+                            suffix += "</u>";
+                        }
+                        tags.insert(tags.begin(), std::make_pair(startChar, prefix));
+                        tags.push_back(std::make_pair(endChar, suffix));
+                    }
+                    buff += 6;  // font-size, text-color-rgba[4]
+                }
+            }
+            else
+                buff += modifierLen;
+        }
+        if (tags.size() > 0)
+        {
+            sort(tags.begin(), tags.end(), greater<>());
+            for (auto i : tags) subtitleText.insert(i.first, i.second);
+        }
+        memcpy(dst, subtitleText.c_str(), subtitleText.length());
+        dst += subtitleText.length();
 
         memcpy(dst, "\n\n", 2);
         m_timeOffset = endTime;
@@ -463,15 +525,58 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         prefix += '\n';
         int textLen = 0;
 
-        if (buff + 2 > end)
-            THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
-        uint32_t unitSize = (buff[0] << 8) + buff[1];
-        buff += 2;
-        textLen += unitSize;
-        if (buff + unitSize > end)
-            THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
-        buff += unitSize;
-        // TODO: PARSE TEXT MODIFIERS
+        try
+        {
+            uint32_t unitSize = (buff[0] << 8) | buff[1];
+            textLen += unitSize;
+            buff += 2 + unitSize;
+
+            while (buff < end)
+            {
+                uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
+                uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
+                buff += 8;
+                modifierLen -= 8;
+                if (modifierLen == 1)  // 64-bit length
+                {
+                    modifierLen = 0;
+                    for (int i = 0; i < 8; i++)
+                    {
+                        modifierLen <<= 8;
+                        modifierLen |= *buff++;
+                    }
+                    modifierLen -= 8;
+                }
+                if (modifierType == 0x7374796C)  // 'styl' box
+                {
+                    uint16_t entry_count = (buff[0] << 8) | buff[1];
+                    buff += 2;
+                    for (size_t i = 0; i < entry_count; i++)
+                    {
+                        uint16_t startChar = (buff[0] << 8) | buff[1];
+                        uint16_t endChar = (buff[2] << 8) | buff[3];
+                        buff += 6;                // startChar, endChar, font-ID
+                        if (startChar < endChar)  // face style flags
+                        {
+                            if (*buff & 1)  // bold
+                                textLen += 7;
+                            if (*buff & 2)  // italics
+                                textLen += 7;
+                            if (*buff & 4)  // underline
+                                textLen += 7;
+                        }
+                        buff += 6;  // font-size, text-color-rgba[4]
+                    }
+                }
+                else
+                    buff += modifierLen;
+            }
+        }
+        catch (BitStreamException& e)
+        {
+            (void)e;
+            LTRACE(LT_ERROR, 2, "MP4/MOV error: Invalid SRT frame at position " << m_demuxer->getProcessedBytes());
+        }
 
         sttsCnt = stored_sttsCnt;
         sttsPos = stored_sttsPos;
