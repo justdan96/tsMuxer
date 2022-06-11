@@ -456,7 +456,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                     modifierLen <<= 8;
                     modifierLen |= *buff++;
                 }
-                modifierLen -= 16;
+                modifierLen -= 8;
             }
             if (modifierType == 0x7374796C)  // 'styl' box
             {
@@ -545,7 +545,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                         modifierLen <<= 8;
                         modifierLen |= *buff++;
                     }
-                    modifierLen -= 16;
+                    modifierLen -= 8;
                 }
                 if (modifierType == 0x7374796C)  // 'styl' box
                 {
