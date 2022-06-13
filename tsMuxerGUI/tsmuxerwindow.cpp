@@ -1188,7 +1188,7 @@ void TsMuxerWindow::continueAddFile()
                 if (firstWarn)
                 {
                     msgBox.setText(
-                        tr("Track %1 was not recognized and ignored. File name: \"%2\"").arg(i).arg(newFileName));
+                        tr("Track %1 (TrackID %2) was not recognized and ignored. File name: \"%3\"").arg(i).arg(codecList[i].trackID).arg(newFileName));
                     msgBox.exec();
                     firstWarn = false;
                 }
