@@ -434,8 +434,6 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         memcpy(dst, prefix.c_str(), prefix.length());
         dst += prefix.length();
-        prefix = "";
-        suffix = "";
 
         uint32_t unitSize = (buff[0] << 8) | buff[1];
         buff += 2;
@@ -464,6 +462,8 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                 buff += 2;
                 for (size_t i = 0; i < entry_count; i++)
                 {
+                    prefix = "";
+                    suffix = "";
                     uint16_t startChar = (buff[0] << 8) | buff[1];
                     uint16_t endChar = (buff[2] << 8) | buff[3];
                     buff += 6;  // startChar, endChar, font_ID
