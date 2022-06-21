@@ -434,12 +434,15 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         uint8_t* dst = pkt->data;
         memcpy(dst, prefix.c_str(), prefix.length());
         dst += prefix.length();
+        uint32_t unitSize = 0;
 
-        uint32_t unitSize = (buff[0] << 8) | buff[1];
-        buff += 2;
-        subtitleText = std::string((char*)buff, unitSize);
-        buff += unitSize;
-
+        while (unitSize == 0)
+        {
+            unitSize = (buff[0] << 8) | buff[1];
+            buff += 2;
+            subtitleText = std::string((char*)buff, unitSize);
+            buff += unitSize;
+        }
         while (buff < end)
         {
             uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
@@ -524,13 +527,16 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         prefix += floatToTime(endTime / 1e3, ',');
         prefix += '\n';
         int textLen = 0;
+        uint32_t unitSize = 0;
 
         try
         {
-            uint32_t unitSize = (buff[0] << 8) | buff[1];
-            textLen += unitSize;
-            buff += 2 + unitSize;
-
+            while (unitSize == 0)
+            {
+                unitSize = (buff[0] << 8) | buff[1];
+                textLen = unitSize;
+                buff += 2 + unitSize;
+            }
             while (buff < end)
             {
                 uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
