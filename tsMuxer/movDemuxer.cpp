@@ -440,9 +440,10 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         {
             unitSize = (buff[0] << 8) | buff[1];
             buff += 2;
-            subtitleText = std::string((char*)buff, unitSize);
-            buff += unitSize;
         }
+        subtitleText = std::string((char*)buff, unitSize);
+        buff += unitSize;
+
         while (buff < end)
         {
             uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
@@ -534,9 +535,11 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             while (unitSize == 0)
             {
                 unitSize = (buff[0] << 8) | buff[1];
-                textLen = unitSize;
-                buff += 2 + unitSize;
+                buff += 2;
             }
+            textLen = unitSize;
+            buff += unitSize;
+
             while (buff < end)
             {
                 uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
