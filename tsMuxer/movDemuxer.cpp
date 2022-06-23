@@ -105,7 +105,6 @@ struct MOVStreamContext : public Track
           sample_count(0),
           keyframe_count(0),
           time_scale(0),
-          time_offset(0),
           current_sample(0),
           bytes_per_frame(0),
           samples_per_frame(0),
@@ -138,7 +137,6 @@ struct MOVStreamContext : public Track
     unsigned int keyframe_count;
     int time_scale;
     // int time_rate;
-    int time_offset;  ///< time offset of the first edit list entry
     int current_sample;
     unsigned int bytes_per_frame;
     unsigned int samples_per_frame;
@@ -1326,9 +1324,9 @@ int MovDemuxer::mov_read_mvhd(MOVAtom atom)
         get_be32();  // creation time
         get_be32();  // modification time
     }
-    uint32_t time_scale = get_be32();                             // time scale
-    int64_t duration = (version == 1) ? get_be64() : get_be32();  // duration ;
-    fileDuration = duration * 1000000000ll / time_scale;
+    m_timescale = get_be32();                                      // time scale
+    uint64_t duration = (version == 1) ? get_be64() : get_be32();  // duration
+    fileDuration = duration * 1000000000ll / m_timescale;
     get_be32();      // preferred scale
     get_be16();      // preferred volume
     skip_bytes(10);  // reserved
@@ -1740,23 +1738,30 @@ if (st->codec->codec_id == CODEC_ID_QDM2) {
 
 int MovDemuxer::mov_read_elst(MOVAtom atom)
 {
-    auto st = (MOVStreamContext*)tracks[num_tracks - 1];
-    get_byte();                   // version
+    int version = get_byte();
     get_be24();                   // flags
     int edit_count = get_be32();  // entries
 
     for (int i = 0; i < edit_count; i++)
     {
-        get_be32();             // Track duration
-        int time = get_be32();  // Media time
-        get_be32();             // Media rate
-        if (i == 0 && time != -1)
+        if (version == 1)
         {
-            st->time_offset = time;
-            // st->time_rate = av_gcd(st->time_rate, time);
+            uint64_t duration = get_be64();
+            int64_t time = get_be64();
+            if (time == -1)
+                m_firstTimecode[num_tracks] = duration * 1000 / m_timescale;
+        }
+        else
+        {
+            uint64_t duration = get_be32();
+            int32_t time = get_be32();
+            if (time == -1)
+                m_firstTimecode[num_tracks] = duration * 1000 / m_timescale;
         }
     }
+    get_be32();  // Media rate
     return 0;
+
 }
 
 double MovDemuxer::getTrackFps(uint32_t trackId)

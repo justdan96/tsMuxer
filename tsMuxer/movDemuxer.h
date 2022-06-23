@@ -20,6 +20,10 @@ class MovDemuxer : public IOContextDemuxer
     void readClose() override final;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
+    int64_t getTrackDelay(uint32_t pid) override
+    {
+        return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
+    }
     double getTrackFps(uint32_t trackId) override;
     int readPacket(AVPacket&) { return 0; }
     void setFileIterator(FileNameIterator* itr) override;
@@ -62,6 +66,8 @@ class MovDemuxer : public IOContextDemuxer
     int64_t m_mdat_pos;
     int64_t m_mdat_size;
     uint64_t m_fileSize;
+    uint32_t m_timescale;
+    std::map<int, uint64_t> m_firstTimecode;
     std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;
