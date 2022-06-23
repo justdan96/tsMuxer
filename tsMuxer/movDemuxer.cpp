@@ -1761,7 +1761,6 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
     }
     get_be32();  // Media rate
     return 0;
-
 }
 
 double MovDemuxer::getTrackFps(uint32_t trackId)
