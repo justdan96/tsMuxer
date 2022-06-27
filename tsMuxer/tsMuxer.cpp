@@ -69,9 +69,9 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_lastPMTPCR = -1;
     m_lastSITPCR = -1;
     m_nullCnt = 0;
-    m_pmtCnt = 0;  // 2;
-    m_patCnt = 0;  // 2;
-    m_sitCnt = 1;
+    m_pmtCnt = 0;
+    m_patCnt = 0;
+    m_sitCnt = 0;
     m_needTruncate = false;
     m_videoTrackCnt = 0;
     m_DVvideoTrackCnt = 0;
