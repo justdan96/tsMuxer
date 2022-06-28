@@ -157,7 +157,7 @@ class TSMuxer : public AbstractMuxer
         StreamInfo()
         {
             m_pts = m_dts = ULLONG_MAX;
-            m_tsCnt = 1;
+            m_tsCnt = 0;
         }
         int64_t m_pts;
         int64_t m_dts;
