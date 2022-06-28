@@ -106,7 +106,7 @@ static inline int get16(uint8_t** pp)
     return c;
 }
 
-TS_program_association_section::TS_program_association_section() : transport_stream_id(1)
+TS_program_association_section::TS_program_association_section() : transport_stream_id(0)
 {
     m_nitPID = -1;
     // av_crc_init(tmpAvCrc, 0, 32, 0x04c11db7, sizeof(AVCRC)*257);
