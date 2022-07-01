@@ -150,7 +150,7 @@ QString unquoteStr(QString val)
 bool isVideoCodec(const QString &displayName)
 {
     return displayName == "H.264" || displayName == "MVC" || displayName == "VC-1" || displayName == "MPEG-2" ||
-           displayName == "HEVC";
+           displayName == "HEVC" || displayName == "VVC";
 }
 
 QString floatToTime(double time, char msSeparator = '.')
