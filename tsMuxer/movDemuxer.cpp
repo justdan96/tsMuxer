@@ -45,8 +45,8 @@ static const char* const mov_mdhd_language_map[] = {
 
 struct MOVStts
 {
-    int count;
-    int duration;
+    uint32_t count;
+    uint64_t duration;
 };
 
 struct MOVDref
@@ -402,7 +402,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             sttsCnt = m_sc->stts_data[sttsPos].count;
         }
         sttsCnt--;
-        return m_sc->stts_data[sttsPos].duration;
+        return m_sc->stts_data[sttsPos].duration * 1000 / m_sc->time_scale;
     }
 
     void setPrivData(uint8_t* buff, int size) override
