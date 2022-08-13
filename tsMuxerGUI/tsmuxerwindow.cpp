@@ -1048,8 +1048,9 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
                 ui->dtsDwnConvert->setText(tr("Downconvert E-AC3 to AC3"));
             else
                 ui->dtsDwnConvert->setText(tr("Downconvert HD audio"));
-            ui->dtsDwnConvert->setEnabled(codecInfo->displayName == "DTS-HD" || codecInfo->displayName == "TRUE-HD" ||
-                                          codecInfo->displayName == "E-AC3 (DD+)");
+            ui->dtsDwnConvert->setEnabled(!codecInfo->descr.contains("(core 0Kbps)") &&
+                                          (codecInfo->displayName == "DTS-HD" || codecInfo->displayName == "TRUE-HD" ||
+                                           codecInfo->displayName == "E-AC3 (DD+)"));
             ui->secondaryCheckBox->setEnabled(codecInfo->descr.contains("(DTS Express)") ||
                                               codecInfo->descr.contains("(DTS Express 24bit)") ||
                                               codecInfo->displayName == "E-AC3 (DD+)");
