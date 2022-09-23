@@ -311,6 +311,7 @@ bool BlurayHelper::createBluRayDirs()
             m_isoWriter->createDir("BDMV/BDJO");
             m_isoWriter->createDir("BDMV/JAR");
             m_isoWriter->createDir("BDMV/BACKUP/BDJO");
+            m_isoWriter->createDir("BDMV/BACKUP/JAR");
         }
         else
         {
@@ -318,6 +319,7 @@ bool BlurayHelper::createBluRayDirs()
             createDir(m_dstPath + toNativeSeparators("BDMV/BDJO"), true);
             createDir(m_dstPath + toNativeSeparators("BDMV/JAR"), true);
             createDir(m_dstPath + toNativeSeparators("BDMV/BACKUP/BDJO"), true);
+            createDir(m_dstPath + toNativeSeparators("BDMV/BACKUP/JAR"), true);
         }
     }
 
