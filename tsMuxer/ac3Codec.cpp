@@ -446,7 +446,7 @@ uint64_t AC3Codec::getFrameDurationNano()
     if (m_previousid > 10 && m_bsid <= 10)
         return 0;  // E-AC3. finish frame after AC3 frame
     if (m_previousid > 10 && m_bsid > 10 && m_strmtyp == 1)
-        return 0;  // E-AC3 dependeant substream 
+        return 0;  // E-AC3 dependeant substream
     if (m_waitMoreData)
         return 0;  // AC3 HD
 
