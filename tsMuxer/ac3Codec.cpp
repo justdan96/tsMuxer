@@ -66,12 +66,12 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
     {
-        int numblkscod, strmtyp, substreamid, number_of_blocks_per_syncframe;
+        int numblkscod, substreamid, number_of_blocks_per_syncframe;
         int acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
         bsmod = fscod = dsurmod = pgmscle = extpgmscle = mixdef = paninfoe = 0;
 
-        strmtyp = gbc.getBits(2);
-        if (strmtyp == 3)
+        m_strmtyp = gbc.getBits(2);
+        if (m_strmtyp == 3)
             return AC3ParseError::SYNC;  // invalid stream type
 
         substreamid = gbc.getBits(3);
@@ -111,7 +111,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
                 gbc.skipBits(8);  // skip Compression gain word
         }
 
-        if (strmtyp == 1)
+        if (m_strmtyp == 1)
         {
             if (gbc.getBit())
             {
@@ -130,7 +130,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
                 gbc.skipBits(6);  // ltrtsurmixlev, lorosurmixlev
             if (lfeon && gbc.getBit())
                 gbc.skipBits(5);  // lfemixlevcod
-            if (strmtyp == 0)
+            if (m_strmtyp == 0)
             {
                 pgmscle = gbc.getBit();
                 if (pgmscle)
@@ -286,7 +286,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             if (err != AC3ParseError::NO_ERROR)
                 return 0;  // parse error
 
-            m_frameDurationNano = (1000000000ull * m_samples) / m_sample_rate;
+            m_frameDurationNano = (m_strmtyp == 1) ? 0 : (1000000000ull * m_samples) / m_sample_rate;
             rez = m_frame_size;
         }
 

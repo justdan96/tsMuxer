@@ -76,6 +76,7 @@ class AC3Codec
     uint8_t m_fscod;
     int m_frmsizecod;
     uint8_t m_bsid;
+    uint8_t m_strmtyp;
     uint8_t m_bsidBase;
     uint8_t m_bsmod;
     uint8_t m_acmod;
