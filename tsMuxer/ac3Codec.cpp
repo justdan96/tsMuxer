@@ -63,6 +63,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     if (id > 16)
         return AC3ParseError::BSID;
 
+    m_previousid = m_bsid;
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
     {
@@ -231,6 +232,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     else  // AC-3
     {
         m_bsidBase = m_bsid;  // id except AC3+ frames
+        m_strmtyp = 0;
         m_samples = AC3_FRAME_SIZE;
         gbc.skipBits(16);  // m_crc1
         m_fscod = gbc.getBits(2);
@@ -441,8 +443,10 @@ bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
 
 uint64_t AC3Codec::getFrameDurationNano()
 {
-    if (m_bit_rateExt)
-        return m_bsid > 10 ? m_frameDurationNano : 0;  // E-AC3. finish frame after AC3 frame
+    if (m_previousid > 10 && m_bsid <= 10)
+        return 0;  // E-AC3. finish frame after AC3 frame
+    if (m_previousid > 10 && m_bsid > 10 && m_strmtyp == 1)
+        return 0;  // E-AC3 dependeant substream 
     if (m_waitMoreData)
         return 0;  // AC3 HD
 
