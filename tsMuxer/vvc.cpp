@@ -441,7 +441,7 @@ int VvcVpsUnit::deserialize()
 
         return rez;
     }
-    catch (VodCoreException& e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
