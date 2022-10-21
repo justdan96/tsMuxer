@@ -1352,6 +1352,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
     else if (demuxerData.lastReadRez[pid] != AbstractReader::DATA_DELAYED || demuxerData.m_allFragmented)
     {
         int demuxRez = 0;
+        
         do
         {
             int64_t discardSize = 0;
@@ -1361,10 +1362,14 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
                  ++itr1)
             {
                 if (itr1->second.size() > MAX_DEMUX_BUFFER_SIZE)
-                    THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
-                          "Reading buffer overflow. Possible container streams are not syncronized. Please, verify "
-                          "stream fps. File name: "
-                              << demuxerData.m_streamName);
+                {
+                    string ext = strToUpperCase(extractFileExt(demuxerData.m_streamName));
+                    if (ext != "MOV" && ext != "MP4" && ext != "M4V" && ext != "M4A")       
+                        THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
+                              "Reading buffer overflow. Possible container streams are not syncronized. Please, verify "
+                              "stream fps. File name: "
+                                  << demuxerData.m_streamName);
+                }
             }
             m_discardedSize += discardSize;
             readCnt = (uint32_t)(FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset);
