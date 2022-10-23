@@ -1352,7 +1352,6 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
     else if (demuxerData.lastReadRez[pid] != AbstractReader::DATA_DELAYED || demuxerData.m_allFragmented)
     {
         int demuxRez = 0;
-        
         do
         {
             int64_t discardSize = 0;
