@@ -1364,7 +1364,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
                 if (itr1->second.size() > MAX_DEMUX_BUFFER_SIZE)
                 {
                     string ext = strToUpperCase(extractFileExt(demuxerData.m_streamName));
-                    if (ext != "MOV" && ext != "MP4" && ext != "M4V" && ext != "M4A")       
+                    if (ext != "MOV" && ext != "MP4" && ext != "M4V" && ext != "M4A")
                         THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
                               "Reading buffer overflow. Possible container streams are not syncronized. Please, verify "
                               "stream fps. File name: "
