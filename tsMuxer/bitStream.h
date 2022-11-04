@@ -73,19 +73,14 @@ class BitStreamReader : public BitStream
 
     inline unsigned getBits(unsigned num)
     {
-        if (num > INT_BIT)
-            THROW_BITSTREAM_ERR;
-        if (m_totalBits < num)
+        if (num > INT_BIT || m_totalBits < num)
             THROW_BITSTREAM_ERR;
         unsigned prevVal = 0;
         if (num <= m_bitLeft)
             m_bitLeft -= num;
         else
         {
-            if (!(num == INT_BIT && m_bitLeft == 0))
-            {
-                prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
-            }
+            prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
             m_bitLeft += INT_BIT - num;
@@ -96,8 +91,7 @@ class BitStreamReader : public BitStream
 
     inline unsigned showBits(unsigned num)
     {
-        assert(num <= INT_BIT);
-        if (m_totalBits < num)
+        if (num > INT_BIT || m_totalBits < num)
             THROW_BITSTREAM_ERR;
         unsigned prevVal = 0;
         unsigned bitLeft = m_bitLeft;
@@ -106,10 +100,7 @@ class BitStreamReader : public BitStream
             bitLeft -= num;
         else
         {
-            if (!(num == INT_BIT && bitLeft == 0))
-            {
-                prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
-            }
+            prevVal = (curVal & m_masks[bitLeft]) << (num - bitLeft);
             curVal = getCurVal(m_buffer + 1);
             bitLeft += INT_BIT - num;
         }
