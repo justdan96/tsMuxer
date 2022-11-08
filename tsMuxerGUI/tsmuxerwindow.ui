@@ -200,7 +200,7 @@
                 </property>
                 <column>
                  <property name="text">
-                  <string>#</string>
+                  <string> # </string>
                  </property>
                 </column>
                 <column>
@@ -215,7 +215,7 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string>lang</string>
+                  <string> lang </string>
                  </property>
                 </column>
                 <column>
@@ -2773,7 +2773,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>128</width>
+         <width>256</width>
          <height>16777215</height>
         </size>
        </property>
