@@ -2545,8 +2545,8 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="203"/>
-        <source> # </source>
-        <translation> # </translation>
+        <source>  # </source>
+        <translation>  # </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="208"/>
@@ -2556,12 +2556,12 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="213"/>
         <source>codec</source>
-        <translation>编码</translation>
+        <translation> 编码 </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="218"/>
-        <source> lang </source>
-        <translation>语言</translation>
+        <source>  lang  </source>
+        <translation> 语言 </translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="223"/>

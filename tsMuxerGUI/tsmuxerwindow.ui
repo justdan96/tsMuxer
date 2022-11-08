@@ -200,7 +200,7 @@
                 </property>
                 <column>
                  <property name="text">
-                  <string> # </string>
+                  <string>  # </string>
                  </property>
                 </column>
                 <column>
@@ -215,7 +215,7 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string> lang </string>
+                  <string>  lang  </string>
                  </property>
                 </column>
                 <column>
