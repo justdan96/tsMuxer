@@ -2778,7 +2778,7 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
        <property name="text">
-        <string>Sta&amp;rt muxing</string>
+        <string>Start muxing</string>
        </property>
       </widget>
      </item>

@@ -2304,9 +2304,9 @@ void TsMuxerWindow::RadioButtonMuxClick()
     if (outFileNameDisableChange)
         return;
     if (ui->radioButtonDemux->isChecked())
-        ui->buttonMux->setText(tr("Sta&rt demuxing"));
+        ui->buttonMux->setText(tr("Start demuxing"));
     else
-        ui->buttonMux->setText(tr("Sta&rt muxing"));
+        ui->buttonMux->setText(tr("Start muxing"));
     ui->checkBoxNewAudioPes->setChecked(!ui->radioButtonTS->isChecked());
     ui->checkBoxNewAudioPes->setEnabled(ui->radioButtonTS->isChecked() || ui->radioButtonM2TS->isChecked());
     outFileNameDisableChange = true;

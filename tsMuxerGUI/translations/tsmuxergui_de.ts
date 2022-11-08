@@ -2546,7 +2546,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="203"/>
         <source> # </source>
-        <translation>Nr.</translation>
+        <translation> Nr.</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="208"/>
@@ -3215,8 +3215,8 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2781"/>
         <location filename="../tsmuxerwindow.cpp" line="2306"/>
-        <source>Sta&amp;rt muxing</source>
-        <translation>Sta&amp;rt muxen</translation>
+        <source>Start muxing</source>
+        <translation>Start muxen</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2806"/>

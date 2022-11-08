@@ -3215,8 +3215,8 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2781"/>
         <location filename="../tsmuxerwindow.cpp" line="2306"/>
-        <source>Sta&amp;rt muxing</source>
-        <translation>Ста&amp;рт муксинга</translation>
+        <source>Start muxing</source>
+        <translation>Старт муксинга</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2806"/>
