@@ -371,7 +371,7 @@ TsMuxerWindow::TsMuxerWindow()
     for (int i = 0; i <= 3600; i += 5 * 60) ui->memoChapters->insertPlainText(floatToTime(i, '.') + '\n');
 
     mSaveDialogFilter = TS_SAVE_DIALOG_FILTER();
-    const static int colWidths[] = {28, 200, 62, 38, 10};
+    const static int colWidths[] = {31, 200, 62, 62, 10};
     for (unsigned i = 0u; i < sizeof(colWidths) / sizeof(int); ++i)
         ui->trackLV->horizontalHeader()->resizeSection(i, colWidths[i]);
     ui->trackLV->setWordWrap(false);

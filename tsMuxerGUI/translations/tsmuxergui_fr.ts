@@ -2545,7 +2545,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="203"/>
-        <source>  # </source>
+        <source>  #</source>
         <translation>  N°</translation>
     </message>
     <message>
@@ -2560,7 +2560,7 @@
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="218"/>
-        <source>  lang  </source>
+        <source>lang</source>
         <translation>langue</translation>
     </message>
     <message>
