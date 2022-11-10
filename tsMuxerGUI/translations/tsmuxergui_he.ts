@@ -2561,7 +2561,7 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="218"/>
         <source>lang</source>
-        <translation>lang</translation>
+        <translation>שפה</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="223"/>
