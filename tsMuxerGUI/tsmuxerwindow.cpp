@@ -1248,7 +1248,6 @@ void TsMuxerWindow::continueAddFile()
         item->setCheckState(info.enabledByDefault ? Qt::Checked : Qt::Unchecked);
         item->setData(Qt::UserRole, reinterpret_cast<qlonglong>(new QtvCodecInfo(info)));
         ui->trackLV->setCurrentItem(item);
-
         ui->trackLV->setItem(newTrackRowIdx, 0, item);
         item = new QTableWidgetItem(newFileName);
         item->setFlags(item->flags() & (~Qt::ItemIsEditable));
@@ -1273,7 +1272,6 @@ void TsMuxerWindow::continueAddFile()
                                       true);
         ui->trackLV->setCurrentCell(firstAddedIndex, 0);
     }
-
     QString displayName = newFileName;
     if (fileDuration > 0)
         displayName += QString(" (%1)").arg(floatToTime(fileDuration));
@@ -1332,7 +1330,6 @@ void TsMuxerWindow::updateCustomChapters()
             chaptersSet << qint64((chapter + offset) * 1000000);
         prevDuration = item->data(FileDurationRole).toDouble();
     }
-
     ui->memoChapters->clear();
     QList<qint64> mergedChapterList = chaptersSet.values();
     std::sort(std::begin(mergedChapterList), std::end(mergedChapterList));
@@ -2081,6 +2078,7 @@ void TsMuxerWindow::onRemoveBtnClick()
     ui->inputFilesLV->takeItem(idx);
     if (idx >= ui->inputFilesLV->count())
         idx--;
+	
     if (delMplsM2ts)
     {
         while (idx < ui->inputFilesLV->count())
@@ -2095,6 +2093,7 @@ void TsMuxerWindow::onRemoveBtnClick()
                 break;
         }
     }
+	
     if (ui->inputFilesLV->count() > 0)
         ui->inputFilesLV->setCurrentRow(idx);
     updateCustomChapters();
@@ -2156,6 +2155,7 @@ void TsMuxerWindow::deleteTrack(int idx)
         }
         updateNum();
     }
+	
     updateMaxOffsets();
     updateMetaLines();
     ui->moveupBtn->setEnabled(ui->trackLV->currentItem() != 0);
