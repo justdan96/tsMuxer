@@ -561,21 +561,18 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
         p = procStdOutput[i].indexOf("Stream lang: ");
         if (p >= 0)
             codecInfo->lang = procStdOutput[i].mid(QString("Stream lang: ").length());
-
         p = procStdOutput[i].indexOf("Stream delay: ");
         if (p >= 0)
         {
             tmpStr = procStdOutput[i].mid(QString("Stream delay: ").length());
             codecInfo->delay = tmpStr.toInt();
         }
-
         p = procStdOutput[i].indexOf("subTrack: ");
         if (p >= 0)
         {
             tmpStr = procStdOutput[i].mid(QString("subTrack: ").length());
             codecInfo->subTrack = tmpStr.toInt();
         }
-
         p = procStdOutput[i].indexOf("Secondary: 1");
         if (p == 0)
         {
