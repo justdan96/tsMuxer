@@ -48,7 +48,7 @@ MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMux
     m_interleave = false;
     m_subBlockFinished = false;
     m_mainBlockFinished = false;
-    m_ptsOffset = 900000ll;
+    m_ptsOffset = 54000000ll;
     m_mvcBaseViewR = false;
     m_extraIsoBlocks = 0;
     m_bluRayMode = false;
