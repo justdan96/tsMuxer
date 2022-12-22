@@ -2078,7 +2078,7 @@ void TsMuxerWindow::onRemoveBtnClick()
     ui->inputFilesLV->takeItem(idx);
     if (idx >= ui->inputFilesLV->count())
         idx--;
-	
+
     if (delMplsM2ts)
     {
         while (idx < ui->inputFilesLV->count())
@@ -2093,7 +2093,7 @@ void TsMuxerWindow::onRemoveBtnClick()
                 break;
         }
     }
-	
+
     if (ui->inputFilesLV->count() > 0)
         ui->inputFilesLV->setCurrentRow(idx);
     updateCustomChapters();
@@ -2155,7 +2155,7 @@ void TsMuxerWindow::deleteTrack(int idx)
         }
         updateNum();
     }
-	
+
     updateMaxOffsets();
     updateMetaLines();
     ui->moveupBtn->setEnabled(ui->trackLV->currentItem() != 0);
