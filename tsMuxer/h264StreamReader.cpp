@@ -77,7 +77,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
     SliceUnit slice;
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
-    uint8_t* nextNal = 0;
     std::string tmpDescr;
     bool pulldownInserted = false;
     bool offsetsInserted = false;
@@ -87,6 +86,10 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
         if (*nal & 0x80)
             return rez;
         auto nalType = (NALUnit::NALType)(*nal & 0x1f);
+        uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+        if (!m_eof && nextNal == end)
+            break;
+
         switch (nalType)
         {
         case NALUnit::NALType::nuSubSPS:
@@ -96,7 +99,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
         {
             if (nalType == NALUnit::NALType::nuSPS)
                 m_mvcPrimaryStream = true;
-            nextNal = NALUnit::findNALWithStartCode(nal, end, true);
             auto sps = new SPSUnit();
             sps->decodeBuffer(nal, nextNal);
             if (sps->deserialize() != 0)
@@ -112,7 +114,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
         case NALUnit::NALType::nuPPS:
         {
             auto pps = new PPSUnit();
-            nextNal = NALUnit::findNALWithStartCode(nal, end, true);
             pps->decodeBuffer(nal, nextNal);
             if (pps->deserialize() != 0)
             {
@@ -131,9 +132,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
             if (!m_spsMap.empty())
             {
                 SPSUnit* sps = m_spsMap.begin()->second;
-                nextNal = NALUnit::findNALWithStartCode(nal, end, true);
-                if (nextNal == m_bufEnd)
-                    break;
                 lastSEI.decodeBuffer(nal, nextNal);
                 lastSEI.deserialize(*sps, sps->nalHrdParams.isPresent || sps->vclHrdParams.isPresent);
                 if (lastSEI.pic_struct == 5 || lastSEI.pic_struct == 6 || lastSEI.pic_struct == 7 ||
@@ -165,7 +163,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t* buffer, int len)
                 break;
             try
             {
-                nextNal = NALUnit::findNALWithStartCode(nal, end, true);
                 uint8_t tmpBuffer[512];
                 int toDecode = (int)FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
                 int decodedLen = slice.decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
