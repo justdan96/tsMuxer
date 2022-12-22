@@ -43,14 +43,16 @@ VVCStreamReader::~VVCStreamReader()
 CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
 {
     CheckStreamRez rez;
-
     uint8_t* end = buffer + len;
+
     for (uint8_t* nal = NALUnit::findNextNAL(buffer, end); nal < end - 4; nal = NALUnit::findNextNAL(nal, end))
     {
         if (*nal & 0x80)
             return rez;  // invalid nal
         auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+        if (!m_eof && nextNal == end)
+            break;
 
         switch (nalType)
         {
