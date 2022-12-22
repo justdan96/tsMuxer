@@ -116,7 +116,7 @@ class AbstractDemuxer
     virtual void getTrackList(std::map<uint32_t, TrackInfo>& trackList) {}
     virtual void setFileIterator(FileNameIterator*) {}
 
-    virtual void setFileBlockSize(uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
+    //virtual void setFileBlockSize(uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
     virtual uint32_t getFileBlockSize() { return m_fileBlockSize; }
 
     virtual int64_t getTrackDelay(uint32_t pid) { return 0; }

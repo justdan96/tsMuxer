@@ -54,6 +54,8 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
             return rez;  // invalid nal
         auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+        if (!m_eof && nextNal == end)
+            break;
 
         switch (nalType)
         {
