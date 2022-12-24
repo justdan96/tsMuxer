@@ -539,8 +539,8 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
             }
             codecInfo->descr = "Can't detect codec";
             codecInfo->displayName = procStdOutput[i].mid(QString("Stream type: ").length());
-            // TODO: fix insertSEI option. Until then ,  the option is not default for H264/MVC
-            // if (codecInfo->displayName != "H.264" && codecInfo->displayName != "MVC")
+
+            if (codecInfo->displayName != "H.264" && codecInfo->displayName != "MVC")
             {
                 codecInfo->addSEIMethod = 0;
                 codecInfo->addSPS = false;
