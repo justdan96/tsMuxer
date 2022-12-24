@@ -1631,7 +1631,10 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
         writer.putBits(8, (int)NALType::nuSEI);
         writer.putBits(8, SEI_MSG_PIC_TIMING);
     }
+    uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
     writer.putBits(8, 0);
+    int beforeMessageLen = writer.getBitsCount();
+
     // pic timing
     if (sps.nalHrdParams.isPresent || sps.vclHrdParams.isPresent)
     {
@@ -1648,6 +1651,9 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
             writer.putBits(sps.nalHrdParams.time_offset_length, 0);
     }
     write_byte_align_bits(writer);
+    // ---------
+    int msgLen = writer.getBitsCount() - beforeMessageLen;
+    *size = msgLen / 8;
 
     if (seiHeader)
         write_rbsp_trailing_bits(writer);
@@ -1660,7 +1666,10 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         writer.putBits(8, (int)NALType::nuSEI);
         writer.putBits(8, SEI_MSG_BUFFERING_PERIOD);
     }
+    uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
     writer.putBits(8, 0);
+    int beforeMessageLen = writer.getBitsCount();
+
     // buffering period
     writeUEGolombCode(writer, sps.seq_parameter_set_id);
     if (sps.nalHrdParams.isPresent)
@@ -1684,6 +1693,10 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         }
     }
     write_byte_align_bits(writer);
+    // ---------
+    int msgLen = writer.getBitsCount() - beforeMessageLen;
+    *size = msgLen / 8;
+
     if (seiHeader)
         write_rbsp_trailing_bits(writer);
 }
