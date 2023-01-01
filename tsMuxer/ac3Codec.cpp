@@ -63,7 +63,6 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
     if (id > 16)
         return AC3ParseError::BSID;
 
-    m_previousid = m_bsid;
     m_bsid = id;
     if (m_bsid > 10)  // bsid = 16 => EAC3
     {
@@ -305,7 +304,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             }
         }
 
-        if ((m_true_hd_mode))  // ommit AC3+
+        if ((m_true_hd_mode))  // omit AC3+
         {
             uint8_t* trueHDData = buf + rez;
             if (end - trueHDData < 7)
@@ -443,13 +442,19 @@ bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
 
 uint64_t AC3Codec::getFrameDurationNano()
 {
-    if (m_previousid > 10 && m_bsid <= 10)
-        return 0;  // E-AC3. finish frame after AC3 frame
-    if (m_previousid > 10 && m_bsid > 10 && m_strmtyp == 1)
-        return 0;  // E-AC3 dependeant substream
-    if (m_waitMoreData)
-        return 0;  // AC3 HD
+    // Pure EAC3: wait for dependent substream
+    if (!m_bit_rate && m_strmtyp == 1)
+        return 0;
 
+    // Interleaved AC3/EAC3: wait for EAC3 frame
+    if (m_bit_rateExt && m_bsid <= 10)
+        return 0;
+
+    // Interleaved AC3/TrueHD: wait for end of True HD frame
+    if (m_waitMoreData)
+        return 0;
+
+    // OK to increment PTS
     return m_frameDurationNano;
 }
 
