@@ -379,7 +379,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
             if (is4K())
                 bdIndexData[0x94] = 0x51;
             // include HDR flags
-            bdIndexData[0x96] = (V3_flags & 0x1e);  
+            bdIndexData[0x96] = (V3_flags & 0x1e);
             // no HDR10 detected => SDR flag
             if (bdIndexData[0x96] == 0)
                 bdIndexData[0x96] = 1;
