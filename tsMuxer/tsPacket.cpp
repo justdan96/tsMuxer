@@ -343,8 +343,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
         if (curPos != crcPos)
             return false;
 
-        uint32_t rez = calculateCRC32(buffer, curPos - buffer);
-        rez = my_htonl(rez);
+        //uint32_t rez = my_htonl(calculateCRC32(buffer, curPos - buffer))à;
         return true;
     }
     catch (BitStreamException&)

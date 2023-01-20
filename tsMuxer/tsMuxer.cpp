@@ -784,9 +784,6 @@ void TSMuxer::writePESPacket()
         if (m_computeMuxStats && (pesPacket->flagsLo & 0x80) == 0x80)
         {
             uint64_t curPts = pesPacket->getPts();
-            uint64_t curDts = curPts;
-            if ((pesPacket->flagsLo & 0xc0) == 0xc0)
-                curDts = pesPacket->getDts();
 
             size_t idxSize = streamInfo.m_index.size();
             if (idxSize == 0)
