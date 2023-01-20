@@ -195,7 +195,7 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
         else if (m_bluRayMode && mlpFound)
             LTRACE(LT_ERROR, 2,
                    "Warning! MLP codec is not standard for BD disks, the disk will not play in a Blu-ray player.");
-        else if (m_bluRayMode && (V3_flags & DV) && !(V3_flags & NON_DV_TRACK))
+        else if (m_bluRayMode && (V3_flags & DV) && !(V3_flags & BL_TRACK))
             LTRACE(LT_ERROR, 2,
                    "Warning! Dolby Vision Double Layer Single Tracks are not standard for BD disks, the disk will "
                    "not play in a Blu-ray player.");

@@ -14,14 +14,14 @@
 
 enum V3Flags
 {
-    SDR = 1,
+    HDMV_V3 = 1,
     HDR10 = 2,
     DV = 4,
     SL_HDR2 = 8,
     HDR10PLUS = 16,
     FOUR_K = 32,
-    NON_DV_TRACK = 64,
-    HDMV_V3 = 128
+    BL_TRACK = 64,
+    BL_NOTCOMPAT = 128
 };
 
 extern int V3_flags;

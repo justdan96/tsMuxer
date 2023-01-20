@@ -235,7 +235,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
 int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
 {
-    bool isDVBL = (V3_flags & NON_DV_TRACK) == 0;
+    bool isDVBL = (V3_flags & BL_TRACK) == 0;
     if (!isDVBL)
         m_hdr->isDVEL = true;
 
@@ -297,6 +297,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
             default:  // unspecified, assumed DV IPT
                 profile = 5;
                 compatibility = 0;
+                V3_flags |= BL_NOTCOMPAT;
             }
         }
     }

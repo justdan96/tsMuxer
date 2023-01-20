@@ -182,7 +182,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             {
                 tsStreamIndex = 0x1011 + m_videoTrackCnt * doubleMux;
                 m_videoTrackCnt++;
-                V3_flags |= NON_DV_TRACK;
+                V3_flags |= BL_TRACK;
             }
             if (m_subMode)
                 tsStreamIndex++;
@@ -294,8 +294,9 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     {
         StreamType stream_type = StreamType::VIDEO_H265;
         // For non-bluray, second Dolby Vision track must be stream_type 06 = private data
-        if (!m_bluRayMode && tsStreamIndex == 0x1015 && (V3_flags & NON_DV_TRACK))
+        if (!m_bluRayMode && tsStreamIndex == 0x1015 && (V3_flags & BL_TRACK))
             stream_type = StreamType::PRIVATE_DATA;
+		
         m_pmt.pidList[tsStreamIndex] =
             PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary);
     }

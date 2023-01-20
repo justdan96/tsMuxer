@@ -378,13 +378,13 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
             // 4K => 66/100 GB Disk, 109 MB/s Recording_Rate
             if (is4K())
                 bdIndexData[0x94] = 0x51;
+            // include HDR flags
+            bdIndexData[0x96] = (V3_flags & 0x1e);  
             // no HDR10 detected => SDR flag
-            if (!(V3_flags & 0x1e))
-                V3_flags |= SDR;
-            // include V3 flags
-            bdIndexData[0x96] = (V3_flags & 0x1f);
+            if (bdIndexData[0x96] == 0)
+                bdIndexData[0x96] = 1;
         }
-        else  // V2
+        else  // V2 Blu-ray
         {
             bdIndexData[5] = '2';
             fileSize = 0x78;
