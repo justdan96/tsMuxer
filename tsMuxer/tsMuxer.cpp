@@ -296,10 +296,10 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         // For non-bluray, second Dolby Vision track must be stream_type 06 = private data
         if (!m_bluRayMode && tsStreamIndex == 0x1015)
             stream_type = StreamType::PRIVATE_DATA;
-		// Dolby Vision profile 5 is not compatible with SDR or HDR and must be stream_type 06 = private data
-		else if (V3_flags & BL_NOTCOMPAT)
+        // Dolby Vision profile 5 is not compatible with SDR or HDR and must be stream_type 06 = private data
+        else if (V3_flags & BL_NOTCOMPAT)
             stream_type = StreamType::PRIVATE_DATA;
-		
+
         m_pmt.pidList[tsStreamIndex] =
             PMTStreamInfo(stream_type, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary);
     }
