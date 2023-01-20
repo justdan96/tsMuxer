@@ -80,7 +80,8 @@ class BitStreamReader : public BitStream
             m_bitLeft -= num;
         else
         {
-            prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
+            if (m_bitLeft != 0)
+                prevVal = (m_curVal & m_masks[m_bitLeft]) << (num - m_bitLeft);
             m_buffer++;
             m_curVal = getCurVal(m_buffer);
             m_bitLeft += INT_BIT - num;
