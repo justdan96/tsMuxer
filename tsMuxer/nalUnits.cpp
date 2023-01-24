@@ -301,23 +301,6 @@ int NALUnit::serialize(uint8_t* dstBuffer)
     return 4;
 }
 
-int ceil_log2(double val)
-{
-    int iVal = (int)val;
-    double frac = val - iVal;
-    int bits = 0;
-    for (; iVal > 0; iVal >>= 1)
-    {
-        bits++;
-    }
-    int mask = 1 << (bits - 1);
-    iVal = (int)val;
-    if (iVal - mask == 0 && frac == 0)
-        return bits - 1;  // For example: cail(log2(8.0)) = 3, but for 8.2 or 9.0 it's 4
-    else
-        return bits;
-}
-
 // -------------------- NALDelimiter ------------------
 int NALDelimiter::deserialize(uint8_t* buffer, uint8_t* end)
 {
