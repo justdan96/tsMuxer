@@ -3163,12 +3163,12 @@
     <message>
         <location filename="../tsmuxerwindow.ui" line="2572"/>
         <source>TS muxing</source>
-        <translation>Multiplexado de TS</translation>
+        <translation>Multiplexar en TS</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2588"/>
         <source>M2TS muxing</source>
-        <translation>Multiplexado de M2TS</translation>
+        <translation>Multiplexar en M2TS</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.ui" line="2595"/>
