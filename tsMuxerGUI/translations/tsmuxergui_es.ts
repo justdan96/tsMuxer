@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="es_ES" sourcelanguage="en_US">
 <context>
     <name>FontSettingsTableModel</name>
     <message>
@@ -29,2452 +29,2452 @@
     <message>
         <location filename="../lang_codes.cpp" line="33"/>
         <source>common</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="38"/>
         <source>all</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="65"/>
         <source>Undetermined</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="72"/>
         <location filename="../lang_codes.cpp" line="175"/>
         <location filename="../lang_codes.cpp" line="176"/>
         <source>Chinese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="73"/>
         <location filename="../lang_codes.cpp" line="212"/>
         <location filename="../lang_codes.cpp" line="213"/>
         <source>Dutch; Flemish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="74"/>
         <location filename="../lang_codes.cpp" line="221"/>
         <source>English</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="75"/>
         <location filename="../lang_codes.cpp" line="234"/>
         <source>Finnish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="76"/>
         <location filename="../lang_codes.cpp" line="237"/>
         <location filename="../lang_codes.cpp" line="238"/>
         <source>French</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="77"/>
         <location filename="../lang_codes.cpp" line="254"/>
         <location filename="../lang_codes.cpp" line="255"/>
         <source>German</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="78"/>
         <location filename="../lang_codes.cpp" line="308"/>
         <source>Italian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="79"/>
         <location filename="../lang_codes.cpp" line="309"/>
         <source>Japanese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="80"/>
         <location filename="../lang_codes.cpp" line="424"/>
         <source>Norwegian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="81"/>
         <location filename="../lang_codes.cpp" line="453"/>
         <source>Portuguese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="82"/>
         <location filename="../lang_codes.cpp" line="468"/>
         <source>Russian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="83"/>
         <location filename="../lang_codes.cpp" line="515"/>
         <source>Spanish; Castilian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="84"/>
         <location filename="../lang_codes.cpp" line="523"/>
         <source>Swedish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="89"/>
         <source>Acehnese, Achinese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="90"/>
         <source>Acoli</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="91"/>
         <source>Adangme</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="92"/>
         <source>Adyghe; Adygei</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="93"/>
         <source>Afar</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="94"/>
         <source>Afrihili</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="95"/>
         <source>Afrikaans</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="96"/>
         <source>Afro-Asiatic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="97"/>
         <source>Ainu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="98"/>
         <source>Akan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="99"/>
         <source>Akkadian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="100"/>
         <location filename="../lang_codes.cpp" line="101"/>
         <source>Albanian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="102"/>
         <source>Aleut</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="103"/>
         <source>Algonquian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="104"/>
         <source>Altaic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="105"/>
         <source>Amharic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="106"/>
         <source>Angika</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="107"/>
         <source>Apache languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="108"/>
         <source>Arabic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="109"/>
         <source>Aragonese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="110"/>
         <source>Aramaic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="111"/>
         <source>Arapaho</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="112"/>
         <source>Araucanian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="113"/>
         <source>Arawak</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="114"/>
         <location filename="../lang_codes.cpp" line="115"/>
         <source>Armenian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="116"/>
         <source>Aromanian; Arumanian; Macedo-Romanian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="117"/>
         <source>Artificial (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="118"/>
         <source>Assamese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="119"/>
         <source>Asturian; Bable</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="120"/>
         <source>Athapascan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="121"/>
         <source>Australian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="122"/>
         <source>Austro-Bavarian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="123"/>
         <source>Austronesian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="124"/>
         <source>Avaric</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="125"/>
         <source>Avestan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="126"/>
         <source>Awadhi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="127"/>
         <source>Aymara</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="128"/>
         <source>Azerbaijani</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="129"/>
         <source>Balinese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="130"/>
         <source>Baltic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="131"/>
         <source>Baluchi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="132"/>
         <source>Bambara</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="133"/>
         <source>Bamileke languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="134"/>
         <source>Banda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="135"/>
         <source>Bantu (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="136"/>
         <source>Basa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="137"/>
         <source>Bashkir</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="138"/>
         <location filename="../lang_codes.cpp" line="139"/>
         <source>Basque</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="140"/>
         <source>Batak (Indonesia)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="141"/>
         <source>Beja</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="142"/>
         <source>Belarusian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="143"/>
         <source>Bemba</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="144"/>
         <source>Bengali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="145"/>
         <source>Berber (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="146"/>
         <source>Bhojpuri</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="147"/>
         <source>Bihari</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="148"/>
         <source>Bikol languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="149"/>
         <source>Bini</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="150"/>
         <source>Bislama</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="151"/>
         <source>Blin; Bilin</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="152"/>
         <source>Bosnian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="153"/>
         <source>Brij Bhasha</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="154"/>
         <source>Breton</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="155"/>
         <source>Buginese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="156"/>
         <source>Bulgarian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="157"/>
         <source>Buriat</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="158"/>
         <location filename="../lang_codes.cpp" line="159"/>
         <source>Burmese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="160"/>
         <source>Caddo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="161"/>
         <source>Carib</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="162"/>
         <source>Catalan; Valencian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="163"/>
         <source>Caucasian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="164"/>
         <source>Cebuano</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="165"/>
         <source>Celtic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="166"/>
         <source>Central American Indian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="167"/>
         <source>Chagatai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="168"/>
         <source>Chamic languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="169"/>
         <source>Chamorro</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="170"/>
         <source>Chechen</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="171"/>
         <source>Cherokee</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="172"/>
         <source>Cheyenne</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="173"/>
         <source>Chibcha</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="174"/>
         <source>Chichewa; Chewa; Nyanja</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="177"/>
         <source>Chinook jargon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="178"/>
         <source>Choctaw</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="179"/>
         <source>Church Slavonic; Church Slavic; Old Church Slavonic; Old Slavonic; Old Bulgarian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="181"/>
         <source>Chuukese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="182"/>
         <source>Chuvash</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="183"/>
         <source>Classical Newari; Old Newari; Classical Nepal Bhasa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="184"/>
         <source>Classical Syriac</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="185"/>
         <source>Coptic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="186"/>
         <source>Cornish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="187"/>
         <source>Corsican</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="188"/>
         <source>Cree</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="189"/>
         <source>Creek; Muskogean</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="190"/>
         <source>Creoles and Pidgins (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="191"/>
         <source>Creoles and Pidgins, English-based (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="192"/>
         <source>Creoles and Pidgins, French-based (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="193"/>
         <source>Creoles and Pidgins, Portuguese-based (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="194"/>
         <source>Crimean Tatar (Crimean Turkish)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="195"/>
         <location filename="../lang_codes.cpp" line="196"/>
         <source>Croatian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="197"/>
         <source>Cushitic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="198"/>
         <location filename="../lang_codes.cpp" line="199"/>
         <source>Czech</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="200"/>
         <source>Dakota</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="201"/>
         <source>Danish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="202"/>
         <source>Dargwa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="203"/>
         <source>Dayak</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="204"/>
         <source>Delaware</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="205"/>
         <source>Dene Suline</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="206"/>
         <source>Dinka</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="207"/>
         <source>Divehi; Dhivehi; Maldivian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="208"/>
         <source>Dogri</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="209"/>
         <source>Dogrib</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="210"/>
         <source>Dravidian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="211"/>
         <source>Duala</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="214"/>
         <source>Dutch, Middle (ca. 1050-1350)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="215"/>
         <source>Dyula</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="216"/>
         <source>Dzongkha</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="217"/>
         <source>Efik</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="218"/>
         <source>Egyptian (Ancient)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="219"/>
         <source>Ekajuk</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="220"/>
         <source>Elamite</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="222"/>
         <source>English, Middle (ca. 1100-1500)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="223"/>
         <source>English, Old (ca. 450-1100)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="224"/>
         <source>Erzya</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="225"/>
         <source>Esperanto</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="226"/>
         <source>Estonian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="227"/>
         <source>Ewe</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="228"/>
         <source>Ewondo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="229"/>
         <source>Fang</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="230"/>
         <source>Fanti</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="231"/>
         <source>Faroese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="232"/>
         <source>Fijian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="233"/>
         <source>Filipino</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="235"/>
         <source>Finno-Ugrian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="236"/>
         <source>Fon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="239"/>
         <source>French, Middle (ca. 1400-1600)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="240"/>
         <source>French, Old (842-ca. 1400)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="241"/>
         <source>Frisian, Eastern</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="242"/>
         <source>Frisian, Northern</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="243"/>
         <source>Frisian, Western</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="244"/>
         <source>Friulian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="245"/>
         <source>Fulah</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="246"/>
         <source>Ga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="247"/>
         <source>Galician</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="248"/>
         <source>Ganda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="249"/>
         <source>Gayo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="250"/>
         <source>Gbaya</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="251"/>
         <source>Ge&apos;ez</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="252"/>
         <location filename="../lang_codes.cpp" line="253"/>
         <source>Georgian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="256"/>
         <source>German, Alemannic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="257"/>
         <source>German, Low; Low German; Saxon, Low; Low Saxon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="258"/>
         <source>German, Middle High (ca. 1050-1500)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="259"/>
         <source>German, Old High (ca. 750-1050)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="260"/>
         <source>Germanic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="261"/>
         <source>Gilbertese; Kiribati</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="262"/>
         <source>Gondi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="263"/>
         <source>Gorontalo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="264"/>
         <source>Gothic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="265"/>
         <source>Grebo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="266"/>
         <source>Greek, Ancient (to 1453)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="267"/>
         <location filename="../lang_codes.cpp" line="268"/>
         <source>Greek, Modern (1453)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="269"/>
         <source>Greenlandic; Kalaallisut</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="270"/>
         <source>Guarani</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="271"/>
         <source>Gujarati</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="272"/>
         <source>Gwich&apos;in</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="273"/>
         <source>Haida</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="274"/>
         <source>Haitian Creole; Haitian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="275"/>
         <source>Hausa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="276"/>
         <source>Hawaiian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="277"/>
         <source>Hebrew</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="278"/>
         <source>Herero</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="279"/>
         <source>Hiligaynon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="280"/>
         <source>Himachali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="281"/>
         <source>Hindi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="282"/>
         <source>Hiri Motu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="283"/>
         <source>Hittite</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="284"/>
         <source>Hmong</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="285"/>
         <source>Hungarian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="286"/>
         <source>Hupa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="287"/>
         <source>Iban</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="288"/>
         <location filename="../lang_codes.cpp" line="289"/>
         <source>Icelandic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="290"/>
         <source>Ido</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="291"/>
         <source>Igbo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="292"/>
         <source>Ijo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="293"/>
         <source>Iloko</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="294"/>
         <source>Inari Sami</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="295"/>
         <source>Indic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="296"/>
         <source>Indo-European (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="297"/>
         <source>Indonesian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="298"/>
         <source>Ingush</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="299"/>
         <source>Interlingua (International Auxiliary Language Association)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="300"/>
         <source>Interlingue</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="301"/>
         <source>Inuktitut</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="302"/>
         <source>Inupiaq</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="303"/>
         <source>Iranian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="304"/>
         <source>Irish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="305"/>
         <source>Irish, Middle (900-1200)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="306"/>
         <source>Irish, Old (to 900)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="307"/>
         <source>Iroquoian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="310"/>
         <source>Javanese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="311"/>
         <source>Judeo-Arabic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="312"/>
         <source>Judeo-Persian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="313"/>
         <source>Kabardian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="314"/>
         <source>Kabyle</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="315"/>
         <source>Kachin</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="316"/>
         <source>Kalmyk; Oirat</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="317"/>
         <source>Kamba</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="318"/>
         <source>Kannada</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="319"/>
         <source>Kanuri</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="320"/>
         <source>Karachay-Balkar</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="321"/>
         <source>Kara-Kalpak</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="322"/>
         <source>Karelian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="323"/>
         <source>Karen</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="324"/>
         <source>Kashmiri</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="325"/>
         <source>Kashubian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="326"/>
         <source>Kawi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="327"/>
         <source>Kazakh</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="328"/>
         <source>Khasi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="329"/>
         <source>Khmer</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="330"/>
         <source>Khoisan (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="331"/>
         <source>Khotanese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="332"/>
         <source>Kikuyu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="333"/>
         <source>Kimbundu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="334"/>
         <source>Kinyarwanda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="335"/>
         <source>Kirghiz</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="336"/>
         <source>Klingon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="337"/>
         <source>Komi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="338"/>
         <source>Kongo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="339"/>
         <source>Konkani</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="340"/>
         <source>Korean</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="341"/>
         <source>Kosraean</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="342"/>
         <source>Kpelle</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="343"/>
         <source>Kru</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="344"/>
         <source>Kuanyama; Kwanyama</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="345"/>
         <source>Kumyk</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="346"/>
         <source>Kurdish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="347"/>
         <source>Kurukh</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="348"/>
         <source>Kutenai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="349"/>
         <source>Ladino</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="350"/>
         <source>Lahnda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="351"/>
         <source>Lamba</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="352"/>
         <source>Lao</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="353"/>
         <source>Latin</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="354"/>
         <source>Latvian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="355"/>
         <source>Lezghian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="356"/>
         <source>Limburgish; Limburger; Limburgan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="357"/>
         <source>Lingala</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="358"/>
         <source>Lithuanian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="359"/>
         <source>Lojban</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="360"/>
         <source>Lozi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="361"/>
         <source>Luba-Katanga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="362"/>
         <source>Luba-Lulua</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="363"/>
         <source>Luise-o</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="364"/>
         <source>Lule Sami</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="365"/>
         <source>Lunda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="366"/>
         <source>Luo (Kenya and Tanzania)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="367"/>
         <source>Lushai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="368"/>
         <source>Luxembourgish; Letzeburgesch</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="369"/>
         <location filename="../lang_codes.cpp" line="370"/>
         <source>Macedonian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="371"/>
         <source>Madurese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="372"/>
         <source>Magahi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="373"/>
         <source>Maithili</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="374"/>
         <source>Makasar</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="375"/>
         <source>Malagasy</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="376"/>
         <location filename="../lang_codes.cpp" line="377"/>
         <source>Malay</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="378"/>
         <source>Malayalam</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="379"/>
         <source>Maltese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="380"/>
         <source>Manchu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="381"/>
         <source>Mandar</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="382"/>
         <source>Mandingo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="383"/>
         <source>Manipuri</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="384"/>
         <source>Manobo languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="385"/>
         <source>Manx</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="386"/>
         <location filename="../lang_codes.cpp" line="387"/>
         <source>Maori</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="388"/>
         <source>Marathi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="389"/>
         <source>Mari</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="390"/>
         <source>Marshallese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="391"/>
         <source>Marwari</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="392"/>
         <source>Masai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="393"/>
         <source>Mayan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="394"/>
         <source>Mende</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="395"/>
         <source>Mi&apos;kmaq; Micmac</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="396"/>
         <source>Minangkabau</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="397"/>
         <source>Mirandese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="398"/>
         <source>Mohawk</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="399"/>
         <source>Moksha</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="400"/>
         <source>Moldavian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="401"/>
         <source>Mon-Khmer (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="402"/>
         <source>Mongo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="403"/>
         <source>Mongolian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="404"/>
         <source>Mossi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="405"/>
         <source>Munda languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="406"/>
         <source>Nahuatl</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="407"/>
         <source>Nauruan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="408"/>
         <source>Navajo; Navaho</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="409"/>
         <source>Ndebele, North</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="410"/>
         <source>Ndebele, South</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="411"/>
         <source>Ndonga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="412"/>
         <source>Neapolitan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="413"/>
         <source>Nepal Bhasa; Newari</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="414"/>
         <source>Nepali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="415"/>
         <source>Nias</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="416"/>
         <source>Niger-Kordofanian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="417"/>
         <source>Nilo-Saharan (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="418"/>
         <source>Niuean</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="419"/>
         <source>N&apos;Ko</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="420"/>
         <source>Nogai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="421"/>
         <source>Norse, Old</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="422"/>
         <source>North American Indian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="423"/>
         <source>Northern Sami</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="425"/>
         <source>Norwegian Bokmål</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="426"/>
         <source>Norwegian Nynorsk</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="427"/>
         <source>Nubian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="428"/>
         <source>Nyamwezi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="429"/>
         <source>Nyankole</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="430"/>
         <source>Nyoro</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="431"/>
         <source>Nzima</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="432"/>
         <source>Occitan (post 1500); Provençal</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="433"/>
         <source>Ojibwa, Anishinaabe languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="434"/>
         <source>Oriya</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="435"/>
         <source>Oromo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="436"/>
         <source>Osage</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="437"/>
         <source>Ossetian; Ossetic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="438"/>
         <source>Otomian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="439"/>
         <source>Pahlavi (Middle Persian)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="440"/>
         <source>Palauan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="441"/>
         <source>Pali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="442"/>
         <source>Pampanga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="443"/>
         <source>Pangasinan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="444"/>
         <source>Papiamento</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="445"/>
         <source>Papuan (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="446"/>
         <location filename="../lang_codes.cpp" line="447"/>
         <source>Persian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="448"/>
         <source>Persian, Old (ca. 600-400 BC)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="449"/>
         <source>Philippine (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="450"/>
         <source>Phoenician</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="451"/>
         <source>Pohnpeian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="452"/>
         <source>Polish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="454"/>
         <source>Prakrit languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="455"/>
         <source>Provençal, Old (to 1500)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="456"/>
         <source>Punjabi; Panjabi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="457"/>
         <source>Pushto</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="458"/>
         <source>Quechuan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="459"/>
         <source>Raeto-Romance</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="460"/>
         <source>Rajasthani</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="461"/>
         <source>Rapanui</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="462"/>
         <source>Rarotongan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="463"/>
         <source>Romance (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="464"/>
         <location filename="../lang_codes.cpp" line="465"/>
         <source>Romanian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="466"/>
         <source>Romany</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="467"/>
         <source>Rundi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="469"/>
         <source>Salishan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="470"/>
         <source>Samaritan Aramaic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="471"/>
         <source>Sami languages (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="472"/>
         <source>Samoan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="473"/>
         <source>Sandawe</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="474"/>
         <source>Sango</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="475"/>
         <source>Sanskrit</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="476"/>
         <source>Santali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="477"/>
         <source>Sardinian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="478"/>
         <source>Sasak</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="479"/>
         <source>Scots</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="480"/>
         <source>Scottish Gaelic; Gaelic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="481"/>
         <source>Selkup</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="482"/>
         <source>Semitic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="483"/>
         <location filename="../lang_codes.cpp" line="484"/>
         <source>Serbian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="485"/>
         <source>Serer</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="486"/>
         <source>Shan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="487"/>
         <source>Shona</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="488"/>
         <source>Sichuan Yi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="489"/>
         <source>Sicilian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="490"/>
         <source>Sidamo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="491"/>
         <source>Sign languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="492"/>
         <source>Siksika</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="493"/>
         <source>Sindhi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="494"/>
         <source>Sinhalese; Sinhala</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="495"/>
         <source>Sino-Tibetan (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="496"/>
         <source>Siouan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="497"/>
         <source>Skolt Sami</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="498"/>
         <source>Slave (Athapascan)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="499"/>
         <source>Slavic (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="500"/>
         <location filename="../lang_codes.cpp" line="501"/>
         <source>Slovak</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="502"/>
         <source>Slovenian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="503"/>
         <source>Sogdian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="504"/>
         <source>Somali</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="505"/>
         <source>Songhai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="506"/>
         <source>Soninke</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="507"/>
         <source>Sorbian languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="508"/>
         <source>Sorbian, Lower</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="509"/>
         <source>Sorbian, Upper</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="510"/>
         <source>Sotho; Northern; Pedi; Sepedi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="511"/>
         <source>Sotho, Southern</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="512"/>
         <source>South American Indian (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="513"/>
         <source>Southern Altai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="514"/>
         <source>Southern Sami</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="516"/>
         <source>Sranan Tongo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="517"/>
         <source>Sukuma</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="518"/>
         <source>Sumerian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="519"/>
         <source>Sundanese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="520"/>
         <source>Susu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="521"/>
         <source>Swahili</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="522"/>
         <source>Swati</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="524"/>
         <source>Syriac</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="525"/>
         <source>Tagalog</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="526"/>
         <source>Tahitian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="527"/>
         <source>Tai (Other)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="528"/>
         <source>Tajik</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="529"/>
         <source>Tamashek</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="530"/>
         <source>Tamil</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="531"/>
         <source>Tatar</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="532"/>
         <source>Telugu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="533"/>
         <source>Tereno</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="534"/>
         <source>Tetum, Lia-Tetun</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="535"/>
         <source>Thai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="536"/>
         <location filename="../lang_codes.cpp" line="537"/>
         <source>Tibetan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="538"/>
         <source>Tigre</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="539"/>
         <source>Tigrinya</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="540"/>
         <source>Timne</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="541"/>
         <source>Tiv</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="542"/>
         <source>Tlingit</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="543"/>
         <source>Tok Pisin</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="544"/>
         <source>Tokelau</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="545"/>
         <source>Tonga (Malawi)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="546"/>
         <source>Tongan</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="547"/>
         <source>Tsimshian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="548"/>
         <source>Tsonga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="549"/>
         <source>Tswana</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="550"/>
         <source>Tumbuka</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="551"/>
         <source>Tupi languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="552"/>
         <source>Turkish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="553"/>
         <source>Turkish, Ottoman (1500-1928)</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="554"/>
         <source>Turkmen</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="555"/>
         <source>Tuvalu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="556"/>
         <source>Tuvinian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="557"/>
         <source>Twi</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="558"/>
         <source>Udmurt</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="559"/>
         <source>Ugaritic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="560"/>
         <source>Uighur; Uyghur</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="561"/>
         <source>Ukrainian</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="562"/>
         <source>Umbundu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="563"/>
         <source>Urdu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="564"/>
         <source>Uzbek</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="565"/>
         <source>Vai</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="566"/>
         <source>Venda</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="567"/>
         <source>Vietnamese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="568"/>
         <source>Volapük</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="569"/>
         <source>Votic</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="570"/>
         <source>Wakashan languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="571"/>
         <source>Walamo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="572"/>
         <source>Walloon</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="573"/>
         <source>Waray</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="574"/>
         <source>Washo</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="575"/>
         <location filename="../lang_codes.cpp" line="576"/>
         <source>Welsh</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="577"/>
         <source>Wolof</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="578"/>
         <source>Xhosa</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="579"/>
         <source>Yakut</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="580"/>
         <source>Yao</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="581"/>
         <source>Yapese</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="582"/>
         <source>Yiddish</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="583"/>
         <source>Yoruba</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="584"/>
         <source>Yupik languages</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="585"/>
         <source>Zande</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="586"/>
         <source>Zaza; Dimili; Dimli; Kirdki; Kirmanjki; Zazaki</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="587"/>
         <source>Zapotec</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="588"/>
         <source>Zenaga</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="589"/>
         <source>Zhuang; Chuang</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="590"/>
         <source>Zulu</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../lang_codes.cpp" line="591"/>
         <source>Zuni&apos;</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3261,7 +3261,7 @@
     <message>
         <location filename="../tsmuxerwindow.cpp" line="65"/>
         <source>TrueHD/AC3+TrueHD</source>
-        <translation>TrueHD/AC3+TrueHD</translation>
+        <translation type="unfinished">TrueHD/AC3+TrueHD</translation>
     </message>
     <message>
         <location filename="../tsmuxerwindow.cpp" line="66"/>
