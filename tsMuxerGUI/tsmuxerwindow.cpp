@@ -540,12 +540,13 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
             }
             codecInfo->descr = "Can't detect codec";
             codecInfo->displayName = procStdOutput[i].mid(QString("Stream type: ").length());
-
+            /* Add SEI and SPS only with AVC and MVC (currently disabled)
             if (codecInfo->displayName != "H.264" && codecInfo->displayName != "MVC")
             {
                 codecInfo->addSEIMethod = 0;
                 codecInfo->addSPS = false;
             }
+            */
             if (codecInfo->displayName == "HEVC")
                 ui->checkBoxV3->setChecked(true);
             else if (codecInfo->displayName == "H.264" || codecInfo->displayName == "MVC" ||
@@ -1012,9 +1013,9 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
             ui->checkBoxLevel->setChecked(codecInfo->checkLevel);
             ui->comboBoxFPS->setEnabled(ui->checkFPS->isChecked());
             ui->comboBoxLevel->setEnabled(ui->checkBoxLevel->isChecked());
-            ui->comboBoxSEI->setCurrentIndex(codecInfo->addSEIMethod);
+            // ui->comboBoxSEI->setCurrentIndex(codecInfo->addSEIMethod);
             ui->checkBoxSecondaryVideo->setChecked(codecInfo->isSecondary);
-            ui->checkBoxSPS->setChecked(codecInfo->addSPS);
+            // ui->checkBoxSPS->setChecked(codecInfo->addSPS);
             ui->checkBoxRemovePulldown->setChecked(codecInfo->delPulldown == 1);
             ui->checkBoxRemovePulldown->setEnabled(codecInfo->delPulldown >= 0);
 
@@ -2698,6 +2699,9 @@ void TsMuxerWindow::writeSettings()
     settings->setValue("language", ui->languageSelectComboBox->currentText());
     settings->setValue("windowSize", size());
 
+    settings->setValue("addSEIMethod", ui->comboBoxSEI->currentIndex());
+    settings->setValue("addSPS", ui->checkBoxSPS->isChecked());
+
     settings->endGroup();
 
     settings->beginGroup("subtitles");
@@ -2788,6 +2792,9 @@ bool TsMuxerWindow::readGeneralSettings(const QString &prefix)
 
     ui->radioButtonOutoutInInput->setChecked(settings->value("outputToInputFolder").toBool());
     ui->radioButtonStoreOutput->setChecked(!ui->radioButtonOutoutInInput->isChecked());
+
+    ui->comboBoxSEI->setCurrentIndex(settings->value("addSEIMethod").toInt());
+    ui->checkBoxSPS->setChecked(settings->value("addSPS").toBool());
 
     settings->endGroup();
     return true;
