@@ -841,18 +841,6 @@ VideoAspectRatio arNameToCode(const string& arName)
         return VideoAspectRatio::AR_KEEP_DEFAULT;
 }
 
-double correctFps(double fps)
-{
-    if (fabs(fps - 23.976) < 1e-4)
-        return 23.97602397602397;
-    else if (fabs(fps - 29.97) < 1e-4)
-        return 29.97002997002997;
-    else if (fabs(fps - 59.94) < 1e-4)
-        return 59.94005994005994;
-    else
-        return fps;
-}
-
 PIPParams::PipCorner pipCornerFromStr(const std::string& value)
 {
     std::string v = trimStr(strToLowerCase(value));

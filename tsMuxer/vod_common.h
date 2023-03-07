@@ -118,6 +118,7 @@ void AV_WB32(uint8_t* buffer, uint32_t value);
 std::string floatToTime(double time, char msSeparator = '.');
 double timeToFloat(const std::string& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
+double correctFps(double fps);
 
 static inline int64_t nanoClockToPts(int64_t value)
 {
