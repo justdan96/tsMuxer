@@ -535,7 +535,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         m_isNewFrame = true;
-        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/1e9 << " DTS=" << m_lastDTS/1e9);
+        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/INTERNAL_PTS_FREQ << " DTS=" << m_lastDTS/INTERNAL_PTS_FREQ);
         if (m_needRescale)
         {
             avPacket.dts = FFMAX(0, avPacket.dts);
@@ -573,7 +573,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         m_curPos += pesHeaderLen;
         m_processedSize += pesHeaderLen;
         m_state = State::stParsePGS;
-        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/1e9 << " DTS=" << m_lastDTS/1e9);
+        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/INTERNAL_PTS_FREQ << " DTS=" << m_lastDTS/INTERNAL_PTS_FREQ);
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         m_isNewFrame = true;
