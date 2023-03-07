@@ -1007,15 +1007,18 @@ void TsMuxerWindow::trackLVItemSelectionChanged()
     {
         if (isVideoCodec(codecInfo->displayName))
         {
+            codecInfo->addSEIMethod = ui->comboBoxSEI->currentIndex();
+            codecInfo->addSPS = ui->checkBoxSPS->isChecked();
+
             ui->tabWidgetTracks->addTab(ui->tabSheetVideo, TI_DEFAULT_TAB_NAME());
 
             ui->checkFPS->setChecked(codecInfo->checkFPS);
             ui->checkBoxLevel->setChecked(codecInfo->checkLevel);
             ui->comboBoxFPS->setEnabled(ui->checkFPS->isChecked());
             ui->comboBoxLevel->setEnabled(ui->checkBoxLevel->isChecked());
-            // ui->comboBoxSEI->setCurrentIndex(codecInfo->addSEIMethod);
+            ui->comboBoxSEI->setCurrentIndex(codecInfo->addSEIMethod);
             ui->checkBoxSecondaryVideo->setChecked(codecInfo->isSecondary);
-            // ui->checkBoxSPS->setChecked(codecInfo->addSPS);
+            ui->checkBoxSPS->setChecked(codecInfo->addSPS);
             ui->checkBoxRemovePulldown->setChecked(codecInfo->delPulldown == 1);
             ui->checkBoxRemovePulldown->setEnabled(codecInfo->delPulldown >= 0);
 
