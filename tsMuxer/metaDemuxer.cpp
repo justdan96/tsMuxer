@@ -544,9 +544,10 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             coeff = 1000000ull;
             value = strToInt32(timeShift.c_str());
         }
-        streamInfo.m_timeShift = value * coeff;
-        if (value * coeff > 0)
-            streamInfo.m_lastDTS = value * coeff;
+        value = value * (int64_t)coeff / 1000ll * (int64_t)INTERNAL_PTS_FREQ / 1000000ll;
+        streamInfo.m_timeShift = value;
+        if (value > 0)
+            streamInfo.m_lastDTS = value;
     }
 
     itr = addParams.find("lang");

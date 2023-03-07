@@ -40,7 +40,7 @@ void SimplePacketizerReader::doMplsCorrection()
             // m_curPts = m_lastMplsTime; // fix PTS up
         }
         m_lastMplsTime += (int64_t)((m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) *
-                                    (1000000000 / 45000.0));
+                                    (INTERNAL_PTS_FREQ / 45000.0));
     }
 }
 

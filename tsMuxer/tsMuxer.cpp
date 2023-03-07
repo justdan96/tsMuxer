@@ -408,7 +408,7 @@ bool TSMuxer::doFlush()
     uint64_t newPCR = 0;
     if (m_m2tsMode)
     {
-        newPCR = (uint64_t)((m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
+        newPCR = (m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
             auto cbrPCR = (uint64_t)(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
@@ -991,7 +991,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
 
     m_lastTSIndex = tsIndex;
 
-    auto newPCR = (int64_t)((avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
+    auto newPCR = (avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
 
     if (m_cbrBitrate != -1 && m_lastPCR != -1)
     {

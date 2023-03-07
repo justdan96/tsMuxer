@@ -322,7 +322,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
         tmp[idx] <<= 1;
         tmp[idx]++;
     }
-    inTime = (int64_t)(inTime / INT_FREQ_TO_TS_FREQ);
+    inTime = inTime / INT_FREQ_TO_TS_FREQ;
 
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
     auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
@@ -374,7 +374,7 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
     auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
     m_firstRenderedPacket = true;
-    outTime = (int64_t)(outTime / INT_FREQ_TO_TS_FREQ);
+    outTime = outTime / INT_FREQ_TO_TS_FREQ;
     m_renderedBlocks.clear();
     // hide text
     uint8_t* curPos = m_renderedData;
@@ -706,8 +706,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     {
         if (m_renderedBlocks.size() > 0)
         {
-            avPacket.pts = (int64_t)(m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ);
-            avPacket.dts = (int64_t)(m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ);
+            avPacket.pts = m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ;
+            avPacket.dts = m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ;
         }
         else
         {
