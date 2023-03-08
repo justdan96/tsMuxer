@@ -596,7 +596,7 @@ uint8_t* LPCMStreamReader::findFrame(uint8_t* buff, uint8_t* end)
 double LPCMStreamReader::getFrameDurationNano()
 {
     if (m_frameRest == 0)
-        return 5000000;  // 5 ms frames
+        return 5 * INTERNAL_PTS_FREQ / 1000.0;  // 5 ms frames
     else
         return 0;
 }
