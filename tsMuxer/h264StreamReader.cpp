@@ -464,7 +464,7 @@ int H264StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         if (nalType == NALUnit::NALType::nuSPS || nalType == NALUnit::NALType::nuSubSPS)
         {
             processSPS(nal);
-            *dstBuff = (uint8_t)TSDescriptorTag::AVC;                  // descriptor tag
+            *dstBuff++ = (uint8_t)TSDescriptorTag::AVC;                // descriptor tag
             *dstBuff++ = 4;                                            // descriptor length
             *dstBuff++ = nal[1];                                       // profile_idc
             *dstBuff++ = nal[2];                                       // constraint flags
