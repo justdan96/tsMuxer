@@ -729,7 +729,7 @@ void DTSStreamReader::BufLeToBe(uint8_t* p_out, const uint8_t* p_in, int i_in)
     }
 }
 
-double DTSStreamReader::getFrameDurationNano()
+double DTSStreamReader::getFrameDuration()
 {
     if (!m_isCoreExists)
         return m_frameDuration;
@@ -744,7 +744,7 @@ bool DTSStreamReader::needSkipFrame(const AVPacket& packet)
     if (m_skippingSamples == 0)
         return false;
 
-    if (getFrameDurationNano() > 0)
+    if (getFrameDuration() > 0)
         m_skippingSamples -= pi_frame_length;
     return true;
 }

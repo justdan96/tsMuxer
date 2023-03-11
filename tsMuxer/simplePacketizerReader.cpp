@@ -194,8 +194,8 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             avPacket.flags |= AVPacket::IS_IFRAME;  // can be used in split points
 
         if (m_halfFrameLen == 0)
-            m_halfFrameLen = getFrameDurationNano() / 2.0;
-        m_curPts += getFrameDurationNano();
+            m_halfFrameLen = getFrameDuration() / 2.0;
+        m_curPts += getFrameDuration();
         int64_t nextDts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
         avPacket.duration = nextDts - avPacket.dts;
         // doMplsCorrection();
@@ -215,8 +215,8 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                                << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
                                << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
                                << ". Remove frame.");
-                m_mplsOffset -= getFrameDurationNano();
-                m_curPts -= getFrameDurationNano();
+                m_mplsOffset -= getFrameDuration();
+                m_curPts -= getFrameDuration();
                 return readPacket(avPacket);  // ignore overlapped packet, get next one
             }
             else
@@ -282,7 +282,7 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
         }
         firstStep = false;
         frame += frameLen + skipBytes + skipBeforeBytes;
-        if (getFrameDurationNano() > 0)
+        if (getFrameDuration() > 0)
             i++;
     }
     setTestMode(false);

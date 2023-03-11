@@ -611,8 +611,8 @@ void TSMuxer::writeEmptyPacketWithPCR(int64_t pcrVal)
 
 void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
 {
-    int64_t curDts = nanoClockToPts(avPacket.dts) + m_timeOffset;
-    int64_t curPts = nanoClockToPts(avPacket.pts) + m_timeOffset;
+    int64_t curDts = internalClockToPts(avPacket.dts) + m_timeOffset;
+    int64_t curPts = internalClockToPts(avPacket.pts) + m_timeOffset;
     uint8_t tmpBuffer[2048]{0};
     auto pesPacket = (PESPacket*)tmpBuffer;
     if (curDts != curPts)
@@ -955,7 +955,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         if (m_firstPts[m_firstPts.size() - 1] == -1)
         {
             m_curFileStartPts = avPacket.pts;
-            int64_t firstPtsShift = nanoClockToPts(avPacket.pts);
+            int64_t firstPtsShift = internalClockToPts(avPacket.pts);
             m_fixed_pcr_offset = m_timeOffset - m_vbvLen + firstPtsShift;
             if (m_fixed_pcr_offset < 0)
                 m_fixed_pcr_offset = 0;
@@ -1429,7 +1429,7 @@ void TSMuxer::openDstFile()
 vector<int64_t> TSMuxer::getFirstPts()
 {
     std::vector<int64_t> rez;
-    for (auto& i : m_firstPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_firstPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     return rez;
 }
 
@@ -1446,7 +1446,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
 vector<int64_t> TSMuxer::getLastPts()
 {
     std::vector<int64_t> rez;
-    for (auto& i : m_lastPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_lastPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     // if (!rez.empty())
     //    *rez.rbegin() += m_mainStreamFrameDuration;
     return rez;

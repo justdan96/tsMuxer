@@ -61,7 +61,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
             break;
         }
         frame += len + skipBytes;
-        if (getFrameDurationNano() > 0)
+        if (getFrameDuration() > 0)
             i++;
     }
     m_state = AC3State::stateDecodeAC3;
@@ -161,7 +161,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         m_thdDemuxWaitAc3 = false;
         avPacket.dts = avPacket.pts = m_nextAc3Time;
         avPacket.flags |= AVPacket::IS_CORE_PACKET;
-        m_nextAc3Time += m_frameDurationNano;
+        m_nextAc3Time += m_frameDuration;
         return 0;
     }
 
@@ -180,7 +180,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
                 m_thdDemuxWaitAc3 = false;
                 avPacket.dts = avPacket.pts = m_nextAc3Time;
                 avPacket.flags |= AVPacket::IS_CORE_PACKET;
-                m_nextAc3Time += m_frameDurationNano;
+                m_nextAc3Time += m_frameDuration;
                 return 0;
             }
             else
