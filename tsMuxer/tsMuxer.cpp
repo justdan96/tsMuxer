@@ -932,7 +932,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     }
 
     // if (m_lastProcessedDts != avPacket.dts || m_lastStreamIndex != avPacket.stream_index)
-    //    LTRACE(LT_INFO, 2, "dts=" << avPacket.dts/1000000000.0 << " index=" << avPacket.stream_index);
+    //    LTRACE(LT_INFO, 2, "dts=" << double(avPacket.dts)/INTERNAL_PTS_FREQ << " index=" << avPacket.stream_index);
 #ifdef _DEBUG
     // assert (avPacket.dts >= m_lastProcessedDts);
     m_lastProcessedDts = avPacket.dts;

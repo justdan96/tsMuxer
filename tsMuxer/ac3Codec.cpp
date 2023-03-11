@@ -287,7 +287,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             if (err != AC3ParseError::NO_ERROR)
                 return 0;  // parse error
 
-            m_frameDurationNano = (1000000000ull * m_samples) / m_sample_rate;
+            m_frameDurationNano = (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
             rez = m_frame_size;
         }
 

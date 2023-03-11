@@ -283,6 +283,7 @@ int MPEGStreamReader::decodeNal(uint8_t* buff)
 void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, int oldSPSLen)
 {
     double spsFps = getStreamFPS(curNALUnit);
+    spsFps = correctFps(spsFps);
     if (spsFps == 0 && m_fps == 0)
     {
         setFPS(25.0);
