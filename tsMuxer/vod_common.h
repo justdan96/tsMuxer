@@ -122,7 +122,7 @@ double correctFps(double fps);
 
 static inline int64_t nanoClockToPts(int64_t value)
 {
-    return int64_t(value / INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5)); 
+    return int64_t(value / INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
 }
 static inline int64_t ptsToNanoClock(int64_t value)
 {
