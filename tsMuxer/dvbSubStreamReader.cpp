@@ -179,7 +179,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
     return NOT_ENOUGH_BUFFER;
 }
 
-double DVBSubStreamReader::getFrameDuration() { return (double)m_frameDuration; }
+double DVBSubStreamReader::getFrameDurationNano() { return (double)m_frameDuration; }
 
 const std::string DVBSubStreamReader::getStreamInfo()
 {

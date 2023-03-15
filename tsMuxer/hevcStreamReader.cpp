@@ -196,7 +196,11 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         dstBuff += 12;
         // flags temporal_layer_subset, HEVC_still_present,
         // HEVC_24hr_picture_present, HDR_WCG unspecified
-        *dstBuff++ = m_sps->sub_pic_hrd_params_present_flag ? 0x0f : 0x1f;
+        *dstBuff = 0x0f;
+
+        if (!m_sps->sub_pic_hrd_params_present_flag)
+            *dstBuff |= 0x10;
+        dstBuff++;
 
         /* HEVC_timing_and_HRD_descriptor
         // mandatory for interlaced video only

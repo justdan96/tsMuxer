@@ -7,7 +7,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "math.h"
 
 using namespace std;
 
@@ -123,28 +122,4 @@ double timeToFloat(const std::string& chapterStr)
     if (timeParts.size() > 2)
         hour = strToInt32(timeParts[timeParts.size() - 3].c_str());
     return hour * 3600 + min * 60 + sec;
-}
-
-double correctFps(double fps)
-{
-    struct FPSCorrect
-    {
-        double from;
-        double to;
-    };
-
-    FPSCorrect fpsCorrectList[] = {
-        {5.994, 5.99400599400599},   {11.988, 11.98801198801198}, {23.976, 23.97602397602397},
-        {47.952, 47.95204795204795}, {7.4925, 7.49250749250749},  {14.985, 14.98501498501498},
-        {29.97, 29.97002997002997},  {59.94, 59.94005994005994},
-    };
-
-    for (int i = 0; i < sizeof(fpsCorrectList) / sizeof(FPSCorrect); i++)
-    {
-        if (fabs(fps - fpsCorrectList[i].from) < 1e-4)
-        {
-            return fpsCorrectList[i].to;
-        }
-    }
-    return fps;
 }

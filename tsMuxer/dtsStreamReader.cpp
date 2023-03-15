@@ -400,7 +400,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 hd_bitDepth = nuBitResolution;
 
                 if (!m_isCoreExists)
-                    m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / hd_pi_sample_rate;
+                    m_frameDuration = pi_frame_length * 1e9 / hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
                     m_hdBitrate = (unsigned)(hd_pi_sample_rate / (double)pi_frame_length * hdFrameSize * 8);
@@ -577,7 +577,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             return 0;
 
         pi_frame_length = (nblks + 1) * 32;
-        m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / pi_sample_rate;
+        m_frameDuration = pi_frame_length * 1e9 / pi_sample_rate;
 
         afterFrameData = buff + i_frame_size;
         if (afterFrameData > end - 4)
@@ -729,7 +729,7 @@ void DTSStreamReader::BufLeToBe(uint8_t* p_out, const uint8_t* p_in, int i_in)
     }
 }
 
-double DTSStreamReader::getFrameDuration()
+double DTSStreamReader::getFrameDurationNano()
 {
     if (!m_isCoreExists)
         return m_frameDuration;
@@ -744,7 +744,7 @@ bool DTSStreamReader::needSkipFrame(const AVPacket& packet)
     if (m_skippingSamples == 0)
         return false;
 
-    if (getFrameDuration() > 0)
+    if (getFrameDurationNano() > 0)
         m_skippingSamples -= pi_frame_length;
     return true;
 }

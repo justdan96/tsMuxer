@@ -61,7 +61,7 @@ int MLPStreamReader::readPacket(AVPacket& avPacket)
             return rez;
 
         // thg packet
-        avPacket.dts = avPacket.pts = m_totalTHDSamples * INTERNAL_PTS_FREQ / m_samplerate;
+        avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / m_samplerate;
 
         m_totalTHDSamples += m_samples;
         m_demuxedTHDSamples += m_samples;
@@ -80,7 +80,7 @@ int MLPStreamReader::flushPacket(AVPacket& avPacket)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
             avPacket.pts = avPacket.dts =
-                m_totalTHDSamples * INTERNAL_PTS_FREQ / m_samplerate;  // replace time to a next HD packet
+                m_totalTHDSamples * 1000000000ll / m_samplerate;  // replace time to a next HD packet
     }
     return rez;
 }

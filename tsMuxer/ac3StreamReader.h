@@ -46,7 +46,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         return AC3Codec::decodeFrame(buff, end, skipBytes);
     }
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override { return AC3Codec::findFrame(buff, end); }
-    double getFrameDuration() override { return (double)AC3Codec::getFrameDuration(); }
+    double getFrameDurationNano() override { return (double)AC3Codec::getFrameDurationNano(); }
     const CodecInfo& getCodecInfo() override { return AC3Codec::getCodecInfo(); }
     const std::string getStreamInfo() override { return AC3Codec::getStreamInfo(); }
     void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;

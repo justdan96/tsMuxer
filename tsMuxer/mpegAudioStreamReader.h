@@ -18,7 +18,7 @@ class MpegAudioStreamReader : public SimplePacketizerReader, MP3Codec
     int getHeaderLen() override { return MPEG_AUDIO_HEADER_SIZE; };
     virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
-    double getFrameDuration() override;
+    double getFrameDurationNano() override;
     const CodecInfo& getCodecInfo() override { return mpegAudioCodecInfo; }
     const std::string getStreamInfo() override;
 

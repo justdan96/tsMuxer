@@ -652,9 +652,9 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 pkt = new AVPacket();
                 pkt->data = 0;
                 pkt->size = 0;
-                pkt->pts = timecode * INTERNAL_PTS_FREQ / 1000;  // our AvPacket in INTERNAL_PTS_FREQ
+                pkt->pts = timecode * 1000000ll;  // our AvPacket in nanoseconds
                 pkt->pos = pos;
-                pkt->duration = duration * INTERNAL_PTS_FREQ / 1000;
+                pkt->duration = duration * 1000000ll;
 
                 pkt->stream_index = track + 1;  // tracks[track]->stream_index;
 

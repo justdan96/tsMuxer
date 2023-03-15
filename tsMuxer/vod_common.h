@@ -62,8 +62,8 @@ const unsigned DEFAULT_FRAME_FREQ = (uint32_t)(PCR_HALF_FREQUENCY / (4.8 * 1024.
 
 // const static int64_t FIXED_PTS_OFFSET = 378000000ll; //377910000ll;
 
-const static int64_t INTERNAL_PTS_FREQ = 196 * 27000000ll;
-const static int64_t INT_FREQ_TO_TS_FREQ = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
+const static int64_t INTERNAL_PTS_FREQ = 1000000000;
+const static double INT_FREQ_TO_TS_FREQ = INTERNAL_PTS_FREQ / (double)PCR_FREQUENCY;
 
 const static uint32_t GOP_BUFFER_SIZE = 2 * 1024 * 1024;  // 512*1024;
 
@@ -118,13 +118,12 @@ void AV_WB32(uint8_t* buffer, uint32_t value);
 std::string floatToTime(double time, char msSeparator = '.');
 double timeToFloat(const std::string& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
-double correctFps(double fps);
 
-static inline int64_t internalClockToPts(int64_t value)
+static inline int64_t nanoClockToPts(int64_t value)
 {
     return int64_t(value / INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
 }
-static inline int64_t ptsToInternalClock(int64_t value)
+static inline int64_t ptsToNanoClock(int64_t value)
 {
     return int64_t(value * INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
 }

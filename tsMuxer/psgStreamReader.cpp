@@ -322,7 +322,7 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
         tmp[idx] <<= 1;
         tmp[idx]++;
     }
-    inTime = inTime / INT_FREQ_TO_TS_FREQ;
+    inTime = (int64_t)(inTime / INT_FREQ_TO_TS_FREQ);
 
     double decodedObjectSize = m_render->renderedHeight() * m_scaled_width;
     auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
@@ -374,7 +374,7 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
     auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
     m_firstRenderedPacket = true;
-    outTime = outTime / INT_FREQ_TO_TS_FREQ;
+    outTime = (int64_t)(outTime / INT_FREQ_TO_TS_FREQ);
     m_renderedBlocks.clear();
     // hide text
     uint8_t* curPos = m_renderedData;
@@ -399,17 +399,17 @@ int64_t getTimeValueNano(uint8_t* pos)
 {
     auto pts = (int64_t)AV_RB32(pos);
     if (pts > 0xff000000u)
-        return ptsToInternalClock(pts - 0x100000000ll);
+        return ptsToNanoClock(pts - 0x100000000ll);
     else
-        return ptsToInternalClock(pts);
+        return ptsToNanoClock(pts);
 }
 
 int64_t getTimeValueNano(int64_t pts)
 {
     if (pts > 0x1ff000000ull)
-        return ptsToInternalClock(pts - 0x200000000ll);
+        return ptsToNanoClock(pts - 0x200000000ll);
     else
-        return ptsToInternalClock(pts);
+        return ptsToNanoClock(pts);
 }
 
 int PGSStreamReader::readPacket(AVPacket& avPacket)
@@ -535,8 +535,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         m_isNewFrame = true;
-        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/INTERNAL_PTS_FREQ << " DTS=" <<
-        // m_lastDTS/INTERNAL_PTS_FREQ);
+        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/1e9 << " DTS=" << m_lastDTS/1e9);
         if (m_needRescale)
         {
             avPacket.dts = FFMAX(0, avPacket.dts);
@@ -574,8 +573,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         m_curPos += pesHeaderLen;
         m_processedSize += pesHeaderLen;
         m_state = State::stParsePGS;
-        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/INTERNAL_PTS_FREQ << " DTS=" <<
-        // m_lastDTS/INTERNAL_PTS_FREQ);
+        // LTRACE(LT_INFO, 2, "PGS PES#" << m_streamIndex << ". PTS=" << m_lastPTS/1e9 << " DTS=" << m_lastDTS/1e9);
         avPacket.pts = m_lastPTS;
         avPacket.dts = m_lastDTS;
         m_isNewFrame = true;
@@ -708,8 +706,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     {
         if (m_renderedBlocks.size() > 0)
         {
-            avPacket.pts = m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ;
-            avPacket.dts = m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ;
+            avPacket.pts = (int64_t)(m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ);
+            avPacket.dts = (int64_t)(m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ);
         }
         else
         {
@@ -823,9 +821,9 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         *dstBuffer++ = 'P';
         *dstBuffer++ = 'G';
         auto data = (uint32_t*)dstBuffer;
-        *data++ = my_htonl((uint32_t)internalClockToPts(m_lastPTS));
+        *data++ = my_htonl((uint32_t)nanoClockToPts(m_lastPTS));
         if (m_lastDTS != m_lastPTS)
-            *data = my_htonl((uint32_t)internalClockToPts(m_lastDTS));
+            *data = my_htonl((uint32_t)nanoClockToPts(m_lastDTS));
         else
             *data = 0;
         return 10;

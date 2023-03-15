@@ -287,7 +287,7 @@ int AC3Codec::decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes)
             if (err != AC3ParseError::NO_ERROR)
                 return 0;  // parse error
 
-            m_frameDuration = (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
+            m_frameDurationNano = (1000000000ull * m_samples) / m_sample_rate;
             rez = m_frame_size;
         }
 
@@ -440,7 +440,7 @@ bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
     return testParseHeader(buf, end) == AC3ParseError::NO_ERROR;
 }
 
-uint64_t AC3Codec::getFrameDuration()
+uint64_t AC3Codec::getFrameDurationNano()
 {
     // Pure EAC3: wait for dependent substream
     if (!m_bit_rate && m_strmtyp == 1)
@@ -455,7 +455,7 @@ uint64_t AC3Codec::getFrameDuration()
         return 0;
 
     // OK to increment PTS
-    return m_frameDuration;
+    return m_frameDurationNano;
 }
 
 const std::string AC3Codec::getStreamInfo()

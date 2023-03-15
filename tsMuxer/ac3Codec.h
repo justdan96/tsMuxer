@@ -42,7 +42,7 @@ class AC3Codec
         m_state = AC3State::stateDecodeAC3;
         m_waitMoreData = false;
         setTestMode(false);
-        m_frameDuration = 0;
+        m_frameDurationNano = 0;
         m_bit_rateExt = 0;
         m_bit_rate = 0;
         m_channels = 0;
@@ -65,7 +65,7 @@ class AC3Codec
    protected:
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes);
     uint8_t* findFrame(uint8_t* buff, uint8_t* end);
-    uint64_t getFrameDuration();
+    uint64_t getFrameDurationNano();
     const CodecInfo& getCodecInfo();
     const std::string getStreamInfo();
 
@@ -104,7 +104,7 @@ class AC3Codec
 
    protected:
     bool m_testMode;
-    uint64_t m_frameDuration;
+    uint64_t m_frameDurationNano;
 };
 
 #endif
