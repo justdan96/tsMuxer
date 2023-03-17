@@ -44,6 +44,7 @@ bool isAudioStreamType(StreamType stream_coding_type)
     case StreamType::AUDIO_DTS:
     case StreamType::AUDIO_TRUE_HD:
     case StreamType::AUDIO_EAC3:
+    case StreamType::AUDIO_EAC3_ATSC:
     case StreamType::AUDIO_DTS_HD:
     case StreamType::AUDIO_DTS_HD_MA:
     case StreamType::AUDIO_EAC3_SECONDARY:
@@ -319,6 +320,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
             case StreamType::AUDIO_AAC:
             case StreamType::AUDIO_AC3:
             case StreamType::AUDIO_EAC3:
+            case StreamType::AUDIO_EAC3_ATSC:
             case StreamType::AUDIO_DTS:
                 audio_pid = elementary_pid;
                 audio_type = (int)stream_type;
