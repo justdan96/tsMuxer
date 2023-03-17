@@ -337,10 +337,17 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             streamType = StreamType::AUDIO_TRUE_HD;
         else if (ac3Reader->isEAC3() && !ac3Reader->getDownconvertToAC3())
         {
-            if (ac3Reader->isSecondary())
-                streamType = StreamType::AUDIO_EAC3_SECONDARY;
+            if (m_bluRayMode)
+            {
+                if (ac3Reader->isSecondary())
+                    streamType = StreamType::AUDIO_EAC3_SECONDARY;
+                else
+                    streamType = StreamType::AUDIO_EAC3;
+            }
             else
-                streamType = StreamType::AUDIO_EAC3;
+            {
+                streamType = StreamType::AUDIO_EAC3_ATSC;
+            }
         }
         else
             streamType = StreamType::AUDIO_AC3;
