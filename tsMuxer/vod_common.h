@@ -37,7 +37,7 @@ class Process
 #define FFMAX(a, b) ((a) > (b) ? (a) : (b))
 #define FFMIN(a, b) ((a) > (b) ? (b) : (a))
 #define bswap_32(x) my_ntohl(x)
-//#define fabs(a) ((a)>=0?(a):-(a))
+// #define fabs(a) ((a)>=0?(a):-(a))
 
 const static int DETECT_STREAM_BUFFER_SIZE = 1024 * 1024 * 64;
 const static unsigned TS_PID_NULL = 8191;
@@ -117,14 +117,8 @@ double timeToFloat(const std::string& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
 double correctFps(double fps);
 
-static inline int64_t nanoClockToPts(int64_t value)
-{
-    return int64_t(value / INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
-}
-static inline int64_t ptsToNanoClock(int64_t value)
-{
-    return int64_t(value * INT_FREQ_TO_TS_FREQ + (value >= 0 ? 0.5 : -0.5));
-}
+static inline int64_t nanoClockToPts(int64_t value) { return value / INT_FREQ_TO_TS_FREQ; }
+static inline int64_t ptsToNanoClock(int64_t value) { return value * INT_FREQ_TO_TS_FREQ; }
 
 struct PIPParams
 {
