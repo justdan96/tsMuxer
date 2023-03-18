@@ -439,5 +439,5 @@ int64_t getPSDuration(const char* fileName)
 
 int64_t ProgramStreamDemuxer::getFileDurationNano() const
 {
-    return getPSDuration(m_streamName.c_str()) * 1000000000ll / 90000ll;
+    return getPSDuration(m_streamName.c_str()) * INTERNAL_PTS_FREQ / 90000ll;
 }

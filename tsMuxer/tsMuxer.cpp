@@ -415,7 +415,7 @@ bool TSMuxer::doFlush()
     uint64_t newPCR = 0;
     if (m_m2tsMode)
     {
-        newPCR = (uint64_t)((m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
+        newPCR = (m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
             auto cbrPCR = (uint64_t)(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
@@ -938,8 +938,6 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         return true;
     }
 
-    // if (m_lastProcessedDts != avPacket.dts || m_lastStreamIndex != avPacket.stream_index)
-    //    LTRACE(LT_INFO, 2, "dts=" << avPacket.dts/1000000000.0 << " index=" << avPacket.stream_index);
 #ifdef _DEBUG
     // assert (avPacket.dts >= m_lastProcessedDts);
     m_lastProcessedDts = avPacket.dts;
@@ -988,7 +986,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     if (tsIndex == 0)
         THROW(ERR_TS_COMMON, "Unknown track number " << avPacket.stream_index);
 
-    auto newPCR = (int64_t)((avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
+    auto newPCR = (avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
     if (m_lastPCR == -1)
     {
         writePATPMT(newPCR, true);

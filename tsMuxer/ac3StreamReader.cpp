@@ -145,7 +145,7 @@ int AC3StreamReader::flushPacket(AVPacket& avPacket)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
             avPacket.pts = avPacket.dts =
-                m_totalTHDSamples * 1000000000ll / mlp.m_samplerate;  // replace time to a next HD packet
+                m_totalTHDSamples * INTERNAL_PTS_FREQ / mlp.m_samplerate;  // replace time to a next HD packet
     }
     return rez;
 }
@@ -190,7 +190,8 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
                     LTRACE(LT_INFO, 2,
                            getCodecInfo().displayName
                                << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
-                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / 1e9, ',') << ". Remove frame.");
+                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
+                               << ". Remove frame.");
                 }
 
                 m_delayedAc3Packet = avPacket;
@@ -202,7 +203,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         else
         {
             // thg packet
-            avPacket.dts = avPacket.pts = m_totalTHDSamples * 1000000000ll / mlp.m_samplerate;
+            avPacket.dts = avPacket.pts = m_totalTHDSamples * INTERNAL_PTS_FREQ / mlp.m_samplerate;
 
             m_totalTHDSamples += mlp.m_samples;
             m_demuxedTHDSamples += mlp.m_samples;

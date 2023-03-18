@@ -397,7 +397,7 @@ int H264StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
                 if (!m_bdRomMetaDataMsg.empty())
                 {
                     // we got slice. fill previous metadata SEI message
-                    auto pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
+                    auto pts90k = m_curDts / INT_FREQ_TO_TS_FREQ + m_startPts;
                     uint8_t* srcData = &m_bdRomMetaDataMsg[0];
                     SEIUnit::updateMetadataPts(srcData + m_bdRomMetaDataMsgPtsPos, pts90k);
 
@@ -1197,7 +1197,7 @@ int H264StreamReader::processSliceNal(uint8_t* buff)
 
     if (m_OffsetMetadataPtsAddr)
     {
-        auto pts90k = (int64_t)(m_curDts / INT_FREQ_TO_TS_FREQ + 0.5 + m_startPts);
+        auto pts90k = m_curDts / INT_FREQ_TO_TS_FREQ + m_startPts;
         SEIUnit::updateMetadataPts(m_OffsetMetadataPtsAddr, pts90k);
         m_OffsetMetadataPtsAddr = 0;
     }

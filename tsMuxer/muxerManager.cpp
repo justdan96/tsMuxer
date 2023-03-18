@@ -361,11 +361,11 @@ void MuxerManager::parseMuxOpt(const string& opts)
             postfix = strToUpperCase(postfix);
 
             if (postfix == "MS")
-                coeff = 1000000;
+                coeff = INTERNAL_PTS_FREQ / 1000;
             else if (postfix == "S")
-                coeff = 1000000000;
+                coeff = INTERNAL_PTS_FREQ;
             else if (postfix == "MIN")
-                coeff = 60000000000ull;
+                coeff = 60 * INTERNAL_PTS_FREQ;
             string prefix = paramPair[1].substr(0, paramPair[1].size() - postfix.size());
             if (paramPair[0] == "--cut-start")
                 setCutStart(strToInt64(prefix.c_str()) * coeff);
