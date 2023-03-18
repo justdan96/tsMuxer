@@ -373,9 +373,9 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         prefix = "\xEF\xBB\xBF";  // UTF-8 header
     prefix += int32ToStr(++m_packetCnt);
     prefix += "\n";
-    prefix += floatToTime(pkt->pts / INTERNAL_PTS_FREQ, ',');
+    prefix += floatToTime(pkt->pts / (double)INTERNAL_PTS_FREQ, ',');
     prefix += " --> ";
-    prefix += floatToTime((pkt->pts + pkt->duration) / INTERNAL_PTS_FREQ, ',');
+    prefix += floatToTime((pkt->pts + pkt->duration) / (double)INTERNAL_PTS_FREQ, ',');
     prefix += '\n';
     std::string postfix = "\n\n";
     pkt->size = (int)(size + prefix.length() + postfix.length());

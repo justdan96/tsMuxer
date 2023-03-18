@@ -400,7 +400,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 hd_bitDepth = nuBitResolution;
 
                 if (!m_isCoreExists)
-                    m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / hd_pi_sample_rate;
+                    m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / (double)hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
                     m_hdBitrate = (unsigned)(hd_pi_sample_rate / (double)pi_frame_length * hdFrameSize * 8);
@@ -577,7 +577,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             return 0;
 
         pi_frame_length = (nblks + 1) * 32;
-        m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / pi_sample_rate;
+        m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / (double)pi_sample_rate;
 
         afterFrameData = buff + i_frame_size;
         if (afterFrameData > end - 4)
