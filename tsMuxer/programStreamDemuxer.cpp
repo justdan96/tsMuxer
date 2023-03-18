@@ -9,7 +9,7 @@ using namespace std;
 
 static const uint32_t LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
 
-//#define min(a,b) a<=b?a:b
+// #define min(a,b) a<=b?a:b
 
 ProgramStreamDemuxer::ProgramStreamDemuxer(const BufferedReaderManager& readManager) : m_readManager(readManager)
 {
