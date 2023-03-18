@@ -56,9 +56,6 @@ const unsigned DEFAULT_FILE_BLOCK_SIZE = 1024 * 1024 * 2;
 const unsigned TS188_ROUND_BLOCK_SIZE = DEFAULT_FILE_BLOCK_SIZE / TS_FRAME_SIZE * TS_FRAME_SIZE;
 
 const unsigned PCR_FREQUENCY = 90000;
-const unsigned PCR_HALF_FREQUENCY = PCR_FREQUENCY / 2;  // (ignoring lower 33-th bit)
-
-const unsigned DEFAULT_FRAME_FREQ = (uint32_t)(PCR_HALF_FREQUENCY / (4.8 * 1024.0 * 1024.0 / 8.0 / TS_FRAME_SIZE));
 
 // const static int64_t FIXED_PTS_OFFSET = 378000000ll; //377910000ll;
 
