@@ -555,6 +555,4 @@ int64_t getTSDuration(const char* fileName)
 }
 
 int64_t TSDemuxer::getFileDurationNano() const
-{
-    return getTSDuration(m_streamName.c_str()) * INTERNAL_PTS_FREQ / 90000ll;
-}
+{ return getTSDuration(m_streamName.c_str()) * 1000000000ll / 90000ll; }
