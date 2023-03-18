@@ -420,7 +420,7 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         dst[0] = 'P';
         dst[1] = 'G';
         auto ptsDts = (uint32_t*)(dst + 2);
-        ptsDts[0] = my_htonl((uint32_t)nanoClockToPts(pkt->pts));
+        ptsDts[0] = my_htonl((uint32_t)internalClockToPts(pkt->pts));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;
         memcpy(dst, curPtr, blockSize);

@@ -21,7 +21,7 @@ class MLPStreamReader : public SimplePacketizerReader, public MLPCodec
     int getHeaderLen() override;
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override { return MLPCodec::findFrame(buff, end); }
-    double getFrameDurationNano() override { return (double)MLPCodec::getFrameDurationNano(); }
+    double getFrameDuration() override { return (double)MLPCodec::getFrameDuration(); }
     const CodecInfo& getCodecInfo() override { return mlpCodecInfo; }
     const std::string getStreamInfo() override;
 

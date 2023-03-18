@@ -34,7 +34,7 @@ int MLPCodec::mlp_samplerate(int ratebits)
     }
 }
 
-uint64_t MLPCodec::getFrameDurationNano() { return INTERNAL_PTS_FREQ * m_samples / m_samplerate; }
+uint64_t MLPCodec::getFrameDuration() { return INTERNAL_PTS_FREQ * m_samples / m_samplerate; }
 
 static int numChannels6(int chanmap)
 {

@@ -44,7 +44,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     int getHeaderLen() override { return 4; }
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
-    double getFrameDurationNano() override;
+    double getFrameDuration() override;
     const CodecInfo& getCodecInfo() override;
     const std::string getStreamInfo() override;
     void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;

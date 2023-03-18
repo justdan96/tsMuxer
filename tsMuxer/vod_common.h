@@ -117,8 +117,8 @@ double timeToFloat(const std::string& chapterStr);
 std::string toNativeSeparators(const std::string& dirName);
 double correctFps(double fps);
 
-static inline int64_t nanoClockToPts(int64_t value) { return value / INT_FREQ_TO_TS_FREQ; }
-static inline int64_t ptsToNanoClock(int64_t value) { return value * INT_FREQ_TO_TS_FREQ; }
+static inline int64_t internalClockToPts(int64_t value) { return value / INT_FREQ_TO_TS_FREQ; }
+static inline int64_t ptsToInternalClock(int64_t value) { return value * INT_FREQ_TO_TS_FREQ; }
 
 struct PIPParams
 {

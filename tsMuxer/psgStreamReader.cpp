@@ -399,17 +399,17 @@ int64_t getTimeValueNano(uint8_t* pos)
 {
     auto pts = (int64_t)AV_RB32(pos);
     if (pts > 0xff000000u)
-        return ptsToNanoClock(pts - 0x100000000ll);
+        return ptsToInternalClock(pts - 0x100000000ll);
     else
-        return ptsToNanoClock(pts);
+        return ptsToInternalClock(pts);
 }
 
 int64_t getTimeValueNano(int64_t pts)
 {
     if (pts > 0x1ff000000ull)
-        return ptsToNanoClock(pts - 0x200000000ll);
+        return ptsToInternalClock(pts - 0x200000000ll);
     else
-        return ptsToNanoClock(pts);
+        return ptsToInternalClock(pts);
 }
 
 int PGSStreamReader::readPacket(AVPacket& avPacket)
@@ -821,9 +821,9 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         *dstBuffer++ = 'P';
         *dstBuffer++ = 'G';
         auto data = (uint32_t*)dstBuffer;
-        *data++ = my_htonl((uint32_t)nanoClockToPts(m_lastPTS));
+        *data++ = my_htonl((uint32_t)internalClockToPts(m_lastPTS));
         if (m_lastDTS != m_lastPTS)
-            *data = my_htonl((uint32_t)nanoClockToPts(m_lastDTS));
+            *data = my_htonl((uint32_t)internalClockToPts(m_lastDTS));
         else
             *data = 0;
         return 10;
