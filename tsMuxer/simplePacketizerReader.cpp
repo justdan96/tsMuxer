@@ -169,10 +169,10 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         else if (frameLen + skipBytes + skipBeforeBytes <= 0)
         {
             LTRACE(LT_INFO, 2,
-                   getCodecInfo().displayName << " stream (track " << m_streamIndex
-                                              << "): bad frame detected at position"
-                                              << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
-                                              << ". Resync stream.");
+                   getCodecInfo().displayName
+                       << " stream (track " << m_streamIndex << "): bad frame detected at position"
+                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                       << ". Resync stream.");
             m_needSync = true;
             return 0;
         }
