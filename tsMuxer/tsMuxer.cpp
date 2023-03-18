@@ -1362,7 +1362,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             setVBVBufferLen(strToInt32(paramPair[1].c_str()));
         else if (paramPair[0] == "--split-duration")
         {
-            setSplitDuration(strToInt64(paramPair[1].c_str()) * 1000000000ull);
+            setSplitDuration(strToInt64(paramPair[1].c_str()) * INTERNAL_PTS_FREQ);
             m_computeMuxStats = true;
         }
         else if (paramPair[0] == "--split-size")
