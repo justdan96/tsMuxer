@@ -44,6 +44,7 @@ const static uint16_t MATROSKA_ID_CHAPTERFLAGHIDDEN = 0x98;
 
 /* general EBML types */
 const static uint8_t EBML_ID_VOID = 0xEC;
+const static uint8_t EBML_ID_CRC32 = 0xBF;
 
 /*
  * Matroska element IDs. max. 32-bit.

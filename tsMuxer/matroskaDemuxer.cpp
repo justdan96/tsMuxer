@@ -135,6 +135,7 @@ int MatroskaDemuxer::matroska_parse_index()
                             break;
                         }
                         case EBML_ID_VOID:
+                        case EBML_ID_CRC32:
                             res = ebml_read_skip();
                             break;
                         default:
@@ -150,6 +151,7 @@ int MatroskaDemuxer::matroska_parse_index()
                     }
                     break;
                 case EBML_ID_VOID:
+                case EBML_ID_CRC32:
                     res = ebml_read_skip();
                     break;
                 default:
@@ -171,6 +173,7 @@ int MatroskaDemuxer::matroska_parse_index()
             }
             break;
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         default:
@@ -333,8 +336,9 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
                 *version = (int)num;
             break;
         }
-        /* we ignore these three, as they don't tell us anything we care about */
+        /* we ignore these four, as they don't tell us anything we care about */
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
         case EBML_ID_EBMLVERSION:
         case EBML_ID_DOCTYPEVERSION:
             res = ebml_read_skip();
@@ -769,6 +773,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
             break;
         }
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         default:
@@ -963,6 +968,7 @@ int MatroskaDemuxer::matroska_parse_cluster()
             break;
 
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         // Don't know why here is the next cluster without level up. Probably file error
@@ -1293,6 +1299,7 @@ int MatroskaDemuxer::matroska_read_header()
         }
 
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
 
@@ -1455,6 +1462,7 @@ int MatroskaDemuxer::matroska_parse_info()
             break;
         }
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
 
@@ -1529,6 +1537,7 @@ int MatroskaDemuxer::matroska_parse_metadata()
         switch (id)
         {
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         default:
@@ -1656,6 +1665,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                                     res = ebml_read_utf8(&id, &title);
                                     break;
                                 case EBML_ID_VOID:
+                                case EBML_ID_CRC32:
                                     res = ebml_read_skip();
                                     break;
 
@@ -1679,6 +1689,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
                         case MATROSKA_ID_CHAPTERFLAGHIDDEN:
                         case EBML_ID_VOID:
+                        case EBML_ID_CRC32:
                             res = ebml_read_skip();
                             break;
 
@@ -1706,6 +1717,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                 case MATROSKA_ID_EDITIONFLAGHIDDEN:
                 case MATROSKA_ID_EDITIONFLAGDEFAULT:
                 case EBML_ID_VOID:
+                case EBML_ID_CRC32:
                     res = ebml_read_skip();
                     break;
                 default:
@@ -1722,6 +1734,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
             break;
         }
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         default:
@@ -1766,6 +1779,7 @@ int MatroskaDemuxer::matroska_parse_tracks()
             res = matroska_add_stream();
             break;
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
             res = ebml_read_skip();
             break;
         default:
@@ -2162,6 +2176,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     break;
                 }
                 case EBML_ID_VOID:
+                case EBML_ID_CRC32:
                     res = ebml_read_skip();
                     break;
                 default:
@@ -2249,6 +2264,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     break;
                 }
                 case EBML_ID_VOID:
+                case EBML_ID_CRC32:
                     res = ebml_read_skip();
                     break;
                 default:
@@ -2376,6 +2392,7 @@ int MatroskaDemuxer::matroska_add_stream()
             break;
             /* we ignore these because they're nothing useful. */
         case EBML_ID_VOID:
+        case EBML_ID_CRC32:
         case MATROSKA_ID_CODECINFOURL:
         case MATROSKA_ID_CODECDOWNLOADURL:
         case MATROSKA_ID_TRACKMINCACHE:
