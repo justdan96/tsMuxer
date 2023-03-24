@@ -132,7 +132,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
                 gbc.skipBits(6);  // ltrtsurmixlev, lorosurmixlev
             if (lfeon && gbc.getBit())
                 gbc.skipBits(5);  // lfemixlevcod
-            if (m_strmtyp == 0)  // independent EAC3 frame
+            if (m_strmtyp == 0)   // independent EAC3 frame
             {
                 pgmscle = gbc.getBit();
                 if (pgmscle)
