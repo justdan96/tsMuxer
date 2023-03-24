@@ -64,7 +64,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
         return AC3ParseError::BSID;
 
     m_bsid = id;
-    if (m_bsid > 10)  // bsid = 16 => EAC3
+
+    // ---------------------------------- EAC3 ------------------------------------------
+    if (m_bsid > 10)
     {
         int numblkscod, substreamid, number_of_blocks_per_syncframe;
         int acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
@@ -111,7 +113,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
                 gbc.skipBits(8);  // skip Compression gain word
         }
 
-        if (m_strmtyp == 1)
+        if (m_strmtyp == 1)  // dependent EAC3 frame
         {
             if (gbc.getBit())
             {
@@ -130,7 +132,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
                 gbc.skipBits(6);  // ltrtsurmixlev, lorosurmixlev
             if (lfeon && gbc.getBit())
                 gbc.skipBits(5);  // lfemixlevcod
-            if (m_strmtyp == 0)
+            if (m_strmtyp == 0)  // independent EAC3 frame
             {
                 pgmscle = gbc.getBit();
                 if (pgmscle)
@@ -228,10 +230,11 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t* buf, uint8_t* end)
             m_channels = ff_ac3_channels[acmod] + lfeon;
         }
     }
-    else  // AC-3
+    // ---------------------------------- AC3 ------------------------------------------
+    else
     {
         m_bsidBase = m_bsid;  // id except AC3+ frames
-        m_strmtyp = 0;
+        m_strmtyp = 2;
         m_samples = AC3_FRAME_SIZE;
         gbc.skipBits(16);  // m_crc1
         m_fscod = gbc.getBits(2);
@@ -442,11 +445,11 @@ bool AC3Codec::testDecodeTestFrame(uint8_t* buf, uint8_t* end)
 
 uint64_t AC3Codec::getFrameDurationNano()
 {
-    // Pure EAC3: wait for dependent substream
+    // EAC3 dependent frame : wait for next independent frame
     if (!m_bit_rate && m_strmtyp == 1)
         return 0;
 
-    // Interleaved AC3/EAC3: wait for EAC3 frame
+    // AC3 frame in AC3/EAC3 stream: wait for EAC3 frame
     if (m_bit_rateExt && m_bsid <= 10)
         return 0;
 

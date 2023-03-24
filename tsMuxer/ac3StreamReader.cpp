@@ -11,7 +11,7 @@
 
 bool AC3StreamReader::isPriorityData(AVPacket* packet)
 {
-    return (packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_bsid <= 10);
+    return (packet->size >= 2 && packet->data[0] == 0x0B && packet->data[1] == 0x77 && m_strmtyp != 1);
 }
 
 bool AC3StreamReader::isSecondary() { return m_secondary; };
