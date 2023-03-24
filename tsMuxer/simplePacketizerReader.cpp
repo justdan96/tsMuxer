@@ -25,7 +25,7 @@ SimplePacketizerReader::SimplePacketizerReader() : AbstractStreamReader()
     m_halfFrameLen = 0;
 }
 
-static const double mplsEps = 1e9 / 45000.0 / 2.0;
+static const double mplsEps = INTERNAL_PTS_FREQ / 45000.0 / 2.0;
 
 void SimplePacketizerReader::doMplsCorrection()
 {
@@ -40,7 +40,7 @@ void SimplePacketizerReader::doMplsCorrection()
             // m_curPts = m_lastMplsTime; // fix PTS up
         }
         m_lastMplsTime += (int64_t)((m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) *
-                                    (1000000000 / 45000.0));
+                                    (INTERNAL_PTS_FREQ / 45000.0));
     }
 }
 
@@ -171,7 +171,8 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             LTRACE(LT_INFO, 2,
                    getCodecInfo().displayName
                        << " stream (track " << m_streamIndex << "): bad frame detected at position"
-                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / 1e9, ',') << ". Resync stream.");
+                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                       << ". Resync stream.");
             m_needSync = true;
             return 0;
         }
@@ -193,8 +194,8 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             avPacket.flags |= AVPacket::IS_IFRAME;  // can be used in split points
 
         if (m_halfFrameLen == 0)
-            m_halfFrameLen = getFrameDurationNano() / 2.0;
-        m_curPts += getFrameDurationNano();
+            m_halfFrameLen = getFrameDuration() / 2.0;
+        m_curPts += getFrameDuration();
         int64_t nextDts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
         avPacket.duration = nextDts - avPacket.dts;
         // doMplsCorrection();
@@ -212,9 +213,10 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                     LTRACE(LT_INFO, 2,
                            getCodecInfo().displayName
                                << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
-                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / 1e9, ',') << ". Remove frame.");
-                m_mplsOffset -= getFrameDurationNano();
-                m_curPts -= getFrameDurationNano();
+                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                               << ". Remove frame.");
+                m_mplsOffset -= getFrameDuration();
+                m_curPts -= getFrameDuration();
                 return readPacket(avPacket);  // ignore overlapped packet, get next one
             }
             else
@@ -280,7 +282,7 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
         }
         firstStep = false;
         frame += frameLen + skipBytes + skipBeforeBytes;
-        if (getFrameDurationNano() > 0)
+        if (getFrameDuration() > 0)
             i++;
     }
     setTestMode(false);

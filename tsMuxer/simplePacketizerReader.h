@@ -31,7 +31,7 @@ class SimplePacketizerReader : public AbstractStreamReader
         if (m_mplsInfo.size() > 0)
         {
             m_curMplsIndex = 0;
-            m_lastMplsTime = (m_mplsInfo[0].OUT_time - m_mplsInfo[0].IN_time) * (1000000000.0 / 45000.0);
+            m_lastMplsTime = (m_mplsInfo[0].OUT_time - m_mplsInfo[0].IN_time) * (INTERNAL_PTS_FREQ / 45000.0);
         }
         else
             m_curMplsIndex = -1;
@@ -45,7 +45,7 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes,
                             int& skipBeforeBytes) = 0;  // decode frame parameters. bitrate, channels for audio e.t.c
     virtual uint8_t* findFrame(uint8_t* buff, uint8_t* end) = 0;  // find forawrd nearest frame
-    virtual double getFrameDurationNano() = 0;                    // frame duration at nano seconds
+    virtual double getFrameDuration() = 0;                        // frame duration at nano seconds
     virtual const std::string getStreamInfo() = 0;
     virtual void setTestMode(bool value) {}
     // virtual bool isSubFrame() {return false;} // used for DTS-HD, Dolby-TRUEHD. returns true for MLP data. Data can't

@@ -415,7 +415,7 @@ bool TSMuxer::doFlush()
     uint64_t newPCR = 0;
     if (m_m2tsMode)
     {
-        newPCR = (uint64_t)((m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
+        newPCR = (m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
             auto cbrPCR = (uint64_t)(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
@@ -618,8 +618,8 @@ void TSMuxer::writeEmptyPacketWithPCR(int64_t pcrVal)
 
 void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
 {
-    int64_t curDts = nanoClockToPts(avPacket.dts) + m_timeOffset;
-    int64_t curPts = nanoClockToPts(avPacket.pts) + m_timeOffset;
+    int64_t curDts = internalClockToPts(avPacket.dts) + m_timeOffset;
+    int64_t curPts = internalClockToPts(avPacket.pts) + m_timeOffset;
     uint8_t tmpBuffer[2048]{0};
     auto pesPacket = (PESPacket*)tmpBuffer;
     if (curDts != curPts)
@@ -938,8 +938,6 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         return true;
     }
 
-    // if (m_lastProcessedDts != avPacket.dts || m_lastStreamIndex != avPacket.stream_index)
-    //    LTRACE(LT_INFO, 2, "dts=" << avPacket.dts/1000000000.0 << " index=" << avPacket.stream_index);
 #ifdef _DEBUG
     // assert (avPacket.dts >= m_lastProcessedDts);
     m_lastProcessedDts = avPacket.dts;
@@ -962,7 +960,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         if (m_firstPts[m_firstPts.size() - 1] == -1)
         {
             m_curFileStartPts = avPacket.pts;
-            int64_t firstPtsShift = nanoClockToPts(avPacket.pts);
+            int64_t firstPtsShift = internalClockToPts(avPacket.pts);
             m_fixed_pcr_offset = m_timeOffset - m_vbvLen + firstPtsShift;
             if (m_fixed_pcr_offset < 0)
                 m_fixed_pcr_offset = 0;
@@ -988,6 +986,13 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     if (tsIndex == 0)
         THROW(ERR_TS_COMMON, "Unknown track number " << avPacket.stream_index);
 
+    auto newPCR = (avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
+    if (m_lastPCR == -1)
+    {
+        writePATPMT(newPCR, true);
+        writePCR(newPCR);
+    }
+
     bool newPES = false;
     if (avPacket.dts != m_streamInfo[tsIndex].m_dts || avPacket.pts != m_streamInfo[tsIndex].m_pts ||
         tsIndex != m_lastTSIndex || avPacket.flags & AVPacket::FORCE_NEW_FRAME)
@@ -997,8 +1002,6 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     }
 
     m_lastTSIndex = tsIndex;
-
-    auto newPCR = (int64_t)((avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + 0.5 + m_fixed_pcr_offset);
 
     if (m_cbrBitrate != -1 && m_lastPCR != -1)
     {
@@ -1359,7 +1362,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             setVBVBufferLen(strToInt32(paramPair[1].c_str()));
         else if (paramPair[0] == "--split-duration")
         {
-            setSplitDuration(strToInt64(paramPair[1].c_str()) * 1000000000ull);
+            setSplitDuration(strToInt64(paramPair[1].c_str()) * INTERNAL_PTS_FREQ);
             m_computeMuxStats = true;
         }
         else if (paramPair[0] == "--split-size")
@@ -1436,7 +1439,7 @@ void TSMuxer::openDstFile()
 vector<int64_t> TSMuxer::getFirstPts()
 {
     std::vector<int64_t> rez;
-    for (auto& i : m_firstPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_firstPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     return rez;
 }
 
@@ -1453,7 +1456,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
 vector<int64_t> TSMuxer::getLastPts()
 {
     std::vector<int64_t> rez;
-    for (auto& i : m_lastPts) rez.push_back(nanoClockToPts(i) + m_timeOffset);
+    for (auto& i : m_lastPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     // if (!rez.empty())
     //    *rez.rbegin() += m_mainStreamFrameDuration;
     return rez;

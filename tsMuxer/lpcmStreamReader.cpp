@@ -593,10 +593,10 @@ uint8_t* LPCMStreamReader::findFrame(uint8_t* buff, uint8_t* end)
     return buff;
 }
 
-double LPCMStreamReader::getFrameDurationNano()
+double LPCMStreamReader::getFrameDuration()
 {
     if (m_frameRest == 0)
-        return 5000000;  // 5 ms frames
+        return 5 * INTERNAL_PTS_FREQ / 1000.0;  // 5 ms frames
     else
         return 0;
 }
@@ -824,7 +824,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     if (frameLen > MAX_AV_PACKET_SIZE)
         THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.");
     avPacket.size = frameLen;
-    avPacket.duration = (int64_t)getFrameDurationNano();  // m_ptsIncPerFrame;
+    avPacket.duration = (int64_t)getFrameDuration();  // m_ptsIncPerFrame;
     m_curPts += avPacket.duration;
     doMplsCorrection();
     if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)

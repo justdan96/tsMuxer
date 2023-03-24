@@ -784,12 +784,7 @@ int main(int argc, char** argv)
                     }
                 }
 
-                for (auto& i : customChapterList) i -= (double)muxerManager.getCutStart() / 1e9;
-                // createMPLSFile(dstDir, mainMuxer->getPidList(), *(mainMuxer->getFirstPts().begin()),
-                // *(mainMuxer->getLastPts().rbegin()),
-                //    autoChapterLen, customChapterList, dt, firstMplsOffset, firstM2tsOffset);
-
-                // allign last PTS between main and sub muxers
+                for (auto& i : customChapterList) i -= (double)muxerManager.getCutStart() / INTERNAL_PTS_FREQ;
 
                 if (subMuxer)
                     mainMuxer->alignPTS(subMuxer);

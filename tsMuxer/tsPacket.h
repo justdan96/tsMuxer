@@ -144,12 +144,9 @@ struct AdaptiveField
     }
 };
 
-static const double PCR_HALF_FREQUENCY_AT_MKS = PCR_HALF_FREQUENCY / 1.0e6;
-
 struct TSPacket
 {
     // static const unsigned TS_FRAME_SIZE = 188;
-    static const unsigned PCR_HALF_FREQUENCY_AT_MS = PCR_HALF_FREQUENCY / 1000;
     static const unsigned TS_FRAME_SYNC_BYTE = 0x47;
     static const unsigned TS_HEADER_SIZE = 4;
 

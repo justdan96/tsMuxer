@@ -373,9 +373,9 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         prefix = "\xEF\xBB\xBF";  // UTF-8 header
     prefix += int32ToStr(++m_packetCnt);
     prefix += "\n";
-    prefix += floatToTime(pkt->pts / 1e9, ',');
+    prefix += floatToTime(pkt->pts / (double)INTERNAL_PTS_FREQ, ',');
     prefix += " --> ";
-    prefix += floatToTime((pkt->pts + pkt->duration) / 1e9, ',');
+    prefix += floatToTime((pkt->pts + pkt->duration) / (double)INTERNAL_PTS_FREQ, ',');
     prefix += '\n';
     std::string postfix = "\n\n";
     pkt->size = (int)(size + prefix.length() + postfix.length());
@@ -420,7 +420,7 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         dst[0] = 'P';
         dst[1] = 'G';
         auto ptsDts = (uint32_t*)(dst + 2);
-        ptsDts[0] = my_htonl((uint32_t)((pkt->pts * 90000) / 1000000000));
+        ptsDts[0] = my_htonl((uint32_t)internalClockToPts(pkt->pts));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;
         memcpy(dst, curPtr, blockSize);

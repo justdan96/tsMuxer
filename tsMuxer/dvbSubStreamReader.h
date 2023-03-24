@@ -24,7 +24,7 @@ class DVBSubStreamReader : public SimplePacketizerReader
     int getHeaderLen() override { return 10; }
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
-    double getFrameDurationNano() override;
+    double getFrameDuration() override;
     const CodecInfo& getCodecInfo() override { return dvbSubCodecInfo; }
     const std::string getStreamInfo() override;
     void setStreamType(int streamType) {}

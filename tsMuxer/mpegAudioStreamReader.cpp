@@ -23,7 +23,7 @@ int MpegAudioStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipByt
     return mp3DecodeFrame(buff, end);
 }
 
-double MpegAudioStreamReader::getFrameDurationNano()
+double MpegAudioStreamReader::getFrameDuration()
 {
     // return (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
     double rez = (1.0 * INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
