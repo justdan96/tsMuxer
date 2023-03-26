@@ -421,7 +421,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         std::vector<pair<int, string>> tags;
         if (m_packetCnt == 0)
             prefix = "\xEF\xBB\xBF";  // UTF-8 header
-        int64_t startTime = m_timeOffset + getSttsVal();
+        int64_t startTime = m_timeOffset;
         int64_t endTime = startTime + getSttsVal();
         prefix += int32ToStr(++m_packetCnt);
         prefix += "\n";
@@ -509,16 +509,19 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
 
     int newBufferSize(uint8_t* buff, int size) override
     {
-        if (size <= 2)
-            return 0;
         int64_t stored_sttsCnt = sttsCnt;
         int64_t stored_sttsPos = sttsPos;
         uint8_t* end = buff + size;
         std::string prefix;
         if (m_packetCnt == 0)
             prefix = "\xEF\xBB\xBF";  // UTF-8 header
-        int64_t startTime = m_timeOffset + getSttsVal();
+        int64_t startTime = m_timeOffset;
         int64_t endTime = startTime + getSttsVal();
+        if (size <= 2)
+        {
+            m_timeOffset = endTime;
+            return 0;
+        }
         prefix += int32ToStr(m_packetCnt + 1);
         prefix += "\n";
         prefix += floatToTime(startTime / 1e3, ',');
