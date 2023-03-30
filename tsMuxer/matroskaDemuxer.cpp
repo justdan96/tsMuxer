@@ -1955,7 +1955,10 @@ int MatroskaDemuxer::matroska_add_stream()
 
     /* start with the master */
     if ((res = ebml_read_master(&id)) < 0)
+    {
+        delete[] track;
         return res;
+    }
 
     /* try reading the trackentry headers */
     while (res == 0)
@@ -2411,6 +2414,7 @@ int MatroskaDemuxer::matroska_add_stream()
         }
     }
 
+    delete[] track;
     return res;
 }
 
