@@ -1811,7 +1811,6 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
     {
         if (!(id = ebml_peek_id(&level_up)))
         {
-            res = -BufferedReader::DATA_EOF;
             break;
         }
         else if (level_up > 0)
@@ -1868,7 +1867,6 @@ int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
     {
         if (!(id = ebml_peek_id(&level_up)))
         {
-            res = -BufferedReader::DATA_EOF;
             break;
         }
         else if (level_up > 0)
@@ -1909,7 +1907,6 @@ int MatroskaDemuxer::readTrackEncodings(MatroskaTrack *track)
     {
         if (!(id = ebml_peek_id(&level_up)))
         {
-            res = -BufferedReader::DATA_EOF;
             break;
         }
         else if (level_up > 0)
