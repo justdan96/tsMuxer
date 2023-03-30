@@ -316,13 +316,8 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
                 return res;
             if (doctype)
             {
-                if (*doctype)
-                    delete[] doctype;
-                // TODO: solve uninitialized memory 'doctype':
                 *doctype = text;
             }
-            else
-                delete[] text;
             break;
         }
 
@@ -1174,7 +1169,7 @@ int MatroskaDemuxer::matroska_read_header()
     num_tracks = 0;
 
     // MatroskaDemuxContext *matroska = s->priv_data;
-    char *doctype = 0;
+    char *doctype = NULL;
     int version, last_level, res = 0;
     uint32_t id;
 
@@ -1185,12 +1180,8 @@ int MatroskaDemuxer::matroska_read_header()
         return res;
     if ((doctype == NULL) || strcmp(doctype, "matroska"))
     {
-        if (doctype)
-            // TODO: solve uninitialized memory 'doctype':
-            delete[] doctype;
         THROW(ERR_MATROSKA_PARSE, "Wrong EBML doctype ('" << (doctype ? doctype : "(none)") << "' != 'matroska').");
     }
-    delete[] doctype;
     if (version > 2)
     {
         THROW(ERR_MATROSKA_PARSE, "Matroska demuxer version 2 too old for file version " << version);
