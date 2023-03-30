@@ -152,7 +152,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
 {
     int descriptorLen = 0;
     uint8_t descrBuffer[1024];
-    if (codecReader != 0)
+    if (codecReader != NULL)
         descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_bluRayMode, m_hdmvDescriptors);
 
     if (codecName[0] == 'V')
@@ -166,14 +166,14 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         lang = itr->second;
 
     int tsStreamIndex = streamIndex + 16;
-    bool isSecondary = codecReader->isSecondary();
+    bool isSecondary = codecReader != NULL ? codecReader->isSecondary() : false;
 
     if (codecName[0] == 'V')
     {
         if (!isSecondary)
         {
             int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
-            if (codecReader->getStreamHDR() == 4)
+            if (codecReader != NULL && codecReader->getStreamHDR() == 4)
             {
                 tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
                 m_DVvideoTrackCnt++;
