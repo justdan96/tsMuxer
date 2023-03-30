@@ -1710,8 +1710,10 @@ int MatroskaDemuxer::matroska_parse_chapters()
                         AVChapter chapter(start, title);
                         chapters[uid] = chapter;
                     }
-                    // TODO: solve uninitialized memory 'title':
-                    delete[] title;
+                    if (title != NULL)
+                    {
+                        delete[] title;
+                    }
                     break;
                 case MATROSKA_ID_EDITIONUID:
                 case MATROSKA_ID_EDITIONFLAGHIDDEN:
