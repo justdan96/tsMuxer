@@ -68,7 +68,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     AC3Codec::setTestMode(false);
     BitStreamWriter bitWriter{};
 
-    if (isAC3() || blurayMode)  // no point putting an EAC3 descriptor in blu-ray mode, it won't be recognized
+    if (isAC3())
     {
         // ATSC A/52 Annex A Table A3.1 AC-3 Registration Descriptor
         *dstBuff++ = (uint8_t)TSDescriptorTag::REGISTRATION;  // descriptor tag
