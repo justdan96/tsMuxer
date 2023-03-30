@@ -648,8 +648,7 @@ void TsMuxerWindow::onTsMuxerCodecInfoReceived()
     }
     if (fileDuration == 0 && !mplsFileList.isEmpty())
     {
-        foreach (const MPLSFileInfo &mplsFile, mplsFileList)
-            fileDuration += mplsFile.duration;
+        foreach (const MPLSFileInfo &mplsFile, mplsFileList) fileDuration += mplsFile.duration;
     }
 
     m_updateMeta = true;
@@ -1331,8 +1330,7 @@ void TsMuxerWindow::updateCustomChapters()
             offset = 0;
 
         ChapterList chapters = item->data(ChaptersRole).value<ChapterList>();
-        foreach (double chapter, chapters)
-            chaptersSet << qint64((chapter + offset) * 1000000);
+        foreach (double chapter, chapters) chaptersSet << qint64((chapter + offset) * 1000000);
         prevDuration = item->data(FileDurationRole).toDouble();
     }
     ui->memoChapters->clear();
@@ -2310,7 +2308,8 @@ void TsMuxerWindow::RadioButtonMuxClick()
     else
         ui->buttonMux->setText(tr("Start muxing"));
     ui->checkBoxNewAudioPes->setChecked(!ui->radioButtonTS->isChecked());
-    ui->checkBoxNewAudioPes->setEnabled(ui->radioButtonTS->isChecked() || ui->radioButtonM2TS->isChecked() || radioButtonAVCHD->isChecked());
+    ui->checkBoxNewAudioPes->setEnabled(ui->radioButtonTS->isChecked() || ui->radioButtonM2TS->isChecked() ||
+                                        radioButtonAVCHD->isChecked());
     outFileNameDisableChange = true;
     if (ui->radioButtonBluRay->isChecked() || ui->radioButtonDemux->isChecked() || ui->radioButtonAVCHD->isChecked())
     {
