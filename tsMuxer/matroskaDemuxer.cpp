@@ -2404,7 +2404,6 @@ int MatroskaDemuxer::matroska_add_stream()
         }
     }
 
-    delete[] track;
     return res;
 }
 
