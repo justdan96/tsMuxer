@@ -25,7 +25,9 @@ class AC3Codec
         SYNC = -1,
         BSID = -2,
         SAMPLE_RATE = -3,
-        FRAME_SIZE = -4
+        FRAME_SIZE = -4,
+        CRC2 = -5,
+        NOT_ENOUGH_BUFFER = -10,
     };
 
     AC3Codec()
@@ -97,6 +99,7 @@ class AC3Codec
     uint32_t m_bit_rateExt;
     bool m_extChannelsExists;
 
+    bool crc32(uint8_t* buf, int length);
     AC3ParseError parseHeader(uint8_t* buf, uint8_t* end);
 
     AC3ParseError testParseHeader(uint8_t* buf, uint8_t* end);
