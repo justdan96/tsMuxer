@@ -100,7 +100,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
     // ---------------------------------- EAC3 ------------------------------------------
     if (m_bsid > 10)
     {
-        m_frame_size = ((buf[0] & 0x07) << 8 | buf[1] + 1) << 1;
+        m_frame_size = (((buf[0] & 0x07) << 8 | buf[1]) + 1) << 1;
         if (m_frame_size < AC3_HEADER_SIZE)
             return AC3ParseError::FRAME_SIZE;  // invalid header size
 
