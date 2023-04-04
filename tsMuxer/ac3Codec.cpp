@@ -11,9 +11,9 @@
 static const int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
 static const int AC3_FRAME_SIZE = NB_BLOCKS * 256;
 
-bool isSyncWord(uint8_t* buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
+bool isSyncWord(uint8_t *buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
 
-bool isHDSyncWord(uint8_t* buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
+bool isHDSyncWord(uint8_t *buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
 
 static const uint8_t eac3_blocks[4] = {1, 2, 3, 6};
 
