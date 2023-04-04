@@ -78,6 +78,7 @@ bool AC3Codec::crc32(uint8_t *buf, int length)
     int crc = 0;
     while (buf < end) crc = ctx[(uint8_t)crc ^ *buf++] ^ (crc >> 8);
 
+    // the last word of the frame is crc2 = crc for the whole frame except sync_byte
     if (crc != buf[0] + (buf[1] << 8))
         return false;
 
