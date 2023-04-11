@@ -487,71 +487,71 @@ Global additional parameters are placed in the first line of the META file,
 which must begin with the MUXOPT token.
 All parameters in this group start with two dashes:
 
---pcr-on-video-pid  Do not allocate a separate PID for PCR and use the existing
-                    video PID.
---new-audio-pes     Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and
-                    DTS-HD. Activated automatically for BD muxing.
---hdmv-descriptors  Use HDMV descriptors instead of ITU-T H.222.0 | ISO/IEC 13818-1
-                    descriptors. Activated automatically for BD muxing.
---vbr               Use variable bitrate.
---minbitrate        Sets the lower limit of the VBR bitrate. If the stream has
-                    a smaller bitrate, NULL packets will be inserted to
-                    compensate.
---maxbitrate        The upper limit of the vbr bitrate.
---cbr               Muxing mode with a fixed bitrate. --vbr and --cbr must not
-                    be used together.
---vbv-len           The  length  of the  virtual  buffer  in milliseconds.  The
-                    default value  is 500.  Typically, this  option  is used
-                    together with --cbr. The parameter is similar to  the value
-                    of  vbv-buffer-size  in  the  x264  codec,  but  defined in
-                    milliseconds instead of kbit.
---no-asyncio        Do not  create  a separate thread  for writing. This option
-                    also disables the FILE_FLAG_NO_BUFFERING flag on Windows
-                    when writing.
-                    This option is deprecated.
---auto-chapters     Insert a chapter every <n> minutes. Used only in BD/AVCHD
-                    mode.
---custom-chapters   A semicolon delimited list of hh:mm:ss.zzz strings,
-                    representing the chapters' start times.
---demux             Run in demux mode : the selected audio and video tracks are
-                    stored as separate files. The output name must be a folder
-                    name. All selected effects (such as changing the level of
-                    a H264 stream) are processed. When demuxing, certain types
-                    of tracks are always changed :
-                    - Subtitles in a Presentation Graphic Stream are converted
-                      into sup format.
-                    - PCM audio is saved as WAV files.
---blu-ray           Mux as a BD disc. If the output file name is a folder, a
-                    Blu-Ray folder structure is created inside that folder.
-                    SSIF files for BD3D discs are not created in this case. If
-                    the output name has an .iso extension, then the disc is
-                    created directly as an image file.
---blu-ray-v3        As above - except mux to UHD BD discs.
---avchd             Mux to AVCHD disc.
---cut-start         Trim the beginning of the file. The value should be followed
-                    by the time unit : "ms" (milliseconds), "s" (seconds) or
-                    "min" (minutes).
---cut-end           Trim the end of the file. Same rules as --cut-start apply.
---split-duration    Split the output into several files, with each of them being
-                    <n> seconds long.
---split-size        Split the output into several files, with each of them
-                    having a given maximum size. KB, KiB, MB, MiB, GB and GiB
-                    are accepted as size units.
---right-eye         Use base video stream for right eye. Used for 3DBD only.
---start-time        Timestamp of the first video frame. May be defined as 45Khz
-                    clock (just a number) or as time in hh:mm:ss.zzz format.
---mplsOffset        The number of the first MPLS file.  Used for BD disc mode.
---m2tsOffset        The number of the first M2TS file.  Used for BD disc mode.
---insertBlankPL     Add an additional short playlist. Used for cropped video
-                    muxed to BD disc.
---blankOffset       Blank playlist number.
---label             Disk label when muxing to ISO.
---extra-iso-space   Allocate extra space in 64K units for ISO metadata (file
-                    and directory names). Normally, tsMuxeR allocates this space
-                    automatically, but if split condition generates a lot
-                    of small files, it may be required to define extra space.
---constant-iso-hdr  Generates an ISO header that does not depend on the program
-                    version or the current time. Not meant for normal usage.
+--pcr-on-video-pid    Do not allocate a separate PID for PCR and use the existing
+                      video PID.
+--new-audio-pes       Use bytes 0xfd instead of 0xbd for AC3, True-HD, DTS and
+                      DTS-HD. Activated automatically for BD muxing.
+--no-hdmv-descriptors Use ITU-T H.222.0 | ISO/IEC 13818-1 descriptors instead of
+                      HDMV descriptors. Not activated for BD or AVCHD muxing.
+--vbr                 Use variable bitrate.
+--minbitrate          Sets the lower limit of the VBR bitrate. If the stream has
+                      a smaller bitrate, NULL packets will be inserted to
+                      compensate.
+--maxbitrate          The upper limit of the vbr bitrate.
+--cbr                 Muxing mode with a fixed bitrate. --vbr and --cbr must not
+                      be used together.
+--vbv-len             The  length  of the  virtual  buffer  in milliseconds.  The
+                      default value  is 500.  Typically, this  option  is used
+                      together with --cbr. The parameter is similar to  the value
+                      of vbv-buffer-size  in  the  x264  codec,  but  defined in
+                      milliseconds instead of kbit.
+--no-asyncio          Do not  create  a separate thread  for writing. This option
+                      also disables the FILE_FLAG_NO_BUFFERING flag on Windows
+                      when writing.
+                      This option is deprecated.
+--auto-chapters       Insert a chapter every <n> minutes. Used only in BD/AVCHD
+                      mode.
+--custom-chapters     A semicolon delimited list of hh:mm:ss.zzz strings,
+                      representing the chapters' start times.
+--demux               Run in demux mode : the selected audio and video tracks are
+                      stored as separate files. The output name must be a folder
+                      name. All selected effects (such as changing the level of
+                      a H264 stream) are processed. When demuxing, certain types
+                      of tracks are always changed :
+                      - Subtitles in a Presentation Graphic Stream are converted
+                        into sup format.
+                      - PCM audio is saved as WAV files.
+--blu-ray             Mux as a BD disc. If the output file name is a folder, a
+                      Blu-Ray folder structure is created inside that folder.
+                      SSIF files for BD3D discs are not created in this case. If
+                      the output name has an .iso extension, then the disc is
+                      created directly as an image file.
+--blu-ray-v3          As above - except mux to UHD BD discs.
+--avchd               Mux to AVCHD disc.
+--cut-start           Trim the beginning of the file. The value should be followed
+                      by the time unit : "ms" (milliseconds), "s" (seconds) or
+                      "min" (minutes).
+--cut-end             Trim the end of the file. Same rules as --cut-start apply.
+--split-duration      Split the output into several files, with each of them being
+                      <n> seconds long.
+--split-size          Split the output into several files, with each of them
+                      having a given maximum size. KB, KiB, MB, MiB, GB and GiB
+                      are accepted as size units.
+--right-eye           Use base video stream for right eye. Used for 3DBD only.
+--start-time          Timestamp of the first video frame. May be defined as 45Khz
+                      clock (just a number) or as time in hh:mm:ss.zzz format.
+--mplsOffset          The number of the first MPLS file.  Used for BD disc mode.
+--m2tsOffset          The number of the first M2TS file.  Used for BD disc mode.
+--insertBlankPL       Add an additional short playlist. Used for cropped video
+                      muxed to BD disc.
+--blankOffset         Blank playlist number.
+--label               Disk label when muxing to ISO.
+--extra-iso-space     Allocate extra space in 64K units for ISO metadata (file
+                      and directory names). Normally, tsMuxeR allocates this space
+                      automatically, but if split condition generates a lot
+                      of small files, it may be required to define extra space.
+--constant-iso-hdr    Generates an ISO header that does not depend on the program
+                      version or the current time. Not meant for normal usage.
 )help";
     LTRACE(LT_INFO, 2, help);
 }

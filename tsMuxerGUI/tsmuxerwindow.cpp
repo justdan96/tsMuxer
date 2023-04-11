@@ -1591,7 +1591,9 @@ QString TsMuxerWindow::getMuxOpts()
 {
     QString rez = "MUXOPT --no-pcr-on-video-pid ";
     if (ui->checkBoxNewAudioPes->isChecked())
-        rez += "--new-audio-pes --hdmv-descriptors ";
+        rez += "--new-audio-pes";
+    else
+        rez += "--no-hdmv-descriptors";
     if (ui->radioButtonBluRay->isChecked())
         rez += (ui->checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
     else if (ui->radioButtonBluRayISO->isChecked())
@@ -2310,8 +2312,7 @@ void TsMuxerWindow::RadioButtonMuxClick()
     else
         ui->buttonMux->setText(tr("Start muxing"));
     ui->checkBoxNewAudioPes->setChecked(!ui->radioButtonTS->isChecked());
-    ui->checkBoxNewAudioPes->setEnabled(ui->radioButtonTS->isChecked() || ui->radioButtonM2TS->isChecked() ||
-                                        ui->radioButtonAVCHD->isChecked());
+    ui->checkBoxNewAudioPes->setEnabled(ui->radioButtonTS->isChecked() || ui->radioButtonM2TS->isChecked());
     outFileNameDisableChange = true;
     if (ui->radioButtonBluRay->isChecked() || ui->radioButtonDemux->isChecked() || ui->radioButtonAVCHD->isChecked())
     {

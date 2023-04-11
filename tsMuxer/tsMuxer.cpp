@@ -97,7 +97,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_splitSize = m_splitDuration = 0;
     m_curFileNum = 0;
     m_bluRayMode = false;
-    m_hdmvDescriptors = false;
+    m_hdmvDescriptors = true;
     m_lastGopNullCnt = 0;
     m_outBufLen = 0;
     m_pesData.reserve(1024 * 128);
@@ -1347,8 +1347,8 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
             setPCROnVideoPID(true);
         else if (paramPair[0] == "--new-audio-pes")
             setNewStyleAudioPES(true);
-        else if (paramPair[0] == "--hdmv-descriptors")
-            m_hdmvDescriptors = true;
+        else if (paramPair[0] == "--no-hdmv-descriptors")
+            m_hdmvDescriptors = false;
         else if (paramPair[0] == "--bitrate" && paramPair.size() > 1)
         {
             setMaxBitrate((int)(strToDouble(paramPair[1].c_str()) * 1000.0));
