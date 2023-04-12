@@ -1589,28 +1589,28 @@ bool TsMuxerWindow::isDiskOutput() const
 
 QString TsMuxerWindow::getMuxOpts()
 {
-    QString rez = "MUXOPT --no-pcr-on-video-pid ";
+    QString rez = "MUXOPT --no-pcr-on-video-pid";
     if (ui->checkBoxNewAudioPes->isChecked())
-        rez += "--new-audio-pes";
+        rez += " --new-audio-pes";
     else
-        rez += "--no-hdmv-descriptors";
+        rez += " --no-hdmv-descriptors";
     if (ui->radioButtonBluRay->isChecked())
-        rez += (ui->checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
+        rez += (ui->checkBoxV3->isChecked() ? " --blu-ray-v3" : " --blu-ray");
     else if (ui->radioButtonBluRayISO->isChecked())
     {
-        rez += (ui->checkBoxV3->isChecked() ? "--blu-ray-v3 " : "--blu-ray ");
+        rez += (ui->checkBoxV3->isChecked() ? " --blu-ray-v3" : " --blu-ray");
         if (!ui->DiskLabelEdit->text().isEmpty())
             rez += QString("--label=\"%1\" ").arg(ui->DiskLabelEdit->text());
     }
     else if (ui->radioButtonAVCHD->isChecked())
-        rez += "--avchd ";
+        rez += " --avchd";
     else if (ui->radioButtonDemux->isChecked())
-        rez += "--demux ";
+        rez += " --demux";
     if (ui->checkBoxCBR->isChecked())
-        rez += "--cbr --bitrate=" + QString::number(ui->editCBRBitrate->value(), 'f', 3);
+        rez += " --cbr --bitrate=" + QString::number(ui->editCBRBitrate->value(), 'f', 3);
     else
     {
-        rez += "--vbr ";
+        rez += " --vbr";
         if (ui->checkBoxRVBR->isChecked())
         {
             rez += QString("--minbitrate=") + QString::number(ui->editMinBitrate->value(), 'f', 3);
