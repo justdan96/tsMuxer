@@ -58,7 +58,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_lastPESDTS = -1;
     m_cbrBitrate = -1;  // mux CBR if bitrate specifed
     m_minBitrate = -1;
-    m_pcrOnVideo = false;
+    m_pcrOnVideo = true;
     m_endStreamDTS = 0;
     m_prevM2TSPCROffset = 0;
     m_pesPID = 0;
@@ -1343,8 +1343,8 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
         if (paramPair.size() == 0)
             continue;
-        if (paramPair[0] == "--pcr-on-video-pid")
-            setPCROnVideoPID(true);
+        if (paramPair[0] == "--no-pcr-on-video-pid")
+            setPCROnVideoPID(false);
         else if (paramPair[0] == "--new-audio-pes")
             setNewStyleAudioPES(true);
         else if (paramPair[0] == "--no-hdmv-descriptors")
