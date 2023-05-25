@@ -1600,7 +1600,7 @@ QString TsMuxerWindow::getMuxOpts()
     {
         rez += (ui->checkBoxV3->isChecked() ? " --blu-ray-v3" : " --blu-ray");
         if (!ui->DiskLabelEdit->text().isEmpty())
-            rez += QString("--label=\"%1\" ").arg(ui->DiskLabelEdit->text());
+            rez += QString(" --label=\"%1\" ").arg(ui->DiskLabelEdit->text());
     }
     else if (ui->radioButtonAVCHD->isChecked())
         rez += " --avchd";
@@ -1613,7 +1613,7 @@ QString TsMuxerWindow::getMuxOpts()
         rez += " --vbr";
         if (ui->checkBoxRVBR->isChecked())
         {
-            rez += QString("--minbitrate=") + QString::number(ui->editMinBitrate->value(), 'f', 3);
+            rez += QString(" --minbitrate=") + QString::number(ui->editMinBitrate->value(), 'f', 3);
             rez += QString(" --maxbitrate=") + QString::number(ui->editMaxBitrate->value(), 'f', 3);
         }
     }
