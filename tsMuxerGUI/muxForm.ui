@@ -70,7 +70,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="text" >
-           <string>Progress: 100.0%</string>
+           <string>Progress: 0.0%</string>
           </property>
          </widget>
         </item>

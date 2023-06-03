@@ -3535,8 +3535,8 @@
     </message>
     <message>
         <location filename="../muxForm.ui" line="73"/>
-        <source>Progress: 100.0%</source>
-        <translation>Progreso: 100,0%</translation>
+        <source>Progress: 0.0%</source>
+        <translation>Progreso: 0,0%</translation>
     </message>
     <message>
         <location filename="../muxForm.ui" line="98"/>
