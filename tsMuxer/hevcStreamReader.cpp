@@ -406,6 +406,24 @@ double HEVCStreamReader::getStreamFPS(void* curNalUnit)
     return fps;
 }
 
+bool HEVCStreamReader::skipNal(uint8_t* nal)
+{
+    auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
+
+    if (nalType == HevcUnit::NalType::FD)
+        return true;
+
+    if ((nalType == HevcUnit::NalType::EOS || nalType == HevcUnit::NalType::EOB))
+    {
+        if (!m_eof || m_bufEnd - nal > 4)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool HEVCStreamReader::isSlice(HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
