@@ -215,8 +215,6 @@ bool VVCStreamReader::skipNal(uint8_t* nal)
     return false;
 }
 
-
-
 bool VVCStreamReader::isSlice(VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_pps)
