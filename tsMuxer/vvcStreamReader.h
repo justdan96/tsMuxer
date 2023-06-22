@@ -31,6 +31,7 @@ class VVCStreamReader : public MPEGStreamReader
     virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                                   PriorityDataInfo* priorityData) override;
     void onSplitEvent() override { m_firstFileFrame = true; }
+    bool skipNal(uint8_t* nal) override;
 
    private:
     bool isSlice(VvcUnit::NalType nalType) const;

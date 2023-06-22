@@ -197,6 +197,26 @@ double VVCStreamReader::getStreamFPS(void* curNalUnit)
     return fps;
 }
 
+bool VVCStreamReader::skipNal(uint8_t* nal)
+{
+    auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
+
+    if (nalType == VvcUnit::NalType::FD)
+        return true;
+
+    if ((nalType == VvcUnit::NalType::EOS || nalType == VvcUnit::NalType::EOB))
+    {
+        if (!m_eof || m_bufEnd - nal > 4)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+
 bool VVCStreamReader::isSlice(VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_pps)
