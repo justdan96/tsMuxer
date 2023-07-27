@@ -2648,7 +2648,6 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
 MPLSStreamInfo::MPLSStreamInfo()
     : M2TSStreamInfo(),
       type(0),
-      character_code(0),
       offsetId(0xff),
       isSSPG(false),
       SS_PG_offset_sequence_id(0xff),
@@ -2660,7 +2659,6 @@ MPLSStreamInfo::MPLSStreamInfo()
 MPLSStreamInfo::MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
     : M2TSStreamInfo(pmtStreamInfo),
       type(1),
-      character_code(0),
       offsetId(0xff),
       isSSPG(false),
       SS_PG_offset_sequence_id(0xff),

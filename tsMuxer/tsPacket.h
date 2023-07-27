@@ -352,7 +352,7 @@ struct M2TSStreamInfo
     int aspect_ratio_index;
     int audio_presentation_type;
     int sampling_frequency_index;
-    int character_code;
+    int8_t character_code;
     char language_code[4];
     bool isSecondary;
     std::vector<PMTIndex> m_index;
@@ -504,7 +504,6 @@ struct MPLSStreamInfo : public M2TSStreamInfo
 
    public:
     int type;
-    uint8_t character_code;
     uint8_t offsetId;
     bool isSSPG;
     int SS_PG_offset_sequence_id;
