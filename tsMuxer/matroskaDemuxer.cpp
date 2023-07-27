@@ -1696,7 +1696,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                         }
                     }
 
-                    if (start != AV_NOPTS_VALUE && uidFound)
+                    if (start != AV_NOPTS_VALUE && uidFound && title != 0)
                     {
                         AVChapter chapter(start, title);
                         chapters[uid] = chapter;
