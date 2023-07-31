@@ -214,7 +214,7 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
 // ----------- H.266 -----------------
 ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264TrackData(0, 0)
 {
-    m_spsPpsList = hevc_extract_priv_data(buff, size, &m_nalSize);
+    m_spsPpsList = vvc_extract_priv_data(buff, size, &m_nalSize);
 }
 
 bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
