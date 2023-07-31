@@ -287,7 +287,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                 curFont.m_opts |= Font::UNDERLINE;
                 isTag = true;
             }
-            else if (ltagStr == "/u" || ltagStr == "underline")
+            else if (ltagStr == "/u" || ltagStr == "/underline")
             {
                 endTag = true;
             }
