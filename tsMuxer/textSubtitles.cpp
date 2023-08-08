@@ -301,8 +301,8 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
         m_rleLen = (int)(trimPos - m_renderedData);
         // sort by colors indexes
         m_paletteByColor.clear();
-        for (std::map<YUVQuad, uint8_t>::const_iterator itr = m_paletteYUV.begin(); itr != m_paletteYUV.end(); ++itr)
-            m_paletteByColor.insert(std::make_pair(itr->second, itr->first));
+        for (auto [fst, snd] : m_paletteYUV)
+            m_paletteByColor.insert(std::make_pair(snd, fst));
         assert(m_paletteByColor.size() == m_paletteYUV.size());
         return true;
     }
@@ -545,13 +545,13 @@ long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_
     uint8_t* startPos = curPos;
     *curPos++ = m_paletteID;       // palette ID
     *curPos++ = m_paletteVersion;  // palette version number
-    for (auto itr = palette.begin(); itr != palette.end(); ++itr)
+    for (const auto [fst, snd] : palette)
     {
-        *curPos++ = itr->first;
-        *curPos++ = itr->second.Y;
-        *curPos++ = itr->second.Cr;
-        *curPos++ = itr->second.Cb;
-        *curPos++ = itr->second.alpha;
+        *curPos++ = fst;
+        *curPos++ = snd.Y;
+        *curPos++ = snd.Cr;
+        *curPos++ = snd.Cb;
+        *curPos++ = snd.alpha;
     }
     AV_WB16(startPos - 2, (uint16_t)(curPos - startPos));  // correct length field
     return (long)(curPos - buff);

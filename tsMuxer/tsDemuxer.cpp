@@ -118,9 +118,9 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                         if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
                             m_nonMVCVideoFound = true;
                         pmtBufferLen = 0;
-                        for (PIDListMap::const_iterator itr = m_pmt.pidList.begin(); itr != m_pmt.pidList.end(); ++itr)
-                            trackList.insert(std::make_pair(
-                                itr->second.m_pid, TrackInfo((int)itr->second.m_streamType, itr->second.m_lang, 0)));
+                        for (const auto& [fst, snd] : m_pmt.pidList)
+                            trackList.insert(
+                                std::make_pair(snd.m_pid, TrackInfo((int)snd.m_streamType, snd.m_lang, 0)));
                         nonProcPMTPid.erase(pid);
                         if (nonProcPMTPid.size() == 0 && !mvcContinueExpected())
                         {  // all pmt pids processed
@@ -192,7 +192,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 {
     if (m_firstDemuxCall)
     {
-        for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) m_acceptedPidCache[*itr] = 1;
+        for (const unsigned int acceptedPID : acceptedPIDs) m_acceptedPidCache[acceptedPID] = 1;
         m_firstDemuxCall = false;
     }
 
@@ -201,7 +201,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     MemoryBlock* vect = nullptr;
     int lastPid = -1;
 
-    for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
+    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     discardSize = 0;
     uint32_t readedBytes;

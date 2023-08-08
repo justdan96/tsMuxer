@@ -2411,7 +2411,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
 int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize)
 {
-    for (auto itr = acceptedPIDs.begin(); itr != acceptedPIDs.end(); ++itr) demuxedData[*itr];
+    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     AVPacket packet;
     uint32_t demuxedSize = 0;
@@ -2471,8 +2471,8 @@ int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
 std::vector<AVChapter> MatroskaDemuxer::getChapters()
 {
     std::vector<AVChapter> rez;
-    for (std::map<uint64_t, AVChapter>::const_iterator itr = chapters.begin(); itr != chapters.end(); ++itr)
-        rez.push_back(itr->second);
+    for (const auto& chapter : chapters)
+        rez.push_back(chapter.second);
     std::sort(rez.begin(), rez.end());
     return rez;
 }

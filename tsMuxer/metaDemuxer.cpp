@@ -52,14 +52,14 @@ METADemuxer::METADemuxer(const BufferedReaderManager& readManager)
 METADemuxer::~METADemuxer()
 {
     readClose();
-    for (unsigned i = 0; i < m_iterators.size(); i++) delete m_iterators[i];
+    for (FileListIterator*& m_iterator : m_iterators) delete m_iterator;
 }
 
 uint64_t METADemuxer::getDemuxedSize()
 {
     uint64_t rez = 0;
-    for (unsigned i = 0; i < m_codecInfo.size(); i++)
-        rez += m_codecInfo[i].m_streamReader->getProcessedSize();  // m_codecInfo[i].m_dataProcessed;
+    for (const StreamInfo& si : m_codecInfo)
+        rez += si.m_streamReader->getProcessedSize();  // m_codecInfo[i].m_dataProcessed;
     return rez + m_containerReader.getDiscardedSize();
 }
 
@@ -117,9 +117,9 @@ int METADemuxer::readPacket(AVPacket& avPacket)
                 }
             }
             if (allDataDelayed)
-                for (unsigned i = 0; i < m_codecInfo.size(); i++)
+                for (const StreamInfo& si : m_codecInfo)
                 {
-                    auto cReader = dynamic_cast<ContainerToReaderWrapper*>(m_codecInfo[i].m_dataReader);
+                    auto cReader = dynamic_cast<ContainerToReaderWrapper*>(si.m_dataReader);
                     if (cReader)
                         cReader->resetDelayedMark();
                 }
@@ -391,7 +391,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     {
         listIterator = new FileListIterator();
         m_iterators.push_back(listIterator);
-        for (unsigned i = 0; i < fileList.size(); i++) listIterator->addFile(fileList[i]);
+        for (const string& fileName : fileList) listIterator->addFile(fileName);
     }
 
     uint64_t fileSize = 0;
@@ -399,10 +399,10 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     if (m_containerReader.m_demuxers.find(fileList[0]) == m_containerReader.m_demuxers.end())
     {
         File tmpFile;
-        for (unsigned i = 0; i < fileList.size(); i++)
+        for (const string& fileName : fileList)
         {
-            if (!tmpFile.open(fileList[i].c_str(), File::ofRead))
-                THROW(ERR_INVALID_CODEC_FORMAT, "Can't open file: " << fileList[i].c_str());
+            if (!tmpFile.open(fileName.c_str(), File::ofRead))
+                THROW(ERR_INVALID_CODEC_FORMAT, "Can't open file: " << fileName.c_str());
             uint64_t tmpSize = 0;
             tmpFile.size(&tmpSize);
             fileSize += tmpSize;
@@ -624,32 +624,31 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         map<uint32_t, TrackInfo> acceptedPidMap;
         demuxer->getTrackList(acceptedPidMap);
         PIDSet acceptedPidSet;
-        for (map<uint32_t, TrackInfo>::const_iterator itr = acceptedPidMap.begin(); itr != acceptedPidMap.end(); ++itr)
-            acceptedPidSet.insert(itr->first);
-        for (auto itr = demuxedData.begin(); itr != demuxedData.end(); ++itr)
+        for (const auto& itr : acceptedPidMap) acceptedPidSet.insert(itr.first);
+        for (auto& itr : demuxedData)
         {
-            StreamData& vect = itr->second;
+            StreamData& vect = itr.second;
             vect.reserve(fileBlockSize);
         }
 
         for (int i = 0; i < DETECT_STREAM_BUFFER_SIZE / fileBlockSize; i++)
             demuxer->simpleDemuxBlock(demuxedData, acceptedPidSet, discardedSize);
 
-        for (auto itr = demuxedData.begin(); itr != demuxedData.end(); ++itr)
+        for (auto& itr : demuxedData)
         {
-            StreamData& vect = itr->second;
+            StreamData& vect = itr.second;
             CheckStreamRez trackRez = detectTrackReader(vect.data(), (int)vect.size(), containerType,
-                                                        acceptedPidMap[itr->first].m_trackType, itr->first);
+                                                        acceptedPidMap[itr.first].m_trackType, itr.first);
             if (trackRez.codecInfo.programName.size() > 0)
             {
                 if (trackRez.codecInfo.programName[0] != 'S')
-                    trackRez.delay = demuxer->getTrackDelay(itr->first);
+                    trackRez.delay = demuxer->getTrackDelay(itr.first);
             }
-            trackRez.trackID = itr->first;
+            trackRez.trackID = itr.first;
             trackRez.lang = acceptedPidMap[trackRez.trackID].m_lang;
             if (clpiParsed)
             {
-                map<int, CLPIStreamInfo>::const_iterator clpiStream = clpi.m_streamInfo.find(itr->first);
+                map<int, CLPIStreamInfo>::const_iterator clpiStream = clpi.m_streamInfo.find(itr.first);
                 if (clpiStream != clpi.m_streamInfo.end())
                     trackRez.lang = clpiStream->second.language_code;
             }
@@ -1046,25 +1045,25 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         int srtWidth = 0, srtHeight = 0;
         double fps = 0.0;
         text_subtitles::TextAnimation animation;
-        for (auto itr = addParams.begin(); itr != addParams.end(); ++itr)
+        for (const auto& addParam : addParams)
         {
-            if (itr->first == "font-name")
+            if (addParam.first == "font-name")
             {
-                font.m_name = unquoteStr(itr->second);
+                font.m_name = unquoteStr(addParam.second);
             }
-            else if (itr->first == "font-size")
-                font.m_size = strToInt32(itr->second.c_str());
-            else if (itr->first == "font-bold")
+            else if (addParam.first == "font-size")
+                font.m_size = strToInt32(addParam.second.c_str());
+            else if (addParam.first == "font-bold")
                 font.m_opts |= font.BOLD;
-            else if (itr->first == "font-italic")
+            else if (addParam.first == "font-italic")
                 font.m_opts |= font.ITALIC;
-            else if (itr->first == "font-underline")
+            else if (addParam.first == "font-underline")
                 font.m_opts |= font.UNDERLINE;
-            else if (itr->first == "font-strike-out")
+            else if (addParam.first == "font-strike-out")
                 font.m_opts |= font.STRIKE_OUT;
-            else if (itr->first == "font-color")
+            else if (addParam.first == "font-color")
             {
-                const string& s = itr->second;
+                const string& s = addParam.second;
                 if (s.size() >= 2 && s[0] == '0' && s[1] == 'x')
                     font.m_color = strToInt32u(s.substr(2, s.size() - 2).c_str(), 16);
                 else if (s.size() >= 1 && s[0] == 'x')
@@ -1074,26 +1073,26 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                 if ((font.m_color & 0xff000000u) == 0)
                     font.m_color |= 0xff000000u;
             }
-            else if (itr->first == "line-spacing")
-                font.m_lineSpacing = strToFloat(itr->second.c_str());
-            else if (itr->first == "font-charset")
-                font.m_charset = strToInt32(itr->second.c_str());
-            else if (itr->first == "font-border")
-                font.m_borderWidth = strToInt32(itr->second.c_str());
-            else if (itr->first == "fps")
+            else if (addParam.first == "line-spacing")
+                font.m_lineSpacing = strToFloat(addParam.second.c_str());
+            else if (addParam.first == "font-charset")
+                font.m_charset = strToInt32(addParam.second.c_str());
+            else if (addParam.first == "font-border")
+                font.m_borderWidth = strToInt32(addParam.second.c_str());
+            else if (addParam.first == "fps")
             {
-                fps = strToDouble(itr->second.c_str());
+                fps = strToDouble(addParam.second.c_str());
             }
-            else if (itr->first == "video-width")
-                srtWidth = strToInt32(itr->second.c_str());
-            else if (itr->first == "video-height")
-                srtHeight = strToInt32(itr->second.c_str());
-            else if (itr->first == "bottom-offset")
-                srtReader->setBottomOffset(strToInt32(itr->second.c_str()));
-            else if (itr->first == "fadein-time")
-                animation.fadeInDuration = strToFloat(itr->second.c_str());
-            else if (itr->first == "fadeout-time")
-                animation.fadeOutDuration = strToFloat(itr->second.c_str());
+            else if (addParam.first == "video-width")
+                srtWidth = strToInt32(addParam.second.c_str());
+            else if (addParam.first == "video-height")
+                srtHeight = strToInt32(addParam.second.c_str());
+            else if (addParam.first == "bottom-offset")
+                srtReader->setBottomOffset(strToInt32(addParam.second.c_str()));
+            else if (addParam.first == "fadein-time")
+                animation.fadeInDuration = strToFloat(addParam.second.c_str());
+            else if (addParam.first == "fadeout-time")
+                animation.fadeOutDuration = strToFloat(addParam.second.c_str());
         }
         if (srtWidth == 0 || srtHeight == 0 || fps == 0)
             THROW(ERR_COMMON, "video-width, video-height and fps parameters MUST be provided for SRT tracks");
@@ -1389,17 +1388,19 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
 void ContainerToReaderWrapper::terminate()
 {
     m_terminated = true;
-    for (auto i = m_demuxers.begin(); i != m_demuxers.end(); ++i) i->second.m_demuxer->terminate();
+    for (const auto& demuxer : m_demuxers) demuxer.second.m_demuxer->terminate();
 }
 
 void ContainerToReaderWrapper::resetDelayedMark()
 {
-    for (auto itr = m_readerInfo.begin(); itr != m_readerInfo.end(); ++itr)
+    for (auto& itr : m_readerInfo)
     {
-        DemuxerData& demuxerData = itr->second.m_demuxerData;
-        for (auto itr2 = demuxerData.lastReadRez.begin(); itr2 != demuxerData.lastReadRez.end(); ++itr2)
-            if (itr2->second == AbstractReader::DATA_DELAYED)
-                itr2->second = 0;
+        DemuxerData& demuxerData = itr.second.m_demuxerData;
+        for (auto& itr2 : demuxerData.lastReadRez)
+        {
+            if (itr2.second == DATA_DELAYED)
+                itr2.second = 0;
+        }
     }
 }
 

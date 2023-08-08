@@ -16,9 +16,11 @@ bool sLastMsg = false;
 std::string toNativeSeparators(const std::string& dirName)
 {
     std::string rez = dirName;
-    for (size_t i = 0; i < rez.length(); ++i)
-        if (rez[i] == '\\' || rez[i] == '/')
-            rez[i] = getDirSeparator();
+    for (char& c : rez)
+    {
+        if (c == '\\' || c == '/')
+            c = getDirSeparator();
+    }
     return rez;
 }
 
@@ -139,11 +141,11 @@ double correctFps(double fps)
         {29.97, 29.97002997002997},  {59.94, 59.94005994005994},
     };
 
-    for (int i = 0; i < sizeof(fpsCorrectList) / sizeof(FPSCorrect); i++)
+    for (const auto& i : fpsCorrectList)
     {
-        if (fabs(fps - fpsCorrectList[i].from) < 1e-4)
+        if (fabs(fps - i.from) < 1e-4)
         {
-            return fpsCorrectList[i].to;
+            return i.to;
         }
     }
     return fps;

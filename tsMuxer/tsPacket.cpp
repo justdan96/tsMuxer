@@ -189,11 +189,11 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
     bitWriter.putBits(1, 1);  // current next indicator
 
     bitWriter.putBits(16, 0);  // section and last section number
-    for (std::map<int, int>::const_iterator itr = pmtPids.begin(); itr != pmtPids.end(); ++itr)
+    for (const auto [fst, snd] : pmtPids)
     {
-        bitWriter.putBits(16, itr->second);  // program number
-        bitWriter.putBits(3, 7);             // current next indicator
-        bitWriter.putBits(13, itr->first);   // pid
+        bitWriter.putBits(16, snd); // program number
+        bitWriter.putBits(3, 7);              // current next indicator
+        bitWriter.putBits(13, fst);  // pid
     }
     bitWriter.flushBits();
     uint32_t crc = calculateCRC32(buffer, bitWriter.getBitsCount() / 8);
@@ -452,28 +452,28 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(12, 0);  // es_info_len
     }
 
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (const auto& [pid, si] : pidList)
     {
-        if (itr->second.m_streamType == StreamType::SUB_PGS && !hdmvDescriptors)
+        if (si.m_streamType == StreamType::SUB_PGS && !hdmvDescriptors)
             LTRACE(LT_WARN, 2, "Warning: PGS might not work without HDMV descriptors.");
 
-        bitWriter.putBits(8, (int)itr->second.m_streamType);
+        bitWriter.putBits(8, (int)si.m_streamType);
         bitWriter.putBits(3, 7);  // reserved
-        bitWriter.putBits(13, itr->second.m_pid);
+        bitWriter.putBits(13, si.m_pid);
 
         auto esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
         bitWriter.putBits(4, 15);  // reserved
         bitWriter.putBits(12, 0);  // es_info_len
         int beforeCount = bitWriter.getBitsCount() / 8;
 
-        for (int j = 0; j < itr->second.m_esInfoLen; j++)
-            bitWriter.putBits(8, itr->second.m_esInfoData[j]);  // es_info_len
+        for (int j = 0; j < si.m_esInfoLen; j++)
+            bitWriter.putBits(8, si.m_esInfoData[j]);  // es_info_len
 
-        if (*itr->second.m_lang && !blurayMode)
+        if (*si.m_lang && !blurayMode)
         {
-            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);                    // lang descriptor ID
-            bitWriter.putBits(8, 4);                                                  // lang descriptor len
-            for (int k = 0; k < 3; k++) bitWriter.putBits(8, itr->second.m_lang[k]);  // lang code[i]
+            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);                  // lang descriptor ID
+            bitWriter.putBits(8, 4);                                                // lang descriptor len
+            for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]); // lang code[i]
             bitWriter.putBits(8, 0);
         }
         *esInfoLen = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount);
@@ -659,9 +659,8 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
         writer.putBits(16, DEFAULT_PMT_PID);  // m_programInfo[i].program_map_PID =
 
         int streams = 0;
-        for (std::map<int, CLPIStreamInfo>::const_iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+        for (const auto& [index, si] : m_streamInfo)
         {
-            const CLPIStreamInfo& si = itr->second;
             bool streamOK = (isSsExt && si.stream_coding_type == StreamType::VIDEO_MVC) ||
                             (!isSsExt && si.stream_coding_type != StreamType::VIDEO_MVC);
             if (streamOK)
@@ -671,15 +670,14 @@ void CLPIParser::composeProgramInfo(BitStreamWriter& writer, bool isSsExt)
         writer.putBits(8, streams);  // m_programInfo[i].number_of_streams_in_ps
         writer.putBits(8, 0);        // reserved_for_future_use
         // for (int i=0; i < m_streamInfo.size(); i++)
-        for (std::map<int, CLPIStreamInfo>::const_iterator itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+        for (const auto& [index, si] : m_streamInfo)
         {
-            const CLPIStreamInfo& si = itr->second;
             bool streamOK = (isSsExt && si.stream_coding_type == StreamType::VIDEO_MVC) ||
                             (!isSsExt && si.stream_coding_type != StreamType::VIDEO_MVC);
             if (!streamOK)
                 continue;
-            writer.putBits(16, itr->first);  // pid
-            itr->second.composeStreamCodingInfo(writer);
+            writer.putBits(16, index);  // pid
+            si.composeStreamCodingInfo(writer);
         }
     }
 
@@ -831,28 +829,28 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, bool isSSExt)
     uint32_t beforeCount = writer.getBitsCount() / 8;
     std::vector<CLPIStreamInfo> processStream;
     int EP_stream_type = 1;
-    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (auto& [index, si] : m_streamInfo)
     {
-        StreamType coding_type = itr->second.stream_coding_type;
+        StreamType coding_type = si.stream_coding_type;
         if (isSSExt)
         {
             if (coding_type == StreamType::VIDEO_MVC)
-                processStream.push_back(itr->second);
+                processStream.push_back(si);
         }
         else
         {
             if (coding_type != StreamType::VIDEO_MVC && isVideoStreamType(coding_type))
-                processStream.push_back(itr->second);
+                processStream.push_back(si);
         }
     }
     if (processStream.size() == 0)
-        for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+        for (const auto& [index, si] : m_streamInfo)
         {
-            StreamType coding_type = itr->second.stream_coding_type;
+            StreamType coding_type = si.stream_coding_type;
             if (isAudioStreamType(coding_type))
             {
-                processStream.push_back(itr->second);
-                if (itr->second.isSecondary)
+                processStream.push_back(si);
+                if (si.isSecondary)
                     EP_stream_type = 4;
                 else
                     EP_stream_type = 3;
@@ -901,10 +899,10 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
     int64_t lastPktCnt = 0;
     int64_t lastCoarsePts = 0;
     PMTIndex& curIndex = streamInfo.m_index[m_clpiNum];
-    for (PMTIndex::const_iterator itr = curIndex.begin(); itr != curIndex.end(); ++itr)
+    for (const auto& [fst, snd] : curIndex)
     {
-        const PMTIndexData& indexData = itr->second;
-        auto newCoarsePts = (uint32_t)(itr->first >> 19);
+        const PMTIndexData& indexData = snd;
+        auto newCoarsePts = (uint32_t)(fst >> 19);
         uint32_t lastCoarseSPN = lastPktCnt & 0xfffe0000;
         uint32_t newCoarseSPN = indexData.m_pktCnt & 0xfffe0000;
         if (rez.size() == 0 || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
@@ -936,9 +934,9 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
     if (streamInfo.m_index.size() > 0)
     {
         const PMTIndex& curIndex = streamInfo.m_index[m_clpiNum];
-        for (auto itr = curIndex.begin(); itr != curIndex.end(); ++itr)
+        for (const auto& [fst, snd] : curIndex)
         {
-            const PMTIndexData& indexData = itr->second;
+            const PMTIndexData& indexData = snd;
             writer.putBit(0);  // is_angle_change_point[EP_fine_id]
             int endCode = 0;
             if (indexData.m_frameLen > 0)
@@ -978,9 +976,9 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
                         endCode = 7;
                 }
             }
-            writer.putBits(3, endCode);                            // I_end_position_offset[EP_fine_id]
-            writer.putBits(11, (itr->first >> 9) % 2048);          // PTS_EP_fine[EP_fine_id]
-            writer.putBits(17, indexData.m_pktCnt % (65536 * 2));  // SPN_EP_fine[EP_fine_id]
+            writer.putBits(3, endCode);                           // I_end_position_offset[EP_fine_id]
+            writer.putBits(11, (fst >> 9) % 2048);          // PTS_EP_fine[EP_fine_id]
+            writer.putBits(17, indexData.m_pktCnt % (65536 * 2)); // SPN_EP_fine[EP_fine_id]
         }
     }
 }
@@ -1412,7 +1410,7 @@ int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
         writer.putBits(32, 0x20);
         writer.putBits(32, 1 << 24);
         writer.putBits(32, 1 << 28);
-        for (int i = 0; i < 6; i++) writer.putBits(32, HDR10_metadata[i]);
+        for (int i : HDR10_metadata) writer.putBits(32, i);
         writer.flushBits();
         return writer.getBitsCount() / 8;
     }
@@ -1424,17 +1422,17 @@ int MPLSParser::composeUHD_metadata(uint8_t* buffer, int bufferSize)
 
 int MPLSParser::compose(uint8_t* curPos, int bufferSize, DiskType dt)
 {
-    for (auto& i : m_streamInfo)
+    for (const MPLSStreamInfo& si : m_streamInfo)
     {
-        StreamType stream_coding_type = i.stream_coding_type;
+        StreamType stream_coding_type = si.stream_coding_type;
         if (isVideoStreamType(stream_coding_type))
         {
-            if (i.isSecondary)
+            if (si.isSecondary)
             {
                 number_of_SubPaths++;
                 subPath_type = 7;  // PIP not fully implemented yet
             }
-            else if (i.HDR & 4)
+            else if (si.HDR & 4)
             {
                 number_of_SubPaths++;
                 subPath_type = 10;

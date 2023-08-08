@@ -58,9 +58,9 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
         if (strStartWith(str, "MUXOPT"))
         {
             vector<string> params = splitQuotedStr(str.c_str(), ' ');
-            for (unsigned i = 0; i < params.size(); i++)
+            for (const auto& param : params)
             {
-                vector<string> paramPair = splitStr(trimStr(params[i]).c_str(), '=');
+                vector<string> paramPair = splitStr(trimStr(param).c_str(), '=');
                 if (paramPair.size() == 0)
                     continue;
                 if (paramPair[0] == "--auto-chapters")
@@ -68,8 +68,7 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
                 else if (paramPair[0] == "--custom-chapters" && paramPair.size() > 1)
                 {
                     vector<string> chapList = splitStr(paramPair[1].c_str(), ';');
-                    for (unsigned k = 0; k < chapList.size(); k++)
-                        customChaptersList.push_back(timeToFloat(chapList[k]));
+                    for (const string& chap : chapList) customChaptersList.push_back(timeToFloat(chap));
                 }
                 else if (paramPair[0] == "--mplsOffset")
                 {
@@ -246,9 +245,9 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
     int videoWidth = 1920;
     int videoHeight = 1080;
     double fps = 23.976;
-    for (auto itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (const auto& [pid, si] : pidList)
     {
-        const PMTStreamInfo& streamInfo = itr->second;
+        const PMTStreamInfo& streamInfo = si;
         const auto streamReader = dynamic_cast<const MPEGStreamReader*>(streamInfo.m_codecReader);
         if (streamReader)
         {

@@ -149,9 +149,11 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
 
 bool SRTStreamReader::strOnlySpace(std::string& str)
 {
-    for (std::string::iterator itr = str.begin(); itr != str.end(); ++itr)
-        if (*itr != ' ')
+    for (const char& c : str)
+    {
+        if (c != ' ')
             return false;
+    }
     return true;
 }
 
@@ -260,12 +262,17 @@ bool SRTStreamReader::parseTime(const string& text)
         {
             string first = trimStr(text.substr(0, i));
             string second = trimStr(text.substr(i + 3, text.length() - i - 3));
-            for (size_t j = 0; j < first.length(); j++)
-                if (first[j] == ',')
-                    first[j] = '.';
-            for (size_t j = 0; j < second.length(); j++)
-                if (second[j] == ',')
-                    second[j] = '.';
+            for (char& c : first)
+            {
+                if (c == ',')
+                    c = '.';
+            }
+            for (char& c : second)
+            {
+                if (c == ',')
+                    c = '.';
+            }
+                
             m_inTime = timeToFloat(first);
             m_outTime = timeToFloat(second);
             return true;

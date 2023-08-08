@@ -759,9 +759,9 @@ void TSMuxer::gotoNextFile(uint64_t newPts)
     m_fileNames.push_back(m_outFileName);
     openDstFile();
 
-    for (auto itr = m_pmt.pidList.begin(); itr != m_pmt.pidList.end(); ++itr)
+    for (auto& [pid, si] : m_pmt.pidList)
     {
-        PMTStreamInfo& pmtInfo = itr->second;
+        PMTStreamInfo& pmtInfo = si;
         pmtInfo.m_codecReader->onSplitEvent();
         if (pmtInfo.m_index.size() == 0)
             continue;

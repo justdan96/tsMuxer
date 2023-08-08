@@ -29,10 +29,10 @@ void BufferedReaderManager::init(uint32_t blockSize, uint32_t allocSize, uint32_
 
 BufferedReaderManager::~BufferedReaderManager()
 {
-    for (size_t i = 0; i < m_fileReaders.size(); i++)
+    for (const auto& m_fileReader : m_fileReaders)
     {
-        delete m_fileReaders[i];  // need to define destruction order first. This object MUST be deleted after
-                                  // MCVodStreamer
+        delete m_fileReader;  // need to define destruction order first. This object MUST be deleted after
+                              // MCVodStreamer
     }
 }
 

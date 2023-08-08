@@ -143,10 +143,10 @@ void PGSStreamReader::yuvToRgb(int minY)
     memset(&rgbPal[0], 0, sizeof(rgbPal));
     memset(&rgbPal[0], 0, sizeof(yuvPal));
 
-    for (map<uint8_t, YUVQuad>::const_iterator itr = m_palette.begin(); itr != m_palette.end(); ++itr)
+    for (auto itr : m_palette)
     {
-        rgbPal[itr->first] = TextToPGSConverter::YUVAToRGBA(itr->second);
-        yuvPal[itr->first] = itr->second;
+        rgbPal[itr.first] = TextToPGSConverter::YUVAToRGBA(itr.second);
+        yuvPal[itr.first] = itr.second;
     }
     RGBQUAD zeroRgb;
     memset(&zeroRgb, 0, sizeof(zeroRgb));

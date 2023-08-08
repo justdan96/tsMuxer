@@ -4,7 +4,7 @@
 
 #include <array>
 
-//#include "hevc.h"
+// #include "hevc.h"
 #include "iso_writer.h"
 #include "muxerManager.h"
 #include "psgStreamReader.h"
@@ -446,9 +446,9 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     }
 
     PIDListMap pidList = muxer->getPidList();
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (const auto& [pid, si] : pidList)
     {
-        CLPIStreamInfo streamInfo(itr->second);
+        CLPIStreamInfo streamInfo(si);
         clpiParser.m_streamInfo.insert(make_pair(streamInfo.streamPID, streamInfo));
     }
     vector<uint32_t> packetCount = muxer->getMuxedPacketCnt();
@@ -525,9 +525,9 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
 
 const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
 {
-    for (auto itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (const auto& [pid, si] : pidList)
     {
-        const PMTStreamInfo& stream = itr->second;
+        const PMTStreamInfo& stream = si;
         if (stream.m_codecReader->getStreamIndex() == index)
             return &stream;
     }
@@ -614,9 +614,9 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     if (subMuxer)
     {
         mplsParser.isDependStreamExist = true;
-        for (PIDListMap::const_iterator itr = pidListMVC.begin(); itr != pidListMVC.end(); ++itr)
+        for (const auto& [pid, si] : pidListMVC)
         {
-            MPLSStreamInfo data(itr->second);
+            MPLSStreamInfo data(si);
             data.type = 2;  // Identify an elementary stream of the Clip used by a SubPath with SubPath_type set to
                             // 2,3,4,5,6,8 or 9
             mplsParser.m_streamInfoMVC.push_back(data);

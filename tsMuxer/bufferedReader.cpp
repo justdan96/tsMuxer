@@ -59,9 +59,9 @@ BufferedReader::~BufferedReader()
     terminate();
     m_readQueue.push(0);
     join();
-    for (auto itr = m_readers.begin(); itr != m_readers.end(); ++itr)
+    for (const auto& m_reader : m_readers)
     {
-        ReaderData* pData = itr->second;
+        ReaderData* pData = m_reader.second;
         delete pData;
     }
 }

@@ -31,7 +31,7 @@ SingleFileMuxer::SingleFileMuxer(MuxerManager* owner) : AbstractMuxer(owner), m_
 
 SingleFileMuxer::~SingleFileMuxer()
 {
-    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr) delete itr->second;
+    for (const auto& itr : m_streamInfo) delete itr.second;
 }
 
 void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
@@ -265,9 +265,9 @@ bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
 
 bool SingleFileMuxer::doFlush()
 {
-    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (const auto& [fst, snd] : m_streamInfo)
     {
-        StreamInfo* streamInfo = itr->second;
+        StreamInfo* streamInfo = snd;
         unsigned lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
         unsigned roundBufLen = streamInfo->m_bufLen & 0xffff0000;
         if (m_owner->isAsyncMode())
@@ -297,9 +297,9 @@ bool SingleFileMuxer::doFlush()
 
 bool SingleFileMuxer::close()
 {
-    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (const auto& [fst, snd] : m_streamInfo)
     {
-        StreamInfo* streamInfo = itr->second;
+        StreamInfo* streamInfo = snd;
         if (!streamInfo->m_file.close())
             return false;
         if (streamInfo->m_bufLen > 0)

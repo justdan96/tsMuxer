@@ -66,9 +66,8 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     vector<StreamInfo>& ci = m_metaDemuxer.getCodecInfo();
     bool mvcTrackFirst = false;
     bool firstH264Track = true;
-    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
+    for (const StreamInfo& si : ci)
     {
-        StreamInfo& si = *itr;
         auto h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
         if (h264Reader)
         {
@@ -134,9 +133,8 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
         m_mainMuxer->setMasterMode(m_subMuxer, !mvcTrackFirst);
     }
 
-    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
+    for (StreamInfo& si : ci)
     {
-        StreamInfo& si = *itr;
         si.read();
         if (si.m_isSubStream && m_allowStereoMux)
         {
@@ -174,9 +172,8 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
     bool aacFound = false;
     bool mlpFound = false;
 
-    for (auto itr = ci.begin(); itr != ci.end(); ++itr)
+    for (const StreamInfo& si : ci)
     {
-        const StreamInfo& si = *itr;
         if (si.m_codec == h264CodecInfo.programName)
             avcFound = true;
         else if (si.m_codec == h264DepCodecInfo.programName)
