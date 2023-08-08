@@ -2471,8 +2471,7 @@ int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
 std::vector<AVChapter> MatroskaDemuxer::getChapters()
 {
     std::vector<AVChapter> rez;
-    for (const auto& chapter : chapters)
-        rez.push_back(chapter.second);
+    for (const auto &chapter : chapters) rez.push_back(chapter.second);
     std::sort(rez.begin(), rez.end());
     return rez;
 }

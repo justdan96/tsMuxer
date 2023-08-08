@@ -272,7 +272,7 @@ bool SRTStreamReader::parseTime(const string& text)
                 if (c == ',')
                     c = '.';
             }
-                
+
             m_inTime = timeToFloat(first);
             m_outTime = timeToFloat(second);
             return true;
