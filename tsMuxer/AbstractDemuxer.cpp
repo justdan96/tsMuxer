@@ -5,6 +5,5 @@
 
 AbstractDemuxer::~AbstractDemuxer()
 {
-    for (const auto &m_pidFilter : m_pidFilters)
-        delete m_pidFilter.second;
+    for (const auto &m_pidFilter : m_pidFilters) delete m_pidFilter.second;
 }

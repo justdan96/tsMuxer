@@ -191,8 +191,8 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, int buf_size
     bitWriter.putBits(16, 0);  // section and last section number
     for (const auto [fst, snd] : pmtPids)
     {
-        bitWriter.putBits(16, snd); // program number
-        bitWriter.putBits(3, 7);              // current next indicator
+        bitWriter.putBits(16, snd);  // program number
+        bitWriter.putBits(3, 7);     // current next indicator
         bitWriter.putBits(13, fst);  // pid
     }
     bitWriter.flushBits();
@@ -466,14 +466,13 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, int max_buf_size, bo
         bitWriter.putBits(12, 0);  // es_info_len
         int beforeCount = bitWriter.getBitsCount() / 8;
 
-        for (int j = 0; j < si.m_esInfoLen; j++)
-            bitWriter.putBits(8, si.m_esInfoData[j]);  // es_info_len
+        for (int j = 0; j < si.m_esInfoLen; j++) bitWriter.putBits(8, si.m_esInfoData[j]);  // es_info_len
 
         if (*si.m_lang && !blurayMode)
         {
-            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);                  // lang descriptor ID
-            bitWriter.putBits(8, 4);                                                // lang descriptor len
-            for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]); // lang code[i]
+            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);           // lang descriptor ID
+            bitWriter.putBits(8, 4);                                         // lang descriptor len
+            for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]);  // lang code[i]
             bitWriter.putBits(8, 0);
         }
         *esInfoLen = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount);
@@ -976,9 +975,9 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
                         endCode = 7;
                 }
             }
-            writer.putBits(3, endCode);                           // I_end_position_offset[EP_fine_id]
-            writer.putBits(11, (fst >> 9) % 2048);          // PTS_EP_fine[EP_fine_id]
-            writer.putBits(17, indexData.m_pktCnt % (65536 * 2)); // SPN_EP_fine[EP_fine_id]
+            writer.putBits(3, endCode);                            // I_end_position_offset[EP_fine_id]
+            writer.putBits(11, (fst >> 9) % 2048);                 // PTS_EP_fine[EP_fine_id]
+            writer.putBits(17, indexData.m_pktCnt % (65536 * 2));  // SPN_EP_fine[EP_fine_id]
         }
     }
 }

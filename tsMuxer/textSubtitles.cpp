@@ -301,8 +301,7 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
         m_rleLen = (int)(trimPos - m_renderedData);
         // sort by colors indexes
         m_paletteByColor.clear();
-        for (auto [fst, snd] : m_paletteYUV)
-            m_paletteByColor.insert(std::make_pair(snd, fst));
+        for (auto [fst, snd] : m_paletteYUV) m_paletteByColor.insert(std::make_pair(snd, fst));
         assert(m_paletteByColor.size() == m_paletteYUV.size());
         return true;
     }
