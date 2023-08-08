@@ -44,3 +44,4 @@
 **/CMakeFiles
 *.cmake
 CMakeCache.txt
+/tsmuxer_main.sln.DotSettings.user
