@@ -51,7 +51,7 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     *curPos++ = static_cast<uint8_t>(TSDescriptorTag::LPCM);  // descriptor tag
     const int audio_presentation_type = (m_channels > 2) ? 6 : (m_channels == 2) ? 3 : 1;
     const int sampling_frequency = (m_freq == 192000) ? 5 : (m_freq == 96000) ? 4 : 1;
-    *curPos++ = static_cast<uint8_t>((audio_presentation_type << 4 | sampling_frequency);
+    *curPos++ = static_cast<uint8_t>(audio_presentation_type << 4 | sampling_frequency);
     *curPos++ = static_cast<uint8_t>((m_bitsPerSample - 12) << 4 | 0x3f);  // bits_per_sample (2 bits), stuffing_bits
 
     return static_cast<int>(curPos - dstBuff);

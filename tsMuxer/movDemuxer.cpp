@@ -596,7 +596,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
     MOVStreamContext* m_sc;
     int m_packetCnt;
-    int64_t sttsPos;
+    size_t sttsPos;
     int64_t sttsCnt;
     int64_t m_timeOffset;
 };
@@ -728,7 +728,7 @@ void MovDemuxer::buildIndex()
     m_curChunk = 0;
     chunks.clear();
 
-    if (num_tracks == 1 && static_cast<MOVStreamContext*>(tracks[0])->chunk_offsets.empty())
+    if (num_tracks == 1 && ((MOVStreamContext*)(tracks[0]))->chunk_offsets.empty())
     {
         chunks.push_back(make_pair(0, 0));
     }
@@ -736,7 +736,7 @@ void MovDemuxer::buildIndex()
     {
         for (int i = 0; i < num_tracks; ++i)
         {
-            const auto st = static_cast<MOVStreamContext*>(tracks[i]);
+            const auto st = (MOVStreamContext*)(tracks[i]);
             for (const auto& j : st->chunk_offsets)
             {
                 if (!found_moof)
@@ -810,7 +810,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
         else if (chunkSize)
         {
             MemoryBlock& vect = demuxedData[trackId + 1ll];
-            const auto st = static_cast<MOVStreamContext*>(tracks[trackId]);
+            const auto st = (MOVStreamContext*)(tracks[trackId]);
             const int64_t oldSize = vect.size();
             if (st->parsed_priv_data)
             {
@@ -1084,7 +1084,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
     Track* st = tracks[frag->track_id - 1];
-    const auto sc = static_cast<MOVStreamContext*>(st);
+    const auto sc = (MOVStreamContext*)(st);
     if (sc->pseudo_stream_id + 1 != frag->stsd_id)
         return 0;
     get_byte();  // version
@@ -1193,7 +1193,7 @@ int MovDemuxer::mov_read_tkhd(MOVAtom atom) { return 0; }
 
 int MovDemuxer::mov_read_ctts(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
     const int entries = get_be32();
@@ -1209,7 +1209,7 @@ int MovDemuxer::mov_read_ctts(MOVAtom atom)
 
 int MovDemuxer::mov_read_stts(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
     const int entries = get_be32();
@@ -1230,7 +1230,7 @@ int MovDemuxer::mov_read_stts(MOVAtom atom)
 
 int MovDemuxer::mov_read_stsz(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
     st->sample_size = get_be32();
@@ -1245,7 +1245,7 @@ int MovDemuxer::mov_read_stsz(MOVAtom atom)
 
 int MovDemuxer::mov_read_stss(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
 
@@ -1339,7 +1339,7 @@ int MovDemuxer::mov_read_mdhd(MOVAtom atom)
 {
     if (num_tracks == -1)
         return -1;
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     const int version = get_byte();
     if (version > 1)
         return -1;  // unsupported
@@ -1371,7 +1371,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
 {
     if (num_tracks == -1)
         return -1;
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
 
     get_byte();  // version
     get_be24();  // flags
@@ -1546,7 +1546,7 @@ if (bits_per_sample) {
 
 int MovDemuxer::mov_read_stco(const MOVAtom atom)
 {
-    const auto sc = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto sc = (MOVStreamContext*)(tracks[num_tracks - 1]);
 
     get_byte();  // version
     get_be24();  // flags
@@ -1628,7 +1628,7 @@ int MovDemuxer::mp4_read_descr(int* tag)
 
 int MovDemuxer::mov_read_esds(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_be32();  // version + flags
     int tag;
     mp4_read_descr(&tag);  // len
@@ -1686,7 +1686,7 @@ for (int i = 0; i < entries; i++) {
 }
 int MovDemuxer::mov_read_stsc(MOVAtom atom)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
+    const auto st = (MOVStreamContext*)(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
 
@@ -1758,7 +1758,7 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
 
 double MovDemuxer::getTrackFps(const uint32_t trackId)
 {
-    const auto st = static_cast<MOVStreamContext*>(tracks[trackId - 1]);
+    const auto st = (MOVStreamContext*)(tracks[trackId - 1]);
     return st->fps;
 }
 
