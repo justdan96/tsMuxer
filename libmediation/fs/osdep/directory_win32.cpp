@@ -43,8 +43,8 @@ bool createDir(const std::string& dirName, const bool createParentDirs)
     const bool ok = preCreateDir(
         [](auto&& parentDir) {
             return parentDir.empty() || parentDir[parentDir.size() - 1] == ':' || parentDir == "\\\\." ||
-                   parentDir == "\\\\.\\" ||                                                        // UNC patch prefix
-                   (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size() - 1] == '}');  // UNC patch prefix
+                   parentDir == R"(\\.\)" ||                                                       // UNC patch prefix
+                   (strStartWith(parentDir, R"(\\.\)") && parentDir[parentDir.size() - 1] == '}'); // UNC patch prefix
         },
         [](auto&& parentDir) {
             if (CreateDirectory(toWide(parentDir).data(), nullptr) == 0)

@@ -498,10 +498,10 @@ void CLPIStreamInfo::ISRC(BitStreamReader& reader)
 
 void CLPIStreamInfo::composeISRC(BitStreamWriter& writer)
 {
-    writeString("\x30\x30", writer, 2);              // country_code
-    writeString("\x30\x30\x30", writer, 3);          // copyright_holder
-    writeString("\x30\x30", writer, 2);              // recording_year
-    writeString("\x30\x30\x30\x30\x30", writer, 5);  // recording_number
+    writeString(R"(00)", writer, 2);    // country_code
+    writeString(R"(000)", writer, 3);   // copyright_holder
+    writeString(R"(00)", writer, 2);    // recording_year
+    writeString(R"(00000)", writer, 5); // recording_number
 }
 
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
