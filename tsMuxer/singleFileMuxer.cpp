@@ -221,8 +221,8 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate);
         lpcmReader->beforeFileCloseEvent(streamInfo->m_file);
         streamInfo->m_file.close();
-        const std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
-        deleteFile(newName.c_str());
+        const std::string newName = getNewName(streamInfo->m_fileName, streamInfo->m_part);
+        deleteFile(newName);
         if (rename(streamInfo->m_fileName.c_str(), newName.c_str()) != 0)
             THROW(ERR_COMMON, "Can't rename file " << streamInfo->m_fileName << " to " << newName);
         streamInfo->m_part++;
@@ -315,8 +315,8 @@ bool SingleFileMuxer::close()
 
             if (streamInfo->m_part > 1)
             {
-                std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
-                deleteFile(newName.c_str());
+                std::string newName = getNewName(streamInfo->m_fileName, streamInfo->m_part);
+                deleteFile(newName);
                 if (rename(streamInfo->m_fileName.c_str(), newName.c_str()) != 0)
                     THROW(ERR_COMMON, "Can't rename file " << streamInfo->m_fileName << " to " << newName);
             }
