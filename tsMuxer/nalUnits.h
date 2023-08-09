@@ -120,7 +120,7 @@ class NALDelimiter : public NALUnit
     int primary_pic_type;
     NALDelimiter() : NALUnit(), primary_pic_type(0) {}
     int deserialize(uint8_t* buffer, uint8_t* end);
-    int serialize(uint8_t* dstBuffer);
+    int serialize(uint8_t* buffer);
 };
 
 class PPSUnit : public NALUnit
@@ -296,11 +296,11 @@ class SEIUnit : public NALUnit
     bool hasProcessedMessage(int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
 
    private:
-    void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuf, int payloadSize,
+    void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
                      int orig_hrd_parameters_present_flag);
     static void buffering_period(int payloadSize);
     void pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag);
-    void pic_timing(SPSUnit& sps, uint8_t* curBuf, int payloadSize, bool orig_hrd_parameters_present_flag);
+    void pic_timing(SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag);
     static void pan_scan_rect(int payloadSize);
     static void filler_payload(int payloadSize);
     static void user_data_registered_itu_t_t35(int payloadSize);

@@ -467,8 +467,8 @@ class CLPIParser
     static void CPI_SS(uint8_t* buffer, int dataLength);
 
    private:
-    static void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfo,
-                                 std::map<int, CLPIStreamInfo>& streamInfo);
+    static void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
+                                 std::map<int, CLPIStreamInfo>& streamInfoMap);
     void parseSequenceInfo(uint8_t* buffer, uint8_t* end);
     static void parseCPI(uint8_t* buffer, uint8_t* end);
     static void EP_map(BitStreamReader& reader);
@@ -498,8 +498,8 @@ struct MPLSStreamInfo : public M2TSStreamInfo
 
     void parseStreamAttributes(BitStreamReader& reader);
     void parseStreamEntry(BitStreamReader& reader);
-    void composeStreamAttributes(BitStreamWriter& reader);
-    void composeStreamEntry(BitStreamWriter& reader, size_t entryNum, int subPathID = 0) const;
+    void composeStreamAttributes(BitStreamWriter& writer);
+    void composeStreamEntry(BitStreamWriter& writer, size_t entryNum, int subPathID = 0) const;
     void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum) const;
 
    public:

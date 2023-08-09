@@ -89,7 +89,7 @@ struct HevcVpsUnit : public HevcUnitWithProfile
     HevcVpsUnit();
     int deserialize();
     double getFPS() const;
-    void setFPS(double value);
+    void setFPS(double fps);
     std::string getDescription() const;
 
    public:
@@ -136,7 +136,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
 
    private:
     int hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1);
-    int sub_layer_hrd_parameters(int subLayerId);
+    int sub_layer_hrd_parameters(int cpb_cnt_minus1);
     int short_term_ref_pic_set(unsigned stRpsIdx);
     int vui_parameters();
     int scaling_list_data();

@@ -448,11 +448,11 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
 }
 
 long TextToPGSConverter::composePresentationSegment(uint8_t* buff, const CompositionMode mode, const int64_t pts,
-                                                    const int64_t dts, const int top, const bool needPGHeader,
+                                                    const int64_t dts, const int top, const bool needPgHeader,
                                                     const bool forced)
 {
     uint8_t* curPos = buff;
-    if (needPGHeader)
+    if (needPgHeader)
         curPos += writePGHeader(curPos, pts, dts);
     *curPos++ = PCS_DEF_SEGMENT;
     curPos += 2;  // skip length field

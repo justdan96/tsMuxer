@@ -97,7 +97,7 @@ struct VvcVpsUnit : public VvcUnitWithProfile
     VvcVpsUnit();
     int deserialize();
     double getFPS() const;
-    void setFPS(double value);
+    void setFPS(double fps);
     std::string getDescription() const;
 
    public:

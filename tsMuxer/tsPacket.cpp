@@ -1417,7 +1417,7 @@ int MPLSParser::composeUHD_metadata(uint8_t* buffer, const int bufferSize)
     }
 }
 
-int MPLSParser::compose(uint8_t* curPos, int bufferSize, const DiskType dt)
+int MPLSParser::compose(uint8_t* buffer, int bufferSize, const DiskType dt)
 {
     for (const MPLSStreamInfo& si : m_streamInfo)
     {
@@ -1438,7 +1438,7 @@ int MPLSParser::compose(uint8_t* curPos, int bufferSize, const DiskType dt)
     }
 
     BitStreamWriter writer{};
-    writer.setBuffer(curPos, curPos + bufferSize);
+    writer.setBuffer(buffer, buffer + bufferSize);
 
     const std::string type_indicator = "MPLS";
     std::string version_number;
@@ -1448,11 +1448,11 @@ int MPLSParser::compose(uint8_t* curPos, int bufferSize, const DiskType dt)
         version_number = "0100";
     CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
     CLPIStreamInfo::writeString(version_number.c_str(), writer, 4);
-    const auto playList_bit_pos = (uint32_t*)(curPos + writer.getBitsCount() / 8);
+    const auto playList_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    const auto playListMark_bit_pos = (uint32_t*)(curPos + writer.getBitsCount() / 8);
+    const auto playListMark_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    const auto extDataStartAddr = (uint32_t*)(curPos + writer.getBitsCount() / 8);
+    const auto extDataStartAddr = (uint32_t*)(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extension data start address
     for (int i = 0; i < 5; i++) writer.putBits(32, 0);  // reserved_for_future_use
     composeAppInfoPlayList(writer);

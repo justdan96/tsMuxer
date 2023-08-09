@@ -65,8 +65,8 @@ class AC3Codec
     bool getTestMode() { return m_testMode; }
 
    protected:
-    int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes);
-    static uint8_t* findFrame(uint8_t* buff, uint8_t* end);
+    int decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes);
+    static uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
     uint64_t getFrameDuration() const;
     const CodecInfo& getCodecInfo();
     const std::string getStreamInfo();

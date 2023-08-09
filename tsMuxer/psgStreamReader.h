@@ -125,7 +125,7 @@ class PGSStreamReader : public AbstractStreamReader
 
     std::map<int, int> composition_object_horizontal_position;
     std::map<int, int> composition_object_vertical_position;
-    void renderTextShow(int64_t startTime);
+    void renderTextShow(int64_t inTime);
     void renderTextHide(int64_t outTime);
 
     void video_descriptor(BitStreamReader& bitReader);

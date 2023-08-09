@@ -88,7 +88,7 @@ class ByteFileWriter
     void writeUDFString(const char* value, int len);
     void skipBytes(int value);
     void doPadding(int padSize);
-    void writeTimestamp(time_t t);
+    void writeTimestamp(time_t time);
 
     int64_t size() const;
 
@@ -187,7 +187,7 @@ class IsoWriter
     void setVolumeLabel(const std::string& value);
     bool open(const std::string& fileName, int64_t diskSize, int extraISOBlocks);
 
-    bool createDir(const std::string& fileName);
+    bool createDir(const std::string& dir);
     ISOFile* createFile();
 
     bool createInterleavedFile(const std::string& inFile1, const std::string& inFile2, const std::string& outFile);
@@ -221,7 +221,7 @@ class IsoWriter
     // void writeFileIdentifierDescriptor();
 
     static void writeEntity(FileEntryInfo* dir);
-    int allocateEntity(FileEntryInfo* dir, int sectorNum);
+    int allocateEntity(FileEntryInfo* entity, int sectorNum);
 
     void sectorSeek(Partition partition, int pos) const;
     void writeSector(uint8_t* sectorData);

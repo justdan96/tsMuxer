@@ -135,9 +135,9 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     MPEGSequenceHeader(int bufferSize);
     ~MPEGSequenceHeader() override{};
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
-    uint8_t* deserializeExtension(BitStreamReader& bitContext);
-    static uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
-    uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
+    uint8_t* deserializeExtension(BitStreamReader& bitReader);
+    static uint8_t* deserializeMatrixExtension(BitStreamReader& bitReader);
+    uint8_t* deserializeDisplayExtension(BitStreamReader& bitReader);
     double getFrameRate() const;
     void setFrameRate(uint8_t* buff, double fps);
     static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
@@ -224,7 +224,7 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     ~MPEGPictureHeader() override{};
 
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
-    uint8_t* deserializeCodingExtension(BitStreamReader& bitContext);
+    uint8_t* deserializeCodingExtension(BitStreamReader& bitReader);
 
     uint32_t serialize(uint8_t* buffer) override;
     uint32_t getPictureSize() const;
