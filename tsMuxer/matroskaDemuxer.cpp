@@ -554,7 +554,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
             uint32_t total = 0;
             for (n = 0; res == 0 && n < laces - 1; n++)
             {
-                while (1)
+                while (true)
                 {
                     if (size == 0)
                     {
@@ -1143,7 +1143,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
         }
 
         if (res == -1)
-            done = 1;
+            done = true;
     }
     if (newPacket)
     {
@@ -1180,7 +1180,7 @@ int MatroskaDemuxer::matroska_read_header()
     }
 
     /* The next thing is a segment. */
-    while (1)
+    while (true)
     {
         if (!(id = ebml_peek_id(&last_level)))
             return -BufferedReader::DATA_EOF;

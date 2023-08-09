@@ -71,7 +71,7 @@ int METADemuxer::readPacket(AVPacket& avPacket)
     avPacket.size = 0;
     avPacket.codec = 0;
     m_lastReadRez = 0;
-    while (1)
+    while (true)
     {
         int minDtsIndex = -1;
         int64_t minDts = LLONG_MAX;

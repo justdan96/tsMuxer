@@ -83,7 +83,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_audioTrackCnt = 0;
     m_secondaryAudioTrackCnt = 0;
     m_pgsTrackCnt = 0;
-    m_beforePCRDataWrited = 0;
+    m_beforePCRDataWrited = false;
     m_useNewStyleAudioPES = false;
     m_minDts = -1;
     m_pcrBits = 0;

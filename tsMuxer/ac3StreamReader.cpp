@@ -165,7 +165,7 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
         return 0;
     }
 
-    while (1)
+    while (true)
     {
         int rez = SimplePacketizerReader::readPacket(avPacket);
         if (rez != 0)

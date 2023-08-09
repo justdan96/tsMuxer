@@ -190,7 +190,7 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
         if (rez != 0)
             return rez;
         nextNal = VC1Unit::findNextMarker(buff, m_bufEnd) + 3;
-        while (1)
+        while (true)
         {
             if (nextNal >= m_bufEnd)
                 return NOT_ENOUGH_BUFFER;

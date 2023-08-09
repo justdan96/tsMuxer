@@ -230,7 +230,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
 
         return 0;
 
-    } while (1);
+    } while (true);
 }
 
 const static int CHECK_FRAMES_COUNT = 10;

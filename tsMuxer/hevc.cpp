@@ -108,8 +108,8 @@ int HevcUnitWithProfile::profile_tier_level(int subLayers)
 {
     try
     {
-        bool sub_layer_profile_present_flag[7]{0};
-        bool sub_layer_level_present_flag[7]{0};
+        bool sub_layer_profile_present_flag[7]{false};
+        bool sub_layer_level_present_flag[7]{false};
 
         m_reader.skipBits(3);  // profile_space, tier_flag
         profile_idc = m_reader.getBits(5);
@@ -407,7 +407,7 @@ int HevcSpsUnit::vui_parameters()
         }
         if (m_reader.getBit())  // vui_hrd_parameters_present_flag
         {
-            if (hrd_parameters(1, max_sub_layers - 1) != 0)
+            if (hrd_parameters(true, max_sub_layers - 1) != 0)
                 return 1;
         }
     }

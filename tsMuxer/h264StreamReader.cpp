@@ -36,8 +36,8 @@ H264StreamReader::H264StreamReader() : MPEGStreamReader()
     m_firstDecodeNal = true;
     // m_cpb_removal_delay_baseaddr = 0;
     // m_cpb_removal_delay_bitpos = 0;
-    orig_hrd_parameters_present_flag = 0;
-    orig_vcl_parameters_present_flag = 0;
+    orig_hrd_parameters_present_flag = false;
+    orig_vcl_parameters_present_flag = false;
     m_lastPictStruct = 0;
 
     // for fixing thundberg streams
@@ -810,7 +810,7 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
     // Remaining NALs of Access Unit
     getAU:
         nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
-        while (1)
+        while (true)
         {
             if (nextNal == m_bufEnd)
                 return NOT_ENOUGH_BUFFER;
@@ -1248,7 +1248,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
         else
             return NOT_ENOUGH_BUFFER;
     }
-    while (1)
+    while (true)
     {
         int nalUnitType = *nextSlice;
         switch ((NALUnit::NALType)(nalUnitType & 0x1f))

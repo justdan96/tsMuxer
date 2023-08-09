@@ -138,7 +138,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         int64_t prevDts = m_curDts;
         m_shortStartCodes = isNal < 4;
         int rez = 0;
-        while (1)
+        while (true)
         {
             rez = decodeNal(m_curPos + isNal);
             if (rez != UNIT_SKIPPED)

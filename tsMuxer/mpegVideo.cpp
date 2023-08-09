@@ -17,7 +17,7 @@ static const int MB_ESCAPE_CODE = -1;
 // --------------------- MPEGRawDataHeader ---------------------
 
 MPEGRawDataHeader::MPEGRawDataHeader(int maxBufferLen)
-    : MPEGHeader(), m_headerIncludedToBuff(0), m_data_buffer_len(0), m_max_data_len(maxBufferLen)
+    : MPEGHeader(), m_headerIncludedToBuff(false), m_data_buffer_len(0), m_max_data_len(maxBufferLen)
 {
     if (maxBufferLen > 0)
         m_data_buffer = new uint8_t[maxBufferLen];

@@ -423,7 +423,7 @@ void FileEntryInfo::serializeDir()
     for (auto &i : m_subDirs) writeEntity(writer, i);
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
-    m_owner->writeExtendedFileEntryDescriptor(0, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
+    m_owner->writeExtendedFileEntryDescriptor(false, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
                                               (int)m_subDirs.size() + 1);
     m_owner->writeSector(buffer);
 }
@@ -847,7 +847,7 @@ void IsoWriter::close()
     // mirror metadata file location and length
     m_metadataMirrorLBN = (int)(m_file.size() / SECTOR_SIZE + 1);
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtendedFileEntryDescriptor(0, 0, FileTypes::MetadataMirror, m_metadataFileLen,
+    writeExtendedFileEntryDescriptor(false, 0, FileTypes::MetadataMirror, m_metadataFileLen,
                                      m_metadataMirrorLBN - m_partitionStartAddress, 0);
 
     // allocate space for metadata mirror file
@@ -868,7 +868,7 @@ void IsoWriter::close()
     m_file.seek(1024 * 576);
     // metadata file location and length (located at 576K, point to 640K address)
     m_tagLocationBaseAddr = m_partitionStartAddress;
-    writeExtendedFileEntryDescriptor(0, 0, FileTypes::Metadata, m_metadataFileLen,
+    writeExtendedFileEntryDescriptor(false, 0, FileTypes::Metadata, m_metadataFileLen,
                                      m_metadataLBN - m_partitionStartAddress, 0);
     m_tagLocationBaseAddr = m_metadataLBN;  // Don't know why. Doing just as scenarist does
     writeMetadata(m_metadataLBN);

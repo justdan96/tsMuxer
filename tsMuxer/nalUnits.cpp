@@ -734,8 +734,8 @@ void SPSUnit::insertHrdParameters()
         nalHrdParams.isPresent = true;
         vclHrdParams.isPresent = true;
     }
-    nalHrdParams.isPresent = 1;
-    vclHrdParams.isPresent = 1;
+    nalHrdParams.isPresent = true;
+    vclHrdParams.isPresent = true;
 
     if (!fixed_frame_rate_flag)
         updateTimingInfo();

@@ -54,7 +54,7 @@ int MLPStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
 int MLPStreamReader::readPacket(AVPacket& avPacket)
 {
-    while (1)
+    while (true)
     {
         int rez = SimplePacketizerReader::readPacket(avPacket);
         if (rez != 0)

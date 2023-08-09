@@ -105,12 +105,12 @@ bool VvcUnit::dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag)
         unsigned dpb_max_dec_pic_buffering_minus1 = extractUEGolombCode();
         unsigned dpb_max_num_reorder_pics = extractUEGolombCode();
         if (dpb_max_num_reorder_pics > dpb_max_dec_pic_buffering_minus1)
-            return 1;
+            return true;
         unsigned dpb_max_latency_increase_plus1 = extractUEGolombCode();
         if (dpb_max_latency_increase_plus1 == 0xffffffff)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 // ------------------------- VvcUnitWithProfile  -------------------
@@ -230,7 +230,7 @@ int VvcVpsUnit::deserialize()
 
         vps_max_sublayers = m_reader.getBits(3) + 1;
         bool vps_default_ptl_dpb_hrd_max_tid_flag =
-            (vps_max_layers > 1 && vps_max_sublayers > 1) ? m_reader.getBit() : 1;
+            (vps_max_layers > 1 && vps_max_sublayers > 1) ? m_reader.getBit() : true;
         int vps_all_independent_layers_flag = (vps_max_layers > 1) ? m_reader.getBit() : 1;
         for (int i = 0; i < vps_max_layers; i++)
         {
@@ -250,7 +250,7 @@ int VvcVpsUnit::deserialize()
             }
         }
 
-        bool vps_each_layer_is_an_ols_flag = 1;
+        bool vps_each_layer_is_an_ols_flag = true;
         int vps_num_ptls = 1;
         int vps_ols_mode_idc = 2;
         int olsModeIdc = 4;
@@ -323,7 +323,7 @@ int VvcVpsUnit::deserialize()
                         dependencyFlag[i][j] = vps_direct_ref_layer_flag[i][j];
                         for (int k = 0; k < i; k++)
                             if (vps_direct_ref_layer_flag[i][k] && dependencyFlag[k][j])
-                                dependencyFlag[i][j] = 1;
+                                dependencyFlag[i][j] = true;
                     }
                 }
 
@@ -340,13 +340,13 @@ int VvcVpsUnit::deserialize()
 
                 for (int i = 1; i < TotalNumOlss; i++)
                 {
-                    for (int j = 0; j < vps_max_layers; j++) layerIncludedInOlsFlag[i][j] = 0;
+                    for (int j = 0; j < vps_max_layers; j++) layerIncludedInOlsFlag[i][j] = false;
                     int j = 0;
                     for (int k = 0; k < vps_max_layers; k++)
                     {
                         if (vps_ols_output_layer_flag[i][k])
                         {
-                            layerIncludedInOlsFlag[i][k] = 1;
+                            layerIncludedInOlsFlag[i][k] = true;
                             OutputLayerIdx[i][j++] = k;
                         }
                     }
@@ -357,7 +357,7 @@ int VvcVpsUnit::deserialize()
                         for (int k = 0; k < NumRefLayers[idx]; k++)
                         {
                             if (!layerIncludedInOlsFlag[i][ReferenceLayerIdx[idx][k]])
-                                layerIncludedInOlsFlag[i][ReferenceLayerIdx[idx][k]] = 1;
+                                layerIncludedInOlsFlag[i][ReferenceLayerIdx[idx][k]] = true;
                         }
                     }
                 }
@@ -388,7 +388,7 @@ int VvcVpsUnit::deserialize()
                 return 1;
             unsigned VpsNumDpbParams = (vps_each_layer_is_an_ols_flag ? 0 : vps_num_dpb_params);
 
-            bool vps_sublayer_dpb_params_present_flag = (vps_max_sublayers > 1) ? m_reader.getBit() : 0;
+            bool vps_sublayer_dpb_params_present_flag = (vps_max_sublayers > 1) ? m_reader.getBit() : false;
 
             for (size_t i = 0; i < VpsNumDpbParams; i++)
             {
@@ -416,7 +416,7 @@ int VvcVpsUnit::deserialize()
             {
                 if (general_timing_hrd_parameters(m_vps_hrd))
                     return 1;
-                bool vps_sublayer_cpb_params_present_flag = (vps_max_sublayers > 1) ? m_reader.getBit() : 0;
+                bool vps_sublayer_cpb_params_present_flag = (vps_max_sublayers > 1) ? m_reader.getBit() : false;
                 unsigned vps_num_ols_timing_hrd_params = extractUEGolombCode() + 1;
                 if (vps_num_ols_timing_hrd_params > NumMultiLayerOlss)
                     return 1;
@@ -491,12 +491,12 @@ VvcSpsUnit::VvcSpsUnit()
       colour_primaries(2),
       transfer_characteristics(2),
       matrix_coeffs(2),  // 2 = unspecified
-      full_range_flag(0),
+      full_range_flag(false),
       sps_num_ref_pic_lists(0),
-      weighted_pred_flag(0),
-      weighted_bipred_flag(0),
-      long_term_ref_pics_flag(0),
-      inter_layer_prediction_enabled_flag(0)
+      weighted_pred_flag(false),
+      weighted_bipred_flag(false),
+      long_term_ref_pics_flag(false),
+      inter_layer_prediction_enabled_flag(false)
 {
 }
 
@@ -522,7 +522,7 @@ int VvcSpsUnit::deserialize()
         if (sps_id == 0 && !sps_ptl_dpb_hrd_params_present_flag)
             return 1;
         if (sps_ptl_dpb_hrd_params_present_flag)
-            if (profile_tier_level(1, max_sublayers_minus1) != 0)
+            if (profile_tier_level(true, max_sublayers_minus1) != 0)
                 return 1;
         m_reader.skipBit();      // sps_gdr_enabled_flag
         if (m_reader.getBit())   // sps_ref_pic_resampling_enabled_flag
@@ -595,7 +595,7 @@ int VvcSpsUnit::deserialize()
         for (size_t i = 0; i < sps_num_extra_sh_bytes; i++) m_reader.skipBits(8);  // sps_extra_sh_bit_present_flag[i]
         if (sps_ptl_dpb_hrd_params_present_flag)
         {
-            bool sps_sublayer_dpb_params_flag = (max_sublayers_minus1 > 0) ? m_reader.getBit() : 0;
+            bool sps_sublayer_dpb_params_flag = (max_sublayers_minus1 > 0) ? m_reader.getBit() : false;
             if (dpb_parameters(max_sublayers_minus1, sps_sublayer_dpb_params_flag))
                 return 1;
         }
@@ -695,7 +695,7 @@ int VvcSpsUnit::deserialize()
         weighted_pred_flag = m_reader.getBit();
         weighted_bipred_flag = m_reader.getBit();
         long_term_ref_pics_flag = m_reader.getBit();
-        inter_layer_prediction_enabled_flag = (sps_id != 0) ? m_reader.getBit() : 0;
+        inter_layer_prediction_enabled_flag = (sps_id != 0) ? m_reader.getBit() : false;
         m_reader.skipBit();  // sps_idr_rpl_present_flag
         bool sps_rpl1_same_as_rpl0_flag = m_reader.getBit();
         for (size_t i = 0; i < (sps_rpl1_same_as_rpl0_flag ? 1 : 2); i++)
@@ -752,7 +752,7 @@ int VvcSpsUnit::deserialize()
 
         bool sps_palette_enabled_flag = m_reader.getBit();
         bool sps_act_enabled_flag =
-            (chroma_format_idc == 3 && !sps_max_luma_transform_size_64_flag) ? m_reader.getBit() : 0;
+            (chroma_format_idc == 3 && !sps_max_luma_transform_size_64_flag) ? m_reader.getBit() : false;
         if (sps_transform_skip_enabled_flag || sps_palette_enabled_flag)
         {
             if (extractUEGolombCode() > 8)  // sps_min_qp_prime_ts
@@ -782,7 +782,7 @@ int VvcSpsUnit::deserialize()
         if (sps_lfnst_enabled_flag && sps_explicit_scaling_list_enabled_flag)
             m_reader.skipBit();  // sps_scaling_matrix_for_lfnst_disabled_flag
         bool sps_scaling_matrix_for_alternative_colour_space_disabled_flag =
-            (sps_act_enabled_flag && sps_explicit_scaling_list_enabled_flag) ? m_reader.getBit() : 0;
+            (sps_act_enabled_flag && sps_explicit_scaling_list_enabled_flag) ? m_reader.getBit() : false;
         if (sps_scaling_matrix_for_alternative_colour_space_disabled_flag)
             m_reader.skipBit();  // sps_scaling_matrix_designated_colour_space_flag
         m_reader.skipBits(2);    // sps_dep_quant_enabled_flag, sps_sign_data_hiding_enabled_flag
@@ -842,15 +842,15 @@ int VvcSpsUnit::deserialize()
 int VvcSpsUnit::ref_pic_list_struct(size_t rplsIdx)
 {
     unsigned num_ref_entries = extractUEGolombCode();
-    bool ltrp_in_header_flag = 1;
+    bool ltrp_in_header_flag = true;
     if (long_term_ref_pics_flag && rplsIdx < sps_num_ref_pic_lists && num_ref_entries > 0)
         ltrp_in_header_flag = m_reader.getBit();
     for (size_t i = 0; i < num_ref_entries; i++)
     {
-        bool inter_layer_ref_pic_flag = (inter_layer_prediction_enabled_flag) ? m_reader.getBit() : 0;
+        bool inter_layer_ref_pic_flag = (inter_layer_prediction_enabled_flag) ? m_reader.getBit() : false;
         if (!inter_layer_ref_pic_flag)
         {
-            bool st_ref_pic_flag = (long_term_ref_pics_flag) ? m_reader.getBit() : 1;
+            bool st_ref_pic_flag = (long_term_ref_pics_flag) ? m_reader.getBit() : true;
             if (st_ref_pic_flag)
             {
                 unsigned abs_delta_poc_st = extractUEGolombCode();
@@ -959,9 +959,9 @@ int VvcPpsUnit::deserialize()
 VvcHrdUnit::VvcHrdUnit()
     : num_units_in_tick(0),
       time_scale(0),
-      general_nal_hrd_params_present_flag(0),
-      general_vcl_hrd_params_present_flag(0),
-      general_du_hrd_params_present_flag(0),
+      general_nal_hrd_params_present_flag(false),
+      general_vcl_hrd_params_present_flag(false),
+      general_du_hrd_params_present_flag(false),
       hrd_cpb_cnt_minus1(0)
 {
 }
@@ -983,9 +983,9 @@ bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit& m_hrd)
             m_reader.skipBits(4);  // cpb_size_du_scale
         m_hrd.hrd_cpb_cnt_minus1 = extractUEGolombCode();
         if (m_hrd.hrd_cpb_cnt_minus1 > 31)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal)
@@ -993,11 +993,11 @@ bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int
     for (int i = firstSubLayer; i <= MaxSubLayersVal; i++)
     {
         bool fixed_pic_rate_within_cvs_flag =
-            m_reader.getBit() /* fixed_pic_rate_general_flag) */ ? 1 : m_reader.getBit();
+            m_reader.getBit() /* fixed_pic_rate_general_flag) */ ? true : m_reader.getBit();
         if (fixed_pic_rate_within_cvs_flag)
         {
             if (extractUEGolombCode() > 2047)  // elemental_duration_in_tc_minus1
-                return 1;
+                return true;
         }
         else if ((m_hrd.general_nal_hrd_params_present_flag || m_hrd.general_vcl_hrd_params_present_flag) &&
                  m_hrd.hrd_cpb_cnt_minus1 == 0)
@@ -1007,7 +1007,7 @@ bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int
         if (m_hrd.general_vcl_hrd_params_present_flag)
             sublayer_hrd_parameters(m_hrd);
     }
-    return 0;
+    return false;
 }
 
 bool VvcUnit::sublayer_hrd_parameters(VvcHrdUnit m_hrd)
@@ -1016,16 +1016,16 @@ bool VvcUnit::sublayer_hrd_parameters(VvcHrdUnit m_hrd)
     {
         if (extractUEGolombCode() == 0xffffffff ||  // bit_rate_value_minus1
             extractUEGolombCode() == 0xffffffff)    // cpb_size_value_minus1
-            return 1;
+            return true;
         if (m_hrd.general_du_hrd_params_present_flag)
         {
             if (extractUEGolombCode() == 0xffffffff ||  // cpb_size_du_value_minus1
                 extractUEGolombCode() == 0xffffffff)    // bit_rate_du_value_minus1
-                return 1;
+                return true;
         }
         m_reader.skipBit();  // cbr_flag
     }
-    return 0;
+    return false;
 }
 
 // -----------------------  VvcSliceHeader() -------------------------------------
