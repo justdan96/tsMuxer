@@ -57,8 +57,8 @@ H264StreamReader::H264StreamReader() : MPEGStreamReader()
     m_blurayMode = true;
     number_of_offset_sequences = -1;
     m_bdRomMetaDataMsgPtsPos = 0;
-    m_priorityNalAddr = 0;
-    m_OffsetMetadataPtsAddr = 0;
+    m_priorityNalAddr = nullptr;
+    m_OffsetMetadataPtsAddr = nullptr;
     m_startPts = 0;
     m_decodedSliceHeader.resize(8 + 8);  // 8 for slice data, 8 - extra size for increase decoded data
     m_removalDelay = 0;
@@ -225,7 +225,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUn
     curPos = writeNalPrefix(curPos);
     writer.setBuffer(tmpBuffer, tmpBuffer + sizeof(tmpBuffer));
 
-    uint8_t *sizeField = 0;
+    uint8_t *sizeField = nullptr;
     int beforeMessageLen = 0;
     if (m_mvcSubStream)
     {
@@ -549,7 +549,7 @@ void H264StreamReader::additionalStreamCheck(uint8_t *buff, uint8_t *end)
 
     int rez = 0;
     SEIUnit sei;
-    uint8_t *nalEnd = 0;
+    uint8_t *nalEnd = nullptr;
     bool tmpspsfound = false;
     for (uint8_t *nal = NALUnit::findNextNAL(buff, end); nal != end; nal = NALUnit::findNextNAL(nal, end))
     {
@@ -775,7 +775,7 @@ int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
 int H264StreamReader::intDecodeNAL(uint8_t *buff)
 {
     auto nal_unit_type = (NALUnit::NALType)(*buff & 0x1f);
-    uint8_t *nextNal = 0;
+    uint8_t *nextNal = nullptr;
     int nalRez = 0;
     m_spsPpsFound = false;
 
@@ -1198,7 +1198,7 @@ int H264StreamReader::processSliceNal(uint8_t *buff)
     {
         auto pts90k = m_curDts / INT_FREQ_TO_TS_FREQ + m_startPts;
         SEIUnit::updateMetadataPts(m_OffsetMetadataPtsAddr, pts90k);
-        m_OffsetMetadataPtsAddr = 0;
+        m_OffsetMetadataPtsAddr = nullptr;
     }
     // LTRACE(LT_INFO, 2, "delta=" << fullPicOrder - m_frameNum << " m_lastDtsInc=" << m_lastDtsInc);
 
@@ -1219,7 +1219,7 @@ int H264StreamReader::processSliceNal(uint8_t *buff)
     }
 
     m_lastSlicePPS = slice.pic_parameter_set_id;
-    if (slice.getPPS() != 0)
+    if (slice.getPPS() != nullptr)
         m_lastSliceSPS = slice.getPPS()->seq_parameter_set_id;
     else
         m_lastSliceSPS = -1;
@@ -1449,19 +1449,19 @@ void H264StreamReader::onShiftBuffer(int offset)
     if (m_lastDecodedPos && m_priorityNalAddr >= m_lastDecodedPos)
         m_priorityNalAddr -= offset;
     else
-        m_priorityNalAddr = 0;
+        m_priorityNalAddr = nullptr;
     if (m_OffsetMetadataPtsAddr > m_lastDecodedPos)
         m_OffsetMetadataPtsAddr -= offset;
     else
-        m_OffsetMetadataPtsAddr = 0;
+        m_OffsetMetadataPtsAddr = nullptr;
 }
 
 bool H264StreamReader::isPriorityData(AVPacket *packet)
 {
     if (packet->data + 3 == m_priorityNalAddr || packet->data + 4 == m_priorityNalAddr)
     {
-        m_priorityNalAddr = 0;
-        m_OffsetMetadataPtsAddr = 0;
+        m_priorityNalAddr = nullptr;
+        m_OffsetMetadataPtsAddr = nullptr;
         return true;
     }
     return false;

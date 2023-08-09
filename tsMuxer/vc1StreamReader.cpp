@@ -102,7 +102,7 @@ CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, int len)
 {
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
-    uint8_t* nextNal = 0;
+    uint8_t* nextNal = nullptr;
     bool spsFound = false;
     bool iFrameFound = false;
     bool pulldown = false;
@@ -173,7 +173,7 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
     m_spsPpsFound = false;
 
     int rez = 0;
-    uint8_t* nextNal = 0;
+    uint8_t* nextNal = nullptr;
     switch ((VC1Code)*buff)
     {
     case VC1Code::ENTRYPOINT:
@@ -240,7 +240,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
 
     fillAspectBySAR(m_sequence.sample_aspect_ratio.num / (double)m_sequence.sample_aspect_ratio.den);
 
-    updateFPS(0, buff, nextNal, (int)oldSpsLen);
+    updateFPS(nullptr, buff, nextNal, (int)oldSpsLen);
     if (m_spsFound == 0)
     {
         LTRACE(LT_INFO, 2, "Decoding VC-1 stream (track " << m_streamIndex << "): " << m_sequence.getStreamDescr());
@@ -412,7 +412,7 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
     if (m_eof)
         return m_bufEnd;
     else
-        return 0;
+        return nullptr;
 }
 
 void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)

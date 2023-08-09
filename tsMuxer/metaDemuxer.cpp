@@ -69,7 +69,7 @@ int METADemuxer::readPacket(AVPacket& avPacket)
     avPacket.stream_index = 0;
     avPacket.data = nullptr;
     avPacket.size = 0;
-    avPacket.codec = 0;
+    avPacket.codec = nullptr;
     m_lastReadRez = 0;
     while (true)
     {
@@ -386,7 +386,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     if (fileList.empty())
         return -1;
 
-    FileListIterator* listIterator = 0;
+    FileListIterator* listIterator = nullptr;
     if (fileList.size() > 1)
     {
         listIterator = new FileListIterator();
@@ -487,7 +487,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     {
         dataReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(fileList[0].c_str());
     }
-    if (dataReader == 0)
+    if (dataReader == nullptr)
     {
         delete codecReader;
         THROW(ERR_INVALID_CODEC_FORMAT, "This version do not support multicast or other network steams for muxing");
@@ -574,7 +574,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
     AVChapters chapters;
     int64_t fileDuration = 0;
     vector<CheckStreamRez> streams, Vstreams;
-    AbstractDemuxer* demuxer = 0;
+    AbstractDemuxer* demuxer = nullptr;
     auto unquoted = unquoteStr(fileName);
     string fileExt = strToLowerCase(extractFileExt(unquoted));
     AbstractStreamReader::ContainerType containerType = AbstractStreamReader::ContainerType::ctNone;
@@ -873,7 +873,7 @@ int pipScaleFromStr(const std::string& value)
 AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const map<string, string>& addParams,
                                                const std::string& codecStreamName, const vector<MPLSPlayItem>& mplsInfo)
 {
-    AbstractStreamReader* rez = 0;
+    AbstractStreamReader* rez = nullptr;
     if (codecName == "V_MPEG4/ISO/AVC" || codecName == "V_MPEG4/ISO/MVC")
     {
         auto h264Reader = new H264StreamReader();
@@ -1289,10 +1289,10 @@ int StreamInfo::read()
 uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
     rez = 0;
-    uint8_t* data = 0;
+    uint8_t* data = nullptr;
     auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())
-        return 0;
+        return nullptr;
 
     DemuxerData& demuxerData = itr->second.m_demuxerData;
     uint32_t pid = itr->second.m_pid;
@@ -1428,7 +1428,7 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
                                           const CodecInfo* codecInfo)
 {
     AbstractDemuxer* demuxer = m_demuxers[streamName].m_demuxer;
-    if (demuxer == 0)
+    if (demuxer == nullptr)
     {
         string ext = strToUpperCase(extractFileExt(streamName));
         if ((ext == "264" || ext == "H264" || ext == "MVC") && pid)
@@ -1468,7 +1468,7 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
         if (!demuxer || !demuxer->isPidFilterSupported())
             THROW(ERR_INVALID_CODEC_FORMAT, "Unsupported parameter subTrack for format " << extractFileExt(streamName));
         int srcPID = pid >> 16;
-        if (demuxer->getPidFilter(srcPID) == 0)
+        if (demuxer->getPidFilter(srcPID) == nullptr)
         {
             if (codecInfo->codecID == CODEC_V_MPEG4_H264 || codecInfo->codecID == CODEC_V_MPEG4_H264_DEP)
                 demuxer->setPidFilter(srcPID, new CombinedH264Filter(srcPID));
@@ -1500,6 +1500,6 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
 
 void ContainerToReaderWrapper::setFileIterator(const char* streamName, FileNameIterator* itr)
 {
-    if (m_demuxers[streamName].m_iterator == 0)
+    if (m_demuxers[streamName].m_iterator == nullptr)
         m_demuxers[streamName].m_iterator = itr;
 }

@@ -124,7 +124,7 @@ CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManage
 {
     m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
     m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
-    if (m_bufferedReader == 0)
+    if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,
               "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
     m_lastReadRez = 0;
@@ -248,7 +248,7 @@ void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
     auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
-    else if (itr != 0)
+    else if (itr != nullptr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 

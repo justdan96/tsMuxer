@@ -61,7 +61,7 @@ uint8_t* MLPCodec::findFrame(uint8_t* buffer, uint8_t* end)
         else
             curBuf++;
     }
-    return 0;
+    return nullptr;
 }
 
 int MLPCodec::getFrameSize(uint8_t* buffer) { return ((buffer[0] & 0x0f) << 9) + (buffer[1] << 1); }

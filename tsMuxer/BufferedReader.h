@@ -28,8 +28,8 @@ struct ReaderData
           m_allocSize(0),
           m_readOffset(0)
     {
-        m_nextBlock[0] = NULL;
-        m_nextBlock[1] = NULL;
+        m_nextBlock[0] = nullptr;
+        m_nextBlock[1] = nullptr;
     }
 
     virtual ~ReaderData()

@@ -32,7 +32,7 @@ ReaderData* BufferedReader::getReader(uint32_t readerID)
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
     auto itr = m_readers.find(readerID);
-    return itr != m_readers.end() ? itr->second : 0;
+    return itr != m_readers.end() ? itr->second : nullptr;
 }
 
 bool BufferedReader::incSeek(uint32_t readerID, int64_t offset)
@@ -125,7 +125,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
 
 uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
-    ReaderData* data = 0;
+    ReaderData* data = nullptr;
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
         auto itr = m_readers.find(readerID);
@@ -143,7 +143,7 @@ uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& re
         {
             rez = UNKNOWN_READERID;
             readCnt = 0;
-            return 0;
+            return nullptr;
         }
     }
 
@@ -172,7 +172,7 @@ void BufferedReader::terminate()
 void BufferedReader::notify(uint32_t readerID, uint32_t dataReaded)
 {
     ReaderData* data = getReader(readerID);
-    if (data == 0)
+    if (data == nullptr)
         return;
     if (dataReaded >= m_prereadThreshold && !data->m_notified)
     {

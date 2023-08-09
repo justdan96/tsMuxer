@@ -178,9 +178,9 @@ int SRTStreamReader::readPacket(AVPacket& avPacket)
 
 uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
 {
-    uint8_t* rez = 0;
+    uint8_t* rez = nullptr;
     if (m_sourceText.size() == 0)
-        return 0;
+        return nullptr;
     if (m_state == ParseState::PARSE_FIRST_LINE)
     {
         while (m_sourceText.size() > 0 && m_sourceText.front().size() == 0)
@@ -190,7 +190,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
             m_origSize.pop();
         }
         if (m_sourceText.size() == 0)
-            return 0;
+            return nullptr;
         m_state = ParseState::PARSE_TIME;
         bool isNUmber = true;
         {
@@ -207,7 +207,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
             m_processedSize += m_origSize.front();
             m_origSize.pop();
             if (m_sourceText.size() == 0)
-                return 0;
+                return nullptr;
         }
     }
     if (m_state == ParseState::PARSE_TIME)
@@ -219,7 +219,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_processedSize += m_origSize.front();
         m_origSize.pop();
         if (m_sourceText.size() == 0)
-            return 0;
+            return nullptr;
     }
 
     while (m_sourceText.size() > 0 && m_sourceText.front().size() > 0)

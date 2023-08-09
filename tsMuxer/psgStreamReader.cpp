@@ -23,7 +23,7 @@ double pgs_frame_rates[16] = {
     0, 23.97602397602397, 24, 25, 29.97002997002997, 30, 50, 59.94005994005994, 60, 0, 0, 0, 0, 0, 0, 0};
 
 PGSStreamReader::PGSStreamReader()
-    : m_avFragmentEnd(0),
+    : m_avFragmentEnd(nullptr),
       object_width(0),
       object_height(0),
       m_firstRenderedPacket(true),
@@ -32,7 +32,7 @@ PGSStreamReader::PGSStreamReader()
       m_objectWindowHeight(0),
       m_objectWindowTop(0)
 {
-    m_curPos = m_buffer = 0;
+    m_curPos = m_buffer = nullptr;
     m_tmpBufferLen = 0;
     m_state = State::stParsePES;
     composition_state = CompositionState::csEpochStart;
@@ -48,13 +48,13 @@ PGSStreamReader::PGSStreamReader()
     m_scale = 1.0;
     m_isNewFrame = false;
     m_needRescale = false;
-    m_imgBuffer = 0;
-    m_rgbBuffer = 0;
-    m_scaledRgbBuffer = 0;
+    m_imgBuffer = nullptr;
+    m_rgbBuffer = nullptr;
+    m_scaledRgbBuffer = nullptr;
     m_scaled_width = 0;
     m_scaled_height = 0;
     m_render = new text_subtitles::TextToPGSConverter(false);
-    m_renderedData = 0;
+    m_renderedData = nullptr;
     m_fontBorder = 0;
     m_offsetId = 0xff;
     m_forced_on_flag = false;
@@ -444,7 +444,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         return 0;
     }
 
-    if (m_curPos == 0)
+    if (m_curPos == nullptr)
         return NEED_MORE_DATA;
 
     if (m_video_height == 0)
@@ -734,7 +734,7 @@ void PGSStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
     if (m_tmpBuffer.size() > 0)
         m_curPos = m_buffer = &m_tmpBuffer[0];
     else
-        m_curPos = m_buffer = 0;
+        m_curPos = m_buffer = nullptr;
     m_bufEnd = m_buffer + m_tmpBufferLen;
     m_tmpBufferLen = 0;
 }

@@ -40,10 +40,10 @@ MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMux
     : m_metaDemuxer(readManager), m_factory(factory)
 {
     m_asyncMode = true;
-    m_fileWriter = 0;
+    m_fileWriter = nullptr;
     m_cutStart = 0;
     m_cutEnd = 0;
-    m_mainMuxer = m_subMuxer = 0;
+    m_mainMuxer = m_subMuxer = nullptr;
     m_allowStereoMux = false;
     m_interleave = false;
     m_subBlockFinished = false;
@@ -245,7 +245,7 @@ void MuxerManager::doMux(const string& outFileName, FileFactory* fileFactory)
 
     delete m_fileWriter;
 
-    m_fileWriter = 0;
+    m_fileWriter = nullptr;
 }
 
 int MuxerManager::addStream(const string& codecName, const string& fileName, const map<string, string>& addParams)
@@ -404,7 +404,7 @@ AbstractMuxer* MuxerManager::getMainMuxer() { return m_mainMuxer; }
 
 AbstractMuxer* MuxerManager::getSubMuxer() { return m_subMuxer; }
 
-bool MuxerManager::isStereoMode() const { return m_subMuxer != 0; }
+bool MuxerManager::isStereoMode() const { return m_subMuxer != nullptr; }
 
 void MuxerManager::setAllowStereoMux(bool value) { m_allowStereoMux = value; }
 

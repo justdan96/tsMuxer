@@ -30,7 +30,7 @@ void ProgramStreamDemuxer::setFileIterator(FileNameIterator* itr)
     auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
-    else if (itr != 0)
+    else if (itr != nullptr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 

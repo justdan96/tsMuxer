@@ -15,7 +15,7 @@ namespace text_subtitles
 class GdiPlusPriv
 {
    public:
-    GdiPlusPriv() { GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, NULL); }
+    GdiPlusPriv() { GdiplusStartup(&m_gdiplusToken, &m_gdiplusStartupInput, nullptr); }
 
     ~GdiPlusPriv() { GdiplusShutdown(m_gdiplusToken); }
 
@@ -24,15 +24,15 @@ class GdiPlusPriv
 };
 #endif
 
-TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : TextSubtitlesRender(), m_hbmp(0)
+TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : TextSubtitlesRender(), m_hbmp(nullptr)
 {
-    m_hfont = 0;
+    m_hfont = nullptr;
 #ifndef OLD_WIN32_RENDERER
     m_gdiPriv = new GdiPlusPriv();
 #endif
 
-    m_pbmpInfo = 0;
-    m_hdcScreen = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
+    m_pbmpInfo = nullptr;
+    m_hdcScreen = CreateDC(TEXT("DISPLAY"), nullptr, nullptr, nullptr);
     m_dc = ::CreateCompatibleDC(m_hdcScreen);
 }
 
@@ -62,8 +62,8 @@ void TextSubtitlesRenderWin32::setRenderSize(int width, int height)
     m_pbmpInfo->bmiHeader.biBitCount = 32;
     m_pbmpInfo->bmiHeader.biCompression = BI_RGB;
     m_pbmpInfo->bmiHeader.biClrUsed = 256 * 256 * 256;
-    m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, (void**)&m_pData, 0, 0);
-    if (m_hbmp == 0)
+    m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, (void**)&m_pData, nullptr, 0);
+    if (m_hbmp == nullptr)
         THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles");
     SelectObject(m_dc, m_hbmp);
     ::SetBkColor(m_dc, RGB(0, 0, 0));
@@ -150,7 +150,7 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     Gdiplus::RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
-    path.GetBounds(&rect, 0, &pen);
+    path.GetBounds(&rect, nullptr, &pen);
     mSize->cx = (int)rect.Width;
     mSize->cy = lineSpacingPixel;
 #endif

@@ -66,7 +66,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
     BitStreamReader bitReader{};
-    uint8_t* nextNal = 0;
+    uint8_t* nextNal = nullptr;
     bool spsFound = false;
     bool gopFound = false;
     bool sliceFound = false;
@@ -108,13 +108,13 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                 case USER_START_SHORT_CODE:
                     break;
                 case PICTURE_START_SHORT_CODE:
-                    if (frame.deserialize(nal + 4, end - nal - 4) == 0)
+                    if (frame.deserialize(nal + 4, end - nal - 4) == nullptr)
                         return rez;
                     pictureFound = true;
                     break;
                 case SEQ_START_SHORT_CODE:
                     nextNal = MPEGHeader::findNextMarker(nal + 4, end);
-                    if (m_sequence.deserialize(nal + 4, nextNal - nal - 4) == 0)
+                    if (m_sequence.deserialize(nal + 4, nextNal - nal - 4) == nullptr)
                         return rez;
                     m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
                     spsFound = true;
@@ -143,7 +143,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
     try
     {
         int rez = 0;
-        uint8_t* nextNal = 0;
+        uint8_t* nextNal = nullptr;
         switch (*buff)
         {
         case SEQ_START_SHORT_CODE:
@@ -207,7 +207,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
     }
     try
     {
-        if (m_sequence.deserialize(buff + 1, nextNal - buff - 1) == 0)
+        if (m_sequence.deserialize(buff + 1, nextNal - buff - 1) == nullptr)
             return NALUnit::UNSUPPORTED_PARAM;
         m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
     }
@@ -216,7 +216,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
         return NOT_ENOUGH_BUFFER;
     }
     int oldSpsLen = 0;
-    updateFPS(0, buff, nextNal, oldSpsLen);
+    updateFPS(nullptr, buff, nextNal, oldSpsLen);
     spsFound = true;
     m_lastIFrame = true;
     return 0;
@@ -255,7 +255,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
 
     try
     {
-        if (m_frame.deserialize(buff + 1, m_bufEnd - buff - 1) == 0)
+        if (m_frame.deserialize(buff + 1, m_bufEnd - buff - 1) == nullptr)
             return NALUnit::UNSUPPORTED_PARAM;
     }
     catch (BitStreamException)

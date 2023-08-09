@@ -329,7 +329,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, int buf_size)
             default:
                 break;
             }
-            PMTStreamInfo pmtStreamInfo(stream_type, elementary_pid, 0, 0, 0, "", false);
+            PMTStreamInfo pmtStreamInfo(stream_type, elementary_pid, nullptr, 0, nullptr, "", false);
             int es_info_len = get16(&curPos) & 0xfff;
             if (curPos + es_info_len > crcPos)
             {
@@ -1083,8 +1083,8 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
     writer.putBits(32, 0);  // skip extent start address
     writer.putBits(32, 0);  // skip extent dataLen
 
-    uint32_t* CPI_SS_StartPos = 0;
-    uint32_t* ProgramInfo_StartPos = 0;
+    uint32_t* CPI_SS_StartPos = nullptr;
+    uint32_t* ProgramInfo_StartPos = nullptr;
     if (isDependStream)
     {
         // write ProgramInfo_SS header
@@ -2547,7 +2547,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
     sampling_frequency_index = 0;
     aspect_ratio_index = 3;  // 16:9; 2 = 4:3
 
-    if (pmtStreamInfo.m_codecReader != 0)
+    if (pmtStreamInfo.m_codecReader != nullptr)
     {
         auto vStream = dynamic_cast<MPEGStreamReader*>(pmtStreamInfo.m_codecReader);
         if (vStream)
@@ -2630,8 +2630,8 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
     pipParams = other.pipParams;
     isSSPG = other.isSSPG;
     SS_PG_offset_sequence_id = other.SS_PG_offset_sequence_id;
-    leftEye = 0;
-    rightEye = 0;
+    leftEye = nullptr;
+    rightEye = nullptr;
     if (other.leftEye)
         leftEye = new MPLSStreamInfo(*other.leftEye);
     if (other.rightEye)
@@ -2641,7 +2641,7 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
 // -------------- MPLSStreamInfo -----------------------
 
 MPLSStreamInfo::MPLSStreamInfo()
-    : M2TSStreamInfo(), type(0), offsetId(0xff), isSSPG(false), SS_PG_offset_sequence_id(0xff), leftEye(0), rightEye(0)
+    : M2TSStreamInfo(), type(0), offsetId(0xff), isSSPG(false), SS_PG_offset_sequence_id(0xff), leftEye(nullptr), rightEye(nullptr)
 {
 }
 
@@ -2651,8 +2651,8 @@ MPLSStreamInfo::MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
       offsetId(0xff),
       isSSPG(false),
       SS_PG_offset_sequence_id(0xff),
-      leftEye(0),
-      rightEye(0)
+      leftEye(nullptr),
+      rightEye(nullptr)
 {
     pipParams = pmtStreamInfo.m_codecReader->getPipParams();
 }

@@ -10,7 +10,7 @@ AbstractMuxer::AbstractMuxer(MuxerManager* owner) : m_owner(owner)
 {
     m_interliaveBlockSize = 0;
     m_sectorSize = 0;
-    m_fileFactory = 0;
+    m_fileFactory = nullptr;
 }
 
 void AbstractMuxer::setBlockMuxMode(int blockSize, int sectorSize)

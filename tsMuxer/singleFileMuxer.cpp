@@ -251,7 +251,7 @@ bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
         const uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
         streamInfo->m_bufLen += avPacket.codec->writeAdditionData(
             streamInfo->m_buffer + streamInfo->m_bufLen,
-            streamInfo->m_buffer + blockSize + MAX_AV_PACKET_SIZE + ADD_DATA_SIZE, avPacket, 0);
+            streamInfo->m_buffer + blockSize + MAX_AV_PACKET_SIZE + ADD_DATA_SIZE, avPacket, nullptr);
         writeOutBuffer(streamInfo);
     }
     m_lastIndex = avPacket.stream_index;
@@ -282,7 +282,7 @@ bool SingleFileMuxer::doFlush()
             else
             {
                 m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, roundBufLen, &streamInfo->m_file);
-                streamInfo->m_buffer = 0;
+                streamInfo->m_buffer = nullptr;
             }
         }
         else

@@ -563,8 +563,8 @@ const std::string AC3Codec::getStreamInfo()
 
 uint8_t *AC3Codec::findFrame(uint8_t *buffer, uint8_t *end)
 {
-    if (buffer == 0)
-        return 0;
+    if (buffer == nullptr)
+        return nullptr;
     uint8_t *curBuf = buffer;
     while (curBuf < end - 1)
     {
@@ -573,5 +573,5 @@ uint8_t *AC3Codec::findFrame(uint8_t *buffer, uint8_t *end)
         else
             curBuf++;
     }
-    return 0;
+    return nullptr;
 }

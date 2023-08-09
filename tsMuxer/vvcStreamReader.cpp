@@ -15,8 +15,8 @@ static const int MAX_SLICE_HEADER = 64;
 VVCStreamReader::VVCStreamReader()
     : MPEGStreamReader(),
       m_vps(new VvcVpsUnit()),
-      m_sps(0),
-      m_pps(0),
+      m_sps(nullptr),
+      m_pps(nullptr),
       m_slice(new VvcSliceHeader()),
       m_firstFrame(true),
       m_frameNum(0),
@@ -317,7 +317,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
     m_spsPpsFound = false;
     m_lastIFrame = false;
 
-    uint8_t* prevPos = 0;
+    uint8_t* prevPos = nullptr;
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
 

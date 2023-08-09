@@ -14,9 +14,9 @@ static const int MAX_SLICE_HEADER = 64;
 
 HEVCStreamReader::HEVCStreamReader()
     : MPEGStreamReader(),
-      m_vps(0),
-      m_sps(0),
-      m_pps(0),
+      m_vps(nullptr),
+      m_sps(nullptr),
+      m_pps(nullptr),
       m_hdr(new HevcHdrUnit()),
       m_slice(new HevcSliceHeader()),
       m_firstFrame(true),
@@ -500,7 +500,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
     m_spsPpsFound = false;
     m_lastIFrame = false;
 
-    uint8_t* prevPos = 0;
+    uint8_t* prevPos = nullptr;
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
 

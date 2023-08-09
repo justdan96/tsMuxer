@@ -46,7 +46,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 {
     AC3Codec::setTestMode(true);
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-    if (frame == 0)
+    if (frame == nullptr)
         return 0;
     for (int i = 0; i < 2 && frame < m_bufEnd;)
     {

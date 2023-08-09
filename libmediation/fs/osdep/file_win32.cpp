@@ -11,8 +11,8 @@ void throwFileError()
     LPVOID msgBuf = nullptr;
     DWORD dw = GetLastError();
 
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf, 0, NULL);
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf, 0, nullptr);
 
     std::string str((char*)msgBuf);
     throw std::runtime_error(str);
@@ -61,8 +61,8 @@ File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFl
         else
             systemDependentFlags = FILE_FLAG_RANDOM_ACCESS;
     }
-    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
-                        systemDependentFlags, NULL);
+    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, nullptr, dwCreationDisposition,
+                        systemDependentFlags, nullptr);
     if (m_impl == INVALID_HANDLE_VALUE)
     {
         throwFileError();
@@ -106,8 +106,8 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
     {
         createDir(extractFileDir(fName), true);
     }
-    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, NULL, dwCreationDisposition,
-                        systemDependentFlags, NULL);
+    m_impl = CreateFile(toWide(fName).data(), dwDesiredAccess, dwShareMode, nullptr, dwCreationDisposition,
+                        systemDependentFlags, nullptr);
     if (m_impl == INVALID_HANDLE_VALUE)
     {
         return false;
@@ -140,7 +140,7 @@ int File::read(void* buffer, uint32_t count) const
         return -1;
 
     DWORD bytesRead = 0;
-    BOOL res = ReadFile(m_impl, buffer, count, &bytesRead, NULL);
+    BOOL res = ReadFile(m_impl, buffer, count, &bytesRead, nullptr);
     if (!res)
         return -1;
 
@@ -155,7 +155,7 @@ int File::write(const void* buffer, uint32_t count)
         return -1;
 
     DWORD bytesWritten = 0;
-    BOOL res = WriteFile(m_impl, buffer, count, &bytesWritten, NULL);
+    BOOL res = WriteFile(m_impl, buffer, count, &bytesWritten, nullptr);
     if (!res)
     {
         throwFileError();

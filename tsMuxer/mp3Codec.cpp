@@ -17,8 +17,8 @@ const static int MPA_MONO = 3;
 
 uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
 {
-    if (buff == 0)
-        return 0;
+    if (buff == nullptr)
+        return nullptr;
     // header
     for (uint8_t* cur = buff; cur < end - 4; cur++)
     {
@@ -36,7 +36,7 @@ uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
             continue;
         return cur;
     }
-    return 0;
+    return nullptr;
 }
 
 int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)

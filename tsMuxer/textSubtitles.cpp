@@ -39,8 +39,8 @@ TextToPGSConverter::TextToPGSConverter(bool sourceIsText)
       m_imageBuffer()
 {
     m_bottomOffset = 0;
-    m_renderedData = 0;
-    m_textRender = 0;
+    m_renderedData = nullptr;
+    m_textRender = nullptr;
     palette_update_flag = 0;
     m_paletteID = 0;
     m_paletteVersion = 0;
@@ -356,7 +356,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     }
 
     if (m_rleLen == 0)
-        return 0;  // empty text
+        return nullptr;  // empty text
 
     int objectWindowHeight = FFMAX(0, renderedHeight());
     int objectWindowTop = FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset);

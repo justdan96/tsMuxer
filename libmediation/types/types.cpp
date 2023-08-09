@@ -78,25 +78,25 @@ uint64_t strToInt64u(const char* const str)
 #endif
 }
 
-int32_t strToInt32(const char* const str) { return strtol(str, 0, 10); }
+int32_t strToInt32(const char* const str) { return strtol(str, nullptr, 10); }
 
 int32_t strToInt32(const std::string& str) { return strToInt32(str.c_str()); }
 
-int32_t strToInt32(const char* const str, int radix) { return strtol(str, 0, radix); }
+int32_t strToInt32(const char* const str, int radix) { return strtol(str, nullptr, radix); }
 
-uint32_t strToInt32u(const char* const str, int radix) { return static_cast<uint32_t>(strtoul(str, 0, radix)); }
+uint32_t strToInt32u(const char* const str, int radix) { return static_cast<uint32_t>(strtoul(str, nullptr, radix)); }
 
-int16_t strToInt16(const char* const str) { return (int16_t)strtol(str, 0, 10); }
+int16_t strToInt16(const char* const str) { return (int16_t)strtol(str, nullptr, 10); }
 
-uint16_t strToInt16u(const char* const str) { return (uint16_t)strtol(str, 0, 10); }
+uint16_t strToInt16u(const char* const str) { return (uint16_t)strtol(str, nullptr, 10); }
 
-int8_t strToInt8(const char* const str) { return (int8_t)strtol(str, 0, 10); }
+int8_t strToInt8(const char* const str) { return (int8_t)strtol(str, nullptr, 10); }
 
-uint8_t strToInt8u(const char* const str) { return (uint8_t)strtol(str, 0, 10); }
+uint8_t strToInt8u(const char* const str) { return (uint8_t)strtol(str, nullptr, 10); }
 
-double strToDouble(const char* const str) { return strtod(str, 0); }
+double strToDouble(const char* const str) { return strtod(str, nullptr); }
 
-float strToFloat(const char* const str) { return strtof(str, 0); }
+float strToFloat(const char* const str) { return strtof(str, nullptr); }
 
 bool strToBool(const char* const str)
 {
@@ -464,7 +464,7 @@ char* strnstr(const char* s1, const char* s2, size_t len)
             return (char*)s1;
         s1++;
     }
-    return NULL;
+    return nullptr;
 }
 
 uint32_t random32()

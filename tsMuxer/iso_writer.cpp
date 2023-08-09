@@ -203,7 +203,7 @@ void writeLongAD(uint8_t *buffer, uint32_t lenBytes, uint32_t pos, uint16_t part
 
 // --------------------- ByteFileWriter ---------------------
 
-ByteFileWriter::ByteFileWriter() : m_buffer(0), m_bufferEnd(0), m_curPos(0), m_tagPos(0) {}
+ByteFileWriter::ByteFileWriter() : m_buffer(nullptr), m_bufferEnd(nullptr), m_curPos(nullptr), m_tagPos(nullptr) {}
 
 void ByteFileWriter::setBuffer(uint8_t *buffer, int len)
 {
@@ -326,7 +326,7 @@ FileEntryInfo::FileEntryInfo(IsoWriter *owner, FileEntryInfo *parent, uint32_t o
     if (isFile())
         m_sectorBuffer = new uint8_t[SECTOR_SIZE];
     else
-        m_sectorBuffer = 0;
+        m_sectorBuffer = nullptr;
 }
 
 bool FileEntryInfo::isFile() const { return m_fileType == FileTypes::File || m_fileType == FileTypes::RealtimeFile; }
@@ -521,7 +521,7 @@ FileEntryInfo *FileEntryInfo::subDirByName(const std::string &name) const
         if (i->m_name == name)
             return i;
     }
-    return 0;
+    return nullptr;
 }
 
 FileEntryInfo *FileEntryInfo::fileByName(const std::string &name) const
@@ -531,7 +531,7 @@ FileEntryInfo *FileEntryInfo::fileByName(const std::string &name) const
         if (i->m_name == name)
             return i;
     }
-    return 0;
+    return nullptr;
 }
 
 // --------------------------------- ISOFile -----------------------------------
@@ -559,7 +559,7 @@ bool ISOFile::close()
 {
     if (m_entry)
         m_entry->close();
-    m_entry = 0;
+    m_entry = nullptr;
     return true;
 }
 
@@ -581,8 +581,8 @@ IsoWriter::IsoWriter(const IsoHeaderData &hdrData)
     m_totalDirectories = 0;
     m_volumeSize = 0;
     // m_sectorNum = 0;
-    m_rootDirInfo = 0;
-    m_systemStreamDir = 0;
+    m_rootDirInfo = nullptr;
+    m_systemStreamDir = nullptr;
 
     m_metadataFileLen = 0x30000;
     m_systemStreamLBN = 0;
@@ -661,10 +661,10 @@ bool IsoWriter::open(const std::string &fileName, int64_t diskSize, int extraISO
     m_metadataLBN = (int)(m_file.size() / SECTOR_SIZE);
 
     // create root
-    m_rootDirInfo = new FileEntryInfo(this, 0, 0, FileTypes::Directory);
+    m_rootDirInfo = new FileEntryInfo(this, nullptr, 0, FileTypes::Directory);
 
     // create system stream dir
-    m_systemStreamDir = new FileEntryInfo(this, 0, 0, FileTypes::SystemStreamDirectory);
+    m_systemStreamDir = new FileEntryInfo(this, nullptr, 0, FileTypes::SystemStreamDirectory);
     m_metadataMappingFile = new FileEntryInfo(this, m_systemStreamDir, 0, FileTypes::File);
     m_metadataMappingFile->setName("*UDF Unique ID Mapping Data");
     m_systemStreamDir->addFile(m_metadataMappingFile);
@@ -689,8 +689,8 @@ bool IsoWriter::open(const std::string &fileName, int64_t diskSize, int extraISO
 FileEntryInfo *IsoWriter::mkdir(const char *name, FileEntryInfo *parent)
 {
     if (!m_rootDirInfo)
-        return 0;
-    if (parent == 0)
+        return nullptr;
+    if (parent == nullptr)
         parent = m_rootDirInfo;
 
     auto dir = new FileEntryInfo(this, parent, m_objectUniqId++, FileTypes::Directory);
@@ -742,8 +742,8 @@ bool IsoWriter::createInterleavedFile(const std::string &inFile1, const std::str
 FileEntryInfo *IsoWriter::createFileEntry(FileEntryInfo *parent, FileTypes fileType)
 {
     if (!m_rootDirInfo)
-        return 0;
-    if (parent == 0)
+        return nullptr;
+    if (parent == nullptr)
         parent = m_rootDirInfo;
 
     auto file = new FileEntryInfo(this, parent, m_objectUniqId++, fileType);
@@ -756,7 +756,7 @@ FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, FileTypes file
     std::vector<std::string> parts = splitStr(name.c_str(), '/');
     FileEntryInfo *entry = m_rootDirInfo;
     if (!entry)
-        return 0;
+        return nullptr;
     bool isDir = fileType == FileTypes::Directory || fileType == FileTypes::SystemStreamDirectory;
     size_t idxMax = isDir ? parts.size() : parts.size() - 1;
     for (size_t i = 0; i < idxMax; ++i)
@@ -767,7 +767,7 @@ FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, FileTypes file
         entry = nextEntry;
     }
     if (isDir)
-        return 0;
+        return nullptr;
 
     std::string fileName = *parts.rbegin();
     if (fileName.empty())
@@ -777,7 +777,7 @@ FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, FileTypes file
     {
         fileEntry = createFileEntry(entry, fileType);
         if (!fileEntry)
-            return 0;
+            return nullptr;
         fileEntry->setName(fileName);
     }
 
@@ -1041,7 +1041,7 @@ int IsoWriter::writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objec
         m_file.write(m_buffer, SECTOR_SIZE);
         sectorsWrited++;
     }
-    else if (extents == 0)
+    else if (extents == nullptr)
     {
         // file object. using long AD
         buff32[212 / 4] = 0x10;  // long AD size
@@ -1402,7 +1402,7 @@ void IsoWriter::setLayerBreakPoint(int lbn) { m_layerBreakPoint = lbn; }
 
 IsoHeaderData IsoHeaderData::normal()
 {
-    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32ToHex(random32()), time(0),
+    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32ToHex(random32()), time(nullptr),
                          random32()};
 }
 

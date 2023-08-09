@@ -22,7 +22,7 @@ uint8_t* AACCodec::findAacFrame(uint8_t* buffer, uint8_t* end)
         else
             curBuf++;
     }
-    return 0;
+    return nullptr;
 }
 
 int AACCodec::getFrameSize(uint8_t* buffer) { return ((buffer[3] & 0x03) << 11) + (buffer[4] << 3) + (buffer[5] >> 5); }

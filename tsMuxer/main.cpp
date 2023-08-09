@@ -116,7 +116,7 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
 
 void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSubMode)
 {
-    DetectStreamRez streamInfo = METADemuxer::DetectStreamReader(readManager, fileName, mplsParser == 0);
+    DetectStreamRez streamInfo = METADemuxer::DetectStreamReader(readManager, fileName, mplsParser == nullptr);
     vector<CheckStreamRez>& streams = streamInfo.streams;
 
     std::vector<MPLSStreamInfo> pgStreams3D;
@@ -309,7 +309,7 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
 
         auto tsMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
 
-        blurayHelper.createMPLSFile(tsMuxer, 0, 0, vector<double>(), dt, blankNum, false);
+        blurayHelper.createMPLSFile(tsMuxer, nullptr, 0, vector<double>(), dt, blankNum, false);
         blurayHelper.createCLPIFile(tsMuxer, blankNum, true);
     }
     deleteFile(tmpFileName);
@@ -494,7 +494,7 @@ All parameters in this group start with two dashes:
                       HDMV descriptors. Not activated for BD or AVCHD muxing.
 --vbr                 Use variable bitrate.
 --minbitrate          Sets the lower limit of the VBR bitrate. If the stream has
-                      a smaller bitrate, NULL packets will be inserted to
+                      a smaller bitrate, nullptr packets will be inserted to
                       compensate.
 --maxbitrate          The upper limit of the vbr bitrate.
 --cbr                 Muxing mode with a fixed bitrate. --vbr and --cbr must not
@@ -696,7 +696,7 @@ int main(int argc, char** argv)
                 }
             }
             else
-                detectStreamReader(argv[1], 0, false);
+                detectStreamReader(argv[1], nullptr, false);
             cout << endl;
             return 0;
         }
@@ -756,7 +756,7 @@ int main(int argc, char** argv)
             }
             if (muxerManager.getTrackCnt() == 0)
                 THROW(ERR_COMMON, "No tracks selected");
-            muxerManager.doMux(dstFile, dt != DiskType::NONE ? &blurayHelper : 0);
+            muxerManager.doMux(dstFile, dt != DiskType::NONE ? &blurayHelper : nullptr);
             if (dt != DiskType::NONE)
             {
                 blurayHelper.writeBluRayFiles(muxerManager, insertBlankPL, firstMplsOffset, blankNum, stereoMode);
@@ -814,7 +814,7 @@ int main(int argc, char** argv)
                 throw runtime_error(string("Output filename is invalid: ") + dstFile);
 
             createDir(dstFile, true);
-            sMuxer.doMux(dstFile, 0);
+            sMuxer.doMux(dstFile, nullptr);
             LTRACE(LT_INFO, 2, "Demux complete.");
         }
         auto endTime = std::chrono::steady_clock::now();

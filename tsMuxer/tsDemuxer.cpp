@@ -20,7 +20,7 @@ TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* strea
     m_firstPCRTime = -1;
     m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
     m_readerID = m_bufferedReader->createReader(TS_FRAME_SIZE);
-    if (m_bufferedReader == 0)
+    if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,
               "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
     m_scale = 1;
@@ -59,7 +59,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 
     bool m2tsHdrDiscarded = false;
     int lastReadRez = 0;
-    uint8_t* curPos = 0;
+    uint8_t* curPos = nullptr;
     while (totalReadedBytes < DETECT_STREAM_BUFFER_SIZE && lastReadRez != BufferedReader::DATA_EOF)
     {
         lastReadRez = 0;
@@ -469,7 +469,7 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
     auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
-    else if (itr != 0)
+    else if (itr != nullptr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 

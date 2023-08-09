@@ -38,7 +38,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
 
     int pos, cmd, x1, y1, x2, y2, offset1, offset2, next_cmd_pos;
     int cmd_pos, is_8bit = 0;
-    const uint8_t* yuv_palette = 0;
+    const uint8_t* yuv_palette = nullptr;
     uint8_t colormap[4]{0}, alpha[256]{0};
     int date;
     int i;

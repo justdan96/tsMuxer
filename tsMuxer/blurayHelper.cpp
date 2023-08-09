@@ -266,7 +266,7 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
 
 // ------------------------- BlurayHelper ---------------------------
 
-BlurayHelper::BlurayHelper() : m_dt(), m_isoWriter(0) {}
+BlurayHelper::BlurayHelper() : m_dt(), m_isoWriter(nullptr) {}
 
 BlurayHelper::~BlurayHelper() { close(); }
 
@@ -276,7 +276,7 @@ void BlurayHelper::close()
     {
         LTRACE(LT_INFO, 2, "Finalize ISO disk");
         delete m_isoWriter;
-        m_isoWriter = 0;
+        m_isoWriter = nullptr;
     }
 }
 
@@ -530,7 +530,7 @@ const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
         if (stream.m_codecReader->getStreamIndex() == index)
             return &stream;
     }
-    return 0;
+    return nullptr;
 }
 
 bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
@@ -704,7 +704,7 @@ AbstractOutputStream* BlurayHelper::createFile()
         return new File();
 }
 
-bool BlurayHelper::isVirtualFS() const { return m_isoWriter != 0; }
+bool BlurayHelper::isVirtualFS() const { return m_isoWriter != nullptr; }
 
 void BlurayHelper::setVolumeLabel(const std::string& label)
 {

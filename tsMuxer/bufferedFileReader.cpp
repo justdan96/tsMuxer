@@ -26,8 +26,8 @@ bool FileReaderData::openStream()
         LPVOID msgBuf = nullptr;
         DWORD dw = GetLastError();
 
-        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, dw,
-                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, NULL);
+        FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, nullptr);
 
         string str((char*)msgBuf);
         LTRACE(LT_ERROR, 0, str);
@@ -46,7 +46,7 @@ bool BufferedFileReader::openStream(uint32_t readerID, const char* streamName, i
 {
     auto data = (FileReaderData*)getReader(readerID);
 
-    if (data == 0)
+    if (data == nullptr)
     {
         LTRACE(LT_ERROR, 0, "Unknown readerID " << readerID);
         return false;

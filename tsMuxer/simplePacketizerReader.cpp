@@ -56,7 +56,7 @@ void SimplePacketizerReader::setBuffer(uint8_t* data, int dataLen, bool lastBloc
     if (m_tmpBuffer.size() > 0)
         m_curPos = m_buffer = &m_tmpBuffer[0];
     else
-        m_curPos = m_buffer = 0;
+        m_curPos = m_buffer = nullptr;
     m_bufEnd = m_buffer + m_tmpBufferLen;
     m_tmpBufferLen = 0;
 }
@@ -116,7 +116,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         if (m_needSync)
         {
             uint8_t* frame = findFrame(m_curPos, m_bufEnd);
-            if (frame == 0)
+            if (frame == nullptr)
             {
                 m_processedBytes += m_bufEnd - m_curPos;
                 return NEED_MORE_DATA;
@@ -246,7 +246,7 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
     uint8_t* frame = findFrame(buffer, end);
-    if (frame == 0)
+    if (frame == nullptr)
     {
         setTestMode(false);
         return rez;
@@ -261,7 +261,7 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
             // return rez;
             frame = findFrame(frame + 2, end);
 
-            if (frame == 0)
+            if (frame == nullptr)
             {
                 setTestMode(false);
                 return rez;

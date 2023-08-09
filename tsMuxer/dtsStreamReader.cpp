@@ -60,7 +60,7 @@ using namespace std;
 int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-    if (frame == 0)
+    if (frame == nullptr)
         return 0;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
@@ -203,13 +203,13 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
             hdrType == NAVI_TBL || hdrType == TIMECODE || hdrType == DTSHDHDR)
         {
             if (hdrSize > (size_t)(end - buff))
-                return 0;  // need more data
+                return nullptr;  // need more data
             buff += hdrSize;
         }
         else if (hdrType == AUPR_HDR)
         {
             if (buff + hdrSize > end)
-                return 0;  // need more data
+                return nullptr;  // need more data
             // determine skipping frames amount
             m_skippingSamples = (buff[35] << 8) + buff[36];
             buff += hdrSize;
@@ -242,7 +242,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
                 return p_buf;
             }
         }
-        return 0;
+        return nullptr;
     }
 
     for (uint8_t* p_buf = buff; p_buf < end - 4; p_buf++)
@@ -272,7 +272,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
             return p_buf;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)

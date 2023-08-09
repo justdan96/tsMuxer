@@ -18,7 +18,7 @@ using namespace wave_format;
 ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size), m_nalSize(0)
 {
     m_firstExtract = true;
-    if (buff == 0)
+    if (buff == nullptr)
         return;
     BitStreamReader bitReader{};
     try
@@ -177,7 +177,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 }
 
 // ----------- H.265 -----------------
-ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, int size) : ParsedH264TrackData(0, 0)
+ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = hevc_extract_priv_data(buff, size, &m_nalSize);
 }
@@ -212,7 +212,7 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
 }
 
 // ----------- H.266 -----------------
-ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264TrackData(0, 0)
+ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = vvc_extract_priv_data(buff, size, &m_nalSize);
 }
@@ -405,7 +405,7 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
     if (curPtr != end)
     {
         pkt->size = 0;
-        pkt->data = 0;
+        pkt->data = nullptr;
         return;  // ignore invalid packet
     }
 

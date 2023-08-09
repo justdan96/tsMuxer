@@ -57,7 +57,7 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
             m_shortStartCodes = isNal < 4;
             if ((prevPos + isNal) > m_lastDecodedPos)
             {
-                m_lastDecodedPos = 0;
+                m_lastDecodedPos = nullptr;
                 decodeRez = decodeNal(m_curPos + isNal);
             }
         }
@@ -90,7 +90,7 @@ void MPEGStreamReader::storeBufferRest()
     if (m_lastDecodedPos > m_curPos)
         m_lastDecodedPos = m_tmpBuffer + (m_lastDecodedPos - m_curPos);
     else
-        m_lastDecodedPos = 0;
+        m_lastDecodedPos = nullptr;
     m_curPos = m_bufEnd;
 }
 
@@ -160,7 +160,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         if (rez == NOT_ENOUGH_BUFFER)
         {
             storeBufferRest();
-            m_lastDecodedPos = 0;
+            m_lastDecodedPos = nullptr;
             return NEED_MORE_DATA;
         }
         if (prevDts != m_curDts)

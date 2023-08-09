@@ -107,14 +107,14 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_pesData.reserve(1024 * 128);
     // m_iFrameFound = false;
     m_mainStreamIndex = -1;
-    m_muxFile = 0;
+    m_muxFile = nullptr;
     m_isExternalFile = false;
     m_writeBlockSize = 0;
     m_frameSize = 188;
 
     m_processedBlockSize = 0;
-    m_sublingMuxer = 0;
-    m_outBuf = 0;
+    m_sublingMuxer = nullptr;
+    m_outBuf = nullptr;
     m_masterMode = false;
     m_subMode = false;
     setPtsOffset(0);
@@ -156,7 +156,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
 {
     int descriptorLen = 0;
     uint8_t descrBuffer[1024];
-    if (codecReader != NULL)
+    if (codecReader != nullptr)
         descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_bluRayMode, m_hdmvDescriptors);
 
     if (codecName[0] == 'V')
@@ -170,14 +170,14 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         lang = itr->second;
 
     int tsStreamIndex = streamIndex + 16;
-    bool isSecondary = codecReader != NULL ? codecReader->isSecondary() : false;
+    bool isSecondary = codecReader != nullptr ? codecReader->isSecondary() : false;
 
     if (codecName[0] == 'V')
     {
         if (!isSecondary)
         {
             int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
-            if (codecReader != NULL && codecReader->getStreamHDR() == 4)
+            if (codecReader != nullptr && codecReader->getStreamHDR() == 4)
             {
                 tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
                 m_DVvideoTrackCnt++;
@@ -462,7 +462,7 @@ bool TSMuxer::doFlush(uint64_t newPCR, int64_t pcrGAP)
         else
         {
             m_owner->asyncWriteBuffer(this, m_outBuf, roundBufLen, m_muxFile);
-            m_outBuf = 0;
+            m_outBuf = nullptr;
         }
     }
     else

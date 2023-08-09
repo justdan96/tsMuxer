@@ -36,11 +36,11 @@ static const char* const mov_mdhd_language_map[] = {
     "rus", "zho", "nld", "gle", "alb", "ron", "ces", "slk", "slv", "yid", "srp", "mkd", "bul", "ukr", "bel", "uzb",
     "kaz", "aze", "aze", "arm", "geo", "ron", "kir", "tgk", "tuk", "mon", "mon", "pus", "kur", "kas", "snd", "tib",
     "nep", "san", "mar", "ben", "asm", "guj", "pa ", "ori", "mal", "kan", "tam", "tel", "sin", "bur", "khm", "lao",
-    "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa", "kin", "run", "nya", "mlg", "epo", NULL, NULL,
-    NULL, NULL, NULL,
+    "vie", "ind", "tgl", "may", "may", "amh", "tir", "orm", "som", "swa", "kin", "run", "nya", "mlg", "epo", nullptr, nullptr,
+    nullptr, nullptr, nullptr,
     /* 100 */
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "cym", "eus", "cat", "lat", "que", "grn", "aym", "crh", "uig",
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+    nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, "cym", "eus", "cat", "lat", "que", "grn", "aym", "crh", "uig",
     "dzo", "jav"};
 
 struct MOVStts
@@ -669,7 +669,7 @@ const MovDemuxer::MOVParseTableEntry MovDemuxer::mov_default_parse_table[] = {
     {MKTAG(0xa9, 'e', 'n', 'c'), &MovDemuxer::mov_read_udta_string},
     {MKTAG(0xa9, 't', 'o', 'o'), &MovDemuxer::mov_read_udta_string},
 
-    {0, 0}};
+    {0, nullptr}};
 
 MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager)
     : IOContextDemuxer(readManager), m_mdat_size(0), m_fileSize(0), fragment()
@@ -683,7 +683,7 @@ MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager)
     isom = 0;
     m_curChunk = 0;
     m_firstDemux = true;
-    m_fileIterator = 0;
+    m_fileIterator = nullptr;
     m_firstHeaderSize = 0;
 }
 
@@ -702,7 +702,7 @@ void MovDemuxer::openFile(const std::string& streamName)
     m_curChunk = 0;
     m_firstDemux = true;
 
-    m_curPos = m_bufEnd = 0;
+    m_curPos = m_bufEnd = nullptr;
     m_processedBytes = 0;
     m_isEOF = false;
     num_tracks = 0;
@@ -974,7 +974,7 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
 int MovDemuxer::mov_read_udta_string(MOVAtom atom)
 {
     char str[1024]{}, language[4] = {0};
-    const char* key = NULL;
+    const char* key = nullptr;
     int str_size;
 
     if (itunes_metadata)
@@ -1160,7 +1160,7 @@ int MovDemuxer::mov_read_trak(MOVAtom atom)
 int MovDemuxer::mov_read_tfhd(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
-    MOVTrackExt* trex = 0;
+    MOVTrackExt* trex = nullptr;
 
     get_byte();  // version
     int flags = get_be24();

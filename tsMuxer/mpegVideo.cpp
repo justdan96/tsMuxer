@@ -22,7 +22,7 @@ MPEGRawDataHeader::MPEGRawDataHeader(int maxBufferLen)
     if (maxBufferLen > 0)
         m_data_buffer = new uint8_t[maxBufferLen];
     else
-        m_data_buffer = 0;
+        m_data_buffer = nullptr;
 }
 
 MPEGRawDataHeader::~MPEGRawDataHeader() { delete[] m_data_buffer; }
@@ -98,17 +98,17 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int64_t buf_size)
     }
     height = bitReader.getBits(12);
     if (width <= 0 || height <= 0 || (width % 2) != 0 || (height % 2) != 0)
-        return 0;
+        return nullptr;
     aspect_ratio_info = bitReader.getBits(4);
     if (aspect_ratio_info == 0)
-        return 0;
+        return nullptr;
     frame_rate_index = bitReader.getBits(4);
     if (frame_rate_index == 0 || frame_rate_index > 13)
-        return 0;
+        return nullptr;
 
     bit_rate = bitReader.getBits(18) * 400;
     if (bitReader.getBit() == 0) /* marker */
-        return 0;
+        return nullptr;
 
     rc_buffer_size = bitReader.getBits(10) * 1024 * 16;
     bitReader.skipBit();  // constrained_parameter_flag
@@ -123,7 +123,7 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int64_t buf_size)
             if (i == 0)
             {
                 LTRACE(LT_ERROR, 1, "mpeg sequence header: intra matrix damaged");
-                return 0;
+                return nullptr;
             }
         }
     }
@@ -137,7 +137,7 @@ uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int64_t buf_size)
             if (i == 0)
             {
                 LTRACE(LT_ERROR, 1, "mpeg sequence header: non-intra matrix damaged");
-                return 0;
+                return nullptr;
             }
         }
     }
@@ -442,7 +442,7 @@ uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, int64_t buf_size)
     ref = bitReader.getBits(10); /* temporal ref */
     pict_type = (PictureCodingType)bitReader.getBits(3);
     if (pict_type == PictureCodingType::FORBIDDEN || pict_type == PictureCodingType::D_FRAME)
-        return 0;
+        return nullptr;
 
     vbv_delay = bitReader.getBits(16);
 

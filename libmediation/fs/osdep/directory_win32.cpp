@@ -47,7 +47,7 @@ bool createDir(const std::string& dirName, bool createParentDirs)
                    (strStartWith(parentDir, "\\\\.\\") && parentDir[parentDir.size() - 1] == '}');  // UNC patch prefix
         },
         [](auto&& parentDir) {
-            if (CreateDirectory(toWide(parentDir).data(), 0) == 0)
+            if (CreateDirectory(toWide(parentDir).data(), nullptr) == 0)
             {
                 if (GetLastError() != ERROR_ALREADY_EXISTS)
                     return false;
@@ -55,7 +55,7 @@ bool createDir(const std::string& dirName, bool createParentDirs)
             return true;
         },
         getDirSeparator(), dirName, createParentDirs);
-    return ok ? CreateDirectory(toWide(dirName).data(), 0) != 0 : false;
+    return ok ? CreateDirectory(toWide(dirName).data(), nullptr) != 0 : false;
 }
 
 bool deleteFile(const string& fileName)

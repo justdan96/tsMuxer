@@ -36,7 +36,7 @@ IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
     m_lastProcessedBytes = 0;
     m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader("");
     m_readerID = m_bufferedReader->createReader(TS_FRAME_SIZE);
-    m_curPos = m_bufEnd = 0;
+    m_curPos = m_bufEnd = nullptr;
     m_processedBytes = 0;
     m_isEOF = false;
     num_tracks = 0;
@@ -95,7 +95,7 @@ uint64_t IOContextDemuxer::get_be64()
 
 bool IOContextDemuxer::url_fseek(int64_t offset)
 {
-    m_curPos = m_bufEnd = 0;
+    m_curPos = m_bufEnd = nullptr;
     m_isEOF = false;
     m_processedBytes = offset;
     return ((BufferedFileReader*)m_bufferedReader)->gotoByte(m_readerID, offset);
@@ -169,7 +169,7 @@ void IOContextDemuxer::setFileIterator(FileNameIterator* itr)
     auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
-    else if (itr != 0)
+    else if (itr != nullptr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 

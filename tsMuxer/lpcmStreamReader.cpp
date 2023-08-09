@@ -30,7 +30,7 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
         if (!detectLPCMType(m_buffer, m_bufEnd - m_buffer))
             return 0;
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-    if (frame == 0)
+    if (frame == nullptr)
         return 0;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
@@ -361,7 +361,7 @@ uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, uint8_
                 break;
             else if (j == patternLen - 1)
                 return curPos;
-    return 0;
+    return nullptr;
 }
 
 int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
@@ -376,7 +376,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
         if (m_headerType == LPCMHeaderType::htWAVE64)
         {
             curPos = findSubstr("fmt ", buff, end);
-            if (curPos == 0 || curPos + sizeof(wave_format::GUID) + 8 >= end)
+            if (curPos == nullptr || curPos + sizeof(wave_format::GUID) + 8 >= end)
                 return NOT_ENOUGH_BUFFER;
             uint8_t* tmpPos = curPos + sizeof(wave_format::GUID);
             fmtSize = *((uint64_t*)tmpPos);
@@ -387,7 +387,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
         else
         {
             curPos = findSubstr("fmt ", buff, end);
-            if (curPos == 0 || curPos + 8 >= end)
+            if (curPos == nullptr || curPos + 8 >= end)
                 return NOT_ENOUGH_BUFFER;
             fmtSize = *((uint32_t*)(curPos + 4));
             if (curPos + 8 + fmtSize >= end)
@@ -479,7 +479,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
     }
 
     curPos = findSubstr("data", curPos, FFMIN(curPos + MAX_HEADER_SIZE, end));
-    if (curPos == 0)
+    if (curPos == nullptr)
     {
         if (end < curPos + MAX_HEADER_SIZE)
             return NOT_ENOUGH_BUFFER;
@@ -589,7 +589,7 @@ uint8_t* LPCMStreamReader::findFrame(uint8_t* buff, uint8_t* end)
 {
     if (m_headerType == LPCMHeaderType::htNone)
         if (!detectLPCMType(buff, end - buff))
-            return 0;
+            return nullptr;
     return buff;
 }
 
@@ -759,7 +759,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     if (m_needSync)
     {
         uint8_t* frame = findFrame(m_curPos, m_bufEnd);
-        if (frame == 0)
+        if (frame == nullptr)
         {
             m_processedBytes += m_bufEnd - m_curPos;
             return NEED_MORE_DATA;
@@ -899,6 +899,6 @@ const CodecInfo& LPCMStreamReader::getCodecInfo() { return lpcmCodecInfo; }
 
 void LPCMStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
 {
-    m_lastChannelRemapPos = 0;
+    m_lastChannelRemapPos = nullptr;
     SimplePacketizerReader::setBuffer(data, dataLen, lastBlock);
 }

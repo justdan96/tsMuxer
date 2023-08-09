@@ -188,7 +188,7 @@ namespace text_subtitles
 {
 TextSubtitlesRender::TextSubtitlesRender() : m_width(0), m_height(0)
 {
-    m_pData = 0;
+    m_pData = nullptr;
     m_borderWidth = 0;
 }
 

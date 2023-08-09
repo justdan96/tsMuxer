@@ -194,7 +194,7 @@ int MatroskaDemuxer::matroska_parse_index()
 MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
     : IOContextDemuxer(readManager), levels(), title(), created(0), fileDuration(0)
 {
-    m_lastDeliveryPacket = 0;
+    m_lastDeliveryPacket = nullptr;
     num_levels = 0;
     level_up = 0;
     peek_id = 0;
@@ -205,8 +205,8 @@ MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
     m_firstTimecode.clear();
     index_parsed = false;
     metadata_parsed = false;
-    writing_app = 0;
-    muxing_app = 0;
+    writing_app = nullptr;
+    muxing_app = nullptr;
 }
 
 int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
@@ -214,14 +214,14 @@ int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
     int res;
     uint64_t rlength;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
     int size = (int)rlength;
 
     // ebml strings are usually not 0-terminated, so we allocate one
-    // byte more, read the string and NULL-terminate it ourselves.
+    // byte more, read the string and nullptr-terminate it ourselves.
     *str = new char[size + 1];
-    if (size < 0 || *str == 0)
+    if (size < 0 || *str == nullptr)
     {
         THROW(ERR_MATROSKA_PARSE, "Memory allocation failed");
     }
@@ -242,7 +242,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
 
     /* default init */
     if (doctype)
-        *doctype = NULL;
+        *doctype = nullptr;
     if (version)
         *version = 1;
 
@@ -437,7 +437,7 @@ int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
     int n = 1, negative = 0, res;
     uint64_t rlength;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
     uint64_t size = rlength;
     if (size < 1 || size > 8)
@@ -493,7 +493,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
     int res = 0;
     // AVStream *st;
     uint8_t *origdata = data;
-    uint32_t *lace_size = NULL;
+    uint32_t *lace_size = nullptr;
     int n, laces = 0;
     uint64_t num;
 
@@ -643,7 +643,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                     slice_size = rv_offset(data, slice + 1, slices) - slice_offset;
 
                 AVPacket* pkt = new AVPacket();
-                pkt->data = 0;
+                pkt->data = nullptr;
                 pkt->size = 0;
                 pkt->pts = timecode * INTERNAL_PTS_FREQ / 1000;
                 pkt->pos = pos;
@@ -672,7 +672,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                     slice_size = (int)m_tmpBuffer.size();
                 }
 
-                if (tracks[track]->parsed_priv_data != 0)
+                if (tracks[track]->parsed_priv_data != nullptr)
                 {
                     tracks[track]->parsed_priv_data->extractData(pkt, curPtr, slice_size + offset);
                 }
@@ -793,7 +793,7 @@ int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
     int n = 0, res;
     uint64_t rlength;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
     uint64_t size = rlength;
     if (size < 1 || size > 8)
@@ -843,7 +843,7 @@ int MatroskaDemuxer::ebml_read_skip()
     uint64_t length;
     int res;
 
-    if ((res = ebml_read_element_id(&id, NULL)) < 0 || (res = ebml_read_element_length(&length)) < 0)
+    if ((res = ebml_read_element_id(&id, nullptr)) < 0 || (res = ebml_read_element_length(&length)) < 0)
         return res;
     skip_bytes(length);
     return 0;
@@ -857,7 +857,7 @@ int MatroskaDemuxer::ebml_read_master(uint32_t *id)
     uint64_t length;
     int res;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&length)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&length)) < 0)
         return res;
 
     /* protect... (Heaven forbids that the '>' is true) */
@@ -890,7 +890,7 @@ int MatroskaDemuxer::ebml_read_binary(uint32_t *id, uint8_t **binary, int *size)
     uint64_t rlength;
     int res;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
     *size = (int)rlength;
 
@@ -1006,7 +1006,7 @@ void MatroskaDemuxer::openFile(const std::string &streamName)
     readClose();
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
         THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
-    m_curPos = m_bufEnd = 0;
+    m_curPos = m_bufEnd = nullptr;
     m_processedBytes = 0;
     m_isEOF = false;
 
@@ -1022,8 +1022,8 @@ void MatroskaDemuxer::openFile(const std::string &streamName)
     index_parsed = false;
     metadata_parsed = false;
 
-    writing_app = 0;
-    muxing_app = 0;
+    writing_app = nullptr;
+    muxing_app = nullptr;
     num_tracks = 0;
     matroska_read_header();
 }
@@ -1096,11 +1096,11 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
     {
         delete[] m_lastDeliveryPacket->data;
         delete m_lastDeliveryPacket;
-        m_lastDeliveryPacket = 0;
+        m_lastDeliveryPacket = nullptr;
     }
 
     // Read stream until we have a packet queued.
-    AVPacket *newPacket = 0;
+    AVPacket *newPacket = nullptr;
     while (matroska_deliver_packet(newPacket) != 0)
     {
         // Have we already reached the end?
@@ -1161,7 +1161,7 @@ int MatroskaDemuxer::matroska_read_header()
     num_tracks = 0;
 
     // MatroskaDemuxContext *matroska = s->priv_data;
-    char *doctype = NULL;
+    char *doctype = nullptr;
     int version, last_level, res = 0;
     uint32_t id;
 
@@ -1170,7 +1170,7 @@ int MatroskaDemuxer::matroska_read_header()
     /* First read the EBML header. */
     if ((res = ebml_read_header(&doctype, &version)) < 0)
         return res;
-    if ((doctype == NULL) || strcmp(doctype, "matroska"))
+    if ((doctype == nullptr) || strcmp(doctype, "matroska"))
     {
         THROW(ERR_MATROSKA_PARSE, "Wrong EBML doctype ('" << (doctype ? doctype : "(none)") << "' != 'matroska').");
     }
@@ -1299,30 +1299,30 @@ int MatroskaDemuxer::matroska_read_header()
     }
 
     /* Have we found a cluster? */
-    if (ebml_peek_id(NULL) == MATROSKA_ID_CLUSTER)
+    if (ebml_peek_id(nullptr) == MATROSKA_ID_CLUSTER)
     {
         for (int i = 0; i < num_tracks; i++)
         {
             MatroskaTrack* track = tracks[i];
             track->stream_index = -1;
-            if (track->codec_id == NULL)
+            if (track->codec_id == nullptr)
                 continue;
 
             track->stream_index = num_streams++;
 
-            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AVC_FOURCC) && (track->codec_priv != NULL))
+            if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AVC_FOURCC) && (track->codec_priv != nullptr))
             {
                 track->parsed_priv_data = new ParsedH264TrackData(track->codec_priv, track->codec_priv_size);
             }
-            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_HEVC_FOURCC) && (track->codec_priv != NULL))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_HEVC_FOURCC) && (track->codec_priv != nullptr))
             {
                 track->parsed_priv_data = new ParsedH265TrackData(track->codec_priv, track->codec_priv_size);
             }
-            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VVC_FOURCC) && (track->codec_priv != NULL))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VVC_FOURCC) && (track->codec_priv != nullptr))
             {
                 track->parsed_priv_data = new ParsedH266TrackData(track->codec_priv, track->codec_priv_size);
             }
-            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC) && (track->codec_priv != NULL))
+            else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_VIDEO_VFW_FOURCC) && (track->codec_priv != nullptr))
             {
                 track->parsed_priv_data = new ParsedVC1TrackData(track->codec_priv, track->codec_priv_size);
             }
@@ -1471,7 +1471,7 @@ int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
     int res;
     uint64_t rlength;
 
-    if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
+    if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
     uint64_t size = rlength;
 
@@ -1568,7 +1568,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
             uint64_t end = AV_NOPTS_VALUE, start = AV_NOPTS_VALUE;
             uint64_t uid = 0;
             bool uidFound = false;
-            char *title = NULL;
+            char *title = nullptr;
             // if there is more than one chapter edition we take only the first one
             if (chapters.size() > 0)
             {
@@ -1684,12 +1684,12 @@ int MatroskaDemuxer::matroska_parse_chapters()
                         }
                     }
 
-                    if (start != AV_NOPTS_VALUE && uidFound && title != 0)
+                    if (start != AV_NOPTS_VALUE && uidFound && title != nullptr)
                     {
                         AVChapter chapter(start, title);
                         chapters[uid] = chapter;
                     }
-                    if (title != NULL)
+                    if (title != nullptr)
                     {
                         delete[] title;
                     }

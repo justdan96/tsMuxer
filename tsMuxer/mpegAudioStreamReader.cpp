@@ -6,7 +6,7 @@
 int MpegAudioStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
-    if (frame == 0)
+    if (frame == nullptr)
         return 0;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
