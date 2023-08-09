@@ -27,7 +27,7 @@ static constexpr int COMPRESSION_ZLIB = 0;
 #define AV_RL32(x) \
     ((((uint8_t *)(x))[3] << 24) | (((uint8_t *)(x))[2] << 16) | (((uint8_t *)(x))[1] << 8) | ((uint8_t *)(x))[0])
 
-#define MAX(a, b) (a > b ? a : b)
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
 static constexpr int MAX_TRACK_SIZE =

@@ -24,7 +24,7 @@ static constexpr int MP4ESDescrTag = 0x03;
 static constexpr int MP4DecConfigDescrTag = 0x04;
 static constexpr int MP4DecSpecificDescrTag = 0x05;
 
-#define MKTAG(a, b, c, d) (a | (b << 8) | (c << 16) | (d << 24))
+#define MKTAG(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 
 static constexpr char* const mov_mdhd_language_map[] = {
     // see https :  // developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap4/qtff4.html

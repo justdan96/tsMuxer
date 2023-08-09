@@ -32,11 +32,11 @@ static constexpr char EXCEPTION_ERR_MSG[] =
 #define LTRACE2(level, msg)            \
     {                                  \
         {                              \
-            if (level <= LT_WARN)      \
-                cerr << msg;           \
-            else if (level == LT_INFO) \
-                cout << msg;           \
-            if (level <= LT_INFO)      \
+            if ((level) <= LT_WARN)      \
+                cerr << (msg);           \
+            else if ((level) == LT_INFO) \
+                cout << (msg);           \
+            if ((level) <= LT_INFO)      \
                 sLastMsg = true;       \
         }                              \
     }

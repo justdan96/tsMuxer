@@ -6,7 +6,7 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-#define max(a, b) (a > b ? a : b)
+#define max(a, b) ((a) > (b) ? (a) : (b))
 static constexpr int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
 static constexpr int AC3_FRAME_SIZE = NB_BLOCKS * 256;
 

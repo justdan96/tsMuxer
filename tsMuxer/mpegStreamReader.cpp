@@ -277,7 +277,7 @@ int MPEGStreamReader::decodeNal(uint8_t* buff)
         return rez;
 }
 
-#define abs_(a, b) (a >= b ? a - b : b - a)
+#define abs_(a, b) ((a) >= (b) ? (a) - (b) : (b) - (a))
 void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, int oldSPSLen)
 {
     double spsFps = getStreamFPS(curNALUnit);
