@@ -172,8 +172,8 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
                                            static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
                                            &aspect_ratio_index);
 
-        *dstBuff++ = (video_format << 4) + frame_rate_index;
-        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+        *dstBuff++ = static_cast<uint8_t>(video_format << 4 | frame_rate_index);
+        *dstBuff++ = static_cast<uint8_t>(aspect_ratio_index << 4 | 0xf);
     }
     else
     {

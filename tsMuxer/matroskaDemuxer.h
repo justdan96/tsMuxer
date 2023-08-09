@@ -59,7 +59,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     char *writing_app;
     char *muxing_app;
     uint64_t time_scale;
-    std::map<int, int64_t> m_firstTimecode;
+    std::map<int, uint64_t> m_firstTimecode;
     bool index_parsed;
     bool metadata_parsed;
     int num_streams;

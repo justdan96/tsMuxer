@@ -127,7 +127,7 @@ class ContainerToReaderWrapper : public AbstractReader
     }
     uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
     void notify(uint32_t readerID, uint32_t dataReaded) override { return; }
-    uint32_t createReader(int readBuffOffset = 0) override;
+    int32_t createReader(int readBuffOffset = 0) override;
     void deleteReader(uint32_t readerID) override;
     bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);

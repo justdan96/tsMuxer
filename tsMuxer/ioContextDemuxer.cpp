@@ -90,15 +90,15 @@ uint64_t IOContextDemuxer::get_be64()
     return val;
 }
 
-bool IOContextDemuxer::url_fseek(const int64_t offset)
+bool IOContextDemuxer::url_fseek(const uint64_t offset)
 {
     m_curPos = m_bufEnd = nullptr;
     m_isEOF = false;
     m_processedBytes = offset;
-    return static_cast<BufferedFileReader*>(m_bufferedReader)->gotoByte(m_readerID, offset);
+    return dynamic_cast<BufferedFileReader*>(m_bufferedReader)->gotoByte(m_readerID, offset);
 }
 
-uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
+int32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;
@@ -130,7 +130,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
         if (readedBytes == 0)
             break;
     }
-    return static_cast<uint32_t>(dst - binary);
+    return static_cast<int32_t>(dst - binary);
 }
 
 void IOContextDemuxer::skip_bytes(const uint64_t size)

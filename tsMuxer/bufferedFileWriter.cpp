@@ -16,7 +16,7 @@ void WriterData::execute() const
         break;
     default:
         break;
-    };
+    }
 }
 
 BufferedFileWriter::BufferedFileWriter() : m_terminated(false), m_writeQueue(WRITE_QUEUE_MAX_SIZE)

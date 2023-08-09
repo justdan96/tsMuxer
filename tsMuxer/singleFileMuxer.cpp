@@ -50,7 +50,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     }
     else if (codecName == "A_MP3")
     {
-        const auto mp3Reader = static_cast<MpegAudioStreamReader*>(codecReader);
+        const auto mp3Reader = dynamic_cast<MpegAudioStreamReader*>(codecReader);
         if (mp3Reader->getLayer() == 3)
             fileExt = ".mp3";
         else
@@ -70,7 +70,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     }
     else if (codecName == "A_AC3")
     {
-        const auto ac3Reader = static_cast<AC3StreamReader*>(codecReader);
+        const auto ac3Reader = dynamic_cast<AC3StreamReader*>(codecReader);
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
             fileExt = ".ac3+thd";
         else if (ac3Reader->isEAC3())

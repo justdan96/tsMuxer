@@ -37,7 +37,7 @@ class CombinedH264Reader
    protected:
     bool m_firstDemuxCall;
 
-    int m_mvcSPS;
+    unsigned m_mvcSPS;
     MemoryBlock m_tmpBuffer;
     ReadState m_state;
     int m_mvcStreamIndex;

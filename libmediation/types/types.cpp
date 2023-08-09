@@ -449,7 +449,7 @@ uint32_t my_ntohl(uint32_t val)
 uint16_t my_ntohs(uint16_t val)
 {
     const auto* tmp = reinterpret_cast<uint8_t*>(&val);
-    return tmp[1] + (tmp[0] << 8);
+    return static_cast<uint16_t>(tmp[1] | tmp[0] << 8);
 }
 
 char* strnstr(char* s1, const char* s2, const size_t len)

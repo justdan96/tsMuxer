@@ -87,7 +87,7 @@ class AC3Codec
     uint8_t m_lfeon;
     uint8_t m_halfratecod;
     int m_sample_rate;
-    uint32_t m_bit_rate;
+    int32_t m_bit_rate;
     uint8_t m_channels;
     uint16_t m_frame_size;
     bool m_mixinfoexists;

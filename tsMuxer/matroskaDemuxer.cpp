@@ -16,7 +16,7 @@ extern "C"
 
 typedef uint64_t offset_t;
 
-int64_t AV_NOPTS_VALUE = static_cast<int64_t>(0x8000000000000000ull);
+uint64_t AV_NOPTS_VALUE = 0x8000000000000000ULL;
 
 static constexpr int PKT_FLAG_KEY = 1;
 static constexpr int AVERROR_INVALIDDATA = -1;
@@ -429,7 +429,8 @@ int MatroskaDemuxer::matroska_deliver_packet(AVPacket *&avPacket)
 
 int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
 {
-    int n = 1, negative = 0, res;
+    unsigned n = 1;
+    int negative = 0, res;
     uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
@@ -786,7 +787,8 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
  * 0 is success, < 0 is failure. */
 int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
 {
-    int n = 0, res;
+    unsigned n = 0;
+    int res;
     uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, nullptr)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)

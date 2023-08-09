@@ -67,9 +67,9 @@ class LPCMStreamReader : public SimplePacketizerReader
     int64_t m_frameRest;
     bool m_needPCMHdr;
 
-    int m_bitsPerSample;
+    uint16_t m_bitsPerSample;
     int m_freq;
-    int m_channels;
+    uint16_t m_channels;
     bool m_lfeExists;
     int64_t m_curChunkLen;
     bool m_openSizeWaveFormat;
@@ -78,7 +78,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     bool detectLPCMType(uint8_t* buffer, int64_t len);
     int decodeLPCMHeader(uint8_t* buff);
     uint32_t convertLPCMToWAV(uint8_t* start, uint8_t* end);
-    uint32_t convertWavToPCM(uint8_t* start, uint8_t* end);
+    int convertWavToPCM(uint8_t* start, uint8_t* end);
 
     void storeChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch) const;
     void copyChannelData(uint8_t* start, uint8_t* end, int chFrom, int chTo, int mch) const;

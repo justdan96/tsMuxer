@@ -73,7 +73,7 @@ uint32_t BufferedReader::createNewReaderID()
     return rez;
 }
 
-uint32_t BufferedReader::createReader(const int readBuffOffset)
+int32_t BufferedReader::createReader(const int readBuffOffset)
 {
     ReaderData* data = intCreateReader();
 

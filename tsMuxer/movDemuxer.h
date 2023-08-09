@@ -63,7 +63,7 @@ class MovDemuxer : public IOContextDemuxer
 
     int found_moov;  // when both 'moov' and 'mdat' sections has been found
     bool found_moof;
-    int64_t m_mdat_pos;
+    uint64_t m_mdat_pos;
     int64_t m_mdat_size;
     uint64_t m_fileSize;
     uint32_t m_timescale;

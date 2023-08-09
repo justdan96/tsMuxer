@@ -51,8 +51,8 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     *curPos++ = static_cast<uint8_t>(TSDescriptorTag::LPCM);  // descriptor tag
     const int audio_presentation_type = (m_channels > 2) ? 6 : (m_channels == 2) ? 3 : 1;
     const int sampling_frequency = (m_freq == 192000) ? 5 : (m_freq == 96000) ? 4 : 1;
-    *curPos++ = (audio_presentation_type << 4) + sampling_frequency;
-    *curPos++ = ((m_bitsPerSample - 12) << 4) + 0x3f;  // bits_per_sample (2 bits), stuffing_bits
+    *curPos++ = static_cast<uint8_t>((audio_presentation_type << 4 | sampling_frequency);
+    *curPos++ = static_cast<uint8_t>((m_bitsPerSample - 12) << 4 | 0x3f);  // bits_per_sample (2 bits), stuffing_bits
 
     return static_cast<int>(curPos - dstBuff);
 }
@@ -165,7 +165,7 @@ void LPCMStreamReader::removeChannel(uint8_t* start, uint8_t* end, const int cnN
     }
 }
 
-uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
+int LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
 {
     // int mch = m_channels; // + (m_channels%2==1 ? 1 : 0);
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
@@ -244,7 +244,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
         const int audio_data_payload_size = (m_bitsPerSample == 20 ? 24 : m_bitsPerSample) * m_freq *
                                             ((m_channels + 1) & 0xfe) / 8 / 200;  // 5 ms frame len. 1000/5 = 200
         // int audio_data_payload_size = dst - (m_tmpFrameBuffer + 4);
-        m_tmpFrameBuffer[0] = audio_data_payload_size >> 8;
+        m_tmpFrameBuffer[0] = static_cast<uint8_t>(audio_data_payload_size >> 8);
         m_tmpFrameBuffer[1] = audio_data_payload_size & 0xff;
         int channelsIndex = 1;
         switch (m_channels)
@@ -277,9 +277,9 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
             sampling_index = 4;
         else if (m_freq == 192000)
             sampling_index = 5;
-        m_tmpFrameBuffer[2] = (channelsIndex << 4) + sampling_index;
+        m_tmpFrameBuffer[2] = (channelsIndex << 4 | sampling_index) & 0xff;
         const int bits_per_sample = (m_bitsPerSample - 12) / 4;
-        m_tmpFrameBuffer[3] = (bits_per_sample << 6) + (m_firstFrame << 5);
+        m_tmpFrameBuffer[3] = (bits_per_sample << 6 | m_firstFrame << 5) & 0xff;
     }
     return static_cast<int>(dst - m_tmpFrameBuffer);
 }
@@ -640,7 +640,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             waveFormatPCMEx->nChannels = m_channels;
             waveFormatPCMEx->nSamplesPerSec = m_freq;
             waveFormatPCMEx->nAvgBytesPerSec = m_channels * m_freq * ((m_bitsPerSample + 4) >> 3);
-            const int bitsPerSample = m_bitsPerSample == 20 ? 24 : m_bitsPerSample;
+            const uint16_t bitsPerSample = m_bitsPerSample == 20 ? 24 : m_bitsPerSample;
             waveFormatPCMEx->nBlockAlign = m_channels * bitsPerSample / 8;
             waveFormatPCMEx->wBitsPerSample = bitsPerSample;
             waveFormatPCMEx->cbSize = 22;  // After this to GUID

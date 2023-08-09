@@ -116,7 +116,7 @@ struct MOVStreamContext : public Track
     }
     virtual ~MOVStreamContext() {}
 
-    vector<int64_t> chunk_offsets;
+    vector<uint64_t> chunk_offsets;
     vector<uint32_t> m_index;
     uint32_t m_indexCur;
 
@@ -198,16 +198,16 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
     int newBufferSize(uint8_t* buff, const int size) override
     {
         int left = size;
-        int i = 0;
+        unsigned i = 0;
         for (; left > 4; ++i)
         {
             left -= m_sc->sample_size;
             if (m_sc->sample_size == 0)
             {
-                if (m_sc->m_indexCur + i >= static_cast<int>(m_sc->m_index.size()))
+                if (m_sc->m_indexCur + i >= static_cast<unsigned>(m_sc->m_index.size()))
                     THROW(ERR_MOV_PARSE, "Out of index for AAC track #" << m_sc->ffindex << " at position "
                                                                         << m_demuxer->getProcessedBytes());
-                left -= m_sc->m_index[static_cast<int64_t>(m_sc->m_indexCur) + i];
+                left -= m_sc->m_index[m_sc->m_indexCur + i];
             }
         }
         if (left < 0 || left > 4)
@@ -408,6 +408,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         sttsCnt = 0;
         sttsPos = -1;
     }
+
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override
     {
         uint8_t* end = buff + size;
@@ -456,31 +457,31 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             }
             if (modifierType == 0x7374796C)  // 'styl' box
             {
-                uint16_t entry_count = (buff[0] << 8) | buff[1];
+                auto entry_count = static_cast<uint16_t>(buff[0] << 8 | buff[1]);
                 buff += 2;
                 for (size_t i = 0; i < entry_count; i++)
                 {
                     prefix = "";
                     suffix = "";
-                    uint16_t startChar = (buff[0] << 8) | buff[1];
-                    uint16_t endChar = (buff[2] << 8) | buff[3];
+                    auto startChar = static_cast<uint16_t>(buff[0] << 8 | buff[1]);
+                    auto endChar = static_cast<uint16_t>(buff[2] << 8 | buff[3]);
                     buff += 6;  // startChar, endChar, font_ID
                     if (startChar < endChar)
                     {
                         if (*buff & 1)
                         {
                             prefix += "<b>";
-                            suffix = "</b>" + suffix;
+                            suffix.insert(0, "</b>");
                         }
                         if (*buff & 2)
                         {
                             prefix += "<i>";
-                            suffix = "</i>" + suffix;
+                            suffix.insert(0, "</i>");
                         }
                         if (*buff & 4)
                         {
                             prefix += "<u>";
-                            suffix = "</u>" + suffix;
+                            suffix.insert(0, "</u>");
                         }
                         tags.insert(tags.begin(), std::make_pair(startChar, prefix));
                         tags.push_back(std::make_pair(endChar, suffix));
@@ -555,12 +556,12 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                 }
                 if (modifierType == 0x7374796C)  // 'styl' box
                 {
-                    const uint16_t entry_count = (buff[0] << 8) | buff[1];
+                    const auto entry_count = static_cast<uint16_t>(buff[0] << 8 | buff[1]);
                     buff += 2;
                     for (size_t i = 0; i < entry_count; i++)
                     {
-                        const uint16_t startChar = (buff[0] << 8) | buff[1];
-                        const uint16_t endChar = (buff[2] << 8) | buff[3];
+                        const auto startChar = static_cast<uint16_t>(buff[0] << 8 | buff[1]);
+                        const auto endChar = static_cast<uint16_t>(buff[2] << 8 | buff[3]);
                         buff += 6;                // startChar, endChar, font-ID
                         if (startChar < endChar)  // face style flags
                         {
@@ -595,7 +596,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
     MOVStreamContext* m_sc;
     int m_packetCnt;
-    size_t sttsPos;
+    int64_t sttsPos;
     int64_t sttsCnt;
     int64_t m_timeOffset;
 };
@@ -1078,7 +1079,7 @@ int MovDemuxer::mov_read_mdat(MOVAtom atom)
 int MovDemuxer::mov_read_trun(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
-    int data_offset = 0;
+    unsigned data_offset = 0;
 
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
@@ -1087,7 +1088,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (sc->pseudo_stream_id + 1 != frag->stsd_id)
         return 0;
     get_byte();  // version
-    const int flags = get_be24();
+    const unsigned flags = get_be24();
     const unsigned entries = get_be32();
     if (flags & 0x001)
         data_offset = get_be32();
@@ -1124,7 +1125,7 @@ int MovDemuxer::mov_read_trkn(MOVAtom atom)
 {
     get_be32();  // type
     get_be32();  // unknown
-    metaData["track"] = int32ToStr(get_be32());
+    metaData["track"] = int32uToStr(get_be32());
     return 0;
 }
 
@@ -1653,7 +1654,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
             // st->parsed_priv_data = new MovParsedAudioTrackData(this, st);
             if (st->parsed_priv_data)
             {
-                static_cast<MovParsedAudioTrackData*>(st->parsed_priv_data)->isAAC = true;
+                dynamic_cast<MovParsedAudioTrackData*>(st->parsed_priv_data)->isAAC = true;
                 st->parsed_priv_data->setPrivData(st->codec_priv, st->codec_priv_size);
                 st->channels = (st->codec_priv[1] >> 3) & 0x0f;
             }

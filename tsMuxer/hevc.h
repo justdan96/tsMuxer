@@ -107,7 +107,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     std::string getDescription() const;
 
    public:
-    unsigned vps_id;
+    int vps_id;
     int max_sub_layers;
     unsigned sps_id;
     unsigned chromaFormat;

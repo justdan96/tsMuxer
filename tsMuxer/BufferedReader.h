@@ -89,7 +89,7 @@ class BufferedReader : public AbstractReader, TerminatableThread
     const static int UNKNOWN_READERID = 3;
     BufferedReader(uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
     ~BufferedReader() override;
-    uint32_t createReader(int readBuffOffset = 0) override;
+    int32_t createReader(int readBuffOffset = 0) override;
     void deleteReader(uint32_t readerID) override;  // unregister readed
     uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
     void notify(uint32_t readerID,

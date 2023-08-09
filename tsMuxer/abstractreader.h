@@ -25,7 +25,7 @@ class AbstractReader
     virtual ~AbstractReader() {}
     virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) = 0;
     virtual void notify(uint32_t readerID, uint32_t dataReaded) = 0;
-    virtual uint32_t createReader(int readBuffOffset = 0) = 0;
+    virtual int32_t createReader(int readBuffOffset = 0) = 0;
     virtual void deleteReader(uint32_t readerID) = 0;
     virtual bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) = 0;
 

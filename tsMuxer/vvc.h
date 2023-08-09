@@ -125,7 +125,7 @@ struct VvcSpsUnit : public VvcUnitWithProfile
     unsigned pic_width_max_in_luma_samples;
     unsigned pic_height_max_in_luma_samples;
     unsigned bitdepth_minus8;
-    unsigned log2_max_pic_order_cnt_lsb;
+    int log2_max_pic_order_cnt_lsb;
     VvcHrdUnit m_sps_hrd;
 
     std::vector<unsigned> cpb_cnt_minus1;

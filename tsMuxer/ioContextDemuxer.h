@@ -64,7 +64,7 @@ struct Track
     IOContextTrackType type;
     /* Unique track number and track ID. stream_index is the index that
      * the calling app uses for this track. */
-    uint32_t num;
+    int num;
     uint64_t uid;
     int stream_index;
 
@@ -111,7 +111,7 @@ class IOContextDemuxer : public AbstractDemuxer
     uint64_t m_lastProcessedBytes;
 
     void skip_bytes(uint64_t size);
-    uint32_t get_buffer(uint8_t* binary, int size);
+    int32_t get_buffer(uint8_t* binary, int size);
     bool url_fseek(int64_t offset);
     uint64_t get_be64();
     unsigned int get_be32();

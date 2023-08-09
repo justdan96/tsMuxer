@@ -95,15 +95,15 @@ void writeTimestamp(uint8_t *buffer, const time_t time)
 
     const time_t lt = mktime(localtime(&time));
     const time_t gt = mktime(gmtime(&time));
-    const int16_t timeZone = static_cast<int16_t>(lt - gt) / 60;
+    const auto timeZone = static_cast<int16_t>((lt - gt) / 60);
 
     buff16[0] = (1 << 12) + (timeZone & 0x0fff);
-    buff16[1] = parts->tm_year + 1900;
-    buffer[4] = parts->tm_mon + 1;
-    buffer[5] = parts->tm_mday;
-    buffer[6] = parts->tm_hour;
-    buffer[7] = parts->tm_min;
-    buffer[8] = parts->tm_sec;
+    buff16[1] = static_cast<int16_t>(parts->tm_year + 1900);
+    buffer[4] = static_cast<uint8_t>(parts->tm_mon + 1);
+    buffer[5] = static_cast<uint8_t>(parts->tm_mday);
+    buffer[6] = static_cast<uint8_t>(parts->tm_hour);
+    buffer[7] = static_cast<uint8_t>(parts->tm_min);
+    buffer[8] = static_cast<uint8_t>(parts->tm_sec);
     buffer[9] = 0;  // ms parts
     buffer[10] = 0;
     buffer[11] = 0;
@@ -173,7 +173,7 @@ std::vector<std::uint8_t> serializeDString(const std::string &str, const size_t 
     return rv;
 }
 
-void writeDString(uint8_t *buffer, const char *value, const int64_t fieldLen)
+void writeDString(uint8_t *buffer, const char *value, const size_t fieldLen)
 {
     auto content = serializeDString(value, fieldLen);
     assert(content.size() == fieldLen);
@@ -235,11 +235,10 @@ void ByteFileWriter::writeDescriptorTag(const DescriptorTag tag, const uint32_t 
     m_curPos += 16;
 }
 
-void ByteFileWriter::closeDescriptorTag(int dataSize) const
+void ByteFileWriter::closeDescriptorTag(const int dataSize) const
 {
-    if (dataSize == -1)
-        dataSize = static_cast<uint16_t>(m_curPos - m_tagPos);
-    calcDescriptorCRC(m_tagPos, dataSize);
+    const uint16_t size = dataSize == -1 ? static_cast<uint16_t>(m_curPos - m_tagPos) : static_cast<uint16_t> (dataSize);
+    calcDescriptorCRC(m_tagPos, size);
 }
 
 void ByteFileWriter::writeIcbTag(const uint8_t fileType)
@@ -269,9 +268,7 @@ void ByteFileWriter::writeLongAD(const uint32_t lenBytes, const uint32_t pos, co
 
 void ByteFileWriter::writeDString(const char *value, const int64_t len)
 {
-    int64_t writeLen = len;
-    if (writeLen == -1)
-        writeLen = strlen(value) + 2;
+    const size_t writeLen = (len == -1) ? strlen(value) + 2 : len;
     ::writeDString(m_curPos, value, writeLen);
     m_curPos += writeLen;
 }
@@ -411,7 +408,7 @@ void FileEntryInfo::serializeDir() const
     writer.writeLE8(0x0A);   // File Characteristics, parent flag (3-th bit) and  'directory' bit (1-th)
     writer.writeLE8(0x00);   // Length of File Identifier (=L_FI)
 
-    const int parentId = m_parent ? m_parent->m_objectId : 0;
+    const uint8_t parentId = m_parent ? m_parent->m_objectId : 0;
     writer.writeLongAD(0x800, m_parent ? m_parent->m_sectorNum : m_owner->absoluteSectorNum(), 0x01,
                        parentId);  // parent entry ICB
     writer.writeLE16(0);           // Length of Implementation Use
@@ -424,7 +421,7 @@ void FileEntryInfo::serializeDir() const
     assert(writer.size() < SECTOR_SIZE);  // not supported
 
     m_owner->writeExtendedFileEntryDescriptor(false, m_objectId, m_fileType, writer.size(), m_sectorNum + 1,
-                                              static_cast<int>(m_subDirs.size()) + 1);
+                                              static_cast<uint16_t>(m_subDirs.size() + 1));
     m_owner->writeSector(buffer);
 }
 
@@ -445,7 +442,7 @@ void FileEntryInfo::addExtent(const Extent &extent)
     m_fileSize += extent.size;
 }
 
-int FileEntryInfo::write(const uint8_t *data, const uint32_t len)
+int FileEntryInfo::write(const uint8_t *data, const int32_t len)
 {
     if (m_owner->m_lastWritedObjectID != m_objectId)
     {
@@ -998,9 +995,9 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, const size_
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint32_t objectId,
+int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint8_t objectId,
                                                 const FileTypes fileType, const uint64_t len, const uint32_t pos,
-                                                const int linkCount, ExtentList *extents)
+                                                const uint16_t linkCount, ExtentList *extents)
 {
     int sectorsWrited = 0;
 
@@ -1318,7 +1315,7 @@ void IsoWriter::writeLogicalVolumeDescriptor()
     buff16[488 / 2] = 0x00;  // Metadata File Location
     // Metadata Mirror File Location, to    do: fill me. should be written here in future
     const uint32_t mirrorHeaderLocation = (m_metadataMirrorLBN - 1 - m_partitionStartAddress);
-    buff16[490 / 2] = mirrorHeaderLocation % 65536;
+    buff16[490 / 2] = static_cast<uint16_t>(mirrorHeaderLocation % 65536);
     buff16[492 / 2] = mirrorHeaderLocation / 65536;
 
     // Metadata Bitmap File Location

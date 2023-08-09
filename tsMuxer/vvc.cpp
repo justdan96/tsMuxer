@@ -585,13 +585,13 @@ int VvcSpsUnit::deserialize()
             return 1;
         if (m_reader.getBit())  // sps_poc_msb_cycle_flag
         {
-            if (extractUEGolombCode() /* sps_poc_msb_cycle_len_minus1 */ > 23 - log2_max_pic_order_cnt_lsb)
+            if (extractUEGolombCode() /* sps_poc_msb_cycle_len_minus1 */ > 23U - log2_max_pic_order_cnt_lsb)
                 return 1;
         }
         const int sps_num_extra_ph_bytes = m_reader.getBits(2);
-        for (size_t i = 0; i < sps_num_extra_ph_bytes; i++) m_reader.skipBits(8);  // sps_extra_ph_bit_present_flag[i]
+        for (int i = 0; i < sps_num_extra_ph_bytes; i++) m_reader.skipBits(8);  // sps_extra_ph_bit_present_flag[i]
         const int sps_num_extra_sh_bytes = m_reader.getBits(2);
-        for (size_t i = 0; i < sps_num_extra_sh_bytes; i++) m_reader.skipBits(8);  // sps_extra_sh_bit_present_flag[i]
+        for (int i = 0; i < sps_num_extra_sh_bytes; i++) m_reader.skipBits(8);  // sps_extra_sh_bit_present_flag[i]
         if (sps_ptl_dpb_hrd_params_present_flag)
         {
             const bool sps_sublayer_dpb_params_flag = (max_sublayers_minus1 > 0) ? m_reader.getBit() : false;

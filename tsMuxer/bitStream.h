@@ -126,7 +126,7 @@ class BitStreamReader : public BitStream
         return prevVal + (curVal >> bitLeft) & m_masks[num];
     }
 
-    inline unsigned getBit()
+    inline int getBit()
     {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
@@ -239,7 +239,7 @@ class BitStreamWriter : public BitStream
 
     inline int getBitsCount() { return (int)(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
 
-   private:
+private:
     unsigned m_curVal;
     unsigned m_bitWrited;
 };

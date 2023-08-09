@@ -17,7 +17,7 @@ int ceilDiv(const int a, const int b) { return (a / b) + ((a % b) ? 1 : 0); }
 
 unsigned HevcUnit::extractUEGolombCode()
 {
-    int cnt = 0;
+    unsigned cnt = 0;
     for (; m_reader.getBit() == 0; cnt++)
         ;
     if (cnt > INT_BIT)
@@ -331,7 +331,7 @@ int HevcSpsUnit::hrd_parameters(const bool commonInfPresentFlag, const int maxNu
 // returns 0 on parse success, 1 on error
 int HevcSpsUnit::sub_layer_hrd_parameters(const int cpb_cnt_minus1)
 {
-    for (size_t i = 0; i <= cpb_cnt_minus1; i++)
+    for (int i = 0; i <= cpb_cnt_minus1; i++)
     {
         if (extractUEGolombCode() == 0xffffffff)  // bit_rate_value_minus1[i]
             return 1;

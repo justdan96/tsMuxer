@@ -78,7 +78,7 @@ class ByteFileWriter
     void writeLE32(uint16_t value);
 
     void writeDescriptorTag(DescriptorTag tag, uint32_t tagLocation);
-    void closeDescriptorTag(int dataSize = -1) const;
+    void closeDescriptorTag(const int dataSize = -1) const;
 
     void writeIcbTag(uint8_t fileType);
     void writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id);
@@ -127,7 +127,7 @@ struct FileEntryInfo
     FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint32_t objectId, FileTypes fileType);
     ~FileEntryInfo();
 
-    int write(const uint8_t* data, uint32_t len);
+    int write(const uint8_t* data, int32_t len);
     bool setName(const std::string& name);
     void close();
     void setSubMode(bool value);
@@ -156,7 +156,7 @@ struct FileEntryInfo
     FileEntryInfo* m_parent;
     int m_sectorNum;
     int m_sectorsUsed;
-    uint32_t m_objectId;
+    uint8_t m_objectId;
     std::string m_name;
     FileTypes m_fileType;
 
@@ -214,8 +214,8 @@ class IsoWriter
     void writeUnallocatedSpaceDescriptor();
     void writeTerminationDescriptor();
     void writeLogicalVolumeIntegrityDescriptor();
-    int writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len,
-                                         uint32_t pos, int linkCount, ExtentList* extents = 0);
+    int writeExtendedFileEntryDescriptor(bool namedStream, uint8_t objectId, FileTypes fileType, uint64_t len,
+                                         uint32_t pos, uint16_t linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();

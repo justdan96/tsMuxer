@@ -107,17 +107,13 @@ std::array<std::uint8_t, 4> getBDMV_VersionNumber(const BDMV_VersionNumber versi
     std::array<std::uint8_t, 4> rv = {0x30, 0x31, 0x30, 0x30};  // "0100"
     switch (version)
     {
-    case BDMV_VersionNumber::Version1:
-        return rv;
     case BDMV_VersionNumber::Version2:
         rv[1] = 0x32;
         return rv;
     case BDMV_VersionNumber::Version3:
         rv[1] = 0x33;
         return rv;
-    // avoid compiler warning: control reaches end of non-void function
     default:
-        assert(0);
         return rv;
     }
 }

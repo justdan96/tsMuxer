@@ -330,7 +330,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
                                                      codecReader, lang, isSecondary);
     else if (codecName == "A_AC3")
     {
-        const auto ac3Reader = static_cast<AC3StreamReader*>(codecReader);
+        const auto ac3Reader = dynamic_cast<AC3StreamReader*>(codecReader);
         ac3Reader->setNewStyleAudioPES(m_useNewStyleAudioPES);
 
         StreamType streamType;
@@ -359,7 +359,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     }
     else if (codecName == "A_MP3")
     {
-        const auto mp3Reader = static_cast<MpegAudioStreamReader*>(codecReader);
+        const auto mp3Reader = dynamic_cast<MpegAudioStreamReader*>(codecReader);
         if (mp3Reader->getLayer() >= 2)
             m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_MPEG2, tsStreamIndex, descrBuffer,
                                                          descriptorLen, codecReader, lang, isSecondary);
@@ -379,7 +379,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     }
     else if (codecName == "A_DTS")
     {
-        const auto dtsReader = static_cast<DTSStreamReader*>(codecReader);
+        const auto dtsReader = dynamic_cast<DTSStreamReader*>(codecReader);
         dtsReader->setNewStyleAudioPES(m_useNewStyleAudioPES);
         StreamType audioType;
         if (dtsReader->getDTSHDMode() != DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED &&

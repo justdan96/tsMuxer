@@ -50,7 +50,7 @@ class PGSStreamReader : public AbstractStreamReader
     void setFontBorder(int value) { m_fontBorder = value; }
     void setBottomOffset(int value) { m_render->setBottomOffset(value); }
     void setOffsetId(int value) { m_offsetId = value; }
-    int getOffsetId() const { return m_offsetId; }
+    uint8_t getOffsetId() const { return m_offsetId; }
 
     // SS PG data
     bool isSSPG;

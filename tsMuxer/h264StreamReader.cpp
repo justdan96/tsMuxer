@@ -266,7 +266,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUn
         if (sizeField)
         {
             const int msgLen = writer.getBitsCount() - beforeMessageLen;
-            *sizeField = msgLen / 8;
+            *sizeField = static_cast<uint8_t>(msgLen / 8);
         }
         SEIUnit::write_rbsp_trailing_bits(writer);
         writer.flushBits();
@@ -315,7 +315,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         else
         {
             *curPos++ = static_cast<uint8_t>(NALUnit::NALType::nuDelimiter);
-            *curPos++ = (m_pict_type << 5) + 0x10;  // primary_pic_type << 5 + rbsp bits
+            *curPos++ = static_cast<uint8_t>(m_pict_type << 5 | 0x10);  // primary_pic_type << 5 + rbsp bits
         }
     }
 
@@ -451,8 +451,8 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
                                            &aspect_ratio_index);
         *dstBuff++ = !m_mvcSubStream ? static_cast<uint8_t>(StreamType::VIDEO_H264)
                                      : static_cast<uint8_t>(StreamType::VIDEO_MVC);  // stream_coding_type
-        *dstBuff++ = (video_format << 4) + frame_rate_index;                         // video_format + frame_rate
-        *dstBuff = (aspect_ratio_index << 4) + 0xf;                                  // aspect ratio + stuffing_bits
+        *dstBuff++ = static_cast<uint8_t>(video_format << 4 | frame_rate_index);     // video_format + frame_rate
+        *dstBuff = static_cast<uint8_t>(aspect_ratio_index << 4 | 0xf);              // aspect ratio + stuffing_bits
 
         return 10;  // total descriptor length
     }
