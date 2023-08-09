@@ -26,16 +26,16 @@ void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
         if (!m_true_hd_mode || m_downconvertToAC3)
         {
             if (m_bsid > 10)
-                *data++ = 0x72;  // E-AC3 subtype
+                *data = 0x72;  // E-AC3 subtype
             else
-                *data++ = 0x71;  // AC3 subtype
+                *data = 0x71;  // AC3 subtype
         }
         else
         {
             if (avPacket.flags & AVPacket::IS_CORE_PACKET)
-                *data++ = 0x76;  // AC3 at TRUE-HD
+                *data = 0x76;  // AC3 at TRUE-HD
             else
-                *data++ = 0x72;  // TRUE-HD data
+                *data = 0x72;  // TRUE-HD data
         }
         pesPacket->m_pesHeaderLen += 3;
     }
@@ -72,8 +72,10 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         // ATSC A/52 Annex A Table A3.1 AC-3 Registration Descriptor
         *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::REGISTRATION);  // descriptor tag
         *dstBuff++ = 4;                                                    // decriptor length
-        memcpy(dstBuff, "AC-3", 4);                                        // format_identifier
-        dstBuff += 4;
+        *dstBuff++ = 'A';
+        *dstBuff++ = 'C';
+        *dstBuff++ = '-';
+        *dstBuff++ = '3';
 
         // ATSC A/52 Annex A Table A4.1 AC-3 Audio Descriptor Syntax
         *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::AC3);  // AC-3_audio_stream_descriptor
@@ -101,8 +103,10 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     // ATSC A/52 Annex G 2.EAC3 Registration Descriptor
     *dstBuff++ = static_cast<int>(TSDescriptorTag::REGISTRATION);  // descriptor tag
     *dstBuff++ = 4;                                                // descriptor length
-    memcpy(dstBuff, "EAC3", 4);                                    // format_identifier
-    dstBuff += 4;
+    *dstBuff++ = 'E';
+    *dstBuff++ = 'A';
+    *dstBuff++ = 'C';
+    *dstBuff++ = '3';
 
     // ATSC A/52 Annex G Table G.1
     *dstBuff++ = static_cast<int>(TSDescriptorTag::EAC3);  // EAC3_audio_stream_descriptor

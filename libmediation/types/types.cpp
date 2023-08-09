@@ -1,7 +1,5 @@
 #include "types.h"
 
-#include <memory.h>
-
 #include <cstring>
 #include <iomanip>
 #include <ostream>

@@ -10,9 +10,9 @@
 static constexpr int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
 static constexpr int AC3_FRAME_SIZE = NB_BLOCKS * 256;
 
-bool isSyncWord(uint8_t *buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
+bool isSyncWord(const uint8_t *buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
 
-bool isHDSyncWord(uint8_t *buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
+bool isHDSyncWord(const uint8_t *buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
 
 static constexpr uint8_t eac3_blocks[4] = {1, 2, 3, 6};
 
@@ -502,7 +502,7 @@ uint64_t AC3Codec::getFrameDuration() const
     return m_frameDuration;
 }
 
-const std::string AC3Codec::getStreamInfo()
+std::string AC3Codec::getStreamInfo()
 {
     std::ostringstream str;
     std::string hd_type;

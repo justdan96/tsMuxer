@@ -125,9 +125,9 @@ void DTSStreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
         *data++ = 1;     // PES_extension_flag_2
         *data++ = 0x81;  // marker bit + extension2 len
         if (m_state == DTSDecodeState::stDecodeHD2 || !m_isCoreExists)
-            *data++ = 0x72;  // stream id extension. 71 = DTS frame, 72 HD frame
+            *data = 0x72;  // stream id extension. 71 = DTS frame, 72 HD frame
         else
-            *data++ = 0x71;  // stream id extension
+            *data = 0x71;  // stream id extension
         pesPacket->m_pesHeaderLen += 3;
     }
 }

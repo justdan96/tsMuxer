@@ -320,7 +320,7 @@ void doTruncatedFile(const char* fileName, const int64_t offset)
     const std::string outName = std::string(fileName) + std::string(".back");
     outFile.open(outName.c_str(), File::ofWrite);
 
-    const uint32_t bufSize = 1024 * 64;
+    constexpr uint32_t bufSize = 1024 * 64;
     const auto buffer = new uint8_t[bufSize];
     f.seek(offset);
     int readed = f.read(buffer, bufSize);

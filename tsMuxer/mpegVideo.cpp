@@ -554,18 +554,15 @@ void MPEGSliceHeader::deserialize(uint8_t* buf, const int buf_size)
 void MPEGSliceHeader::macroblocks(BitStreamReader& reader)
 {
     int increment = readMacroblockAddressIncrement(reader);
-    int incSum = 0;
     while (increment == MB_ESCAPE_CODE)
     {
-        incSum += 33;
         increment = readMacroblockAddressIncrement(reader);
     }
-    incSum += increment;
 }
 
 int MPEGSliceHeader::readMacroblockAddressIncrement(BitStreamReader& reader)
 {
-    int cnt = 0;
+    unsigned cnt = 0;
     for (; reader.getBit() == 0; cnt++)
         ;
     if (cnt > INT_BIT)
@@ -581,33 +578,18 @@ int MPEGSliceHeader::readMacroblockAddressIncrement(BitStreamReader& reader)
     case 3:
         return 7 - reader.getBit();
     case 4:
-        switch (reader.getBit())
-        {
-        case 1:
-            return 9 - reader.getBit();
-        case 0:
-            return 13 - reader.getBits(2);
-        }
+        return reader.getBit() ? 9 - reader.getBit() : 13 - reader.getBits(2);
     case 5:
-        switch (reader.getBit())
-        {
-        case 1:
+        if (reader.getBit())
             return 15 - reader.getBit();
-        case 0:
-            switch (reader.getBit())
-            {  // last bit of first byte
-            case 1:
-                return 19 - reader.getBits(2);
-            case 0:
-                switch (reader.getBit())
-                {
-                case 1:
-                    return 21 - reader.getBit();
-                case 0:
-                    return 25 - reader.getBits(2);
-                }
-            }
+
+        if (reader.getBit())
+        {  // last bit of first byte
+            return 19 - reader.getBits(2);
         }
+        if (reader.getBit())
+            return 21 - reader.getBit();
+        return 25 - reader.getBits(2);
     case 6:
         reader.skipBit();
         return 33 - reader.getBits(3);

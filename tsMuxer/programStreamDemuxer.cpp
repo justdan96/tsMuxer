@@ -133,7 +133,6 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
             const int ext2_len = *curBuf++ & 0x7f;  // PES_extension_field_length
             if (ext2_len > 0)
                 startcode = (startcode << 8) + *curBuf;
-            curBuf += ext2_len;
         }
     }
     curBuf = buff + pesPacket->getHeaderLength();
@@ -348,7 +347,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
     return 0;
 }
 
-int64_t getLastPCR(File& file, const int bufferSize, const int64_t fileSize)
+int64_t getLastPCR(const File& file, const int bufferSize, const int64_t fileSize)
 {
     file.seek(FFMAX(0, fileSize - bufferSize), File::SeekMethod::smBegin);
     const auto tmpBuffer = new uint8_t[bufferSize];
@@ -378,7 +377,7 @@ int64_t getLastPCR(File& file, const int bufferSize, const int64_t fileSize)
 
 int64_t getPSDuration(const char* fileName)
 {
-    const int BUF_SIZE = 1024 * 256;
+    constexpr int BUF_SIZE = 1024 * 256;
 
     try
     {

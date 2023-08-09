@@ -20,7 +20,7 @@ void VC1StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
     uint8_t* data = reinterpret_cast<uint8_t*>(pesPacket) + pesPacket->getHeaderLength();
     *data++ = 0x01;
     *data++ = 0x81;
-    *data++ = 0x55;  // VC-1 sub type id 0x55-0x5f
+    *data = 0x55;  // VC-1 sub type id 0x55-0x5f
     pesPacket->m_pesHeaderLen += 3;
 }
 
@@ -301,7 +301,7 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
         checkPulldownSync();
         m_testPulldownDts += m_prevDtsInc;
 
-        pcrIncVal = m_prevDtsInc = m_pcrIncPerFrame;
+        m_prevDtsInc = m_pcrIncPerFrame;
         if (m_sequence.pulldown)
         {
             if (!m_sequence.interlace || m_sequence.psf)

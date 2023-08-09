@@ -21,7 +21,6 @@ static uint32_t FOUR_CC(const uint8_t a, const uint8_t b, const uint8_t c, const
 
 static const uint32_t RIFF_SMALL = FOUR_CC('r', 'i', 'f', 'f');
 static const uint32_t RIFF_LARGE = FOUR_CC('R', 'I', 'F', 'F');
-static const uint32_t FMT_FOURCC = FOUR_CC('f', 'm', 't', ' ');
 
 using namespace wave_format;
 
@@ -101,6 +100,7 @@ int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
         m_channels = 8;
         m_lfeExists = true;
         break;
+    default: ;
     }
     const int sampling_index = buff[2] & 0x0f;
     m_freq = m2tsFreqs[sampling_index];
@@ -270,6 +270,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
         case 8:
             channelsIndex = 11;
             break;
+        default: ;
         }
         int sampling_index = 1;
         if (m_freq == 96000)

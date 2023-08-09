@@ -190,7 +190,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
     constexpr uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
     if (streamInfo->m_bufLen >= blockSize)
     {
-        const int toFileLen = blockSize & 0xffff0000;
+        constexpr int toFileLen = blockSize & 0xffff0000;
         if (m_owner->isAsyncMode())
         {
             const auto newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];

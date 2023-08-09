@@ -481,7 +481,7 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 
-int64_t getLastPCR(File& file, const int bufferSize, const int frameSize, const int64_t fileSize)
+int64_t getLastPCR(const File& file, const int bufferSize, const int frameSize, const int64_t fileSize)
 {
     // pcr from end of file
     const auto tmpBuffer = new uint8_t[bufferSize];

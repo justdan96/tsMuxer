@@ -311,7 +311,7 @@ void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const i
 
 void MuxerManager::asyncWriteBlock(const WriterData& data) const
 {
-    const int nMaxWriteQueueSize = 256 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;
+    static constexpr int nMaxWriteQueueSize = 256 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;
     while (m_fileWriter->getQueueSize() > nMaxWriteQueueSize)
     {
         Process::sleep(1);

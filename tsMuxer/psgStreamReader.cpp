@@ -131,7 +131,7 @@ void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)
 
 void PGSStreamReader::yuvToRgb(const int minY) const
 {
-    uint8_t* src = m_imgBuffer;
+    const uint8_t* src = m_imgBuffer;
     const uint8_t* end = src + m_video_width * m_video_height;
     // uint8_t* dst = m_rgbBuffer;
     auto dst = reinterpret_cast<RGBQUAD*>(m_rgbBuffer);
@@ -146,8 +146,7 @@ void PGSStreamReader::yuvToRgb(const int minY) const
         rgbPal[itr.first] = TextToPGSConverter::YUVAToRGBA(itr.second);
         yuvPal[itr.first] = itr.second;
     }
-    RGBQUAD zeroRgb;
-    memset(&zeroRgb, 0, sizeof(zeroRgb));
+    constexpr RGBQUAD zeroRgb = {};
     for (; src < end; ++src)
     {
         if (yuvPal[*src].Y >= minY)
@@ -161,7 +160,7 @@ void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset)
 {
     if (m_dstRle.empty())
         return;
-    uint8_t* src = m_dstRle.data();
+    const uint8_t* src = m_dstRle.data();
     const uint8_t* srcEnd = src + m_dstRle.size();
 
     uint8_t* dst = m_imgBuffer + (yOffset * m_video_width + xOffset);
@@ -281,11 +280,11 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
             const double fraction_y = yDest * yFactor - floor_y;
             const double one_minus_x = 1.0 - fraction_x;
             const double one_minus_y = 1.0 - fraction_y;
-            RGBQUAD* c1 = bmpRef->buffer + floor_y * bmpRef->Width;
+            const RGBQUAD* c1 = bmpRef->buffer + floor_y * bmpRef->Width;
             const RGBQUAD* c2 = c1;
             c1 += floor_x;
             c2 += ceil_x;
-            RGBQUAD* c3 = bmpRef->buffer + ceil_y * bmpRef->Width;
+            const RGBQUAD* c3 = bmpRef->buffer + ceil_y * bmpRef->Width;
             const RGBQUAD* c4 = c3;
             c3 += floor_x;
             c4 += ceil_x;

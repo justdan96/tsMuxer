@@ -210,7 +210,7 @@ class METADemuxer : public AbstractDemuxer
                                             int containerStreamIndex);
     static std::string findBluRayFile(const std::string& streamDir, const std::string& requestDir,
                                       const std::string& requestFile);
-    const std::vector<MPLSParser> getMplsInfo(const std::string& mplsFileName);
+    std::vector<MPLSParser> getMplsInfo(const std::string& mplsFileName);
 
     int addPGSubStream(const std::string& codec, const std::string& _codecStreamName,
                        const std::map<std::string, std::string>& addParams, MPLSStreamInfo* subStream);

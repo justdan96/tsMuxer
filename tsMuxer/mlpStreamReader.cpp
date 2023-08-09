@@ -41,7 +41,10 @@ int MLPStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     *dstBuff++ = static_cast<int>(TSDescriptorTag::REGISTRATION);  // descriptor tag
     *dstBuff++ = 4;                                                // descriptor length
     // https://smpte-ra.org/registered-mpeg-ts-ids
-    memcpy(dstBuff, "mlpa", 4);  // format_identifier
+    *dstBuff++ = 'm';
+    *dstBuff++ = 'l';
+    *dstBuff++ = 'p';
+    *dstBuff = 'a';
 
     return 6;  // total descriptor length
 }

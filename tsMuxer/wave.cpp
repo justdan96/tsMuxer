@@ -35,6 +35,7 @@ uint32_t getWaveChannelMask(const int channels, const bool lfeExists)
     case 8:
         return SPEAKER_FRONT_LEFT + SPEAKER_FRONT_RIGHT + SPEAKER_FRONT_CENTER + SPEAKER_BACK_LEFT +
                SPEAKER_BACK_RIGHT + SPEAKER_SIDE_LEFT + SPEAKER_SIDE_RIGHT + SPEAKER_LOW_FREQUENCY;
+    default: ;
     }
     return 0;  // unknown value
 }

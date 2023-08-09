@@ -404,6 +404,7 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
         case 7:
             pict_type = VC1PictType::BI_TYPE;
             break;
+        default: ;
         }
     }
     else
@@ -425,6 +426,7 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
         case 4:
             pict_type = VC1PictType::P_TYPE;  // skipped pic
             break;
+        default: ;
         }
     }
 

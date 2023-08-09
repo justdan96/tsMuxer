@@ -908,14 +908,14 @@ void TSMuxer::finishFileBlock(const uint64_t newPts, const uint64_t newPCR, cons
 {
     if (m_processedBlockSize > 0)
     {
-        const auto gapForPATPMT = static_cast<int64_t>((192 * 4.0) / 35000000.0 * 27000000.0);
+        constexpr auto gapForPATPMT = static_cast<int64_t>((192 * 4.0) / 35000000.0 * 27000000.0);
         doFlush(newPCR, gapForPATPMT);
         if (!doChangeFile)
             m_interleaveInfo.rbegin()->push_back(static_cast<int32_t>(m_processedBlockSize / 192));
         m_processedBlockSize = 0;
         m_owner->muxBlockFinished(this);
         if (m_m2tsMode)
-            assert(m_outBuf == 0 && m_outBufLen == 0);
+            assert(m_outBuf == nullptr && m_outBufLen == 0);
         else
             flushTSBuffer();
         m_outBuf = new uint8_t[m_writeBlockSize + 1024];
@@ -1012,7 +1012,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
         newPCR = FFMAX(newPCR, cbrPCR);
     }
 
-    if (newPES && m_canSwithBlock && (isSplitPoint(avPacket) || isSplitPoint(avPacket)))
+    if (newPES && m_canSwithBlock && isSplitPoint(avPacket))
     {
         finishFileBlock(avPacket.pts, newPCR, true);  // goto next file
     }

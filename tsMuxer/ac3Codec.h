@@ -69,7 +69,7 @@ class AC3Codec
     static uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
     uint64_t getFrameDuration() const;
     const CodecInfo& getCodecInfo();
-    const std::string getStreamInfo();
+    std::string getStreamInfo();
 
    protected:
     AC3State m_state;

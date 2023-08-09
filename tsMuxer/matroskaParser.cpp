@@ -141,7 +141,6 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
     if (curPos > end)
     {
         LTRACE(LT_ERROR, 2, "Matroska parse error: invalid H264 NAL unit size. NAL unit truncated.");
-        curPos = end;
     }
     newBufSize += elements * (4 - m_nalSize);
     pkt->data = new uint8_t[newBufSize];

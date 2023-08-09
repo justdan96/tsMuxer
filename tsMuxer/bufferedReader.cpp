@@ -75,7 +75,6 @@ uint32_t BufferedReader::createNewReaderID()
 
 uint32_t BufferedReader::createReader(const int readBuffOffset)
 {
-    uint32_t newReaderID;
     ReaderData* data = intCreateReader();
 
     data->m_blockSize = m_blockSize;
@@ -85,17 +84,15 @@ uint32_t BufferedReader::createReader(const int readBuffOffset)
 
     data->m_firstBlock = true;
     data->m_lastBlock = false;
-    size_t rSize;
+
+    std::lock_guard lock(m_readersMtx);
+    const uint32_t newReaderID = createNewReaderID();
+    m_readers[newReaderID] = data;
+    size_t rSize = m_readers.size();
+    if (!m_started)
     {
-        std::lock_guard lock(m_readersMtx);
-        newReaderID = createNewReaderID();
-        m_readers[newReaderID] = data;
-        rSize = m_readers.size();
-        if (!m_started)
-        {
-            run(this);
-            m_started = true;
-        }
+        run(this);
+        m_started = true;
     }
     LTRACE(LT_INFO, 0, "Reader #" << m_id << ". Start new stream " << newReaderID << ". stream(s): " << rSize);
 

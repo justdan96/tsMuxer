@@ -1585,6 +1585,7 @@ int SEIUnit::getNumClockTS(const int pic_struct)
     case 8:
         NumClockTS = 3;
         break;
+    default: ;
     }
     return NumClockTS;
 }
@@ -1778,6 +1779,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size,
                     case 0x47534D50:
                         processBlurayGopStructure();
                         break;
+                    default: ;
                     }
                 }
             }

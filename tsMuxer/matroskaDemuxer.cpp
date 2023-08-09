@@ -456,8 +456,7 @@ int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
 
 void MatroskaDemuxer::decompressData(uint8_t *data, const int size)
 {
-    z_stream zstream;
-    memset(&zstream, 0, sizeof(zstream));
+    z_stream zstream = {};
 
     int err = inflateInit(&zstream);
     if (err != Z_OK)
@@ -601,8 +600,10 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             lace_size[n] = size - total;
             break;
         }
+        default: ;
         }
         break;
+    default: ;
     }
 
     if (res == 0)
@@ -1043,12 +1044,12 @@ int MatroskaDemuxer::ebml_read_num(const int max_size, uint64_t *number)
 {
     // ByteIOContext *pb = &matroska->ctx->pb;
     int len_mask = 0x80, read = 1, n = 1;
-    int64_t total = 0;
+    int64_t total;
 
     /* the first byte tells us the length in bytes - get_byte() can normally
      * return 0, but since that's not a valid first ebmlID byte, we can
      * use it safely here to catch EOS. */
-    if (!(total == get_byte()))
+    if ((total = get_byte()) == 0)
     {
         /* we might encounter EOS here */
         if (!m_isEOF)

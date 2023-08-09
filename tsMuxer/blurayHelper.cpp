@@ -93,7 +93,7 @@ struct MovieObject
     {
         const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
         return (2 * sizeof(std::uint16_t)) /* flags + numOfNavCommands */
-               + (numOfNavCommands * std::tuple_size<decltype(navigationCommands)::value_type>::value);
+               + (numOfNavCommands * std::tuple_size_v<decltype(navigationCommands)::value_type>);
     }
 };
 enum class BDMV_VersionNumber
@@ -418,10 +418,12 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
     auto clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
     CLPIParser clpiParser;
     string version_number;
-    if (m_dt == DiskType::BLURAY)
-        memcpy(&clpiParser.version_number, isV3() ? "0300" : "0200", 5);
-    else
-        memcpy(&clpiParser.version_number, "0100", 5);
+    clpiParser.version_number[0] = '0';
+    clpiParser.version_number[1] = m_dt == DiskType::BLURAY ? (isV3() ? '3' : '2') : '1';
+    clpiParser.version_number[2] = '0';
+    clpiParser.version_number[3] = '0';
+    clpiParser.version_number[4] = 0;
+
     clpiParser.clip_stream_type = 1;  // AV stream
     clpiParser.isDependStream = muxer->isSubStream();
     if (clpiParser.isDependStream)
@@ -555,7 +557,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
         for (auto& i : customChapters)
         {
             auto mark = static_cast<uint32_t>(i * 45000.0);
-            if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
+            if (mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }
     }

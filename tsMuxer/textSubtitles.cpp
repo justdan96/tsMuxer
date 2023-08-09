@@ -12,9 +12,8 @@
 #endif
 
 #include <cassert>
-
 #include <cmath>
-#include "memory.h"
+
 #include "psgStreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"

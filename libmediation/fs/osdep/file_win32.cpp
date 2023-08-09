@@ -1,8 +1,6 @@
 #include <io.h>
 #include <windows.h>
 
-#include <sstream>
-
 #include "../directory.h"
 #include "../file.h"
 

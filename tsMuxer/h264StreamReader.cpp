@@ -439,8 +439,11 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
         // Blu-ray core specifications Table 9-10 - HDMV_video_registration_descriptor
         *dstBuff++ = static_cast<int>(TSDescriptorTag::REGISTRATION);  // descriptor tag
         *dstBuff++ = 8;                                                // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);                                // HDMV + stuffing byte
-        dstBuff += 5;
+        *dstBuff++ = 'H';
+        *dstBuff++ = 'D';
+        *dstBuff++ = 'M';
+        *dstBuff++ = 'V';
+        *dstBuff++ = 0xff;  // stuffing byte
 
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
@@ -449,7 +452,7 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
         *dstBuff++ = !m_mvcSubStream ? static_cast<uint8_t>(StreamType::VIDEO_H264)
                                      : static_cast<uint8_t>(StreamType::VIDEO_MVC);  // stream_coding_type
         *dstBuff++ = (video_format << 4) + frame_rate_index;                         // video_format + frame_rate
-        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;                                // aspect ratio + stuffing_bits
+        *dstBuff = (aspect_ratio_index << 4) + 0xf;                                  // aspect ratio + stuffing_bits
 
         return 10;  // total descriptor length
     }
@@ -468,7 +471,7 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
             *dstBuff++ = nal[1];                                       // profile_idc
             *dstBuff++ = nal[2];                                       // constraint flags
             *dstBuff++ = m_forcedLevel == 0 ? nal[3] : m_forcedLevel;  // level_idc
-            *dstBuff++ = 0xbf;  // AVC_still_present, AVC_24_hour flag, Frame_Packing_SEI_not_present_flag, reserved
+            *dstBuff = 0xbf;  // AVC_still_present, AVC_24_hour flag, Frame_Packing_SEI_not_present_flag, reserved
 
             return 6;
         }
@@ -1308,6 +1311,7 @@ int H264StreamReader::sliceTypeToPictType(const int slice_type) const
             return 7;
         return 6;
     }
+    default:;
     }
     return 0;
 }
@@ -1366,7 +1370,6 @@ int H264StreamReader::processSPS(uint8_t *buff)
     }
 
     updateFPS(sps, buff, nextNal, oldSpsLen);
-    nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
     updateHRDParam(sps);
     if (sps->nalHrdParams.isPresent)
         updatedSPSList.insert(sps->seq_parameter_set_id);

@@ -61,7 +61,7 @@ bool deleteFile(const string& fileName)
     {
         return true;
     }
-    DWORD err = GetLastError();
+    // DWORD err = GetLastError();
     return false;
 }
 

@@ -39,7 +39,7 @@ const uint16_t Crc16Table[256] = {
     0x1CE0, 0x0CC1, 0xEF1F, 0xFF3E, 0xCF5D, 0xDF7C, 0xAF9B, 0xBFBA, 0x8FD9, 0x9FF8, 0x6E17, 0x7E36, 0x4E55, 0x5E74,
     0x2E93, 0x3EB2, 0x0ED1, 0x1EF0};
 
-unsigned short crc16(unsigned char *pcBlock, unsigned short len)
+unsigned short crc16(const unsigned char *pcBlock, unsigned short len)
 {
     unsigned short crc = 0;
 
@@ -399,9 +399,8 @@ void FileEntryInfo::serializeFile()
 
 void FileEntryInfo::serializeDir() const
 {
-    uint8_t buffer[SECTOR_SIZE];
+    uint8_t buffer[SECTOR_SIZE] = {};
 
-    memset(buffer, 0, sizeof(buffer));
     ByteFileWriter writer;
     writer.setBuffer(buffer, sizeof(buffer));
 
@@ -621,7 +620,7 @@ void IsoWriter::setVolumeLabel(const std::string &value)
 
 bool IsoWriter::open(const std::string &fileName, const int64_t diskSize, const int extraISOBlocks)
 {
-    const int systemFlags = 0;
+    constexpr int systemFlags = 0;
     if (!m_file.open(fileName.c_str(), File::ofWrite, systemFlags))
         return false;
 
@@ -638,19 +637,31 @@ bool IsoWriter::open(const std::string &fileName, const int64_t diskSize, const 
 
     // 2. write Beginning Extended Area Descriptor
     m_buffer[0] = 0;  // Structure Type
-    memcpy(m_buffer + 1, "BEA01", 5);
+    m_buffer[1] = 'B';
+    m_buffer[2] = 'E';
+    m_buffer[3] = 'A';
+    m_buffer[4] = '0';
+    m_buffer[5] = '1';
     m_buffer[6] = 1;  // Structure Version
     m_file.write(m_buffer, SECTOR_SIZE);
 
     // 3. Volume recognition structures. NSR Descriptor
     m_buffer[0] = 0;  // Structure Type
-    memcpy(m_buffer + 1, "NSR03", 5);
+    m_buffer[1] = 'N';
+    m_buffer[2] = 'S';
+    m_buffer[3] = 'R';
+    m_buffer[4] = '0';
+    m_buffer[5] = '3';
     m_buffer[6] = 1;  // Structure Version
     m_file.write(m_buffer, SECTOR_SIZE);
 
     // 4. Terminating Extended Area Descriptor
     m_buffer[0] = 0;  // Structure Type
-    memcpy(m_buffer + 1, "TEA01", 5);
+    m_buffer[1] = 'T';
+    m_buffer[2] = 'E';
+    m_buffer[3] = 'A';
+    m_buffer[4] = '0';
+    m_buffer[5] = '1';
     m_buffer[6] = 1;  // Structure Version
     m_file.write(m_buffer, SECTOR_SIZE);
 
@@ -808,7 +819,7 @@ void IsoWriter::writeMetadata(const int lbn)
 
 void IsoWriter::allocateMetadata()
 {
-    const int sectorNum = 2;  // reserve sector for file set descriptor and terminating descriptor
+    constexpr int sectorNum = 2;  // reserve sector for file set descriptor and terminating descriptor
     m_systemStreamLBN = allocateEntity(m_rootDirInfo, sectorNum);
     allocateEntity(m_systemStreamDir, m_systemStreamLBN);
 
@@ -891,7 +902,7 @@ void IsoWriter::writeDescriptors()
 {
     m_tagLocationBaseAddr = 0;
     // descriptors in a beginning of a file
-    m_file.seek(1024 * 64);
+    m_file.seek(1024LL * 64);
 
     writePrimaryVolumeDescriptor();
     writeImpUseDescriptor();
@@ -900,12 +911,12 @@ void IsoWriter::writeDescriptors()
     writeUnallocatedSpaceDescriptor();
     writeTerminationDescriptor();
 
-    m_file.seek(1024 * 128);
+    m_file.seek(1024LL * 128);
 
     writeLogicalVolumeIntegrityDescriptor();
     writeTerminationDescriptor();
 
-    m_file.seek(1024 * 512);
+    m_file.seek(1024LL * 512);
 
     writeAnchorVolumeDescriptor(m_partitionEndAddress +
                                 ALLOC_BLOCK_SIZE / SECTOR_SIZE);  // add space for last 64K anchor volume

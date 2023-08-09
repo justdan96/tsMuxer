@@ -51,12 +51,15 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
     // HDMV registration descriptor
     *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // registration descriptor tag
     *dstBuff++ = 8;                                            // descriptor length
-    memcpy(dstBuff, "HDMV\xff", 5);
-    dstBuff += 5;
+    *dstBuff++ = 'H';
+    *dstBuff++ = 'D';
+    *dstBuff++ = 'M';
+    *dstBuff++ = 'V';
+    *dstBuff++ = 0xff;
 
     *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_MPEG2);  // stream_coding_type
     *dstBuff++ = (m_sequence.video_format << 4) + m_sequence.frame_rate_index;
-    *dstBuff++ = (m_sequence.aspect_ratio_info << 4) + 0xf;
+    *dstBuff = (m_sequence.aspect_ratio_info << 4) + 0xf;
 
     return 10;  // total descriptor length
 }
@@ -67,10 +70,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
     uint8_t* end = buffer + len;
     BitStreamReader bitReader{};
     uint8_t* nextNal = nullptr;
-    bool spsFound = false;
-    bool gopFound = false;
     bool sliceFound = false;
-    bool seqExtFound = false;
     bool pictureFound = false;
     bool pulldownFound = false;
     int extType = 0;
@@ -92,7 +92,6 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                     if (extType == SEQUENCE_EXT)
                     {
                         m_sequence.deserializeExtension(bitReader);
-                        seqExtFound = true;
                     }
                     else if (extType == PICTURE_CODING_EXT)
                     {
@@ -101,10 +100,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                     }
                     break;
                 case SEQ_END_SHORT_CODE:
-                    break;
                 case GOP_START_SHORT_CODE:
-                    gopFound = true;
-                    break;
                 case USER_START_SHORT_CODE:
                     break;
                 case PICTURE_START_SHORT_CODE:
@@ -173,6 +169,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
                         m_lastDecodedPos = nextNal;
                     }
                     return rez;
+                default: ;
                 }
                 nextNal = MPEGHeader::findNextMarker(nextNal, m_bufEnd) + 3;
             }
@@ -185,6 +182,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
         case PICTURE_START_SHORT_CODE:
             rez = decodePicture(buff);
             return rez;
+        default: ;
         }
         return 0;
     }

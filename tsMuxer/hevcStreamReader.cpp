@@ -160,8 +160,11 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
         // 'HDMV' registration descriptor
         *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // descriptor tag
         *dstBuff++ = 8;                                            // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);                            // HDMV + stuffing byte
-        dstBuff += 5;
+        *dstBuff++ = 'H';
+        *dstBuff++ = 'D';
+        *dstBuff++ = 'M';
+        *dstBuff++ = 'V';
+        *dstBuff++ = 0xff;  // stuffing byte
 
         *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_H265);  // stream_conding_type
         int video_format, frame_rate_index, aspect_ratio_index;

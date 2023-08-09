@@ -360,11 +360,8 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, const int es_in
         const uint8_t len = curPos[1];
         curPos += 2;
         const uint8_t* descrBuf = curPos;
-        if (tag == TSDescriptorTag::REGISTRATION)
-        {
-            descrBuf += 4;
-        }
-        else if (tag == TSDescriptorTag::LANG)
+
+        if (tag == TSDescriptorTag::LANG)
         {
             for (int i = 0; i < 3; i++) pmtInfo.m_lang[i] = descrBuf[i];
         }
@@ -1147,7 +1144,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
     {
         const uint32_t dataID = reader.get32Bits();
         const uint32_t dataAddress = reader.get32Bits();
-        const uint32_t dataLength = reader.get32Bits();
+        const int32_t dataLength = reader.getBits(32);
 
         if (dataAddress + dataLength > static_cast<uint32_t>(end - buffer))
         {
@@ -1169,6 +1166,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
         case 0x00020006:
             CPI_SS(buffer + dataAddress, dataLength);
             break;
+        default: ;
         }
     }
 }
@@ -1711,7 +1709,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
 
     const std::string clip_Information_file_name = strPadLeft(int32ToStr(fileNum + m_m2tsOffset), 5, '0');
     CLPIStreamInfo::writeString(clip_Information_file_name.c_str(), writer, 5);
-    const char clip_codec_identifier[] = "M2TS";
+    constexpr char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
     const int connection_condition = playItemNum == 0 ? 1 : 6;
     writer.putBits(27, 0);  // reserved_for_future_use
@@ -1986,7 +1984,7 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
         {
             const uint32_t dataID = reader.get32Bits();
             const uint32_t dataAddress = reader.get32Bits();
-            const uint32_t dataLength = reader.get32Bits();
+            const int32_t dataLength = reader.getBits(32);
 
             if (dataAddress + dataLength > static_cast<uint32_t>(dataEnd - data))
             {
@@ -2008,6 +2006,8 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
                 // stn table ss
                 isDependStreamExist = true;
                 parseSubPathEntryExtension(data + dataAddress, dataLength);
+                break;
+            default: ;
             }
         }
     }
@@ -2098,7 +2098,7 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemN
         fileNum *= 2;
     const std::string clip_Information_file_name = strPadLeft(int32ToStr(fileNum + m_m2tsOffset), 5u, '0');
     CLPIStreamInfo::writeString(clip_Information_file_name.c_str(), writer, 5);
-    const char clip_codec_identifier[] = "M2TS";
+    constexpr char clip_codec_identifier[] = "M2TS";
     CLPIStreamInfo::writeString(clip_codec_identifier, writer, 4);
     writer.putBits(11, 0);  // reserved_for_future_use
     writer.putBit(0);       // is_multi_angle
@@ -2598,6 +2598,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             case 192000:
                 sampling_frequency_index = 5;
                 break;
+            default: ;
             }
         }
     }

@@ -276,7 +276,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         }
     }
 
-    int getNalSize(uint8_t* buff) const
+    int getNalSize(const uint8_t* buff) const
     {
         if (nal_length_size == 1)
             return buff[0];
@@ -494,12 +494,12 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         if (!tags.empty())
         {
             sort(tags.begin(), tags.end(), greater<>());
-            for (auto i : tags) subtitleText.insert(i.first, i.second);
+            for (auto [fst, snd] : tags) subtitleText.insert(fst, snd);
         }
         memcpy(dst, subtitleText.c_str(), subtitleText.length());
         dst += subtitleText.length();
-
-        memcpy(dst, "\n\n", 2);
+        *dst++ = '\n';
+        *dst = '\n';
         m_timeOffset = endTime;
     }
 
@@ -1024,6 +1024,7 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
     case MKTAG(0xa9, 'e', 'n', 'c'):
         key = "muxer";
         break;
+    default: ;
     }
     if (!key)
         return 0;
@@ -1163,7 +1164,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
-    for (auto& i : trex_data)
+    for (const auto& i : trex_data)
         if (i.track_id == frag->track_id)
         {
             trex = &i;
@@ -1420,6 +1421,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         case MKTAG('t', 'm', 'c', 'd'):
             st->type = IOContextTrackType::CONTROL;
             break;
+        default: ;
         }
 
         if (st->type == IOContextTrackType::VIDEO)

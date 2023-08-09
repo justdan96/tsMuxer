@@ -11,7 +11,7 @@ BufferedReaderManager::BufferedReaderManager(const uint32_t readersCnt, const ui
 
     for (uint32_t i = 0; i < readersCnt; i++)
     {
-        BufferedReader* reader = new BufferedFileReader(m_blockSize, m_allocSize, m_prereadThreshold);
+        BufferedReader* reader = new BufferedFileReader(blockSize, allocSize, prereadThreshold);
         reader->setId(i);
         m_fileReaders.push_back(reader);
     }

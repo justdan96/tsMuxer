@@ -1149,7 +1149,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
     return rez;
 }
 
-const std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileName)
+std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileName)
 {
     std::vector<MPLSParser> result;
 

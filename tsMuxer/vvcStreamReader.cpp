@@ -121,8 +121,11 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bo
     {
         *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // descriptor tag
         *dstBuff++ = 8;                                            // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);
-        dstBuff += 5;
+        *dstBuff++ = 'H';
+        *dstBuff++ = 'D';
+        *dstBuff++ = 'M';
+        *dstBuff++ = 'V';
+        *dstBuff++ = 0xff;
 
         *dstBuff++ = static_cast<int>(StreamType::VIDEO_H266);  // stream_coding_type
         int video_format, frame_rate_index, aspect_ratio_index;
@@ -131,7 +134,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bo
                                            &aspect_ratio_index);
 
         *dstBuff++ = (video_format << 4) + frame_rate_index;
-        *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
+        *dstBuff = (aspect_ratio_index << 4) + 0xf;
 
         return 10;  // total descriptor length
     }
