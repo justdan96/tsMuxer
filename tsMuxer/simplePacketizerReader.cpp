@@ -76,7 +76,8 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
     int skipBeforeBytes = 0;
     if (m_tmpBufferLen >= getHeaderLen())
     {
-        const int size = decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
+        const int size =
+            decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
@@ -170,9 +171,9 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         {
             LTRACE(LT_INFO, 2,
                    getCodecInfo().displayName
-                   << " stream (track " << m_streamIndex << "): bad frame detected at position"
-                   << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
-                   << ". Resync stream.");
+                       << " stream (track " << m_streamIndex << "): bad frame detected at position"
+                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                       << ". Resync stream.");
             m_needSync = true;
             return 0;
         }

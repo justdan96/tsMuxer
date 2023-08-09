@@ -120,14 +120,15 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bo
     if (hdmvDescriptors)
     {
         *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // descriptor tag
-        *dstBuff++ = 8;                               // descriptor length
+        *dstBuff++ = 8;                                            // descriptor length
         memcpy(dstBuff, "HDMV\xff", 5);
         dstBuff += 5;
 
         *dstBuff++ = static_cast<int>(StreamType::VIDEO_H266);  // stream_coding_type
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index, &aspect_ratio_index);
+                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
+                                           &aspect_ratio_index);
 
         *dstBuff++ = (video_format << 4) + frame_rate_index;
         *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
@@ -338,7 +339,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                 m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
                 rez = m_slice->deserialize(m_sps, m_pps);
                 if (rez)
-                    return rez; // not enough buffer or error
+                    return rez;  // not enough buffer or error
                 if (nalType >= VvcUnit::NalType::IDR_W_RADL)
                     m_lastIFrame = true;
                 m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);

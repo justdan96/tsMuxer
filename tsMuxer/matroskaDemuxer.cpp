@@ -41,7 +41,7 @@ int MatroskaDemuxer::matroska_parse_index()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;

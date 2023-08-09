@@ -171,10 +171,7 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
     return skipProcessedBytes(bitReader);
 }
 
-uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(BitStreamReader& bitReader)
-{
-    return bitReader.getBuffer();
-}
+uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(BitStreamReader& bitReader) { return bitReader.getBuffer(); }
 
 uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitReader)
 {

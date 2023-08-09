@@ -514,8 +514,8 @@ std::vector<wchar_t> toWide(const char* utf8Str, const int sz)
         return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
     }
     /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
-         * to keep compatibility with meta files saved by older versions of the GUI which put the file name through
-         * QString::toLocal8Bit, which uses the ACP on Windows. */
+     * to keep compatibility with meta files saved by older versions of the GUI which put the file name through
+     * QString::toLocal8Bit, which uses the ACP on Windows. */
     return fromAcp(utf8Str, sz);
 }
 

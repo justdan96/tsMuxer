@@ -50,9 +50,8 @@ int HevcUnit::deserialize()
         nuh_layer_id = m_reader.getBits(6);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
         if (nuh_temporal_id_plus1 == 0 ||
-            (nuh_temporal_id_plus1 != 1 &&
-             (nal_unit_type == NalType::VPS || nal_unit_type == NalType::SPS ||
-              nal_unit_type == NalType::EOS || nal_unit_type == NalType::EOB)))
+            (nuh_temporal_id_plus1 != 1 && (nal_unit_type == NalType::VPS || nal_unit_type == NalType::SPS ||
+                                            nal_unit_type == NalType::EOS || nal_unit_type == NalType::EOB)))
             return 1;
         return 0;
     }
@@ -173,10 +172,7 @@ std::string HevcUnitWithProfile::getProfileString() const
 
 // ------------------------- HevcVpsUnit -------------------
 
-HevcVpsUnit::HevcVpsUnit()
-    : vps_id(0), num_units_in_tick(0), time_scale(0), num_units_in_tick_bit_pos(-1)
-{
-}
+HevcVpsUnit::HevcVpsUnit() : vps_id(0), num_units_in_tick(0), time_scale(0), num_units_in_tick_bit_pos(-1) {}
 
 int HevcVpsUnit::deserialize()
 {

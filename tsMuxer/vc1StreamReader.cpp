@@ -67,12 +67,12 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
                 return 0;
 
             dstBuff[0] = static_cast<int>(TSDescriptorTag::REGISTRATION);  // descriptor tag
-            dstBuff[1] = 0x06;                                // descriptor len
-            dstBuff[2] = 0x56;                                // "V"
-            dstBuff[3] = 0x43;                                // "C"
-            dstBuff[4] = 0x2D;                                // "-"
-            dstBuff[5] = 0x31;                                // "1"
-            dstBuff[6] = 0x01;                                // profile and level subdescriptor
+            dstBuff[1] = 0x06;                                             // descriptor len
+            dstBuff[2] = 0x56;                                             // "V"
+            dstBuff[3] = 0x43;                                             // "C"
+            dstBuff[4] = 0x2D;                                             // "-"
+            dstBuff[5] = 0x31;                                             // "1"
+            dstBuff[6] = 0x01;                                             // profile and level subdescriptor
 
             const int profile = static_cast<int>(sequence.profile) << 4;
             switch (sequence.profile)

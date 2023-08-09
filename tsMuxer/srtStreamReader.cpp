@@ -241,7 +241,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         }
         return rez;
     }
-    m_sourceText.pop(); // delete empty line (messages separator)
+    m_sourceText.pop();  // delete empty line (messages separator)
     m_processedSize += m_origSize.front();
     m_origSize.pop();
     rez = m_srtRender->doConvert(m_renderedText, m_animation, m_inTime, m_outTime, renderedLen);
