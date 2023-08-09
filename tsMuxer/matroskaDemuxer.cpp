@@ -67,7 +67,7 @@ int MatroskaDemuxer::matroska_parse_index()
 
             while (res == 0)
             {
-                if (!(id = ebml_peek_id(&level_up)))
+                if ((id = ebml_peek_id(&level_up)) == 0)
                 {
                     res = -BufferedReader::DATA_EOF;
                     break;
@@ -98,7 +98,7 @@ int MatroskaDemuxer::matroska_parse_index()
 
                     while (res == 0)
                     {
-                        if (!(id = ebml_peek_id(&level_up)))
+                        if ((id = ebml_peek_id(&level_up)) == 0)
                         {
                             res = -BufferedReader::DATA_EOF;
                             break;
@@ -242,7 +242,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
     if (version)
         *version = 1;
 
-    if (!(id = ebml_peek_id(&level_up)) || level_up != 0 || id != EBML_ID_HEADER)
+    if ((id = ebml_peek_id(&level_up)) == 0 || level_up != 0 || id != EBML_ID_HEADER)
     {
         THROW(ERR_MATROSKA_PARSE, "This is not an EBML file (id=" << id << "/" << EBML_ID_HEADER);
     }
@@ -251,7 +251,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
             return -BufferedReader::DATA_EOF;
 
         /* end-of-header */
@@ -712,7 +712,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -913,7 +913,7 @@ int MatroskaDemuxer::matroska_parse_cluster()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1105,7 +1105,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
         int res = 0;
         while (res == 0)
         {
-            if (!(id = ebml_peek_id(&level_up)))
+            if ((id = ebml_peek_id(&level_up)) == 0)
             {
                 return BufferedReader::DATA_EOF;
             }
@@ -1177,7 +1177,7 @@ int MatroskaDemuxer::matroska_read_header()
     /* The next thing is a segment. */
     while (true)
     {
-        if (!(id = ebml_peek_id(&last_level)))
+        if ((id = ebml_peek_id(&last_level)) == 0)
             return -BufferedReader::DATA_EOF;
         if (id == MATROSKA_ID_SEGMENT)
             break;
@@ -1196,7 +1196,7 @@ int MatroskaDemuxer::matroska_read_header()
     /* we've found our segment, start reading the different contents in here */
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1367,7 +1367,7 @@ int MatroskaDemuxer::matroska_parse_info()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1497,7 +1497,7 @@ int MatroskaDemuxer::matroska_parse_metadata()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1545,7 +1545,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1576,7 +1576,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
             while (res == 0)
             {
-                if (!(id = ebml_peek_id(&level_up)))
+                if ((id = ebml_peek_id(&level_up)) == 0)
                 {
                     res = -BufferedReader::DATA_EOF;
                     break;
@@ -1595,7 +1595,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
                     while (res == 0)
                     {
-                        if (!(id = ebml_peek_id(&level_up)))
+                        if ((id = ebml_peek_id(&level_up)) == 0)
                         {
                             res = -BufferedReader::DATA_EOF;
                             break;
@@ -1622,7 +1622,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
 
                             while (res == 0)
                             {
-                                if (!(id = ebml_peek_id(&level_up)))
+                                if ((id = ebml_peek_id(&level_up)) == 0)
                                 {
                                     res = -BufferedReader::DATA_EOF;
                                     break;
@@ -1737,7 +1737,7 @@ int MatroskaDemuxer::matroska_parse_tracks()
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -1785,7 +1785,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             break;
         }
@@ -1841,7 +1841,7 @@ int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             break;
         }
@@ -1881,7 +1881,7 @@ int MatroskaDemuxer::readTrackEncodings(MatroskaTrack *track)
 
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             break;
         }
@@ -1936,7 +1936,7 @@ int MatroskaDemuxer::matroska_add_stream()
     /* try reading the trackentry headers */
     while (res == 0)
     {
-        if (!(id = ebml_peek_id(&level_up)))
+        if ((id = ebml_peek_id(&level_up)) == 0)
         {
             res = -BufferedReader::DATA_EOF;
             break;
@@ -2017,7 +2017,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
             while (res == 0)
             {
-                if (!(id = ebml_peek_id(&level_up)))
+                if ((id = ebml_peek_id(&level_up)) == 0)
                 {
                     res = -BufferedReader::DATA_EOF;
                     break;
@@ -2191,7 +2191,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
             while (res == 0)
             {
-                if (!(id = ebml_peek_id(&level_up)))
+                if ((id = ebml_peek_id(&level_up)) == 0)
                 {
                     res = -BufferedReader::DATA_EOF;
                     break;
