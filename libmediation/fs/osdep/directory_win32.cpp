@@ -76,10 +76,10 @@ bool deleteFile(const string& fileName)
 bool findFiles(const string& path, const string& fileMask, vector<string>* fileList, bool savePaths)
 {
     WIN32_FIND_DATA fileData;  // Data structure describes the file found
-    HANDLE hSearch;            // Search handle returned by FindFirstFile
+    // Search handle returned by FindFirstFile
 
     auto searchStr = toWide(path + '/' + fileMask);
-    hSearch = FindFirstFile(searchStr.data(), &fileData);
+    HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
     if (hSearch == INVALID_HANDLE_VALUE)
         return false;
 
@@ -100,10 +100,10 @@ bool findFiles(const string& path, const string& fileMask, vector<string>* fileL
 bool findDirs(const string& path, vector<string>* dirsList)
 {
     WIN32_FIND_DATA fileData;  // Data structure describes the file found
-    HANDLE hSearch;            // Search handle returned by FindFirstFile
+    // Search handle returned by FindFirstFile
 
     auto searchStr = toWide(path + "*");
-    hSearch = FindFirstFile(searchStr.data(), &fileData);
+    HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
     if (hSearch == INVALID_HANDLE_VALUE)
         return false;
 

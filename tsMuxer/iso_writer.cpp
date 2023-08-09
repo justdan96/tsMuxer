@@ -822,12 +822,11 @@ void IsoWriter::allocateMetadata()
     writer.writeLE32(0);  // reserved
     writer.writeLE32(0);  // reserved
 
-    std::map<int, MappingEntry>::iterator itr;
-    for (itr = m_mappingEntries.begin(); itr != m_mappingEntries.end(); ++itr)
+    for (auto& mappingEntry : m_mappingEntries)
     {
-        writer.writeLE32(itr->first);  // unique ID
-        writer.writeLE32(itr->second.parentLBN);
-        writer.writeLE32(itr->second.LBN);
+        writer.writeLE32(mappingEntry.first);  // unique ID
+        writer.writeLE32(mappingEntry.second.parentLBN);
+        writer.writeLE32(mappingEntry.second.LBN);
         writer.writeLE16(1);  // parent partition
         writer.writeLE16(1);  // object partition
     }

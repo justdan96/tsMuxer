@@ -453,9 +453,8 @@ uint16_t my_ntohs(const uint16_t val)
 
 char* strnstr(const char* s1, const char* s2, size_t len)
 {
-    size_t l1 = len, l2;
-
-    l2 = strlen(s2);
+    size_t l1 = len;
+    size_t l2 = strlen(s2);
     if (!l2)
         return (char*)s1;
     while (l1 >= l2)

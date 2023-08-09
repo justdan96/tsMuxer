@@ -1044,8 +1044,6 @@ int MovDemuxer::mov_read_cmov(MOVAtom atom) { THROW(ERR_MOV_PARSE, "Compressed M
 
 int MovDemuxer::mov_read_wide(MOVAtom atom)
 {
-    int err;
-
     if (atom.size < 8)
         return 0;  // continue
     if (get_be32() != 0)
@@ -1061,7 +1059,7 @@ int MovDemuxer::mov_read_wide(MOVAtom atom)
         skip_bytes(atom.size);
         return 0;
     }
-    err = mov_read_mdat(atom);
+    int err = mov_read_mdat(atom);
     return err;
 }
 
@@ -1082,27 +1080,23 @@ int MovDemuxer::mov_read_mdat(MOVAtom atom)
 int MovDemuxer::mov_read_trun(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
-    Track* st;
-    MOVStreamContext* sc;
-    uint64_t offset;
     int data_offset = 0;
-    unsigned entries, first_sample_flags = frag->flags;
-    int flags;
+    unsigned first_sample_flags = frag->flags;
 
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
-    st = tracks[frag->track_id - 1];
-    sc = (MOVStreamContext*)st;
+    Track* st = tracks[frag->track_id - 1];
+    MOVStreamContext* sc = (MOVStreamContext*)st;
     if (sc->pseudo_stream_id + 1 != frag->stsd_id)
         return 0;
     get_byte();  // version
-    flags = get_be24();
-    entries = get_be32();
+    int flags = get_be24();
+    unsigned entries = get_be32();
     if (flags & 0x001)
         data_offset = get_be32();
     if (flags & 0x004)
         first_sample_flags = get_be32();
-    offset = frag->base_data_offset + data_offset;
+    uint64_t offset = frag->base_data_offset + data_offset;
     sc->chunk_offsets.push_back(offset);
     for (size_t i = 0; i < entries; i++)
     {
@@ -1167,12 +1161,11 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
     MOVTrackExt* trex = 0;
-    int flags, track_id;
 
     get_byte();  // version
-    flags = get_be24();
+    int flags = get_be24();
 
-    track_id = get_be32();
+    int track_id = get_be32();
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;

@@ -632,14 +632,12 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 
 int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 {
-    unsigned int frame_size;
-    unsigned int i_lfe;
     nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
+    unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
     pi_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
     pi_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
     pi_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    i_lfe = (p_buf[10] >> 1) & 0x03;
+    unsigned int i_lfe = (p_buf[10] >> 1) & 0x03;
     if (i_lfe)
         pi_audio_mode |= 0x10000;
 
@@ -659,15 +657,12 @@ int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 
 int DTSStreamReader::testSyncInfo16be(const uint8_t* p_buf)
 {
-    unsigned int frame_size;
-    unsigned int test_lfe;
-    unsigned int test_audio_mode, test_sample_rate_index, test_bit_rate_index;
     nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
-    test_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
-    test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
-    test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    test_lfe = (p_buf[10] >> 1) & 0x03;
+    unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
+    unsigned int test_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
+    unsigned int test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
+    unsigned int test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+    unsigned int test_lfe = (p_buf[10] >> 1) & 0x03;
     if (test_lfe)
         test_audio_mode |= 0x10000;
     if (test_audio_mode == pi_audio_mode && test_sample_rate_index == pi_sample_rate_index &&

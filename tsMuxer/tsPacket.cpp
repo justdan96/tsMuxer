@@ -98,10 +98,8 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, int buf_size)
 
 static inline int get16(uint8_t** pp)
 {
-    uint8_t* p;
-    int c;
-    p = *pp;
-    c = (p[0] << 8) | p[1];
+    uint8_t* p = *pp;
+    int c = (p[0] << 8) | p[1];
     p += 2;
     *pp = p;
     return c;

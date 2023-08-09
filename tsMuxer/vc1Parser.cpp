@@ -110,7 +110,7 @@ void VC1SequenceHeader::setFPS(double value)
 
     if (m_fpsFieldBitVal > 0)
     {
-        int nr, dr;
+        int nr;
         int time_scale = (int)(value + 0.5) * 1000;
         int num_units_in_tick = (int)(time_scale / value + 0.5);
         if ((time_scale == 24000 || time_scale == 25000 || time_scale == 30000 || time_scale == 50000 ||
@@ -145,7 +145,7 @@ void VC1SequenceHeader::setFPS(double value)
             THROW(ERR_VC1_ERR_FPS,
                   "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
         }
-        dr = (num_units_in_tick == 1000) ? 1 : 2;
+        int dr = (num_units_in_tick == 1000) ? 1 : 2;
 
         updateBits(m_fpsFieldBitVal, 8, nr);
         updateBits(m_fpsFieldBitVal + 8, 4, dr);
@@ -269,10 +269,9 @@ if(psf) { //PsF, 6.1.13
             }
             else
             {
-                int nr, dr;
                 m_fpsFieldBitVal = bitReader.getBitsCount();
-                nr = bitReader.getBits(8);
-                dr = bitReader.getBits(4);
+                int nr = bitReader.getBits(8);
+                int dr = bitReader.getBits(4);
                 if (nr > 0 && nr < 8 && dr > 0 && dr < 3)
                 {
                     time_base_num = ff_vc1_fps_dr[dr - 1];

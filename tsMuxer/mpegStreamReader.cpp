@@ -323,8 +323,7 @@ void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextN
 
 void MPEGStreamReader::checkPulldownSync()
 {
-    int64_t asyncValue;
-    asyncValue = m_curDts * 5 - m_testPulldownDts * 4;
+    int64_t asyncValue = m_curDts * 5 - m_testPulldownDts * 4;
     if (asyncValue < 0)
         asyncValue = -asyncValue;
 

@@ -360,7 +360,6 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
     else
         file = new File();
 
-    uint8_t* V3metaData;
     if (m_dt == DiskType::BLURAY)
     {
         if (isV3())
@@ -368,7 +367,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
             bdIndexData[5] = '3';
             fileSize = 0x9C;         // add 36 bytes for UHD data extension
             bdIndexData[15] = 0x78;  // start address of UHD data extension
-            V3metaData = bdIndexData + 0x78;
+            uint8_t* V3metaData = bdIndexData + 0x78;
             // UHD data extension
             memcpy(V3metaData,
                    "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"

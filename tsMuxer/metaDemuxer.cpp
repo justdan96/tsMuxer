@@ -1230,9 +1230,8 @@ void METADemuxer::updateReport(bool checkTime)
 void METADemuxer::lineBack()
 {
 #ifdef _WIN32
-    HANDLE consoleOutput;
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     GetConsoleScreenBufferInfo(consoleOutput, &csbi);
     if (csbi.dwCursorPosition.Y == m_lastProgressY)
     {

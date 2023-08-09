@@ -68,31 +68,27 @@ int IOContextDemuxer::get_byte()
 
 unsigned int IOContextDemuxer::get_be16()
 {
-    unsigned int val;
-    val = get_byte() << 8;
+    unsigned int val = get_byte() << 8;
     val |= get_byte();
     return val;
 }
 
 unsigned int IOContextDemuxer::get_be24()
 {
-    unsigned int val;
-    val = get_be16() << 8;
+    unsigned int val = get_be16() << 8;
     val |= get_byte();
     return val;
 }
 unsigned int IOContextDemuxer::get_be32()
 {
-    unsigned int val;
-    val = get_be16() << 16;
+    unsigned int val = get_be16() << 16;
     val |= get_be16();
     return val;
 }
 
 uint64_t IOContextDemuxer::get_be64()
 {
-    uint64_t val;
-    val = (uint64_t)get_be32() << 32;
+    uint64_t val = (uint64_t)get_be32() << 32;
     val |= (uint64_t)get_be32();
     return val;
 }
@@ -181,24 +177,21 @@ uint64_t IOContextDemuxer::getDemuxedSize() { return 0; }
 
 unsigned int IOContextDemuxer::get_le16()
 {
-    unsigned int val;
-    val = get_byte();
+    unsigned int val = get_byte();
     val |= get_byte() << 8;
     return val;
 }
 
 unsigned int IOContextDemuxer::get_le24()
 {
-    unsigned int val;
-    val = get_le16();
+    unsigned int val = get_le16();
     val |= get_byte() << 16;
     return val;
 }
 
 unsigned int IOContextDemuxer::get_le32()
 {
-    unsigned int val;
-    val = get_le16();
+    unsigned int val = get_le16();
     val |= get_le16() << 16;
     return val;
 }

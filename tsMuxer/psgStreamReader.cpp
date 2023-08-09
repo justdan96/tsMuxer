@@ -270,7 +270,6 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
     double xFactor = (double)bmpRef->Width / (double)bmpDest->Width;
     double yFactor = (double)bmpRef->Height / (double)bmpDest->Height;
     RGBQUAD* ImagePixels = bmpDest->buffer;
-    RGBQUAD *c1, *c2, *c3, *c4;
 
     for (int yDest = 0; yDest < bmpDest->Height; yDest++)
     {
@@ -284,10 +283,12 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
             double fraction_y = yDest * yFactor - floor_y;
             double one_minus_x = 1.0 - fraction_x;
             double one_minus_y = 1.0 - fraction_y;
-            c2 = c1 = bmpRef->buffer + floor_y * bmpRef->Width;
+            RGBQUAD* c1 = bmpRef->buffer + floor_y * bmpRef->Width;
+            RGBQUAD* c2 = c1;
             c1 += floor_x;
             c2 += ceil_x;
-            c4 = c3 = bmpRef->buffer + ceil_y * bmpRef->Width;
+            RGBQUAD* c3 = bmpRef->buffer + ceil_y * bmpRef->Width;
+            RGBQUAD* c4 = c3;
             c3 += floor_x;
             c4 += ceil_x;
             double b1 = one_minus_x * c1->rgbRed + fraction_x * c2->rgbRed;

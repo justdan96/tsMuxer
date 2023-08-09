@@ -111,9 +111,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
         if (!crc32(buf, m_frame_size - 4))
             return AC3ParseError::CRC2;
 
-        int numblkscod, number_of_blocks_per_syncframe;
-        int acmod, lfeon, bsmod, fscod, dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
-        bsmod = dsurmod = pgmscle = extpgmscle = mixdef = paninfoe = 0;
+        int numblkscod;
+        int dsurmod, pgmscle, extpgmscle, mixdef, paninfoe;
+        int bsmod = dsurmod = pgmscle = extpgmscle = mixdef = paninfoe = 0;
 
         BitStreamReader gbc{};
         gbc.setBuffer(buf, end);
@@ -124,7 +124,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
 
         gbc.skipBits(14);  // substreamid, frmsize
 
-        fscod = gbc.getBits(2);
+        int fscod = gbc.getBits(2);
 
         if (fscod == 3)
         {
@@ -140,9 +140,9 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
             numblkscod = gbc.getBits(2);
             m_sample_rate = ff_ac3_freqs[fscod];
         }
-        number_of_blocks_per_syncframe = numblkscod == 0 ? 1 : (numblkscod == 1 ? 2 : (numblkscod == 2 ? 3 : 6));
-        acmod = gbc.getBits(3);
-        lfeon = gbc.getBit();
+        int number_of_blocks_per_syncframe = numblkscod == 0 ? 1 : (numblkscod == 1 ? 2 : (numblkscod == 2 ? 3 : 6));
+        int acmod = gbc.getBits(3);
+        int lfeon = gbc.getBit();
 
         m_samples = eac3_blocks[numblkscod] << 8;
         m_bit_rateExt = m_frame_size * m_sample_rate * 8 / m_samples;
@@ -322,7 +322,6 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
     try
     {
         int rez = 0;
-        AC3ParseError err;
 
         if (end - buf < 2)
             return NOT_ENOUGH_BUFFER;
@@ -335,7 +334,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
         if (m_state == AC3State::stateDecodeAC3)
         {
             skipBytes = 0;
-            err = parseHeader(buf, end);
+            AC3ParseError err = parseHeader(buf, end);
 
             if (err == AC3ParseError::NOT_ENOUGH_BUFFER)
                 return NOT_ENOUGH_BUFFER;

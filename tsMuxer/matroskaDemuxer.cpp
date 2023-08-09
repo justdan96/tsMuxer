@@ -211,12 +211,12 @@ MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
 
 int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
 {
-    int size, res;
+    int res;
     uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    size = (int)rlength;
+    int size = (int)rlength;
 
     // ebml strings are usually not 0-terminated, so we allocate one
     // byte more, read the string and NULL-terminate it ourselves.
@@ -368,12 +368,12 @@ int MatroskaDemuxer::matroska_find_track_by_num(uint64_t num)
 int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num)
 {
     unsigned read = 1, n = 1, num_ffs = 0;
-    uint64_t total, len_mask = 0x80;
+    uint64_t len_mask = 0x80;
 
     if (size <= 0)
         return AVERROR_INVALIDDATA;
 
-    total = data[0];
+    uint64_t total = data[0];
     while (read <= 8 && !(total & len_mask))
     {
         read++;
@@ -435,11 +435,11 @@ int MatroskaDemuxer::matroska_deliver_packet(AVPacket *&avPacket)
 int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
 {
     int n = 1, negative = 0, res;
-    uint64_t size, rlength;
+    uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    size = rlength;
+    uint64_t size = rlength;
     if (size < 1 || size > 8)
     {
         offset_t pos = m_processedBytes;
@@ -491,13 +491,10 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                                           uint64_t duration, int is_keyframe, int is_bframe)
 {
     int res = 0;
-    int track;
     // AVStream *st;
-    AVPacket *pkt;
     uint8_t *origdata = data;
-    int16_t block_time;
     uint32_t *lace_size = NULL;
-    int n, flags, laces = 0;
+    int n, laces = 0;
     uint64_t num;
 
     /* first byte(s): tracknum */
@@ -511,7 +508,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
     size -= n;
 
     /* fetch track from num */
-    track = matroska_find_track_by_num(num);
+    int track = matroska_find_track_by_num(num);
     if (size <= 3 || track < 0 || track >= num_tracks)
     {
         LTRACE(LT_INFO, 0, "Invalid stream " << track << " or size " << size);
@@ -521,9 +518,9 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
     if (tracks[track]->stream_index < 0)
         return res;
     /* block_time (relative to cluster time) */
-    block_time = (int16_t)AV_RB16(data);
+    int16_t block_time = (int16_t)AV_RB16(data);
     data += 2;
-    flags = *data++;
+    int flags = *data++;
     size -= 3;
     if (is_keyframe == -1)
         is_keyframe = flags & 0x80 ? PKT_FLAG_KEY : 0;
@@ -554,7 +551,6 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
         {
         case 0x1: /* xiph lacing */
         {
-            uint8_t temp;
             uint32_t total = 0;
             for (n = 0; res == 0 && n < laces - 1; n++)
             {
@@ -565,7 +561,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                         res = -1;
                         break;
                     }
-                    temp = *data;
+                    uint8_t temp = *data;
                     lace_size[n] += temp;
                     data += 1;
                     size -= 1;
@@ -584,7 +580,6 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
 
         case 0x3: /* EBML lacing */
         {
-            uint32_t total;
             n = matroska_ebmlnum_uint(data, size, &num);
             if (n < 0)
             {
@@ -593,12 +588,11 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
             }
             data += n;
             size -= n;
-            total = lace_size[0] = (uint32_t)num;
+            uint32_t total = lace_size[0] = (uint32_t)num;
             for (n = 1; res == 0 && n < laces - 1; n++)
             {
                 int64_t snum;
-                int r;
-                r = matroska_ebmlnum_sint(data, size, &snum);
+                int r = matroska_ebmlnum_sint(data, size, &snum);
                 if (r < 0)
                 {
                     LTRACE(LT_INFO, 0, "EBML block data error");
@@ -630,7 +624,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
 
         for (n = 0; n < laces; n++)
         {
-            int slice, slices = 1;
+            int slices = 1;
 
             if (real_v)
             {
@@ -638,7 +632,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 lace_size[n]--;
             }
 
-            for (slice = 0; slice < slices; slice++)
+            for (int slice = 0; slice < slices; slice++)
             {
                 int slice_size, slice_offset = 0;
                 if (real_v)
@@ -648,7 +642,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 else
                     slice_size = rv_offset(data, slice + 1, slices) - slice_offset;
 
-                pkt = new AVPacket();
+                AVPacket* pkt = new AVPacket();
                 pkt->data = 0;
                 pkt->size = 0;
                 pkt->pts = timecode * INTERNAL_PTS_FREQ / 1000;
@@ -797,11 +791,11 @@ int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
 int MatroskaDemuxer::ebml_read_uint(uint32_t *id, uint64_t *num)
 {
     int n = 0, res;
-    uint64_t size, rlength;
+    uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    size = rlength;
+    uint64_t size = rlength;
     if (size < 1 || size > 8)
     {
         THROW(ERR_MATROSKA_PARSE, "Invalid uint element size " << size << " at position " << m_processedBytes);
@@ -861,7 +855,6 @@ int MatroskaDemuxer::ebml_read_skip()
 int MatroskaDemuxer::ebml_read_master(uint32_t *id)
 {
     uint64_t length;
-    MatroskaLevel *level;
     int res;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&length)) < 0)
@@ -874,7 +867,7 @@ int MatroskaDemuxer::ebml_read_master(uint32_t *id)
     }
 
     /* remember level */
-    level = &levels[num_levels++];
+    MatroskaLevel* level = &levels[num_levels++];
     level->start = m_processedBytes;
     level->length = length;
     return 0;
@@ -1098,7 +1091,6 @@ uint32_t MatroskaDemuxer::ebml_peek_id(int *level_up)
 
 int MatroskaDemuxer::readPacket(AVPacket &avPacket)
 {
-    int res;
     uint32_t id;
     if (m_lastDeliveryPacket)
     {
@@ -1115,7 +1107,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
         if (done)
             return BufferedReader::DATA_EOF;
 
-        res = 0;
+        int res = 0;
         while (res == 0)
         {
             if (!(id = ebml_peek_id(&level_up)))
@@ -1309,13 +1301,9 @@ int MatroskaDemuxer::matroska_read_header()
     /* Have we found a cluster? */
     if (ebml_peek_id(NULL) == MATROSKA_ID_CLUSTER)
     {
-        int i;
-        MatroskaTrack *track;
-        // AVStream *st;
-
-        for (i = 0; i < num_tracks; i++)
+        for (int i = 0; i < num_tracks; i++)
         {
-            track = tracks[i];
+            MatroskaTrack* track = tracks[i];
             track->stream_index = -1;
             if (track->codec_id == NULL)
                 continue;
@@ -1481,11 +1469,11 @@ int MatroskaDemuxer::ebml_read_date(uint32_t *id, int64_t *date) { return ebml_r
 int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
 {
     int res;
-    uint64_t size, rlength;
+    uint64_t rlength;
 
     if ((res = ebml_read_element_id(id, NULL)) < 0 || (res = ebml_read_element_length(&rlength)) < 0)
         return res;
-    size = rlength;
+    uint64_t size = rlength;
 
     if (size == 4)
     {

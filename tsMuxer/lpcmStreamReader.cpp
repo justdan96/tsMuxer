@@ -694,10 +694,9 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int64_t len)
 
     // 2. test for M2TS LPCM headers
     curPos = buffer;
-    uint16_t frameLen;
     while (curPos < end)
     {
-        frameLen = AV_RB16(curPos);
+        uint16_t frameLen = AV_RB16(curPos);
         switch (frameLen)
         {
         case 960:

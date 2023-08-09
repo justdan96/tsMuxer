@@ -45,13 +45,12 @@ ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sou
     UTF16* target = *targetStart;
     while (source < sourceEnd)
     {
-        UTF32 ch;
         if (target >= targetEnd)
         {
             result = ConversionResult::targetExhausted;
             break;
         }
-        ch = *source++;
+        UTF32 ch = *source++;
         if (ch <= UNI_MAX_BMP)
         { /* Target is a character <= 0xFFFF */
             /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
@@ -125,18 +124,17 @@ ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sou
     ConversionResult result = ConversionResult::conversionOK;
     const UTF16* source = *sourceStart;
     UTF32* target = *targetStart;
-    UTF32 ch, ch2;
     while (source < sourceEnd)
     {
         const UTF16* oldSource = source; /*  In case we have to back up because of target overflow. */
-        ch = *source++;
+        UTF32 ch = *source++;
         /* If we have a surrogate pair, convert to UTF32 first. */
         if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
         {
             /* If the 16 bits following the high surrogate are in the source buffer... */
             if (source < sourceEnd)
             {
-                ch2 = *source;
+                UTF32 ch2 = *source;
                 /* If it's a low surrogate, convert to UTF32. */
                 if (ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END)
                 {
@@ -218,12 +216,11 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
     UTF8* target = *targetStart;
     while (source < sourceEnd)
     {
-        UTF32 ch;
         unsigned short bytesToWrite = 0;
         const UTF32 byteMask = 0xBF;
         const UTF32 byteMark = 0x80;
         const UTF16* oldSource = source; /* In case we have to back up because of target overflow. */
-        ch = *source++;
+        UTF32 ch = *source++;
         /* If we have a surrogate pair, convert to UTF32 first. */
         if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END)
         {
@@ -538,11 +535,10 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
     UTF8* target = *targetStart;
     while (source < sourceEnd)
     {
-        UTF32 ch;
         unsigned short bytesToWrite = 0;
         const UTF32 byteMask = 0xBF;
         const UTF32 byteMark = 0x80;
-        ch = *source++;
+        UTF32 ch = *source++;
         if (flags == ConversionFlags::strictConversion)
         {
             /* UTF-16 surrogate values are illegal in UTF-32 */

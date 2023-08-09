@@ -43,7 +43,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
 {
     // int sample_rate, frame_size, mpeg25, padding;
     // int sample_rate_index, bitrate_index;
-    int mpeg25, padding, lsf;
+    int mpeg25, lsf;
     if (end - buff < 4)
         return 0;
     uint32_t header = my_ntohl(*((uint32_t*)buff));
@@ -72,7 +72,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
     m_bitrate_index = (header >> 12) & 0xf;
     if (m_bitrate_index == 15)
         return 0;  // invalid bitrate index
-    padding = (header >> 9) & 1;
+    int padding = (header >> 9) & 1;
     // extension = (header >> 8) & 1;
     m_mode = (header >> 6) & 3;
     m_mode_ext = (header >> 4) & 3;

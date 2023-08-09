@@ -320,7 +320,6 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
     uint8_t* prevPos = 0;
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
-    uint8_t* nextNalWithStartCode;
 
     if (!m_eof && nextNal == m_bufEnd)
         return NOT_ENOUGH_BUFFER;
@@ -360,7 +359,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
                 return 0;
             }
 
-            nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
+            uint8_t* nextNalWithStartCode = nextNal[-4] == 0 ? nextNal - 4 : nextNal - 3;
 
             switch (nalType)
             {

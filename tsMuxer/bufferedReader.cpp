@@ -105,7 +105,6 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
 
 void BufferedReader::deleteReader(uint32_t readerID)
 {
-    size_t rSize;
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
         auto iterator = m_readers.find(readerID);
@@ -119,7 +118,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
             delete iterator->second;  // No outstanding requests for reading in the queue. Delete immediately.
             m_readers.erase(iterator);
         }
-        rSize = m_readers.size();
+        size_t rSize = m_readers.size();
     }
     // LTRACE(LT_INFO, 0, "stop stream " << readerID << ". stream(s): " << (uint32_t) rSize);
 }

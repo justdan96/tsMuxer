@@ -1344,8 +1344,7 @@ int H264StreamReader::processSPS(uint8_t *buff)
             return 0;  // already processed
     }
 
-    SPSUnit *sps;
-    sps = new SPSUnit();
+    SPSUnit* sps = new SPSUnit();
     uint8_t *nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
     int oldSpsLen = (int)(nextNal - buff);
     sps->decodeBuffer(buff, nextNal);
@@ -1408,8 +1407,7 @@ int H264StreamReader::processSPS(uint8_t *buff)
 
 int H264StreamReader::processPPS(uint8_t *buff)
 {
-    PPSUnit *pps;
-    pps = new PPSUnit();
+    PPSUnit* pps = new PPSUnit();
     uint8_t *nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
 
     pps->decodeBuffer(buff, nextNal);
