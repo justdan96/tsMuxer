@@ -465,7 +465,7 @@ string VvcVpsUnit::getDescription() const
 {
     string rez("Frame rate: ");
     double fps = getFPS();
-    if (fps != 0)
+    if (fps != 0.0)
         rez += doubleToStr(fps);
     else
         rez += string("not found");

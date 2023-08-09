@@ -86,7 +86,7 @@ string VC1SequenceHeader::getStreamDescr()
     rez << (interlace ? 'i' : 'p') << "  ";
     rez << "Frame rate: ";
     double fps = getFPS();
-    if (fps != 0)
+    if (fps != 0.0)
         rez << fps;
     else
         rez << "not found";

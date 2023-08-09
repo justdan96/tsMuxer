@@ -284,7 +284,7 @@ void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextN
 {
     double spsFps = getStreamFPS(curNALUnit);
     spsFps = correctFps(spsFps);
-    if (spsFps == 0 && m_fps == 0)
+    if (spsFps == 0.0 && m_fps == 0.0)
     {
         setFPS(25.0);
         LTRACE(LT_INFO, 2,
@@ -292,13 +292,13 @@ void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextN
                        << " stream doesn't contain fps value. Muxing fps is absent too. Set muxing FPS to default 25.0 "
                           "value.");
     }
-    else if (m_fps == 0)
+    else if (m_fps == 0.0)
     {
         setFPS(spsFps);
         LTRACE(LT_INFO, 2,
                getCodecInfo().displayName << " muxing fps is not set. Get fps from stream. Value: " << spsFps);
     }
-    else if (spsFps != 0 && abs_(m_fps, spsFps) > EPSILON)
+    else if (spsFps != 0.0 && abs_(m_fps, spsFps) > EPSILON)
     {
         if (m_isFirstFpsWarn)
         {
@@ -310,7 +310,7 @@ void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextN
         }
         updateStreamFps(curNALUnit, buff, nextNal, oldSPSLen);
     }
-    else if (spsFps == 0)
+    else if (spsFps == 0.0)
     {
         if (m_isFirstFpsWarn)
         {

@@ -474,7 +474,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
                "Decoding PGS stream (track " << m_streamIndex << "): "
                                              << " Resolution: " << m_video_width << ':' << m_video_height
                                              << "  Frame rate: " << m_frame_rate);
-        if (m_newFps != 0 && fabs(m_newFps - m_frame_rate) > 1e-4)
+        if (m_newFps != 0.0 && fabs(m_newFps - m_frame_rate) > 1e-4)
         {
             LTRACE(LT_INFO, 2,
                    "Change FPS from " << m_frame_rate << " to " << m_newFps << " for PGS stream #" << m_streamIndex);

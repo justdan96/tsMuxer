@@ -193,7 +193,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         if (isIFrame(&avPacket))
             avPacket.flags |= AVPacket::IS_IFRAME;  // can be used in split points
 
-        if (m_halfFrameLen == 0)
+        if (m_halfFrameLen == 0.0)
             m_halfFrameLen = getFrameDuration() / 2.0;
         m_curPts += getFrameDuration();
         int64_t nextDts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;

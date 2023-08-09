@@ -1014,7 +1014,7 @@ std::string SPSUnit::getStreamDescr()
     rez << (frame_mbs_only_flag ? 'p' : 'i') << "  ";
     rez << "Frame rate: ";
     double fps = getFPS();
-    if (fps != 0)
+    if (fps != 0.0)
     {
         rez << fps;
     }

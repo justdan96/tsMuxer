@@ -401,7 +401,7 @@ double HEVCStreamReader::getStreamFPS(void* curNalUnit)
     double fps = 0;
     if (m_vps)
         fps = m_vps->getFPS();
-    if (fps == 0 && m_sps)
+    if (fps == 0.0 && m_sps)
         fps = m_sps->getFPS();
     return fps;
 }

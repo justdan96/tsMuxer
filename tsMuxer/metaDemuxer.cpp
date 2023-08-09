@@ -1094,7 +1094,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
             else if (addParam.first == "fadeout-time")
                 animation.fadeOutDuration = strToFloat(addParam.second.c_str());
         }
-        if (srtWidth == 0 || srtHeight == 0 || fps == 0)
+        if (srtWidth == 0 || srtHeight == 0 || fps == 0.0)
             THROW(ERR_COMMON, "video-width, video-height and fps parameters MUST be provided for SRT tracks");
         srtReader->setVideoInfo(srtWidth, srtHeight, fps);
         srtReader->setFont(font);
@@ -1118,7 +1118,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                 string secondStr = itr->second.substr(divPos + 1, itr->second.size() - divPos - 1);
                 double dFirst = strToDouble(firstStr.c_str());
                 double dSecond = strToDouble(secondStr.c_str());
-                if (dSecond != 0)
+                if (dSecond != 0.0)
                     stretch = dFirst / dSecond;
                 else
                     THROW(ERR_COMMON, "Second argument at stretch parameter can not be 0");

@@ -125,8 +125,8 @@ class TSMuxer : public AbstractMuxer
 
     int64_t m_fixed_pcr_offset;
     bool m_pcrOnVideo;
-    double m_cbrBitrate;
-    double m_minBitrate;
+    int m_cbrBitrate;
+    int m_minBitrate;
     int m_pcr_delta;    // how often write PCR
     int m_patPmtDelta;  // how often write PAT/PMT
     bool m_m2tsMode;
