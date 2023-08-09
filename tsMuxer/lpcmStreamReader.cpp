@@ -363,10 +363,12 @@ uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, uint8_
     const size_t patternLen = strlen(pattern);
     for (uint8_t* curPos = buff; curPos < end - patternLen; curPos++)
         for (size_t j = 0; j < patternLen; j++)
+        {
             if (curPos[j] != pattern[j])
                 break;
-            else if (j == patternLen - 1)
+            if (j == patternLen - 1)
                 return curPos;
+        }
     return nullptr;
 }
 

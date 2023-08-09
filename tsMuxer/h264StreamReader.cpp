@@ -1272,36 +1272,41 @@ int H264StreamReader::sliceTypeToPictType(const int slice_type) const
     switch (slice_type)
     {
     case SliceUnit::P_TYPE:
+    {
         if (m_pict_type < 3)
             return 1;
-        else
-            return 6;
+        return 6;
+    }
     case SliceUnit::B_TYPE:
+    {
         if (m_pict_type < 3)
             return 2;
-        else
-            return 7;
+        return 7;
+    }
     case SliceUnit::I_TYPE:
+    {
         if (m_pict_type < 3)
             return 0;
-        else
-            return 5;
+        return 5;
+    }
     case SliceUnit::SP_TYPE:
+    {
         if (m_pict_type == -1 || m_pict_type == 3)
             return 4;
-        else if (m_pict_type == 2)
+        if (m_pict_type == 2)
             return 7;
-        else
-            return 6;
+        return 6;
+    }
     case SliceUnit::SI_TYPE:
+    {
         if (m_pict_type == -1)
             return 3;
-        else if (m_pict_type == 0)
+        if (m_pict_type == 0)
             return 5;
-        else if (m_pict_type == 2)
+        if (m_pict_type == 2)
             return 7;
-        else
-            return 6;
+        return 6;
+    }
     }
     return 0;
 }
