@@ -30,14 +30,14 @@ BufferedReader::BufferedReader(const uint32_t blockSize, const uint32_t allocSiz
 
 ReaderData* BufferedReader::getReader(const uint32_t readerID)
 {
-    std::lock_guard<std::mutex> lock(m_readersMtx);
+    std::lock_guard lock(m_readersMtx);
     const auto itr = m_readers.find(readerID);
     return itr != m_readers.end() ? itr->second : nullptr;
 }
 
 bool BufferedReader::incSeek(const uint32_t readerID, const int64_t offset)
 {
-    std::lock_guard<std::mutex> lock(m_readersMtx);
+    std::lock_guard lock(m_readersMtx);
     const auto itr = m_readers.find(readerID);
     if (itr != m_readers.end())
     {
@@ -87,7 +87,7 @@ uint32_t BufferedReader::createReader(const int readBuffOffset)
     data->m_lastBlock = false;
     size_t rSize;
     {
-        std::lock_guard<std::mutex> lock(m_readersMtx);
+        std::lock_guard lock(m_readersMtx);
         newReaderID = createNewReaderID();
         m_readers[newReaderID] = data;
         rSize = m_readers.size();
@@ -105,7 +105,7 @@ uint32_t BufferedReader::createReader(const int readBuffOffset)
 void BufferedReader::deleteReader(const uint32_t readerID)
 {
     {
-        std::lock_guard<std::mutex> lock(m_readersMtx);
+        std::lock_guard lock(m_readersMtx);
         const auto iterator = m_readers.find(readerID);
         if (iterator == m_readers.end())
             return;
@@ -126,7 +126,7 @@ uint8_t* BufferedReader::readBlock(const uint32_t readerID, uint32_t& readCnt, i
 {
     ReaderData* data = nullptr;
     {
-        std::lock_guard<std::mutex> lock(m_readersMtx);
+        std::lock_guard lock(m_readersMtx);
         const auto itr = m_readers.find(readerID);
         if (itr != m_readers.end())
         {
@@ -148,7 +148,7 @@ uint8_t* BufferedReader::readBlock(const uint32_t readerID, uint32_t& readCnt, i
 
     if (!data->m_nextBlockSize)
     {
-        std::unique_lock<std::mutex> lk(m_readMtx);
+        std::unique_lock lk(m_readMtx);
         while (data->m_nextBlockSize == 0 && !data->m_eof) m_readCond.wait(lk);
     }
     readCnt = data->m_nextBlockSize >= 0 ? data->m_nextBlockSize : 0;
@@ -175,7 +175,7 @@ void BufferedReader::notify(const uint32_t readerID, const uint32_t dataReaded)
         return;
     if (dataReaded >= m_prereadThreshold && !data->m_notified)
     {
-        std::lock_guard<std::mutex> lock(m_readersMtx);
+        std::lock_guard lock(m_readersMtx);
         data->m_notified = true;
         data->m_atQueue++;
         m_readQueue.push(readerID);
@@ -184,7 +184,7 @@ void BufferedReader::notify(const uint32_t readerID, const uint32_t dataReaded)
 
 uint32_t BufferedReader::getReaderCount()
 {
-    std::lock_guard<std::mutex> lock(m_readersMtx);
+    std::lock_guard lock(m_readersMtx);
     return static_cast<uint32_t>(m_readers.size());
 }
 
@@ -260,14 +260,14 @@ void BufferedReader::thread_main()
                     }
 
                     {
-                        std::lock_guard<std::mutex> lk(m_readMtx);
+                        std::lock_guard lk(m_readMtx);
                         data->m_nextBlockSize = bytesReaded;
                         m_readCond.notify_one();
                     }
                 }
 
                 {
-                    std::lock_guard<std::mutex> lock(m_readersMtx);
+                    std::lock_guard lock(m_readersMtx);
                     data->m_atQueue--;
                     if (data->m_deleted && data->m_atQueue == 0)
                     {
@@ -291,7 +291,7 @@ void BufferedReader::thread_main()
 void BufferedReader::setFileIterator(FileNameIterator* itr, const int readerID)
 {
     assert(readerID != -1);
-    std::lock_guard<std::mutex> lock(m_readersMtx);
+    std::lock_guard lock(m_readersMtx);
     const auto reader = m_readers.find(readerID);
     if (reader != m_readers.end())
         reader->second->itr = itr;

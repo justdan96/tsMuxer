@@ -646,7 +646,7 @@ void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
     for (auto& i : tmpPriorityData)
-        m_priorityData.push_back(std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
+        m_priorityData.push_back(std::pair(i.first + pesPacket->getHeaderLength(), i.second));
 }
 
 void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
@@ -672,7 +672,7 @@ void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
         if (!m_priorityData.empty() && m_priorityData.rbegin()->first + m_priorityData.rbegin()->second == beforePesLen)
             m_priorityData.rbegin()->second += avPacket.size + pesHeaderLen;
         else
-            m_priorityData.push_back(pair<int, int>(beforePesLen, avPacket.size + pesHeaderLen));
+            m_priorityData.push_back(pair(beforePesLen, avPacket.size + pesHeaderLen));
     }
 }
 

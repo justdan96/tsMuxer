@@ -222,7 +222,7 @@ int VvcVpsUnit::deserialize()
     {
         vps_id = m_reader.getBits(4);
         vps_max_layers = m_reader.getBits(6) + 1;
-        vector<vector<bool>> vps_direct_ref_layer_flag(vps_max_layers, vector<bool>(vps_max_layers));
+        vector vps_direct_ref_layer_flag(vps_max_layers, vector<bool>(vps_max_layers));
 
         vps_max_sublayers = m_reader.getBits(3) + 1;
         bool vps_default_ptl_dpb_hrd_max_tid_flag =
@@ -277,8 +277,8 @@ int VvcVpsUnit::deserialize()
             vps_num_ptls = m_reader.getBits(8) + 1;
         }
 
-        vector<bool> vps_pt_present_flag(vps_num_ptls, true);
-        vector<int> vps_ptl_max_tid(vps_num_ptls, vps_max_sublayers - 1);
+        vector vps_pt_present_flag(vps_num_ptls, true);
+        vector vps_ptl_max_tid(vps_num_ptls, vps_max_sublayers - 1);
 
         if (!vps_default_ptl_dpb_hrd_max_tid_flag)
             vps_ptl_max_tid[0] = m_reader.getBits(3);
@@ -307,10 +307,10 @@ int VvcVpsUnit::deserialize()
             if (vps_ols_mode_idc == 2)
             {
                 layerIncludedInOlsFlag.resize(TotalNumOlss, vector<bool>(vps_max_layers));
-                vector<vector<bool>> dependencyFlag(vps_max_layers, vector<bool>(vps_max_layers));
-                vector<vector<bool>> ReferenceLayerIdx(vps_max_layers, vector<bool>(vps_max_layers));
-                vector<vector<bool>> OutputLayerIdx(TotalNumOlss, vector<bool>(vps_max_layers));
-                vector<int> NumRefLayers(vps_max_layers, 0);
+                vector dependencyFlag(vps_max_layers, vector<bool>(vps_max_layers));
+                vector ReferenceLayerIdx(vps_max_layers, vector<bool>(vps_max_layers));
+                vector OutputLayerIdx(TotalNumOlss, vector<bool>(vps_max_layers));
+                vector NumRefLayers(vps_max_layers, 0);
 
                 for (int i = 0; i < vps_max_layers; i++)
                 {
