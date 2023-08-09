@@ -225,13 +225,10 @@ int MPEGStreamReader::bufFromNAL() const
     {
         if (m_longCodesAllowed && m_curPos[2] == 0 && m_curPos[3] == 1)
             return 4;
-        else if (m_curPos[2] == 1)
+        if (m_curPos[2] == 1)
             return 3;
-        else
-            return 0;
     }
-    else
-        return 0;
+    return 0;
 }
 
 /*
@@ -274,8 +271,7 @@ int MPEGStreamReader::decodeNal(uint8_t* buff)
         // m_skippedNal.erase(m_skippedNal.begin());
         return UNIT_SKIPPED;
     }
-    else
-        return rez;
+    return rez;
 }
 
 #define abs_(a, b) ((a) >= (b) ? (a) - (b) : (b) - (a))

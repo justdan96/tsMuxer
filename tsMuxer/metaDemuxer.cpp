@@ -150,16 +150,13 @@ int METADemuxer::readPacket(AVPacket& avPacket)
             updateReport(true);
             return 0;
         }
+        if (!m_flushDataMode)
+            m_flushDataMode = true;
         else
         {
-            if (!m_flushDataMode)
-                m_flushDataMode = true;
-            else
-            {
-                updateReport(false);
-                m_lastReadRez = BufferedFileReader::DATA_EOF;
-                return BufferedReader::DATA_EOF;
-            }
+            updateReport(false);
+            m_lastReadRez = BufferedFileReader::DATA_EOF;
+            return BufferedReader::DATA_EOF;
         }
     }
 }
@@ -335,7 +332,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
                               "Current playlist file doesn't has MVC track info. Please, remove MVC track from the "
                               "track list");
                     }
-                    else if (mplsInfo.m_mvcFiles.size() <= i)
+                    if (mplsInfo.m_mvcFiles.size() <= i)
                         THROW(ERR_INVALID_CODEC_FORMAT,
                               "Bad playlist file: number of CLPI files for AVC and VMC parts do not match");
                     playItemName = mplsInfo.m_mvcFiles[i];
@@ -826,15 +823,15 @@ VideoAspectRatio arNameToCode(const string& arName)
 {
     if (arName == "9x16" || arName == "16x9" || arName == "9:16" || arName == "16:9")
         return VideoAspectRatio::AR_16_9;
-    else if (arName == "3:4" || arName == "4:3" || arName == "4x3" || arName == "3x4")
+    if (arName == "3:4" || arName == "4:3" || arName == "4x3" || arName == "3x4")
         return VideoAspectRatio::AR_3_4;
-    else if (arName == "Square" || arName == "VGA" || arName == "1:1" || arName == "1x1" || arName == "1:1 (Square)")
+    if (arName == "Square" || arName == "VGA" || arName == "1:1" || arName == "1x1" || arName == "1:1 (Square)")
         return VideoAspectRatio::AR_VGA;
-    else if (arName == "WIDE" || arName == "1x2,21" || arName == "1x2.21" || arName == "1:2.21" || arName == "1:2,21" ||
-             arName == "2.21:1" || arName == "2,21:1" || arName == "2.21x1" || arName == "2,21x1")
+    if (arName == "WIDE" || arName == "1x2,21" || arName == "1x2.21" || arName == "1:2.21" || arName == "1:2,21" ||
+        arName == "2.21:1" || arName == "2,21:1" || arName == "2.21x1" || arName == "2,21x1")
         return VideoAspectRatio::AR_221_100;
-    else
-        return VideoAspectRatio::AR_KEEP_DEFAULT;
+
+    return VideoAspectRatio::AR_KEEP_DEFAULT;
 }
 
 PIPParams::PipCorner pipCornerFromStr(const std::string& value)
@@ -842,29 +839,28 @@ PIPParams::PipCorner pipCornerFromStr(const std::string& value)
     const std::string v = trimStr(strToLowerCase(value));
     if (v == "topleft")
         return PIPParams::PipCorner::TopLeft;
-    else if (v == "topright")
+    if (v == "topright")
         return PIPParams::PipCorner::TopRight;
-    else if (v == "bottomright")
+    if (v == "bottomright")
         return PIPParams::PipCorner::BottomRight;
-    else
-        return PIPParams::PipCorner::BottomLeft;
+
+    return PIPParams::PipCorner::BottomLeft;
 }
 
 int pipScaleFromStr(const std::string& value)
 {
     const std::string v = trimStr(strToLowerCase(value));
-    if (v == "1")
-        return 1;
-    else if (v == "1/2" || v == "0.5")
+
+    if (v == "1/2" || v == "0.5")
         return 2;
-    else if (v == "1/4" || v == "0.25")
+    if (v == "1/4" || v == "0.25")
         return 3;
-    else if (v == "1.5")
+    if (v == "1.5")
         return 4;
-    else if (v == "fullscreen")
+    if (v == "fullscreen")
         return 5;
-    else
-        return 1;  // default
+
+    return 1;  // default
 }
 
 AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const map<string, string>& addParams,
@@ -1195,14 +1191,14 @@ string METADemuxer::findBluRayFile(const string& streamDir, const string& reques
             fileName = dirName + string("BACKUP") + getDirSeparator() + requestDir + getDirSeparator() + requestFile;
             if (!fileExists(fileName))
                 return "";
-            else
-                return fileName;
-        }
-        else
+
             return fileName;
+        }
+
+        return fileName;
     }
-    else
-        return "";
+
+    return "";
 }
 
 void METADemuxer::updateReport(const bool checkTime)
@@ -1272,7 +1268,7 @@ int StreamInfo::read()
             m_lastAVRez = readRez;
             return readRez;
         }
-        else if (readRez == BufferedFileReader::DATA_EOF)
+        if (readRez == BufferedFileReader::DATA_EOF)
             m_isEOF = true;
         m_streamReader->setBuffer(m_data, m_blockSize, m_isEOF);
         m_readCnt += m_blockSize;
@@ -1324,9 +1320,8 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
 
     readCnt = static_cast<uint32_t>((FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset));
     const DemuxerReadPolicy policy = demuxerData.m_pids[pid];
-    if ((readCnt > 0 &&
-         (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == DATA_EOF2 ||
-          demuxerData.lastReadCnt[pid] == DATA_EOF2)) ||
+    if ((readCnt > 0 && (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == DATA_EOF2 ||
+                         demuxerData.lastReadCnt[pid] == DATA_EOF2)) ||
         readCnt >= MIN_READED_BLOCK)
     {
         data = streamData.data();

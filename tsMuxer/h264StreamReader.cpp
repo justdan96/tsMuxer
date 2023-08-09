@@ -198,8 +198,7 @@ const CodecInfo &H264StreamReader::getCodecInfo()
 {
     if (m_mvcSubStream)
         return h264DepCodecInfo;
-    else
-        return h264CodecInfo;
+    return h264CodecInfo;
 }
 
 uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos) const
@@ -748,11 +747,11 @@ int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
             deserializeRez = deserializeSliceHeader(slice, nal, bufEnd);
             if (deserializeRez == NOT_ENOUGH_BUFFER && !m_eof)
                 return -1;
-            else if (deserializeRez != 0)
+            if (deserializeRez != 0)
                 return 0;
             if (slice.isIDR() && slice.first_mb_in_slice == 0)
                 return 0;
-            else if (slice.first_mb_in_slice != 0)
+            if (slice.first_mb_in_slice != 0)
                 break;
             MaxPicOrderCntLsbHalf = 1 << (slice.getSPS()->log2_max_pic_order_cnt_lsb - 1);
             if (slice.pic_order_cnt_lsb > MaxPicOrderCntLsbHalf)
@@ -769,14 +768,12 @@ int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
     }
     if (m_eof)
         return prevPicCnt;
-    else
-        return -1;
+    return -1;
 }
 
 int H264StreamReader::intDecodeNAL(uint8_t *buff)
 {
     const auto nal_unit_type = static_cast<NALUnit::NALType>(*buff & 0x1f);
-    uint8_t *nextNal;
     int nalRez;
     m_spsPpsFound = false;
 
@@ -810,7 +807,7 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
         m_delimiterFound = true;
     // Remaining NALs of Access Unit
     getAU:
-        nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
+        uint8_t *nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
         while (true)
         {
             if (nextNal == m_bufEnd)
@@ -905,7 +902,7 @@ bool H264StreamReader::skipNal(uint8_t *nal)
         return true;  // SPS/PPS will be composed from our side on writePesHeader. It is required to compose SPS/PPS
                       // before SEI
     }
-    else if (nalType == NALUnit::NALType::nuSEI)
+    if (nalType == NALUnit::NALType::nuSEI)
     {
         SEIUnit sei;
         const uint8_t *nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
@@ -1024,21 +1021,11 @@ int H264StreamReader::getNalHrdLen(uint8_t *nal) const
         {
             if (nal[2] == 1)
                 return 3;
-            else if (m_bufEnd - nal >= 4)
-            {
-                if (nal[3] == 1)
-                    return 4;
-                else
-                    return 0;
-            }
-            else
-                return 0;
+            if (m_bufEnd - nal >= 4 && nal[3] == 1)
+                return 4;
         }
-        else
-            return 0;
     }
-    else
-        return 0;
+    return 0;
 }
 
 bool H264StreamReader::findPPSForward(uint8_t *buff)
@@ -1242,11 +1229,9 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
     uint8_t *nextSlice = NALUnit::findNextNAL(buff, m_bufEnd);
     if (nextSlice == m_bufEnd)
     {
-        if (m_eof)
-            return 0;
-        else
-            return NOT_ENOUGH_BUFFER;
+        return m_eof ? 0 : NOT_ENOUGH_BUFFER;
     }
+
     while (true)
     {
         const int nalUnitType = *nextSlice;
@@ -1260,10 +1245,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
         case NALUnit::NALType::nuSliceExt:
             if (slice.deserializeSliceType(nextSlice, m_bufEnd) != 0)
             {
-                if (m_eof)
-                    return 0;
-                else
-                    return NOT_ENOUGH_BUFFER;
+                return m_eof ? 0 : NOT_ENOUGH_BUFFER;
             }
 
             if (slice.first_mb_in_slice == 0)
@@ -1280,10 +1262,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
         nextSlice = NALUnit::findNextNAL(nextSlice, m_bufEnd);
         if (nextSlice == m_bufEnd)
         {
-            if (m_eof)
-                return 0;
-            else
-                return NOT_ENOUGH_BUFFER;
+            return m_eof ? 0 : NOT_ENOUGH_BUFFER;
         }
     }
 }

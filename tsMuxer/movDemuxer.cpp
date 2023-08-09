@@ -231,8 +231,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
 class MovParsedH264TrackData : public ParsedTrackPrivData
 {
    public:
-    MovParsedH264TrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : m_sc(sc), m_demuxer(demuxer), nal_length_size(4)
+    MovParsedH264TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : m_sc(sc), m_demuxer(demuxer), nal_length_size(4)
     {
     }
     void setPrivData(uint8_t* buff, int size) override
@@ -281,14 +280,14 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     {
         if (nal_length_size == 1)
             return buff[0];
-        else if (nal_length_size == 2)
+        if (nal_length_size == 2)
             return (buff[0] << 8) + buff[1];
-        else if (nal_length_size == 3)
+        if (nal_length_size == 3)
             return (buff[0] << 16) + (buff[1] << 8) + buff[2];
-        else if (nal_length_size == 4)
+        if (nal_length_size == 4)
             return (buff[0] << 24) + (buff[1] << 16) + (buff[2] << 8) + buff[3];
-        else
-            THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size);
+
+        THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size);
     }
 
     void extractData(AVPacket* pkt, uint8_t* buff, const int size) override
@@ -879,7 +878,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
 
     if (m_processedBytes > startPos)
         return 0;
-    else if (m_fileIterator)
+    if (m_fileIterator)
     {
         const std::string nextName = m_fileIterator->getNextName();
         if (!nextName.empty())
@@ -1092,7 +1091,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (flags & 0x001)
         data_offset = get_be32();
     if (flags & 0x004)
-        get_be32(); // first_sample_flags
+        get_be32();  // first_sample_flags
     uint64_t offset = frag->base_data_offset + data_offset;
     sc->chunk_offsets.push_back(offset);
     for (size_t i = 0; i < entries; i++)
@@ -1100,11 +1099,11 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
         unsigned sample_size = frag->size;
 
         if (flags & 0x100)
-            get_be32(); // sample_duration
+            get_be32();  // sample_duration
         if (flags & 0x200)
             sample_size = get_be32();
         if (flags & 0x400)
-            get_be32(); // sample_flags
+            get_be32();  // sample_flags
         if (flags & 0x800)
         {
             sc->ctts_data.push_back(MOVStts());
@@ -1629,11 +1628,11 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
     const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
     get_be32();  // version + flags
     int tag;
-    mp4_read_descr(&tag); // len
-    get_be16();  // ID
+    mp4_read_descr(&tag);  // len
+    get_be16();            // ID
     if (tag == MP4ESDescrTag)
-        get_byte();  // priority
-    mp4_read_descr(&tag); // len
+        get_byte();        // priority
+    mp4_read_descr(&tag);  // len
     if (tag == MP4DecConfigDescrTag)
     {
         get_byte();  // object_type_id

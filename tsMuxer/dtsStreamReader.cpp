@@ -255,8 +255,8 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
                 return p_buf;
             }
             // 14 bits, big endian version of the bitstream
-            else if (p_buf[0] == 0x1f && p_buf[1] == 0xff && p_buf[2] == 0xe8 && p_buf[3] == 0x00 && p_buf[4] == 0x07 &&
-                     (p_buf[5] & 0xf0) == 0xf0)
+            if (p_buf[0] == 0x1f && p_buf[1] == 0xff && p_buf[2] == 0xe8 && p_buf[3] == 0x00 && p_buf[4] == 0x07 &&
+                (p_buf[5] & 0xf0) == 0xf0)
             {
                 return p_buf;
             }
@@ -267,7 +267,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
             return p_buf;
         }
         // 16 bits, little endian version of the bitstream
-        else if (p_buf[0] == 0xfe && p_buf[1] == 0x7f && p_buf[2] == 0x01 && p_buf[3] == 0x80)
+        if (p_buf[0] == 0xfe && p_buf[1] == 0x7f && p_buf[2] == 0x01 && p_buf[3] == 0x80)
         {
             return p_buf;
         }
@@ -594,8 +594,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
                 {
                     const auto exHeader = reinterpret_cast<uint8_t*>(curPtr32);
                     const int dataRest = static_cast<int>(buff + i_frame_size - exHeader);
-                    const int frameSize =
-                        (exHeader[0] << 2) + (exHeader[1] >> 6) - 4;  // remove 4 bytes of ext world
+                    const int frameSize = (exHeader[0] << 2) + (exHeader[1] >> 6) - 4;  // remove 4 bytes of ext world
                     if (dataRest - frameSize == 0 || dataRest - frameSize == 1)
                     {
                         m_dtsEsChannels = (static_cast<int>(exHeader[1]) >> 2) & 0x07;
@@ -621,15 +620,11 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             skipBytes = static_cast<int>(nextFrame - buff - i_frame_size);
             return i_frame_size;
         }
-        else
-        {
-            m_state = DTSDecodeState::stDecodeHD;
-            m_hdFrameLen = static_cast<int>(nextFrame - afterFrameData);
-            return m_isCoreExists ? i_frame_size : m_hdFrameLen;
-        }
+        m_state = DTSDecodeState::stDecodeHD;
+        m_hdFrameLen = static_cast<int>(nextFrame - afterFrameData);
+        return m_isCoreExists ? i_frame_size : m_hdFrameLen;
     }
-    else
-        return i_frame_size;
+    return i_frame_size;
 }
 
 int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
@@ -670,8 +665,7 @@ int DTSStreamReader::testSyncInfo16be(const uint8_t* p_buf)
     if (test_audio_mode == pi_audio_mode && test_sample_rate_index == pi_sample_rate_index &&
         test_bit_rate_index == pi_bit_rate_index)
         return frame_size + 1;
-    else
-        return 0;
+    return 0;
 }
 
 int DTSStreamReader::buf14To16(uint8_t* p_out, const uint8_t* p_in, const int i_in, const int i_le)
@@ -730,10 +724,10 @@ double DTSStreamReader::getFrameDuration()
 {
     if (!m_isCoreExists)
         return m_frameDuration;
-    else if (m_dts_hd_mode && !m_downconvertToDTS && m_state != DTSDecodeState::stDecodeHD2)
+    if (m_dts_hd_mode && !m_downconvertToDTS && m_state != DTSDecodeState::stDecodeHD2)
         return 0;
-    else
-        return m_frameDuration;
+
+    return m_frameDuration;
 }
 
 bool DTSStreamReader::needSkipFrame(const AVPacket& packet)

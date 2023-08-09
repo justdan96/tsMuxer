@@ -65,8 +65,7 @@ const CodecInfo &AC3Codec::getCodecInfo()
         return trueHDCodecInfo;
     if (isEAC3())
         return eac3CodecInfo;
-    else
-        return ac3CodecInfo;
+    return ac3CodecInfo;
 }
 
 // returns true if ok, or false if error
@@ -395,21 +394,14 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
                 skipBytes = trueHDFrameLen;
                 return 0;
             }
-            else
-            {
-                return trueHDFrameLen;
-            }
+            return trueHDFrameLen;
         }
-        else
+        if (m_downconvertToAC3 && m_bsid > 10)
         {
-            if (m_downconvertToAC3 && m_bsid > 10)
-            {
-                skipBytes = rez;  // skip E-AC3 frame
-                return 0;
-            }
-            else
-                return rez;
+            skipBytes = rez;  // skip E-AC3 frame
+            return 0;
         }
+        return rez;
     }
     catch (BitStreamException &)
     {
@@ -437,56 +429,53 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t *buf, uint8_t *end) co
     {
         return AC3ParseError::SYNC;  // invalid stream type
     }
-    else if (m_bsid > 10)
+    if (m_bsid > 10)
     {
         return AC3ParseError::SYNC;  // doesn't used for EAC3
     }
-    else
+    gbc.skipBits(16);  // test_crc1
+    const int test_fscod = gbc.getBits(2);
+    if (test_fscod == 3)
+        return AC3ParseError::SAMPLE_RATE;
+
+    const int test_frmsizecod = gbc.getBits(6);
+    if (test_frmsizecod > 37)
+        return AC3ParseError::FRAME_SIZE;
+
+    gbc.skipBits(5);  // skip bsid, already got it
+
+    const int test_bsmod = gbc.getBits(3);
+    const int test_acmod = gbc.getBits(3);
+
+    if (test_fscod != m_fscod || /*(test_frmsizecod>>1) != (m_frmsizecod>>1) ||*/
+        test_bsmod != m_bsmod /*|| test_acmod != m_acmod*/)
+        return AC3ParseError::SYNC;
+
+    if ((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO)
+        gbc.skipBits(2);  // test_cmixlev
+
+    if (m_acmod & 4)
+        gbc.skipBits(2);  // test_surmixlev
+
+    if (m_acmod == AC3_ACMOD_STEREO)
     {
-        gbc.skipBits(16);  // test_crc1
-        const int test_fscod = gbc.getBits(2);
-        if (test_fscod == 3)
-            return AC3ParseError::SAMPLE_RATE;
-
-        const int test_frmsizecod = gbc.getBits(6);
-        if (test_frmsizecod > 37)
-            return AC3ParseError::FRAME_SIZE;
-
-        gbc.skipBits(5);  // skip bsid, already got it
-
-        const int test_bsmod = gbc.getBits(3);
-        const int test_acmod = gbc.getBits(3);
-
-        if (test_fscod != m_fscod || /*(test_frmsizecod>>1) != (m_frmsizecod>>1) ||*/
-            test_bsmod != m_bsmod /*|| test_acmod != m_acmod*/)
-            return AC3ParseError::SYNC;
-
-        if ((test_acmod & 1) && test_acmod != AC3_ACMOD_MONO)
-            gbc.skipBits(2);  // test_cmixlev
-
-        if (m_acmod & 4)
-            gbc.skipBits(2);  // test_surmixlev
-
-        if (m_acmod == AC3_ACMOD_STEREO)
-        {
-            const int test_dsurmod = gbc.getBits(2);
-            if (test_dsurmod != m_dsurmod)
-                return AC3ParseError::SYNC;
-        }
-        const int test_lfeon = gbc.getBit();
-
-        if (test_lfeon != m_lfeon)
-            return AC3ParseError::SYNC;
-
-        const int test_halfratecod = max(test_bsid, 8) - 8;
-        const int test_sample_rate = ff_ac3_freqs[test_fscod] >> test_halfratecod;
-        const int test_bit_rate = (ff_ac3_bitratetab[test_frmsizecod >> 1] * 1000) >> test_halfratecod;
-        const int test_channels = ff_ac3_channels[test_acmod] + test_lfeon;
-        const int test_frame_size = ff_ac3_frame_sizes[test_frmsizecod][test_fscod] * 2;
-        if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
-            test_channels != m_channels || test_frame_size != m_frame_size)
+        const int test_dsurmod = gbc.getBits(2);
+        if (test_dsurmod != m_dsurmod)
             return AC3ParseError::SYNC;
     }
+    const int test_lfeon = gbc.getBit();
+
+    if (test_lfeon != m_lfeon)
+        return AC3ParseError::SYNC;
+
+    const int test_halfratecod = max(test_bsid, 8) - 8;
+    const int test_sample_rate = ff_ac3_freqs[test_fscod] >> test_halfratecod;
+    const int test_bit_rate = (ff_ac3_bitratetab[test_frmsizecod >> 1] * 1000) >> test_halfratecod;
+    const int test_channels = ff_ac3_channels[test_acmod] + test_lfeon;
+    const int test_frame_size = ff_ac3_frame_sizes[test_frmsizecod][test_fscod] * 2;
+    if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
+        test_channels != m_channels || test_frame_size != m_frame_size)
+        return AC3ParseError::SYNC;
     return AC3ParseError::NO_ERROR;
 }
 
@@ -570,8 +559,7 @@ uint8_t *AC3Codec::findFrame(uint8_t *buffer, uint8_t *end)
     {
         if (*curBuf == 0x0B && curBuf[1] == 0x77)
             return curBuf;
-        else
-            curBuf++;
+        curBuf++;
     }
     return nullptr;
 }

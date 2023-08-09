@@ -702,12 +702,12 @@ bool TSMuxer::isSplitPoint(const AVPacket& avPacket) const
     {
         return m_muxedPacketCnt[m_muxedPacketCnt.size() - 1] * m_frameSize > m_splitSize;
     }
-    else if (m_splitDuration > 0)
+    if (m_splitDuration > 0)
     {
         return (avPacket.pts - m_curFileStartPts) > m_splitDuration;
     }
-    else
-        return false;
+
+    return false;
 }
 
 int TSMuxer::getFirstFileNum() const

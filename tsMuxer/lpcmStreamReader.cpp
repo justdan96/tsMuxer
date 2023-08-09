@@ -487,10 +487,8 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
     curPos = findSubstr("data", curPos, FFMIN(curPos + MAX_HEADER_SIZE, end));
     if (curPos == nullptr)
     {
-        if (end < curPos + MAX_HEADER_SIZE)
-            return NOT_ENOUGH_BUFFER;
-        else
-            return 0;  // 'riff' header was wrong detected, it is just data
+        return end < curPos + MAX_HEADER_SIZE ? NOT_ENOUGH_BUFFER : 0;
+        // 'riff' header was wrong detected, it is just data
     }
 
     if (m_headerType == LPCMHeaderType::htWAVE)
@@ -530,12 +528,9 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
             skipBeforeBytes = 4;
             return newSize;
         }
-        else
-        {
-            return 4 + audio_data_payload_size;  // 4 byte header + payload
-        }
+        return 4 + audio_data_payload_size;  // 4 byte header + payload
     }
-    else if (m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64)
+    if (m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64)
     {
         int hdrSize = 0;
         if (end - buff < 4)
@@ -577,18 +572,14 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
                 m_needPCMHdr = true;
             return frameLen;
         }
-        else
-        {
-            if (end - buff < m_frameRest + hdrSize)
-                return NOT_ENOUGH_BUFFER;
-            const int frameLen = static_cast<int>(m_frameRest);
-            m_frameRest = 0;
-            m_needPCMHdr = false;
-            return frameLen;
-        }
+        if (end - buff < m_frameRest + hdrSize)
+            return NOT_ENOUGH_BUFFER;
+        const int frameLen = static_cast<int>(m_frameRest);
+        m_frameRest = 0;
+        m_needPCMHdr = false;
+        return frameLen;
     }
-    else
-        return 0;
+    return 0;
 }
 
 uint8_t* LPCMStreamReader::findFrame(uint8_t* buff, uint8_t* end)
@@ -603,8 +594,7 @@ double LPCMStreamReader::getFrameDuration()
 {
     if (m_frameRest == 0)
         return 5 * INTERNAL_PTS_FREQ / 1000.0;  // 5 ms frames
-    else
-        return 0;
+    return 0;
 }
 
 const std::string LPCMStreamReader::getStreamInfo()
@@ -778,7 +768,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
         }
-        else if (decodeRez + skipBytes + skipBeforeBytes <= 0)
+        if (decodeRez + skipBytes + skipBeforeBytes <= 0)
         {
             m_curPos++;
             m_processedBytes++;
@@ -809,7 +799,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
     }
-    else if (frameLen + skipBytes + skipBeforeBytes <= 0)
+    if (frameLen + skipBytes + skipBeforeBytes <= 0)
     {
         LTRACE(LT_INFO, 2, getCodecInfo().displayName << " bad frame detected. Resync stream.");
         m_needSync = true;
@@ -861,7 +851,8 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
     int skipBeforeBytes = 0;
     if (m_tmpBufferLen >= getHeaderLen())
     {
-        const int size = decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
+        const int size =
+            decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }

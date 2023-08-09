@@ -46,7 +46,7 @@ int MatroskaDemuxer::matroska_parse_index()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -72,7 +72,7 @@ int MatroskaDemuxer::matroska_parse_index()
                     res = -BufferedReader::DATA_EOF;
                     break;
                 }
-                else if (level_up)
+                if (level_up)
                 {
                     level_up--;
                     break;
@@ -103,7 +103,7 @@ int MatroskaDemuxer::matroska_parse_index()
                             res = -BufferedReader::DATA_EOF;
                             break;
                         }
-                        else if (level_up)
+                        if (level_up)
                         {
                             level_up--;
                             break;
@@ -717,7 +717,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -918,7 +918,7 @@ int MatroskaDemuxer::matroska_parse_cluster()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1109,7 +1109,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
             {
                 return BufferedReader::DATA_EOF;
             }
-            else if (level_up)
+            if (level_up)
             {
                 level_up--;
                 break;
@@ -1201,7 +1201,7 @@ int MatroskaDemuxer::matroska_read_header()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1372,7 +1372,7 @@ int MatroskaDemuxer::matroska_parse_info()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1502,7 +1502,7 @@ int MatroskaDemuxer::matroska_parse_metadata()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1550,7 +1550,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1581,7 +1581,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                     res = -BufferedReader::DATA_EOF;
                     break;
                 }
-                else if (level_up)
+                if (level_up)
                 {
                     level_up--;
                     break;
@@ -1600,7 +1600,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                             res = -BufferedReader::DATA_EOF;
                             break;
                         }
-                        else if (level_up)
+                        if (level_up)
                         {
                             level_up--;
                             break;
@@ -1627,7 +1627,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
                                     res = -BufferedReader::DATA_EOF;
                                     break;
                                 }
-                                else if (level_up)
+                                if (level_up)
                                 {
                                     level_up--;
                                     break;
@@ -1742,7 +1742,7 @@ int MatroskaDemuxer::matroska_parse_tracks()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up)
+        if (level_up)
         {
             level_up--;
             break;
@@ -1789,7 +1789,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
         {
             break;
         }
-        else if (level_up > 0)
+        if (level_up > 0)
         {
             level_up--;
             break;
@@ -1845,7 +1845,7 @@ int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
         {
             break;
         }
-        else if (level_up > 0)
+        if (level_up > 0)
         {
             level_up--;
             break;
@@ -1885,7 +1885,7 @@ int MatroskaDemuxer::readTrackEncodings(MatroskaTrack *track)
         {
             break;
         }
-        else if (level_up > 0)
+        if (level_up > 0)
         {
             level_up--;
             break;
@@ -1941,7 +1941,7 @@ int MatroskaDemuxer::matroska_add_stream()
             res = -BufferedReader::DATA_EOF;
             break;
         }
-        else if (level_up > 0)
+        if (level_up > 0)
         {
             level_up--;
             break;
@@ -2011,7 +2011,7 @@ int MatroskaDemuxer::matroska_add_stream()
                 res = AVERROR_INVALIDDATA;
                 break;
             }
-            else if ((res = ebml_read_master(&id)) < 0)
+            if ((res = ebml_read_master(&id)) < 0)
                 break;
             videotrack = reinterpret_cast<MatroskaVideoTrack *>(track);
 
@@ -2022,7 +2022,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     res = -BufferedReader::DATA_EOF;
                     break;
                 }
-                else if (level_up > 0)
+                if (level_up > 0)
                 {
                     level_up--;
                     break;
@@ -2183,7 +2183,7 @@ int MatroskaDemuxer::matroska_add_stream()
                 res = AVERROR_INVALIDDATA;
                 break;
             }
-            else if ((res = ebml_read_master(&id)) < 0)
+            if ((res = ebml_read_master(&id)) < 0)
                 break;
             audiotrack = reinterpret_cast<MatroskaAudioTrack *>(track);
             audiotrack->channels = 1;
@@ -2196,7 +2196,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     res = -BufferedReader::DATA_EOF;
                     break;
                 }
-                else if (level_up > 0)
+                if (level_up > 0)
                 {
                     level_up--;
                     break;
@@ -2441,16 +2441,16 @@ int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
 {
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
         return TRACKTYPE_SRT;
-    else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
+    if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
         return TRACKTYPE_WAV;
-    else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_LIT))
+    if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_LIT))
         return TRACKTYPE_WAV;
-    else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_ACM))
+    if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_ACM))
         return TRACKTYPE_WAV;
-    else if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SUBTITLE_PGS))
+    if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SUBTITLE_PGS))
         return TRACKTYPE_PGS;
-    else
-        return 0;
+
+    return 0;
 }
 
 std::vector<AVChapter> MatroskaDemuxer::getChapters()

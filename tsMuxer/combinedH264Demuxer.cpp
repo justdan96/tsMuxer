@@ -31,13 +31,10 @@ int CombinedH264Reader::getPrefixLen(const uint8_t* pos, const uint8_t* end)
     {
         if (pos[2] == 0 && pos[3] == 1)
             return 4;
-        else if (pos[2] == 1)
+        if (pos[2] == 1)
             return 3;
-        else
-            return 0;
     }
-    else
-        return 0;
+    return 0;
 }
 
 void CombinedH264Reader::addDataToPrimary(const uint8_t* data, const uint8_t* dataEnd, DemuxedData& demuxedData,
@@ -87,8 +84,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
             return ReadState::NeedMoreData;
         if (pps.seq_parameter_set_id == m_mvcSPS)
             return ReadState::Secondary;
-        else
-            return ReadState::Primary;
+        return ReadState::Primary;
     }
     case NALUnit::NALType::nuSEI:
     {
@@ -97,10 +93,9 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
         const int rez = sei.isMVCSEI();
         if (rez == NOT_ENOUGH_BUFFER)
             return ReadState::NeedMoreData;
-        else if (rez == 0)
+        if (rez == 0)
             return ReadState::Primary;
-        else
-            return ReadState::Secondary;
+        return ReadState::Secondary;
     }
     default:
         return ReadState::Primary;
@@ -191,11 +186,8 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
                     m_tmpBuffer.append(curNal, dataEnd - curNal);
                     return 0;
                 }
-                else
-                {
-                    // some error in a stream, just ignore
-                    m_state = ReadState::Primary;
-                }
+                // some error in a stream, just ignore
+                m_state = ReadState::Primary;
             }
         }
         if (m_state == ReadState::Both)
