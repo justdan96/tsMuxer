@@ -452,7 +452,7 @@ int FileEntryInfo::write(const uint8_t *data, const int32_t len)
                 m_owner->checkLayerBreakPoint((SUB_INTERLEAVE_BLOCKSIZE + MAIN_INTERLEAVE_BLOCKSIZE) / SECTOR_SIZE);
         }
 #endif
-        m_extents.push_back(Extent(m_owner->absoluteSectorNum(), len));
+        m_extents.emplace_back(m_owner->absoluteSectorNum(), len);
     }
     else
     {
@@ -461,7 +461,7 @@ int FileEntryInfo::write(const uint8_t *data, const int32_t len)
         else
         {
             assert(m_extents.rbegin()->size % SECTOR_SIZE == 0);
-            m_extents.push_back(Extent(m_owner->absoluteSectorNum(), len));
+            m_extents.emplace_back(m_owner->absoluteSectorNum(), len);
         }
     }
     m_owner->m_lastWritedObjectID = m_objectId;

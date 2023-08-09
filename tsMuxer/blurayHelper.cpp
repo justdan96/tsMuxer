@@ -554,7 +554,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
         {
             auto mark = static_cast<uint32_t>(i * 45000.0);
             if (mark <= (mplsParser.OUT_time - mplsParser.IN_time))
-                mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
+                mplsParser.m_marks.emplace_back(-1, mark + mplsParser.IN_time);
         }
     }
     mplsParser.PlayItem_random_access_flag = false;
@@ -565,7 +565,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
 
     for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
     {
-        mplsParser.m_streamInfo.push_back(MPLSStreamInfo(itr->second));
+        mplsParser.m_streamInfo.emplace_back(itr->second);
         MPLSStreamInfo& info = *(mplsParser.m_streamInfo.rbegin());
         auto pgStream = dynamic_cast<PGSStreamReader*>(itr->second.m_codecReader);
         if (pgStream)

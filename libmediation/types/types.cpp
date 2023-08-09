@@ -256,12 +256,12 @@ vector<string> splitStr(const char* str, const char splitter)
     {
         if (*buf == splitter)
         {
-            rez.push_back(string(prevPos, buf - prevPos));
+            rez.emplace_back(prevPos, buf - prevPos);
             prevPos = buf + 1;
         }
     }
     if (buf > prevPos)
-        rez.push_back(string(prevPos, buf - prevPos));
+        rez.emplace_back(prevPos, buf - prevPos);
     return rez;
 }
 
@@ -297,12 +297,12 @@ void splitStr(vector<string>& rez, const char* str, const char splitter)
     {
         if (*buf == splitter)
         {
-            rez.push_back(string(prevPos, buf - prevPos));
+            rez.emplace_back(prevPos, buf - prevPos);
             prevPos = buf + 1;
         }
     }
     if (buf > prevPos)
-        rez.push_back(string(prevPos, buf - prevPos));
+        rez.emplace_back(prevPos, buf - prevPos);
 }
 
 string extractFileExt(const string& src)
@@ -413,12 +413,12 @@ vector<string> splitQuotedStr(const char* str, const char splitter)
             quoted = !quoted;
         if (*buf == splitter && !quoted)
         {
-            rez.push_back(string(prevPos, buf - prevPos));
+            rez.emplace_back(prevPos, buf - prevPos);
             prevPos = buf + 1;
         }
     }
     if (buf > prevPos)
-        rez.push_back(string(prevPos, buf - prevPos));
+        rez.emplace_back(prevPos, buf - prevPos);
     return rez;
 }
 

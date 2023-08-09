@@ -256,7 +256,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
                 THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
             if (nalSize > 0)
             {
-                spsPpsList.push_back(vector<uint8_t>());
+                spsPpsList.emplace_back();
                 for (int i = 0; i < nalSize; ++i, ++src) spsPpsList.rbegin()->push_back(*src);
             }
         }
@@ -271,7 +271,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
                 THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
             if (nalSize > 0)
             {
-                spsPpsList.push_back(vector<uint8_t>());
+                spsPpsList.emplace_back();
                 for (int i = 0; i < nalSize; ++i, ++src) spsPpsList.rbegin()->push_back(*src);
             }
         }
@@ -485,7 +485,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
                             suffix.insert(0, "</u>");
                         }
                         tags.insert(tags.begin(), std::make_pair(startChar, prefix));
-                        tags.push_back(std::make_pair(endChar, suffix));
+                        tags.emplace_back(endChar, suffix);
                     }
                     buff += 6;  // font-size, text-color-rgba[4]
                 }
@@ -731,7 +731,7 @@ void MovDemuxer::buildIndex()
 
     if (num_tracks == 1 && (dynamic_cast<MOVStreamContext*>(tracks[0]))->chunk_offsets.empty())
     {
-        chunks.push_back(make_pair(0, 0));
+        chunks.emplace_back(0, 0);
     }
     else
     {
@@ -743,7 +743,7 @@ void MovDemuxer::buildIndex()
                 if (!found_moof)
                     if (j < m_mdat_pos || j > m_mdat_pos + m_mdat_size)
                         THROW(ERR_MOV_PARSE, "Invalid chunk offset " << j);
-                chunks.push_back(make_pair(j - m_mdat_pos, i));
+                chunks.emplace_back(j - m_mdat_pos, i);
             }
         }
         sort(chunks.begin(), chunks.end());
@@ -1073,7 +1073,7 @@ int MovDemuxer::mov_read_mdat(MOVAtom atom)
         m_mdat_pos = m_processedBytes;
         m_mdat_size = atom.size;
     }
-    m_mdat_data.push_back(make_pair(m_processedBytes, atom.size));
+    m_mdat_data.emplace_back(m_processedBytes, atom.size);
     return 0;  // now go for moov
 }
 
@@ -1109,7 +1109,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
             get_be32();  // sample_flags
         if (flags & 0x800)
         {
-            sc->ctts_data.push_back(MOVStts());
+            sc->ctts_data.emplace_back();
             sc->ctts_data[sc->ctts_count].count = 1;
             sc->ctts_data[sc->ctts_count].duration = get_be32();
             sc->ctts_count++;
@@ -1132,7 +1132,7 @@ int MovDemuxer::mov_read_trkn(MOVAtom atom)
 
 int MovDemuxer::mov_read_trex(MOVAtom atom)
 {
-    trex_data.push_back(MOVTrackExt());
+    trex_data.emplace_back();
     MOVTrackExt& trex = trex_data[trex_data.size() - 1];
     get_byte();  // version
     get_be24();  // flags

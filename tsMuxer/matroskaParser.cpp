@@ -34,7 +34,7 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : Parsed
             const int spsLen = bitReader.getBits(16);
             if (spsLen > 0)
             {
-                m_spsPpsList.push_back(std::vector<uint8_t>());
+                m_spsPpsList.emplace_back();
                 std::vector<uint8_t>& curData = m_spsPpsList[m_spsPpsList.size() - 1];
                 for (int j = 0; j < spsLen; j++) curData.push_back(bitReader.getBits(8) & 0xff);
             }
@@ -45,7 +45,7 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : Parsed
             const int ppsLen = bitReader.getBits(16);
             if (ppsLen > 0)
             {
-                m_spsPpsList.push_back(std::vector<uint8_t>());
+                m_spsPpsList.emplace_back();
                 std::vector<uint8_t>& curData = m_spsPpsList[m_spsPpsList.size() - 1];
                 for (int j = 0; j < ppsLen; j++) curData.push_back(bitReader.getBits(8) & 0xff);
             }

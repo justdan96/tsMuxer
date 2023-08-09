@@ -487,7 +487,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         THROW(ERR_INVALID_CODEC_FORMAT, "This version do not support multicast or other network steams for muxing");
     }
 
-    m_codecInfo.push_back(StreamInfo(dataReader, codecReader, fileList[0], codecStreamName, pid, isSubStream));
+    m_codecInfo.emplace_back(dataReader, codecReader, fileList[0], codecStreamName, pid, isSubStream);
     if (listIterator)
     {
         auto fileReader = dynamic_cast<BufferedFileReader*>(dataReader);

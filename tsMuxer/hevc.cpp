@@ -875,7 +875,7 @@ vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, in
                 THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format");
             if (nalSize > 0)
             {
-                spsPps.push_back(vector<uint8_t>());
+                spsPps.emplace_back();
                 for (int k = 0; k < nalSize; ++k, ++src) spsPps.rbegin()->push_back(*src);
             }
         }

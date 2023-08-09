@@ -353,7 +353,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                 if (bStartPos > prevTextPos)
                 {
                     string msg = line.substr(prevTextPos, bStartPos - prevTextPos);
-                    rez.push_back(make_pair(fontStack[fontStack.size() - 1], msg));
+                    rez.emplace_back(fontStack[fontStack.size() - 1], msg);
                 }
                 if (isTag)
                     fontStack.push_back(curFont);
@@ -368,7 +368,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
         }
     }
     if (line.size() > static_cast<unsigned>(prevTextPos))
-        rez.push_back(make_pair(curFont, line.substr(prevTextPos, line.size() - prevTextPos)));
+        rez.emplace_back(curFont, line.substr(prevTextPos, line.size() - prevTextPos));
     double rSize = m_initFont.m_size;
     for (auto& i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
     return rez;

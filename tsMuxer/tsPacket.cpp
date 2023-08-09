@@ -623,7 +623,7 @@ void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLP
     const uint8_t number_of_program_sequences = reader.getBits(8);
     for (int i = 0; i < number_of_program_sequences; i++)
     {
-        programInfoMap.push_back(CLPIProgramInfo());
+        programInfoMap.emplace_back();
         programInfoMap[i].SPN_program_sequence_start = reader.get32Bits();
         programInfoMap[i].program_map_PID = reader.getBits(16);
         programInfoMap[i].number_of_streams_in_ps = reader.getBits(8);
@@ -901,7 +901,7 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
         const uint32_t newCoarseSPN = indexData.m_pktCnt & 0xfffe0000;
         if (rez.empty() || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
         {
-            rez.push_back(BluRayCoarseInfo(newCoarsePts, cnt, indexData.m_pktCnt));
+            rez.emplace_back(newCoarsePts, cnt, indexData.m_pktCnt);
         }
         lastCoarsePts = newCoarsePts;
         lastPktCnt = indexData.m_pktCnt;
@@ -1938,7 +1938,7 @@ void MPLSParser::parseSubPathEntryExtension(uint8_t* data, const int dataLen)
                     reader.skipBits(16);
                     char clip_Information_file_name[6];
                     CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
-                    m_mvcFiles.push_back(clip_Information_file_name);
+                    m_mvcFiles.emplace_back(clip_Information_file_name);
                     reader.skipBits(32);  // clip codec identifier
                     reader.skipBits(31);  // reserved, condition
                     const bool isMulticlip = reader.getBit();
@@ -1954,7 +1954,7 @@ void MPLSParser::parseSubPathEntryExtension(uint8_t* data, const int dataLen)
                         for (int j = 1; j < numberOfClipEntries; ++j)
                         {
                             CLPIStreamInfo::readString(clip_Information_file_name, reader, 5);
-                            m_mvcFiles.push_back(clip_Information_file_name);
+                            m_mvcFiles.emplace_back(clip_Information_file_name);
                             reader.skipBits(32);  // clip codec identifier
                             reader.skipBits(8);   // ref to stc id
                         }
@@ -2148,7 +2148,7 @@ void MPLSParser::parsePlayListMark(uint8_t* buffer, const int len)
         reader.skipBits(16);  // entry_ES_PID
         reader.skipBits(32);  // duration
         if (mark_type == 1)   // mark_type 0x01 = Chapter search
-            m_marks.push_back(PlayListMark(ref_to_PlayItem_id, mark_time_stamp));
+            m_marks.emplace_back(ref_to_PlayItem_id, mark_time_stamp);
     }
 }
 
@@ -2174,10 +2174,10 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
     if (m_marks.empty())
     {
         if (m_chapterLen == 0)
-            m_marks.push_back(PlayListMark(-1, IN_time));
+            m_marks.emplace_back(-1, IN_time);
         else
         {
-            for (uint32_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.push_back(PlayListMark(-1, i));
+            for (uint32_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.emplace_back(-1, i);
         }
     }
     writer.putBits(16, static_cast<unsigned>(m_marks.size()));

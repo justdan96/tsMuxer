@@ -339,31 +339,29 @@ void PGSStreamReader::renderTextShow(int64_t inTime)
     int rLen =
         m_render->composePresentationSegment(curPos, CompositionMode::Start, inTime, inTime - PRESENTATION_DTS_DELTA,
                                              m_objectWindowTop, m_demuxMode, m_forced_on_flag);
-    m_renderedBlocks.push_back(PGSRenderedBlock(inTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
+    m_renderedBlocks.emplace_back(inTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos);
     curPos += rLen;
     // window definition.   pts=x-0.001, dts = x-0.0648
     rLen = m_render->composeWindowDefinition(curPos, inTime - windowsTransferTime, inTime - PRESENTATION_DTS_DELTA,
                                              m_objectWindowTop, m_objectWindowHeight, m_demuxMode);
-    m_renderedBlocks.push_back(
-        PGSRenderedBlock(inTime - windowsTransferTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
+    m_renderedBlocks.emplace_back(inTime - windowsTransferTime, inTime - PRESENTATION_DTS_DELTA, rLen, curPos);
     curPos += rLen;
 
     // palette.             pts=x-0.0648, dts = x-0.0648
     rLen = m_render->composePaletteDefinition(m_render->m_paletteByColor, curPos, inTime - PRESENTATION_DTS_DELTA,
                                               inTime - PRESENTATION_DTS_DELTA, m_demuxMode);
-    m_renderedBlocks.push_back(
-        PGSRenderedBlock(inTime - PRESENTATION_DTS_DELTA, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
+    m_renderedBlocks.emplace_back(inTime - PRESENTATION_DTS_DELTA, inTime - PRESENTATION_DTS_DELTA, rLen, curPos);
     curPos += rLen;
     // object               pts=x-0.0627, dts = x-0.0648
     // inTime - 5643
     const int64_t odfPTS = inTime - PRESENTATION_DTS_DELTA + compositionDecodeTime;
     rLen = m_render->composeObjectDefinition(curPos, odfPTS, inTime - PRESENTATION_DTS_DELTA, m_render->minLine(),
                                              m_render->maxLine(), m_demuxMode);
-    m_renderedBlocks.push_back(PGSRenderedBlock(odfPTS, inTime - PRESENTATION_DTS_DELTA, rLen, curPos));
+    m_renderedBlocks.emplace_back(odfPTS, inTime - PRESENTATION_DTS_DELTA, rLen, curPos);
     curPos += rLen;
     // end                  pts=x-0.0627, dts = x-0.0627
     rLen = m_render->composeEnd(curPos, odfPTS, odfPTS, m_demuxMode);
-    m_renderedBlocks.push_back(PGSRenderedBlock(odfPTS, odfPTS, rLen, curPos));
+    m_renderedBlocks.emplace_back(odfPTS, odfPTS, rLen, curPos);
 }
 
 void PGSStreamReader::renderTextHide(int64_t outTime)
@@ -380,17 +378,16 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
     int rLen =
         m_render->composePresentationSegment(curPos, CompositionMode::Finish, outTime,
                                              outTime - windowsTransferTime - 90, m_objectWindowTop, m_demuxMode, false);
-    m_renderedBlocks.push_back(PGSRenderedBlock(outTime, outTime - windowsTransferTime - 90, rLen, curPos));
+    m_renderedBlocks.emplace_back(outTime, outTime - windowsTransferTime - 90, rLen, curPos);
     curPos += rLen;
     // windows              pts=x-0.001, dts = x-0.001
     rLen = m_render->composeWindowDefinition(curPos, outTime - windowsTransferTime, outTime - windowsTransferTime - 90,
                                              m_objectWindowTop, m_objectWindowHeight, m_demuxMode);
-    m_renderedBlocks.push_back(
-        PGSRenderedBlock(outTime - windowsTransferTime, outTime - windowsTransferTime - 90, rLen, curPos));
+    m_renderedBlocks.emplace_back(outTime - windowsTransferTime, outTime - windowsTransferTime - 90, rLen, curPos);
     curPos += rLen;
     // end                  pts=x-0.001, dts = x-0.001
     rLen = m_render->composeEnd(curPos, outTime - 90, outTime - 90, m_demuxMode);
-    m_renderedBlocks.push_back(PGSRenderedBlock(outTime - 90, outTime - 90, rLen, curPos));
+    m_renderedBlocks.emplace_back(outTime - 90, outTime - 90, rLen, curPos);
 }
 
 int64_t getTimeValueNano(uint8_t* pos)

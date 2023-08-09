@@ -88,7 +88,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_firstPts.push_back(-1);
     m_lastPts.push_back(-1);
     m_muxedPacketCnt.push_back(0);
-    m_interleaveInfo.push_back(std::vector<int32_t>());
+    m_interleaveInfo.emplace_back();
     m_pesIFrame = false;
     m_pesSpsPps = false;
     m_computeMuxStats = false;
@@ -646,7 +646,7 @@ void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
     for (auto& i : tmpPriorityData)
-        m_priorityData.push_back(std::pair(i.first + pesPacket->getHeaderLength(), i.second));
+        m_priorityData.emplace_back(i.first + pesPacket->getHeaderLength(), i.second);
 }
 
 void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
@@ -672,7 +672,7 @@ void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
         if (!m_priorityData.empty() && m_priorityData.rbegin()->first + m_priorityData.rbegin()->second == beforePesLen)
             m_priorityData.rbegin()->second += avPacket.size + pesHeaderLen;
         else
-            m_priorityData.push_back(pair(beforePesLen, avPacket.size + pesHeaderLen));
+            m_priorityData.emplace_back(beforePesLen, avPacket.size + pesHeaderLen);
     }
 }
 
@@ -761,11 +761,11 @@ void TSMuxer::gotoNextFile(const uint64_t newPts)
         pmtInfo.m_codecReader->onSplitEvent();
         if (pmtInfo.m_index.empty())
             continue;
-        pmtInfo.m_index.push_back(PMTIndex());
+        pmtInfo.m_index.emplace_back();
     }
 
     m_muxedPacketCnt.push_back(0);
-    m_interleaveInfo.push_back(std::vector<int32_t>());
+    m_interleaveInfo.emplace_back();
     m_interleaveInfo.rbegin()->push_back(0);
 
     m_lastPts[m_lastPts.size() - 1] = newPts;  //(curPts-FIXED_PTS_OFFSET)*INT_FREQ_TO_TS_FREQ;
@@ -796,7 +796,7 @@ void TSMuxer::writePESPacket()
 
             size_t idxSize = streamInfo.m_index.size();
             if (idxSize == 0)
-                streamInfo.m_index.push_back(PMTIndex());
+                streamInfo.m_index.emplace_back();
             const auto vCodec = dynamic_cast<MPEGStreamReader*>(streamInfo.m_codecReader);
             // bool isH264 = dynamic_cast <H264StreamReader*> (streamInfo.m_codecReader);
             const bool SPSRequired = streamInfo.m_codecReader->needSPSForSplit();
@@ -1311,7 +1311,7 @@ void TSMuxer::writeOutBuffer()
                     m_prevM2TSPCROffset -= toFileLen;
                 }
                 else
-                    m_m2tsDelayBlocks.push_back(std::make_pair(m_outBuf, toFileLen));
+                    m_m2tsDelayBlocks.emplace_back(m_outBuf, toFileLen);
             }
             else
                 m_owner->asyncWriteBuffer(this, m_outBuf, toFileLen, m_muxFile);
@@ -1332,7 +1332,7 @@ void TSMuxer::writeOutBuffer()
                 {
                     auto newBuf = new uint8_t[toFileLen];
                     memcpy(newBuf, m_outBuf, toFileLen);
-                    m_m2tsDelayBlocks.push_back(std::make_pair(newBuf, toFileLen));
+                    m_m2tsDelayBlocks.emplace_back(newBuf, toFileLen);
                 }
             }
             memmove(m_outBuf, m_outBuf + toFileLen, m_outBufLen - toFileLen);
