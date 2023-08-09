@@ -775,6 +775,7 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
 {
     const auto nal_unit_type = static_cast<NALUnit::NALType>(*buff & 0x1f);
     int nalRez;
+    uint8_t *nextNal;
     m_spsPpsFound = false;
 
     // First NAL of Access Unit
@@ -807,7 +808,7 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
         m_delimiterFound = true;
     // Remaining NALs of Access Unit
     getAU:
-        uint8_t *nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
+        nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
         while (true)
         {
             if (nextNal == m_bufEnd)
