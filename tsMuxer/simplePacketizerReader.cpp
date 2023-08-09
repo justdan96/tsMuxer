@@ -25,7 +25,7 @@ SimplePacketizerReader::SimplePacketizerReader() : AbstractStreamReader()
     m_halfFrameLen = 0;
 }
 
-static const double mplsEps = INTERNAL_PTS_FREQ / 45000.0 / 2.0;
+static constexpr double mplsEps = INTERNAL_PTS_FREQ / 45000.0 / 2.0;
 
 void SimplePacketizerReader::doMplsCorrection()
 {
@@ -233,7 +233,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
     } while (true);
 }
 
-const static int CHECK_FRAMES_COUNT = 10;
+static constexpr int CHECK_FRAMES_COUNT = 10;
 
 CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, ContainerType containerType,
                                                    int containerDataType, int containerStreamIndex)

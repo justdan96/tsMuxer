@@ -2,8 +2,8 @@
 
 #if 1
 
-const static uint64_t TS_FREQ_TO_INT_FREQ_COEFF = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
-static const int BAD_FRAME = -1;
+static constexpr uint64_t TS_FREQ_TO_INT_FREQ_COEFF = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
+static constexpr int BAD_FRAME = -1;
 
 int DVBSubStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) { return 0; }
 

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-static const int MAX_SLICE_HEADER = 64;
+static constexpr int MAX_SLICE_HEADER = 64;
 
 VVCStreamReader::VVCStreamReader()
     : MPEGStreamReader(),

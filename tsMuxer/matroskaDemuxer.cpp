@@ -22,11 +22,11 @@ typedef uint64_t offset_t;
 
 int64_t AV_NOPTS_VALUE = int64_t(0x8000000000000000ull);
 
-const static int PKT_FLAG_KEY = 1;
-const static int AVERROR_INVALIDDATA = -1;
+static constexpr int PKT_FLAG_KEY = 1;
+static constexpr int AVERROR_INVALIDDATA = -1;
 
-static const int COMPRESSION_STRIP_HEADERS = 3;
-static const int COMPRESSION_ZLIB = 0;
+static constexpr int COMPRESSION_STRIP_HEADERS = 3;
+static constexpr int COMPRESSION_ZLIB = 0;
 
 #define AV_RL32(x) \
     ((((uint8_t *)(x))[3] << 24) | (((uint8_t *)(x))[2] << 16) | (((uint8_t *)(x))[1] << 8) | ((uint8_t *)(x))[0])
@@ -34,7 +34,7 @@ static const int COMPRESSION_ZLIB = 0;
 #define MAX(a, b) (a > b ? a : b)
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 
-const static int MAX_TRACK_SIZE =
+static constexpr int MAX_TRACK_SIZE =
     (MAX(MAX(sizeof(MatroskaVideoTrack), sizeof(MatroskaAudioTrack)), sizeof(MatroskaSubtitleTrack)));
 
 int MatroskaDemuxer::matroska_parse_index()

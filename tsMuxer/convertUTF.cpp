@@ -23,17 +23,15 @@
 
 namespace convertUTF
 {
-static const int halfShift = 10; /* used for shifting by 10 bits */
+static constexpr int halfShift = 10; /* used for shifting by 10 bits */
 
-static const UTF32 halfBase = 0x0010000UL;
-static const UTF32 halfMask = 0x3FFUL;
+static constexpr UTF32 halfBase = 0x0010000UL;
+static constexpr UTF32 halfMask = 0x3FFUL;
 
 #define UNI_SUR_HIGH_START (UTF32)0xD800
 #define UNI_SUR_HIGH_END (UTF32)0xDBFF
 #define UNI_SUR_LOW_START (UTF32)0xDC00
 #define UNI_SUR_LOW_END (UTF32)0xDFFF
-#define false 0
-#define true 1
 
 /* --------------------------------------------------------------------- */
 
@@ -194,7 +192,7 @@ ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sou
  * (I.e., one byte sequence, two byte... etc.). Remember that sequencs
  * for *legal* UTF-8 will be 4 or fewer bytes total.
  */
-static const UTF8 firstByteMark[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC};
+static constexpr UTF8 firstByteMark[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC};
 
 /* --------------------------------------------------------------------- */
 
@@ -217,8 +215,8 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
     while (source < sourceEnd)
     {
         unsigned short bytesToWrite = 0;
-        const UTF32 byteMask = 0xBF;
-        const UTF32 byteMark = 0x80;
+        static constexpr UTF32 byteMask = 0xBF;
+        static constexpr UTF32 byteMark = 0x80;
         const UTF16* oldSource = source; /* In case we have to back up because of target overflow. */
         UTF32 ch = *source++;
         /* If we have a surrogate pair, convert to UTF32 first. */
@@ -536,8 +534,8 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
     while (source < sourceEnd)
     {
         unsigned short bytesToWrite = 0;
-        const UTF32 byteMask = 0xBF;
-        const UTF32 byteMark = 0x80;
+        static constexpr UTF32 byteMask = 0xBF;
+        static constexpr UTF32 byteMark = 0x80;
         UTF32 ch = *source++;
         if (flags == ConversionFlags::strictConversion)
         {

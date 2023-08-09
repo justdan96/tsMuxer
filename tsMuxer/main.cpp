@@ -26,7 +26,7 @@ BufferedReaderManager readManager(2, DEFAULT_FILE_BLOCK_SIZE, DEFAULT_FILE_BLOCK
 TSMuxerFactory tsMuxerFactory;
 SingleFileMuxerFactory singleFileMuxerFactory;
 
-static const char EXCEPTION_ERR_MSG[] =
+static constexpr char EXCEPTION_ERR_MSG[] =
     ". It does not have to be! Please contact application support team for more information.";
 
 // const static uint32_t BLACK_PL_NUM = 1900;
@@ -337,7 +337,7 @@ void doTruncatedFile(const char* fileName, int64_t offset)
 
 void showHelp()
 {
-    const char help[] = R"help(
+    constexpr char help[] = R"help(
 tsMuxeR is a simple program to mux video to TS/M2TS files or create BD disks.
 tsMuxeR does not use external filters (codecs).
 

@@ -12,9 +12,9 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-const static double EPSILON = 5e-5;
-const static int64_t MAX_PULLDOWN_ASYNC = 100000000ll;
-static const int UNIT_SKIPPED = 5;
+static constexpr double EPSILON = 5e-5;
+static constexpr int64_t MAX_PULLDOWN_ASYNC = 100000000ll;
+static constexpr int UNIT_SKIPPED = 5;
 
 using namespace std;
 
@@ -342,7 +342,7 @@ void MPEGStreamReader::fillAspectBySAR(double sar)
     if (m_streamAR == VideoAspectRatio::AR_KEEP_DEFAULT)
     {
         double ar = getStreamWidth() * sar / (double)getStreamHeight();
-        const static double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
+        static constexpr double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
         double minEps = INT_MAX;
         m_streamAR = VideoAspectRatio::AR_KEEP_DEFAULT;
         for (int i = 0; i < sizeof(base_ar) / sizeof(double); ++i)

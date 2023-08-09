@@ -3,9 +3,9 @@
 #include <sstream>
 
 // static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
-static const int DCA_EXT_XXCH = 0x002;  ///< XXCh channels extension in core substream
-static const int DCA_EXT_X96 = 0x004;   ///< 96/24 extension in core substream
-static const int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core substream
+static constexpr int DCA_EXT_XXCH = 0x002; ///< XXCh channels extension in core substream
+static constexpr int DCA_EXT_X96 = 0x004;  ///< 96/24 extension in core substream
+static constexpr int DCA_EXT_XCH = 0x008;  ///< XCh channel extension in core substream
 // static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
 // static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
 // static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
@@ -13,8 +13,8 @@ static const int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core subst
 // static const int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
 // static const int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
 
-static const int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
-                                               -1,          -1, DCA_EXT_XXCH, -1};
+static constexpr int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
+                                                   -1,          -1, DCA_EXT_XXCH, -1};
 
 static const unsigned int ppi_dts_samplerate[] = {0,     8000, 16000, 32000, 0,     0,     11025, 22050,
                                                   44100, 0,    0,     12000, 24000, 48000, 96000, 192000};
@@ -28,31 +28,31 @@ static const unsigned int ppi_dts_bitrate[] = {
     1411200, 1472000, 1536000, 1920000, 2048000, 3072000, 3840000, 1 /*open*/, 2 /*variable*/, 3 /*lossless*/
 };
 
-static const int64_t AUPR_HDR = 0x415550522D484452ll;
-static const int64_t AUPRINFO = 0x41555052494E464Fll;
-static const int64_t BITSHVTB = 0x4249545348565442ll;
-static const int64_t BLACKOUT = 0x424C41434B4F5554ll;
-static const int64_t BRANCHPT = 0x4252414E43485054ll;
-static const int64_t BUILDVER = 0x4255494C44564552ll;
-static const int64_t CORESSMD = 0x434F524553534D44ll;
-static const int64_t DTSHDHDR = 0x4454534844484452ll;
-static const int64_t EXTSS_MD = 0x45585453535f4d44ll;
-static const int64_t FILEINFO = 0x46494C45494E464Fll;
-static const int64_t NAVI_TBL = 0x4E4156492D54424Cll;
-static const int64_t STRMDATA = 0x5354524D44415441ll;
-static const int64_t TIMECODE = 0x54494D45434F4445ll;
+static constexpr int64_t AUPR_HDR = 0x415550522D484452ll;
+static constexpr int64_t AUPRINFO = 0x41555052494E464Fll;
+static constexpr int64_t BITSHVTB = 0x4249545348565442ll;
+static constexpr int64_t BLACKOUT = 0x424C41434B4F5554ll;
+static constexpr int64_t BRANCHPT = 0x4252414E43485054ll;
+static constexpr int64_t BUILDVER = 0x4255494C44564552ll;
+static constexpr int64_t CORESSMD = 0x434F524553534D44ll;
+static constexpr int64_t DTSHDHDR = 0x4454534844484452ll;
+static constexpr int64_t EXTSS_MD = 0x45585453535f4d44ll;
+static constexpr int64_t FILEINFO = 0x46494C45494E464Fll;
+static constexpr int64_t NAVI_TBL = 0x4E4156492D54424Cll;
+static constexpr int64_t STRMDATA = 0x5354524D44415441ll;
+static constexpr int64_t TIMECODE = 0x54494D45434F4445ll;
 
-static const int AOUT_CHAN_CENTER = 0x1;
-static const int AOUT_CHAN_LEFT = 0x2;
-static const int AOUT_CHAN_RIGHT = 0x4;
-static const int AOUT_CHAN_REARCENTER = 0x10;
-static const int AOUT_CHAN_REARLEFT = 0x20;
-static const int AOUT_CHAN_REARRIGHT = 0x40;
-static const int AOUT_CHAN_MIDDLELEFT = 0x100;
-static const int AOUT_CHAN_MIDDLERIGHT = 0x200;
-static const int AOUT_CHAN_LFE = 0x1000;
+static constexpr int AOUT_CHAN_CENTER = 0x1;
+static constexpr int AOUT_CHAN_LEFT = 0x2;
+static constexpr int AOUT_CHAN_RIGHT = 0x4;
+static constexpr int AOUT_CHAN_REARCENTER = 0x10;
+static constexpr int AOUT_CHAN_REARLEFT = 0x20;
+static constexpr int AOUT_CHAN_REARRIGHT = 0x40;
+static constexpr int AOUT_CHAN_MIDDLELEFT = 0x100;
+static constexpr int AOUT_CHAN_MIDDLERIGHT = 0x200;
+static constexpr int AOUT_CHAN_LFE = 0x1000;
 // static const int AOUT_CHAN_DOLBYSTEREO = 0x10000;
-static const int AOUT_CHAN_DUALMONO = 0x20000;
+static constexpr int AOUT_CHAN_DUALMONO = 0x20000;
 // static const int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;

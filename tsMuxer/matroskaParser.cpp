@@ -248,7 +248,7 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
 
 // ------------ VC-1 ---------------
 
-const static int MS_BIT_MAP_HEADER_SIZE = 40;
+static constexpr int MS_BIT_MAP_HEADER_SIZE = 40;
 ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size)
 {
     if (size < MS_BIT_MAP_HEADER_SIZE)
@@ -388,7 +388,7 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 // ------------ PG ---------------
 void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 {
-    static const int PG_HEADER_SIZE = 10;
+    static constexpr int PG_HEADER_SIZE = 10;
 
     uint8_t* curPtr = buff;
     uint8_t* end = buff + size;

@@ -433,8 +433,8 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     return forced;
 }
 
-const static uint32_t BORDER_COLOR = 0xff020202;
-const static uint32_t BORDER_COLOR_TMP = RGB(0x1, 0x1, 0x1);
+static constexpr uint32_t BORDER_COLOR = 0xff020202;
+static constexpr uint32_t BORDER_COLOR_TMP = RGB(0x1, 0x1, 0x1);
 
 inline void setBPoint(uint32_t* addr)
 {

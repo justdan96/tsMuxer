@@ -29,15 +29,15 @@ int HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
 bool isV3() { return V3_flags & HDMV_V3; }
 bool is4K() { return V3_flags & FOUR_K; }
 
-const static uint64_t M_PCR_DELTA = 7000;
-const static uint64_t SIT_INTERVAL = 76900;
-const static uint64_t M_CBR_PCR_DELTA = 7000;
+static constexpr uint64_t M_PCR_DELTA = 7000;
+static constexpr uint64_t SIT_INTERVAL = 76900;
+static constexpr uint64_t M_CBR_PCR_DELTA = 7000;
 
-static const int64_t DEFAULT_VBV_BUFFER_LEN = 500;  // default 500 ms vbv buffer
+static constexpr int64_t DEFAULT_VBV_BUFFER_LEN = 500;  // default 500 ms vbv buffer
 
-static const int PAT_PID = 0;
-static const int SIT_PID = 0x1f;
-static const int NULL_PID = 8191;
+static constexpr int PAT_PID = 0;
+static constexpr int SIT_PID = 0x1f;
+static constexpr int NULL_PID = 8191;
 
 uint8_t DefaultSitTableOne[] = {
     0x47, 0x40, 0x1f, 0x10, 0x00, 0x7f, 0xf0, 0x19, 0xff, 0xff, 0xc1, 0x00, 0x00, 0xf0, 0x0a, 0x63, 0x08, 0xc1, 0xd4,

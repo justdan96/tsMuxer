@@ -11,8 +11,8 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-static const double FRAME_RATE_EPS = 3e-5;
-static const int MB_ESCAPE_CODE = -1;
+static constexpr double FRAME_RATE_EPS = 3e-5;
+static constexpr int MB_ESCAPE_CODE = -1;
 
 // --------------------- MPEGRawDataHeader ---------------------
 

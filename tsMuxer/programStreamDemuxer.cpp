@@ -7,7 +7,7 @@
 
 using namespace std;
 
-static const uint32_t LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
+static constexpr uint32_t LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
 
 // #define min(a,b) a<=b?a:b
 

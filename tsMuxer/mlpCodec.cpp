@@ -3,7 +3,7 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-static const int HD_SYNC_WORD = 0xf8726f;
+static constexpr int HD_SYNC_WORD = 0xf8726f;
 
 static const uint8_t mlp_channels[32] = {1, 2, 3, 4, 3, 4, 5, 3, 4, 5, 4, 5, 6, 4, 5, 4,
                                          5, 6, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};

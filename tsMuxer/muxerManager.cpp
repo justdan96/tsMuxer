@@ -10,7 +10,7 @@
 using namespace std;
 
 // static const int SSIF_INTERLEAVE_BLOCKSIZE = 1024 * 1024 * 7;
-static const int MAX_FRAME_SIZE = 1200000;  // 1.2m
+static constexpr int MAX_FRAME_SIZE = 1200000;  // 1.2m
 
 namespace
 {

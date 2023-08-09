@@ -125,17 +125,17 @@ std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
 std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
                                                 const std::vector<MovieObject>& movieObjects)
 {
-    const std::array<std::uint8_t, 4> type_indicator = {0x4D, 0x4F, 0x42, 0x4A};  // "MOBJ"
+    constexpr std::array<std::uint8_t, 4> type_indicator = {0x4D, 0x4F, 0x42, 0x4A};  // "MOBJ"
     const auto version_number = getBDMV_VersionNumber(version);
-    const std::uint32_t extension_data_start_addr = 0;
-    const std::uint32_t reserved_after_length = 0;
-    const auto header_reserved_bytes = 28u;
+    constexpr std::uint32_t extension_data_start_addr = 0;
+    constexpr std::uint32_t reserved_after_length = 0;
+    constexpr auto header_reserved_bytes = 28u;
 
     std::vector<std::uint8_t> rv;
     const auto num_movie_objects = static_cast<std::uint16_t>(movieObjects.size());
     auto payload_length = static_cast<std::uint32_t>(sizeof(reserved_after_length) + sizeof(num_movie_objects));
-    const auto header_size = type_indicator.size() + version_number.size() + sizeof(extension_data_start_addr) +
-                             header_reserved_bytes + sizeof(payload_length);
+    constexpr auto header_size = type_indicator.size() + version_number.size() + sizeof(extension_data_start_addr) +
+                                 header_reserved_bytes + sizeof(payload_length);
 
     for (auto&& movieObj : movieObjects)
     {
@@ -417,7 +417,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
 
 bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
 {
-    static const int CLPI_BUFFER_SIZE = 1024 * 1024;
+    static constexpr int CLPI_BUFFER_SIZE = 1024 * 1024;
     auto clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
     CLPIParser clpiParser;
     string version_number;

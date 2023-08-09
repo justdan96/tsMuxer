@@ -205,7 +205,7 @@ void PGSStreamReader::decodeRleData(int xOffset, int yOffset)
     }
 }
 
-const static int Y_THRESHOLD = 33;
+static constexpr int Y_THRESHOLD = 33;
 
 int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
 {

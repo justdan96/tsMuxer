@@ -22,8 +22,8 @@
 using namespace std;
 using namespace text_subtitles;
 
-static const float FLOAT_EPS = 1e-6f;
-static const int PG_BUFFER_SIZE = 1024 * 1024 * 2;
+static constexpr float FLOAT_EPS = 1e-6f;
+static constexpr int PG_BUFFER_SIZE = 1024 * 1024 * 2;
 
 // const static int BORDER_WIDTH = 4;
 // const RGBQUAD RESERVED_BACKGROUND_COLOR = {0x00, 0x00, 0x00, 0x00};

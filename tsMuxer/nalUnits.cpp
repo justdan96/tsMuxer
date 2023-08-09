@@ -746,7 +746,7 @@ void SPSUnit::updateTimingInfo()
     // replace hrd parameters not implemented. only insert
     int bitPos = hrdParamsBitPos - 1;
 
-    const int EXTRA_SPACE = 64;
+    static constexpr int EXTRA_SPACE = 64;
 
     auto newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
 
@@ -804,7 +804,7 @@ void SPSUnit::updateTimingInfo()
 void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool addVuiHeader, const HRDParams& params)
 {
     // replace hrd parameters not implemented. only insert
-    const int EXTRA_SPACE = 64;
+    static constexpr int EXTRA_SPACE = 64;
 
     auto newNalBuffer = new uint8_t[m_nalBufferLen + EXTRA_SPACE];
 

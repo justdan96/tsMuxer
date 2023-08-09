@@ -9,9 +9,9 @@
 
 using namespace std;
 
-static const int MVC_STREAM_INDEX = 1;
-static const int AVC_STREAM_INDEX = 2;
-static const int MAX_TMP_BUFFER_SIZE = 128;
+static constexpr int MVC_STREAM_INDEX = 1;
+static constexpr int AVC_STREAM_INDEX = 2;
+static constexpr int MAX_TMP_BUFFER_SIZE = 128;
 
 // ------------------------ CombinedH264Reader -------------------------------
 

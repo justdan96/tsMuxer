@@ -10,7 +10,7 @@
 #include "vod_common.h"
 
 using namespace std;
-static const int EXTENDED_SAR = 255;
+static constexpr int EXTENDED_SAR = 255;
 
 // ------------------------- VvcUnit -------------------
 

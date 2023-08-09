@@ -189,7 +189,7 @@ void SingleFileMuxer::openDstFile()
 
 void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
 {
-    const uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
+    constexpr uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
     if (streamInfo->m_bufLen >= blockSize)
     {
         int toFileLen = blockSize & 0xffff0000;
@@ -248,7 +248,7 @@ bool SingleFileMuxer::muxPacket(AVPacket& avPacket)
     if (avPacket.dts != streamInfo->m_dts || avPacket.pts != streamInfo->m_pts ||
         m_lastIndex != avPacket.stream_index || avPacket.flags & AVPacket::FORCE_NEW_FRAME)
     {
-        const uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
+        constexpr uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
         streamInfo->m_bufLen += avPacket.codec->writeAdditionData(
             streamInfo->m_buffer + streamInfo->m_bufLen,
             streamInfo->m_buffer + blockSize + MAX_AV_PACKET_SIZE + ADD_DATA_SIZE, avPacket, nullptr);

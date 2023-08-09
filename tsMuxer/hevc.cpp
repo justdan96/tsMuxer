@@ -9,7 +9,7 @@
 #include "vod_common.h"
 
 using namespace std;
-static const int EXTENDED_SAR = 255;
+static constexpr int EXTENDED_SAR = 255;
 
 int ceilDiv(int a, int b) { return (a / b) + ((a % b) ? 1 : 0); }
 

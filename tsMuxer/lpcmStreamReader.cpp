@@ -10,8 +10,8 @@
 #include "vod_common.h"
 #include "wave.h"
 
-static const int m2tsFreqs[] = {0, 48000, 0, 0, 96000, 192000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static const int MAX_HEADER_SIZE = 192;
+static constexpr int m2tsFreqs[] = {0, 48000, 0, 0, 96000, 192000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static constexpr int MAX_HEADER_SIZE = 192;
 
 static uint32_t FOUR_CC(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {

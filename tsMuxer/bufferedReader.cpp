@@ -14,7 +14,7 @@ using namespace std;
 
 uint32_t BufferedReader::m_newReaderID = 0;
 std::mutex BufferedReader::m_genReaderMtx;
-const unsigned QUEUE_MAX_SIZE = 4096;
+static constexpr unsigned QUEUE_MAX_SIZE = 4096;
 
 BufferedReader::BufferedReader(uint32_t blockSize, uint32_t allocSize, uint32_t prereadThreshold)
     : m_started(false), m_terminated(false), m_readQueue(QUEUE_MAX_SIZE), m_id(0)

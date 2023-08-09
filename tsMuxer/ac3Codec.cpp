@@ -8,25 +8,25 @@
 #include "vod_common.h"
 
 #define max(a, b) (a > b ? a : b)
-static const int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
-static const int AC3_FRAME_SIZE = NB_BLOCKS * 256;
+static constexpr int NB_BLOCKS = 6;  // number of PCM blocks inside an AC3 frame
+static constexpr int AC3_FRAME_SIZE = NB_BLOCKS * 256;
 
 bool isSyncWord(uint8_t *buff) { return buff[0] == 0x0B && buff[1] == 0x77; }
 
 bool isHDSyncWord(uint8_t *buff) { return buff[0] == 0xf8 && buff[1] == 0x72 && buff[2] == 0x6f; }
 
-static const uint8_t eac3_blocks[4] = {1, 2, 3, 6};
+static constexpr uint8_t eac3_blocks[4] = {1, 2, 3, 6};
 
-const uint8_t ff_ac3_channels[8] = {2, 1, 2, 3, 3, 4, 4, 5};
+static constexpr uint8_t ff_ac3_channels[8] = {2, 1, 2, 3, 3, 4, 4, 5};
 
 // possible frequencies
-const uint16_t ff_ac3_freqs[3] = {48000, 44100, 32000};
+static constexpr uint16_t ff_ac3_freqs[3] = {48000, 44100, 32000};
 
 // possible bitrates
-const uint16_t ff_ac3_bitratetab[19] = {32,  40,  48,  56,  64,  80,  96,  112, 128, 160,
+static constexpr uint16_t ff_ac3_bitratetab[19] = {32,  40,  48,  56,  64,  80,  96,  112, 128, 160,
                                         192, 224, 256, 320, 384, 448, 512, 576, 640};
 
-const uint16_t ff_ac3_frame_sizes[38][3] = {
+static constexpr uint16_t ff_ac3_frame_sizes[38][3] = {
     {64, 69, 96},       {64, 70, 96},       {80, 87, 120},      {80, 88, 120},      {96, 104, 144},
     {96, 105, 144},     {112, 121, 168},    {112, 122, 168},    {128, 139, 192},    {128, 140, 192},
     {160, 174, 240},    {160, 175, 240},    {192, 208, 288},    {192, 209, 288},    {224, 243, 336},
@@ -36,7 +36,7 @@ const uint16_t ff_ac3_frame_sizes[38][3] = {
     {896, 975, 1344},   {896, 976, 1344},   {1024, 1114, 1536}, {1024, 1115, 1536}, {1152, 1253, 1728},
     {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920}};
 
-const uint16_t ctx[256] = {
+static const uint16_t ctx[256] = {
     0x0000, 0x0580, 0x0F80, 0x0A00, 0x1B80, 0x1E00, 0x1400, 0x1180, 0x3380, 0x3600, 0x3C00, 0x3980, 0x2800, 0x2D80,
     0x2780, 0x2200, 0x6380, 0x6600, 0x6C00, 0x6980, 0x7800, 0x7D80, 0x7780, 0x7200, 0x5000, 0x5580, 0x5F80, 0x5A00,
     0x4B80, 0x4E00, 0x4400, 0x4180, 0xC380, 0xC600, 0xCC00, 0xC980, 0xD800, 0xDD80, 0xD780, 0xD200, 0xF000, 0xF580,
@@ -57,8 +57,8 @@ const uint16_t ctx[256] = {
     0x6402, 0x6182, 0x2002, 0x2582, 0x2F82, 0x2A02, 0x3B82, 0x3E02, 0x3402, 0x3182, 0x1382, 0x1602, 0x1C02, 0x1982,
     0x0802, 0x0D82, 0x0782, 0x0202};
 
-static const int AC3_ACMOD_MONO = 1;
-static const int AC3_ACMOD_STEREO = 2;
+static constexpr int AC3_ACMOD_MONO = 1;
+static constexpr int AC3_ACMOD_STEREO = 2;
 
 const CodecInfo &AC3Codec::getCodecInfo()
 {

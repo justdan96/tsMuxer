@@ -23,13 +23,13 @@ struct MovDemuxer::MOVParseTableEntry
     int (MovDemuxer::*parse)(MOVAtom atom);
 };
 
-static const int MP4ESDescrTag = 0x03;
-static const int MP4DecConfigDescrTag = 0x04;
-static const int MP4DecSpecificDescrTag = 0x05;
+static constexpr int MP4ESDescrTag = 0x03;
+static constexpr int MP4DecConfigDescrTag = 0x04;
+static constexpr int MP4DecSpecificDescrTag = 0x05;
 
 #define MKTAG(a, b, c, d) (a | (b << 8) | (c << 16) | (d << 24))
 
-static const char* const mov_mdhd_language_map[] = {
+static constexpr char* const mov_mdhd_language_map[] = {
     // see https :  // developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap4/qtff4.html
     "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "ell", "isl",
     "mlt", "tur", "hrv", "zho", "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav", "smi", "fao", "fas",
