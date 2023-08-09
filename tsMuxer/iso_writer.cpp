@@ -581,7 +581,13 @@ int64_t ISOFile::size() const { return m_entry ? m_entry->m_fileSize : -1; }
 // ------------------------------ IsoWriter ----------------------------------
 
 IsoWriter::IsoWriter(const IsoHeaderData &hdrData)
-    : m_impId(hdrData.impId), m_appId(hdrData.appId), m_volumeId(hdrData.volumeId), m_currentTime(hdrData.fileTime)
+    : m_impId(hdrData.impId), m_appId(hdrData.appId), m_volumeId(hdrData.volumeId), m_buffer{},
+      m_currentTime(hdrData.fileTime),
+      m_metadataMappingFile(nullptr),
+      m_partitionStartAddress(0),
+      m_partitionEndAddress(0),
+      m_metadataLBN(0),
+      m_curMetadataPos(0)
 {
     m_objectUniqId = 16;
     m_totalFiles = 0;
