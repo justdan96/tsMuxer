@@ -84,7 +84,10 @@ int32_t strToInt32(const std::string& str) { return strToInt32(str.c_str()); }
 
 int32_t strToInt32(const char* const str, const int radix) { return strtol(str, nullptr, radix); }
 
-uint32_t strToInt32u(const char* const str, const int radix) { return static_cast<uint32_t>(strtoul(str, nullptr, radix)); }
+uint32_t strToInt32u(const char* const str, const int radix)
+{
+    return static_cast<uint32_t>(strtoul(str, nullptr, radix));
+}
 
 int16_t strToInt16(const char* const str) { return (int16_t)strtol(str, nullptr, 10); }
 
