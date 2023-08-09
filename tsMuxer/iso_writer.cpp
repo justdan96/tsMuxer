@@ -187,7 +187,8 @@ void writeUDFString(uint8_t *buffer, const char *str, const int len)
     buffer[len - 7] = 0x02;  // UDF suffix
 }
 
-void writeLongAD(uint8_t *buffer, const uint32_t lenBytes, const uint32_t pos, const uint16_t partition, const uint32_t id)
+void writeLongAD(uint8_t *buffer, const uint32_t lenBytes, const uint32_t pos, const uint16_t partition,
+                 const uint32_t id)
 {
     const auto buff32 = (uint32_t *)buffer;
     const auto buff16 = (uint16_t *)buffer;
@@ -259,7 +260,8 @@ void ByteFileWriter::writeIcbTag(const uint8_t fileType)
     m_curPos += 20;
 }
 
-void ByteFileWriter::writeLongAD(const uint32_t lenBytes, const uint32_t pos, const uint16_t partition, const uint32_t id)
+void ByteFileWriter::writeLongAD(const uint32_t lenBytes, const uint32_t pos, const uint16_t partition,
+                                 const uint32_t id)
 {
     ::writeLongAD(m_curPos, lenBytes, pos, partition, id);
     m_curPos += 16;
@@ -973,8 +975,9 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, const size_
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint32_t objectId, const FileTypes fileType, const uint64_t len,
-                                                const uint32_t pos, const int linkCount, ExtentList *extents)
+int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint32_t objectId,
+                                                const FileTypes fileType, const uint64_t len, const uint32_t pos,
+                                                const int linkCount, ExtentList *extents)
 {
     int sectorsWrited = 0;
 

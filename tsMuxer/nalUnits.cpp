@@ -798,7 +798,8 @@ void SPSUnit::updateTimingInfo()
     m_nalBuffer = newNalBuffer;
 }
 
-void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int vcl_hrd_len, const bool addVuiHeader, const HRDParams& params)
+void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int vcl_hrd_len, const bool addVuiHeader,
+                            const HRDParams& params)
 {
     // replace hrd parameters not implemented. only insert
     static constexpr int EXTRA_SPACE = 64;
@@ -1092,8 +1093,8 @@ int SPSUnit::seq_parameter_set_mvc_extension()
             return 1;
         for (size_t j = 0; j <= num_applicable_ops_minus1[i]; j++)
         {
-            bitReader.skipBits(3);                        // applicable_op_temporal_id[ i ][ j ]
-            const unsigned dummy = extractUEGolombCode(); // applicable_op_num_target_views_minus1[ i ][ j ]
+            bitReader.skipBits(3);                         // applicable_op_temporal_id[ i ][ j ]
+            const unsigned dummy = extractUEGolombCode();  // applicable_op_num_target_views_minus1[ i ][ j ]
             if (dummy >= 1 << 10)
                 return 1;
             for (size_t k = 0; k <= dummy; k++)
@@ -1639,7 +1640,8 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
         write_rbsp_trailing_bits(writer);
 }
 
-void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, const bool seiHeader) const
+void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer,
+                                                 const bool seiHeader) const
 {
     if (seiHeader)
     {
@@ -1681,7 +1683,8 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         write_rbsp_trailing_bits(writer);
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, const int payloadSize, const bool orig_hrd_parameters_present_flag)
+void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, const int payloadSize,
+                         const bool orig_hrd_parameters_present_flag)
 {
     bitReader.setBuffer(curBuff, curBuff + payloadSize);
     pic_timing(sps, orig_hrd_parameters_present_flag);
@@ -1730,7 +1733,8 @@ void SEIUnit::deblocking_filter_display_preference(int payloadSize) {}
 void SEIUnit::stereo_video_info(int payloadSize) {}
 void SEIUnit::reserved_sei_message(int payloadSize) {}
 
-int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size, const int orig_hrd_parameters_present_flag)
+int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size,
+                                  const int orig_hrd_parameters_present_flag)
 {
     try
     {

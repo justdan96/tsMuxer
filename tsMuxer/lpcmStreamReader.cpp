@@ -109,7 +109,8 @@ int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
     return audio_data_payload_size;
 }
 
-void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData, const int mch) const
+void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData,
+                                        const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     const int fullSampleSize = mch * ch1SampleSize;
@@ -121,7 +122,8 @@ void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int 
     }
 }
 
-void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData, const int mch) const
+void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData,
+                                          const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     const int fullSampleSize = mch * ch1SampleSize;
@@ -133,7 +135,8 @@ void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const in
     }
 }
 
-void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, const int chFrom, const int chTo, const int mch) const
+void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, const int chFrom, const int chTo,
+                                       const int mch) const
 {
     // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);

@@ -1,7 +1,7 @@
 #include "textSubtitles.h"
 
 #ifdef _WIN32
-//#include <winerror.h>
+// #include <winerror.h>
 
 #include "osdep/textSubtitlesRenderWin32.h"
 #ifdef WIN32_DEBUG_FREETYPE
@@ -447,8 +447,9 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     return m_pgsBuffer;
 }
 
-long TextToPGSConverter::composePresentationSegment(uint8_t* buff, const CompositionMode mode, const int64_t pts, const int64_t dts,
-                                                    const int top, const bool needPGHeader, const bool forced)
+long TextToPGSConverter::composePresentationSegment(uint8_t* buff, const CompositionMode mode, const int64_t pts,
+                                                    const int64_t dts, const int top, const bool needPGHeader,
+                                                    const bool forced)
 {
     uint8_t* curPos = buff;
     if (needPGHeader)
@@ -494,8 +495,8 @@ long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff) const
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int top, const int height,
-                                                 const bool needPgHeader) const
+long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int top,
+                                                 const int height, const bool needPgHeader) const
 {
     uint8_t* curPos = buff;
     if (needPgHeader)
@@ -533,8 +534,8 @@ long TextToPGSConverter::composeWindow(uint8_t* buff, const int top, const int h
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_t* buff, const int64_t pts, const int64_t dts,
-                                                  const bool needPgHeader) const
+long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_t* buff, const int64_t pts,
+                                                  const int64_t dts, const bool needPgHeader) const
 {
     uint8_t* curPos = buff;
     if (needPgHeader)
@@ -556,8 +557,8 @@ long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int firstLine, const int lastLine,
-                                                 const bool needPgHeader) const
+long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pts, const int64_t dts,
+                                                 const int firstLine, const int lastLine, const bool needPgHeader) const
 {
     std::vector<uint8_t*> seqPos;
 
