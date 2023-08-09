@@ -61,31 +61,31 @@ bool isAudioStreamType(const StreamType stream_coding_type)
 // ------------ PS PACK -------------------
 bool PS_stream_pack::deserialize(uint8_t* buffer, const int buf_size)
 {
-    m_pts = 0;
-    BitStreamReader bitReader{};
-    bitReader.setBuffer(buffer, buffer + buf_size);
-    if (bitReader.getBits(2) != 1)
-        return false;  // 0b01 required
-    m_pts = (static_cast<uint64_t>(bitReader.getBits(3)) << 30);
-    if (bitReader.getBit() != 1)
-        return false;
-    m_pts += (static_cast<uint64_t>(bitReader.getBits(15)) << 15);
-    if (bitReader.getBit() != 1)
-        return false;
-    m_pts += bitReader.getBits(15);
-    if (bitReader.getBit() != 1)
-        return false;
-    m_pts_ext = bitReader.getBits(9);
-    if (bitReader.getBit() != 1)
-        return false;
-    m_program_mux_rate = bitReader.getBits(22) * 50 * 8;  // convert to bits/sec
-    if (bitReader.getBits(2) != 3)
-        return false;
-    bitReader.skipBits(5);  // reserved
-    m_pack_stuffing_length = bitReader.getBits(3);
-    return true;
     try
     {
+        m_pts = 0;
+        BitStreamReader bitReader{};
+        bitReader.setBuffer(buffer, buffer + buf_size);
+        if (bitReader.getBits(2) != 1)
+            return false;  // 0b01 required
+        m_pts = (static_cast<uint64_t>(bitReader.getBits(3)) << 30);
+        if (bitReader.getBit() != 1)
+            return false;
+        m_pts += (static_cast<uint64_t>(bitReader.getBits(15)) << 15);
+        if (bitReader.getBit() != 1)
+            return false;
+        m_pts += bitReader.getBits(15);
+        if (bitReader.getBit() != 1)
+            return false;
+        m_pts_ext = bitReader.getBits(9);
+        if (bitReader.getBit() != 1)
+            return false;
+        m_program_mux_rate = bitReader.getBits(22) * 50 * 8;  // convert to bits/sec
+        if (bitReader.getBits(2) != 3)
+            return false;
+        bitReader.skipBits(5);  // reserved
+        m_pack_stuffing_length = bitReader.getBits(3);
+        return true;
     }
     catch (BitStreamException)
     {
@@ -95,7 +95,7 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, const int buf_size)
 
 // ------------- PAT -----------------------
 
-static inline int get16(uint8_t** pp)
+static int get16(uint8_t** pp)
 {
     uint8_t* p = *pp;
     const int c = (p[0] << 8) | p[1];
@@ -468,9 +468,9 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
 
         if (*si.m_lang && !blurayMode)
         {
-            bitWriter.putBits(8, static_cast<unsigned>(TSDescriptorTag::LANG));           // lang descriptor ID
-            bitWriter.putBits(8, 4);                                         // lang descriptor len
-            for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]);  // lang code[i]
+            bitWriter.putBits(8, static_cast<unsigned>(TSDescriptorTag::LANG));  // lang descriptor ID
+            bitWriter.putBits(8, 4);                                             // lang descriptor len
+            for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]);      // lang code[i]
             bitWriter.putBits(8, 0);
         }
         *esInfoLen = my_htons(0xf000 + bitWriter.getBitsCount() / 8 - beforeCount);
@@ -498,10 +498,10 @@ void CLPIStreamInfo::ISRC(BitStreamReader& reader)
 
 void CLPIStreamInfo::composeISRC(BitStreamWriter& writer)
 {
-    writeString(R"(00)", writer, 2);    // country_code
-    writeString(R"(000)", writer, 3);   // copyright_holder
-    writeString(R"(00)", writer, 2);    // recording_year
-    writeString(R"(00000)", writer, 5); // recording_number
+    writeString(R"(00)", writer, 2);     // country_code
+    writeString(R"(000)", writer, 3);    // copyright_holder
+    writeString(R"(00)", writer, 2);     // recording_year
+    writeString(R"(00000)", writer, 5);  // recording_number
 }
 
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
@@ -857,8 +857,8 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
     if (processStream.empty())
         THROW(ERR_COMMON, "Can't create EP map. One audio or video stream is needed.");
     // ------------------
-    writer.putBits(8, 0);                                      // reserved_for_word_align
-    writer.putBits(8, static_cast<int>(processStream.size())); // number_of_stream_PID_entries
+    writer.putBits(8, 0);                                       // reserved_for_word_align
+    writer.putBits(8, static_cast<int>(processStream.size()));  // number_of_stream_PID_entries
     std::vector<uint32_t*> epStartAddrPos;
 
     for (auto& i : processStream)
@@ -1655,7 +1655,7 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     writer.putBits(16, 0);  // reserved_for_future_use
     MPLSStreamInfo& mainStreamInfo = getMainStream();
     writer.putBits(16, static_cast<unsigned>(mainStreamInfo.m_index.size()));  // number_of_PlayItems
-    writer.putBits(16, number_of_SubPaths);                       // number_of_SubPaths
+    writer.putBits(16, number_of_SubPaths);                                    // number_of_SubPaths
     // connection_condition = 1;
     for (size_t PlayItem_id = 0; PlayItem_id < mainStreamInfo.m_index.size(); PlayItem_id++)
     {
@@ -2034,8 +2034,8 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
             writer.putBits(16, extDataBlockInfo[i].id1);
             writer.putBits(16, extDataBlockInfo[i].id2);
             extDataStartAddrPos[i] = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
-            writer.putBits(32, 0);                                                      // ext_data_start_address
-            writer.putBits(32, static_cast<unsigned>(extDataBlockInfo[i].data.size())); // ext_data_length
+            writer.putBits(32, 0);                                                       // ext_data_start_address
+            writer.putBits(32, static_cast<unsigned>(extDataBlockInfo[i].data.size()));  // ext_data_length
         }
         while ((writer.getBitsCount() / 8 - initPos) % 4 != 0) writer.putBits(16, 0);
         *(lengthPos + 1) = my_htonl(writer.getBitsCount() / 8 - initPos + 4);  // data_block_start_address
@@ -2556,8 +2556,8 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             height = vStream->getStreamHeight();
             HDR = vStream->getStreamHDR();
             VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, static_cast<int>(ar), &video_format,
-                               &frame_rate_index, &aspect_ratio_index);
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, static_cast<int>(ar),
+                               &video_format, &frame_rate_index, &aspect_ratio_index);
             if (ar == VideoAspectRatio::AR_3_4)
                 width = height * 4 / 3;
             else if (ar == VideoAspectRatio::AR_16_9)
@@ -2641,12 +2641,7 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
 // -------------- MPLSStreamInfo -----------------------
 
 MPLSStreamInfo::MPLSStreamInfo()
-    : type(0),
-      offsetId(0xff),
-      isSSPG(false),
-      SS_PG_offset_sequence_id(0xff),
-      leftEye(nullptr),
-      rightEye(nullptr)
+    : type(0), offsetId(0xff), isSSPG(false), SS_PG_offset_sequence_id(0xff), leftEye(nullptr), rightEye(nullptr)
 {
 }
 

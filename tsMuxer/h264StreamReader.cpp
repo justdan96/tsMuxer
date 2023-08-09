@@ -864,7 +864,6 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
             }
             nextNal = NALUnit::findNextNAL(nextNal, m_bufEnd);
         }
-        break;
     case NALUnit::NALType::nuSliceIDR:
     case NALUnit::NALType::nuSliceNonIDR:
     case NALUnit::NALType::nuSliceA:
@@ -1325,8 +1324,6 @@ int H264StreamReader::sliceTypeToPictType(const int slice_type) const
             return 7;
         else
             return 6;
-
-        return 3;
     }
     return 0;
 }

@@ -361,6 +361,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         }
         for (int i = 0; i < nuNumAssets; i++) reader.skipBits(isBlownUpHeader ? 20 : 16);
 
+        // JCDR TODO: have a look at this loop: with the 'break', i is never incremented
         for (int i = 0; i < nuNumAssets; i++)
         {
             reader.skipBits(12);  // nuAssetDescriptorFSIZE - 1, DescriptorDataForAssetIndex

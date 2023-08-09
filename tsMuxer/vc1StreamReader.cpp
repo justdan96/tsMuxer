@@ -178,7 +178,6 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
     {
     case VC1Code::ENTRYPOINT:
         return decodeEntryPoint(buff);
-        break;
     case VC1Code::ENDOFSEQ:
         nextNal = VC1Unit::findNextMarker(buff, m_bufEnd) + 3;
         if (!m_eof && nextNal >= m_bufEnd)
@@ -213,7 +212,6 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
             }
             nextNal = VC1Unit::findNextMarker(nextNal, m_bufEnd) + 3;
         }
-        break;
     case VC1Code::FRAME:
     case VC1Code::USER_FRAME:
         m_decodedAfterSeq = false;

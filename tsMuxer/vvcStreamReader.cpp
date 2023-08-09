@@ -254,8 +254,6 @@ bool VVCStreamReader::isSuffix(const VvcUnit::NalType nalType) const
     default:
         return false;
     }
-
-    return (nalType == VvcUnit::NalType::FD || nalType == VvcUnit::NalType::SUFFIX_APS);
 }
 
 void VVCStreamReader::incTimings()

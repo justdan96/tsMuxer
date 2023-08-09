@@ -226,7 +226,6 @@ int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
     {
         const offset_t pos = m_processedBytes;
         THROW(ERR_MATROSKA_PARSE, "Read error at pos. " << pos);
-        return -BufferedReader::DATA_EOF;
     }
     (*str)[size] = '\0';
     return 0;
@@ -271,7 +270,6 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
             if (num > EBML_VERSION)
             {
                 THROW(ERR_MATROSKA_PARSE, "EBML version " << num << " > " << EBML_VERSION << " is not supported");
-                return AVERROR_INVALIDDATA;
             }
             break;
         }

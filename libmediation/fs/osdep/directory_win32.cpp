@@ -63,8 +63,6 @@ bool deleteFile(const string& fileName)
     }
     DWORD err = GetLastError();
     return false;
-
-    return DeleteFile(toWide(fileName).data()) != 0;
 }
 
 bool findFiles(const string& path, const string& fileMask, vector<string>* fileList, const bool savePaths)
