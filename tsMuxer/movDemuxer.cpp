@@ -304,7 +304,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
                 *dst++ = 0x0;
                 *dst++ = 0x1;
 
-                memcpy(dst, &i[0], i.size());
+                memcpy(dst, i.data(), i.size());
                 dst += i.size();
             }
             spsPpsList.clear();
@@ -817,17 +817,17 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             {
                 if (chunkSize > static_cast<int>(m_tmpChunkBuffer.size()))
                     m_tmpChunkBuffer.resize(chunkSize);
-                const int64_t readed = get_buffer(&m_tmpChunkBuffer[0], chunkSize);
+                const int64_t readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
                 if (readed == 0)
                     break;
-                m_deliveredPacket.size = st->parsed_priv_data->newBufferSize(&m_tmpChunkBuffer[0], chunkSize);
+                m_deliveredPacket.size = st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize);
                 if (m_deliveredPacket.size)
                 {
                     if (filterItr != m_pidFilters.end())
                     {
                         m_filterBuffer.resize(m_deliveredPacket.size);
                         m_deliveredPacket.data = m_filterBuffer.data();
-                        st->parsed_priv_data->extractData(&m_deliveredPacket, &m_tmpChunkBuffer[0], chunkSize);
+                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), chunkSize);
                         const int demuxed =
                             filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
                         discardSize += static_cast<int64_t>(chunkSize) - demuxed;
@@ -837,7 +837,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                         discardSize += static_cast<int64_t>(chunkSize) - m_deliveredPacket.size;
                         vect.grow(m_deliveredPacket.size);
                         m_deliveredPacket.data = vect.data() + oldSize;
-                        st->parsed_priv_data->extractData(&m_deliveredPacket, &m_tmpChunkBuffer[0], chunkSize);
+                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), chunkSize);
                     }
                 }
                 else

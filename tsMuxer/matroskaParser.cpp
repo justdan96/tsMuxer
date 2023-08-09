@@ -75,7 +75,7 @@ int ParsedH264TrackData::writeSPSPPS(uint8_t* dst) const
     for (auto& i : m_spsPpsList)
     {
         writeNalHeader(dst);
-        memcpy(dst, &i[0], i.size());
+        memcpy(dst, i.data(), i.size());
         dst += i.size();
     }
     return static_cast<int>(dst - start);
@@ -269,7 +269,7 @@ void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int siz
     uint8_t* dst = pkt->data;
     if (m_firstPacket && m_seqHeader.size() > 0)
     {
-        memcpy(dst, &m_seqHeader[0], m_seqHeader.size());
+        memcpy(dst, m_seqHeader.data(), m_seqHeader.size());
         dst += m_seqHeader.size();
     }
     if (addFrameHdr)

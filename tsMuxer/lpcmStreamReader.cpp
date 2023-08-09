@@ -773,7 +773,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
         const int decodeRez = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
         if (decodeRez == NOT_ENOUGH_BUFFER)
         {
-            memcpy(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+            memcpy(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
             m_tmpBufferLen = m_bufEnd - m_curPos;
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
@@ -794,7 +794,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_bufEnd - m_curPos < getHeaderLen())
     {
-        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
@@ -804,7 +804,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     const int frameLen = decodeFrame(m_curPos, m_bufEnd, skipBytes, skipBeforeBytes);
     if (frameLen == NOT_ENOUGH_BUFFER)
     {
-        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
@@ -817,7 +817,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     }
     if (m_bufEnd - m_curPos < frameLen + skipBytes + skipBeforeBytes)
     {
-        memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+        memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
         m_tmpBufferLen = m_bufEnd - m_curPos;
         m_curPos = m_bufEnd;
         return NEED_MORE_DATA;
@@ -861,13 +861,13 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
     int skipBeforeBytes = 0;
     if (m_tmpBufferLen >= getHeaderLen())
     {
-        const int size = decodeFrame(&m_tmpBuffer[0], &m_tmpBuffer[0] + m_tmpBufferLen, skipBytes, skipBeforeBytes);
+        const int size = decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
     avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_tmpBuffer.size() > 0)
-        avPacket.data = &m_tmpBuffer[0];
+        avPacket.data = m_tmpBuffer.data();
     else
         avPacket.data = nullptr;
     avPacket.data += skipBeforeBytes;

@@ -658,7 +658,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                     {
                         curPtr -= offset;
                         m_tmpBuffer.append(curPtr, offset);  // save data
-                        memcpy(curPtr, &tracks[track]->encodingAlgoPriv[0],
+                        memcpy(curPtr, tracks[track]->encodingAlgoPriv.data(),
                                offset);  // place extra header direct to data
                     }
                 }
@@ -1816,7 +1816,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
             if (size > 0)
             {
                 track->encodingAlgoPriv.resize(size);
-                memcpy(&track->encodingAlgoPriv[0], data, size);
+                memcpy(track->encodingAlgoPriv.data(), data, size);
             }
             break;
         }

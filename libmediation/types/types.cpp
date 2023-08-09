@@ -529,7 +529,7 @@ std::string toUtf8(const wchar_t* wideStr)
     auto needed = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, nullptr, 0, nullptr, nullptr);
     needed--;  // includes terminating null byte, needless when returning a std::string.
     std::string s(static_cast<std::size_t>(needed), 0);
-    WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, &s[0], needed, nullptr, nullptr);
+    WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, s.data(), needed, nullptr, nullptr);
     return s;
 }
 #endif

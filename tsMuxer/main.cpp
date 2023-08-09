@@ -571,9 +571,9 @@ int main(int argc, char** argv)
     argv_vec.reserve(argv_utf8.size());
     for (auto&& s : argv_utf8)
     {
-        argv_vec.push_back(&s[0]);
+        argv_vec.push_back(s.data());
     }
-    argv = &argv_vec[0];
+    argv = argv_vec.data();
 #endif
     LTRACE(LT_INFO, 2, "tsMuxeR version " TSMUXER_VERSION << ". github.com/justdan96/tsMuxer");
     int firstMplsOffset = 0;

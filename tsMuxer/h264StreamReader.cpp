@@ -397,7 +397,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
                 {
                     // we got slice. fill previous metadata SEI message
                     auto pts90k = m_curDts / INT_FREQ_TO_TS_FREQ + m_startPts;
-                    uint8_t *srcData = &m_bdRomMetaDataMsg[0];
+                    uint8_t *srcData = m_bdRomMetaDataMsg.data();
                     SEIUnit::updateMetadataPts(srcData + m_bdRomMetaDataMsgPtsPos, pts90k);
 
                     uint8_t *prevPos = curPos;
@@ -969,7 +969,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
                     // copy to buffer, then isert sei
                     m_bdRomMetaDataMsg.resize(lastSEI.m_nalBufferLen);
                     m_bdRomMetaDataMsgPtsPos = lastSEI.metadataPtsOffset;
-                    memcpy(&m_bdRomMetaDataMsg[0], lastSEI.m_nalBuffer, lastSEI.m_nalBufferLen);
+                    memcpy(m_bdRomMetaDataMsg.data(), lastSEI.m_nalBuffer, lastSEI.m_nalBufferLen);
                 }
                 else
                 {
@@ -982,7 +982,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
             if (timingSEI && lastSEI.m_mvcHeaderLen > 0)
             {
                 m_lastSeiMvcHeader.resize(lastSEI.m_mvcHeaderLen);
-                memcpy(&m_lastSeiMvcHeader[0], lastSEI.m_mvcHeaderStart, lastSEI.m_mvcHeaderLen);
+                memcpy(m_lastSeiMvcHeader.data(), lastSEI.m_mvcHeaderStart, lastSEI.m_mvcHeaderLen);
             }
         }
 
@@ -1072,7 +1072,7 @@ int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, uint8_t *buff, ui
     int toDecode = 0;
     do
     {
-        uint8_t *tmpBuffer = &m_decodedSliceHeader[0];
+        uint8_t *tmpBuffer = m_decodedSliceHeader.data();
         const int tmpBufferSize = static_cast<int>(m_decodedSliceHeader.size());
         toDecode = FFMIN(tmpBufferSize - 8, maxHeaderSize);
         const int decodedLen = SliceUnit::decodeNAL(buff, buff + toDecode, tmpBuffer, tmpBufferSize);

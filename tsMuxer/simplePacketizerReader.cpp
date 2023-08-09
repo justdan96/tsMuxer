@@ -50,11 +50,11 @@ void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool la
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (m_tmpBuffer.size() > 0)
-        memcpy(&m_tmpBuffer[0] + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
+        memcpy(m_tmpBuffer.data() + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
     m_tmpBufferLen += dataLen;
 
     if (m_tmpBuffer.size() > 0)
-        m_curPos = m_buffer = &m_tmpBuffer[0];
+        m_curPos = m_buffer = m_tmpBuffer.data();
     else
         m_curPos = m_buffer = nullptr;
     m_bufEnd = m_buffer + m_tmpBufferLen;
@@ -76,14 +76,14 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
     int skipBeforeBytes = 0;
     if (m_tmpBufferLen >= getHeaderLen())
     {
-        const int size = decodeFrame(&m_tmpBuffer[0], &m_tmpBuffer[0] + m_tmpBufferLen, skipBytes, skipBeforeBytes);
+        const int size = decodeFrame(m_tmpBuffer.data(), m_tmpBuffer.data() + m_tmpBufferLen, skipBytes, skipBeforeBytes);
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
     avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_tmpBufferLen > 0)
     {
-        avPacket.data = &m_tmpBuffer[0];
+        avPacket.data = m_tmpBuffer.data();
         avPacket.data += skipBeforeBytes;
         avPacket.size = static_cast<int>(m_tmpBufferLen);
         if (isPriorityData(&avPacket))
@@ -127,7 +127,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                 if (m_bufEnd - frame > DEFAULT_FILE_BLOCK_SIZE)
                     THROW(ERR_COMMON,
                           getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.");
-                memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+                memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
                 m_tmpBufferLen = m_bufEnd - m_curPos;
                 m_curPos = m_bufEnd;
                 return NEED_MORE_DATA;
@@ -148,7 +148,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
         if (m_bufEnd - m_curPos < getHeaderLen())
         {
-            memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+            memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
             m_tmpBufferLen = m_bufEnd - m_curPos;
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
@@ -161,7 +161,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             if (m_bufEnd - m_curPos > DEFAULT_FILE_BLOCK_SIZE)
                 THROW(ERR_COMMON,
                       getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.");
-            memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+            memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
             m_tmpBufferLen = m_bufEnd - m_curPos;
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
@@ -178,7 +178,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         }
         if (m_bufEnd - m_curPos < frameLen + skipBytes + skipBeforeBytes)
         {
-            memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
+            memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
             m_tmpBufferLen = m_bufEnd - m_curPos;
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
