@@ -5,7 +5,6 @@
 
 #include "convertUTF.h"
 #include "matroskaParser.h"
-#include "memory.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 

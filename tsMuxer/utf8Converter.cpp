@@ -1,9 +1,6 @@
 #include "utf8Converter.h"
 
-#include <fs/systemlog.h>
 #include <types/types.h>
-
-#include <type_traits>
 
 #include "convertUTF.h"
 #include "vodCoreException.h"

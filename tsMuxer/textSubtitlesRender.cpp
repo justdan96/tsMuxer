@@ -4,11 +4,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "math.h"
-#include "memory.h"
-#include "stdio.h"
 #include "utf8Converter.h"
-#include "vodCoreException.h"
 #include "vod_common.h"
 
 using namespace std;

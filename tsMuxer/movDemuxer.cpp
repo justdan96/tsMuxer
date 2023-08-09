@@ -1,7 +1,5 @@
 #include "movDemuxer.h"
 
-#include <math.h>
-
 #include <algorithm>
 
 #include "aac.h"
@@ -9,8 +7,7 @@
 #include "avPacket.h"
 #include "bitStream.h"
 #include "hevc.h"
-#include "limits.h"
-#include "math.h"
+#include <climits>
 #include "subTrackFilter.h"
 #include "vodCoreException.h"
 #include "vvc.h"

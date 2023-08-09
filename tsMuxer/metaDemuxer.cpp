@@ -14,9 +14,8 @@
 #include "dvbSubStreamReader.h"
 #include "h264StreamReader.h"
 #include "hevcStreamReader.h"
-#include "limits.h"
+#include <climits>
 #include "lpcmStreamReader.h"
-#include "math.h"
 #include "matroskaDemuxer.h"
 #include "mlpStreamReader.h"
 #include "movDemuxer.h"
@@ -28,7 +27,6 @@
 #include "srtStreamReader.h"
 #include "subTrackFilter.h"
 #include "tsDemuxer.h"
-#include "utf8Converter.h"
 #include "vc1StreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"

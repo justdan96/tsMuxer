@@ -9,15 +9,13 @@
 #include "blurayHelper.h"
 #include "convertUTF.h"
 #include "iso_writer.h"
-#include "math.h"
+#include <cmath>
 #include "metaDemuxer.h"
 #include "mpegStreamReader.h"
 #include "muxerManager.h"
 #include "psgStreamReader.h"
 #include "singleFileMuxer.h"
-#include "textSubtitles.h"
 #include "tsMuxer.h"
-#include "utf8Converter.h"
 
 using namespace std;
 

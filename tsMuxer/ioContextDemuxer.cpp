@@ -1,12 +1,10 @@
 #include "ioContextDemuxer.h"
 
-#include <math.h>
+#include <cmath>
 #include <types/types.h>
 
 #include "abstractStreamReader.h"
-#include "avPacket.h"
-#include "bitStream.h"
-#include "limits.h"
+#include <climits>
 #include "vodCoreException.h"
 
 using namespace std;

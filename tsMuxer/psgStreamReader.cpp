@@ -8,9 +8,8 @@
 
 #include "avCodecs.h"
 #include "ioContextDemuxer.h"
-#include "math.h"
+#include <cmath>
 #include "tsMuxer.h"
-#include "tsPacket.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 

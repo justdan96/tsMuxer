@@ -1,8 +1,6 @@
 
 #include "abstractMuxer.h"
-
 #include "muxerManager.h"
-#include "vodCoreException.h"
 
 using namespace std;
 

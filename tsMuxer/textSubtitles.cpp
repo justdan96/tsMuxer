@@ -1,7 +1,7 @@
 #include "textSubtitles.h"
 
 #ifdef _WIN32
-#include <winerror.h>
+//#include <winerror.h>
 
 #include "osdep/textSubtitlesRenderWin32.h"
 #ifdef WIN32_DEBUG_FREETYPE
@@ -11,9 +11,9 @@
 #include "osdep/textSubtitlesRenderFT.h"
 #endif
 
-#include <assert.h>
+#include <cassert>
 
-#include "math.h"
+#include <cmath>
 #include "memory.h"
 #include "psgStreamReader.h"
 #include "vodCoreException.h"

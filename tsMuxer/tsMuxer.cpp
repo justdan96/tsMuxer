@@ -6,12 +6,8 @@
 #include "tsPacket.h"
 
 #include "ac3StreamReader.h"
-#include "avCodecs.h"
 #include "dtsStreamReader.h"
-#include "dvbSubStreamReader.h"
 #include "h264StreamReader.h"
-#include "iso_writer.h"
-#include "lpcmStreamReader.h"
 #include "mpegAudioStreamReader.h"
 #include "mpegStreamReader.h"
 #include "muxerManager.h"

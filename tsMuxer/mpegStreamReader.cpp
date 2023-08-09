@@ -1,13 +1,11 @@
 
-#ifndef _WIN32
-#endif
 #include "mpegStreamReader.h"
 
 #include <fs/systemlog.h>
 
 #include <iostream>
 
-#include "math.h"
+#include <cmath>
 #include "nalUnits.h"
 #include "vodCoreException.h"
 #include "vod_common.h"

@@ -6,7 +6,6 @@
 
 #include "avCodecs.h"
 #include "bitStream.h"
-#include "vodCoreException.h"
 #include "vod_common.h"
 
 bool AC3StreamReader::isPriorityData(AVPacket* packet)

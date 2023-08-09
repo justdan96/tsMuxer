@@ -1,6 +1,5 @@
 
 #include "abstractDemuxer.h"
-
 #include "subTrackFilter.h"
 
 AbstractDemuxer::~AbstractDemuxer()

@@ -5,7 +5,6 @@
 
 #include "abstractMuxer.h"
 #include "ac3StreamReader.h"
-#include "avCodecs.h"
 #include "lpcmStreamReader.h"
 #include "mpegAudioStreamReader.h"
 #include "muxerManager.h"
@@ -14,7 +13,7 @@
 #include "vodCoreException.h"
 
 #ifndef win32
-#include <stdio.h>
+#include <cstdio>
 #endif
 
 using namespace std;

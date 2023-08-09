@@ -1,6 +1,4 @@
 
-#ifndef _WIN32
-#endif
 #include "mpegVideo.h"
 
 #include <fs/systemlog.h>

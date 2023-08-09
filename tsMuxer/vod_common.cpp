@@ -3,11 +3,10 @@
 
 #include <fs/directory.h>
 
-#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "math.h"
+#include <cmath>
 
 using namespace std;
 

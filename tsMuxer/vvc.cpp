@@ -1,7 +1,6 @@
 ﻿#include "vvc.h"
 
-#include <fs/systemlog.h>
-#include <math.h>
+#include <cmath>
 
 #include <algorithm>
 

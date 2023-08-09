@@ -1,15 +1,12 @@
 #include "matroskaDemuxer.h"
 
-#include <math.h>
 #include <types/types.h>
 
 #include <algorithm>
 
 #include "abstractDemuxer.h"
-#include "abstractStreamReader.h"
 #include "avPacket.h"
-#include "bitStream.h"
-#include "limits.h"
+#include <climits>
 #include "subTrackFilter.h"
 #include "vodCoreException.h"
 

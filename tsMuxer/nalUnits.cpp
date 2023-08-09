@@ -1,7 +1,6 @@
 
 #include "nalUnits.h"
-//#include <math.h>
-#include <assert.h>
+#include <cassert>
 #include <fs/systemlog.h>
 
 #include <sstream>

@@ -3,7 +3,6 @@
 #include "fs/textfile.h"
 #include "h264StreamReader.h"
 #include "iso_writer.h"
-#include "muxerManager.h"
 #include "tsMuxer.h"
 #include "vodCoreException.h"
 

@@ -1,7 +1,6 @@
 #include "vc1Parser.h"
 
 #include <fs/systemlog.h>
-#include <memory.h>
 
 #include <sstream>
 

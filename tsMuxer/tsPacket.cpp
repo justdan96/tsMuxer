@@ -11,7 +11,7 @@
 #include "bitStream.h"
 #include "crc32.h"
 #include "h264StreamReader.h"
-#include "math.h"
+#include <cmath>
 #include "mpegStreamReader.h"
 #include "simplePacketizerReader.h"
 #include "tsMuxer.h"

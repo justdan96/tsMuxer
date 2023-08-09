@@ -4,7 +4,6 @@
 
 #include "avCodecs.h"
 #include "bitStream.h"
-#include "vodCoreException.h"
 #include "vod_common.h"
 
 #define max(a, b) (a > b ? a : b)

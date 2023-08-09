@@ -3,7 +3,6 @@
 #include <fs/systemlog.h>
 
 #include "avCodecs.h"
-#include "math.h"
 #include "tsPacket.h"
 #include "vodCoreException.h"
 #include "vod_common.h"

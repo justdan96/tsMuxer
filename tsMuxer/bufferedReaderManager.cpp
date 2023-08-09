@@ -1,7 +1,6 @@
 #include "bufferedReaderManager.h"
 
-#include <fs/systemlog.h>
-#include <limits.h>
+#include <climits>
 
 using namespace std;
 
