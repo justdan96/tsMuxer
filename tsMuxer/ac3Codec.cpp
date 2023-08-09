@@ -90,7 +90,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
         return AC3ParseError::SYNC;
 
     // read ahead to bsid to make sure this is AC-3, not E-AC-3
-    const int id = buf[3] >> 3;
+    const uint8_t id = buf[3] >> 3;
     if (id > 16)
         return AC3ParseError::BSID;
 
@@ -99,7 +99,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
     // ---------------------------------- EAC3 ------------------------------------------
     if (m_bsid > 10)
     {
-        m_frame_size = (((buf[0] & 0x07) << 8 | buf[1]) + 1) << 1;
+        m_frame_size = static_cast<uint8_t>((((buf[0] & 0x07) << 8 | buf[1]) + 1) << 1);
         if (m_frame_size < AC3_HEADER_SIZE)
             return AC3ParseError::FRAME_SIZE;  // invalid header size
 

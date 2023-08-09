@@ -26,7 +26,7 @@ class AACCodec
     static uint8_t* findAacFrame(uint8_t* buffer, uint8_t* end);
     static int getFrameSize(uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);
-    void buildADTSHeader(uint8_t* buffer, int frameSize);
+    void buildADTSHeader(uint8_t* buffer, unsigned frameSize);
     inline void setSampleRate(int value) { m_sample_rate = value; }
     void readConfig(uint8_t* buff, int size);
 

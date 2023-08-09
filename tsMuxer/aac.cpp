@@ -71,7 +71,7 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
     }
 }
 
-void AACCodec::buildADTSHeader(uint8_t* buffer, const int frameSize)
+void AACCodec::buildADTSHeader(uint8_t* buffer, const unsigned frameSize)
 {
     BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + AAC_HEADER_LEN);

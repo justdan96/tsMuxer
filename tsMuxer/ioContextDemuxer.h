@@ -54,7 +54,7 @@ struct Track
         encodingAlgo = 0;
         type = IOContextTrackType::UNDEFINED;
     }
-    ~Track()
+    virtual ~Track()
     {
         delete[] name;
         delete[] codec_id;
