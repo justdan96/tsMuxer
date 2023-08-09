@@ -217,8 +217,8 @@ int HevcVpsUnit::deserialize()
         if (m_reader.getBit())  // vps_timing_info_present_flag
         {
             num_units_in_tick_bit_pos = m_reader.getBitsCount();
-            num_units_in_tick = m_reader.getBits(32);
-            time_scale = m_reader.getBits(32);
+            num_units_in_tick = m_reader.get32Bits();
+            time_scale = m_reader.get32Bits();
         }
 
         return rez;
@@ -397,8 +397,8 @@ int HevcSpsUnit::vui_parameters()
 
     if (m_reader.getBit())  // vui_timing_info_present_flag
     {
-        num_units_in_tick = m_reader.getBits(32);
-        time_scale = m_reader.getBits(32);
+        num_units_in_tick = m_reader.get32Bits();
+        time_scale = m_reader.get32Bits();
 
         if (m_reader.getBit())  // vui_poc_proportional_to_timing_flag
         {

@@ -15,8 +15,8 @@ class BitStreamException : public std::exception
     BitStreamException() : std::exception() {}
 };
 
-//#define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") +
-// std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
+// #define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") +
+//  std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
 #define THROW_BITSTREAM_ERR throw BitStreamException()
 
 class BitStream
@@ -71,7 +71,7 @@ class BitStreamReader : public BitStream
         m_bitLeft = INT_BIT;
     }
 
-    inline unsigned getBits(unsigned num)
+    inline int getBits(unsigned num)
     {
         if (num > INT_BIT || m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -88,6 +88,24 @@ class BitStreamReader : public BitStream
         }
         m_totalBits -= num;
         return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
+    }
+
+    inline unsigned get32Bits()
+    {
+        if (m_totalBits < INT_BIT)
+            THROW_BITSTREAM_ERR;
+        unsigned prevVal = 0;
+        if (m_bitLeft >= INT_BIT)
+            m_bitLeft -= INT_BIT;
+        else
+        {
+            if (m_bitLeft != 0)
+                prevVal = (m_curVal & m_masks[m_bitLeft]) << (INT_BIT - m_bitLeft);
+            m_buffer++;
+            m_curVal = getCurVal(m_buffer);
+        }
+        m_totalBits -= INT_BIT;
+        return prevVal + (m_curVal >> m_bitLeft);
     }
 
     inline unsigned showBits(unsigned num)
@@ -155,7 +173,7 @@ class BitStreamReader : public BitStream
         m_totalBits--;
     }
 
-    inline unsigned getBitsCount() const { return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft; }
+    inline int getBitsCount() const { return (int)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft; }
 
    private:
     unsigned m_curVal;

@@ -967,8 +967,8 @@ VvcHrdUnit::VvcHrdUnit()
 
 bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit& m_hrd)
 {
-    m_hrd.num_units_in_tick = m_reader.getBits(32);
-    m_hrd.time_scale = m_reader.getBits(32);
+    m_hrd.num_units_in_tick = m_reader.get32Bits();
+    m_hrd.time_scale = m_reader.get32Bits();
     m_hrd.general_nal_hrd_params_present_flag = m_reader.getBit();
     m_hrd.general_vcl_hrd_params_present_flag = m_reader.getBit();
     if (m_hrd.general_nal_hrd_params_present_flag || m_hrd.general_vcl_hrd_params_present_flag)

@@ -128,8 +128,8 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, const int buf_
             return false;
         bitReader.skipBits(2);  // reserved
 
-        const unsigned section_length = bitReader.getBits(12);
-        const unsigned crcBit = bitReader.getBitsCount() + (section_length - 4) * 8;
+        const int section_length = bitReader.getBits(12);
+        const int crcBit = bitReader.getBitsCount() + (section_length - 4) * 8;
 
         transport_stream_id = bitReader.getBits(16);
         bitReader.skipBits(2);  // reserved
@@ -627,7 +627,7 @@ void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLP
     for (int i = 0; i < number_of_program_sequences; i++)
     {
         programInfoMap.push_back(CLPIProgramInfo());
-        programInfoMap[i].SPN_program_sequence_start = reader.getBits(32);
+        programInfoMap[i].SPN_program_sequence_start = reader.get32Bits();
         programInfoMap[i].program_map_PID = reader.getBits(16);
         programInfoMap[i].number_of_streams_in_ps = reader.getBits(8);
         reader.skipBits(8);
@@ -717,8 +717,8 @@ void CLPIParser::parseClipInfo(BitStreamReader& reader)
     application_type = reader.getBits(8);  // 1 - Main TS for a main-path of Movie
     reader.skipBits(31);                   // reserved_for_future_use
     is_ATC_delta = reader.getBit();
-    TS_recording_rate = reader.getBits(32);         // kbps in bytes/sec
-    number_of_source_packets = reader.getBits(32);  // number of TS packets?
+    TS_recording_rate = reader.get32Bits();         // kbps in bytes/sec
+    number_of_source_packets = reader.get32Bits();  // number of TS packets?
     for (int i = 0; i < 32; i++) reader.skipBits(32);
     TS_type_info_block(reader);
 }
@@ -761,8 +761,8 @@ void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
         {
             reader.skipBits(16);  // PCR_PID
             reader.skipBits(32);  // SPN_STC_start
-            presentation_start_time = reader.getBits(32);
-            presentation_end_time = reader.getBits(32);
+            presentation_start_time = reader.get32Bits();
+            presentation_end_time = reader.get32Bits();
         }
     }
 }
@@ -795,7 +795,7 @@ void CLPIParser::parseCPI(uint8_t* buffer, uint8_t* end)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
-    if (reader.getBits(32) != 0)  // length
+    if (reader.get32Bits() != 0)  // length
         reader.skipBits(16);      // reserved_for_word_align, CPI_type (1 is typical value)
 }
 
@@ -1029,7 +1029,7 @@ void CLPIParser::Extent_Start_Point(uint8_t* buffer, const int dataLength)
     SPN_extent_start.resize(number_of_extent_start_points);
     for (int i = 0; i < number_of_extent_start_points; ++i)
     {
-        SPN_extent_start[i] = reader.getBits(32);
+        SPN_extent_start[i] = reader.get32Bits();
     }
 }
 
@@ -1137,7 +1137,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
     // added for 3D compatibility
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
-    if (reader.getBits(32) == 0)  // length
+    if (reader.get32Bits() == 0)  // length
         return;
 
     reader.skipBits(32);  // data_block_start_address
@@ -1145,9 +1145,9 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
     const int entries = reader.getBits(8);
     for (int i = 0; i < entries; ++i)
     {
-        const uint32_t dataID = reader.getBits(32);
-        const uint32_t dataAddress = reader.getBits(32);
-        const uint32_t dataLength = reader.getBits(32);
+        const uint32_t dataID = reader.get32Bits();
+        const uint32_t dataAddress = reader.get32Bits();
+        const uint32_t dataLength = reader.get32Bits();
 
         if (dataAddress + dataLength > (uint32_t)(end - buffer))
         {
@@ -1182,11 +1182,11 @@ void CLPIParser::parse(uint8_t* buffer, const int64_t len)
 
         CLPIStreamInfo::readString(type_indicator, reader, 4);
         CLPIStreamInfo::readString(version_number, reader, 4);
-        const uint32_t sequenceInfo_start_address = reader.getBits(32);
-        const uint32_t programInfo_start_address = reader.getBits(32);
-        const uint32_t CPI_start_address = reader.getBits(32);
-        const uint32_t clipMark_start_address = reader.getBits(32);
-        const uint32_t extensionData_start_address = reader.getBits(32);
+        const uint32_t sequenceInfo_start_address = reader.get32Bits();
+        const uint32_t programInfo_start_address = reader.get32Bits();
+        const uint32_t CPI_start_address = reader.get32Bits();
+        const uint32_t clipMark_start_address = reader.get32Bits();
+        const uint32_t extensionData_start_address = reader.get32Bits();
         for (int i = 0; i < 3; i++) reader.skipBits(32);  // reserved_for_future_use
         parseClipInfo(reader);
         parseSequenceInfo(buffer + sequenceInfo_start_address, buffer + len);
@@ -1976,7 +1976,7 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
     {
         BitStreamReader reader{};
         reader.setBuffer(data, dataEnd);
-        if (reader.getBits(32) == 0)  // length
+        if (reader.get32Bits() == 0)  // length
             return;
 
         reader.skipBits(32);  // data_block_start_address
@@ -1984,9 +1984,9 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
         const int entries = reader.getBits(8);
         for (int i = 0; i < entries; ++i)
         {
-            const uint32_t dataID = reader.getBits(32);
-            const uint32_t dataAddress = reader.getBits(32);
-            const uint32_t dataLength = reader.getBits(32);
+            const uint32_t dataID = reader.get32Bits();
+            const uint32_t dataAddress = reader.get32Bits();
+            const uint32_t dataLength = reader.get32Bits();
 
             if (dataAddress + dataLength > (uint32_t)(dataEnd - data))
             {
@@ -2063,8 +2063,8 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, const int PlayItem_id)
     newItem.connection_condition = reader.getBits(4);
     ref_to_STC_id = reader.getBits(8);
 
-    newItem.IN_time = reader.getBits(32);
-    newItem.OUT_time = reader.getBits(32);
+    newItem.IN_time = reader.get32Bits();
+    newItem.OUT_time = reader.get32Bits();
     m_playItems.push_back(newItem);
 
     UO_mask_table(reader);
@@ -2144,7 +2144,7 @@ void MPLSParser::parsePlayListMark(uint8_t* buffer, const int len)
         reader.skipBits(8);  // reserved_for_future_use
         const int mark_type = reader.getBits(8);
         const int ref_to_PlayItem_id = reader.getBits(16);
-        const uint32_t mark_time_stamp = reader.getBits(32);
+        const uint32_t mark_time_stamp = reader.get32Bits();
         reader.skipBits(16);  // entry_ES_PID
         reader.skipBits(32);  // duration
         if (mark_type == 1)   // mark_type 0x01 = Chapter search

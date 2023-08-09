@@ -621,8 +621,8 @@ int SPSUnit::deserializeVuiParameters()
     if (timing_info_present_flag)
     {
         num_units_in_tick_bit_pos = bitReader.getBitsCount();
-        num_units_in_tick = bitReader.getBits(32);
-        time_scale = bitReader.getBits(32);
+        num_units_in_tick = bitReader.get32Bits();
+        time_scale = bitReader.get32Bits();
         fixed_frame_rate_flag = bitReader.getBit();
     }
     hrdParamsBitPos = bitReader.getBitsCount() + 32;
@@ -848,7 +848,7 @@ void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int v
         if (reader.getBit())
         {  // source nal_hrd_parameters_present_flag
             // nal hrd already exists, copy from a source stream
-            for (int i = 0; i < nal_hrd_len / 32; ++i) writer.putBits(32, reader.getBits(32));
+            for (int i = 0; i < nal_hrd_len / 32; ++i) writer.putBits(32, reader.get32Bits());
             writer.putBits(nal_hrd_len % 32, reader.getBits(nal_hrd_len % 32));
         }
         else
@@ -860,7 +860,7 @@ void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int v
         if (reader.getBit())
         {  // source vcl_hrd_parameters_present_flag
             // vcl hrd already exists, copy from a source stream
-            for (int i = 0; i < vcl_hrd_len / 32; ++i) writer.putBits(32, reader.getBits(32));
+            for (int i = 0; i < vcl_hrd_len / 32; ++i) writer.putBits(32, reader.get32Bits());
             writer.putBits(vcl_hrd_len % 32, reader.getBits(vcl_hrd_len % 32));
         }
         else
