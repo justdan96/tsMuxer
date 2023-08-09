@@ -548,13 +548,17 @@ int VvcSpsUnit::deserialize()
                     if (!sps_subpic_same_size_flag || i == 0)
                     {
                         if (i != 0 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_ctu_top_left_x[i]
+                            m_reader.skipBits(
+                                static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_ctu_top_left_x[i]
                         if (i != 0 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_ctu_top_left_y[i]
+                            m_reader.skipBits(
+                                static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_ctu_top_left_y[i]
                         if (i < sps_num_subpics_minus1 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_width_minus1[i]
+                            m_reader.skipBits(
+                                static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_width_minus1[i]
                         if (i < sps_num_subpics_minus1 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_height_minus1[i]
+                            m_reader.skipBits(
+                                static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_height_minus1[i]
                     }
                     if (!sps_independent_subpics_flag)
                         m_reader.skipBits(
@@ -595,7 +599,8 @@ int VvcSpsUnit::deserialize()
                 return 1;
         }
         const unsigned sps_log2_min_luma_coding_block_size_minus2 = extractUEGolombCode();
-        if (sps_log2_min_luma_coding_block_size_minus2 > static_cast<unsigned>(min(4, static_cast<int>(sps_log2_ctu_size_minus5) + 3)))
+        if (sps_log2_min_luma_coding_block_size_minus2 >
+            static_cast<unsigned>(min(4, static_cast<int>(sps_log2_ctu_size_minus5) + 3)))
             return 1;
         const unsigned MinCbLog2SizeY = sps_log2_min_luma_coding_block_size_minus2 + 2;
         m_reader.skipBit();  // sps_partition_constraints_override_enabled_flag

@@ -524,7 +524,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                 m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
                 rez = m_slice->deserialize(m_sps, m_pps);
                 if (rez)
-                    return rez; // not enough buffer or error
+                    return rez;  // not enough buffer or error
                 if (nalType >= HevcUnit::NalType::BLA_W_LP)
                     m_lastIFrame = true;
                 m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);
