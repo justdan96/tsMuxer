@@ -1136,7 +1136,7 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
     MOVTrackExt& trex = trex_data[trex_data.size() - 1];
     get_byte();  // version
     get_be24();  // flags
-    tr = get_be32();
+    trex.track_id = get_be32();
     trex.stsd_id = get_be32();
     trex.duration = get_be32();
     trex.size = get_be32();
