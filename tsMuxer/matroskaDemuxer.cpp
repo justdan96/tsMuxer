@@ -1,12 +1,11 @@
 #include "matroskaDemuxer.h"
 
 #include <types/types.h>
-
 #include <algorithm>
+#include <climits>
 
 #include "abstractDemuxer.h"
 #include "avPacket.h"
-#include <climits>
 #include "subTrackFilter.h"
 #include "vodCoreException.h"
 
@@ -639,7 +638,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 else
                     slice_size = rv_offset(data, slice + 1, slices) - slice_offset;
 
-                auto* pkt = new AVPacket();
+                auto *pkt = new AVPacket();
                 pkt->data = nullptr;
                 pkt->size = 0;
                 pkt->pts = timecode * INTERNAL_PTS_FREQ / 1000;
@@ -864,7 +863,7 @@ int MatroskaDemuxer::ebml_read_master(uint32_t *id)
     }
 
     /* remember level */
-    MatroskaLevel* level = &levels[num_levels++];
+    MatroskaLevel *level = &levels[num_levels++];
     level->start = m_processedBytes;
     level->length = length;
     return 0;
@@ -1300,7 +1299,7 @@ int MatroskaDemuxer::matroska_read_header()
     {
         for (int i = 0; i < num_tracks; i++)
         {
-            MatroskaTrack* track = tracks[i];
+            MatroskaTrack *track = tracks[i];
             track->stream_index = -1;
             if (track->codec_id == nullptr)
                 continue;
