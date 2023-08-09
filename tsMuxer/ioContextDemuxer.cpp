@@ -31,7 +31,7 @@ IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
     : tracks(), m_readManager(readManager), m_lastReadRez(0)
 {
     m_lastProcessedBytes = 0;
-    m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader("");
+    m_bufferedReader = m_readManager.getReader("");
     m_readerID = m_bufferedReader->createReader(TS_FRAME_SIZE);
     m_curPos = m_bufEnd = nullptr;
     m_processedBytes = 0;

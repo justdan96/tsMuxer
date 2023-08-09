@@ -430,8 +430,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         PGSRenderedBlock& block = m_renderedBlocks[0];
         avPacket.data = block.data;
         avPacket.size = FFMIN(MAX_AV_PACKET_SIZE, block.len);
-        avPacket.pts = (int64_t)(block.pts * INT_FREQ_TO_TS_FREQ);
-        avPacket.dts = (int64_t)(block.dts * INT_FREQ_TO_TS_FREQ);
+        avPacket.pts = block.pts * INT_FREQ_TO_TS_FREQ;
+        avPacket.dts = block.dts * INT_FREQ_TO_TS_FREQ;
         block.data += avPacket.size;
         block.len -= avPacket.size;
         if (block.len == 0)
@@ -593,7 +593,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         return NEED_MORE_DATA;
     }
     const uint8_t segment_type = *m_curPos;
-    const auto segment_len = (uint16_t)AV_RB16(m_curPos + 1);
+    const auto segment_len = AV_RB16(m_curPos + 1);
     if (m_bufEnd - m_curPos < 3ll + segment_len)
     {
         m_tmpBufferLen = m_bufEnd - m_curPos;
@@ -722,7 +722,7 @@ int PGSStreamReader::flushPacket(AVPacket& avPacket) { return 0; }
 
 void PGSStreamReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
 {
-    if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
+    if (m_tmpBufferLen + dataLen > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (!m_tmpBuffer.empty())
@@ -792,7 +792,7 @@ void PGSStreamReader::intDecodeStream(uint8_t* buffer, const size_t len)
         }
 
         const uint8_t segment_type = *curPos;
-        const auto segment_len = (uint16_t)AV_RB16(curPos + 1);
+        const auto segment_len = AV_RB16(curPos + 1);
         if (bufEnd - curPos < 3ll + segment_len)
             return;
 

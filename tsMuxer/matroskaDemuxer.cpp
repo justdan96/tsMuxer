@@ -466,7 +466,7 @@ void MatroskaDemuxer::decompressData(uint8_t *data, const int size)
         return;
 
     zstream.avail_in = size;
-    zstream.next_in = (Bytef *)data;
+    zstream.next_in = data;
     int curSize = size;
     do
     {

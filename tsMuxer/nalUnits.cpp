@@ -1283,12 +1283,12 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
 void NALUnit::updateBits(const int bitOffset, const int bitLen, const int value) const
 {
     // uint8_t* ptr = m_getbitContextBuffer + (bitOffset/8);
-    uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
+    uint8_t* ptr = bitReader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
     const int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
-    const uint8_t* ptr_end = (uint8_t*)bitReader.getBuffer() + (bitOffset + bitLen) / 8;
+    const uint8_t* ptr_end = bitReader.getBuffer() + (bitOffset + bitLen) / 8;
     const int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
     if (byteOffset > 0)

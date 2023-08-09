@@ -122,7 +122,7 @@ void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, const int pid)
 CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
     : AbstractDemuxer(), CombinedH264Reader(), m_readManager(readManager)
 {
-    m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
+    m_bufferedReader = m_readManager.getReader(streamName);
     m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
     if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,

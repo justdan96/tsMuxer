@@ -1280,7 +1280,7 @@ int MovDemuxer::mov_read_extradata(const MOVAtom atom)
     uint8_t* buf = st->codec_priv + oldSize;
 
     //  !!! PROBLEM WITH MP4 SIZE ABOVE 4GB: TODO...
-    AV_WB32(buf, (uint32_t)(atom.size + 8));
+    AV_WB32(buf, static_cast<uint32_t>(atom.size) + 8);
     AV_WB32(buf + 4, my_htonl(atom.type));
     get_buffer(buf + 8, static_cast<int>(atom.size));
     st->codec_priv_size = static_cast<int>(newSize);

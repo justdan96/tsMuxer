@@ -9,7 +9,7 @@ const std::string AACStreamReader::getStreamInfo()
 {
     std::ostringstream str;
     str << "Sample Rate: " << m_sample_rate / 1000 << "KHz  ";
-    str << "Channels: " << (int)m_channels;
+    str << "Channels: " << m_channels;
     return str.str();
 }
 

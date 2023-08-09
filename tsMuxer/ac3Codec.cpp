@@ -555,9 +555,9 @@ const std::string AC3Codec::getStreamInfo()
         channels = mlp.m_channels;
 
     if (m_lfeon)
-        str << (int)(channels - 1) << ".1";
+        str << channels - 1 << ".1";
     else
-        str << (int)channels;
+        str << channels;
     return str.str();
 }
 

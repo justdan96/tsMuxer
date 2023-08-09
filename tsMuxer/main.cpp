@@ -220,13 +220,13 @@ string getBlurayStreamDir(const string& mplsName)
 {
     string dirName = extractFileDir(mplsName);
     dirName = toNativeSeparators(dirName);
-    size_t tmp = dirName.substr(0, (size_t)(dirName.size() - 1)).find_last_of(getDirSeparator());
+    size_t tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
     if (tmp != string::npos)
     {
         dirName = dirName.substr(0, tmp + 1);
         if (strEndWith(dirName, string("BACKUP") + getDirSeparator()))
         {
-            tmp = dirName.substr(0, (size_t)(dirName.size() - 1)).find_last_of(getDirSeparator());
+            tmp = dirName.substr(0, dirName.size() - 1).find_last_of(getDirSeparator());
             if (tmp == string::npos)
                 return "";
             dirName = dirName.substr(0, tmp + 1);

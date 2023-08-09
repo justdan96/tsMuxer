@@ -17,7 +17,7 @@ bool isM2TSExt(const std::string& streamName)
 TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* streamName) : m_readManager(readManager)
 {
     m_firstPCRTime = -1;
-    m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(streamName);
+    m_bufferedReader = m_readManager.getReader(streamName);
     m_readerID = m_bufferedReader->createReader(TS_FRAME_SIZE);
     if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,

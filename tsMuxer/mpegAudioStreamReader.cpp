@@ -37,7 +37,7 @@ const std::string MpegAudioStreamReader::getStreamInfo()
     std::ostringstream str;
     str << "Bitrate: " << m_bit_rate / 1000 << "Kbps  ";
     str << "Sample Rate: " << m_sample_rate / 1000 << "KHz  ";
-    str << "Channels: " << (int)m_nb_channels << "  ";
+    str << "Channels: " << m_nb_channels << "  ";
     str << "Layer: " << m_layer;
     return str.str();
 }

@@ -461,12 +461,12 @@ char* strnstr(char* s1, const char* s2, const size_t len)
     size_t l1 = len;
     const size_t l2 = strlen(s2);
     if (!l2)
-        return (char*)s1;
+        return s1;
     while (l1 >= l2)
     {
         l1--;
         if (!memcmp(s1, s2, l2))
-            return (char*)s1;
+            return s1;
         s1++;
     }
     return nullptr;
@@ -476,7 +476,7 @@ uint32_t random32()
 {
     static std::random_device dev;
     static std::minstd_rand raand(dev());
-    return static_cast<std::uint32_t>(raand());
+    return raand();
 }
 
 #ifdef _WIN32

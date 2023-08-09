@@ -422,12 +422,12 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     {
         palette_update_flag = 1;
         m_paletteVersion++;
-        curPos += composePresentationSegment(curPos, CompositionMode::Update, (int64_t)updateTime,
-                                             (int64_t)updateTime - windowsTransferTime, objectWindowTop, true, forced);
+        curPos += composePresentationSegment(curPos, CompositionMode::Update, updateTime,
+                                             updateTime - windowsTransferTime, objectWindowTop, true, forced);
         curPos +=
-            composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, (int64_t)updateTime - windowsTransferTime,
-                                     (int64_t)updateTime - windowsTransferTime);
-        curPos += composeEnd(curPos, (int64_t)updateTime - 90, (int64_t)updateTime - 90);
+            composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, updateTime - windowsTransferTime,
+                                     updateTime - windowsTransferTime);
+        curPos += composeEnd(curPos, updateTime - 90, updateTime - 90);
 
         updateTime = static_cast<int64_t>(alignToGrid(updateTime + fpsPts));
         opacity -= opacityOutDelta;

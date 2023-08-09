@@ -174,7 +174,7 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
 
 uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(BitStreamReader& bitReader)
 {
-    return (uint8_t*)bitReader.getBuffer();
+    return bitReader.getBuffer();
 }
 
 uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitReader)

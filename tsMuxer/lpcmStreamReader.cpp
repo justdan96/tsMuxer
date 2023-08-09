@@ -616,9 +616,9 @@ const std::string LPCMStreamReader::getStreamInfo()
     str << "Sample Rate: " << m_freq / 1000 << "KHz  ";
     str << "Channels: ";
     if (m_lfeExists)
-        str << (int)m_channels - 1 << ".1";
+        str << m_channels - 1 << ".1";
     else
-        str << (int)m_channels;
+        str << m_channels;
     str << "  Bits per sample: " << m_bitsPerSample << "bit";
     return str.str();
 }

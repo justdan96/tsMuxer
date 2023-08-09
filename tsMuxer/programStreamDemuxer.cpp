@@ -15,7 +15,7 @@ ProgramStreamDemuxer::ProgramStreamDemuxer(const BufferedReaderManager& readMana
 {
     memset(m_psm_es_type, 0, sizeof(m_psm_es_type));
     memset(m_lpcpHeaderAdded, 0, sizeof(m_lpcpHeaderAdded));
-    m_bufferedReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(m_streamName.c_str());
+    m_bufferedReader = m_readManager.getReader(m_streamName.c_str());
     m_readerID = m_bufferedReader->createReader(MAX_PES_HEADER_SIZE);
     m_lastReadRez = 0;
     m_lastPesLen = 0;

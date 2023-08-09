@@ -519,7 +519,7 @@ void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
     const int m2tsFrameCnt = calcM2tsFrameCnt();
     const int64_t hiResPCR = pcrVal * 300 - pcrGAP;
     const uint64_t pcrValDif = hiResPCR - m_prevM2TSPCR;  // m2ts pcr clock based on full 27Mhz counter
-    const double pcrIncPerFrame = static_cast<double>(pcrValDif + 0.1) / static_cast<double>(m2tsFrameCnt);
+    const double pcrIncPerFrame = (pcrValDif + 0.1) / static_cast<double>(m2tsFrameCnt);
 
     auto curM2TSPCR = static_cast<double>(m_prevM2TSPCR);
     uint8_t* curPos;
@@ -1418,7 +1418,7 @@ void TSMuxer::setSubMode(AbstractMuxer* mainMuxer, const bool flushInterleavedBl
 void TSMuxer::joinToMasterFile()
 {
     m_isExternalFile = true;
-    m_muxFile = dynamic_cast<TSMuxer*>(m_sublingMuxer)->getDstFile();
+    m_muxFile = m_sublingMuxer->getDstFile();
 }
 
 void TSMuxer::setMasterMode(AbstractMuxer* subMuxer, const bool flushInterleavedBlock)

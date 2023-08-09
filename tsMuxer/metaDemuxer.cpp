@@ -429,7 +429,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         }
         else
         {
-            dataReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(fileList[0].c_str());
+            dataReader = m_readManager.getReader(fileList[0].c_str());
         }
     }
     else if (strEndWith(tmpname, ".ts") || strEndWith(tmpname, ".m2ts") || strEndWith(tmpname, ".mts") ||
@@ -482,7 +482,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     }
     else
     {
-        dataReader = (const_cast<BufferedReaderManager&>(m_readManager)).getReader(fileList[0].c_str());
+        dataReader = m_readManager.getReader(fileList[0].c_str());
     }
     if (dataReader == nullptr)
     {
