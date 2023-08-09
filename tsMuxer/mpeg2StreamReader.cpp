@@ -169,7 +169,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
                         m_lastDecodedPos = nextNal;
                     }
                     return rez;
-                default: ;
+                default:;
                 }
                 nextNal = MPEGHeader::findNextMarker(nextNal, m_bufEnd) + 3;
             }
@@ -182,7 +182,7 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
         case PICTURE_START_SHORT_CODE:
             rez = decodePicture(buff);
             return rez;
-        default: ;
+        default:;
         }
         return 0;
     }

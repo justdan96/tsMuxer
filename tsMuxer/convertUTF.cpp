@@ -298,7 +298,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
         case 1:
             *--target = static_cast<UTF8>(ch | firstByteMark[bytesToWrite]);
             break;
-        default: ;
+        default:;
         }
         target += bytesToWrite;
     }
@@ -458,7 +458,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
         case 0:
             ch += *source++;
             break;
-        default: ;
+        default:;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
 
@@ -591,7 +591,7 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
         case 1:
             *--target = static_cast<UTF8>(ch | firstByteMark[bytesToWrite]);
             break;
-        default: ;
+        default:;
         }
         target += bytesToWrite;
     }
@@ -651,7 +651,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
         case 0:
             ch += *source++;
             break;
-        default: ;
+        default:;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
 

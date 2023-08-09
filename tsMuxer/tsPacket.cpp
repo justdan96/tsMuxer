@@ -1166,7 +1166,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
         case 0x00020006:
             CPI_SS(buffer + dataAddress, dataLength);
             break;
-        default: ;
+        default:;
         }
     }
 }
@@ -2007,7 +2007,7 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
                 isDependStreamExist = true;
                 parseSubPathEntryExtension(data + dataAddress, dataLength);
                 break;
-            default: ;
+            default:;
             }
         }
     }
@@ -2598,7 +2598,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             case 192000:
                 sampling_frequency_index = 5;
                 break;
-            default: ;
+            default:;
             }
         }
     }

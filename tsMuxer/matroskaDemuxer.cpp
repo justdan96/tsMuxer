@@ -600,10 +600,10 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             lace_size[n] = size - total;
             break;
         }
-        default: ;
+        default:;
         }
         break;
-    default: ;
+    default:;
     }
 
     if (res == 0)

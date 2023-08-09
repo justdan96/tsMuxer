@@ -1024,7 +1024,7 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
     case MKTAG(0xa9, 'e', 'n', 'c'):
         key = "muxer";
         break;
-    default: ;
+    default:;
     }
     if (!key)
         return 0;
@@ -1421,7 +1421,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         case MKTAG('t', 'm', 'c', 'd'):
             st->type = IOContextTrackType::CONTROL;
             break;
-        default: ;
+        default:;
         }
 
         if (st->type == IOContextTrackType::VIDEO)
