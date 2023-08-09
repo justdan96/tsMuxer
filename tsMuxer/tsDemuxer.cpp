@@ -541,7 +541,7 @@ int64_t getTSDuration(const char* fileName)
         }
         delete[] tmpBuffer;
 
-        int64_t lastPcrVal{};
+        int64_t lastPcrVal;
         bufferSize = 1024 * 256;
         bufferSize -= bufferSize % frameSize;
         do

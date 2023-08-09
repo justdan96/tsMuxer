@@ -1048,7 +1048,7 @@ int MatroskaDemuxer::ebml_read_num(const int max_size, uint64_t *number)
     /* the first byte tells us the length in bytes - get_byte() can normally
      * return 0, but since that's not a valid first ebmlID byte, we can
      * use it safely here to catch EOS. */
-    if (!(total = get_byte()))
+    if (!(total == get_byte()))
     {
         /* we might encounter EOS here */
         if (!m_isEOF)
@@ -1157,7 +1157,7 @@ int MatroskaDemuxer::matroska_read_header()
 
     // MatroskaDemuxContext *matroska = s->priv_data;
     char *doctype = nullptr;
-    int version, last_level, res = 0;
+    int version, last_level, res;
     uint32_t id;
 
     // matroska->ctx = s;
@@ -1775,7 +1775,7 @@ int MatroskaDemuxer::matroska_parse_tracks()
 
 int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
 {
-    int res = 0;
+    int res;
     uint32_t id;
 
     if ((res = ebml_read_master(&id)) < 0)
@@ -1833,7 +1833,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
 
 int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
 {
-    int res = 0;
+    int res;
     uint32_t id;
 
     if ((res = ebml_read_master(&id)) < 0)
@@ -1873,7 +1873,7 @@ int MatroskaDemuxer::readTrackEncoding(MatroskaTrack *track)
 
 int MatroskaDemuxer::readTrackEncodings(MatroskaTrack *track)
 {
-    int res = 0;
+    int res;
     uint32_t id;
 
     if ((res = ebml_read_master(&id)) < 0)

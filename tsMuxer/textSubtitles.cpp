@@ -182,7 +182,7 @@ YUVQuad TextToPGSConverter::RGBAToYUVA(uint32_t data)
 
 RGBQUAD TextToPGSConverter::YUVAToRGBA(const YUVQuad& yuv)
 {
-    RGBQUAD rez{};
+    RGBQUAD rez;
     int tmp = static_cast<int>(298.082 * yuv.Y + 516.412 * yuv.Cb - 70742.016) >> 8;
     rez.rgbBlue = FFMAX(FFMIN(tmp, 255), 0);
     tmp = static_cast<int>(298.082 * yuv.Y - 208.120 * yuv.Cr - 100.291 * yuv.Cb + 34835.456) >> 8;

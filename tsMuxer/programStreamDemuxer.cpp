@@ -419,7 +419,7 @@ int64_t getPSDuration(const char* fileName)
 
         // pcr from end of file
 
-        int64_t lastPcrVal = -1;
+        int64_t lastPcrVal;
         int bufferSize = BUF_SIZE;
         do
         {

@@ -702,7 +702,7 @@ int H264StreamReader::calcPicOrder(SliceUnit &slice)
 
     const int PicOrderCntLsb = slice.pic_order_cnt_lsb;
     const int MaxPicOrderCntLsb = 1 << slice.getSPS()->log2_max_pic_order_cnt_lsb;
-    int PicOrderCntMsb = 0;
+    int PicOrderCntMsb;
 
     if ((PicOrderCntLsb < prevPicOrderCntLsb) && ((prevPicOrderCntLsb - PicOrderCntLsb) >= (MaxPicOrderCntLsb / 2)))
         PicOrderCntMsb = prevPicOrderCntMsb + MaxPicOrderCntLsb;
@@ -735,8 +735,8 @@ int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
          nal = NALUnit::findNextNAL(nal, m_bufEnd))
     {
         SliceUnit slice;
-        // int MaxPicOrderCntLsb = 0;
-        int MaxPicOrderCntLsbHalf = 0;
+
+        int MaxPicOrderCntLsbHalf;
         switch (static_cast<NALUnit::NALType>(*nal & 0x1f))
         {
         case NALUnit::NALType::nuSliceIDR:
@@ -776,8 +776,8 @@ int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
 int H264StreamReader::intDecodeNAL(uint8_t *buff)
 {
     const auto nal_unit_type = static_cast<NALUnit::NALType>(*buff & 0x1f);
-    uint8_t *nextNal = nullptr;
-    int nalRez = 0;
+    uint8_t *nextNal;
+    int nalRez;
     m_spsPpsFound = false;
 
     // First NAL of Access Unit
@@ -1066,9 +1066,8 @@ bool H264StreamReader::findPPSForward(uint8_t *buff)
 
 int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, uint8_t *buff, uint8_t *sliceEnd)
 {
-    int nalRez{};
+    int nalRez, toDecode;
     const int maxHeaderSize = static_cast<int>(sliceEnd - buff);
-    int toDecode = 0;
     do
     {
         uint8_t *tmpBuffer = m_decodedSliceHeader.data();

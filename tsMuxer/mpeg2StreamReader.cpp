@@ -142,8 +142,8 @@ int MPEG2StreamReader::intDecodeNAL(uint8_t* buff)
 {
     try
     {
-        int rez = 0;
-        uint8_t* nextNal = nullptr;
+        int rez;
+        uint8_t* nextNal;
         switch (*buff)
         {
         case SEQ_START_SHORT_CODE:

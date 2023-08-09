@@ -97,7 +97,7 @@ bool MLPCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
     if (reader.getBits(24) != HD_SYNC_WORD) /* Sync words */
         return isMinorSync(buffer, end);
 
-    int ratebits = 0;
+    int ratebits;
     const int stream_type = reader.getBits(8);
 
     if (stream_type == 0xbb)  // MLP

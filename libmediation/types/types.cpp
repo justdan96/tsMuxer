@@ -273,7 +273,7 @@ vector<string> splitStr(const string& str, const string& splitter)
 
     const size_t splitterSize = splitter.size();
     size_t posBegin = 0;
-    size_t posEnd = string::npos;
+    size_t posEnd;
 
     if (splitterSize > 0 && !str.empty())
     {

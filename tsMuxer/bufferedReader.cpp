@@ -75,7 +75,7 @@ uint32_t BufferedReader::createNewReaderID()
 
 uint32_t BufferedReader::createReader(const int readBuffOffset)
 {
-    uint32_t newReaderID = 0;
+    uint32_t newReaderID;
     ReaderData* data = intCreateReader();
 
     data->m_blockSize = m_blockSize;
@@ -124,7 +124,7 @@ void BufferedReader::deleteReader(const uint32_t readerID)
 
 uint8_t* BufferedReader::readBlock(const uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
-    ReaderData* data = nullptr;
+    ReaderData* data;
     {
         std::lock_guard lock(m_readersMtx);
         const auto itr = m_readers.find(readerID);

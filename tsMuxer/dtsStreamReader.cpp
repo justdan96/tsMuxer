@@ -325,7 +325,6 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         else
             return hdFrameSize;
 
-        int nuNumAudioPresent = 1;
         int nuNumAssets = 1;
         const bool bStaticFieldsPresent = reader.getBit();
         if (bStaticFieldsPresent)
@@ -340,7 +339,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
                 reader.skipBits(18);  // nuTimeStamp, 18 high bits
                 reader.skipBits(18);  // nuTimeStamp, 18 low bits
             }
-            nuNumAudioPresent = reader.getBits(3) + 1;
+            const int nuNumAudioPresent = reader.getBits(3) + 1;
             nuNumAssets = reader.getBits(3) + 1;
             for (int i = 0; i < nuNumAudioPresent; i++) reader.skipBits(nuSubStreamIndex + 1);
             for (int i = 0; i < nuNumAudioPresent; i++)

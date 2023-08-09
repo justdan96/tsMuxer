@@ -245,8 +245,8 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
         decodeRleData(composition_object_horizontal_position[object_id],
                       composition_object_vertical_position[object_id]);
         yuvToRgb(m_fontBorder ? Y_THRESHOLD : 0);
-        BitmapInfo bmpDest{};
-        BitmapInfo bmpRef{};
+        BitmapInfo bmpDest;
+        BitmapInfo bmpRef;
 
         bmpRef.buffer = reinterpret_cast<RGBQUAD*>(m_rgbBuffer);
         bmpRef.Width = m_video_width;

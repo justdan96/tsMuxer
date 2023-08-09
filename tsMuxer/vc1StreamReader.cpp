@@ -102,7 +102,7 @@ CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, const int len)
 {
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
-    uint8_t* nextNal = nullptr;
+    uint8_t* nextNal;
     bool spsFound = false;
     bool iFrameFound = false;
     bool pulldown = false;
@@ -113,10 +113,8 @@ CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, const int len)
         switch (unitType)
         {
         case VC1Code::ENDOFSEQ:
-            break;
         case VC1Code::SLICE:
         case VC1Code::USER_SLICE:
-            break;
         case VC1Code::FIELD:
         case VC1Code::USER_FIELD:
             break;
@@ -172,8 +170,8 @@ int VC1StreamReader::intDecodeNAL(uint8_t* buff)
 {
     m_spsPpsFound = false;
 
-    int rez = 0;
-    uint8_t* nextNal = nullptr;
+    int rez;
+    uint8_t* nextNal;
     switch (static_cast<VC1Code>(*buff))
     {
     case VC1Code::ENTRYPOINT:

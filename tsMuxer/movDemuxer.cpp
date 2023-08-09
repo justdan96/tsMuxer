@@ -790,7 +790,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
     while (m_processedBytes - startPos < m_fileBlockSize && m_curChunk < chunks.size())
     {
         const int64_t offset = chunks[m_curChunk].first;
-        int64_t next = LLONG_MAX;
+        int64_t next;
         if (m_curChunk < chunks.size() - 1)
             next = chunks[m_curChunk + 1].first;
         else
@@ -1079,7 +1079,6 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
     int data_offset = 0;
-    unsigned first_sample_flags = frag->flags;
 
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
@@ -1093,21 +1092,19 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (flags & 0x001)
         data_offset = get_be32();
     if (flags & 0x004)
-        first_sample_flags = get_be32();
+        get_be32(); // first_sample_flags
     uint64_t offset = frag->base_data_offset + data_offset;
     sc->chunk_offsets.push_back(offset);
     for (size_t i = 0; i < entries; i++)
     {
         unsigned sample_size = frag->size;
-        int sample_flags = i ? frag->flags : first_sample_flags;
-        unsigned sample_duration = frag->duration;
 
         if (flags & 0x100)
-            sample_duration = get_be32();
+            get_be32(); // sample_duration
         if (flags & 0x200)
             sample_size = get_be32();
         if (flags & 0x400)
-            sample_flags = get_be32();
+            get_be32(); // sample_flags
         if (flags & 0x800)
         {
             sc->ctts_data.push_back(MOVStts());
@@ -1632,11 +1629,11 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
     const auto st = static_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
     get_be32();  // version + flags
     int tag;
-    int len = mp4_read_descr(&tag);
+    mp4_read_descr(&tag); // len
     get_be16();  // ID
     if (tag == MP4ESDescrTag)
         get_byte();  // priority
-    len = mp4_read_descr(&tag);
+    mp4_read_descr(&tag); // len
     if (tag == MP4DecConfigDescrTag)
     {
         get_byte();  // object_type_id
@@ -1644,7 +1641,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
         get_be24();  // buffer size db
         get_be32();  // max bitrate
         get_be32();  // avg bitrate
-        len = mp4_read_descr(&tag);
+        const int len = mp4_read_descr(&tag);
         if (tag == MP4DecSpecificDescrTag)
         {
             if (static_cast<uint64_t>(len) > (1 << 30))

@@ -309,7 +309,7 @@ void VVCStreamReader::storeBuffer(MemoryBlock& dst, const uint8_t* data, const u
 
 int VVCStreamReader::intDecodeNAL(uint8_t* buff)
 {
-    int rez = 0;
+    int rez;
     bool sliceFound = false;
     m_spsPpsFound = false;
     m_lastIFrame = false;

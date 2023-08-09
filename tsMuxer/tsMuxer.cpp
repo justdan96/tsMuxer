@@ -333,7 +333,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         const auto ac3Reader = static_cast<AC3StreamReader*>(codecReader);
         ac3Reader->setNewStyleAudioPES(m_useNewStyleAudioPES);
 
-        StreamType streamType = StreamType::RESERVED;
+        StreamType streamType;
 
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
             streamType = StreamType::AUDIO_TRUE_HD;
@@ -381,7 +381,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     {
         const auto dtsReader = static_cast<DTSStreamReader*>(codecReader);
         dtsReader->setNewStyleAudioPES(m_useNewStyleAudioPES);
-        StreamType audioType = StreamType::RESERVED;
+        StreamType audioType;
         if (dtsReader->getDTSHDMode() != DTSStreamReader::DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED &&
             !dtsReader->getDownconvertToDTS())
         {

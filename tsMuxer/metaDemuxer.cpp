@@ -1210,11 +1210,10 @@ void METADemuxer::updateReport(const bool checkTime)
     const auto currentTime = std::chrono::steady_clock::now();
     if (!checkTime || currentTime - m_lastReportTime > std::chrono::microseconds(250000))
     {
-        uint64_t currentProcessedSize = 0;
         double progress = 100.0;
         if (m_totalSize > 0)
         {
-            currentProcessedSize = getDemuxedSize();
+            const uint64_t currentProcessedSize = getDemuxedSize();
             progress = currentProcessedSize / static_cast<double>(m_totalSize) * 100.0;
             if (progress > 100.0)
                 progress = 100.0;
@@ -1336,7 +1335,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
     }
     else if (demuxerData.lastReadRez[pid] != DATA_DELAYED || demuxerData.m_allFragmented)
     {
-        int demuxRez = 0;
+        int demuxRez;
         do
         {
             int64_t discardSize = 0;

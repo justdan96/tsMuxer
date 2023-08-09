@@ -1753,7 +1753,7 @@ int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size,
 
         const int payloadType = bitReader.getBits(8);
         int payloadSize = 0;
-        uint8_t sizePart = 0;
+        uint8_t sizePart;
         do
         {
             sizePart = bitReader.getBits(8);

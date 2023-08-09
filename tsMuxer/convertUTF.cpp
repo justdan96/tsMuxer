@@ -208,7 +208,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
     UTF8* target = *targetStart;
     while (source < sourceEnd)
     {
-        unsigned short bytesToWrite = 0;
+        unsigned short bytesToWrite;
         static constexpr UTF32 byteMask = 0xBF;
         static constexpr UTF32 byteMark = 0x80;
         const UTF16* oldSource = source; /* In case we have to back up because of target overflow. */
@@ -521,7 +521,7 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
     UTF8* target = *targetStart;
     while (source < sourceEnd)
     {
-        unsigned short bytesToWrite = 0;
+        unsigned short bytesToWrite;
         static constexpr UTF32 byteMask = 0xBF;
         static constexpr UTF32 byteMark = 0x80;
         UTF32 ch = *source++;

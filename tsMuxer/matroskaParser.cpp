@@ -89,7 +89,7 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, const int size)
     bool ppsFound = false;
     while (curPos < end - m_nalSize)
     {
-        uint32_t elSize = 0;
+        uint32_t elSize;
         if (m_nalSize == 4)
         {
             const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
@@ -191,7 +191,7 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, const int size)
     bool ppsFound = false;
     while (curPos < end - m_nalSize)
     {
-        uint32_t elSize = 0;
+        uint32_t elSize;
         if (m_nalSize == 4)
         {
             const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
@@ -226,7 +226,7 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, const int size)
     bool ppsFound = false;
     while (curPos < end - m_nalSize)
     {
-        uint32_t elSize = 0;
+        uint32_t elSize;
         if (m_nalSize == 4)
         {
             const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
