@@ -821,7 +821,7 @@ void IsoWriter::allocateMetadata()
     writer.writeLE32(0);  // reserved
     writer.writeLE32(0);  // reserved
 
-    for (auto& mappingEntry : m_mappingEntries)
+    for (auto &mappingEntry : m_mappingEntries)
     {
         writer.writeLE32(mappingEntry.first);  // unique ID
         writer.writeLE32(mappingEntry.second.parentLBN);

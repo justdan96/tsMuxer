@@ -3,9 +3,9 @@
 #include <sstream>
 
 // static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
-static constexpr int DCA_EXT_XXCH = 0x002; ///< XXCh channels extension in core substream
-static constexpr int DCA_EXT_X96 = 0x004;  ///< 96/24 extension in core substream
-static constexpr int DCA_EXT_XCH = 0x008;  ///< XCh channel extension in core substream
+static constexpr int DCA_EXT_XXCH = 0x002;  ///< XXCh channels extension in core substream
+static constexpr int DCA_EXT_X96 = 0x004;   ///< 96/24 extension in core substream
+static constexpr int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core substream
 // static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
 // static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
 // static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS

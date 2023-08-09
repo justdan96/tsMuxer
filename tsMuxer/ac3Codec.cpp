@@ -23,7 +23,7 @@ static constexpr uint16_t ff_ac3_freqs[3] = {48000, 44100, 32000};
 
 // possible bitrates
 static constexpr uint16_t ff_ac3_bitratetab[19] = {32,  40,  48,  56,  64,  80,  96,  112, 128, 160,
-                                        192, 224, 256, 320, 384, 448, 512, 576, 640};
+                                                   192, 224, 256, 320, 384, 448, 512, 576, 640};
 
 static constexpr uint16_t ff_ac3_frame_sizes[38][3] = {
     {64, 69, 96},       {64, 70, 96},       {80, 87, 120},      {80, 88, 120},      {96, 104, 144},

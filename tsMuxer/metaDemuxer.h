@@ -199,8 +199,10 @@ class METADemuxer : public AbstractDemuxer
 
     friend class ContainerToReaderWrapper;
 
-    static AbstractStreamReader* createCodec(const std::string& codecName, const std::map<std::string, std::string>& addParams,
-                                      const std::string& codecStreamName, const std::vector<MPLSPlayItem>& mplsInfo);
+    static AbstractStreamReader* createCodec(const std::string& codecName,
+                                             const std::map<std::string, std::string>& addParams,
+                                             const std::string& codecStreamName,
+                                             const std::vector<MPLSPlayItem>& mplsInfo);
     inline void updateReport(bool checkTime);
     void lineBack();
     static CheckStreamRez detectTrackReader(uint8_t* tmpBuffer, int len,

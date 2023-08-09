@@ -468,7 +468,7 @@ class CLPIParser
 
    private:
     static void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfo,
-                          std::map<int, CLPIStreamInfo>& streamInfo);
+                                 std::map<int, CLPIStreamInfo>& streamInfo);
     void parseSequenceInfo(uint8_t* buffer, uint8_t* end);
     static void parseCPI(uint8_t* buffer, uint8_t* end);
     static void EP_map(BitStreamReader& reader);

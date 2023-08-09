@@ -1,15 +1,14 @@
 #include <fs/directory.h>
 #include <fs/textfile.h>
 
-#include <algorithm>
 #include <iostream>
 #include <vector>
 
+#include <cmath>
 #include "blank_patterns.h"
 #include "blurayHelper.h"
 #include "convertUTF.h"
 #include "iso_writer.h"
-#include <cmath>
 #include "metaDemuxer.h"
 #include "mpegStreamReader.h"
 #include "muxerManager.h"

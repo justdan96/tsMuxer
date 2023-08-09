@@ -80,7 +80,7 @@ class NALUnit
     static int encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
-                   bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
+                          bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
     int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
     int serialize(uint8_t* dstBuffer);

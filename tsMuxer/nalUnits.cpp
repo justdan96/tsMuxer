@@ -1,11 +1,9 @@
 
-#include "nalUnits.h"
-#include <cassert>
 #include <fs/systemlog.h>
-
 #include <sstream>
 
 #include "bitStream.h"
+#include "nalUnits.h"
 #include "vod_common.h"
 
 uint8_t BDROM_METADATA_GUID[] = "\x17\xee\x8c\x60\xf8\x4d\x11\xd9\x8c\xd6\x08\x00\x20\x0c\x9a\x66";

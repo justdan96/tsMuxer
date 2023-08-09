@@ -5,13 +5,12 @@
 
 #include <fs/file.h>
 #include <fs/systemlog.h>
-
+#include <cmath>
 #include <string>
 
 #include "bitStream.h"
 #include "crc32.h"
 #include "h264StreamReader.h"
-#include <cmath>
 #include "mpegStreamReader.h"
 #include "simplePacketizerReader.h"
 #include "tsMuxer.h"
@@ -2641,7 +2640,13 @@ MPLSStreamInfo::MPLSStreamInfo(const MPLSStreamInfo& other) : M2TSStreamInfo(oth
 // -------------- MPLSStreamInfo -----------------------
 
 MPLSStreamInfo::MPLSStreamInfo()
-    : M2TSStreamInfo(), type(0), offsetId(0xff), isSSPG(false), SS_PG_offset_sequence_id(0xff), leftEye(nullptr), rightEye(nullptr)
+    : M2TSStreamInfo(),
+      type(0),
+      offsetId(0xff),
+      isSSPG(false),
+      SS_PG_offset_sequence_id(0xff),
+      leftEye(nullptr),
+      rightEye(nullptr)
 {
 }
 
