@@ -44,10 +44,10 @@ void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool
     uint8_t* curPos = waveBuffer.data();
     memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt ", 16);
     curPos += 16;
-    auto fmtSize = (uint32_t*)curPos;
+    const auto fmtSize = (uint32_t*)curPos;
     *fmtSize = sizeof(WAVEFORMATPCMEX);
     curPos += 4;
-    auto waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
+    const auto waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
 
     waveFormatPCMEx->wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     waveFormatPCMEx->nChannels = channels;
@@ -80,7 +80,7 @@ void toLittleEndian(uint8_t* dstData, const uint8_t* srcData, int size, int bitd
         const uint8_t* srcEnd = srcData + size;
         while (src < srcEnd)
         {
-            uint8_t tmp = src[0];
+            const uint8_t tmp = src[0];
             dst[0] = src[2];
             dst[1] = src[1];
             dst[2] = tmp;

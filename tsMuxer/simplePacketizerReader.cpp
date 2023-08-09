@@ -76,7 +76,7 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
     int skipBeforeBytes = 0;
     if (m_tmpBufferLen >= getHeaderLen())
     {
-        int size = decodeFrame(&m_tmpBuffer[0], &m_tmpBuffer[0] + m_tmpBufferLen, skipBytes, skipBeforeBytes);
+        const int size = decodeFrame(&m_tmpBuffer[0], &m_tmpBuffer[0] + m_tmpBufferLen, skipBytes, skipBeforeBytes);
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
@@ -270,11 +270,11 @@ CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, Con
         else
             break;
     }
-    int freq = getFreq();
+    const int freq = getFreq();
     bool firstStep = true;
     for (int i = 0; i < CHECK_FRAMES_COUNT && frame < end;)
     {
-        int frameLen = decodeFrame(frame, end, skipBytes, skipBeforeBytes);
+        const int frameLen = decodeFrame(frame, end, skipBytes, skipBeforeBytes);
         if (frameLen <= 0 || getFreq() != freq || (firstStep && frameLen > end - frame))
         {
             setTestMode(false);

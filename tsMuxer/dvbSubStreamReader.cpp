@@ -21,11 +21,11 @@ int DVBSubStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes,
 {
     skipBytes = 0;
     skipBeforeBytes = 0;
-    int rez = intDecodeFrame(buff, end);
+    const int rez = intDecodeFrame(buff, end);
     if (rez <= 0)
         return rez;
-    int64_t currentTime = m_start_display_time;
-    int nextRez = intDecodeFrame(buff + rez, end);
+    const int64_t currentTime = m_start_display_time;
+    const int nextRez = intDecodeFrame(buff + rez, end);
     if (nextRez <= 0)
         return rez;
     m_frameDuration = m_start_display_time - currentTime;

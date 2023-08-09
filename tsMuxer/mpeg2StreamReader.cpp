@@ -19,7 +19,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
         {
             if (nal[3] == SEQ_START_SHORT_CODE)
             {
-                uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
+                const uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
                 m_sequence.deserialize(nal + 4, nextNal - nal - 4);
                 m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
             }
@@ -27,7 +27,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             {
                 BitStreamReader bitReader{};
                 bitReader.setBuffer(nal + 4, m_bufEnd);
-                int extType = bitReader.getBits(4);
+                const int extType = bitReader.getBits(4);
                 if (extType == SEQUENCE_EXT)
                 {
                     m_sequence.deserializeExtension(bitReader);
@@ -39,7 +39,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             }
             else if (nal[3] == GOP_START_SHORT_CODE)
             {
-                uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
+                const uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
                 m_gop.deserialize(nal + 4, nextNal - nal - 4);
             }
         }
@@ -215,7 +215,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
     {
         return NOT_ENOUGH_BUFFER;
     }
-    int oldSpsLen = 0;
+    const int oldSpsLen = 0;
     updateFPS(nullptr, buff, nextNal, oldSpsLen);
     spsFound = true;
     m_lastIFrame = true;
@@ -228,7 +228,7 @@ int MPEG2StreamReader::processExtStartCode(uint8_t* buff)
     try
     {
         bitReader.setBuffer(buff + 1, m_bufEnd);
-        int extType = bitReader.getBits(4);
+        const int extType = bitReader.getBits(4);
         if (extType == SEQUENCE_EXT)
         {
             m_sequence.deserializeExtension(bitReader);
@@ -264,7 +264,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
     }
 
     m_frame.picture_structure = 0;
-    int rez = findFrameExt(buff + 1);
+    const int rez = findFrameExt(buff + 1);
     if (rez == NOT_ENOUGH_BUFFER)
         return rez;
 
@@ -303,7 +303,7 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
         }
     }
     m_isFirstFrame = false;
-    int refDif = m_frame.ref - m_framesAtGop;
+    const int refDif = m_frame.ref - m_framesAtGop;
     m_curPts = m_curDts + refDif * m_pcrIncPerFrame;
     m_lastIFrame = m_frame.pict_type == PictureCodingType::I_FRAME;
 
@@ -321,7 +321,7 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
             try
             {
                 bitReader.setBuffer(nal + 4, m_bufEnd);
-                int extType = bitReader.getBits(4);
+                const int extType = bitReader.getBits(4);
                 if (extType == PICTURE_CODING_EXT)
                 {
                     m_frame.deserializeCodingExtension(bitReader);

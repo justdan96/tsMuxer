@@ -209,7 +209,7 @@ uint64_t roundUp64(const uint64_t& value, const uint64_t& roundVal)
 
 string strPadLeft(const string& str, size_t newSize, char filler)
 {
-    int cnt = (int)(newSize - str.size());
+    const int cnt = (int)(newSize - str.size());
     string prefix = "";
     for (int i = 0; i < cnt; i++) prefix += filler;
     return prefix + str;
@@ -217,7 +217,7 @@ string strPadLeft(const string& str, size_t newSize, char filler)
 
 string strPadRight(const string& str, size_t newSize, char filler)
 {
-    int cnt = (int)(newSize - str.size());
+    const int cnt = (int)(newSize - str.size());
     string postfix = "";
     for (int i = 0; i < cnt; i++) postfix += filler;
     return str + postfix;
@@ -266,7 +266,7 @@ vector<string> splitStr(const string& str, const string& splitter)
 {
     vector<string> res;
 
-    size_t splitterSize = splitter.size();
+    const size_t splitterSize = splitter.size();
     size_t posBegin = 0;
     size_t posEnd = string::npos;
 
@@ -340,7 +340,7 @@ string extractFileName2(const string& src, bool withExt)
 {
     string fileName = src;
 
-    size_t extSep = fileName.find_last_of('.');
+    const size_t extSep = fileName.find_last_of('.');
     size_t dirSep = fileName.find_last_of('/');
 
     if (dirSep == string::npos)
@@ -380,10 +380,10 @@ string closeDirPath(const string& src, char delimiter)
 // extract the filename from a path, check for invalid characters
 bool isValidFileName(const string& src)
 {
-    string filename = extractFileName(src);
+    const string filename = extractFileName(src);
 
     // invalidChars() returns a different regex pattern for Windows or Unix
-    bool isvalid = !(std::regex_search(filename, invalidChars()));
+    const bool isvalid = !(std::regex_search(filename, invalidChars()));
     return isvalid;
 }
 
@@ -441,20 +441,20 @@ string strToLowerCase(const string& src)
 
 uint32_t my_ntohl(const uint32_t val)
 {
-    auto* tmp = (uint8_t*)&val;
+    const auto* tmp = (uint8_t*)&val;
     return tmp[3] + (tmp[2] << 8) + (tmp[1] << 16) + (tmp[0] << 24);
 }
 
 uint16_t my_ntohs(const uint16_t val)
 {
-    auto* tmp = (uint8_t*)&val;
+    const auto* tmp = (uint8_t*)&val;
     return tmp[1] + (tmp[0] << 8);
 }
 
 char* strnstr(const char* s1, const char* s2, size_t len)
 {
     size_t l1 = len;
-    size_t l2 = strlen(s2);
+    const size_t l2 = strlen(s2);
     if (!l2)
         return (char*)s1;
     while (l1 >= l2)
@@ -494,7 +494,7 @@ std::vector<wchar_t> mbtwc_wrapper(int codePage, const char* inputStr, int input
 
 std::vector<wchar_t> fromAcp(const char* acpStr, int sz)
 {
-    auto requiredSiz = MultiByteToWideChar(CP_ACP, 0, acpStr, sz, nullptr, 0);
+    const auto requiredSiz = MultiByteToWideChar(CP_ACP, 0, acpStr, sz, nullptr, 0);
     return mbtwc_wrapper(CP_ACP, acpStr, sz, requiredSiz);
 }
 
@@ -502,7 +502,7 @@ std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.
 
 std::vector<wchar_t> toWide(const char* utf8Str, int sz)
 {
-    auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
+    const auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
     if (requiredSiz != 0)
     {
         return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));

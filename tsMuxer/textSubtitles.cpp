@@ -109,7 +109,7 @@ void TextToPGSConverter::setVideoInfo(int width, int height, double fps)
 
 double TextToPGSConverter::alignToGrid(double value)
 {
-    auto frameCnt =
+    const auto frameCnt =
         (int64_t)(value * m_videoFps + 0.5);  // how many frames have passed until this moment in time (rounded)
     return frameCnt / m_videoFps;
 }
@@ -121,12 +121,12 @@ uint8_t TextToPGSConverter::color32To8(uint32_t* buff, uint32_t colorMask)
     // else
     {
         YUVQuad yuv = RGBAToYUVA(*buff | colorMask);
-        auto itr = m_paletteYUV.find(yuv);
+        const auto itr = m_paletteYUV.find(yuv);
         if (itr == m_paletteYUV.end())
         {
             if (m_paletteYUV.size() < 255)
             {
-                pair<map<YUVQuad, uint8_t>::iterator, bool> rez =
+                const pair<map<YUVQuad, uint8_t>::iterator, bool> rez =
                     m_paletteYUV.insert(std::make_pair(yuv, (uint8_t)m_paletteYUV.size()));
                 return rez.first->second;
             }
@@ -159,10 +159,10 @@ int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, u
     else
     {
         const uint32_t rgbColor = *pos | colorMask;
-        YUVQuad color = RGBAToYUVA(rgbColor);
+        const YUVQuad color = RGBAToYUVA(rgbColor);
         for (const uint32_t* cur = pos + 1; cur < end && *cur != 0; cur++)
         {
-            uint32_t newRGBColor = *cur | colorMask;
+            const uint32_t newRGBColor = *cur | colorMask;
             if (newRGBColor == rgbColor || RGBAToYUVA(newRGBColor) == color)
                 rez++;
             else
@@ -174,7 +174,7 @@ int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, u
 
 YUVQuad TextToPGSConverter::RGBAToYUVA(uint32_t data)
 {
-    auto rgba = (RGBQUAD*)&data;
+    const auto rgba = (RGBQUAD*)&data;
     YUVQuad rez;
     rez.Y = (int)(65.738 * rgba->rgbRed + 129.057 * rgba->rgbGreen + 25.064 * rgba->rgbBlue + 4224.0) >> 8;
     rez.Cr = (int)(112.439 * rgba->rgbRed - 94.154 * rgba->rgbGreen - 18.285 * rgba->rgbBlue + 32896.0) >> 8;
@@ -199,9 +199,9 @@ RGBQUAD TextToPGSConverter::YUVAToRGBA(const YUVQuad& yuv)
 void TextToPGSConverter::reduceColors(uint8_t mask)
 {
     mask = ~mask;
-    uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
+    const uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
     auto dst = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
-    uint32_t* end = dst + m_videoWidth * m_videoHeight;
+    const uint32_t* end = dst + m_videoWidth * m_videoHeight;
     for (; dst < end; ++dst) *dst &= val;
 }
 
@@ -213,7 +213,7 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
         // compress render buffer by RLE
 
         uint8_t* curPtr = m_renderedData;
-        uint8_t* trimPos = m_renderedData;
+        const uint8_t* trimPos = m_renderedData;
         auto srcData = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
         assert(srcData);
         m_rleLen = 0;
@@ -226,7 +226,7 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
             bool isEmptyLine = false;
             while (srcData < srcLineEnd)
             {
-                int repCnt = getRepeatCnt(srcData, srcLineEnd, colorMask);
+                const int repCnt = getRepeatCnt(srcData, srcLineEnd, colorMask);
 
                 if (repCnt == m_videoWidth)
                 {
@@ -243,7 +243,7 @@ bool TextToPGSConverter::rlePack(uint32_t colorMask)
                     m_maxLine = FFMAX(m_maxLine, y);
                 }
 
-                uint8_t srcColor = color32To8(srcData, colorMask);
+                const uint8_t srcColor = color32To8(srcData, colorMask);
                 assert(repCnt < 16384);
                 if (srcColor)  // color exists
                 {
@@ -330,27 +330,27 @@ TextToPGSConverter::Palette TextToPGSConverter::buildPalette(float opacity)
 float toCurve(float value)
 {
     // float result = pow(value, 1.5f);
-    float result = value * sqrt(value);  // same as pow 1.5, reduce binary size
+    const float result = value * sqrt(value);  // same as pow 1.5, reduce binary size
     return result;
 }
 
 uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& animation, double inTimeSec,
                                        double outTimeSec, uint32_t& dstBufSize)
 {
-    bool forced = m_textRender->rasterText(text);
+    const bool forced = m_textRender->rasterText(text);
     inTimeSec = alignToGrid(inTimeSec);
     outTimeSec = alignToGrid(outTimeSec);
 
-    auto inTimePTS = (int64_t)(inTimeSec * 90000);
-    auto outTimePTS = (int64_t)(outTimeSec * 90000);
+    const auto inTimePTS = (int64_t)(inTimeSec * 90000);
+    const auto outTimePTS = (int64_t)(outTimeSec * 90000);
 
     uint32_t mask = 0;
     int step = 0;
     while (!rlePack(mask))
     {
         // reduce colors
-        auto tmp = (uint8_t*)&mask;
-        int idx = step++ % 4;
+        const auto tmp = (uint8_t*)&mask;
+        const int idx = step++ % 4;
         tmp[idx] <<= 1;
         tmp[idx]++;
     }
@@ -358,21 +358,21 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     if (m_rleLen == 0)
         return nullptr;  // empty text
 
-    int objectWindowHeight = FFMAX(0, renderedHeight());
-    int objectWindowTop = FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset);
+    const int objectWindowHeight = FFMAX(0, renderedHeight());
+    const int objectWindowTop = FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset);
 
     int fadeInFrames = (int)(animation.fadeInDuration * m_videoFps + 0.5);
     int fadeOutFrames = (int)(animation.fadeOutDuration * m_videoFps + 0.5);
     fadeInFrames++;
     fadeOutFrames++;
 
-    float opacityInDelta = 1.0f / fadeInFrames;
-    float opacityOutDelta = 1.0f / fadeOutFrames;
+    const float opacityInDelta = 1.0f / fadeInFrames;
+    const float opacityOutDelta = 1.0f / fadeOutFrames;
     float opacity = opacityInDelta;
 
-    double decodedObjectSize = (m_maxLine - m_minLine + 1) * m_videoWidth;
-    auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
-    auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
+    const double decodedObjectSize = (m_maxLine - m_minLine + 1) * m_videoWidth;
+    const auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    const auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
     const auto PLANEINITIALIZATIONTIME =
         (int64_t)(90000.0 * (m_videoWidth * m_videoHeight) / PIXEL_COMPOSITION_RATE + 0.999);
@@ -390,15 +390,15 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
                                       objectWindowTop, objectWindowHeight);
     curPos += composePaletteDefinition(buildPalette(toCurve(opacity)), curPos, inTimePTS - PRESENTATION_DTS_DELTA,
                                        inTimePTS - PRESENTATION_DTS_DELTA);
-    int64_t odfPTS = inTimePTS - PRESENTATION_DTS_DELTA + compositionDecodeTime;
+    const int64_t odfPTS = inTimePTS - PRESENTATION_DTS_DELTA + compositionDecodeTime;
     curPos += composeObjectDefinition(curPos, odfPTS, inTimePTS - PRESENTATION_DTS_DELTA, m_minLine, m_maxLine, true);
     curPos += composeEnd(curPos, odfPTS, odfPTS);
 
     // 2.1 fade in palette
-    double fpsPts = 90000.0 / m_videoFps;
+    const double fpsPts = 90000.0 / m_videoFps;
     auto updateTime = (int64_t)alignToGrid(inTimePTS + fpsPts);
 
-    auto lastAnimateTime = (int64_t)alignToGrid(outTimePTS - fpsPts);
+    const auto lastAnimateTime = (int64_t)alignToGrid(outTimePTS - fpsPts);
     opacity += opacityInDelta;
     while (updateTime <= lastAnimateTime + FLOAT_EPS && opacity <= 1.0 + FLOAT_EPS)
     {
@@ -593,7 +593,7 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, int64_t pts, int
         int MAX_PG_PACKET = 65515;
         if (blocks == 0)
             MAX_PG_PACKET -= 7;
-        int size = FFMIN(m_rleLen - srcProcessed, MAX_PG_PACKET);
+        const int size = FFMIN(m_rleLen - srcProcessed, MAX_PG_PACKET);
         memcpy(curPos, srcData + srcProcessed, size);
         srcProcessed += size;
         curPos += size;

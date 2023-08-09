@@ -234,7 +234,7 @@ std::string MPEGSequenceHeader::getStreamDescr()
     rez << "Resolution: " << width << ':' << height;
     rez << (progressive_sequence ? 'p' : 'i') << ". ";
     rez << "Frame rate: ";
-    double fps = getFrameRate();
+    const double fps = getFrameRate();
     rez << fps;
     return rez.str();
 }
@@ -321,7 +321,7 @@ uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
   are missing (open gop)*/
     bitWriter.putBits(1, broken_link);
     bitWriter.flushBits();
-    uint32_t bitCnt = bitWriter.getBitsCount();
+    const uint32_t bitCnt = bitWriter.getBitsCount();
     return (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
 
@@ -386,7 +386,7 @@ void MPEGPictureHeader::buildHeader()
         bitWriter.putBits(3, mpeg_f_code[1][0]);
     }
     bitWriter.flushBits();
-    uint32_t bitCnt = bitWriter.getBitsCount();
+    const uint32_t bitCnt = bitWriter.getBitsCount();
     m_data_buffer_len = (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
 
@@ -429,7 +429,7 @@ void MPEGPictureHeader::buildCodingExtension()
         bitWriter.putBits(8, sub_carrier_phase);
     }
     bitWriter.flushBits();
-    uint32_t bitCnt = bitWriter.getBitsCount();
+    const uint32_t bitCnt = bitWriter.getBitsCount();
     m_data_buffer_len += (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
 
@@ -531,7 +531,7 @@ uint32_t MPEGPictureHeader::getPictureSize() { return m_headerSize + m_data_buff
 bool MPEGPictureHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader)
 
 {
-    bool rez = MPEGRawDataHeader::addRawData(buffer, len, headerIncluded, isHeader);
+    const bool rez = MPEGRawDataHeader::addRawData(buffer, len, headerIncluded, isHeader);
     if (!isHeader)
         m_picture_data_len += len;
     return rez;
@@ -539,7 +539,7 @@ bool MPEGPictureHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded
 
 uint32_t MPEGPictureHeader::serialize(uint8_t* buffer)
 {
-    uint32_t rez = MPEGRawDataHeader::serialize(buffer);
+    const uint32_t rez = MPEGRawDataHeader::serialize(buffer);
     m_picture_data_len = 0;
     return rez;
 }

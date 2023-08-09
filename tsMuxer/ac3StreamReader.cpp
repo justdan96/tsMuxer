@@ -51,7 +51,7 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     {
         int skipBytes = 0;
         int skipBeforeBytes = 0;
-        int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
+        const int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
         if (len < 1)
         {
             // m_state = stateDecodeAC3;
@@ -139,7 +139,7 @@ int AC3StreamReader::readPacket(AVPacket& avPacket)
 
 int AC3StreamReader::flushPacket(AVPacket& avPacket)
 {
-    int rez = SimplePacketizerReader::flushPacket(avPacket);
+    const int rez = SimplePacketizerReader::flushPacket(avPacket);
     if (rez > 0 && m_true_hd_mode && !m_downconvertToAC3)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))
@@ -166,11 +166,11 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
 
     while (true)
     {
-        int rez = SimplePacketizerReader::readPacket(avPacket);
+        const int rez = SimplePacketizerReader::readPacket(avPacket);
         if (rez != 0)
             return rez;
 
-        bool isAc3Packet = (m_state == AC3State::stateDecodeTrueHDFirst);
+        const bool isAc3Packet = (m_state == AC3State::stateDecodeTrueHDFirst);
 
         if (isAc3Packet)
         {

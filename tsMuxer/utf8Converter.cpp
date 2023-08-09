@@ -44,7 +44,7 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
     rv.resize(vec.size() * 4);
     const InputType *sourceStart = vec.data();
     auto sourceEnd = sourceStart + vec.size();
-    auto targetStart = reinterpret_cast<UTF8 *>(&rv[0]);
+    const auto targetStart = reinterpret_cast<UTF8 *>(&rv[0]);
     auto targetStart_out = targetStart;
     auto targetEnd = targetStart + rv.size();
     auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, ConversionFlags::strictConversion);

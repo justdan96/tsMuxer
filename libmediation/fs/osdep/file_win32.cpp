@@ -9,12 +9,12 @@
 void throwFileError()
 {
     LPVOID msgBuf = nullptr;
-    DWORD dw = GetLastError();
+    const DWORD dw = GetLastError();
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf, 0, nullptr);
 
-    std::string str((char*)msgBuf);
+    const std::string str((char*)msgBuf);
     throw std::runtime_error(str);
 }
 
@@ -72,7 +72,7 @@ File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFl
         if (oflag & File::ofAppend)
         {
             long hiword = 0;
-            DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
+            const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
             if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
                 throwFileError();
         }
@@ -117,7 +117,7 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
         if (oflag & File::ofAppend)
         {
             long hiword = 0;
-            DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
+            const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
             if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
                 throwFileError();
         }
@@ -129,7 +129,7 @@ bool File::open(const char* fName, unsigned int oflag, unsigned int systemDepend
 bool File::close()
 {
     // sync();
-    BOOL res = CloseHandle(m_impl);
+    const BOOL res = CloseHandle(m_impl);
     m_impl = INVALID_HANDLE_VALUE;
     return res != 0;
 }
@@ -140,7 +140,7 @@ int File::read(void* buffer, uint32_t count) const
         return -1;
 
     DWORD bytesRead = 0;
-    BOOL res = ReadFile(m_impl, buffer, count, &bytesRead, nullptr);
+    const BOOL res = ReadFile(m_impl, buffer, count, &bytesRead, nullptr);
     if (!res)
         return -1;
 
@@ -155,7 +155,7 @@ int File::write(const void* buffer, uint32_t count)
         return -1;
 
     DWORD bytesWritten = 0;
-    BOOL res = WriteFile(m_impl, buffer, count, &bytesWritten, nullptr);
+    const BOOL res = WriteFile(m_impl, buffer, count, &bytesWritten, nullptr);
     if (!res)
     {
         throwFileError();
@@ -175,7 +175,7 @@ bool File::isOpen() const { return m_impl != INVALID_HANDLE_VALUE; }
 bool File::size(uint64_t* const fileSize) const
 {
     DWORD highDw;
-    DWORD lowDw = GetFileSize(m_impl, &highDw);
+    const DWORD lowDw = GetFileSize(m_impl, &highDw);
     if ((lowDw == INVALID_FILE_SIZE) && (GetLastError() != NO_ERROR))
         return false;
     *fileSize = highDw;
@@ -203,10 +203,10 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
         break;
     }
 
-    LONG distanceToMoveLow = (uint32_t)(offset & 0xffffffff);
+    const LONG distanceToMoveLow = (uint32_t)(offset & 0xffffffff);
     LONG distanceToMoveHigh = (uint32_t)((offset & 0xffffffff00000000ull) >> 32);
 
-    DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, moveMethod);
+    const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, moveMethod);
     if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
         return (uint64_t)-1;
 
@@ -217,10 +217,10 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
 
 bool File::truncate(uint64_t newFileSize)
 {
-    LONG distanceToMoveLow = (uint32_t)(newFileSize & 0xffffffff);
+    const LONG distanceToMoveLow = (uint32_t)(newFileSize & 0xffffffff);
     LONG distanceToMoveHigh = (uint32_t)((newFileSize & 0xffffffff00000000ull) >> 32);
-    DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
-    int errCode = GetLastError();
+    const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
+    const int errCode = GetLastError();
     if ((newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR))
         // return false;
         throwFileError();

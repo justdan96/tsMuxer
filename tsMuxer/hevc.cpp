@@ -27,7 +27,7 @@ unsigned HevcUnit::extractUEGolombCode()
 
 int HevcUnit::extractSEGolombCode()
 {
-    unsigned rez = extractUEGolombCode();
+    const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
         return -(int)(rez / 2);
     else
@@ -68,22 +68,22 @@ void HevcUnit::updateBits(int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = m_reader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
-    int byteOffset = bitOffset % 8;
+    const int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
-    uint8_t* ptr_end = m_reader.getBuffer() + (bitOffset + bitLen) / 8;
-    int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
+    const uint8_t* ptr_end = m_reader.getBuffer() + (bitOffset + bitLen) / 8;
+    const int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
     if (byteOffset > 0)
     {
-        int prefix = *ptr >> (8 - byteOffset);
+        const int prefix = *ptr >> (8 - byteOffset);
         bitWriter.putBits(byteOffset, prefix);
     }
     bitWriter.putBits(bitLen, value);
 
     if (endBitsPostfix < 8)
     {
-        int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
+        const int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
         bitWriter.putBits(endBitsPostfix, postfix);
     }
     bitWriter.flushBits();
@@ -93,7 +93,7 @@ int HevcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
 {
     if (m_nalBufferLen == 0)
         return 0;
-    int encodeRez = NALUnit::encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
+    const int encodeRez = NALUnit::encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
     if (encodeRez == -1)
         return -1;
     else
@@ -182,32 +182,32 @@ HevcVpsUnit::HevcVpsUnit()
 
 int HevcVpsUnit::deserialize()
 {
-    int rez = HevcUnit::deserialize();
+    const int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
 
     try
     {
         m_reader.skipBits(12);  // vps_id, reserved, vps_max_layers
-        int vps_max_sub_layers = m_reader.getBits(3) + 1;
+        const int vps_max_sub_layers = m_reader.getBits(3) + 1;
         if (vps_max_sub_layers > 7)
             return 1;
         m_reader.skipBits(17);  // vps_temporal_id_nesting_flag, vps_reserved_0xffff_16bits
         if (profile_tier_level(vps_max_sub_layers) != 0)
             return 1;
 
-        bool vps_sub_layer_ordering_info_present_flag = m_reader.getBit();
+        const bool vps_sub_layer_ordering_info_present_flag = m_reader.getBit();
         for (int i = (vps_sub_layer_ordering_info_present_flag ? 0 : vps_max_sub_layers - 1);
              i <= vps_max_sub_layers - 1; i++)
         {
-            unsigned vps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
+            const unsigned vps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
             if (extractUEGolombCode() > vps_max_dec_pic_buffering_minus1)  // vps_max_num_reorder_pics
                 return 1;
             if (extractUEGolombCode() == 0xffffffff)  // vps_max_latency_increase_plus1
                 return 1;
         }
-        int vps_max_layer_id = m_reader.getBits(6);
-        unsigned vps_num_layer_sets_minus1 = extractUEGolombCode();
+        const int vps_max_layer_id = m_reader.getBits(6);
+        const unsigned vps_num_layer_sets_minus1 = extractUEGolombCode();
         if (vps_num_layer_sets_minus1 > 1023)
             return 1;
         for (unsigned i = 1; i <= vps_num_layer_sets_minus1; i++)
@@ -245,7 +245,7 @@ double HevcVpsUnit::getFPS() const { return num_units_in_tick ? time_scale / (fl
 string HevcVpsUnit::getDescription() const
 {
     string rez("Frame rate: ");
-    double fps = getFPS();
+    const double fps = getFPS();
     if (fps != 0.0)
         rez += doubleToStr(fps);
     else
@@ -308,7 +308,7 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
     {
         bool low_delay_hrd_flag = false;
         unsigned cpb_cnt_minus1 = 0;
-        bool fixed_pic_rate_within_cvs_flag = m_reader.getBit() ? true : m_reader.getBit();
+        const bool fixed_pic_rate_within_cvs_flag = m_reader.getBit() ? true : m_reader.getBit();
         if (fixed_pic_rate_within_cvs_flag)
         {
             if (extractUEGolombCode() > 2047)  // elemental_duration_in_tc_minus1
@@ -355,7 +355,7 @@ int HevcSpsUnit::sub_layer_hrd_parameters(int cpb_cnt_minus1)
 
 int HevcSpsUnit::vui_parameters()
 {
-    bool aspect_ratio_info_present_flag = m_reader.getBit();
+    const bool aspect_ratio_info_present_flag = m_reader.getBit();
     if (aspect_ratio_info_present_flag)
     {
         if (m_reader.getBits(8) == EXTENDED_SAR)  // aspect_ratio_idc
@@ -433,7 +433,7 @@ int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
 {
     int numDeltaPocs = 0;
 
-    bool inter_ref_pic_set_prediction_flag = stRpsIdx ? m_reader.getBit() : false;
+    const bool inter_ref_pic_set_prediction_flag = stRpsIdx ? m_reader.getBit() : false;
 
     if (inter_ref_pic_set_prediction_flag)
     {
@@ -441,7 +441,7 @@ int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
 
         if (stRpsIdx == num_short_term_ref_pic_sets)
         {
-            unsigned delta_idx_minus1 = extractUEGolombCode();
+            const unsigned delta_idx_minus1 = extractUEGolombCode();
             if (delta_idx_minus1 >= stRpsIdx)
                 return 1;
             refRpsIdx -= delta_idx_minus1;
@@ -452,8 +452,8 @@ int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
 
         for (int j = 0; j <= num_delta_pocs[refRpsIdx]; j++)
         {
-            bool used = m_reader.getBit();                          // used_by_curr_pic_flag[j]
-            bool use_delta_flag = used ? true : m_reader.getBit();  // use_delta_flag[j]
+            const bool used = m_reader.getBit();                         // used_by_curr_pic_flag[j]
+            const bool use_delta_flag = used ? true : m_reader.getBit(); // use_delta_flag[j]
             if (use_delta_flag)
                 numDeltaPocs++;
         }
@@ -490,16 +490,16 @@ int HevcSpsUnit::scaling_list_data()
             }
             else
             {
-                int coefNum = FFMIN(64, (1 << (4 + (sizeId << 1))));
+                const int coefNum = FFMIN(64, (1 << (4 + (sizeId << 1))));
                 if (sizeId > 1)
                 {
-                    int scaling_list_dc_coef = extractSEGolombCode() + 8;
+                    const int scaling_list_dc_coef = extractSEGolombCode() + 8;
                     if (scaling_list_dc_coef < 1 || scaling_list_dc_coef > 255)
                         return 1;
                 }
                 for (int i = 0; i < coefNum; i++)
                 {
-                    int scaling_list_delta_coef = extractSEGolombCode();
+                    const int scaling_list_delta_coef = extractSEGolombCode();
                     if (scaling_list_delta_coef < -128 || scaling_list_delta_coef > 127)
                         return 1;
                 }
@@ -511,7 +511,7 @@ int HevcSpsUnit::scaling_list_data()
 
 int HevcSpsUnit::deserialize()
 {
-    int rez = HevcUnit::deserialize();
+    const int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
     try
@@ -557,30 +557,30 @@ int HevcSpsUnit::deserialize()
         log2_max_pic_order_cnt_lsb = extractUEGolombCode() + 4;
         if (log2_max_pic_order_cnt_lsb > 16)
             return 1;
-        bool sps_sub_layer_ordering_info_present_flag = m_reader.getBit();
+        const bool sps_sub_layer_ordering_info_present_flag = m_reader.getBit();
         for (int i = (sps_sub_layer_ordering_info_present_flag ? 0 : max_sub_layers - 1); i <= max_sub_layers - 1; i++)
         {
-            unsigned sps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
-            unsigned sps_max_num_reorder_pics = extractUEGolombCode();
+            const unsigned sps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
+            const unsigned sps_max_num_reorder_pics = extractUEGolombCode();
             if (sps_max_num_reorder_pics > sps_max_dec_pic_buffering_minus1)
                 return 1;
-            unsigned sps_max_latency_increase_plus1 = extractUEGolombCode();
+            const unsigned sps_max_latency_increase_plus1 = extractUEGolombCode();
             if (sps_max_latency_increase_plus1 == 0xffffffff)
                 return 1;
         }
 
-        unsigned log2_min_luma_coding_block_size_minus3 = extractUEGolombCode();
-        unsigned log2_diff_max_min_luma_coding_block_size = extractUEGolombCode();
+        const unsigned log2_min_luma_coding_block_size_minus3 = extractUEGolombCode();
+        const unsigned log2_diff_max_min_luma_coding_block_size = extractUEGolombCode();
         extractUEGolombCode();  // log2_min_luma_transform_block_size_minus2 ue(v)
         extractUEGolombCode();  // log2_diff_max_min_luma_transform_block_size ue(v)
         extractUEGolombCode();  // max_transform_hierarchy_depth_inter ue(v)
         extractUEGolombCode();  // max_transform_hierarchy_depth_intra ue(v)
 
-        int MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
-        int CtbLog2SizeY = MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
-        int CtbSizeY = 1 << CtbLog2SizeY;
-        int PicWidthInCtbsY = ceilDiv(pic_width_in_luma_samples, CtbSizeY);
-        int PicHeightInCtbsY = ceilDiv(pic_height_in_luma_samples, CtbSizeY);
+        const int MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
+        const int CtbLog2SizeY = MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
+        const int CtbSizeY = 1 << CtbLog2SizeY;
+        const int PicWidthInCtbsY = ceilDiv(pic_width_in_luma_samples, CtbSizeY);
+        const int PicHeightInCtbsY = ceilDiv(pic_height_in_luma_samples, CtbSizeY);
         int PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
         PicSizeInCtbsY_bits = 0;
         int count1bits = 0;
@@ -627,7 +627,7 @@ int HevcSpsUnit::deserialize()
         }
         if (m_reader.getBit())  // long_term_ref_pics_present_flag
         {
-            unsigned num_long_term_ref_pics_sps = extractUEGolombCode();
+            const unsigned num_long_term_ref_pics_sps = extractUEGolombCode();
             if (num_long_term_ref_pics_sps > 32)
                 return 1;
             for (unsigned i = 0; i < num_long_term_ref_pics_sps; i++)
@@ -660,7 +660,7 @@ string HevcSpsUnit::getDescription() const
               int32ToStr(pic_height_in_luma_samples);
     result += (interlaced_source_flag ? string("i") : string("p"));
 
-    double fps = getFPS();
+    const double fps = getFPS();
     result += "  Frame rate: ";
     result += (fps ? doubleToStr(fps) : string("not found"));
     return result;
@@ -678,7 +678,7 @@ HevcPpsUnit::HevcPpsUnit()
 
 int HevcPpsUnit::deserialize()
 {
-    int rez = HevcUnit::deserialize();
+    const int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
 
@@ -708,7 +708,7 @@ HevcHdrUnit::HevcHdrUnit() : isHDR10(false), isHDR10plus(false), isDVRPU(false),
 
 int HevcHdrUnit::deserialize()
 {
-    int rez = HevcUnit::deserialize();
+    const int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
     try
@@ -760,9 +760,9 @@ int HevcHdrUnit::deserialize()
             {                           // HDR10Plus Metadata
                 m_reader.skipBits(8);   // country_code
                 m_reader.skipBits(32);  // terminal_provider
-                int application_identifier = m_reader.getBits(8);
-                int application_version = m_reader.getBits(8);
-                int num_windows = m_reader.getBits(2);
+                const int application_identifier = m_reader.getBits(8);
+                const int application_version = m_reader.getBits(8);
+                const int num_windows = m_reader.getBits(2);
                 m_reader.skipBits(6);
                 if (application_identifier == 4 && application_version == 1 && num_windows == 1)
                 {
@@ -791,7 +791,7 @@ HevcSliceHeader::HevcSliceHeader() : HevcUnit(), first_slice(false), pps_id(-1),
 
 int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
 {
-    int rez = HevcUnit::deserialize();
+    const int rez = HevcUnit::deserialize();
     if (rez)
         return rez;
 

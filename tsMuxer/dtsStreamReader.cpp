@@ -64,7 +64,7 @@ int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         return 0;
     int skipBytes = 0;
     int skipBeforeBytes = 0;
-    int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
+    const int len = decodeFrame(frame, m_bufEnd, skipBytes, skipBeforeBytes);
     if (len < 1)
         return 0;
 
@@ -163,7 +163,7 @@ void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, uint8_t* end)
 {
     for (int i = 0; i < 2 && buff < end - 4; ++i)
     {
-        bool isHDData = *((uint32_t*)buff) == my_htonl(DTS_HD_PREFIX);
+        const bool isHDData = *((uint32_t*)buff) == my_htonl(DTS_HD_PREFIX);
         if (!isHDData)
             return;
 
@@ -191,9 +191,9 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
     // check for DTS-HD headers
     while (end - buff >= 16)
     {
-        auto ptr = (int64_t*)buff;
-        uint64_t hdrType = my_ntohll(ptr[0]);
-        uint64_t hdrSize = my_ntohll(ptr[1]) + 16;
+        const auto ptr = (int64_t*)buff;
+        const uint64_t hdrType = my_ntohll(ptr[0]);
+        const uint64_t hdrSize = my_ntohll(ptr[1]) + 16;
 
         if (hdrSize > (uint64_t)1 << 61)
             break;
@@ -283,8 +283,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         reader.setBuffer(buff + 5, end);  // skip 4 byte magic and 1 unknown byte
         int headerSize;
         int hdFrameSize;
-        int nuSubStreamIndex = reader.getBits(2);
-        bool isBlownUpHeader = reader.getBit();
+        const int nuSubStreamIndex = reader.getBits(2);
+        const bool isBlownUpHeader = reader.getBit();
         if (isBlownUpHeader)
         {
             headerSize = reader.getBits(12) + 1;
@@ -299,7 +299,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
         {
             if (buff + headerSize + 4 > end)
                 return NOT_ENOUGH_BUFFER;
-            auto hdAudioData = (uint32_t*)(buff + headerSize);
+            const auto hdAudioData = (uint32_t*)(buff + headerSize);
             switch (my_ntohl(*hdAudioData))
             {
             case 0x41A29547:  // XLL
@@ -327,11 +327,11 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 
         int nuNumAudioPresent = 1;
         int nuNumAssets = 1;
-        bool bStaticFieldsPresent = reader.getBit();
+        const bool bStaticFieldsPresent = reader.getBit();
         if (bStaticFieldsPresent)
         {
             reader.skipBits(2);  // nuRefClockCode
-            int nuExSSFrameDurationCode = reader.getBits(3) + 1;
+            const int nuExSSFrameDurationCode = reader.getBits(3) + 1;
             if (pi_frame_length == 0)
                 pi_frame_length = nuExSSFrameDurationCode << 9;
 
@@ -354,8 +354,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
             if (reader.getBit())
             {
                 reader.skipBits(2);  // nuMixMetadataAdjLevel
-                int nuBits4MixOutMask = reader.getBits(2) * 4 + 4;
-                int nuNumMixOutConfigs = reader.getBits(2) + 1;
+                const int nuBits4MixOutMask = reader.getBits(2) * 4 + 4;
+                const int nuNumMixOutConfigs = reader.getBits(2) + 1;
                 for (int i = 0; i < nuNumMixOutConfigs; i++) reader.skipBits(nuBits4MixOutMask);
             }
         }
@@ -374,11 +374,11 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 
                 if (reader.getBit())  // bInfoTextPresent
                 {
-                    int nuInfoTextByteSize = reader.getBits(10) + 1;
+                    const int nuInfoTextByteSize = reader.getBits(10) + 1;
                     for (int j = 0; j < nuInfoTextByteSize; j++) reader.skipBits(8);
                 }
-                int nuBitResolution = reader.getBits(5) + 1;
-                int nuMaxSampleRate = reader.getBits(4);
+                const int nuBitResolution = reader.getBits(5) + 1;
+                const int nuMaxSampleRate = reader.getBits(4);
                 hd_pi_channels = reader.getBits(8) + 1;
                 int nuSpkrActivityMask = 0;
                 if (reader.getBit())  // bOne2OneMapChannels2Speakers
@@ -391,7 +391,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
 
                     if (reader.getBit())  // bSpkrMaskEnabled
                     {
-                        int nuNumBits4SAMask = reader.getBits(2) * 4 + 4;
+                        const int nuNumBits4SAMask = reader.getBits(2) * 4 + 4;
                         nuSpkrActivityMask = reader.getBits(nuNumBits4SAMask);
                     }
                     // TODO...
@@ -586,14 +586,14 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         if (m_testMode && m_dtsEsChannels == 0)
         {
             auto curPtr32 = (uint32_t*)(buff + 16);
-            int findSize = FFMIN((int)(end - buff), i_frame_size) / 4 - 4;
+            const int findSize = FFMIN((int)(end - buff), i_frame_size) / 4 - 4;
             for (int i = 0; i < findSize; ++i)
             {
                 if (*curPtr32++ == 0x5a5a5a5a)
                 {
-                    auto exHeader = (uint8_t*)curPtr32;
-                    int dataRest = (int)(buff + i_frame_size - exHeader);
-                    int frameSize = (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
+                    const auto exHeader = (uint8_t*)curPtr32;
+                    const int dataRest = (int)(buff + i_frame_size - exHeader);
+                    const int frameSize = (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
                     if (dataRest - frameSize == 0 || dataRest - frameSize == 1)
                     {
                         m_dtsEsChannels = (int(exHeader[1]) >> 2) & 0x07;
@@ -607,11 +607,11 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
     {
         m_dts_hd_mode = true;
 
-        int hdFrameSize = decodeHdInfo(afterFrameData, end);
+        const int hdFrameSize = decodeHdInfo(afterFrameData, end);
         if (hdFrameSize == NOT_ENOUGH_BUFFER)
             return NOT_ENOUGH_BUFFER;
 
-        uint8_t* nextFrame = afterFrameData + hdFrameSize;
+        const uint8_t* nextFrame = afterFrameData + hdFrameSize;
         if (nextFrame >= end)
             return NOT_ENOUGH_BUFFER;
         if (m_downconvertToDTS)
@@ -633,18 +633,18 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 {
     nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
+    const unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
     pi_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
     pi_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
     pi_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    unsigned int i_lfe = (p_buf[10] >> 1) & 0x03;
+    const unsigned int i_lfe = (p_buf[10] >> 1) & 0x03;
     if (i_lfe)
         pi_audio_mode |= 0x10000;
 
-    int pi_ext_coding = (p_buf[10] >> 4) & 0x01;
+    const int pi_ext_coding = (p_buf[10] >> 4) & 0x01;
     if (pi_ext_coding)
     {
-        int ext_descr = p_buf[10] >> 5;
+        const int ext_descr = p_buf[10] >> 5;
         core_ext_mask = dca_ext_audio_descr_mask[ext_descr];
     }
     else
@@ -658,11 +658,11 @@ int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 int DTSStreamReader::testSyncInfo16be(const uint8_t* p_buf)
 {
     nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
+    const unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
     unsigned int test_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
-    unsigned int test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
-    unsigned int test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    unsigned int test_lfe = (p_buf[10] >> 1) & 0x03;
+    const unsigned int test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
+    const unsigned int test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+    const unsigned int test_lfe = (p_buf[10] >> 1) & 0x03;
     if (test_lfe)
         test_audio_mode |= 0x10000;
     if (test_audio_mode == pi_audio_mode && test_sample_rate_index == pi_sample_rate_index &&
@@ -692,7 +692,7 @@ int DTSStreamReader::buf14To16(uint8_t* p_out, const uint8_t* p_in, int i_in, in
 
         if (bits_out < 8)
         {
-            int need = (std::min)(8 - bits_out, bits_in);
+            const int need = (std::min)(8 - bits_out, bits_in);
             cur <<= need;
             cur |= (tmp >> (bits_in - need));
             tmp <<= (8 - bits_in + need);

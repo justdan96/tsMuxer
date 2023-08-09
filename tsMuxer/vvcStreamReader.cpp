@@ -49,7 +49,7 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
     {
         if (*nal & 0x80)
             return rez;  // invalid nal
-        auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
+        const auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
         if (!m_eof && nextNal == end)
             break;
@@ -101,7 +101,7 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
     {
         rez.codecInfo = vvcCodecInfo;
         rez.streamDescr = m_sps->getDescription();
-        size_t frSpsPos = rez.streamDescr.find("Frame rate: not found");
+        const size_t frSpsPos = rez.streamDescr.find("Frame rate: not found");
         if (frSpsPos != string::npos)
         {
             rez.streamDescr = rez.streamDescr.substr(0, frSpsPos);
@@ -136,7 +136,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
         return 10;  // total descriptor length
     }
 
-    uint8_t* descStart = dstBuff;
+    const uint8_t* descStart = dstBuff;
 
     // ITU-T Rec.H.222 Table 2-133 - VVC video descriptor
     *dstBuff++ = (uint8_t)TSDescriptorTag::VVC;
@@ -144,7 +144,7 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
     *dstBuff++ = m_sps->ptl_num_sub_profiles;
     auto bufPos = (uint32_t*)dstBuff;
-    for (auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
+    for (const auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
     dstBuff = (uint8_t*)bufPos;
     *dstBuff++ = (m_sps->progressive_source_flag << 7) | (m_sps->interlaced_source_flag << 6) |
                  (m_sps->non_packed_constraint_flag << 5) | (m_sps->ptl_frame_only_constraint_flag << 4);
@@ -152,8 +152,8 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     *dstBuff++ = 0;
     *dstBuff++ = 0xc0;
 
-    uint8_t* descEnd = dstBuff;
-    auto descSize = (int)(descEnd - descStart);
+    const uint8_t* descEnd = dstBuff;
+    const auto descSize = (int)(descEnd - descStart);
     *descLength = descSize - 2;  // fill descriptor length
 
     return descSize;
@@ -161,12 +161,12 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
 void VVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
 {
-    int oldNalSize = (int)(nextNal - buff);
+    const int oldNalSize = (int)(nextNal - buff);
     m_vpsSizeDiff = 0;
-    auto vps = (VvcVpsUnit*)nalUnit;
+    const auto vps = (VvcVpsUnit*)nalUnit;
     vps->setFPS(m_fps);
-    auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
-    long newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
+    const auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
+    const long newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
     if (newSpsLen == -1)
         THROW(ERR_COMMON, "Not enough buffer");
 
@@ -199,7 +199,7 @@ double VVCStreamReader::getStreamFPS(void* curNalUnit)
 
 bool VVCStreamReader::skipNal(uint8_t* nal)
 {
-    auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
+    const auto nalType = (VvcUnit::NalType)(nal[1] >> 3);
 
     if (nalType == VvcUnit::NalType::FD)
         return true;
@@ -263,7 +263,7 @@ void VVCStreamReader::incTimings()
 {
     if (m_totalFrameNum++ > 0)
         m_curDts += m_pcrIncPerFrame;
-    int delta = m_frameNum - m_fullPicOrder;
+    const int delta = m_frameNum - m_fullPicOrder;
     m_curPts = m_curDts - delta * m_pcrIncPerFrame;
     m_frameNum++;
     m_firstFrame = false;
@@ -286,7 +286,7 @@ int VVCStreamReader::toFullPicOrder(VvcSliceHeader* slice, int pic_bits)
     }
     else
     {
-        int range = 1 << pic_bits;
+        const int range = 1 << pic_bits;
 
         if (slice->pic_order_cnt_lsb < m_prevPicOrder && m_prevPicOrder - slice->pic_order_cnt_lsb >= range / 2)
             m_picOrderMsb += range;
@@ -317,7 +317,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
     m_spsPpsFound = false;
     m_lastIFrame = false;
 
-    uint8_t* prevPos = nullptr;
+    const uint8_t* prevPos = nullptr;
     uint8_t* curPos = buff;
     uint8_t* nextNal = NALUnit::findNextNAL(curPos, m_bufEnd);
 
@@ -326,7 +326,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
 
     while (curPos < m_bufEnd)
     {
-        auto nalType = (VvcUnit::NalType)((*curPos >> 1) & 0x3f);
+        const auto nalType = (VvcUnit::NalType)((*curPos >> 1) & 0x3f);
         if (isSlice(nalType))
         {
             if (curPos[2] & 0x80)  // slice.first_slice
@@ -431,8 +431,8 @@ uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, 
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    int64_t bytesLeft = dstEnd - dstBuffer;
-    int64_t requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
+    const int64_t bytesLeft = dstEnd - dstBuffer;
+    const int64_t requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
 
@@ -449,8 +449,8 @@ int VVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
 
     if (avPacket.size > 4 && avPacket.size < dstEnd - dstBuffer)
     {
-        int offset = avPacket.data[2] == 1 ? 3 : 4;
-        auto nalType = (VvcUnit::NalType)((avPacket.data[offset] >> 1) & 0x3f);
+        const int offset = avPacket.data[2] == 1 ? 3 : 4;
+        const auto nalType = (VvcUnit::NalType)((avPacket.data[offset] >> 1) & 0x3f);
         if (nalType == VvcUnit::NalType::AUD)
         {
             // place delimiter at first place
@@ -461,7 +461,7 @@ int VVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         }
     }
 
-    bool needInsSpsPps = m_firstFileFrame && !(avPacket.flags & AVPacket::IS_SPS_PPS_IN_GOP);
+    const bool needInsSpsPps = m_firstFileFrame && !(avPacket.flags & AVPacket::IS_SPS_PPS_IN_GOP);
     if (needInsSpsPps)
     {
         avPacket.flags |= AVPacket::IS_SPS_PPS_IN_GOP;

@@ -56,11 +56,11 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     for (uint8_t* nal = VC1Unit::findNextMarker(m_buffer, m_bufEnd); nal <= m_bufEnd - 32;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))
     {
-        auto unitType = (VC1Code)nal[3];
+        const auto unitType = (VC1Code)nal[3];
 
         if (unitType == VC1Code::SEQHDR)
         {
-            uint8_t* nextNal = VC1Unit::findNextMarker(nal + 4, m_bufEnd);
+            const uint8_t* nextNal = VC1Unit::findNextMarker(nal + 4, m_bufEnd);
             VC1SequenceHeader sequence;
             sequence.vc1_unescape_buffer(nal + 4, nextNal - nal - 4);
             if (sequence.decode_sequence_header() != 0)
@@ -74,7 +74,7 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
             dstBuff[5] = 0x31;                                // "1"
             dstBuff[6] = 0x01;                                // profile and level subdescriptor
 
-            int profile = (int)sequence.profile << 4;
+            const int profile = (int)sequence.profile << 4;
             switch (sequence.profile)
             {
             case Profile::SIMPLE:
@@ -109,7 +109,7 @@ CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, int len)
     for (uint8_t* nal = VC1Unit::findNextMarker(buffer, end); nal <= end - 32;
          nal = VC1Unit::findNextMarker(nal + 4, end))
     {
-        auto unitType = (VC1Code)nal[3];
+        const auto unitType = (VC1Code)nal[3];
         switch (unitType)
         {
         case VC1Code::ENDOFSEQ:
@@ -232,9 +232,9 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
     {
         return NOT_ENOUGH_BUFFER;
     }
-    int64_t oldSpsLen = nextNal - buff - 1;
+    const int64_t oldSpsLen = nextNal - buff - 1;
     m_sequence.vc1_unescape_buffer(buff + 1, oldSpsLen);
-    int rez = m_sequence.decode_sequence_header();
+    const int rez = m_sequence.decode_sequence_header();
     if (rez != 0)
         return rez;
 
@@ -255,7 +255,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
     m_seqBuffer.push_back(0);
     m_seqBuffer.push_back(0);
     m_seqBuffer.push_back(1);
-    for (uint8_t* cur = buff; cur < nextNal; cur++) m_seqBuffer.push_back(*cur);
+    for (const uint8_t* cur = buff; cur < nextNal; cur++) m_seqBuffer.push_back(*cur);
     return 0;
 }
 
@@ -263,7 +263,7 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
 {
     if (!m_spsFound)
         return NALUnit::SPS_OR_PPS_NOT_READY;
-    int rez = m_frame.decode_frame_direct(m_sequence, buff + 1, m_bufEnd);
+    const int rez = m_frame.decode_frame_direct(m_sequence, buff + 1, m_bufEnd);
     if (rez != 0)
         return rez;
 
@@ -343,14 +343,14 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
 
 int VC1StreamReader::decodeEntryPoint(uint8_t* buff)
 {
-    uint8_t* nextNal = VC1Unit::findNextMarker(buff, m_bufEnd);
+    const uint8_t* nextNal = VC1Unit::findNextMarker(buff, m_bufEnd);
     if (nextNal == m_bufEnd)
         return NOT_ENOUGH_BUFFER;
     m_entryPointBuffer.clear();
     m_entryPointBuffer.push_back(0);
     m_entryPointBuffer.push_back(0);
     m_entryPointBuffer.push_back(1);
-    for (uint8_t* cur = buff; cur < nextNal; cur++) m_entryPointBuffer.push_back(*cur);
+    for (const uint8_t* cur = buff; cur < nextNal; cur++) m_entryPointBuffer.push_back(*cur);
     return 0;
 }
 
@@ -361,7 +361,7 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
     for (uint8_t* nal = VC1Unit::findNextMarker(buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))
     {
-        auto vc1Code = (VC1Code)nal[3];
+        const auto vc1Code = (VC1Code)nal[3];
         if (vc1Code == VC1Code::FRAME || vc1Code == VC1Code::USER_FRAME)
         {
             VC1Frame frame;
@@ -405,7 +405,7 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
     for (uint8_t* nal = VC1Unit::findNextMarker(buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))
     {
-        auto vc1Code = (VC1Code)nal[3];
+        const auto vc1Code = (VC1Code)nal[3];
         if (vc1Code != VC1Code::FIELD && vc1Code != VC1Code::USER_FIELD)
             return nal;
     }
@@ -418,11 +418,11 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
 void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
 {
     m_sequence.setFPS(m_fps);
-    auto tmpBuffer = new uint8_t[oldSpsLen + 16];
-    int64_t newSpsLen = m_sequence.vc1_escape_buffer(tmpBuffer);
+    const auto tmpBuffer = new uint8_t[oldSpsLen + 16];
+    const int64_t newSpsLen = m_sequence.vc1_escape_buffer(tmpBuffer);
     if (newSpsLen != oldSpsLen)
     {
-        int64_t sizeDiff = newSpsLen - oldSpsLen;
+        const int64_t sizeDiff = newSpsLen - oldSpsLen;
         memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
         m_bufEnd += sizeDiff;
     }

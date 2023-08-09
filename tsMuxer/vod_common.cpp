@@ -25,7 +25,7 @@ std::string toNativeSeparators(const std::string& dirName)
 
 bool isFillerNullPacket(uint8_t* curBuf)
 {
-    auto endPos = (uint32_t*)(curBuf + TS_FRAME_SIZE);
+    const auto endPos = (uint32_t*)(curBuf + TS_FRAME_SIZE);
     for (auto curBuf32 = (uint32_t*)(curBuf + 4); curBuf32 < endPos; curBuf32++)
         if (*curBuf32 != 0xffffffff && *curBuf32 != 0)
             return false;
@@ -96,12 +96,12 @@ void AV_WB32(uint8_t* buffer, uint32_t value) { *((uint32_t*)buffer) = my_htonl(
 std::string floatToTime(double time, char msSeparator)
 {
     int iTime = (int)time;
-    int hour = iTime / 3600;
+    const int hour = iTime / 3600;
     iTime -= hour * 3600;
-    int min = iTime / 60;
+    const int min = iTime / 60;
     iTime -= min * 60;
-    int sec = iTime;
-    int msec = (int)((time - (int)time) * 1000.0);
+    const int sec = iTime;
+    const int msec = (int)((time - (int)time) * 1000.0);
     std::ostringstream str;
     str << strPadLeft(int32ToStr(hour), 2, '0') << ':';
     str << strPadLeft(int32ToStr(min), 2, '0') << ':';
@@ -113,7 +113,7 @@ double timeToFloat(const std::string& chapterStr)
 {
     if (chapterStr.size() == 0)
         return 0;
-    std::vector<std::string> timeParts = splitStr(chapterStr.c_str(), ':');
+    const std::vector<std::string> timeParts = splitStr(chapterStr.c_str(), ':');
     double sec = 0;
     if (timeParts.size() > 0)
         sec = strToDouble(timeParts[timeParts.size() - 1].c_str());

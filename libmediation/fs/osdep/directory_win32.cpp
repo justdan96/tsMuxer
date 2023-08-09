@@ -11,7 +11,7 @@ char getDirSeparator() { return '\\'; }
 
 string extractFileDir(const string& fileName)
 {
-    size_t index = fileName.find_last_of('\\');
+    const size_t index = fileName.find_last_of('\\');
     if (index != string::npos)
         return fileName.substr(0, index + 1);
 
@@ -40,7 +40,7 @@ uint64_t getFileSize(const std::string& fileName)
 
 bool createDir(const std::string& dirName, bool createParentDirs)
 {
-    bool ok = preCreateDir(
+    const bool ok = preCreateDir(
         [](auto&& parentDir) {
             return parentDir.empty() || parentDir[parentDir.size() - 1] == ':' || parentDir == "\\\\." ||
                    parentDir == "\\\\.\\" ||                                                        // UNC patch prefix
@@ -78,8 +78,8 @@ bool findFiles(const string& path, const string& fileMask, vector<string>* fileL
     WIN32_FIND_DATA fileData;  // Data structure describes the file found
     // Search handle returned by FindFirstFile
 
-    auto searchStr = toWide(path + '/' + fileMask);
-    HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
+    const auto searchStr = toWide(path + '/' + fileMask);
+    const HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
     if (hSearch == INVALID_HANDLE_VALUE)
         return false;
 
@@ -102,8 +102,8 @@ bool findDirs(const string& path, vector<string>* dirsList)
     WIN32_FIND_DATA fileData;  // Data structure describes the file found
     // Search handle returned by FindFirstFile
 
-    auto searchStr = toWide(path + "*");
-    HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
+    const auto searchStr = toWide(path + "*");
+    const HANDLE hSearch = FindFirstFile(searchStr.data(), &fileData);
     if (hSearch == INVALID_HANDLE_VALUE)
         return false;
 

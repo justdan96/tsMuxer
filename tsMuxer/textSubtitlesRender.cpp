@@ -217,8 +217,8 @@ string findFontArg(const string& text, size_t pos)
 
 uint32_t rgbSwap(uint32_t color)
 {
-    auto rgb = (uint8_t*)&color;
-    uint8_t tmp = rgb[0];
+    const auto rgb = (uint8_t*)&color;
+    const uint8_t tmp = rgb[0];
     rgb[0] = rgb[2];
     rgb[2] = tmp;
     return color;
@@ -380,13 +380,13 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
     bool forced = false;
     memset(m_pData, 0, (size_t)m_width * m_height * 4);
     vector<Font> fontStack;
-    vector<string> lines = splitStr(text.c_str(), '\n');
+    const vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
     m_initFont = m_font;
     for (auto& i : lines)
     {
         vector<pair<Font, string>> txtParts = processTxtLine(i, fontStack);
-        for (auto& j : txtParts)
+        for (const auto& j : txtParts)
         {
             if (j.first.m_opts & Font::FORCED)
                 forced = true;
@@ -408,7 +408,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
             xSize.push_back(mSize.cx);
             tWidth += mSize.cx;
         }
-        int xOffs = (m_width - tWidth) / 2;
+        const int xOffs = (m_width - tWidth) / 2;
         int curX = 0;
         for (size_t j = 0; j < txtParts.size(); j++)
         {

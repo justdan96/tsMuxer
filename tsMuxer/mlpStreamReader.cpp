@@ -50,7 +50,7 @@ int MLPStreamReader::readPacket(AVPacket& avPacket)
 {
     while (true)
     {
-        int rez = SimplePacketizerReader::readPacket(avPacket);
+        const int rez = SimplePacketizerReader::readPacket(avPacket);
         if (rez != 0)
             return rez;
 
@@ -69,7 +69,7 @@ int MLPStreamReader::readPacket(AVPacket& avPacket)
 
 int MLPStreamReader::flushPacket(AVPacket& avPacket)
 {
-    int rez = SimplePacketizerReader::flushPacket(avPacket);
+    const int rez = SimplePacketizerReader::flushPacket(avPacket);
     if (rez > 0)
     {
         if (!(avPacket.flags & AVPacket::PRIORITY_DATA))

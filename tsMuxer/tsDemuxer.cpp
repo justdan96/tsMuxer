@@ -10,7 +10,7 @@ using namespace std;
 
 bool isM2TSExt(const std::string& streamName)
 {
-    string sName = strToLowerCase(unquoteStr(streamName));
+    const string sName = strToLowerCase(unquoteStr(streamName));
     return strEndWith(sName, ".m2ts") || strEndWith(sName, ".mts") || strEndWith(sName, ".ssif");
 }
 
@@ -175,10 +175,10 @@ bool TSDemuxer::isVideoPID(StreamType streamType)
 
 bool TSDemuxer::checkForRealM2ts(uint8_t* buffer, uint8_t* end)
 {
-    for (uint8_t* cur = buffer; cur < end; cur += 192)
+    for (const uint8_t* cur = buffer; cur < end; cur += 192)
         if (cur[4] != 0x47)
             return false;
-    for (uint8_t* cur = buffer; cur < end; cur += 188)
+    for (const uint8_t* cur = buffer; cur < end; cur += 188)
         if (*cur != 0x47)
         {
             LTRACE(LT_WARN, 2, "Warning! The file " << m_streamName << " has a M2TS format.");
@@ -278,7 +278,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 break;
             forpmtm2tsHdrDiscarded = false;
 
-            auto tsPacket = (TSPacket*)m_curPos;
+            const auto tsPacket = (TSPacket*)m_curPos;
             int pid = tsPacket->getPID();
             if (pid == 0)
             {  // PAT
@@ -322,7 +322,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         }
         m_m2tsHdrDiscarded = false;
 
-        auto tsPacket = (TSPacket*)m_curPos;
+        const auto tsPacket = (TSPacket*)m_curPos;
         int pid = tsPacket->getPID();
         discardSize += TS_FRAME_SIZE;
 
@@ -342,15 +342,15 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         }
 
         uint8_t* frameData = m_curPos + tsPacket->getHeaderSize();
-        bool pesStartCode = frameData[0] == 0 && frameData[1] == 0 && frameData[2] == 1 && tsPacket->payloadStart;
+        const bool pesStartCode = frameData[0] == 0 && frameData[1] == 0 && frameData[2] == 1 && tsPacket->payloadStart;
         if (pesStartCode)
         {
-            auto pesPacket = (PESPacket*)frameData;
+            const auto pesPacket = (PESPacket*)frameData;
             auto streamInfo = m_pmt.pidList.find(pid);
 
             if ((pesPacket->flagsLo & 0x80) == 0x80)
             {
-                int64_t curPts = pesPacket->getPts();
+                const int64_t curPts = pesPacket->getPts();
                 int64_t curDts = curPts;
 
                 if ((pesPacket->flagsLo & 0xc0) == 0xc0)
@@ -386,16 +386,16 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 frameData += pesPacket->getHeaderLength();
             else
             {
-                int64_t ptsBase = m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS;
+                const int64_t ptsBase = m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS;
                 if ((pesPacket->flagsLo & 0xc0) == 0xc0)
                 {
-                    int64_t pts = pesPacket->getPts() - ptsBase + m_prevFileLen;
-                    int64_t dts = pesPacket->getDts() - ptsBase + m_prevFileLen;
+                    const int64_t pts = pesPacket->getPts() - ptsBase + m_prevFileLen;
+                    const int64_t dts = pesPacket->getDts() - ptsBase + m_prevFileLen;
                     pesPacket->setPtsAndDts(pts, dts);
                 }
                 else if ((pesPacket->flagsLo & 0x80) == 0x80)
                 {
-                    int64_t pts = pesPacket->getPts() - ptsBase + m_prevFileLen;
+                    const int64_t pts = pesPacket->getPts() - ptsBase + m_prevFileLen;
                     pesPacket->setPts(pts);
                 }
             }
@@ -405,7 +405,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         if (!m_acceptedPidCache[pid])
             continue;
 
-        int64_t payloadLen = TS_FRAME_SIZE - (frameData - m_curPos);
+        const int64_t payloadLen = TS_FRAME_SIZE - (frameData - m_curPos);
         if (payloadLen > 0)
         {
             if (pid != lastPid)
@@ -465,7 +465,7 @@ uint64_t TSDemuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void TSDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    const auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
@@ -475,17 +475,17 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
 int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
 {
     // pcr from end of file
-    auto tmpBuffer = new uint8_t[bufferSize];
+    const auto tmpBuffer = new uint8_t[bufferSize];
     file.seek(FFMAX(fileSize - fileSize % frameSize - bufferSize, 0), File::SeekMethod::smBegin);
-    int len = file.read(tmpBuffer, bufferSize);
+    const int len = file.read(tmpBuffer, bufferSize);
     if (len < 1)
         return -2;  // read error
     uint8_t* curPtr = tmpBuffer;
-    uint8_t* bufferEnd = tmpBuffer + len;
+    const uint8_t* bufferEnd = tmpBuffer + len;
     int64_t lastPcrVal = -1;
     while (curPtr <= bufferEnd - frameSize)
     {
-        auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+        const auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
         if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
         {
             lastPcrVal = tsPacket->adaptiveField.getPCR33();
@@ -509,20 +509,20 @@ int64_t getTSDuration(const char* fileName)
             return -1;
         int bufferSize = 1024 * 256;
         bufferSize -= bufferSize % frameSize;
-        auto tmpBuffer = new uint8_t[bufferSize];
+        const auto tmpBuffer = new uint8_t[bufferSize];
         // pcr from start of file
-        int len = file.read(tmpBuffer, bufferSize);
+        const int len = file.read(tmpBuffer, bufferSize);
         if (len < 1)
         {
             delete[] tmpBuffer;
             return 0;
         }
         uint8_t* curPtr = tmpBuffer;
-        uint8_t* bufferEnd = tmpBuffer + len;
+        const uint8_t* bufferEnd = tmpBuffer + len;
         int64_t firstPcrVal = 0;
         while (curPtr <= bufferEnd - frameSize)
         {
-            auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+            const auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
             if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
             {
                 firstPcrVal = tsPacket->adaptiveField.getPCR33();

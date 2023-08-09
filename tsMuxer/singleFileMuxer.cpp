@@ -170,7 +170,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
 
 void SingleFileMuxer::openDstFile()
 {
-    string dir = closeDirPath(toNativeSeparators(m_origFileName));
+    const string dir = closeDirPath(toNativeSeparators(m_origFileName));
     // if (!createDir(dstFileName, true))
     //	THROW(ERR_CANT_CREATE_FILE, "Can't create output directory " << dstFileName);
     int systemFlags = 0;
@@ -191,10 +191,10 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
     constexpr uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
     if (streamInfo->m_bufLen >= blockSize)
     {
-        int toFileLen = blockSize & 0xffff0000;
+        const int toFileLen = blockSize & 0xffff0000;
         if (m_owner->isAsyncMode())
         {
-            auto newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
+            const auto newBuf = new uint8_t[blockSize + MAX_AV_PACKET_SIZE];
             memcpy(newBuf, streamInfo->m_buffer + toFileLen, streamInfo->m_bufLen - toFileLen);
             m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, toFileLen, &streamInfo->m_file);
             streamInfo->m_buffer = newBuf;
@@ -208,7 +208,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_bufLen -= toFileLen;
     }
 
-    auto lpcmReader = dynamic_cast<LPCMStreamReader*>(streamInfo->m_codecReader);
+    const auto lpcmReader = dynamic_cast<LPCMStreamReader*>(streamInfo->m_codecReader);
     if (lpcmReader && streamInfo->m_totalWrited >= 0xffff0000ul - blockSize)
     // if (lpcmReader && streamInfo->m_totalWrited >= 0x0ffffffful)
     {
@@ -221,7 +221,7 @@ void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
         streamInfo->m_file.open(streamInfo->m_fileName.c_str(), File::ofWrite + File::ofNoTruncate);
         lpcmReader->beforeFileCloseEvent(streamInfo->m_file);
         streamInfo->m_file.close();
-        std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
+        const std::string newName = getNewName(streamInfo->m_fileName.c_str(), streamInfo->m_part);
         deleteFile(newName.c_str());
         if (rename(streamInfo->m_fileName.c_str(), newName.c_str()) != 0)
             THROW(ERR_COMMON, "Can't rename file " << streamInfo->m_fileName << " to " << newName);
@@ -267,13 +267,13 @@ bool SingleFileMuxer::doFlush()
     for (const auto& [fst, snd] : m_streamInfo)
     {
         StreamInfo* streamInfo = snd;
-        unsigned lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
-        unsigned roundBufLen = streamInfo->m_bufLen & 0xffff0000;
+        const unsigned lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
+        const unsigned roundBufLen = streamInfo->m_bufLen & 0xffff0000;
         if (m_owner->isAsyncMode())
         {
             if (lastBlockSize > 0)
             {
-                auto newBuff = new uint8_t[lastBlockSize];
+                const auto newBuff = new uint8_t[lastBlockSize];
                 memcpy(newBuff, streamInfo->m_buffer + roundBufLen, lastBlockSize);
                 m_owner->asyncWriteBuffer(this, streamInfo->m_buffer, roundBufLen, &streamInfo->m_file);
                 streamInfo->m_buffer = newBuff;
@@ -327,7 +327,7 @@ bool SingleFileMuxer::close()
 
 void SingleFileMuxer::parseMuxOpt(const std::string& opts)
 {
-    vector<string> params = splitStr(opts.c_str(), ' ');
+    const vector<string> params = splitStr(opts.c_str(), ' ');
     for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');

@@ -225,7 +225,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
             /* If the 16 bits following the high surrogate are in the source buffer... */
             if (source < sourceEnd)
             {
-                UTF32 ch2 = *source;
+                const UTF32 ch2 = *source;
                 /* If it's a low surrogate, convert to UTF32. */
                 if (ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END)
                 {
@@ -385,7 +385,7 @@ static Boolean isLegalUTF8(const UTF8* source, int length)
  */
 Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
 {
-    int length = trailingBytesForUTF8[*source] + 1;
+    const int length = trailingBytesForUTF8[*source] + 1;
     if (source + length > sourceEnd)
     {
         return false;
@@ -422,7 +422,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;
@@ -617,7 +617,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;

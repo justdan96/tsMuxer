@@ -28,10 +28,10 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackP
         bitReader.skipBits(14);  // level 8, reserved 6
         m_nalSize = bitReader.getBits(2) + 1;
         bitReader.skipBits(3);  // reserved
-        int spsCnt = bitReader.getBits(5);
+        const int spsCnt = bitReader.getBits(5);
         for (int i = 0; i < spsCnt; i++)
         {
-            int spsLen = bitReader.getBits(16);
+            const int spsLen = bitReader.getBits(16);
             if (spsLen > 0)
             {
                 m_spsPpsList.push_back(std::vector<uint8_t>());
@@ -39,10 +39,10 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackP
                 for (int j = 0; j < spsLen; j++) curData.push_back(bitReader.getBits(8));
             }
         }
-        int ppsCnt = bitReader.getBits(8);
+        const int ppsCnt = bitReader.getBits(8);
         for (int i = 0; i < ppsCnt; i++)
         {
-            int ppsLen = bitReader.getBits(16);
+            const int ppsLen = bitReader.getBits(16);
             if (ppsLen > 0)
             {
                 m_spsPpsList.push_back(std::vector<uint8_t>());
@@ -71,7 +71,7 @@ size_t ParsedH264TrackData::getSPSPPSLen()
 
 int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
 {
-    uint8_t* start = dst;
+    const uint8_t* start = dst;
     for (auto& i : m_spsPpsList)
     {
         writeNalHeader(dst);
@@ -84,7 +84,7 @@ int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
 bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
 {
     uint8_t* curPos = buff;
-    uint8_t* end = buff + size;
+    const uint8_t* end = buff + size;
     bool spsFound = false;
     bool ppsFound = false;
     while (curPos < end - m_nalSize)
@@ -92,12 +92,12 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        auto nalUnitType = (NALUnit::NALType)(curPos[m_nalSize] & 0x1f);
+        const auto nalUnitType = (NALUnit::NALType)(curPos[m_nalSize] & 0x1f);
         if (nalUnitType == NALUnit::NALType::nuSPS)
             spsFound = true;
         else if (nalUnitType == NALUnit::NALType::nuPPS)
@@ -125,7 +125,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -158,7 +158,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -185,7 +185,7 @@ ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, int size) : ParsedH264Tr
 bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
 {
     uint8_t* curPos = buff;
-    uint8_t* end = buff + size;
+    const uint8_t* end = buff + size;
     bool vpsFound = false;
     bool spsFound = false;
     bool ppsFound = false;
@@ -194,12 +194,12 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        auto nalUnitType = (HevcUnit::NalType)((curPos[m_nalSize] >> 1) & 0x3f);
+        const auto nalUnitType = (HevcUnit::NalType)((curPos[m_nalSize] >> 1) & 0x3f);
         if (nalUnitType == HevcUnit::NalType::VPS)
             vpsFound = true;
         else if (nalUnitType == HevcUnit::NalType::SPS)
@@ -220,7 +220,7 @@ ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264Tr
 bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
 {
     uint8_t* curPos = buff;
-    uint8_t* end = buff + size;
+    const uint8_t* end = buff + size;
     bool vpsFound = false;
     bool spsFound = false;
     bool ppsFound = false;
@@ -229,12 +229,12 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = (uint32_t*)curPos;
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        auto nalUnitType = (VvcUnit::NalType)(curPos[m_nalSize + 1] >> 3);
+        const auto nalUnitType = (VvcUnit::NalType)(curPos[m_nalSize + 1] >> 3);
         if (nalUnitType == VvcUnit::NalType::VPS)
             vpsFound = true;
         else if (nalUnitType == VvcUnit::NalType::SPS)
@@ -253,8 +253,8 @@ ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPri
 {
     if (size < MS_BIT_MAP_HEADER_SIZE)
         THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid or unsupported VC-1 stream");
-    uint8_t* curBuf = buff + MS_BIT_MAP_HEADER_SIZE;
-    uint8_t dataLen = *curBuf++;
+    const uint8_t* curBuf = buff + MS_BIT_MAP_HEADER_SIZE;
+    const uint8_t dataLen = *curBuf++;
     for (int i = 0; i < dataLen; i++) m_seqHeader.push_back(*curBuf++);
     m_firstPacket = true;
 }
@@ -262,7 +262,7 @@ ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPri
 void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 {
     pkt->size = size + (m_firstPacket ? (int)m_seqHeader.size() : 0);
-    bool addFrameHdr = !(size >= 4 && buff[0] == 0 && buff[1] == 0 && buff[2] == 1);
+    const bool addFrameHdr = !(size >= 4 && buff[0] == 0 && buff[1] == 0 && buff[2] == 1);
     if (addFrameHdr)
         pkt->size += 4;
     pkt->data = new uint8_t[pkt->size];
@@ -308,7 +308,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
     : ParsedTrackPrivData(track->codec_priv, track->codec_priv_size)
 {
     m_convertBytes = strEndWith(track->codec_id, "/BIG");
-    auto audiotrack = (MatroskaAudioTrack*)track;
+    const auto audiotrack = (MatroskaAudioTrack*)track;
     m_channels = audiotrack->channels;
     m_bitdepth = audiotrack->bitdepth;
 
@@ -377,7 +377,7 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
     prefix += " --> ";
     prefix += floatToTime((pkt->pts + pkt->duration) / (double)INTERNAL_PTS_FREQ, ',');
     prefix += '\n';
-    std::string postfix = "\n\n";
+    const std::string postfix = "\n\n";
     pkt->size = (int)(size + prefix.length() + postfix.length());
     pkt->data = new uint8_t[pkt->size];
     memcpy(pkt->data, prefix.c_str(), prefix.length());
@@ -390,12 +390,12 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 {
     static constexpr int PG_HEADER_SIZE = 10;
 
-    uint8_t* curPtr = buff;
-    uint8_t* end = buff + size;
+    const uint8_t* curPtr = buff;
+    const uint8_t* end = buff + size;
     int blocks = 0;
     while (curPtr <= end - 3)
     {
-        uint16_t blockSize = AV_RB16(curPtr + 1) + 3;
+        const uint16_t blockSize = AV_RB16(curPtr + 1) + 3;
         if (blockSize == 0)
             break;
         curPtr += blockSize;
@@ -415,11 +415,11 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
     uint8_t* dst = pkt->data;
     while (curPtr <= end - 3)
     {
-        uint16_t blockSize = AV_RB16(curPtr + 1) + 3;
+        const uint16_t blockSize = AV_RB16(curPtr + 1) + 3;
 
         dst[0] = 'P';
         dst[1] = 'G';
-        auto ptsDts = (uint32_t*)(dst + 2);
+        const auto ptsDts = (uint32_t*)(dst + 2);
         ptsDts[0] = my_htonl((uint32_t)internalClockToPts(pkt->pts));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;

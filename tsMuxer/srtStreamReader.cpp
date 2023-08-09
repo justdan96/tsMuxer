@@ -39,8 +39,8 @@ void SRTStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
     if (m_tmpBuffer.size() > 0)
         memmove(dataBegin, &m_tmpBuffer[0], m_tmpBuffer.size());
-    int parsedLen = parseText(dataBegin, dataLen + (int)m_tmpBuffer.size());
-    int rest = dataLen + (int)m_tmpBuffer.size() - parsedLen;
+    const int parsedLen = parseText(dataBegin, dataLen + (int)m_tmpBuffer.size());
+    const int rest = dataLen + (int)m_tmpBuffer.size() - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
         THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)");
     m_tmpBuffer.resize(rest);
@@ -117,9 +117,9 @@ int SRTStreamReader::parseText(uint8_t* dataStart, int len)
             return false;
     }
     uint8_t* cur = dataStart + prefixLen;
-    int roundLen = len & (~(m_charSize - 1));
-    uint8_t* end = cur + roundLen;
-    uint8_t* lastProcessedLine = cur;
+    const int roundLen = len & (~(m_charSize - 1));
+    const uint8_t* end = cur + roundLen;
+    const uint8_t* lastProcessedLine = cur;
     vector<string> rez;
     for (; cur < end; cur += m_charSize)
     {
@@ -158,7 +158,7 @@ bool SRTStreamReader::strOnlySpace(std::string& str)
 
 int SRTStreamReader::readPacket(AVPacket& avPacket)
 {
-    int rez = m_dstSubCodec->readPacket(avPacket);
+    const int rez = m_dstSubCodec->readPacket(avPacket);
     if (rez == NEED_MORE_DATA)
     {
         uint32_t renderedLen;
@@ -193,7 +193,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_state = ParseState::PARSE_TIME;
         bool isNUmber = true;
         {
-            for (auto& c : m_sourceText.front())
+            for (const auto& c : m_sourceText.front())
                 if (!(c >= '0' && c <= '9') && c != ' ')
                 {
                     isNUmber = false;

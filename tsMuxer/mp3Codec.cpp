@@ -23,7 +23,7 @@ uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
     // header
     for (uint8_t* cur = buff; cur < end - 4; cur++)
     {
-        uint32_t header = my_ntohl(*((uint32_t*)cur));
+        const uint32_t header = my_ntohl(*((uint32_t*)cur));
         if ((header & 0xffe00000) != 0xffe00000)
             continue;
         // layer check
@@ -47,7 +47,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
     int mpeg25, lsf;
     if (end - buff < 4)
         return 0;
-    uint32_t header = my_ntohl(*((uint32_t*)buff));
+    const uint32_t header = my_ntohl(*((uint32_t*)buff));
     if (header & (1 << 20))
     {
         lsf = (header & (1 << 19)) ? 0 : 1;
@@ -73,7 +73,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
     m_bitrate_index = (header >> 12) & 0xf;
     if (m_bitrate_index == 15)
         return 0;  // invalid bitrate index
-    int padding = (header >> 9) & 1;
+    const int padding = (header >> 9) & 1;
     // extension = (header >> 8) & 1;
     m_mode = (header >> 6) & 3;
     m_mode_ext = (header >> 4) & 3;

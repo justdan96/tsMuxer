@@ -45,10 +45,10 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
 
     if (m_tmpBufferLen > 0)
     {
-        uint8_t* prevPos = m_curPos;
+        const uint8_t* prevPos = m_curPos;
         m_curPos = m_tmpBuffer;
         m_bufEnd = m_tmpBuffer + m_tmpBufferLen;
-        int isNal = bufFromNAL();
+        const int isNal = bufFromNAL();
         int decodeRez = 0;
         if (isNal)
         {
@@ -105,7 +105,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
     avPacket.size = 0;
     avPacket.pts = m_curPts + m_timeOffset;
     avPacket.dts = m_curDts + m_timeOffset - m_pcrIncPerFrame * getFrameDepth();  // shift dts back
-    uint8_t* prevPos = m_curPos;
+    const uint8_t* prevPos = m_curPos;
     if (!m_syncToStream)
     {
         uint8_t* nal = NALUnit::findNALWithStartCode(m_curPos, m_bufEnd, m_longCodesAllowed);
@@ -116,14 +116,14 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
         else
             m_curPos = m_bufEnd;
-        int bytesProcessed = (int)(m_curPos - prevPos);
+        const int bytesProcessed = (int)(m_curPos - prevPos);
         m_processedBytes += bytesProcessed;
         prevPos = m_curPos;
         if (!m_syncToStream)
             return NEED_MORE_DATA;
     }
 
-    uint8_t* nextNal = NALUnit::findNALWithStartCode((std::min)(m_curPos + 3, m_bufEnd), m_bufEnd, m_longCodesAllowed);
+    const uint8_t* nextNal = NALUnit::findNALWithStartCode((std::min)(m_curPos + 3, m_bufEnd), m_bufEnd, m_longCodesAllowed);
     if (nextNal == m_bufEnd)
     {
         storeBufferRest();
@@ -133,7 +133,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
     int isNal = bufFromNAL();
     if (isNal)
     {
-        int64_t prevDts = m_curDts;
+        const int64_t prevDts = m_curDts;
         m_shortStartCodes = isNal < 4;
         int rez = 0;
         while (true)
@@ -177,7 +177,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
             return 0;  // return zero AV packet for new frame
         }
     }
-    uint8_t* findEnd = (std::min)(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
+    const uint8_t* findEnd = (std::min)(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
     uint8_t* nal = NALUnit::findNALWithStartCode(m_curPos + isNal, findEnd, m_longCodesAllowed);
 
     if (nal == findEnd)
@@ -196,7 +196,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
     }
 
-    int bytesProcessed = (int)(nal - prevPos);
+    const int bytesProcessed = (int)(nal - prevPos);
     avPacket.data = m_curPos;
     avPacket.size = bytesProcessed;
     avPacket.pts = m_curPts + m_timeOffset;
@@ -339,7 +339,7 @@ void MPEGStreamReader::fillAspectBySAR(double sar)
 {
     if (m_streamAR == VideoAspectRatio::AR_KEEP_DEFAULT)
     {
-        double ar = getStreamWidth() * sar / (double)getStreamHeight();
+        const double ar = getStreamWidth() * sar / (double)getStreamHeight();
         static constexpr double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
         double minEps = INT_MAX;
         m_streamAR = VideoAspectRatio::AR_KEEP_DEFAULT;

@@ -116,7 +116,7 @@ int METADemuxer::readPacket(AVPacket& avPacket)
             if (allDataDelayed)
                 for (const StreamInfo& si : m_codecInfo)
                 {
-                    auto cReader = dynamic_cast<ContainerToReaderWrapper*>(si.m_dataReader);
+                    const auto cReader = dynamic_cast<ContainerToReaderWrapper*>(si.m_dataReader);
                     if (cReader)
                         cReader->resetDelayedMark();
                 }
@@ -127,7 +127,7 @@ int METADemuxer::readPacket(AVPacket& avPacket)
             {
                 if (m_codecInfo[minDtsIndex].lastReadRez != BufferedFileReader::DATA_EOF2)
                 {
-                    int res = m_codecInfo[minDtsIndex].m_streamReader->readPacket(avPacket);
+                    const int res = m_codecInfo[minDtsIndex].m_streamReader->readPacket(avPacket);
                     m_codecInfo[minDtsIndex].m_lastAVRez = res;
                 }
                 else
@@ -239,12 +239,12 @@ void METADemuxer::openFile(const string& streamName)
 std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum)
 {
     string path = toNativeSeparators(extractFilePath(mplsFileName));
-    size_t tmp = path.find_last_of(getDirSeparator());
+    const size_t tmp = path.find_last_of(getDirSeparator());
     if (tmp == string::npos)
         return string();
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator();
 
-    string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
+    const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
     string m2tsExt;
     if (mplsExt == "mpls")
         m2tsExt = "m2ts";
@@ -257,12 +257,12 @@ std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, st
 std::string METADemuxer::mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum)
 {
     string path = toNativeSeparators(extractFilePath(mplsFileName));
-    size_t tmp = path.find_last_of(getDirSeparator());
+    const size_t tmp = path.find_last_of(getDirSeparator());
     if (tmp == string::npos)
         return string();
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator() + string("SSIF") + getDirSeparator();
 
-    string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
+    const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
     string ssifExt;
     if (mplsExt == "mpls")
         ssifExt = "ssif";
@@ -557,7 +557,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
 
 void METADemuxer::readClose()
 {
-    for (auto& codecInfo : m_codecInfo)
+    for (const auto& codecInfo : m_codecInfo)
     {
         codecInfo.m_dataReader->deleteReader(codecInfo.m_readerID);
         delete codecInfo.m_streamReader;
@@ -716,7 +716,7 @@ void METADemuxer::addTrack(vector<CheckStreamRez>& rez, CheckStreamRez trackRez)
         rez.push_back(trackRez);
 
         trackRez.codecInfo = h264CodecInfo;
-        size_t postfixPos = trackRez.streamDescr.find("3d-pg");
+        const size_t postfixPos = trackRez.streamDescr.find("3d-pg");
         if (postfixPos != string::npos)
             trackRez.streamDescr = trackRez.streamDescr.substr(0, postfixPos);
 
@@ -839,7 +839,7 @@ VideoAspectRatio arNameToCode(const string& arName)
 
 PIPParams::PipCorner pipCornerFromStr(const std::string& value)
 {
-    std::string v = trimStr(strToLowerCase(value));
+    const std::string v = trimStr(strToLowerCase(value));
     if (v == "topleft")
         return PIPParams::PipCorner::TopLeft;
     else if (v == "topright")
@@ -852,7 +852,7 @@ PIPParams::PipCorner pipCornerFromStr(const std::string& value)
 
 int pipScaleFromStr(const std::string& value)
 {
-    std::string v = trimStr(strToLowerCase(value));
+    const std::string v = trimStr(strToLowerCase(value));
     if (v == "1")
         return 1;
     else if (v == "1/2" || v == "0.5")
@@ -1179,12 +1179,12 @@ string METADemuxer::findBluRayFile(const string& streamDir, const string& reques
     string dirName = streamDir.substr(0, streamDir.size() - 1);
     if (strEndWith(strToLowerCase(dirName), "ssif"))
     {
-        size_t pos = dirName.find_last_of(getDirSeparator());
+        const size_t pos = dirName.find_last_of(getDirSeparator());
         if (pos > 0)
             dirName = streamDir.substr(0, pos);
     }
 
-    size_t tmp = dirName.find_last_of(getDirSeparator());
+    const size_t tmp = dirName.find_last_of(getDirSeparator());
     if (tmp != std::string::npos)
     {
         dirName = streamDir.substr(0, tmp + 1);
@@ -1206,7 +1206,7 @@ string METADemuxer::findBluRayFile(const string& streamDir, const string& reques
 
 void METADemuxer::updateReport(bool checkTime)
 {
-    auto currentTime = std::chrono::steady_clock::now();
+    const auto currentTime = std::chrono::steady_clock::now();
     if (!checkTime || currentTime - m_lastReportTime > std::chrono::microseconds(250000))
     {
         uint64_t currentProcessedSize = 0;
@@ -1228,7 +1228,7 @@ void METADemuxer::lineBack()
 {
 #ifdef _WIN32
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    const HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     GetConsoleScreenBufferInfo(consoleOutput, &csbi);
     if (csbi.dwCursorPosition.Y == m_lastProgressY)
     {
@@ -1287,13 +1287,13 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
 {
     rez = 0;
     uint8_t* data = nullptr;
-    auto itr = m_readerInfo.find(readerID);
+    const auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())
         return nullptr;
 
     DemuxerData& demuxerData = itr->second.m_demuxerData;
-    uint32_t pid = itr->second.m_pid;
-    uint32_t nFileBlockSize = demuxerData.m_demuxer->getFileBlockSize();
+    const uint32_t pid = itr->second.m_pid;
+    const uint32_t nFileBlockSize = demuxerData.m_demuxer->getFileBlockSize();
 
     if (demuxerData.m_firstRead)
     {
@@ -1307,11 +1307,11 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
     }
     StreamData& streamData = demuxerData.demuxedData[pid];
 
-    uint32_t lastReadCnt = demuxerData.lastReadCnt[pid];
+    const uint32_t lastReadCnt = demuxerData.lastReadCnt[pid];
     if (lastReadCnt > 0)
     {
         demuxerData.lastReadCnt[pid] = 0;
-        size_t currentSize = streamData.size() - m_readBuffOffset;
+        const size_t currentSize = streamData.size() - m_readBuffOffset;
         assert(currentSize >= lastReadCnt);
         if (currentSize > lastReadCnt)
         {
@@ -1323,7 +1323,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCn
     }
 
     readCnt = (uint32_t)(FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset);
-    DemuxerReadPolicy policy = demuxerData.m_pids[pid];
+    const DemuxerReadPolicy policy = demuxerData.m_pids[pid];
     if ((readCnt > 0 &&
          (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2 ||
           demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2)) ||
@@ -1408,10 +1408,10 @@ uint32_t ContainerToReaderWrapper::createReader(int readBuffOffset)
 
 void ContainerToReaderWrapper::deleteReader(uint32_t readerID)
 {
-    auto itr = m_readerInfo.find(readerID);
+    const auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())
         return;
-    ReaderInfo& ri = itr->second;
+    const ReaderInfo& ri = itr->second;
     ri.m_demuxerData.m_pids.erase(ri.m_pid);
     if (ri.m_demuxerData.m_pids.empty())
     {

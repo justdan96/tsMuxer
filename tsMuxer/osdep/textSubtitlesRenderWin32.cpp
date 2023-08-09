@@ -107,16 +107,16 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
     graphics.SetSmoothingMode(SmoothingModeHighQuality);
     graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
 
-    FontFamily fontFamily(toWide(m_font.m_name).data());
-    StringFormat strformat;
+    const FontFamily fontFamily(toWide(m_font.m_name).data());
+    const StringFormat strformat;
     Gdiplus::GraphicsPath path;
 
-    auto text_wide = toWide(text);
+    const auto text_wide = toWide(text);
     path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, m_font.m_opts & 0xf,
                    static_cast<float>(m_font.m_size), Gdiplus::Point(rect->left, rect->top), &strformat);
 
-    uint8_t alpha = m_font.m_color >> 24;
-    uint8_t outColor = (alpha * 48 + 128) / 255;
+    const uint8_t alpha = m_font.m_color >> 24;
+    const uint8_t outColor = (alpha * 48 + 128) / 255;
     Pen pen(Color(outColor, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&pen, &path);
@@ -125,7 +125,7 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
     penInner.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&penInner, &path);
 
-    SolidBrush brush(Color(m_font.m_color));
+    const SolidBrush brush(Color(m_font.m_color));
     graphics.FillPath(&brush, &path);
 #endif
 }
@@ -135,16 +135,16 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 #ifdef OLD_WIN32_RENDERER
     ::GetTextExtentPoint32(m_dc, text.c_str(), text.size(), mSize);
 #else
-    int opts = m_font.m_opts & 0xf;
-    FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const int opts = m_font.m_opts & 0xf;
+    const FontFamily fontFamily(toWide(m_font.m_name).data());
+    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
-    int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
-    int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
+    const int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
 
-    StringFormat strformat;
+    const StringFormat strformat;
     Gdiplus::GraphicsPath path;
-    auto text_wide = toWide(text);
+    const auto text_wide = toWide(text);
     path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, opts,
                    static_cast<float>(m_font.m_size), Gdiplus::Point(0, 0), &strformat);
     Gdiplus::RectF rect;
@@ -163,12 +163,12 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     ::GetTextMetrics(m_dc, &tm);
     return tm.tmAscent;
 #else
-    int opts = m_font.m_opts & 0xf;
-    Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const int opts = m_font.m_opts & 0xf;
+    const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
-    int lineSpacing = fontFamily.GetLineSpacing(opts);
-    int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacing = fontFamily.GetLineSpacing(opts);
+    const int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
     return lineSpacingPixel;
 #endif
 }
@@ -180,12 +180,12 @@ int TextSubtitlesRenderWin32::getBaseline()
     ::GetTextMetrics(m_dc, &tm);
     return tm.tmAscent;
 #else
-    int opts = m_font.m_opts & 0xf;
-    Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
-    ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const int opts = m_font.m_opts & 0xf;
+    const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
 
-    int descentOffset = fontFamily.GetCellDescent(opts);
-    int descentPixel = (int)(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
+    const int descentOffset = fontFamily.GetCellDescent(opts);
+    const int descentPixel = (int)(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
     return descentPixel;
 #endif
 }

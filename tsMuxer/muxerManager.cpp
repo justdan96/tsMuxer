@@ -67,7 +67,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     bool firstH264Track = true;
     for (const StreamInfo& si : ci)
     {
-        auto h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
+        const auto h264Reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
         if (h264Reader)
         {
             h264Reader->setStartPTS(m_ptsOffset);
@@ -83,7 +83,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
             if (!m_subMuxer)
             {
                 m_subMuxer = m_factory.newInstance(this);
-                auto tsMuxer = dynamic_cast<TSMuxer*>(m_subMuxer);
+                const auto tsMuxer = dynamic_cast<TSMuxer*>(m_subMuxer);
                 if (tsMuxer)
                     tsMuxer->setPtsOffset(m_ptsOffset);
                 m_subMuxer->parseMuxOpt(m_muxOpts);
@@ -94,7 +94,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
             if (!m_mainMuxer)
             {
                 m_mainMuxer = m_factory.newInstance(this);
-                auto tsMuxer = dynamic_cast<TSMuxer*>(m_mainMuxer);
+                const auto tsMuxer = dynamic_cast<TSMuxer*>(m_mainMuxer);
                 if (tsMuxer)
                     tsMuxer->setPtsOffset(m_ptsOffset);
                 m_mainMuxer->parseMuxOpt(m_muxOpts);
@@ -210,7 +210,7 @@ void MuxerManager::doMux(const string& outFileName, FileFactory* fileFactory)
 
     while (true)
     {
-        int avRez = m_metaDemuxer.readPacket(avPacket);
+        const int avRez = m_metaDemuxer.readPacket(avPacket);
 
         if (avRez == BufferedReader::DATA_EOF)
             break;
@@ -249,7 +249,7 @@ void MuxerManager::doMux(const string& outFileName, FileFactory* fileFactory)
 
 int MuxerManager::addStream(const string& codecName, const string& fileName, const map<string, string>& addParams)
 {
-    int rez = m_metaDemuxer.addStream(codecName, fileName, addParams);
+    const int rez = m_metaDemuxer.addStream(codecName, fileName, addParams);
     return rez;
 }
 
@@ -311,7 +311,7 @@ void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len
 
 void MuxerManager::asyncWriteBlock(const WriterData& data)
 {
-    int nMaxWriteQueueSize = 256 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;
+    const int nMaxWriteQueueSize = 256 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;
     while (m_fileWriter->getQueueSize() > nMaxWriteQueueSize)
     {
         Process::sleep(1);
@@ -322,13 +322,13 @@ void MuxerManager::asyncWriteBlock(const WriterData& data)
 int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile)
 {
     assert(m_interleave == 0);
-    int rez = dstFile->write(buff, len);
+    const int rez = dstFile->write(buff, len);
     dstFile->sync();
     return rez;
 }
 void MuxerManager::parseMuxOpt(const string& opts)
 {
-    vector<string> params = splitQuotedStr(opts.c_str(), ' ');
+    const vector<string> params = splitQuotedStr(opts.c_str(), ' ');
     for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
@@ -348,7 +348,7 @@ void MuxerManager::parseMuxOpt(const string& opts)
         {
             uint64_t coeff = 1;
             string postfix;
-            for (auto j : paramPair[1])
+            for (const auto j : paramPair[1])
             {
                 if (!((j >= '0' && j <= '9') || j == '.'))
                     postfix += j;
@@ -417,8 +417,8 @@ int MuxerManager::getDefaultAudioTrackIdx() const
 int MuxerManager::getDefaultSubTrackIdx(SubTrackMode& mode) const
 {
     std::string paramVal;
-    auto idx = seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
-                                [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
+    const auto idx = seekDefaultTrack(m_metaDemuxer.getStreamInfo(), paramVal,
+                                      [](auto&& streamInfo) { return streamInfo.m_codec[0] == 'S'; });
     if (idx != -1)
     {
         if (paramVal == "all")

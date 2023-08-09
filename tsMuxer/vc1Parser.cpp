@@ -23,7 +23,7 @@ static inline int get_unary(BitStreamReader& bitReader, int stop, int len)
 
 static inline int decode012(BitStreamReader& bitReader)
 {
-    int n = bitReader.getBit();
+    const int n = bitReader.getBit();
     if (n == 0)
         return 0;
     else
@@ -36,22 +36,22 @@ void VC1Unit::updateBits(int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
-    int byteOffset = bitOffset % 8;
+    const int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
-    uint8_t* ptr_end = (uint8_t*)bitReader.getBuffer() + (bitOffset + bitLen) / 8;
-    int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
+    const uint8_t* ptr_end = (uint8_t*)bitReader.getBuffer() + (bitOffset + bitLen) / 8;
+    const int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
     if (byteOffset > 0)
     {
-        int prefix = *ptr >> (8 - byteOffset);
+        const int prefix = *ptr >> (8 - byteOffset);
         bitWriter.putBits(byteOffset, prefix);
     }
     bitWriter.putBits(bitLen, value);
 
     if (endBitsPostfix < 8)
     {
-        int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
+        const int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
         bitWriter.putBits(endBitsPostfix, postfix);
     }
     bitWriter.flushBits();
@@ -84,7 +84,7 @@ string VC1SequenceHeader::getStreamDescr()
     rez << " Resolution: " << coded_width << ':' << coded_height;
     rez << (interlace ? 'i' : 'p') << "  ";
     rez << "Frame rate: ";
-    double fps = getFPS();
+    const double fps = getFPS();
     if (fps != 0.0)
         rez << fps;
     else
@@ -96,7 +96,7 @@ double VC1SequenceHeader::getFPS()
 {
     if (time_base_num == 0 || time_base_den == 0)
         return 0;
-    double fps = time_base_den / (double)time_base_num;
+    const double fps = time_base_den / (double)time_base_num;
     // if (fps > 25.0 && pulldown)
     //	fps /= 1.25;
     return fps;
@@ -110,8 +110,8 @@ void VC1SequenceHeader::setFPS(double value)
     if (m_fpsFieldBitVal > 0)
     {
         int nr;
-        int time_scale = (int)(value + 0.5) * 1000;
-        int num_units_in_tick = (int)(time_scale / value + 0.5);
+        const int time_scale = (int)(value + 0.5) * 1000;
+        const int num_units_in_tick = (int)(time_scale / value + 0.5);
         if ((time_scale == 24000 || time_scale == 25000 || time_scale == 30000 || time_scale == 50000 ||
              time_scale == 60000) &&
             (num_units_in_tick == 1000 || num_units_in_tick == 1001))
@@ -144,7 +144,7 @@ void VC1SequenceHeader::setFPS(double value)
             THROW(ERR_VC1_ERR_FPS,
                   "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
         }
-        int dr = (num_units_in_tick == 1000) ? 1 : 2;
+        const int dr = (num_units_in_tick == 1000) ? 1 : 2;
 
         updateBits(m_fpsFieldBitVal, 8, nr);
         updateBits(m_fpsFieldBitVal + 8, 4, dr);
@@ -164,7 +164,7 @@ int VC1SequenceHeader::decode_sequence_header()
             return decode_sequence_header_adv();
         else
         {
-            int res_sm = bitReader.getBits(2);  // reserved
+            const int res_sm = bitReader.getBits(2);  // reserved
             if (res_sm)
             {
                 LTRACE(LT_ERROR, 0, "Reserved RES_SM=" << res_sm << " is forbidden");
@@ -177,8 +177,8 @@ int VC1SequenceHeader::decode_sequence_header()
             LTRACE(LT_WARN, 0, "LOOPFILTER shell not be enabled in simple profile");
         if (bitReader.getBit())  // reserved res_x8
             LTRACE(LT_WARN, 0, "1 for reserved RES_X8 is forbidden");
-        bitReader.skipBit();                  // multires
-        int res_fasttx = bitReader.getBit();  // reserved
+        bitReader.skipBit();                       // multires
+        const int res_fasttx = bitReader.getBit(); // reserved
         if (!res_fasttx)
             LTRACE(LT_WARN, 0, "0 for reserved RES_FASTTX is forbidden");
         if (profile == Profile::SIMPLE && !bitReader.getBit())  // fastuvmc
@@ -269,8 +269,8 @@ if(psf) { //PsF, 6.1.13
             else
             {
                 m_fpsFieldBitVal = bitReader.getBitsCount();
-                int nr = bitReader.getBits(8);
-                int dr = bitReader.getBits(4);
+                const int nr = bitReader.getBits(8);
+                const int dr = bitReader.getBits(4);
                 if (nr > 0 && nr < 8 && dr > 0 && dr < 3)
                 {
                     time_base_num = ff_vc1_fps_dr[dr - 1];
@@ -306,7 +306,7 @@ int VC1SequenceHeader::decode_entry_point()
         bitReader.skipBit();                                             // refdist flag
         bitReader.skipBit();                                             // loop_filter
         bitReader.skipBit();                                             // fastuvmc
-        int extended_mv = bitReader.getBit();
+        const int extended_mv = bitReader.getBit();
         bitReader.skipBits(6);  // dquant, vstransform, overlap, quantizer_mode
 
         if (hrd_param_flag)

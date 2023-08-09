@@ -18,13 +18,13 @@ bool FileReaderData::openStream()
 {
     base_class::openStream();
 
-    bool rez = m_file.open(m_streamName.c_str(), File::ofRead);
+    const bool rez = m_file.open(m_streamName.c_str(), File::ofRead);
 
     if (!rez)
     {
 #ifdef _WIN32
         LPVOID msgBuf = nullptr;
-        DWORD dw = GetLastError();
+        const DWORD dw = GetLastError();
 
         FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, nullptr);
@@ -44,7 +44,7 @@ BufferedFileReader::BufferedFileReader(uint32_t blockSize, uint32_t allocSize, u
 
 bool BufferedFileReader::openStream(uint32_t readerID, const char* streamName, int pid, const CodecInfo* codecInfo)
 {
-    auto data = (FileReaderData*)getReader(readerID);
+    const auto data = (FileReaderData*)getReader(readerID);
 
     if (data == nullptr)
     {
@@ -64,12 +64,12 @@ bool BufferedFileReader::openStream(uint32_t readerID, const char* streamName, i
 }
 bool BufferedFileReader::gotoByte(uint32_t readerID, uint64_t seekDist)
 {
-    auto data = (FileReaderData*)getReader(readerID);
+    const auto data = (FileReaderData*)getReader(readerID);
     if (data)
     {
         data->m_blockSize = m_blockSize - (uint32_t)(seekDist % (uint64_t)m_blockSize);
-        uint64_t seekRez = data->m_file.seek(seekDist + data->m_fileHeaderSize, File::SeekMethod::smBegin);
-        bool rez = seekRez != (uint64_t)-1;
+        const uint64_t seekRez = data->m_file.seek(seekDist + data->m_fileHeaderSize, File::SeekMethod::smBegin);
+        const bool rez = seekRez != (uint64_t)-1;
         if (rez)
         {
             data->m_eof = false;

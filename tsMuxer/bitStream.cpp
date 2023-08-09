@@ -11,22 +11,22 @@ void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
 {
     uint8_t* ptr = (uint8_t*)buffer + bitOffset / 8;
     BitStreamWriter bitWriter{};
-    int byteOffset = bitOffset % 8;
+    const int byteOffset = bitOffset % 8;
     bitWriter.setBuffer(ptr, ptr + (bitLen / 8 + 5));
 
-    uint8_t* ptr_end = (uint8_t*)buffer + (bitOffset + bitLen) / 8;
-    int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
+    const uint8_t* ptr_end = (uint8_t*)buffer + (bitOffset + bitLen) / 8;
+    const int endBitsPostfix = 8 - ((bitOffset + bitLen) % 8);
 
     if (byteOffset > 0)
     {
-        int prefix = *ptr >> (8 - byteOffset);
+        const int prefix = *ptr >> (8 - byteOffset);
         bitWriter.putBits(byteOffset, prefix);
     }
     bitWriter.putBits(bitLen, value);
 
     if (endBitsPostfix < 8)
     {
-        int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
+        const int postfix = *ptr_end & (1 << endBitsPostfix) - 1;
         bitWriter.putBits(endBitsPostfix, postfix);
     }
     bitWriter.flushBits();
@@ -44,7 +44,7 @@ void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
     if (oldBitOffset % 8)
     {
         reader.skipBits(oldBitOffset % 8);
-        int c = 8 - (oldBitOffset % 8);
+        const int c = 8 - (oldBitOffset % 8);
         writer.putBits(c, reader.getBits(c));
         len -= c;
         src++;

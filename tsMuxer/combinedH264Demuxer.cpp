@@ -60,7 +60,7 @@ void CombinedH264Reader::addDataToSecondary(const uint8_t* data, const uint8_t* 
 
 CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_t* data, const uint8_t* dataEnd)
 {
-    auto nalType = (NALUnit::NALType)(*data & 0x1f);
+    const auto nalType = (NALUnit::NALType)(*data & 0x1f);
 
     switch (nalType)
     {
@@ -94,7 +94,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     {
         SEIUnit sei;
         sei.decodeBuffer(data, dataEnd);
-        int rez = sei.isMVCSEI();
+        const int rez = sei.isMVCSEI();
         if (rez == NOT_ENOUGH_BUFFER)
             return ReadState::NeedMoreData;
         else if (rez == 0)
@@ -168,7 +168,7 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
         m_bufferedReader->notify(m_readerID, readedBytes);
     m_lastReadRez = readRez;
     data += MAX_TMP_BUFFER_SIZE;
-    uint8_t* dataEnd = data + readedBytes;
+    const uint8_t* dataEnd = data + readedBytes;
     if (m_tmpBuffer.size() > 0)
     {
         data -= m_tmpBuffer.size();
@@ -180,7 +180,7 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
     const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     while (curNal < dataEnd - 4)
     {
-        int prefixLen = getPrefixLen(curNal, dataEnd);
+        const int prefixLen = getPrefixLen(curNal, dataEnd);
         if (prefixLen != 0)
         {
             m_state = detectStreamByNal(curNal + prefixLen, nextNal);
@@ -245,7 +245,7 @@ uint64_t CombinedH264Demuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
 {
-    auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
+    const auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
@@ -270,7 +270,7 @@ int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acce
     int64_t discardSize = 0;
     while (curNal < dataEnd - 4)
     {
-        int prefixLen = getPrefixLen(curNal, dataEnd);
+        const int prefixLen = getPrefixLen(curNal, dataEnd);
         if (prefixLen != 0)
             m_state = detectStreamByNal(curNal + prefixLen, nextNal);
         if (m_state == ReadState::Both)

@@ -53,8 +53,8 @@ void push_back_raw(std::vector<std::uint8_t>& byteVector, const Container& c, st
 template <typename PODType>
 void push_back_raw(std::vector<std::uint8_t>& byteVector, const PODType& value, std::true_type)
 {
-    auto start = reinterpret_cast<const std::uint8_t*>(&value);
-    auto finish = start + sizeof(value);
+    const auto start = reinterpret_cast<const std::uint8_t*>(&value);
+    const auto finish = start + sizeof(value);
     std::copy(start, finish, std::back_inserter(byteVector));
 }
 template <typename T>
@@ -233,16 +233,16 @@ bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* fil
     {
         num = isV3() ? BDMV_VersionNumber::Version3 : BDMV_VersionNumber::Version2;
     }
-    auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
+    const auto defaultAudioIdx = muxer.getDefaultAudioTrackIdx();
     MuxerManager::SubTrackMode mode;
-    auto defaultSubIdx = muxer.getDefaultSubTrackIdx(mode);
+    const auto defaultSubIdx = muxer.getDefaultSubTrackIdx(mode);
     if (defaultAudioIdx != -1 || defaultSubIdx != -1)
     {
         auto&& navCmds = movieObjects[0].navigationCommands;
         movieObjects[0].navigationCommands.insert(std::begin(navCmds) + 2,
                                                   makeDefaultTrackCommand(defaultAudioIdx, defaultSubIdx, mode));
     }
-    auto objectData = makeBdMovieObjectData(num, movieObjects);
+    const auto objectData = makeBdMovieObjectData(num, movieObjects);
     if (!file->open((prefix + "BDMV/MovieObject.bdmv").c_str(), File::ofWrite))
     {
         delete file;
@@ -352,7 +352,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
                                     bool stereoMode)
 {
     int fileSize = sizeof(bdIndexData);
-    string prefix = m_isoWriter ? "" : m_dstPath;
+    const string prefix = m_isoWriter ? "" : m_dstPath;
     AbstractOutputStream* file;
     if (m_isoWriter)
         file = m_isoWriter->createFile();
@@ -679,16 +679,16 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
 
 string BlurayHelper::m2tsFileName(int num)
 {
-    string prefix = m_isoWriter ? "" : m_dstPath;
-    char separator = m_isoWriter ? '/' : getDirSeparator();
+    const string prefix = m_isoWriter ? "" : m_dstPath;
+    const char separator = m_isoWriter ? '/' : getDirSeparator();
     return prefix + string("BDMV") + separator + string("STREAM") + separator + strPadLeft(int32ToStr(num), 5, '0') +
            string(".m2ts");
 }
 
 string BlurayHelper::ssifFileName(int num)
 {
-    string prefix = m_isoWriter ? "" : m_dstPath;
-    char separator = m_isoWriter ? '/' : getDirSeparator();
+    const string prefix = m_isoWriter ? "" : m_dstPath;
+    const char separator = m_isoWriter ? '/' : getDirSeparator();
     return prefix + string("BDMV") + separator + string("STREAM") + separator + string("SSIF") + separator +
            strPadLeft(int32ToStr(num), 5, '0') + string(".ssif");
 }

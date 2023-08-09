@@ -103,10 +103,10 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
     uint32_t readedBytes = 0;
     int readRez = 0;
     uint8_t* dst = binary;
-    uint8_t* dstEnd = dst + size;
+    const uint8_t* dstEnd = dst + size;
     if (m_curPos < m_bufEnd)
     {
-        int copyLen = min((int)(m_bufEnd - m_curPos), size);
+        const int copyLen = min((int)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -121,7 +121,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
 
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        int copyLen = min((int)(m_bufEnd - m_curPos), size);
+        const int copyLen = min((int)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -140,7 +140,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
     uint64_t skipLeft = size;
     if (m_curPos < m_bufEnd)
     {
-        uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
+        const uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
         skipLeft -= copyLen;
         m_curPos += copyLen;
         m_processedBytes += copyLen;
@@ -152,7 +152,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
             m_bufferedReader->notify(m_readerID, readedBytes);
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
+        const uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
         m_curPos += copyLen;
         m_processedBytes += copyLen;
         skipLeft -= copyLen;
@@ -163,7 +163,7 @@ void IOContextDemuxer::skip_bytes(uint64_t size)
 
 void IOContextDemuxer::setFileIterator(FileNameIterator* itr)
 {
-    auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
+    const auto br = dynamic_cast<BufferedReader*>(m_bufferedReader);
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
