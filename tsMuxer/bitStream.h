@@ -226,10 +226,10 @@ class BitStreamWriter : public BitStream
     unsigned m_bitWrited;
 };
 
-void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value);
-void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value);
+void updateBits(const BitStreamReader& bitReader, const int bitOffset, const int bitLen, const int value);
+void updateBits(uint8_t* buffer, const int bitOffset, const int bitLen, const int value);
 
 // move len bits from oldBitOffset position to newBitOffset
-void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len);
+void moveBits(uint8_t* buffer, const int oldBitOffset, const int newBitOffset, const int len);
 
 #endif

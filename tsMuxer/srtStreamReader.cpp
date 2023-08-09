@@ -33,7 +33,7 @@ SRTStreamReader::~SRTStreamReader()
 
 void SRTStreamReader::setAnimation(const text_subtitles::TextAnimation& animation) { m_animation = animation; }
 
-void SRTStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
+void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
 {
     m_lastBlock = lastBlock;
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
@@ -48,7 +48,7 @@ void SRTStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
         memmove(&m_tmpBuffer[0], dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
 }
 
-bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLen)
+bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, const int len, int& prefixLen)
 {
     prefixLen = 0;
     if (len < 4)
@@ -108,7 +108,7 @@ bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, int len, int& prefixLe
     return true;
 }
 
-int SRTStreamReader::parseText(uint8_t* dataStart, int len)
+int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
 {
     int prefixLen = 0;
     if (m_srcFormat == UtfConverter::SourceFormat::sfUnknown)
@@ -280,8 +280,8 @@ bool SRTStreamReader::parseTime(const string& text)
     return false;
 }
 
-CheckStreamRez SRTStreamReader::checkStream(uint8_t* buffer, int len, ContainerType containerType,
-                                            int containerDataType, int containerStreamIndex)
+CheckStreamRez SRTStreamReader::checkStream(uint8_t* buffer, const int len, const ContainerType containerType,
+                                            const int containerDataType, int containerStreamIndex)
 {
     CheckStreamRez rez;
     if (((containerType == ContainerType::ctMKV || containerType == ContainerType::ctMOV) &&

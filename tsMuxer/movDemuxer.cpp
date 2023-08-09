@@ -159,7 +159,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
     {
         isAAC = false;
     }
-    void setPrivData(uint8_t* buff, int size) override
+    void setPrivData(uint8_t* buff, const int size) override
     {
         m_buff = buff;
         m_size = size;
@@ -172,7 +172,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
         m_aacRaw.m_layer = 0;
         m_aacRaw.m_rdb = 0;
     }
-    void extractData(AVPacket* pkt, uint8_t* buff, int size) override
+    void extractData(AVPacket* pkt, uint8_t* buff, const int size) override
     {
         uint8_t* dst = pkt->data;
         const uint8_t* srcEnd = buff + size;
@@ -196,7 +196,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
             buff += frameSize;
         }
     }
-    int newBufferSize(uint8_t* buff, int size) override
+    int newBufferSize(uint8_t* buff, const int size) override
     {
         int left = size;
         int i = 0;
@@ -277,7 +277,8 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             }
         }
     }
-    int getNalSize(uint8_t* buff)
+
+    int getNalSize(uint8_t* buff) const
     {
         if (nal_length_size == 1)
             return buff[0];
@@ -291,7 +292,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size);
     }
 
-    void extractData(AVPacket* pkt, uint8_t* buff, int size) override
+    void extractData(AVPacket* pkt, uint8_t* buff, const int size) override
     {
         uint8_t* dst = pkt->data;
         if (!spsPpsList.empty())
@@ -323,7 +324,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         }
     }
 
-    int newBufferSize(uint8_t* buff, int size) override
+    int newBufferSize(uint8_t* buff, const int size) override
     {
         const uint8_t* end = buff + size;
         size_t nalCnt = 0;
@@ -359,7 +360,7 @@ class MovParsedH265TrackData : public MovParsedH264TrackData
    public:
     MovParsedH265TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : MovParsedH264TrackData(demuxer, sc) {}
 
-    void setPrivData(uint8_t* buff, int size) override
+    void setPrivData(uint8_t* buff, const int size) override
     {
         spsPpsList = hevc_extract_priv_data(buff, size, &nal_length_size);
     }
@@ -370,7 +371,7 @@ class MovParsedH266TrackData : public MovParsedH264TrackData
    public:
     MovParsedH266TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : MovParsedH264TrackData(demuxer, sc) {}
 
-    void setPrivData(uint8_t* buff, int size) override
+    void setPrivData(uint8_t* buff, const int size) override
     {
         spsPpsList = vvc_extract_priv_data(buff, size, &nal_length_size);
     }
@@ -402,7 +403,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         return m_sc->stts_data[sttsPos].duration * 1000 / m_sc->time_scale;
     }
 
-    void setPrivData(uint8_t* buff, int size) override
+    void setPrivData(uint8_t* buff, const int size) override
     {
         m_buff = buff;
         m_size = size;
@@ -504,7 +505,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         m_timeOffset = endTime;
     }
 
-    int newBufferSize(uint8_t* buff, int size) override
+    int newBufferSize(uint8_t* buff, const int size) override
     {
         const int64_t stored_sttsCnt = sttsCnt;
         const int64_t stored_sttsPos = sttsPos;
@@ -1144,7 +1145,7 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_trak(MOVAtom atom)
+int MovDemuxer::mov_read_trak(const MOVAtom atom)
 {
     const auto sc = new MOVStreamContext();
     Track* st = tracks[num_tracks] = sc;
@@ -1259,7 +1260,7 @@ int MovDemuxer::mov_read_stss(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_extradata(MOVAtom atom)
+int MovDemuxer::mov_read_extradata(const MOVAtom atom)
 {
     if (num_tracks < 1)  // will happen with jp2 files
         return 0;
@@ -1287,7 +1288,7 @@ int MovDemuxer::mov_read_extradata(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_moov(MOVAtom atom)
+int MovDemuxer::mov_read_moov(const MOVAtom atom)
 {
     if (mov_read_default(atom) < 0)
         return -1;
@@ -1295,7 +1296,7 @@ int MovDemuxer::mov_read_moov(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_moof(MOVAtom atom)
+int MovDemuxer::mov_read_moof(const MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
     found_moof = true;
@@ -1544,7 +1545,7 @@ if (bits_per_sample) {
     return 0;
 }
 
-int MovDemuxer::mov_read_stco(MOVAtom atom)
+int MovDemuxer::mov_read_stco(const MOVAtom atom)
 {
     const auto sc = (MOVStreamContext*)tracks[num_tracks - 1];
 
@@ -1568,7 +1569,7 @@ int MovDemuxer::mov_read_stco(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_glbl(MOVAtom atom)
+int MovDemuxer::mov_read_glbl(const MOVAtom atom)
 {
     if ((uint64_t)atom.size > (1 << 30))
         return -1;
@@ -1582,7 +1583,7 @@ int MovDemuxer::mov_read_glbl(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_hdlr(MOVAtom atom)
+int MovDemuxer::mov_read_hdlr(const MOVAtom atom)
 {
     get_byte();  // version
     get_be24();  // flags
@@ -1601,7 +1602,7 @@ int MovDemuxer::mov_read_hdlr(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_ftyp(MOVAtom atom)
+int MovDemuxer::mov_read_ftyp(const MOVAtom atom)
 {
     const uint32_t type = get_le32();
     if (type != MKTAG('q', 't', ' ', ' '))
@@ -1704,7 +1705,7 @@ int MovDemuxer::mov_read_stsc(MOVAtom atom)
 
 int MovDemuxer::mov_read_smi(MOVAtom atom) { return 0; }
 
-int MovDemuxer::mov_read_wave(MOVAtom atom)
+int MovDemuxer::mov_read_wave(const MOVAtom atom)
 {
     if ((uint64_t)atom.size > (1 << 30))
         return -1;
@@ -1756,7 +1757,7 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
     return 0;
 }
 
-double MovDemuxer::getTrackFps(uint32_t trackId)
+double MovDemuxer::getTrackFps(const uint32_t trackId)
 {
     const auto st = (MOVStreamContext*)tracks[trackId - 1];
     return st->fps;

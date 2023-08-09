@@ -71,7 +71,7 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
     }
 }
 
-void AACCodec::buildADTSHeader(uint8_t* buffer, int frameSize)
+void AACCodec::buildADTSHeader(uint8_t* buffer, const int frameSize)
 {
     BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + AAC_HEADER_LEN);
@@ -111,7 +111,7 @@ void AACCodec::buildADTSHeader(uint8_t* buffer, int frameSize)
     writer.flushBits();
 }
 
-void AACCodec::readConfig(uint8_t* buff, int size)
+void AACCodec::readConfig(uint8_t* buff, const int size)
 {
     BitStreamReader reader{};
     reader.setBuffer(buff, buff + size);

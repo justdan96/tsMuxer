@@ -107,7 +107,7 @@ enum class DiskType
 
 uint16_t AV_RB16(const uint8_t* buffer);
 uint32_t AV_RB24(const uint8_t* buffer);
-uint32_t AV_RB32(const uint8_t* buffer);
+uint32_t AV_RB32(uint8_t* buffer);
 void AV_WB16(uint8_t* buffer, uint16_t value);
 void AV_WB24(uint8_t* buffer, uint32_t value);
 void AV_WB32(uint8_t* buffer, uint32_t value);

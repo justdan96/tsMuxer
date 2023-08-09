@@ -63,7 +63,7 @@ struct VvcUnit
    protected:
     unsigned extractUEGolombCode();
     int extractSEGolombCode();
-    void updateBits(int bitOffset, int bitLen, int value);
+    void updateBits(int bitOffset, int bitLen, int value) const;
     bool dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag);
     bool general_timing_hrd_parameters(VvcHrdUnit& m_hrd);
     bool ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal);

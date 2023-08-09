@@ -18,7 +18,7 @@ void throwFileError()
     throw std::runtime_error(str);
 }
 
-void makeWin32OpenFlags(unsigned int oflag, DWORD* const dwDesiredAccess, DWORD* const dwCreationDisposition,
+void makeWin32OpenFlags(const unsigned int oflag, DWORD* const dwDesiredAccess, DWORD* const dwCreationDisposition,
                         DWORD* const dwShareMode)
 {
     *dwDesiredAccess = 0;
@@ -47,7 +47,7 @@ void makeWin32OpenFlags(unsigned int oflag, DWORD* const dwDesiredAccess, DWORD*
 
 File::File() : AbstractOutputStream(), m_impl(INVALID_HANDLE_VALUE), m_name(""), m_pos(0) {}
 
-File::File(const char* fName, unsigned int oflag, unsigned int systemDependentFlags) /* throw ( std::runtime_error ) */
+File::File(const char* fName, const unsigned int oflag, unsigned int systemDependentFlags) /* throw ( std::runtime_error ) */
     : AbstractOutputStream(), m_impl(INVALID_HANDLE_VALUE), m_name(fName), m_pos(0)
 {
     DWORD dwDesiredAccess = 0;
@@ -85,7 +85,7 @@ File::~File()
         close();
 }
 
-bool File::open(const char* fName, unsigned int oflag, unsigned int systemDependentFlags)
+bool File::open(const char* fName, const unsigned int oflag, unsigned int systemDependentFlags)
 {
     m_name = fName;
     m_pos = 0;
@@ -134,7 +134,7 @@ bool File::close()
     return res != 0;
 }
 
-int File::read(void* buffer, uint32_t count) const
+int File::read(void* buffer, const uint32_t count) const
 {
     if (!isOpen())
         return -1;
@@ -149,7 +149,7 @@ int File::read(void* buffer, uint32_t count) const
     return (int)bytesRead;
 }
 
-int File::write(const void* buffer, uint32_t count)
+int File::write(const void* buffer, const uint32_t count)
 {
     if (!isOpen())
         return -1;
@@ -184,7 +184,7 @@ bool File::size(uint64_t* const fileSize) const
     return true;
 }
 
-uint64_t File::seek(int64_t offset, SeekMethod whence)
+uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
         return (uint64_t)-1;
@@ -215,7 +215,7 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     return m_pos;
 }
 
-bool File::truncate(uint64_t newFileSize)
+bool File::truncate(const uint64_t newFileSize) const
 {
     const LONG distanceToMoveLow = (uint32_t)(newFileSize & 0xffffffff);
     LONG distanceToMoveHigh = (uint32_t)((newFileSize & 0xffffffff00000000ull) >> 32);

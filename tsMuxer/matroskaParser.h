@@ -223,8 +223,8 @@ class ParsedH264TrackData : public ParsedTrackPrivData
 
     std::vector<std::vector<uint8_t>> m_spsPpsList;
     static void writeNalHeader(uint8_t*& dst);
-    size_t getSPSPPSLen();
-    int writeSPSPPS(uint8_t* dst);
+    size_t getSPSPPSLen() const;
+    int writeSPSPPS(uint8_t* dst) const;
     virtual bool spsppsExists(uint8_t* buff, int size);
 };
 

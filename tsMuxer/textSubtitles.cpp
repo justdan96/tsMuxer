@@ -29,7 +29,7 @@ static constexpr int PG_BUFFER_SIZE = 1024 * 1024 * 2;
 // const RGBQUAD RESERVED_BACKGROUND_COLOR = {0x00, 0x00, 0x00, 0x00};
 
 ///////////////////////////////////////////
-TextToPGSConverter::TextToPGSConverter(bool sourceIsText)
+TextToPGSConverter::TextToPGSConverter(const bool sourceIsText)
     : /* TextSubtitlesRenderWin32(), */
       m_rleLen(0),
       m_composition_number(0),
@@ -68,7 +68,7 @@ TextToPGSConverter::~TextToPGSConverter()
     delete m_textRender;
 }
 
-void TextToPGSConverter::enlargeCrop(int width, int height, int* newWidth, int* newHeight)
+void TextToPGSConverter::enlargeCrop(const int width, const int height, int* newWidth, int* newHeight) const
 {
     *newWidth = width;
     *newHeight = height;
@@ -94,7 +94,7 @@ void TextToPGSConverter::enlargeCrop(int width, int height, int* newWidth, int* 
     }
 }
 
-void TextToPGSConverter::setVideoInfo(int width, int height, double fps)
+void TextToPGSConverter::setVideoInfo(const int width, const int height, const double fps)
 {
     enlargeCrop(width, height, &m_videoWidth, &m_videoHeight);
     // m_bottomOffset += m_videoHeight - height;
@@ -107,14 +107,14 @@ void TextToPGSConverter::setVideoInfo(int width, int height, double fps)
     m_renderedData = new uint8_t[(m_videoWidth + 16) * m_videoHeight];
 }
 
-double TextToPGSConverter::alignToGrid(double value)
+double TextToPGSConverter::alignToGrid(const double value) const
 {
     const auto frameCnt =
         (int64_t)(value * m_videoFps + 0.5);  // how many frames have passed until this moment in time (rounded)
     return frameCnt / m_videoFps;
 }
 
-uint8_t TextToPGSConverter::color32To8(uint32_t* buff, uint32_t colorMask)
+uint8_t TextToPGSConverter::color32To8(uint32_t* buff, const uint32_t colorMask)
 {
     // if (*buff == 0) // RESERVED_BACKGROUND_COLOR
     //	return 0xff;
@@ -143,7 +143,7 @@ uint8_t TextToPGSConverter::color32To8(uint32_t* buff, uint32_t colorMask)
     }
 }
 
-int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask)
+int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, const uint32_t colorMask)
 {
     int rez = 1;
     if (*pos == 0)
@@ -196,7 +196,7 @@ RGBQUAD TextToPGSConverter::YUVAToRGBA(const YUVQuad& yuv)
     return rez;
 }
 
-void TextToPGSConverter::reduceColors(uint8_t mask)
+void TextToPGSConverter::reduceColors(uint8_t mask) const
 {
     mask = ~mask;
     const uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
@@ -205,7 +205,7 @@ void TextToPGSConverter::reduceColors(uint8_t mask)
     for (; dst < end; ++dst) *dst &= val;
 }
 
-bool TextToPGSConverter::rlePack(uint32_t colorMask)
+bool TextToPGSConverter::rlePack(const uint32_t colorMask)
 {
     try
     {
@@ -317,7 +317,7 @@ int TextToPGSConverter::maxLine() const { return m_maxLine; }
 
 int TextToPGSConverter::minLine() const { return m_minLine; }
 
-TextToPGSConverter::Palette TextToPGSConverter::buildPalette(float opacity)
+TextToPGSConverter::Palette TextToPGSConverter::buildPalette(const float opacity)
 {
     if (opacity == 1.0)
         return m_paletteByColor;
@@ -327,7 +327,7 @@ TextToPGSConverter::Palette TextToPGSConverter::buildPalette(float opacity)
     return result;
 }
 
-float toCurve(float value)
+float toCurve(const float value)
 {
     // float result = pow(value, 1.5f);
     const float result = value * sqrt(value);  // same as pow 1.5, reduce binary size
@@ -447,8 +447,8 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     return m_pgsBuffer;
 }
 
-long TextToPGSConverter::composePresentationSegment(uint8_t* buff, CompositionMode mode, int64_t pts, int64_t dts,
-                                                    int top, bool needPGHeader, bool forced)
+long TextToPGSConverter::composePresentationSegment(uint8_t* buff, const CompositionMode mode, const int64_t pts, const int64_t dts,
+                                                    const int top, const bool needPGHeader, const bool forced)
 {
     uint8_t* curPos = buff;
     if (needPGHeader)
@@ -483,7 +483,7 @@ long TextToPGSConverter::composePresentationSegment(uint8_t* buff, CompositionMo
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff)
+long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff) const
 {
     uint8_t* curPos = buff;
     AV_WB16(curPos, m_videoWidth);
@@ -494,8 +494,8 @@ long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff)
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, int64_t pts, int64_t dts, int top, int height,
-                                                 bool needPgHeader)
+long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int top, const int height,
+                                                 const bool needPgHeader) const
 {
     uint8_t* curPos = buff;
     if (needPgHeader)
@@ -509,7 +509,7 @@ long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, int64_t pts, int
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeCompositionDescriptor(uint8_t* buff, uint16_t number, uint8_t state)
+long TextToPGSConverter::composeCompositionDescriptor(uint8_t* buff, const uint16_t number, const uint8_t state)
 {
     uint8_t* curPos = buff;
     AV_WB16(curPos, number);
@@ -518,7 +518,7 @@ long TextToPGSConverter::composeCompositionDescriptor(uint8_t* buff, uint16_t nu
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeWindow(uint8_t* buff, int top, int height)
+long TextToPGSConverter::composeWindow(uint8_t* buff, const int top, const int height) const
 {
     uint8_t* curPos = buff;
     *curPos++ = 0;  // window ID
@@ -533,8 +533,8 @@ long TextToPGSConverter::composeWindow(uint8_t* buff, int top, int height)
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_t* buff, int64_t pts, int64_t dts,
-                                                  bool needPgHeader)
+long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_t* buff, const int64_t pts, const int64_t dts,
+                                                  const bool needPgHeader) const
 {
     uint8_t* curPos = buff;
     if (needPgHeader)
@@ -556,8 +556,8 @@ long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, int64_t pts, int64_t dts, int firstLine, int lastLine,
-                                                 bool needPgHeader)
+long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int firstLine, const int lastLine,
+                                                 const bool needPgHeader) const
 {
     std::vector<uint8_t*> seqPos;
 
@@ -610,7 +610,7 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, int64_t pts, int
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::composeEnd(uint8_t* buff, int64_t pts, int64_t dts, bool needPgHeader)
+long TextToPGSConverter::composeEnd(uint8_t* buff, const int64_t pts, const int64_t dts, const bool needPgHeader)
 {
     uint8_t* curPos = buff;
     if (needPgHeader)
@@ -622,7 +622,7 @@ long TextToPGSConverter::composeEnd(uint8_t* buff, int64_t pts, int64_t dts, boo
     return (long)(curPos - buff);
 }
 
-long TextToPGSConverter::writePGHeader(uint8_t* buff, int64_t pts, int64_t dts)
+long TextToPGSConverter::writePGHeader(uint8_t* buff, const int64_t pts, int64_t dts)
 {
     if (dts > pts)
         dts = pts;

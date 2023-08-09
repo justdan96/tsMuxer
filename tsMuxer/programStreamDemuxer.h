@@ -54,7 +54,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     bool m_lpcpHeaderAdded[16];
 
    private:
-    bool isVideoPID(uint32_t pid);
+    bool isVideoPID(uint32_t pid) const;
     int mpegps_psm_parse(uint8_t* buff, uint8_t* end);
     uint8_t processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
 };

@@ -48,7 +48,7 @@ unsigned short crc16(unsigned char *pcBlock, unsigned short len)
     return crc;
 }
 
-void writeDescriptorTag(uint8_t *buffer, DescriptorTag tag, uint32_t tagLocation)
+void writeDescriptorTag(uint8_t *buffer, DescriptorTag tag, const uint32_t tagLocation)
 {
     const auto buff16 = (uint16_t *)buffer;
     const auto buff32 = (uint32_t *)buffer;
@@ -73,7 +73,7 @@ std::string toIsoSeparator(const std::string &path)
     return result;
 }
 
-void calcDescriptorCRC(uint8_t *buffer, uint16_t len)
+void calcDescriptorCRC(uint8_t *buffer, const uint16_t len)
 {
     const auto buff16 = (uint16_t *)buffer;
 
@@ -87,7 +87,7 @@ void calcDescriptorCRC(uint8_t *buffer, uint16_t len)
     buffer[4] = sum;
 }
 
-void writeTimestamp(uint8_t *buffer, time_t time)
+void writeTimestamp(uint8_t *buffer, const time_t time)
 {
     const auto buff16 = (uint16_t *)buffer;
 
@@ -119,7 +119,7 @@ bool canUse8BitUnicode(const std::string &utf8Str)
     return rv;
 }
 
-std::vector<std::uint8_t> serializeDString(const std::string &str, size_t fieldLen)
+std::vector<std::uint8_t> serializeDString(const std::string &str, const size_t fieldLen)
 {
     if (str.empty())
     {
@@ -173,21 +173,21 @@ std::vector<std::uint8_t> serializeDString(const std::string &str, size_t fieldL
     return rv;
 }
 
-void writeDString(uint8_t *buffer, const char *value, int64_t fieldLen)
+void writeDString(uint8_t *buffer, const char *value, const int64_t fieldLen)
 {
     auto content = serializeDString(value, fieldLen);
     assert(content.size() == fieldLen);
     std::copy(std::begin(content), std::end(content), buffer);
 }
 
-void writeUDFString(uint8_t *buffer, const char *str, int len)
+void writeUDFString(uint8_t *buffer, const char *str, const int len)
 {
     strcpy((char *)buffer + 1, str);
     buffer[len - 8] = 0x50;  // UDF suffix
     buffer[len - 7] = 0x02;  // UDF suffix
 }
 
-void writeLongAD(uint8_t *buffer, uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id)
+void writeLongAD(uint8_t *buffer, const uint32_t lenBytes, const uint32_t pos, const uint16_t partition, const uint32_t id)
 {
     const auto buff32 = (uint32_t *)buffer;
     const auto buff16 = (uint16_t *)buffer;
@@ -204,44 +204,44 @@ void writeLongAD(uint8_t *buffer, uint32_t lenBytes, uint32_t pos, uint16_t part
 
 ByteFileWriter::ByteFileWriter() : m_buffer(nullptr), m_bufferEnd(nullptr), m_curPos(nullptr), m_tagPos(nullptr) {}
 
-void ByteFileWriter::setBuffer(uint8_t *buffer, int len)
+void ByteFileWriter::setBuffer(uint8_t *buffer, const int len)
 {
     m_buffer = buffer;
     m_bufferEnd = buffer + len;
     m_curPos = buffer;
 }
 
-void ByteFileWriter::writeLE8(uint8_t value) { *m_curPos++ = value; }
+void ByteFileWriter::writeLE8(const uint8_t value) { *m_curPos++ = value; }
 
-void ByteFileWriter::writeLE16(uint16_t value)
+void ByteFileWriter::writeLE16(const uint16_t value)
 {
     const auto pos16 = (uint16_t *)m_curPos;
     *pos16 = value;
     m_curPos += 2;
 }
 
-void ByteFileWriter::writeLE32(uint16_t value)
+void ByteFileWriter::writeLE32(const uint16_t value)
 {
     const auto pos32 = (uint32_t *)m_curPos;
     *pos32 = value;
     m_curPos += 4;
 }
 
-void ByteFileWriter::writeDescriptorTag(DescriptorTag tag, uint32_t tagLocation)
+void ByteFileWriter::writeDescriptorTag(const DescriptorTag tag, const uint32_t tagLocation)
 {
     ::writeDescriptorTag(m_curPos, tag, tagLocation);
     m_tagPos = m_curPos;
     m_curPos += 16;
 }
 
-void ByteFileWriter::closeDescriptorTag(int dataSize)
+void ByteFileWriter::closeDescriptorTag(int dataSize) const
 {
     if (dataSize == -1)
         dataSize = (uint16_t)(m_curPos - m_tagPos);
     calcDescriptorCRC(m_tagPos, dataSize);
 }
 
-void ByteFileWriter::writeIcbTag(uint8_t fileType)
+void ByteFileWriter::writeIcbTag(const uint8_t fileType)
 {
     const auto buff32 = (uint32_t *)m_curPos;
     const auto buff16 = (uint16_t *)m_curPos;
@@ -259,13 +259,13 @@ void ByteFileWriter::writeIcbTag(uint8_t fileType)
     m_curPos += 20;
 }
 
-void ByteFileWriter::writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id)
+void ByteFileWriter::writeLongAD(const uint32_t lenBytes, const uint32_t pos, const uint16_t partition, const uint32_t id)
 {
     ::writeLongAD(m_curPos, lenBytes, pos, partition, id);
     m_curPos += 16;
 }
 
-void ByteFileWriter::writeDString(const char *value, int64_t len)
+void ByteFileWriter::writeDString(const char *value, const int64_t len)
 {
     int64_t writeLen = len;
     if (writeLen == -1)
@@ -274,9 +274,9 @@ void ByteFileWriter::writeDString(const char *value, int64_t len)
     m_curPos += writeLen;
 }
 
-void ByteFileWriter::writeDString(const std::string &value, int64_t len) { writeDString(value.c_str(), len); }
+void ByteFileWriter::writeDString(const std::string &value, const int64_t len) { writeDString(value.c_str(), len); }
 
-void ByteFileWriter::doPadding(int padSize)
+void ByteFileWriter::doPadding(const int padSize)
 {
     m_curPos--;
     int rest = (m_curPos - m_buffer) % padSize;
@@ -287,21 +287,21 @@ void ByteFileWriter::doPadding(int padSize)
     }
 }
 
-void ByteFileWriter::writeCharSpecString(const char *value, int len)
+void ByteFileWriter::writeCharSpecString(const char *value, const int len)
 {
     strcpy((char *)m_curPos + 1, value);
     m_curPos += len;
 }
 
-void ByteFileWriter::writeUDFString(const char *value, int len)
+void ByteFileWriter::writeUDFString(const char *value, const int len)
 {
     ::writeUDFString(m_curPos, value, len);
     m_curPos += len;
 }
 
-void ByteFileWriter::skipBytes(int value) { m_curPos += value; }
+void ByteFileWriter::skipBytes(const int value) { m_curPos += value; }
 
-void ByteFileWriter::writeTimestamp(time_t time)
+void ByteFileWriter::writeTimestamp(const time_t time)
 {
     ::writeTimestamp(m_curPos, time);
     m_curPos += 12;
@@ -311,7 +311,7 @@ int64_t ByteFileWriter::size() const { return m_curPos - m_buffer; }
 
 // ------------------------------ FileEntryInfo ------------------------------------
 
-FileEntryInfo::FileEntryInfo(IsoWriter *owner, FileEntryInfo *parent, uint32_t objectId, FileTypes fileType)
+FileEntryInfo::FileEntryInfo(IsoWriter *owner, FileEntryInfo *parent, const uint32_t objectId, const FileTypes fileType)
     : m_owner(owner),
       m_parent(parent),
       m_sectorNum(0),
@@ -347,7 +347,7 @@ void FileEntryInfo::addSubDir(FileEntryInfo *dir) { m_subDirs.push_back(dir); }
 
 void FileEntryInfo::addFile(FileEntryInfo *file) { m_files.push_back(file); }
 
-void FileEntryInfo::writeEntity(ByteFileWriter &writer, FileEntryInfo *subDir)
+void FileEntryInfo::writeEntity(ByteFileWriter &writer, FileEntryInfo *subDir) const
 {
     const bool isSystemFile = (m_objectId == 0);
 
@@ -373,7 +373,7 @@ void FileEntryInfo::serialize()
         serializeDir();
 }
 
-int FileEntryInfo::allocateEntity(int sectorNum)
+int FileEntryInfo::allocateEntity(const int sectorNum)
 {
     m_sectorNum = sectorNum;
     if (!isFile())
@@ -395,7 +395,7 @@ void FileEntryInfo::serializeFile()
     assert(writed == m_sectorsUsed);
 }
 
-void FileEntryInfo::serializeDir()
+void FileEntryInfo::serializeDir() const
 {
     uint8_t buffer[SECTOR_SIZE];
 
@@ -444,7 +444,7 @@ void FileEntryInfo::addExtent(const Extent &extent)
     m_fileSize += extent.size;
 }
 
-int FileEntryInfo::write(const uint8_t *data, uint32_t len)
+int FileEntryInfo::write(const uint8_t *data, const uint32_t len)
 {
     if (m_owner->m_lastWritedObjectID != m_objectId)
     {
@@ -511,7 +511,7 @@ void FileEntryInfo::close()
     }
 }
 
-void FileEntryInfo::setSubMode(bool value) { m_subMode = value; }
+void FileEntryInfo::setSubMode(const bool value) { m_subMode = value; }
 
 FileEntryInfo *FileEntryInfo::subDirByName(const std::string &name) const
 {
@@ -535,7 +535,7 @@ FileEntryInfo *FileEntryInfo::fileByName(const std::string &name) const
 
 // --------------------------------- ISOFile -----------------------------------
 
-int ISOFile::write(const void *data, uint32_t len)
+int ISOFile::write(const void *data, const uint32_t len)
 {
     if (m_entry)
         return m_entry->write((const uint8_t *)data, len);
@@ -562,7 +562,7 @@ bool ISOFile::close()
     return true;
 }
 
-void ISOFile::setSubMode(bool value)
+void ISOFile::setSubMode(const bool value) const
 {
     if (m_entry)
         m_entry->setSubMode(value);
@@ -600,7 +600,7 @@ IsoWriter::~IsoWriter()
     delete m_systemStreamDir;
 }
 
-void IsoWriter::setMetaPartitionSize(int size) { m_metadataFileLen = roundUp(size, ALLOC_BLOCK_SIZE); }
+void IsoWriter::setMetaPartitionSize(const int size) { m_metadataFileLen = roundUp(size, ALLOC_BLOCK_SIZE); }
 
 void IsoWriter::setVolumeLabel(const std::string &value)
 {
@@ -609,7 +609,7 @@ void IsoWriter::setVolumeLabel(const std::string &value)
         m_volumeLabel = "Blu-Ray";
 }
 
-bool IsoWriter::open(const std::string &fileName, int64_t diskSize, int extraISOBlocks)
+bool IsoWriter::open(const std::string &fileName, const int64_t diskSize, const int extraISOBlocks)
 {
     const int systemFlags = 0;
     if (!m_file.open(fileName.c_str(), File::ofWrite, systemFlags))
@@ -738,7 +738,7 @@ bool IsoWriter::createInterleavedFile(const std::string &inFile1, const std::str
     return true;
 }
 
-FileEntryInfo *IsoWriter::createFileEntry(FileEntryInfo *parent, FileTypes fileType)
+FileEntryInfo *IsoWriter::createFileEntry(FileEntryInfo *parent, const FileTypes fileType)
 {
     if (!m_rootDirInfo)
         return nullptr;
@@ -750,7 +750,7 @@ FileEntryInfo *IsoWriter::createFileEntry(FileEntryInfo *parent, FileTypes fileT
     return file;
 }
 
-FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, FileTypes fileType)
+FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, const FileTypes fileType)
 {
     const std::vector<std::string> parts = splitStr(name.c_str(), '/');
     FileEntryInfo *entry = m_rootDirInfo;
@@ -783,7 +783,7 @@ FileEntryInfo *IsoWriter::getEntryByName(const std::string &name, FileTypes file
     return fileEntry;
 }
 
-void IsoWriter::writeMetadata(int lbn)
+void IsoWriter::writeMetadata(const int lbn)
 {
     m_file.seek(int64_t(lbn) * SECTOR_SIZE);
     m_curMetadataPos = lbn;
@@ -919,9 +919,9 @@ void IsoWriter::writeDescriptors()
     writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
 }
 
-uint32_t IsoWriter::absoluteSectorNum() { return (uint32_t)(m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr); }
+uint32_t IsoWriter::absoluteSectorNum() const { return (uint32_t)(m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr); }
 
-void IsoWriter::sectorSeek(Partition partition, int pos)
+void IsoWriter::sectorSeek(const Partition partition, const int pos) const
 {
     const int64_t offset = (partition == Partition::MetadataPartition) ? m_curMetadataPos : m_partitionStartAddress;
     m_file.seek((offset + pos) * SECTOR_SIZE, File::SeekMethod::smBegin);
@@ -950,7 +950,7 @@ int IsoWriter::allocateEntity(FileEntryInfo *entity, int sectorNum)
     return sectorNum;
 }
 
-void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, size_t start, size_t indexEnd)
+void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, const size_t start, const size_t indexEnd)
 {
     const auto buff32 = (uint32_t *)m_buffer;
     memset(m_buffer, 0, sizeof(m_buffer));
@@ -973,8 +973,8 @@ void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, size_t star
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-int IsoWriter::writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objectId, FileTypes fileType, uint64_t len,
-                                                uint32_t pos, int linkCount, ExtentList *extents)
+int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint32_t objectId, const FileTypes fileType, const uint64_t len,
+                                                const uint32_t pos, const int linkCount, ExtentList *extents)
 {
     int sectorsWrited = 0;
 
@@ -1086,7 +1086,7 @@ int IsoWriter::writeExtendedFileEntryDescriptor(bool namedStream, uint32_t objec
     return sectorsWrited;
 }
 
-void IsoWriter::writeIcbTag(bool namedStream, uint8_t *buffer, FileTypes fileType)
+void IsoWriter::writeIcbTag(const bool namedStream, uint8_t *buffer, FileTypes fileType)
 {
     const auto buff32 = (uint32_t *)buffer;
     const auto buff16 = (uint16_t *)buffer;
@@ -1364,7 +1364,7 @@ void IsoWriter::writeLogicalVolumeIntegrityDescriptor()
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-void IsoWriter::writeAnchorVolumeDescriptor(uint32_t endPartitionAddr)
+void IsoWriter::writeAnchorVolumeDescriptor(const uint32_t endPartitionAddr)
 {
     memset(m_buffer, 0, sizeof(m_buffer));
     writeDescriptorTag(m_buffer, DescriptorTag::AnchorVolPtr, absoluteSectorNum());
@@ -1381,9 +1381,9 @@ void IsoWriter::writeAnchorVolumeDescriptor(uint32_t endPartitionAddr)
 
 void IsoWriter::writeSector(uint8_t *sectorData) { m_file.write(sectorData, SECTOR_SIZE); }
 
-int IsoWriter::writeRawData(const uint8_t *data, int size) { return m_file.write(data, size); }
+int IsoWriter::writeRawData(const uint8_t *data, const int size) { return m_file.write(data, size); }
 
-void IsoWriter::checkLayerBreakPoint(int maxExtentSize)
+void IsoWriter::checkLayerBreakPoint(const int maxExtentSize)
 {
     const int lbn = absoluteSectorNum();
     if (lbn < m_layerBreakPoint && lbn + maxExtentSize > m_layerBreakPoint)
@@ -1397,7 +1397,7 @@ void IsoWriter::checkLayerBreakPoint(int maxExtentSize)
     }
 }
 
-void IsoWriter::setLayerBreakPoint(int lbn) { m_layerBreakPoint = lbn; }
+void IsoWriter::setLayerBreakPoint(const int lbn) { m_layerBreakPoint = lbn; }
 
 IsoHeaderData IsoHeaderData::normal()
 {

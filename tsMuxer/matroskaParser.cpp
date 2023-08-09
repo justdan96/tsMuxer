@@ -15,7 +15,7 @@ using namespace wave_format;
 
 // ------------ H-264 ---------------
 
-ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size), m_nalSize(0)
+ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size), m_nalSize(0)
 {
     m_firstExtract = true;
     if (buff == nullptr)
@@ -62,14 +62,14 @@ void ParsedH264TrackData::writeNalHeader(uint8_t*& dst)
     for (int i = 0; i < 3; i++) *dst++ = 0;
     *dst++ = 1;
 }
-size_t ParsedH264TrackData::getSPSPPSLen()
+size_t ParsedH264TrackData::getSPSPPSLen() const
 {
     size_t rez = 0;
     for (auto& i : m_spsPpsList) rez += i.size() + 4;
     return rez;
 }
 
-int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
+int ParsedH264TrackData::writeSPSPPS(uint8_t* dst) const
 {
     const uint8_t* start = dst;
     for (auto& i : m_spsPpsList)
@@ -81,7 +81,7 @@ int ParsedH264TrackData::writeSPSPPS(uint8_t* dst)
     return (int)(dst - start);
 }
 
-bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
+bool ParsedH264TrackData::spsppsExists(uint8_t* buff, const int size)
 {
     uint8_t* curPos = buff;
     const uint8_t* end = buff + size;
@@ -107,7 +107,7 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, int size)
     return spsFound && ppsFound;
 }
 
-void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     int newBufSize = size;
     uint8_t* curPos = buff;
@@ -177,12 +177,12 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 }
 
 // ----------- H.265 -----------------
-ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, int size) : ParsedH264TrackData(nullptr, 0)
+ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = hevc_extract_priv_data(buff, size, &m_nalSize);
 }
 
-bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
+bool ParsedH265TrackData::spsppsExists(uint8_t* buff, const int size)
 {
     uint8_t* curPos = buff;
     const uint8_t* end = buff + size;
@@ -212,12 +212,12 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, int size)
 }
 
 // ----------- H.266 -----------------
-ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, int size) : ParsedH264TrackData(nullptr, 0)
+ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = vvc_extract_priv_data(buff, size, &m_nalSize);
 }
 
-bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
+bool ParsedH266TrackData::spsppsExists(uint8_t* buff, const int size)
 {
     uint8_t* curPos = buff;
     const uint8_t* end = buff + size;
@@ -249,7 +249,7 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, int size)
 // ------------ VC-1 ---------------
 
 static constexpr int MS_BIT_MAP_HEADER_SIZE = 40;
-ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size)
+ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size)
 {
     if (size < MS_BIT_MAP_HEADER_SIZE)
         THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid or unsupported VC-1 stream");
@@ -259,7 +259,7 @@ ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, int size) : ParsedTrackPri
     m_firstPacket = true;
 }
 
-void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     pkt->size = size + (m_firstPacket ? (int)m_seqHeader.size() : 0);
     const bool addFrameHdr = !(size >= 4 && buff[0] == 0 && buff[1] == 0 && buff[2] == 1);
@@ -287,7 +287,7 @@ void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 
 // ------------ AAC --------------
 
-ParsedAACTrackData::ParsedAACTrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size)
+ParsedAACTrackData::ParsedAACTrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size)
 {
     m_aacRaw.m_id = 1;  // MPEG2
     m_aacRaw.m_layer = 0;
@@ -295,7 +295,7 @@ ParsedAACTrackData::ParsedAACTrackData(uint8_t* buff, int size) : ParsedTrackPri
     m_aacRaw.readConfig(buff, size);
 }
 
-void ParsedAACTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedAACTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     pkt->size = size + AAC_HEADER_LEN;
     pkt->data = new uint8_t[pkt->size];
@@ -318,7 +318,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
         memcpy(m_waveBuffer.data() + 20, track->codec_priv, track->codec_priv_size);
 }
 
-void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     pkt->size = size + (int)m_waveBuffer.size();
     pkt->data = new uint8_t[pkt->size];
@@ -337,13 +337,13 @@ void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 
 // ------------ AC3 ---------------
 
-ParsedAC3TrackData::ParsedAC3TrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size)
+ParsedAC3TrackData::ParsedAC3TrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size)
 {
     m_firstPacket = true;
     m_shortHeaderMode = false;
 }
 
-void ParsedAC3TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedAC3TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     if (m_firstPacket && size > 2)
     {
@@ -364,9 +364,9 @@ void ParsedAC3TrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 
 // ------------ SRT ---------------
 
-ParsedSRTTrackData::ParsedSRTTrackData(uint8_t* buff, int size) : ParsedTrackPrivData(buff, size) { m_packetCnt = 0; }
+ParsedSRTTrackData::ParsedSRTTrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size) { m_packetCnt = 0; }
 
-void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     std::string prefix;
     if (m_packetCnt == 0)
@@ -386,7 +386,7 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
 }
 
 // ------------ PG ---------------
-void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, int size)
+void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
     static constexpr int PG_HEADER_SIZE = 10;
 

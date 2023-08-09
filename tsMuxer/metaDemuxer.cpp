@@ -1204,7 +1204,7 @@ string METADemuxer::findBluRayFile(const string& streamDir, const string& reques
         return "";
 }
 
-void METADemuxer::updateReport(bool checkTime)
+void METADemuxer::updateReport(const bool checkTime)
 {
     const auto currentTime = std::chrono::steady_clock::now();
     if (!checkTime || currentTime - m_lastReportTime > std::chrono::microseconds(250000))
@@ -1283,7 +1283,7 @@ int StreamInfo::read()
 
 // ------------------------------ ContainerToReaderWrapper --------------------------------
 
-uint8_t* ContainerToReaderWrapper::readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
+uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
     rez = 0;
     uint8_t* data = nullptr;
@@ -1387,7 +1387,7 @@ void ContainerToReaderWrapper::terminate()
     for (const auto& demuxer : m_demuxers) demuxer.second.m_demuxer->terminate();
 }
 
-void ContainerToReaderWrapper::resetDelayedMark()
+void ContainerToReaderWrapper::resetDelayedMark() const
 {
     for (auto& itr : m_readerInfo)
     {
@@ -1400,13 +1400,13 @@ void ContainerToReaderWrapper::resetDelayedMark()
     }
 }
 
-uint32_t ContainerToReaderWrapper::createReader(int readBuffOffset)
+uint32_t ContainerToReaderWrapper::createReader(const int readBuffOffset)
 {
     m_readBuffOffset = readBuffOffset;
     return ++m_readerCnt;
 }
 
-void ContainerToReaderWrapper::deleteReader(uint32_t readerID)
+void ContainerToReaderWrapper::deleteReader(const uint32_t readerID)
 {
     const auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())

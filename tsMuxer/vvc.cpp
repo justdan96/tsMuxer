@@ -61,7 +61,7 @@ int VvcUnit::deserialize()
     }
 }
 
-void VvcUnit::updateBits(int bitOffset, int bitLen, int value)
+void VvcUnit::updateBits(const int bitOffset, const int bitLen, const int value) const
 {
     uint8_t* ptr = (uint8_t*)m_reader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
@@ -97,7 +97,7 @@ int VvcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
         return encodeRez;
 }
 
-bool VvcUnit::dpb_parameters(int MaxSubLayersMinus1, bool subLayerInfoFlag)
+bool VvcUnit::dpb_parameters(const int MaxSubLayersMinus1, const bool subLayerInfoFlag)
 {
     for (int i = (subLayerInfoFlag ? 0 : MaxSubLayersMinus1); i <= MaxSubLayersMinus1; i++)
     {
@@ -124,7 +124,7 @@ VvcUnitWithProfile::VvcUnitWithProfile()
 {
 }
 
-int VvcUnitWithProfile::profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1)
+int VvcUnitWithProfile::profile_tier_level(const bool profileTierPresentFlag, const int MaxNumSubLayersMinus1)
 {
     try
     {
@@ -447,7 +447,7 @@ int VvcVpsUnit::deserialize()
     }
 }
 
-void VvcVpsUnit::setFPS(double fps)
+void VvcVpsUnit::setFPS(const double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
     num_units_in_tick = (int)(time_scale / fps + 0.5);
@@ -838,7 +838,7 @@ int VvcSpsUnit::deserialize()
     }
 }
 
-int VvcSpsUnit::ref_pic_list_struct(size_t rplsIdx)
+int VvcSpsUnit::ref_pic_list_struct(const size_t rplsIdx)
 {
     const unsigned num_ref_entries = extractUEGolombCode();
     bool ltrp_in_header_flag = true;
@@ -987,7 +987,7 @@ bool VvcUnit::general_timing_hrd_parameters(VvcHrdUnit& m_hrd)
     return false;
 }
 
-bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal)
+bool VvcUnit::ols_timing_hrd_parameters(const VvcHrdUnit m_hrd, const int firstSubLayer, const int MaxSubLayersVal)
 {
     for (int i = firstSubLayer; i <= MaxSubLayersVal; i++)
     {
@@ -1009,7 +1009,7 @@ bool VvcUnit::ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int
     return false;
 }
 
-bool VvcUnit::sublayer_hrd_parameters(VvcHrdUnit m_hrd)
+bool VvcUnit::sublayer_hrd_parameters(const VvcHrdUnit m_hrd)
 {
     for (int j = 0; j <= m_hrd.hrd_cpb_cnt_minus1; j++)
     {

@@ -138,10 +138,10 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     uint8_t* deserializeExtension(BitStreamReader& bitContext);
     static uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
-    double getFrameRate();
+    double getFrameRate() const;
     void setFrameRate(uint8_t* buff, double fps);
     static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
-    std::string getStreamDescr();
+    std::string getStreamDescr() const;
 };
 
 class MPEGGOPHeader : public MPEGHeader
@@ -159,7 +159,7 @@ class MPEGGOPHeader : public MPEGHeader
     int close_gop;
     int broken_link;
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
-    uint32_t serialize(uint8_t* buffer);
+    uint32_t serialize(uint8_t* buffer) const;
 };
 
 enum class PictureCodingType
@@ -227,7 +227,7 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     uint8_t* deserializeCodingExtension(BitStreamReader& bitContext);
 
     uint32_t serialize(uint8_t* buffer) override;
-    uint32_t getPictureSize();
+    uint32_t getPictureSize() const;
     void setTempRef(uint32_t number);
     void setVbvDelay(uint16_t val);
 

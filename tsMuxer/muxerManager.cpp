@@ -161,7 +161,7 @@ void MuxerManager::preinitMux(const std::string& outFileName, FileFactory* fileF
     }
 }
 
-void MuxerManager::checkTrackList(const vector<StreamInfo>& ci)
+void MuxerManager::checkTrackList(const vector<StreamInfo>& ci) const
 {
     if (m_demuxMode)
         return;
@@ -291,7 +291,7 @@ void MuxerManager::muxBlockFinished(AbstractMuxer* muxer)
     }
 }
 
-void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile)
+void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const int len, AbstractOutputStream* dstFile)
 {
     WriterData data;
     data.m_buffer = buff;
@@ -309,7 +309,7 @@ void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len
     asyncWriteBlock(data);
 }
 
-void MuxerManager::asyncWriteBlock(const WriterData& data)
+void MuxerManager::asyncWriteBlock(const WriterData& data) const
 {
     const int nMaxWriteQueueSize = 256 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;
     while (m_fileWriter->getQueueSize() > nMaxWriteQueueSize)
@@ -319,7 +319,7 @@ void MuxerManager::asyncWriteBlock(const WriterData& data)
     m_fileWriter->addWriterData(data);
 }
 
-int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile)
+int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const int len, AbstractOutputStream* dstFile)
 {
     assert(m_interleave == 0);
     const int rez = dstFile->write(buff, len);
@@ -392,20 +392,20 @@ void MuxerManager::parseMuxOpt(const string& opts)
     }
 }
 
-void MuxerManager::waitForWriting()
+void MuxerManager::waitForWriting() const
 {
     while (!m_fileWriter->isQueueEmpty()) Process::sleep(1);
 }
 
 AbstractMuxer* MuxerManager::createMuxer() { return m_factory.newInstance(this); }
 
-AbstractMuxer* MuxerManager::getMainMuxer() { return m_mainMuxer; }
+AbstractMuxer* MuxerManager::getMainMuxer() const { return m_mainMuxer; }
 
-AbstractMuxer* MuxerManager::getSubMuxer() { return m_subMuxer; }
+AbstractMuxer* MuxerManager::getSubMuxer() const { return m_subMuxer; }
 
 bool MuxerManager::isStereoMode() const { return m_subMuxer != nullptr; }
 
-void MuxerManager::setAllowStereoMux(bool value) { m_allowStereoMux = value; }
+void MuxerManager::setAllowStereoMux(const bool value) { m_allowStereoMux = value; }
 
 int MuxerManager::getDefaultAudioTrackIdx() const
 {

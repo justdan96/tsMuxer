@@ -11,7 +11,7 @@
 using namespace std;
 static constexpr int EXTENDED_SAR = 255;
 
-int ceilDiv(int a, int b) { return (a / b) + ((a % b) ? 1 : 0); }
+int ceilDiv(const int a, const int b) { return (a / b) + ((a % b) ? 1 : 0); }
 
 // ------------------------- HevcUnit -------------------
 
@@ -64,7 +64,7 @@ int HevcUnit::deserialize()
     }
 }
 
-void HevcUnit::updateBits(int bitOffset, int bitLen, int value)
+void HevcUnit::updateBits(const int bitOffset, const int bitLen, const int value) const
 {
     uint8_t* ptr = m_reader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
@@ -104,7 +104,7 @@ int HevcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
 
 HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), interlaced_source_flag(0) {}
 
-int HevcUnitWithProfile::profile_tier_level(int subLayers)
+int HevcUnitWithProfile::profile_tier_level(const int subLayers)
 {
     try
     {
@@ -230,7 +230,7 @@ int HevcVpsUnit::deserialize()
     }
 }
 
-void HevcVpsUnit::setFPS(double fps)
+void HevcVpsUnit::setFPS(const double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
     num_units_in_tick = (unsigned)(time_scale / fps + 0.5);
@@ -284,7 +284,7 @@ HevcSpsUnit::HevcSpsUnit()
 }
 
 // returns 0 on parse success, 1 on error
-int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1)
+int HevcSpsUnit::hrd_parameters(const bool commonInfPresentFlag, const int maxNumSubLayersMinus1)
 {
     if (commonInfPresentFlag)
     {
@@ -333,7 +333,7 @@ int HevcSpsUnit::hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMi
 }
 
 // returns 0 on parse success, 1 on error
-int HevcSpsUnit::sub_layer_hrd_parameters(int cpb_cnt_minus1)
+int HevcSpsUnit::sub_layer_hrd_parameters(const int cpb_cnt_minus1)
 {
     for (size_t i = 0; i <= cpb_cnt_minus1; i++)
     {
@@ -429,7 +429,7 @@ int HevcSpsUnit::vui_parameters()
     return 0;
 }
 
-int HevcSpsUnit::short_term_ref_pic_set(unsigned stRpsIdx)
+int HevcSpsUnit::short_term_ref_pic_set(const unsigned stRpsIdx)
 {
     int numDeltaPocs = 0;
 

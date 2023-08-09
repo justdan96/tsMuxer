@@ -190,7 +190,7 @@ TextSubtitlesRender::TextSubtitlesRender() : m_width(0), m_height(0)
 
 TextSubtitlesRender::~TextSubtitlesRender() {}
 
-string findFontArg(const string& text, size_t pos)
+string findFontArg(const string& text, const size_t pos)
 {
     bool delFound = false;
     size_t firstPos = 0;
@@ -224,7 +224,7 @@ uint32_t rgbSwap(uint32_t color)
     return color;
 }
 
-int TextSubtitlesRender::browserSizeToRealSize(int bSize, double rSize)
+int TextSubtitlesRender::browserSizeToRealSize(const int bSize, double rSize)
 {
     if (bSize > DEFAULT_BROWSER_STYLE_FS)
         for (int i = DEFAULT_BROWSER_STYLE_FS; i < bSize; i++) rSize *= BROWSER_FONT_STYLE_INC_COEFF;
@@ -233,7 +233,7 @@ int TextSubtitlesRender::browserSizeToRealSize(int bSize, double rSize)
     return (int)rSize;
 }
 
-vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack)
+vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack) const
 {
     if (fontStack.size() == 0)
     {
@@ -438,7 +438,7 @@ inline void setBPoint(uint32_t* addr)
         *addr = BORDER_COLOR_TMP;
 }
 
-void TextSubtitlesRender::addBorder(int borderWidth, uint8_t* data, int width, int height)
+void TextSubtitlesRender::addBorder(const int borderWidth, uint8_t* data, const int width, const int height)
 {
     // add black border
     for (int i = 0; i < borderWidth; ++i)

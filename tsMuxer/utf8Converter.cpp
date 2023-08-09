@@ -59,7 +59,7 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
 
 namespace UtfConverter
 {
-std::string toUtf8(const uint8_t *start, size_t numBytes, SourceFormat srcFormat)
+std::string toUtf8(const uint8_t *start, const size_t numBytes, const SourceFormat srcFormat)
 {
     switch (srcFormat)
     {

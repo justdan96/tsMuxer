@@ -2,12 +2,12 @@
 
 #include <cstdint>
 
-void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value)
+void updateBits(const BitStreamReader& bitReader, const int bitOffset, const int bitLen, const int value)
 {
     updateBits(bitReader.getBuffer(), bitOffset, bitLen, value);
 }
 
-void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
+void updateBits(uint8_t* buffer, const int bitOffset, const int bitLen, const int value)
 {
     uint8_t* ptr = (uint8_t*)buffer + bitOffset / 8;
     BitStreamWriter bitWriter{};
@@ -32,7 +32,7 @@ void updateBits(const uint8_t* buffer, int bitOffset, int bitLen, int value)
     bitWriter.flushBits();
 }
 
-void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len)
+void moveBits(uint8_t* buffer, const int oldBitOffset, const int newBitOffset, int len)
 {
     uint8_t* src = (uint8_t*)buffer + (oldBitOffset >> 3);
     BitStreamReader reader{};

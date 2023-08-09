@@ -78,7 +78,7 @@ class ByteFileWriter
     void writeLE32(uint16_t value);
 
     void writeDescriptorTag(DescriptorTag tag, uint32_t tagLocation);
-    void closeDescriptorTag(int dataSize = -1);
+    void closeDescriptorTag(int dataSize = -1) const;
 
     void writeIcbTag(uint8_t fileType);
     void writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id);
@@ -141,8 +141,8 @@ struct FileEntryInfo
     void addFile(FileEntryInfo* file);
     void serialize();  // flush directory tree to a disk
     int allocateEntity(int sectorNum);
-    void writeEntity(ByteFileWriter& writer, FileEntryInfo* subDir);
-    void serializeDir();
+    void writeEntity(ByteFileWriter& writer, FileEntryInfo* subDir) const;
+    void serializeDir() const;
     void serializeFile();
     bool isFile() const;
 
@@ -223,9 +223,9 @@ class IsoWriter
     static void writeEntity(FileEntryInfo* dir);
     int allocateEntity(FileEntryInfo* dir, int sectorNum);
 
-    void sectorSeek(Partition partition, int pos);
+    void sectorSeek(Partition partition, int pos) const;
     void writeSector(uint8_t* sectorData);
-    uint32_t absoluteSectorNum();
+    uint32_t absoluteSectorNum() const;
 
     static void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);
     void writeDescriptors();
@@ -286,7 +286,7 @@ class ISOFile : public AbstractOutputStream
     void sync() override;
     bool close() override final;
     int64_t size() const override;
-    void setSubMode(bool value);
+    void setSubMode(bool value) const;
 
    private:
     IsoWriter* m_owner;

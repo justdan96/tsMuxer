@@ -122,7 +122,7 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
 #endif
 }
 
-void TSMuxer::setPtsOffset(int64_t value)
+void TSMuxer::setPtsOffset(const int64_t value)
 {
     m_timeOffset = value;
     m_fixed_pcr_offset = m_timeOffset - DEFAULT_VBV_BUFFER_LEN * 90;
@@ -138,7 +138,7 @@ TSMuxer::~TSMuxer()
         delete m_muxFile;
 }
 
-void TSMuxer::setVBVBufferLen(int value)
+void TSMuxer::setVBVBufferLen(const int value)
 {
     m_vbvLen = (int64_t)value * 90;
     m_fixed_pcr_offset = m_timeOffset - m_vbvLen;
@@ -147,7 +147,7 @@ void TSMuxer::setVBVBufferLen(int value)
     m_prevM2TSPCR = m_fixed_pcr_offset * 300;
 }
 
-void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
+void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, const int streamIndex,
                            const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     int descriptorLen = 0;
@@ -427,7 +427,7 @@ bool TSMuxer::doFlush()
     return doFlush(newPCR, 0);
 }
 
-bool TSMuxer::doFlush(uint64_t newPCR, int64_t pcrGAP)
+bool TSMuxer::doFlush(const uint64_t newPCR, const int64_t pcrGAP)
 {
     flushTSFrame();
 
@@ -471,7 +471,7 @@ bool TSMuxer::doFlush(uint64_t newPCR, int64_t pcrGAP)
     return true;
 }
 
-int TSMuxer::writeOutFile(uint8_t* buffer, int len)
+int TSMuxer::writeOutFile(uint8_t* buffer, const int len) const
 {
     const int rez = m_muxFile->write(buffer, len);
     return rez;
@@ -504,7 +504,7 @@ bool TSMuxer::close()
     return bRes;
 }
 
-int TSMuxer::calcM2tsFrameCnt()
+int TSMuxer::calcM2tsFrameCnt() const
 {
     uint32_t byteCnt = 0;
     for (const auto& i : m_m2tsDelayBlocks) byteCnt += i.second;
@@ -514,7 +514,7 @@ int TSMuxer::calcM2tsFrameCnt()
     return byteCnt / 192;
 }
 
-void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
+void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
 {
     const int m2tsFrameCnt = calcM2tsFrameCnt();
     const int64_t hiResPCR = pcrVal * 300 - pcrGAP;
@@ -561,7 +561,7 @@ void TSMuxer::processM2TSPCR(int64_t pcrVal, int64_t pcrGAP)
     m_prevM2TSPCR = hiResPCR;
 }
 
-void TSMuxer::writeEmptyPacketWithPCRTest(int64_t pcrVal)
+void TSMuxer::writeEmptyPacketWithPCRTest(const int64_t pcrVal)
 {
     if (m_m2tsMode)
     {
@@ -588,7 +588,7 @@ void TSMuxer::writeEmptyPacketWithPCRTest(int64_t pcrVal)
     m_muxedPacketCnt[m_muxedPacketCnt.size() - 1]++;
 }
 
-void TSMuxer::writeEmptyPacketWithPCR(int64_t pcrVal)
+void TSMuxer::writeEmptyPacketWithPCR(const int64_t pcrVal)
 {
     if (m_m2tsMode)
     {
@@ -618,7 +618,7 @@ void TSMuxer::writeEmptyPacketWithPCR(int64_t pcrVal)
     writeOutBuffer();
 }
 
-void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
+void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
 {
     const int64_t curDts = internalClockToPts(avPacket.dts) + m_timeOffset;
     const int64_t curPts = internalClockToPts(avPacket.pts) + m_timeOffset;
@@ -649,7 +649,7 @@ void TSMuxer::buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid)
         m_priorityData.push_back(std::pair<int, int>(i.first + pesPacket->getHeaderLength(), i.second));
 }
 
-void TSMuxer::addData(int pesStreamID, int pid, AVPacket& avPacket)
+void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
 {
     int beforePesLen = (int)m_pesData.size();
     if (m_pesData.size() == 0)
@@ -678,7 +678,7 @@ void TSMuxer::addData(int pesStreamID, int pid, AVPacket& avPacket)
 
 void TSMuxer::flushTSFrame() { writePESPacket(); }
 
-void TSMuxer::writePATPMT(int64_t pcr, bool force)
+void TSMuxer::writePATPMT(const int64_t pcr, const bool force)
 {
     if (pcr == -1 || pcr - m_lastPMTPCR >= m_patPmtDelta || force)
     {
@@ -693,7 +693,7 @@ void TSMuxer::writePATPMT(int64_t pcr, bool force)
     }
 }
 
-bool TSMuxer::isSplitPoint(const AVPacket& avPacket)
+bool TSMuxer::isSplitPoint(const AVPacket& avPacket) const
 {
     if (avPacket.stream_index != m_mainStreamIndex || !(avPacket.flags & AVPacket::IS_IFRAME))
         return false;
@@ -739,7 +739,7 @@ std::string TSMuxer::getNextName(const std::string curName)
     return toNativeSeparators(result);
 }
 
-void TSMuxer::gotoNextFile(uint64_t newPts)
+void TSMuxer::gotoNextFile(const uint64_t newPts)
 {
     // 2. CloseCurrentFile
     if (m_owner->isAsyncMode())
@@ -861,7 +861,7 @@ void TSMuxer::writePESPacket()
     }
 }
 
-void TSMuxer::writePCR(uint64_t newPCR)
+void TSMuxer::writePCR(const uint64_t newPCR)
 {
     int bitsRest = 0;
     if (m_cbrBitrate != -1 && m_minBitrate != -1 && m_lastPCR != -1)
@@ -903,7 +903,7 @@ void TSMuxer::flushTSBuffer()
     m_outBufLen = 0;
 }
 
-void TSMuxer::finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFile, bool recursive)
+void TSMuxer::finishFileBlock(const uint64_t newPts, const uint64_t newPCR, const bool doChangeFile, const bool recursive)
 {
     if (m_processedBlockSize > 0)
     {
@@ -1053,7 +1053,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     return true;
 }
 
-int TSMuxer::writeTSFrames(int pid, uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart)
+int TSMuxer::writeTSFrames(const int pid, uint8_t* buffer, const int64_t len, const bool priorityData, bool payloadStart)
 {
     int result = 0;
 
@@ -1185,7 +1185,7 @@ void TSMuxer::buildPMT()
 
 void TSMuxer::buildSIT() {}
 
-void TSMuxer::writeNullPackets(int cnt)
+void TSMuxer::writeNullPackets(const int cnt)
 {
     for (int i = 0; i < cnt; i++)
     {
@@ -1206,7 +1206,7 @@ void TSMuxer::writeNullPackets(int cnt)
     }
 }
 
-bool TSMuxer::appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited)
+bool TSMuxer::appendM2TSNullPacketToFile(const uint64_t curFileSize, int counter, int* packetsWrited) const
 {
     *packetsWrited = 0;
     while (counter < 0) counter += 16;
@@ -1403,7 +1403,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
     }
 }
 
-void TSMuxer::setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock)
+void TSMuxer::setSubMode(AbstractMuxer* mainMuxer, const bool flushInterleavedBlock)
 {
     m_sublingMuxer = dynamic_cast<TSMuxer*>(mainMuxer);
     m_subMode = true;
@@ -1417,7 +1417,7 @@ void TSMuxer::joinToMasterFile()
     m_muxFile = dynamic_cast<TSMuxer*>(m_sublingMuxer)->getDstFile();
 }
 
-void TSMuxer::setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock)
+void TSMuxer::setMasterMode(AbstractMuxer* subMuxer, const bool flushInterleavedBlock)
 {
     m_sublingMuxer = dynamic_cast<TSMuxer*>(subMuxer);
     m_masterMode = true;
@@ -1438,7 +1438,7 @@ void TSMuxer::openDstFile()
         THROW(ERR_CANT_CREATE_FILE, "Can't create file " << m_outFileName);
 }
 
-vector<int64_t> TSMuxer::getFirstPts()
+vector<int64_t> TSMuxer::getFirstPts() const
 {
     std::vector<int64_t> rez;
     for (const auto& i : m_firstPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
@@ -1455,7 +1455,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
     }
 }
 
-vector<int64_t> TSMuxer::getLastPts()
+vector<int64_t> TSMuxer::getLastPts() const
 {
     std::vector<int64_t> rez;
     for (const auto& i : m_lastPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
@@ -1476,7 +1476,7 @@ void TSMuxer::setFileName(const std::string& fileName, FileFactory* fileFactory)
     m_fileNames.push_back(m_outFileName);
 }
 
-std::string TSMuxer::getFileNameByIdx(size_t idx)
+std::string TSMuxer::getFileNameByIdx(const size_t idx)
 {
     if (idx < m_fileNames.size())
         return m_fileNames[idx];
@@ -1496,4 +1496,4 @@ void TSMuxer::setMuxFormat(const std::string& format)
 
 bool TSMuxer::isInterleaveMode() const { return m_masterMode || m_subMode; }
 
-std::vector<int32_t> TSMuxer::getInterleaveInfo(size_t idx) const { return m_interleaveInfo[idx]; }
+std::vector<int32_t> TSMuxer::getInterleaveInfo(const size_t idx) const { return m_interleaveInfo[idx]; }

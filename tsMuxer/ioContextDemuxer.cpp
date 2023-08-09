@@ -13,14 +13,14 @@ using namespace std;
 #endif
 /////////////////////////////////////
 
-double av_int2dbl(int64_t v)
+double av_int2dbl(const int64_t v)
 {
     if (v + v > 0xFFEULL << 52)
         return 0;  // 0.0/0.0;
     return ldexp((double)((v & ((1LL << 52) - 1)) + (1LL << 52)) * (v >> 63 | 1), (v >> 52 & 0x7FF) - 1075);
 }
 
-float av_int2flt(int32_t v)
+float av_int2flt(const int32_t v)
 {
     if (v + v > 0xFF000000U)
         return 0;  // 0.0/0.0;
@@ -90,7 +90,7 @@ uint64_t IOContextDemuxer::get_be64()
     return val;
 }
 
-bool IOContextDemuxer::url_fseek(int64_t offset)
+bool IOContextDemuxer::url_fseek(const int64_t offset)
 {
     m_curPos = m_bufEnd = nullptr;
     m_isEOF = false;
@@ -133,7 +133,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
     return (uint32_t)(dst - binary);
 }
 
-void IOContextDemuxer::skip_bytes(uint64_t size)
+void IOContextDemuxer::skip_bytes(const uint64_t size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;

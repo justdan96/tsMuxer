@@ -40,7 +40,7 @@ VVCStreamReader::~VVCStreamReader()
     delete m_slice;
 }
 
-CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
+CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, const int len)
 {
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
@@ -113,7 +113,7 @@ CheckStreamRez VVCStreamReader::checkStream(uint8_t* buffer, int len)
     return rez;
 }
 
-int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
+int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bool hdmvDescriptors)
 {
     if (m_firstFrame)
         CheckStreamRez rez = checkStream(m_buffer, (int)(m_bufEnd - m_buffer));
@@ -215,7 +215,7 @@ bool VVCStreamReader::skipNal(uint8_t* nal)
     return false;
 }
 
-bool VVCStreamReader::isSlice(VvcUnit::NalType nalType) const
+bool VVCStreamReader::isSlice(const VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_pps)
         return false;
@@ -236,7 +236,7 @@ bool VVCStreamReader::isSlice(VvcUnit::NalType nalType) const
     }
 }
 
-bool VVCStreamReader::isSuffix(VvcUnit::NalType nalType) const
+bool VVCStreamReader::isSuffix(const VvcUnit::NalType nalType) const
 {
     if (!m_sps || !m_pps)
         return false;
@@ -276,7 +276,7 @@ void VVCStreamReader::incTimings()
     }
 }
 
-int VVCStreamReader::toFullPicOrder(VvcSliceHeader* slice, int pic_bits)
+int VVCStreamReader::toFullPicOrder(VvcSliceHeader* slice, const int pic_bits)
 {
     if (slice->isIDR())
     {
@@ -417,7 +417,7 @@ int VVCStreamReader::intDecodeNAL(uint8_t* buff)
         return NEED_MORE_DATA;
 }
 
-uint8_t* VVCStreamReader::writeNalPrefix(uint8_t* curPos)
+uint8_t* VVCStreamReader::writeNalPrefix(uint8_t* curPos) const
 {
     if (!m_shortStartCodes)
         *curPos++ = 0;
@@ -427,7 +427,7 @@ uint8_t* VVCStreamReader::writeNalPrefix(uint8_t* curPos)
     return curPos;
 }
 
-uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd)
+uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd) const
 {
     if (srcData.isEmpty())
         return dstBuffer;

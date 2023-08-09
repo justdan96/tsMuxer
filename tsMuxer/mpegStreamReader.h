@@ -98,7 +98,7 @@ class MPEGStreamReader : public AbstractStreamReader
     long m_lastDecodeOffset;
     bool m_syncToStream;
     bool m_isFirstFpsWarn;
-    int bufFromNAL();
+    int bufFromNAL() const;
     virtual int decodeNal(uint8_t* buff);
     void storeBufferRest();
 };

@@ -70,7 +70,7 @@ const CodecInfo &AC3Codec::getCodecInfo()
 }
 
 // returns true if ok, or false if error
-bool AC3Codec::crc32(uint8_t *buf, int length)
+bool AC3Codec::crc32(uint8_t *buf, const int length)
 {
     const uint8_t *end = buf + length;
 
@@ -416,7 +416,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
     }
 }
 
-AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t *buf, uint8_t *end)
+AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t *buf, uint8_t *end) const
 {
     BitStreamReader gbc{};
     gbc.setBuffer(buf, buf + 7);
@@ -489,12 +489,12 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t *buf, uint8_t *end)
     return AC3ParseError::NO_ERROR;
 }
 
-bool AC3Codec::testDecodeTestFrame(uint8_t *buf, uint8_t *end)
+bool AC3Codec::testDecodeTestFrame(uint8_t *buf, uint8_t *end) const
 {
     return testParseHeader(buf, end) == AC3ParseError::NO_ERROR;
 }
 
-uint64_t AC3Codec::getFrameDuration()
+uint64_t AC3Codec::getFrameDuration() const
 {
     // EAC3 dependent frame : wait for next independent frame
     if (!m_bit_rate && m_strmtyp == 1)

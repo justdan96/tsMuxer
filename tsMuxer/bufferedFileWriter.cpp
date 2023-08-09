@@ -3,7 +3,7 @@
 
 #include <fs/systemlog.h>
 
-void WriterData::execute()
+void WriterData::execute() const
 {
     switch (m_command)
     {

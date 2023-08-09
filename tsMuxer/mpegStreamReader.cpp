@@ -16,7 +16,7 @@ static constexpr int UNIT_SKIPPED = 5;
 
 using namespace std;
 
-void MPEGStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
+void MPEGStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
 {
     if (lastBlock)
         m_eof = true;
@@ -177,7 +177,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
             return 0;  // return zero AV packet for new frame
         }
     }
-    const uint8_t* findEnd = (std::min)(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
+    uint8_t* findEnd = (std::min)(m_bufEnd, m_curPos + MAX_AV_PACKET_SIZE);
     uint8_t* nal = NALUnit::findNALWithStartCode(m_curPos + isNal, findEnd, m_longCodesAllowed);
 
     if (nal == findEnd)
@@ -216,7 +216,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
     return 0;
 }
 
-int MPEGStreamReader::bufFromNAL()
+int MPEGStreamReader::bufFromNAL() const
 {
     if (m_bufEnd - m_curPos < (3 + (m_longCodesAllowed ? 1 : 0)))
         return 0;
@@ -278,7 +278,7 @@ int MPEGStreamReader::decodeNal(uint8_t* buff)
 }
 
 #define abs_(a, b) ((a) >= (b) ? (a) - (b) : (b) - (a))
-void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, int oldSPSLen)
+void MPEGStreamReader::updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, const int oldSPSLen)
 {
     double spsFps = getStreamFPS(curNALUnit);
     spsFps = correctFps(spsFps);
@@ -335,7 +335,7 @@ void MPEGStreamReader::checkPulldownSync()
     }
 }
 
-void MPEGStreamReader::fillAspectBySAR(double sar)
+void MPEGStreamReader::fillAspectBySAR(const double sar)
 {
     if (m_streamAR == VideoAspectRatio::AR_KEEP_DEFAULT)
     {

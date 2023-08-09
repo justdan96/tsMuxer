@@ -22,8 +22,8 @@ class MLPCodec
     static uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
     static int getFrameSize(uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);
-    bool isMinorSync(uint8_t* buffer, uint8_t* end);
-    uint64_t getFrameDuration();
+    bool isMinorSync(uint8_t* buffer, uint8_t* end) const;
+    uint64_t getFrameDuration() const;
     static int mlp_samplerate(int audio_sampling_frequency);
 
    public:

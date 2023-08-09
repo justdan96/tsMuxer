@@ -18,7 +18,7 @@
 
 using namespace std;
 
-std::string getNewName(const std::string& oldName, int cnt)
+std::string getNewName(const std::string& oldName, const int cnt)
 {
     if (strEndWith(oldName, ".wav"))
         return oldName.substr(0, oldName.size() - 4) + "." + int32ToStr(cnt) + ".wav";

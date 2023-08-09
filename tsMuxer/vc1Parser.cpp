@@ -13,7 +13,7 @@ using namespace std;
 
 const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
-static inline int get_unary(BitStreamReader& bitReader, int stop, int len)
+static inline int get_unary(BitStreamReader& bitReader, const int stop, const int len)
 {
     int i;
     for (i = 0; i < len && bitReader.getBit() != stop; i++)
@@ -32,7 +32,7 @@ static inline int decode012(BitStreamReader& bitReader)
 
 // ---------------------------- VC1Unit ------------------------------------------
 
-void VC1Unit::updateBits(int bitOffset, int bitLen, int value)
+void VC1Unit::updateBits(const int bitOffset, const int bitLen, const int value) const
 {
     uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
@@ -59,7 +59,7 @@ void VC1Unit::updateBits(int bitOffset, int bitLen, int value)
 
 // ---------------------------- VC1SequenceHeader ------------------------------------------
 
-string VC1SequenceHeader::getStreamDescr()
+string VC1SequenceHeader::getStreamDescr() const
 {
     std::ostringstream rez;
     rez << "Profile: ";
@@ -92,7 +92,7 @@ string VC1SequenceHeader::getStreamDescr()
     return rez.str();
 }
 
-double VC1SequenceHeader::getFPS()
+double VC1SequenceHeader::getFPS() const
 {
     if (time_base_num == 0 || time_base_den == 0)
         return 0;
@@ -102,7 +102,7 @@ double VC1SequenceHeader::getFPS()
     return fps;
 }
 
-void VC1SequenceHeader::setFPS(double value)
+void VC1SequenceHeader::setFPS(const double value)
 {
     // if (value < 25.0 && pulldown)
     //	value *= 1.25;

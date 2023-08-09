@@ -152,7 +152,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
 // static int64_t prevPCR = -1;
 // static int pcrFrames = 0;
 
-bool TSDemuxer::isVideoPID(StreamType streamType)
+bool TSDemuxer::isVideoPID(const StreamType streamType)
 {
     switch (streamType)
     {
@@ -173,7 +173,7 @@ bool TSDemuxer::isVideoPID(StreamType streamType)
 // static uint64_t prevDts = 0;
 // static int ggCnt = 0;
 
-bool TSDemuxer::checkForRealM2ts(uint8_t* buffer, uint8_t* end)
+bool TSDemuxer::checkForRealM2ts(uint8_t* buffer, uint8_t* end) const
 {
     for (const uint8_t* cur = buffer; cur < end; cur += 192)
         if (cur[4] != 0x47)
@@ -472,7 +472,7 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
 }
 
-int64_t getLastPCR(File& file, int bufferSize, int frameSize, int64_t fileSize)
+int64_t getLastPCR(File& file, const int bufferSize, const int frameSize, const int64_t fileSize)
 {
     // pcr from end of file
     const auto tmpBuffer = new uint8_t[bufferSize];

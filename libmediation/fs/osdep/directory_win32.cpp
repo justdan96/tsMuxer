@@ -38,7 +38,7 @@ uint64_t getFileSize(const std::string& fileName)
     }
 }
 
-bool createDir(const std::string& dirName, bool createParentDirs)
+bool createDir(const std::string& dirName, const bool createParentDirs)
 {
     const bool ok = preCreateDir(
         [](auto&& parentDir) {
@@ -73,7 +73,7 @@ bool deleteFile(const string& fileName)
     return DeleteFile(toWide(fileName).data()) != 0;
 }
 
-bool findFiles(const string& path, const string& fileMask, vector<string>* fileList, bool savePaths)
+bool findFiles(const string& path, const string& fileMask, vector<string>* fileList, const bool savePaths)
 {
     WIN32_FIND_DATA fileData;  // Data structure describes the file found
     // Search handle returned by FindFirstFile

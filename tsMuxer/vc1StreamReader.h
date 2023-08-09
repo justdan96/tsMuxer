@@ -55,8 +55,8 @@ class VC1StreamReader : public MPEGStreamReader
     int m_spsFound;
     VC1SequenceHeader m_sequence;
     VC1Frame m_frame;
-    int getNextBFrames(uint8_t* buffer, int64_t& bTiming);
-    uint8_t* findNextFrame(uint8_t* buffer);
+    int getNextBFrames(uint8_t* buffer, int64_t& bTiming) const;
+    uint8_t* findNextFrame(uint8_t* buffer) const;
     bool m_firstFileFrame;
     bool m_decodedAfterSeq;
     uint8_t* m_nextFrameAddr;

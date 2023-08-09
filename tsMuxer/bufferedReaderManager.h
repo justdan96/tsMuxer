@@ -13,7 +13,7 @@ class BufferedReaderManager
     BufferedReaderManager(uint32_t readersCnt, uint32_t blockSize = 0, uint32_t allocSize = 0,
                           uint32_t prereadThreshold = 0);
     ~BufferedReaderManager();
-    AbstractReader* getReader(const char* streamName);
+    AbstractReader* getReader(const char* streamName) const;
 
     void init(uint32_t blockSize = 0, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
 

@@ -44,7 +44,7 @@ void SimplePacketizerReader::doMplsCorrection()
     }
 }
 
-void SimplePacketizerReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
+void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
 {
     if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
@@ -235,8 +235,8 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
 
 static constexpr int CHECK_FRAMES_COUNT = 10;
 
-CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, int len, ContainerType containerType,
-                                                   int containerDataType, int containerStreamIndex)
+CheckStreamRez SimplePacketizerReader::checkStream(uint8_t* buffer, const int len, const ContainerType containerType,
+                                                   const int containerDataType, const int containerStreamIndex)
 {
     m_containerType = containerType;
     m_containerDataType = containerDataType;

@@ -76,7 +76,7 @@ class NALUnit
     // NALUnit(const NALUnit& other);
     virtual ~NALUnit() { delete[] m_nalBuffer; }
     static uint8_t* findNextNAL(uint8_t* buffer, uint8_t* end);
-    static uint8_t* findNALWithStartCode(const uint8_t* buffer, const uint8_t* end, bool longCodesAllowed);
+    static uint8_t* findNALWithStartCode(uint8_t* buffer, uint8_t* end, bool longCodesAllowed);
     static int encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
@@ -103,7 +103,7 @@ class NALUnit
     BitStreamReader bitReader;
     inline unsigned extractUEGolombCode();
     inline int extractSEGolombCode();
-    void updateBits(int bitOffset, int bitLen, int value);
+    void updateBits(const int bitOffset, const int bitLen, const int value) const;
 };
 
 class NALDelimiter : public NALUnit
@@ -234,11 +234,11 @@ class SPSUnit : public NALUnit
     int deserialize();
     void insertHrdParameters();
     void updateTimingInfo();
-    int getMaxBitrate();
+    int getMaxBitrate() const;
     int hrd_parameters(HRDParams& params);
     int deserializeVuiParameters();
-    int getCropY();
-    int getCropX();
+    int getCropY() const;
+    int getCropX() const;
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
     static void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
@@ -273,8 +273,8 @@ class SEIUnit : public NALUnit
     ~SEIUnit() override {}
     void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
 
-    void serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader);
-    void serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader);
+    void serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader) const;
+    void serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader) const;
     int removePicTimingSEI(SPSUnit& sps);
 
     static void updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts);

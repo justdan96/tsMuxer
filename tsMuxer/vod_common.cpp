@@ -80,20 +80,20 @@ std::vector<std::string> extractFileList(const std::string& val)
 }
 
 uint16_t AV_RB16(const uint8_t* buffer) { return (*buffer << 8) + buffer[1]; }
-uint32_t AV_RB32(const uint8_t* buffer) { return my_ntohl(*((int32_t*)buffer)); }
+uint32_t AV_RB32(uint8_t* buffer) { return my_ntohl(*(int32_t*)buffer); }
 uint32_t AV_RB24(const uint8_t* buffer) { return (buffer[0] << 16) + (buffer[1] << 8) + buffer[2]; }
 
-void AV_WB16(uint8_t* buffer, uint16_t value) { *((uint16_t*)buffer) = my_htons(value); }
+void AV_WB16(uint8_t* buffer, const uint16_t value) { *((uint16_t*)buffer) = my_htons(value); }
 
-void AV_WB24(uint8_t* buffer, uint32_t value)
+void AV_WB24(uint8_t* buffer, const uint32_t value)
 {
     buffer[0] = (uint8_t)(value >> 16);
     buffer[1] = (uint8_t)(value >> 8);
     buffer[2] = (uint8_t)value;
 }
-void AV_WB32(uint8_t* buffer, uint32_t value) { *((uint32_t*)buffer) = my_htonl(value); }
+void AV_WB32(uint8_t* buffer, const uint32_t value) { *((uint32_t*)buffer) = my_htonl(value); }
 
-std::string floatToTime(double time, char msSeparator)
+std::string floatToTime(const double time, const char msSeparator)
 {
     int iTime = (int)time;
     const int hour = iTime / 3600;
@@ -126,7 +126,7 @@ double timeToFloat(const std::string& chapterStr)
     return hour * 3600 + min * 60 + sec;
 }
 
-double correctFps(double fps)
+double correctFps(const double fps)
 {
     struct FPSCorrect
     {

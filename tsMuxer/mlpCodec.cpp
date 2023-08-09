@@ -13,7 +13,7 @@ static const uint8_t thd_chancount[13] = {
     2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1};
 
 // returns 48/96/192/44.1/88.2/176.4 kHz, or 0 on error
-int MLPCodec::mlp_samplerate(int ratebits)
+int MLPCodec::mlp_samplerate(const int ratebits)
 {
     switch (ratebits)
     {
@@ -34,16 +34,16 @@ int MLPCodec::mlp_samplerate(int ratebits)
     }
 }
 
-uint64_t MLPCodec::getFrameDuration() { return INTERNAL_PTS_FREQ * m_samples / m_samplerate; }
+uint64_t MLPCodec::getFrameDuration() const { return INTERNAL_PTS_FREQ * m_samples / m_samplerate; }
 
-static int numChannels6(int chanmap)
+static int numChannels6(const int chanmap)
 {
     int channels = 0;
     for (int i = 0; i < 5; i++) channels += thd_chancount[i] * ((chanmap >> i) & 1);
     return channels;
 }
 
-static int numChannels8(int chanmap)
+static int numChannels8(const int chanmap)
 {
     int channels = 0;
     for (int i = 0; i < 13; i++) channels += thd_chancount[i] * ((chanmap >> i) & 1);
@@ -66,7 +66,7 @@ uint8_t* MLPCodec::findFrame(uint8_t* buffer, uint8_t* end)
 
 int MLPCodec::getFrameSize(uint8_t* buffer) { return ((buffer[0] & 0x0f) << 9) + (buffer[1] << 1); }
 
-bool MLPCodec::isMinorSync(uint8_t* buffer, uint8_t* end)
+bool MLPCodec::isMinorSync(uint8_t* buffer, uint8_t* end) const
 {
     /* The first nibble of a frame is a parity check of the 4-byte
        access unit header and all the 2- or 4-byte substream headers. */

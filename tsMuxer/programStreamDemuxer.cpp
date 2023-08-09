@@ -185,7 +185,7 @@ void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList
     return;
 }
 
-bool ProgramStreamDemuxer::isVideoPID(uint32_t pid)
+bool ProgramStreamDemuxer::isVideoPID(const uint32_t pid) const
 {
     return (pid >= 0x55 && pid <= 0x5f) ||  // vc1
            (pid >= 0xe0 && pid <= 0xef) ||  // mpeg video
@@ -348,7 +348,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
     return 0;
 }
 
-int64_t getLastPCR(File& file, int bufferSize, int64_t fileSize)
+int64_t getLastPCR(File& file, const int bufferSize, const int64_t fileSize)
 {
     file.seek(FFMAX(0, fileSize - bufferSize), File::SeekMethod::smBegin);
     const auto tmpBuffer = new uint8_t[bufferSize];

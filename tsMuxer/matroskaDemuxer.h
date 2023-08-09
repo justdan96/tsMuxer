@@ -80,7 +80,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     static int matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num);
     int matroska_parse_blockgroup(uint64_t cluster_time);
     static int matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
-    int matroska_find_track_by_num(uint64_t num);
+    int matroska_find_track_by_num(uint64_t num) const;
     int matroska_parse_block(uint8_t *data, int size, int64_t pos, uint64_t cluster_time, uint64_t duration,
                              int is_keyframe, int is_bframe);
     static int rv_offset(uint8_t *data, int slice, int slices);
@@ -105,7 +105,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int readTrackEncodings(MatroskaTrack *track);
     int readTrackEncoding(MatroskaTrack *track);
     int readEncodingCompression(MatroskaTrack *track);
-    void decompressData(const uint8_t *data, int size);
+    void decompressData(uint8_t *data, int size);
 
     std::map<uint64_t, AVChapter> chapters;
     MemoryBlock m_tmpBuffer;

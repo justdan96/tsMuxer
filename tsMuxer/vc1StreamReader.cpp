@@ -98,7 +98,7 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
 bool VC1StreamReader::skipNal(uint8_t* nal) { return !m_eof && nal[0] == (uint8_t)VC1Code::ENDOFSEQ; }
 
-CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, int len)
+CheckStreamRez VC1StreamReader::checkStream(uint8_t* buffer, const int len)
 {
     CheckStreamRez rez;
     uint8_t* end = buffer + len;
@@ -354,7 +354,7 @@ int VC1StreamReader::decodeEntryPoint(uint8_t* buff)
     return 0;
 }
 
-int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
+int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming) const
 {
     int bFrameCnt = 0;
     bTiming = 0;
@@ -400,7 +400,7 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming)
     }
 }
 
-uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
+uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer) const
 {
     for (uint8_t* nal = VC1Unit::findNextMarker(buffer, m_bufEnd); nal < m_bufEnd - 4;
          nal = VC1Unit::findNextMarker(nal + 4, m_bufEnd))
@@ -415,7 +415,7 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer)
         return nullptr;
 }
 
-void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen)
+void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, const int oldSpsLen)
 {
     m_sequence.setFPS(m_fps);
     const auto tmpBuffer = new uint8_t[oldSpsLen + 16];

@@ -131,7 +131,7 @@ class ContainerToReaderWrapper : public AbstractReader
     void deleteReader(uint32_t readerID) override;
     bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
-    void resetDelayedMark();
+    void resetDelayedMark() const;
     int64_t getDiscardedSize() { return m_discardedSize; };
 
     bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }

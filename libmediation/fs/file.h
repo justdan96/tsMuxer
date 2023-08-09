@@ -114,14 +114,14 @@ class File : public AbstractOutputStream
             \param whence
             \return Location of the cursor after relocating it, or uint64_t(-1) in case of an error.
     */
-    uint64_t seek(int64_t offset, SeekMethod whence = SeekMethod::smBegin);
+    uint64_t seek(int64_t offset, SeekMethod whence = SeekMethod::smBegin) const;
 
     //! Change the size of the file
     /*!
             The location of the file cursor after calling this function is undefined.
             \param newFileSize New size of the file. This function can both enlarge, as well as reduce the file size.
     */
-    bool truncate(uint64_t newFileSize);
+    bool truncate(uint64_t newFileSize) const;
 
     std::string getName() { return m_name; }
 

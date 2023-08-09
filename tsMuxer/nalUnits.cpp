@@ -74,7 +74,7 @@ uint8_t* NALUnit::findNextNAL(uint8_t* buffer, uint8_t* end)
     return end;
 }
 
-uint8_t* NALUnit::findNALWithStartCode(const uint8_t* buffer, const uint8_t* end, bool longCodesAllowed)
+uint8_t* NALUnit::findNALWithStartCode(uint8_t* buffer, uint8_t* end, const bool longCodesAllowed)
 {
     const uint8_t* bufStart = buffer;
     for (buffer += 2; buffer < end;)
@@ -86,14 +86,14 @@ uint8_t* NALUnit::findNALWithStartCode(const uint8_t* buffer, const uint8_t* end
         else if (buffer[-2] == 0 && buffer[-1] == 0)
         {
             if (longCodesAllowed && buffer - 3 >= bufStart && buffer[-3] == 0)
-                return (uint8_t*)buffer - 3;
+                return buffer - 3;
             else
-                return (uint8_t*)buffer - 2;
+                return buffer - 2;
         }
         else
             buffer += 3;
     }
-    return (uint8_t*)end;
+    return end;
 }
 
 int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize)
@@ -206,7 +206,7 @@ unsigned NALUnit::extractUEGolombCode()
     return (1 << cnt) - 1 + bitReader.getBits(cnt);
 }
 
-void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value)
+void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, const int32_t value)
 {
     if (value <= 0)
         writeUEGolombCode(bitWriter, -value * 2);
@@ -214,7 +214,7 @@ void NALUnit::writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value)
         writeUEGolombCode(bitWriter, value * 2 - 1);
 }
 
-void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value)
+void NALUnit::writeUEGolombCode(BitStreamWriter& bitWriter, const uint32_t value)
 {
     uint32_t maxVal = 0;
     int x = 1;
@@ -269,7 +269,7 @@ void NALUnit::decodeBuffer(const uint8_t* buffer, const uint8_t* end)
     m_nalBufferLen = decodeNAL(buffer, end, m_nalBuffer, end - buffer);
 }
 
-int NALUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const
+int NALUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, const bool writeStartCode) const
 {
     if (m_nalBufferLen == 0)
         return 0;
@@ -357,7 +357,7 @@ HRDParams::HRDParams()
 
 HRDParams::~HRDParams() {}
 
-void HRDParams::resetDefault(bool mvc)
+void HRDParams::resetDefault(const bool mvc)
 {
     isPresent = false;
     bitLen = 0;
@@ -435,7 +435,7 @@ SPSUnit::SPSUnit()
 {
 }
 
-void SPSUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag)
+void SPSUnit::scaling_list(int* scalingList, const int sizeOfScalingList, bool& useDefaultScalingMatrixFlag)
 {
     int lastScale = 8;
     int nextScale = 8;
@@ -798,7 +798,7 @@ void SPSUnit::updateTimingInfo()
     m_nalBuffer = newNalBuffer;
 }
 
-void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool addVuiHeader, const HRDParams& params)
+void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int vcl_hrd_len, const bool addVuiHeader, const HRDParams& params)
 {
     // replace hrd parameters not implemented. only insert
     static constexpr int EXTRA_SPACE = 64;
@@ -894,7 +894,7 @@ void SPSUnit::insertHrdData(int bitPos, int nal_hrd_len, int vcl_hrd_len, bool a
     m_nalBuffer = newNalBuffer;
 }
 
-int SPSUnit::getMaxBitrate()
+int SPSUnit::getMaxBitrate() const
 {
     if (nalHrdParams.bit_rate_value_minus1.empty() == 0)
         return 0;
@@ -932,7 +932,7 @@ int SPSUnit::hrd_parameters(HRDParams& params)
     return 0;
 }
 
-int SPSUnit::getCropY()
+int SPSUnit::getCropY() const
 {
     if (chroma_format_idc == 0)
         return (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
@@ -945,7 +945,7 @@ int SPSUnit::getCropY()
     }
 }
 
-int SPSUnit::getCropX()
+int SPSUnit::getCropX() const
 {
     if (chroma_format_idc == 0)
         return frame_crop_left_offset + frame_crop_right_offset;
@@ -971,7 +971,7 @@ double SPSUnit::getFPS() const
         return 0;
 }
 
-void SPSUnit::setFps(double fps)
+void SPSUnit::setFps(const double fps)
 {
     time_scale = (uint32_t)(fps + 0.5) * 1000000;
     // time_scale = (uint32_t)(fps+0.5) * 1000;
@@ -1279,7 +1279,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
     }
 }
 
-void NALUnit::updateBits(int bitOffset, int bitLen, int value)
+void NALUnit::updateBits(const int bitOffset, const int bitLen, const int value) const
 {
     // uint8_t* ptr = m_getbitContextBuffer + (bitOffset/8);
     uint8_t* ptr = (uint8_t*)bitReader.getBuffer() + bitOffset / 8;
@@ -1354,7 +1354,7 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
 }
 
 // --------------- SEI UNIT ------------------------
-void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
+void SEIUnit::deserialize(SPSUnit& sps, const int orig_hrd_parameters_present_flag)
 {
     pic_struct = -1;
 
@@ -1499,8 +1499,8 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
     return tmpBufferLen;
 }
 
-void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
-                          int orig_hrd_parameters_present_flag)
+void SEIUnit::sei_payload(SPSUnit& sps, const int payloadType, uint8_t* curBuff, const int payloadSize,
+                          const int orig_hrd_parameters_present_flag)
 {
     switch (payloadType)
     {
@@ -1580,7 +1580,7 @@ void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int p
 
 void SEIUnit::buffering_period(int payloadSize) {}
 
-int SEIUnit::getNumClockTS(int pic_struct)
+int SEIUnit::getNumClockTS(const int pic_struct)
 {
     int NumClockTS = 0;
     switch (pic_struct)
@@ -1604,7 +1604,7 @@ int SEIUnit::getNumClockTS(int pic_struct)
     return NumClockTS;
 }
 
-void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader)
+void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, const bool seiHeader) const
 {
     if (seiHeader)
     {
@@ -1639,7 +1639,7 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
         write_rbsp_trailing_bits(writer);
 }
 
-void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader)
+void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, const bool seiHeader) const
 {
     if (seiHeader)
     {
@@ -1681,13 +1681,13 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         write_rbsp_trailing_bits(writer);
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag)
+void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, const int payloadSize, const bool orig_hrd_parameters_present_flag)
 {
     bitReader.setBuffer(curBuff, curBuff + payloadSize);
     pic_timing(sps, orig_hrd_parameters_present_flag);
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag)
+void SEIUnit::pic_timing(SPSUnit& sps, const bool orig_hrd_parameters_present_flag)
 {
     const bool CpbDpbDelaysPresentFlag = orig_hrd_parameters_present_flag == 1;
     cpb_removal_delay = dpb_output_delay = 0;
@@ -1730,7 +1730,7 @@ void SEIUnit::deblocking_filter_display_preference(int payloadSize) {}
 void SEIUnit::stereo_video_info(int payloadSize) {}
 void SEIUnit::reserved_sei_message(int payloadSize) {}
 
-int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag)
+int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size, const int orig_hrd_parameters_present_flag)
 {
     try
     {
@@ -1823,7 +1823,7 @@ void SEIUnit::processBlurayOffsetMetadata()
     number_of_offset_sequences = bitReader.getBits(6);
 }
 
-void SEIUnit::updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts)
+void SEIUnit::updateMetadataPts(uint8_t* metadataPtsPtr, const int64_t pts)
 {
     metadataPtsPtr[0] = (pts >> 30) & 0x07;
 

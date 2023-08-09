@@ -57,7 +57,7 @@ static constexpr int AOUT_CHAN_DUALMONO = 0x20000;
 
 using namespace std;
 
-int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
+int DTSStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bool hdmvDescriptors)
 {
     uint8_t* frame = findFrame(m_buffer, m_bufEnd);
     if (frame == nullptr)
@@ -132,7 +132,7 @@ void DTSStreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
     }
 }
 
-int DTSStreamReader::getSurroundModeCode()
+int DTSStreamReader::getSurroundModeCode() const
 {
     int rez = 0;
     if ((pi_channels_conf & AOUT_CHAN_LEFT) && (pi_channels_conf & AOUT_CHAN_RIGHT) &&
@@ -672,7 +672,7 @@ int DTSStreamReader::testSyncInfo16be(const uint8_t* p_buf)
         return 0;
 }
 
-int DTSStreamReader::buf14To16(uint8_t* p_out, const uint8_t* p_in, int i_in, int i_le)
+int DTSStreamReader::buf14To16(uint8_t* p_out, const uint8_t* p_in, const int i_in, const int i_le)
 {
     unsigned char tmp, cur = 0;
     int bits_in, bits_out = 0;
@@ -715,7 +715,7 @@ int DTSStreamReader::buf14To16(uint8_t* p_out, const uint8_t* p_in, int i_in, in
     return i_out;
 }
 
-void DTSStreamReader::BufLeToBe(uint8_t* p_out, const uint8_t* p_in, int i_in)
+void DTSStreamReader::BufLeToBe(uint8_t* p_out, const uint8_t* p_in, const int i_in)
 {
     for (int i = 0; i < i_in / 2; i++)
     {

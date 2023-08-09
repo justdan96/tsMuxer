@@ -4,7 +4,7 @@
 
 namespace wave_format
 {
-uint32_t getWaveChannelMask(int channels, bool lfeExists)
+uint32_t getWaveChannelMask(const int channels, const bool lfeExists)
 {
     switch (channels)
     {
@@ -37,7 +37,7 @@ uint32_t getWaveChannelMask(int channels, bool lfeExists)
     return 0;  // unknown value
 }
 
-void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool lfeExist, int bitdepth)
+void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const int channels, const bool lfeExist, const int bitdepth)
 {
     waveBuffer.clear();
     waveBuffer.grow(40 + 28);
@@ -64,13 +64,13 @@ void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool
     memcpy(curPos, "data\x00\x00\x00\x0", 8);
 }
 
-void toLittleEndian(uint8_t* dstData, const uint8_t* srcData, int size, int bitdepth)
+void toLittleEndian(uint8_t* dstData, uint8_t* srcData, const int size, const int bitdepth)
 {
     if (bitdepth == 16)
     {
         auto dst = (uint16_t*)dstData;
         auto src = (uint16_t*)srcData;
-        const auto srcEnd = (const uint16_t*)(srcData + size);
+        const auto srcEnd = (uint16_t*)(srcData + size);
         while (src < srcEnd) *dst++ = my_ntohs(*src++);
     }
     else if (bitdepth > 16)

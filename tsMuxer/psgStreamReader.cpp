@@ -103,7 +103,7 @@ void PGSStreamReader::pgs_window(BitStreamReader& bitReader)
     bitReader.skipBits(32);  // window_width, window_height
 }
 
-int PGSStreamReader::calcFpsIndex(double fps)
+int PGSStreamReader::calcFpsIndex(const double fps)
 {
     for (int i = 0; i < 16; i++)
         if (fabs(pgs_frame_rates[i] - fps) < 1e-4)
@@ -129,7 +129,7 @@ void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)
     }
 }
 
-void PGSStreamReader::yuvToRgb(int minY)
+void PGSStreamReader::yuvToRgb(const int minY) const
 {
     uint8_t* src = m_imgBuffer;
     const uint8_t* end = src + m_video_width * m_video_height;
@@ -157,7 +157,7 @@ void PGSStreamReader::yuvToRgb(int minY)
     }
 }
 
-void PGSStreamReader::decodeRleData(int xOffset, int yOffset)
+void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset)
 {
     if (m_dstRle.size() == 0)
         return;
@@ -403,7 +403,7 @@ int64_t getTimeValueNano(uint8_t* pos)
         return ptsToInternalClock(pts);
 }
 
-int64_t getTimeValueNano(int64_t pts)
+int64_t getTimeValueNano(const int64_t pts)
 {
     if (pts > 0x1ff000000ull)
         return ptsToInternalClock(pts - 0x200000000ll);
@@ -720,7 +720,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
 
 int PGSStreamReader::flushPacket(AVPacket& avPacket) { return 0; }
 
-void PGSStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
+void PGSStreamReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
 {
     if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
@@ -773,7 +773,7 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
     return rez;
 }
 
-void PGSStreamReader::intDecodeStream(uint8_t* buffer, size_t len)
+void PGSStreamReader::intDecodeStream(uint8_t* buffer, const size_t len)
 {
     uint8_t* bufEnd = buffer + len;
     uint8_t* curPos = buffer;
@@ -831,7 +831,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         return 0;
 }
 
-void PGSStreamReader::setVideoInfo(int width, int height, double fps)
+void PGSStreamReader::setVideoInfo(const int width, const int height, const double fps)
 {
     m_scaled_width = width;
     m_scaled_height = height;

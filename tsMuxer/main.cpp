@@ -312,7 +312,7 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
     deleteFile(tmpFileName);
 }
 
-void doTruncatedFile(const char* fileName, int64_t offset)
+void doTruncatedFile(const char* fileName, const int64_t offset)
 {
     File f;
     File outFile;

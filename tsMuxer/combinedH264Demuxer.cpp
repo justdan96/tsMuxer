@@ -41,7 +41,7 @@ int CombinedH264Reader::getPrefixLen(const uint8_t* pos, const uint8_t* end)
 }
 
 void CombinedH264Reader::addDataToPrimary(const uint8_t* data, const uint8_t* dataEnd, DemuxedData& demuxedData,
-                                          int64_t& discardSize)
+                                          int64_t& discardSize) const
 {
     if (m_avcStreamIndex >= 0)
         demuxedData[m_avcStreamIndex].append(data, dataEnd - data);
@@ -50,7 +50,7 @@ void CombinedH264Reader::addDataToPrimary(const uint8_t* data, const uint8_t* da
 }
 
 void CombinedH264Reader::addDataToSecondary(const uint8_t* data, const uint8_t* dataEnd, DemuxedData& demuxedData,
-                                            int64_t& discardSize)
+                                            int64_t& discardSize) const
 {
     if (m_mvcStreamIndex >= 0)
         demuxedData[m_mvcStreamIndex].append(data, dataEnd - data);
@@ -107,7 +107,7 @@ CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_
     }
 }
 
-void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, int pid)
+void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, const int pid)
 {
     m_mvcStreamIndex = SubTrackFilter::pidToSubPid(pid, MVC_STREAM_INDEX);
     m_avcStreamIndex = SubTrackFilter::pidToSubPid(pid, AVC_STREAM_INDEX);
@@ -168,16 +168,16 @@ int CombinedH264Demuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet
         m_bufferedReader->notify(m_readerID, readedBytes);
     m_lastReadRez = readRez;
     data += MAX_TMP_BUFFER_SIZE;
-    const uint8_t* dataEnd = data + readedBytes;
+    uint8_t* dataEnd = data + readedBytes;
     if (m_tmpBuffer.size() > 0)
     {
         data -= m_tmpBuffer.size();
         memcpy(data, m_tmpBuffer.data(), m_tmpBuffer.size());
         m_tmpBuffer.clear();
     }
-    const uint8_t* curNal = data;
+    uint8_t* curNal = data;
 
-    const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+    uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     while (curNal < dataEnd - 4)
     {
         const int prefixLen = getPrefixLen(curNal, dataEnd);
@@ -254,7 +254,7 @@ void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
 
 // ------------------------------ CombinedH264Filter -----------------------------------
 
-CombinedH264Filter::CombinedH264Filter(int demuxedPID) : SubTrackFilter(demuxedPID), CombinedH264Reader() {}
+CombinedH264Filter::CombinedH264Filter(const int demuxedPID) : SubTrackFilter(demuxedPID), CombinedH264Reader() {}
 
 int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket)
 {
@@ -264,9 +264,9 @@ int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acce
         m_firstDemuxCall = false;
     }
 
-    const uint8_t* curNal = avPacket.data;
-    const uint8_t* dataEnd = avPacket.data + avPacket.size;
-    const uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
+    uint8_t* curNal = avPacket.data;
+    uint8_t* dataEnd = avPacket.data + avPacket.size;
+    uint8_t* nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     int64_t discardSize = 0;
     while (curNal < dataEnd - 4)
     {

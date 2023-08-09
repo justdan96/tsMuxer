@@ -43,7 +43,7 @@ HEVCStreamReader::~HEVCStreamReader()
     delete m_slice;
 }
 
-CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
+CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, const int len)
 {
     CheckStreamRez rez;
 
@@ -138,7 +138,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, int len)
     return rez;
 }
 
-int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors)
+int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, const bool hdmvDescriptors)
 {
     if (m_firstFrame)
         CheckStreamRez rez = checkStream(m_buffer, (int)(m_bufEnd - m_buffer));
@@ -229,7 +229,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     return (hdmvDescriptors ? 10 : 15) + lenDoviDesc;
 }
 
-int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff)
+int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff) const
 {
     const bool isDVBL = (V3_flags & BL_TRACK) == 0;
     if (!isDVBL)
@@ -424,7 +424,7 @@ bool HEVCStreamReader::skipNal(uint8_t* nal)
     return false;
 }
 
-bool HEVCStreamReader::isSlice(HevcUnit::NalType nalType) const
+bool HEVCStreamReader::isSlice(const HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
@@ -432,7 +432,7 @@ bool HEVCStreamReader::isSlice(HevcUnit::NalType nalType) const
            (nalType >= HevcUnit::NalType::BLA_W_LP && nalType <= HevcUnit::NalType::RSV_IRAP_VCL23);
 }
 
-bool HEVCStreamReader::isSuffix(HevcUnit::NalType nalType) const
+bool HEVCStreamReader::isSuffix(const HevcUnit::NalType nalType) const
 {
     if (!m_sps || !m_vps || !m_pps)
         return false;
@@ -459,7 +459,7 @@ void HEVCStreamReader::incTimings()
     }
 }
 
-int HEVCStreamReader::toFullPicOrder(HevcSliceHeader* slice, int pic_bits)
+int HEVCStreamReader::toFullPicOrder(HevcSliceHeader* slice, const int pic_bits)
 {
     if (slice->isIDR())
     {
@@ -607,7 +607,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
         return NEED_MORE_DATA;
 }
 
-uint8_t* HEVCStreamReader::writeNalPrefix(uint8_t* curPos)
+uint8_t* HEVCStreamReader::writeNalPrefix(uint8_t* curPos) const
 {
     if (!m_shortStartCodes)
         *curPos++ = 0;
@@ -617,7 +617,7 @@ uint8_t* HEVCStreamReader::writeNalPrefix(uint8_t* curPos)
     return curPos;
 }
 
-uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd)
+uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd) const
 {
     if (srcData.isEmpty())
         return dstBuffer;

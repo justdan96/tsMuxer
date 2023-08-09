@@ -102,7 +102,7 @@ enum class BDMV_VersionNumber
     Version2,
     Version3
 };
-std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
+std::array<std::uint8_t, 4> getBDMV_VersionNumber(const BDMV_VersionNumber version)
 {
     std::array<std::uint8_t, 4> rv = {0x30, 0x31, 0x30, 0x30};  // "0100"
     switch (version)
@@ -121,7 +121,7 @@ std::array<std::uint8_t, 4> getBDMV_VersionNumber(BDMV_VersionNumber version)
         return rv;
     }
 }
-std::vector<std::uint8_t> makeBdMovieObjectData(BDMV_VersionNumber version,
+std::vector<std::uint8_t> makeBdMovieObjectData(const BDMV_VersionNumber version,
                                                 const std::vector<MovieObject>& movieObjects)
 {
     constexpr std::array<std::uint8_t, 4> type_indicator = {0x4D, 0x4F, 0x42, 0x4A};  // "MOBJ"
@@ -178,7 +178,7 @@ NavigationCommand makeNoBlankCommand()
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
 
-NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, MuxerManager::SubTrackMode subTrackMode)
+NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, const MuxerManager::SubTrackMode subTrackMode)
 {
     NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     if (audioTrackIdx >= 0)
@@ -205,7 +205,7 @@ NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, Mu
 }
 
 bool writeBdMovieObjectData(const MuxerManager& muxer, AbstractOutputStream* file, const std::string& prefix,
-                            DiskType diskType, bool usedBlankPL, int mplsNum, int blankNum)
+                            const DiskType diskType, const bool usedBlankPL, const int mplsNum, const int blankNum)
 {
     std::vector<MovieObject> movieObjects = {
         {{{0x50, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x00, 0x00},
@@ -279,8 +279,8 @@ void BlurayHelper::close()
     }
 }
 
-bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int extraISOBlocks,
-                        bool useReproducibleIsoHeader)
+bool BlurayHelper::open(const string& dst, const DiskType dt, const int64_t diskSize, const int extraISOBlocks,
+                        const bool useReproducibleIsoHeader)
 {
     m_dstPath = toNativeSeparators(dst);
 
@@ -300,7 +300,7 @@ bool BlurayHelper::open(const string& dst, DiskType dt, int64_t diskSize, int ex
     }
 }
 
-bool BlurayHelper::createBluRayDirs()
+bool BlurayHelper::createBluRayDirs() const
 {
     if (m_dt == DiskType::BLURAY)
     {
@@ -348,8 +348,8 @@ bool BlurayHelper::createBluRayDirs()
     return true;
 }
 
-bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum,
-                                    bool stereoMode)
+bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, const bool usedBlankPL, const int mplsNum, const int blankNum,
+                                    const bool stereoMode) const
 {
     int fileSize = sizeof(bdIndexData);
     const string prefix = m_isoWriter ? "" : m_dstPath;
@@ -414,7 +414,7 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL,
     return writeBdMovieObjectData(muxer, file, prefix, m_dt, usedBlankPL, mplsNum, blankNum);
 }
 
-bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
+bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
 {
     static constexpr int CLPI_BUFFER_SIZE = 1024 * 1024;
     auto clpiBuffer = new uint8_t[CLPI_BUFFER_SIZE];
@@ -521,7 +521,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog)
     return true;
 }
 
-const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
+const PMTStreamInfo* streamByIndex(const int index, const PIDListMap& pidList)
 {
     for (const auto& [pid, si] : pidList)
     {
@@ -533,7 +533,7 @@ const PMTStreamInfo* streamByIndex(int index, const PIDListMap& pidList)
 }
 
 bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
-                                  vector<double> customChapters, DiskType dt, int mplsOffset, bool isMvcBaseViewR)
+                                  vector<double> customChapters, DiskType dt, int mplsOffset, bool isMvcBaseViewR) const
 {
     int64_t firstPts = *(mainMuxer->getFirstPts().begin());
     int64_t lastPts = *(mainMuxer->getLastPts().rbegin());
@@ -677,7 +677,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     return true;
 }
 
-string BlurayHelper::m2tsFileName(int num)
+string BlurayHelper::m2tsFileName(const int num) const
 {
     const string prefix = m_isoWriter ? "" : m_dstPath;
     const char separator = m_isoWriter ? '/' : getDirSeparator();
@@ -685,7 +685,7 @@ string BlurayHelper::m2tsFileName(int num)
            string(".m2ts");
 }
 
-string BlurayHelper::ssifFileName(int num)
+string BlurayHelper::ssifFileName(const int num) const
 {
     const string prefix = m_isoWriter ? "" : m_dstPath;
     const char separator = m_isoWriter ? '/' : getDirSeparator();
@@ -705,7 +705,7 @@ AbstractOutputStream* BlurayHelper::createFile()
 
 bool BlurayHelper::isVirtualFS() const { return m_isoWriter != nullptr; }
 
-void BlurayHelper::setVolumeLabel(const std::string& label)
+void BlurayHelper::setVolumeLabel(const std::string& label) const
 {
     if (m_isoWriter)
         m_isoWriter->setVolumeLabel(unquoteStr(label));

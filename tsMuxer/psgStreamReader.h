@@ -135,7 +135,7 @@ class PGSStreamReader : public AbstractStreamReader
     void readPalette(uint8_t* pos, uint8_t* end);
     int readObjectDef(uint8_t* pos, uint8_t* end);
     void decodeRleData(int xOffset, int yOffset);
-    void yuvToRgb(int minY);
+    void yuvToRgb(int minY) const;
     static void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
     void intDecodeStream(uint8_t* buffer, size_t len);
 

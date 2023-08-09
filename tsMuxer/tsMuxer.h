@@ -52,9 +52,9 @@ class TSMuxer : public AbstractMuxer
     void openDstFile() override;
     void setVBVBufferLen(int value);
     const PIDListMap& getPidList() const { return m_pmt.pidList; }
-    std::vector<int64_t> getFirstPts();
+    std::vector<int64_t> getFirstPts() const;
     void alignPTS(TSMuxer* otherMuxer);
-    std::vector<int64_t> getLastPts();
+    std::vector<int64_t> getLastPts() const;
     const std::vector<uint32_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
     size_t splitFileCnt() const { return m_fileNames.size(); }
     void setSplitDuration(int64_t value) { m_splitDuration = value; }
@@ -74,7 +74,7 @@ class TSMuxer : public AbstractMuxer
     bool muxPacket(AVPacket& avPacket) override;
     virtual void internalReset();
     void setMuxFormat(const std::string& format);
-    bool isSplitPoint(const AVPacket& avPacket);
+    bool isSplitPoint(const AVPacket& avPacket) const;
     bool blockFull() const;
 
    private:
@@ -95,7 +95,7 @@ class TSMuxer : public AbstractMuxer
     void buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid);
     void writePESPacket();
     void processM2TSPCR(int64_t pcrVal, int64_t pcrGAP);
-    inline int calcM2tsFrameCnt();
+    inline int calcM2tsFrameCnt() const;
     inline void writeM2TSHeader(uint8_t* buffer, uint64_t m2tsPCR)
     {
         auto cur = (uint32_t*)buffer;
@@ -105,8 +105,8 @@ class TSMuxer : public AbstractMuxer
     void writePCR(uint64_t newPCR);
     std::string getNextName(const std::string curName) override;
     void writeEmptyPacketWithPCRTest(int64_t pcrVal);
-    bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited);
-    int writeOutFile(uint8_t* buffer, int len);
+    bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited) const;
+    int writeOutFile(uint8_t* buffer, int len) const;
 
     void joinToMasterFile() override;
     void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;

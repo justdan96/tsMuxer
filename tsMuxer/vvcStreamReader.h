@@ -39,8 +39,8 @@ class VVCStreamReader : public MPEGStreamReader
     void incTimings();
     int toFullPicOrder(VvcSliceHeader* slice, int pic_bits);
     static void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);
-    uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd);
-    uint8_t* writeNalPrefix(uint8_t* curPos);
+    uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd) const;
+    uint8_t* writeNalPrefix(uint8_t* curPos) const;
 
    private:
     typedef std::map<int, VvcVpsUnit*> VPSMap;

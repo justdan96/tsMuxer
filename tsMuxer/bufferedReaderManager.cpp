@@ -4,8 +4,8 @@
 
 using namespace std;
 
-BufferedReaderManager::BufferedReaderManager(uint32_t readersCnt, uint32_t blockSize, uint32_t allocSize,
-                                             uint32_t prereadThreshold)
+BufferedReaderManager::BufferedReaderManager(const uint32_t readersCnt, const uint32_t blockSize, const uint32_t allocSize,
+                                             const uint32_t prereadThreshold)
 {
     init(blockSize, allocSize, prereadThreshold);
 
@@ -19,7 +19,7 @@ BufferedReaderManager::BufferedReaderManager(uint32_t readersCnt, uint32_t block
     m_readersCnt = readersCnt;
 }
 
-void BufferedReaderManager::init(uint32_t blockSize, uint32_t allocSize, uint32_t prereadThreshold)
+void BufferedReaderManager::init(const uint32_t blockSize, const uint32_t allocSize, const uint32_t prereadThreshold)
 {
     m_blockSize = blockSize > 0 ? blockSize : DEFAULT_FILE_BLOCK_SIZE;
     m_allocSize = allocSize > 0 ? allocSize : m_blockSize + MAX_AV_PACKET_SIZE;
@@ -35,7 +35,7 @@ BufferedReaderManager::~BufferedReaderManager()
     }
 }
 
-AbstractReader* BufferedReaderManager::getReader(const char* streamName)
+AbstractReader* BufferedReaderManager::getReader(const char* streamName) const
 {
     uint32_t minReaderCnt = UINT_MAX;
     uint32_t minReaderIndex = 0;

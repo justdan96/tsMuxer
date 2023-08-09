@@ -345,7 +345,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
 
 void MatroskaDemuxer::matroska_queue_packet(AVPacket *pkt) { packets.push(pkt); }
 
-int MatroskaDemuxer::rv_offset(uint8_t *data, int slice, int slices)
+int MatroskaDemuxer::rv_offset(uint8_t *data, const int slice, const int slices)
 {
     return AV_RL32(data + 8 * slice + 4) + 8 * slices;
 }
@@ -353,7 +353,7 @@ int MatroskaDemuxer::rv_offset(uint8_t *data, int slice, int slices)
 /* Read signed/unsigned "EBML" numbers.
  * Return: number of bytes processed, < 0 on error.
  * XXX: use ebml_read_num(). */
-int MatroskaDemuxer::matroska_find_track_by_num(uint64_t num)
+int MatroskaDemuxer::matroska_find_track_by_num(const uint64_t num) const
 {
     for (int i = 0; i < num_tracks; i++)
         if (tracks[i]->num == num)
@@ -361,7 +361,7 @@ int MatroskaDemuxer::matroska_find_track_by_num(uint64_t num)
     return -1;
 }
 
-int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num)
+int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const uint32_t size, uint64_t *num)
 {
     unsigned read = 1, n = 1, num_ffs = 0;
     uint64_t len_mask = 0x80;
@@ -398,7 +398,7 @@ int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_
     return read;
 }
 
-int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num)
+int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, const uint32_t size, int64_t *num)
 {
     uint64_t unum;
     int res;
@@ -455,7 +455,7 @@ int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
     return 0;
 }
 
-void MatroskaDemuxer::decompressData(const uint8_t *data, int size)
+void MatroskaDemuxer::decompressData(uint8_t *data, const int size)
 {
     z_stream zstream;
     memset(&zstream, 0, sizeof(zstream));
@@ -483,8 +483,8 @@ void MatroskaDemuxer::decompressData(const uint8_t *data, int size)
         m_tmpBuffer.clear();
 }
 
-int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, uint64_t cluster_time,
-                                          uint64_t duration, int is_keyframe, int is_bframe)
+int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t pos, const uint64_t cluster_time,
+                                          const uint64_t duration, int is_keyframe, int is_bframe)
 {
     int res = 0;
     // AVStream *st;
@@ -699,7 +699,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
     return res;
 }
 
-int MatroskaDemuxer::matroska_parse_blockgroup(uint64_t cluster_time)
+int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
 {
     int res = 0;
     uint32_t id;
@@ -1040,7 +1040,7 @@ void MatroskaDemuxer::readClose()
 
 // --------------------------- refactored from ffmpeg matroska decoder -----------------------
 
-int MatroskaDemuxer::ebml_read_num(int max_size, uint64_t *number)
+int MatroskaDemuxer::ebml_read_num(const int max_size, uint64_t *number)
 {
     // ByteIOContext *pb = &matroska->ctx->pb;
     int len_mask = 0x80, read = 1, n = 1;
@@ -1532,7 +1532,7 @@ int MatroskaDemuxer::matroska_parse_metadata()
 
 /* Seek to a given offset.
  * 0 is success, -1 is failure. */
-int MatroskaDemuxer::ebml_read_seek(int64_t offset)
+int MatroskaDemuxer::ebml_read_seek(const int64_t offset)
 {
     /* clear ID cache, if any */
     peek_id = 0;

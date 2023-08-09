@@ -13,7 +13,7 @@
 static constexpr int m2tsFreqs[] = {0, 48000, 0, 0, 96000, 192000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static constexpr int MAX_HEADER_SIZE = 192;
 
-static uint32_t FOUR_CC(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+static uint32_t FOUR_CC(const uint8_t a, const uint8_t b, const uint8_t c, const uint8_t d)
 {
     return my_ntohl((uint32_t(a) << 24) + (uint32_t(b) << 16) + (uint32_t(c) << 8) + uint32_t(d));
 }
@@ -109,7 +109,7 @@ int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
     return audio_data_payload_size;
 }
 
-void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch)
+void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData, const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     const int fullSampleSize = mch * ch1SampleSize;
@@ -121,7 +121,7 @@ void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, int chNum,
     }
 }
 
-void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch)
+void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData, const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
     const int fullSampleSize = mch * ch1SampleSize;
@@ -133,7 +133,7 @@ void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, int chNu
     }
 }
 
-void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, int chFrom, int chTo, int mch)
+void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, const int chFrom, const int chTo, const int mch) const
 {
     // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
@@ -147,7 +147,7 @@ void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, int chFrom,
     }
 }
 
-void LPCMStreamReader::removeChannel(uint8_t* start, uint8_t* end, int cnNum, int mch)
+void LPCMStreamReader::removeChannel(uint8_t* start, uint8_t* end, const int cnNum, const int mch) const
 {
     // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     assert(mch == cnNum);
@@ -663,9 +663,9 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     return (int)(curPos - dstBuffer);
 }
 
-void LPCMStreamReader::setHeadersType(LPCMStreamReader::LPCMHeaderType value) { m_headerType = value; }
+void LPCMStreamReader::setHeadersType(const LPCMStreamReader::LPCMHeaderType value) { m_headerType = value; }
 
-bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, int64_t len)
+bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, const int64_t len)
 {
     if (len == 0)
         return false;
@@ -897,7 +897,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
 
 const CodecInfo& LPCMStreamReader::getCodecInfo() { return lpcmCodecInfo; }
 
-void LPCMStreamReader::setBuffer(uint8_t* data, int dataLen, bool lastBlock)
+void LPCMStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
 {
     m_lastChannelRemapPos = nullptr;
     SimplePacketizerReader::setBuffer(data, dataLen, lastBlock);

@@ -16,7 +16,7 @@ uint32_t BufferedReader::m_newReaderID = 0;
 std::mutex BufferedReader::m_genReaderMtx;
 static constexpr unsigned QUEUE_MAX_SIZE = 4096;
 
-BufferedReader::BufferedReader(uint32_t blockSize, uint32_t allocSize, uint32_t prereadThreshold)
+BufferedReader::BufferedReader(const uint32_t blockSize, const uint32_t allocSize, const uint32_t prereadThreshold)
     : m_started(false), m_terminated(false), m_readQueue(QUEUE_MAX_SIZE), m_id(0)
 {
     // size of the blocks being read
@@ -28,14 +28,14 @@ BufferedReader::BufferedReader(uint32_t blockSize, uint32_t allocSize, uint32_t 
     m_prereadThreshold = prereadThreshold ? prereadThreshold : m_blockSize / 2;
 }
 
-ReaderData* BufferedReader::getReader(uint32_t readerID)
+ReaderData* BufferedReader::getReader(const uint32_t readerID)
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
     const auto itr = m_readers.find(readerID);
     return itr != m_readers.end() ? itr->second : nullptr;
 }
 
-bool BufferedReader::incSeek(uint32_t readerID, int64_t offset)
+bool BufferedReader::incSeek(const uint32_t readerID, const int64_t offset)
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
     const auto itr = m_readers.find(readerID);
@@ -74,7 +74,7 @@ uint32_t BufferedReader::createNewReaderID()
     return rez;
 }
 
-uint32_t BufferedReader::createReader(int readBuffOffset)
+uint32_t BufferedReader::createReader(const int readBuffOffset)
 {
     uint32_t newReaderID = 0;
     ReaderData* data = intCreateReader();
@@ -103,7 +103,7 @@ uint32_t BufferedReader::createReader(int readBuffOffset)
     return newReaderID;
 }
 
-void BufferedReader::deleteReader(uint32_t readerID)
+void BufferedReader::deleteReader(const uint32_t readerID)
 {
     {
         std::lock_guard<std::mutex> lock(m_readersMtx);
@@ -123,7 +123,7 @@ void BufferedReader::deleteReader(uint32_t readerID)
     // LTRACE(LT_INFO, 0, "stop stream " << readerID << ". stream(s): " << (uint32_t) rSize);
 }
 
-uint8_t* BufferedReader::readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
+uint8_t* BufferedReader::readBlock(const uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
     ReaderData* data = nullptr;
     {
@@ -169,7 +169,7 @@ void BufferedReader::terminate()
     // join();
 }
 
-void BufferedReader::notify(uint32_t readerID, uint32_t dataReaded)
+void BufferedReader::notify(const uint32_t readerID, const uint32_t dataReaded)
 {
     ReaderData* data = getReader(readerID);
     if (data == nullptr)
@@ -289,7 +289,7 @@ void BufferedReader::thread_main()
     }
 }
 
-void BufferedReader::setFileIterator(FileNameIterator* itr, int readerID)
+void BufferedReader::setFileIterator(FileNameIterator* itr, const int readerID)
 {
     assert(readerID != -1);
     std::lock_guard<std::mutex> lock(m_readersMtx);

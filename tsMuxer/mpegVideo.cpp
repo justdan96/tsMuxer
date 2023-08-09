@@ -14,7 +14,7 @@ static constexpr int MB_ESCAPE_CODE = -1;
 
 // --------------------- MPEGRawDataHeader ---------------------
 
-MPEGRawDataHeader::MPEGRawDataHeader(int maxBufferLen)
+MPEGRawDataHeader::MPEGRawDataHeader(const int maxBufferLen)
     : MPEGHeader(), m_headerIncludedToBuff(false), m_data_buffer_len(0), m_max_data_len(maxBufferLen)
 {
     if (maxBufferLen > 0)
@@ -38,7 +38,7 @@ uint32_t MPEGRawDataHeader::serialize(uint8_t* buffer)
     return m_data_buffer_len;
 }
 
-bool MPEGRawDataHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader)
+bool MPEGRawDataHeader::addRawData(uint8_t* buffer, const int len, const bool headerIncluded, bool isHeader)
 {
     if (m_data_buffer_len + len > m_max_data_len)
     {
@@ -52,7 +52,7 @@ bool MPEGRawDataHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded
 
 // --------------------- MPEGSequenceHeader --------------------
 
-MPEGSequenceHeader::MPEGSequenceHeader(int bufferSize)
+MPEGSequenceHeader::MPEGSequenceHeader(const int bufferSize)
     : MPEGRawDataHeader(bufferSize),
       width(0),
       height(0),
@@ -84,7 +84,7 @@ MPEGSequenceHeader::MPEGSequenceHeader(int bufferSize)
     level = -1;
 }
 
-uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, int64_t buf_size)
+uint8_t* MPEGSequenceHeader::deserialize(uint8_t* buf, const int64_t buf_size)
 {
     BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
@@ -198,7 +198,7 @@ uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitRea
     return skipProcessedBytes(bitReader);
 }
 
-std::string MPEGSequenceHeader::getStreamDescr()
+std::string MPEGSequenceHeader::getStreamDescr() const
 {
     std::ostringstream rez;
     rez << "Profile: ";
@@ -239,7 +239,7 @@ std::string MPEGSequenceHeader::getStreamDescr()
     return rez.str();
 }
 
-double MPEGSequenceHeader::getFrameRate()
+double MPEGSequenceHeader::getFrameRate() const
 {
     if (frame_rate_index > 0 && frame_rate_index < sizeof(frame_rates) / sizeof(double))
         return frame_rates[frame_rate_index];
@@ -247,7 +247,7 @@ double MPEGSequenceHeader::getFrameRate()
         return 0;
 }
 
-void MPEGSequenceHeader::setFrameRate(uint8_t* buff, double fps)
+void MPEGSequenceHeader::setFrameRate(uint8_t* buff, const double fps)
 {
     for (int i = 1; i < sizeof(frame_rates) / sizeof(double); i++)
         if (std::abs(frame_rates[i] - fps) < FRAME_RATE_EPS)
@@ -281,7 +281,7 @@ MPEGGOPHeader::MPEGGOPHeader()
 
 MPEGGOPHeader::~MPEGGOPHeader() {}
 
-uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int64_t buf_size)
+uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, const int64_t buf_size)
 {
     BitStreamReader bitReader{};
     bitReader.setBuffer(buf, buf + buf_size);
@@ -303,7 +303,7 @@ uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, int64_t buf_size)
     return skipProcessedBytes(bitReader);
 }
 
-uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
+uint32_t MPEGGOPHeader::serialize(uint8_t* buffer) const
 {
     BitStreamWriter bitWriter{};
     bitWriter.setBuffer(buffer, buffer + 8);
@@ -327,7 +327,7 @@ uint32_t MPEGGOPHeader::serialize(uint8_t* buffer)
 
 // ----------------- picture headers -----------
 
-MPEGPictureHeader::MPEGPictureHeader(int bufferSize)
+MPEGPictureHeader::MPEGPictureHeader(const int bufferSize)
     : MPEGRawDataHeader(bufferSize),
       ref(0),
       pict_type(PictureCodingType::FORBIDDEN),
@@ -433,7 +433,7 @@ void MPEGPictureHeader::buildCodingExtension()
     m_data_buffer_len += (bitCnt >> 3) + (bitCnt & 7 ? 1 : 0);
 }
 
-uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, int64_t buf_size)
+uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, const int64_t buf_size)
 {
     bitReader.setBuffer(buf, buf + buf_size);
 
@@ -500,7 +500,7 @@ uint8_t* MPEGPictureHeader::deserializeCodingExtension(BitStreamReader& bitReade
     return skipProcessedBytes(bitReader);
 }
 
-void MPEGPictureHeader::setTempRef(uint32_t number)
+void MPEGPictureHeader::setTempRef(const uint32_t number)
 {
     if (m_headerIncludedToBuff)
     {
@@ -511,7 +511,7 @@ void MPEGPictureHeader::setTempRef(uint32_t number)
         ref = number;
 }
 
-void MPEGPictureHeader::setVbvDelay(uint16_t val)
+void MPEGPictureHeader::setVbvDelay(const uint16_t val)
 {
     if (m_headerIncludedToBuff)
     {
@@ -526,9 +526,9 @@ void MPEGPictureHeader::setVbvDelay(uint16_t val)
         vbv_delay = val;
 }
 
-uint32_t MPEGPictureHeader::getPictureSize() { return m_headerSize + m_data_buffer_len; }
+uint32_t MPEGPictureHeader::getPictureSize() const { return m_headerSize + m_data_buffer_len; }
 
-bool MPEGPictureHeader::addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader)
+bool MPEGPictureHeader::addRawData(uint8_t* buffer, const int len, const bool headerIncluded, const bool isHeader)
 
 {
     const bool rez = MPEGRawDataHeader::addRawData(buffer, len, headerIncluded, isHeader);
@@ -544,7 +544,7 @@ uint32_t MPEGPictureHeader::serialize(uint8_t* buffer)
     return rez;
 }
 
-void MPEGSliceHeader::deserialize(uint8_t* buf, int buf_size)
+void MPEGSliceHeader::deserialize(uint8_t* buf, const int buf_size)
 {
     BitStreamReader reader{};
     reader.setBuffer(buf, buf + buf_size);

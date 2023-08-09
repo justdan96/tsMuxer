@@ -62,7 +62,7 @@ struct HevcUnit
    protected:
     unsigned extractUEGolombCode();
     int extractSEGolombCode();
-    void updateBits(int bitOffset, int bitLen, int value);
+    void updateBits(int bitOffset, int bitLen, int value) const;
 
    protected:
     uint8_t* m_nalBuffer;

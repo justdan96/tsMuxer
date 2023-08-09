@@ -38,7 +38,7 @@ class MuxerManager
     void setCutEnd(int64_t value) { m_cutEnd = value; }
     int64_t getCutEnd() const { return m_cutEnd; }
 
-    void waitForWriting();
+    void waitForWriting() const;
 
     virtual void asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
     virtual int syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
@@ -47,8 +47,8 @@ class MuxerManager
     void parseMuxOpt(const std::string& opts);
     int getTrackCnt() { return (int)m_metaDemuxer.getCodecInfo().size(); }
     bool getHevcFound() { return m_metaDemuxer.m_HevcFound; }
-    AbstractMuxer* getMainMuxer();
-    AbstractMuxer* getSubMuxer();
+    AbstractMuxer* getMainMuxer() const;
+    AbstractMuxer* getSubMuxer() const;
     bool isStereoMode() const;
 
     void setAllowStereoMux(bool value);
@@ -70,8 +70,8 @@ class MuxerManager
    private:
     void preinitMux(const std::string& outFileName, FileFactory* fileFactory);
     AbstractMuxer* createMuxer();
-    void asyncWriteBlock(const WriterData& data);
-    void checkTrackList(const std::vector<StreamInfo>& ci);
+    void asyncWriteBlock(const WriterData& data) const;
+    void checkTrackList(const std::vector<StreamInfo>& ci) const;
 
    private:
     AbstractMuxer* m_mainMuxer;

@@ -49,7 +49,7 @@ TextSubtitlesRenderWin32::~TextSubtitlesRenderWin32()
 #endif
 }
 
-void TextSubtitlesRenderWin32::setRenderSize(int width, int height)
+void TextSubtitlesRenderWin32::setRenderSize(const int width, const int height)
 {
     delete[] m_pbmpInfo;
     m_width = width;

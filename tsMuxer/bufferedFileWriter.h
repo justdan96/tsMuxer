@@ -30,7 +30,7 @@ struct WriterData
    public:
     WriterData() : m_buffer(0), m_bufferLen(0), m_mainFile(), m_command() {}
 
-    void execute();
+    void execute() const;
 };
 
 class BufferedFileWriter : public TerminatableThread

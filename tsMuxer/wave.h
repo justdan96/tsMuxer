@@ -90,7 +90,7 @@ static GUID WAVE64GUID(0x66666972, 0x912E, 0x11CF, "\xA5\xD6\x28\xDB\x04\xC1\x00
 
 void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool lfeExist, int bitdepth);
 uint32_t getWaveChannelMask(int channels, bool lfeExists);
-void toLittleEndian(uint8_t* dstData, const uint8_t* srcData, int size, int bitdepth);
+void toLittleEndian(uint8_t* dstData, uint8_t* srcData, int size, int bitdepth);
 }  // namespace wave_format
 
 #endif

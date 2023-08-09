@@ -36,7 +36,7 @@ static constexpr UTF32 halfMask = 0x3FFUL;
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
-                                     UTF16* targetEnd, ConversionFlags flags)
+                                     UTF16* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF32* source = *sourceStart;
@@ -117,7 +117,7 @@ std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32 ch)
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,
-                                     UTF32* targetEnd, ConversionFlags flags)
+                                     UTF32* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF16* source = *sourceStart;
@@ -207,7 +207,7 @@ static constexpr UTF8 firstByteMark[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0x
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sourceEnd, UTF8** targetStart,
-                                    UTF8* targetEnd, ConversionFlags flags)
+                                    UTF8* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF16* source = *sourceStart;
@@ -324,7 +324,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-static Boolean isLegalUTF8(const UTF8* source, int length)
+static Boolean isLegalUTF8(const UTF8* source, const int length)
 {
     UTF8 a;
     const UTF8* srcptr = source + length;
@@ -393,7 +393,7 @@ Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
     return isLegalUTF8(source, length);
 }
 
-Boolean isLegalUTF8String(const UTF8* string, int length)
+Boolean isLegalUTF8String(const UTF8* string, const int length)
 {
     /* same as above, but verify if the whole passed bytestream consists of valid UTF-8 sequences only. */
     const auto stringEnd = string + length;
@@ -414,7 +414,7 @@ Boolean isLegalUTF8String(const UTF8* string, int length)
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart,
-                                    UTF16* targetEnd, ConversionFlags flags)
+                                    UTF16* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF8* source = *sourceStart;
@@ -526,7 +526,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sourceEnd, UTF8** targetStart,
-                                    UTF8* targetEnd, ConversionFlags flags)
+                                    UTF8* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF32* source = *sourceStart;
@@ -609,7 +609,7 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* sourceEnd, UTF32** targetStart,
-                                    UTF32* targetEnd, ConversionFlags flags)
+                                    UTF32* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF8* source = *sourceStart;

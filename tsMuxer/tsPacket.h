@@ -478,15 +478,15 @@ class CLPIParser
     void TS_type_info_block(BitStreamReader& reader);
     void composeProgramInfo(BitStreamWriter& writer, bool isSsExt);
     static void composeTS_type_info_block(BitStreamWriter& writer);
-    void composeClipInfo(BitStreamWriter& writer);
-    void composeSequenceInfo(BitStreamWriter& writer);
+    void composeClipInfo(BitStreamWriter& writer) const;
+    void composeSequenceInfo(BitStreamWriter& writer) const;
     void composeCPI(BitStreamWriter& writer, bool isCPIExt);
     static void composeClipMark(BitStreamWriter& writer);
     void composeExtentInfo(BitStreamWriter& writer);
-    void composeExtentStartPoint(BitStreamWriter& writer);
+    void composeExtentStartPoint(BitStreamWriter& writer) const;
     void composeEP_map(BitStreamWriter& writer, bool isSSExt);
-    std::vector<BluRayCoarseInfo> buildCoarseInfo(M2TSStreamInfo& streamInfo);
-    void composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSStreamInfo& streamInfo);
+    std::vector<BluRayCoarseInfo> buildCoarseInfo(M2TSStreamInfo& streamInfo) const;
+    void composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSStreamInfo& streamInfo) const;
 };
 
 struct MPLSStreamInfo : public M2TSStreamInfo
@@ -499,8 +499,8 @@ struct MPLSStreamInfo : public M2TSStreamInfo
     void parseStreamAttributes(BitStreamReader& reader);
     void parseStreamEntry(BitStreamReader& reader);
     void composeStreamAttributes(BitStreamWriter& reader);
-    void composeStreamEntry(BitStreamWriter& reader, size_t entryNum, int subPathID = 0);
-    void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum);
+    void composeStreamEntry(BitStreamWriter& reader, size_t entryNum, int subPathID = 0) const;
+    void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum) const;
 
    public:
     int type;
@@ -588,16 +588,16 @@ struct MPLSParser
 
    private:
     void composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum, size_t subPathNum,
-                            std::vector<PMTIndex>& pmtIndexList);
-    void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList, int type);
-    int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList);
+                            std::vector<PMTIndex>& pmtIndexList) const;
+    void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList, int type) const;
+    int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList) const;
     static void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, uint8_t* dataEnd);
     void SubPath_extension(BitStreamWriter& writer);
     void parseStnTableSS(uint8_t* data, int dataLength);
 
     void AppInfoPlayList(BitStreamReader& reader);
-    void composeAppInfoPlayList(BitStreamWriter& writer);
+    void composeAppInfoPlayList(BitStreamWriter& writer) const;
     static void UO_mask_table(BitStreamReader& reader);
     void parsePlayList(uint8_t* buffer, int len);
     void parsePlayItem(BitStreamReader& reader, int PlayItem_id);
@@ -615,7 +615,7 @@ struct MPLSParser
     MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
     static int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);
-    int pgIndexToFullIndex(int value);
+    int pgIndexToFullIndex(int value) const;
     void parseSubPathEntryExtension(uint8_t* data, int dataLen);
 };
 

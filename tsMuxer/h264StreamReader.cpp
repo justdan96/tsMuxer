@@ -85,7 +85,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
         if (*nal & 0x80)
             return rez;
         auto nalType = (NALUnit::NALType)(*nal & 0x1f);
-        uint8_t *nextNal = NALUnit::findNALWithStartCode(nal, end, true);
+        const uint8_t *nextNal = NALUnit::findNALWithStartCode(nal, end, true);
         if (!m_eof && nextNal == end)
             break;
 
@@ -202,7 +202,7 @@ const CodecInfo &H264StreamReader::getCodecInfo()
         return h264CodecInfo;
 }
 
-uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos)
+uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos) const
 {
     if (!m_shortStartCodes)
         *curPos++ = 0;
@@ -212,7 +212,7 @@ uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos)
     return curPos;
 }
 
-int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUnit &sei, uint8_t payloadType)
+int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUnit &sei, const uint8_t payloadType) const
 {
     uint8_t *curPos = dstBuffer;
 
@@ -425,7 +425,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
     return (int)(curPos - dstBuffer);
 }
 
-int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, bool hdmvDescriptors)
+int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const bool hdmvDescriptors)
 {
     SliceUnit slice;
     if (m_firstDecodeNal)
@@ -477,7 +477,7 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, bool hd
     return 0;
 }
 
-void H264StreamReader::updateStreamFps(void *nalUnit, uint8_t *buff, uint8_t *nextNal, int oldSpsLen)
+void H264StreamReader::updateStreamFps(void *nalUnit, uint8_t *buff, uint8_t *nextNal, const int oldSpsLen)
 {
     const auto sps = (SPSUnit *)nalUnit;
     sps->setFps(m_fps);
@@ -498,7 +498,7 @@ void H264StreamReader::updateStreamFps(void *nalUnit, uint8_t *buff, uint8_t *ne
     delete[] tmpBuffer;
 }
 
-void H264StreamReader::updateHRDParam(SPSUnit *sps)
+void H264StreamReader::updateHRDParam(SPSUnit *sps) const
 {
     // correct HRD parameters here (this function is called for every SPS nal unit)
     if (!m_needSeiCorrection)
@@ -514,7 +514,7 @@ void H264StreamReader::updateHRDParam(SPSUnit *sps)
 
 // All the remaining checks of the stream, executed at start
 
-void H264StreamReader::checkPyramid(int frameNum, int *fullPicOrder, bool nextFrameFound)
+void H264StreamReader::checkPyramid(const int frameNum, int *fullPicOrder, const bool nextFrameFound)
 {
     int depth = frameNum - *fullPicOrder;
     if (depth > 3)
@@ -1015,7 +1015,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
     return 0;
 }
 
-int H264StreamReader::getNalHrdLen(uint8_t *nal)
+int H264StreamReader::getNalHrdLen(uint8_t *nal) const
 {
     if (m_bufEnd - nal >= 3)
     {
@@ -1288,7 +1288,7 @@ int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
     }
 }
 
-int H264StreamReader::sliceTypeToPictType(int slice_type)
+int H264StreamReader::sliceTypeToPictType(const int slice_type) const
 {
     switch (slice_type)
     {
@@ -1442,7 +1442,7 @@ bool H264StreamReader::getInterlaced()
     return !m_spsMap.begin()->second->frame_mbs_only_flag;
 }
 
-void H264StreamReader::onShiftBuffer(int offset)
+void H264StreamReader::onShiftBuffer(const int offset)
 {
     MPEGStreamReader::onShiftBuffer(offset);
     if (m_lastDecodedPos && m_priorityNalAddr >= m_lastDecodedPos)

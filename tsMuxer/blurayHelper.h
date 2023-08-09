@@ -21,14 +21,14 @@ class BlurayHelper : public FileFactory
 
     bool open(const std::string& dst, DiskType dt, int64_t diskSize = 0, int extraISOBlocks = 0,
               bool useReproducibleIsoHeader = false);
-    bool createBluRayDirs();
-    bool writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum, bool stereoMode);
-    bool createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog);
+    bool createBluRayDirs() const;
+    bool writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum, bool stereoMode) const;
+    bool createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const;
     bool createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen, std::vector<double> customChapters,
-                        DiskType dt, int mplsOffset, bool isMvcBaseViewR);
+                        DiskType dt, int mplsOffset, bool isMvcBaseViewR) const;
 
-    std::string m2tsFileName(int num);
-    std::string ssifFileName(int num);
+    std::string m2tsFileName(int num) const;
+    std::string ssifFileName(int num) const;
 
     IsoWriter* isoWriter() const;
 
@@ -37,7 +37,7 @@ class BlurayHelper : public FileFactory
 
     AbstractOutputStream* createFile() override;
     bool isVirtualFS() const override;
-    void setVolumeLabel(const std::string& label);
+    void setVolumeLabel(const std::string& label) const;
 
    private:
     std::string m_dstPath;
