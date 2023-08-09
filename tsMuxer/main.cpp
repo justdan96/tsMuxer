@@ -29,16 +29,16 @@ static constexpr char EXCEPTION_ERR_MSG[] =
 // const static uint32_t BLACK_PL_NUM = 1900;
 // const static uint32_t BLACK_FILE_NUM = 1900;
 
-#define LTRACE2(level, msg)            \
-    {                                  \
-        {                              \
+#define LTRACE2(level, msg)              \
+    {                                    \
+        {                                \
             if ((level) <= LT_WARN)      \
-                cerr << (msg);           \
+                cerr << msg;             \
             else if ((level) == LT_INFO) \
-                cout << (msg);           \
+                cout << msg;             \
             if ((level) <= LT_INFO)      \
-                sLastMsg = true;       \
-        }                              \
+                sLastMsg = true;         \
+        }                                \
     }
 DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<double>& customChaptersList,
                         int& firstMplsOffset, int& firstM2tsOffset, bool& insertBlankPL, int& blankNum,
