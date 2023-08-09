@@ -1086,7 +1086,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     if (!frag->track_id || frag->track_id > num_tracks)
         return -1;
     Track* st = tracks[frag->track_id - 1];
-    MOVStreamContext* sc = (MOVStreamContext*)st;
+    auto sc = (MOVStreamContext*)st;
     if (sc->pseudo_stream_id + 1 != frag->stsd_id)
         return 0;
     get_byte();  // version

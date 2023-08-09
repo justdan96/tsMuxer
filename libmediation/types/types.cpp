@@ -441,13 +441,13 @@ string strToLowerCase(const string& src)
 
 uint32_t my_ntohl(const uint32_t val)
 {
-    uint8_t* tmp = (uint8_t*)&val;
+    auto* tmp = (uint8_t*)&val;
     return tmp[3] + (tmp[2] << 8) + (tmp[1] << 16) + (tmp[0] << 24);
 }
 
 uint16_t my_ntohs(const uint16_t val)
 {
-    uint8_t* tmp = (uint8_t*)&val;
+    auto* tmp = (uint8_t*)&val;
     return tmp[1] + (tmp[0] << 8);
 }
 

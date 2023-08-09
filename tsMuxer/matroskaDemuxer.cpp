@@ -518,7 +518,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
     if (tracks[track]->stream_index < 0)
         return res;
     /* block_time (relative to cluster time) */
-    int16_t block_time = (int16_t)AV_RB16(data);
+    auto block_time = (int16_t)AV_RB16(data);
     data += 2;
     int flags = *data++;
     size -= 3;
@@ -642,7 +642,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, int64_t pos, 
                 else
                     slice_size = rv_offset(data, slice + 1, slices) - slice_offset;
 
-                AVPacket* pkt = new AVPacket();
+                auto* pkt = new AVPacket();
                 pkt->data = nullptr;
                 pkt->size = 0;
                 pkt->pts = timecode * INTERNAL_PTS_FREQ / 1000;
