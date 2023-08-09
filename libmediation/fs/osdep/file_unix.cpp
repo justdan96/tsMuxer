@@ -129,7 +129,7 @@ bool File::size(uint64_t* const fileSize) const
     return res;
 }
 
-uint64_t File::seek(int64_t offset, SeekMethod whence)
+uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
         return UINT64_C(-1);
@@ -151,6 +151,6 @@ uint64_t File::seek(int64_t offset, SeekMethod whence)
     return lseek(to_fd(m_impl), offset, sWhence);
 }
 
-bool File::truncate(uint64_t newFileSize) { return ftruncate(to_fd(m_impl), newFileSize) == 0; }
+bool File::truncate(const uint64_t newFileSize) const { return ftruncate(to_fd(m_impl), newFileSize) == 0; }
 
 void File::sync() { ::sync(); }
