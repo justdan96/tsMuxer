@@ -382,9 +382,9 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
         if (m_headerType == LPCMHeaderType::htWAVE64)
         {
             curPos = findSubstr("fmt ", buff, end);
-            if (curPos == nullptr || curPos + sizeof(wave_format::GUID) + 8 >= end)
+            if (curPos == nullptr || curPos + sizeof(GUID) + 8 >= end)
                 return NOT_ENOUGH_BUFFER;
-            uint8_t* tmpPos = curPos + sizeof(wave_format::GUID);
+            uint8_t* tmpPos = curPos + sizeof(GUID);
             fmtSize = *reinterpret_cast<uint64_t*>(tmpPos);
             if (curPos + fmtSize >= end)
                 return NOT_ENOUGH_BUFFER;
@@ -505,9 +505,9 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
     }
     else
     {
-        if (curPos + sizeof(wave_format::GUID) + 8 >= end)
+        if (curPos + sizeof(GUID) + 8 >= end)
             return NOT_ENOUGH_BUFFER;
-        curPos += sizeof(wave_format::GUID);
+        curPos += sizeof(GUID);
         // For w64, data length includes data metadata (16 bytes) and size (8 bytes)
         m_curChunkLen = *reinterpret_cast<uint64_t*>(curPos) - 24;
         curPos += 8;
@@ -669,7 +669,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     return static_cast<int>(curPos - dstBuffer);
 }
 
-void LPCMStreamReader::setHeadersType(const LPCMStreamReader::LPCMHeaderType value) { m_headerType = value; }
+void LPCMStreamReader::setHeadersType(const LPCMHeaderType value) { m_headerType = value; }
 
 bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, const int64_t len)
 {
@@ -689,7 +689,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, const int64_t len)
         (curPos[0] == 'r' && curPos[1] == 'i' && curPos[2] == 'f' && curPos[3] == 'f'))
     {
         m_headerType = LPCMHeaderType::htWAVE;
-        const auto testWave64 = reinterpret_cast<wave_format::GUID*>(curPos);
+        const auto testWave64 = reinterpret_cast<GUID*>(curPos);
         if (*testWave64 == WAVE64GUID)
             m_headerType = LPCMHeaderType::htWAVE64;
         return true;

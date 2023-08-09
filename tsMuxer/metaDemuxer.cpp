@@ -1326,15 +1326,15 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
     readCnt = static_cast<uint32_t>((FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset));
     const DemuxerReadPolicy policy = demuxerData.m_pids[pid];
     if ((readCnt > 0 &&
-         (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2 ||
-          demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2)) ||
+         (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == DATA_EOF2 ||
+          demuxerData.lastReadCnt[pid] == DATA_EOF2)) ||
         readCnt >= MIN_READED_BLOCK)
     {
         data = streamData.data();
         demuxerData.lastReadCnt[pid] = readCnt;
         demuxerData.lastReadRez[pid] = 0;
     }
-    else if (demuxerData.lastReadRez[pid] != AbstractReader::DATA_DELAYED || demuxerData.m_allFragmented)
+    else if (demuxerData.lastReadRez[pid] != DATA_DELAYED || demuxerData.m_allFragmented)
     {
         int demuxRez = 0;
         do
@@ -1366,19 +1366,19 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
         {
             rez = demuxerData.m_demuxer->getLastReadRez();
         }
-        else if (demuxerData.m_demuxer->getLastReadRez() == AbstractReader::DATA_EOF)
-            rez = AbstractReader::DATA_EOF;
+        else if (demuxerData.m_demuxer->getLastReadRez() == DATA_EOF)
+            rez = DATA_EOF;
         else
         {
             if (policy == DemuxerReadPolicy::drpReadSequence)
-                rez = AbstractReader::DATA_NOT_READY;
+                rez = DATA_NOT_READY;
             else
-                rez = AbstractReader::DATA_DELAYED;
+                rez = DATA_DELAYED;
         }
         demuxerData.lastReadRez[pid] = rez;
     }
     else
-        rez = AbstractReader::DATA_DELAYED;
+        rez = DATA_DELAYED;
     return data;
 }
 

@@ -31,7 +31,7 @@ SRTStreamReader::~SRTStreamReader()
     delete m_srtRender;
 }
 
-void SRTStreamReader::setAnimation(const text_subtitles::TextAnimation& animation) { m_animation = animation; }
+void SRTStreamReader::setAnimation(const TextAnimation& animation) { m_animation = animation; }
 
 void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
 {

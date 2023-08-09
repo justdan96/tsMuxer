@@ -70,7 +70,7 @@ File::File(const char* fName, const unsigned int oflag,
     }
     else
     {
-        if (oflag & File::ofAppend)
+        if (oflag & ofAppend)
         {
             long hiword = 0;
             const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
@@ -103,7 +103,7 @@ bool File::open(const char* fName, const unsigned int oflag, unsigned int system
             systemDependentFlags = FILE_FLAG_RANDOM_ACCESS;
     }
 
-    if ((oflag & File::ofOpenExisting) == 0)
+    if ((oflag & ofOpenExisting) == 0)
     {
         createDir(extractFileDir(fName), true);
     }
@@ -113,7 +113,7 @@ bool File::open(const char* fName, const unsigned int oflag, unsigned int system
     {
         return false;
     }
-    if (oflag & File::ofAppend)
+    if (oflag & ofAppend)
     {
         long hiword = 0;
         const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);

@@ -330,7 +330,7 @@ void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         m_waveBuffer.clear();
     }
     if (m_convertBytes)
-        wave_format::toLittleEndian(dst, buff, size, m_bitdepth);
+        toLittleEndian(dst, buff, size, m_bitdepth);
     else
         memcpy(dst, buff, size);
 }

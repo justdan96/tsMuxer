@@ -277,7 +277,7 @@ int NALUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, const bool wri
         *dstBuffer++ = 0;
         *dstBuffer++ = 1;
     }
-    const int encodeRez = NALUnit::encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
+    const int encodeRez = encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
     if (encodeRez == -1)
         return -1;
     return encodeRez + (writeStartCode ? 4 : 0);
@@ -1188,7 +1188,7 @@ bool SliceUnit::isIDR() const
 
 bool SliceUnit::isIFrame() const
 {
-    return nal_unit_type == NALType::nuSliceExt ? anchor_pic_flag : slice_type == SliceUnit::I_TYPE;
+    return nal_unit_type == NALType::nuSliceExt ? anchor_pic_flag : slice_type == I_TYPE;
 }
 
 int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)

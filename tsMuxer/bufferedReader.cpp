@@ -93,7 +93,7 @@ uint32_t BufferedReader::createReader(const int readBuffOffset)
         rSize = m_readers.size();
         if (!m_started)
         {
-            TerminatableThread::run(this);
+            run(this);
             m_started = true;
         }
     }

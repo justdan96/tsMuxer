@@ -51,8 +51,8 @@ int HevcUnit::deserialize()
         nuh_temporal_id_plus1 = m_reader.getBits(3);
         if (nuh_temporal_id_plus1 == 0 ||
             (nuh_temporal_id_plus1 != 1 &&
-             (nal_unit_type == HevcUnit::NalType::VPS || nal_unit_type == HevcUnit::NalType::SPS ||
-              nal_unit_type == HevcUnit::NalType::EOS || nal_unit_type == HevcUnit::NalType::EOB)))
+             (nal_unit_type == NalType::VPS || nal_unit_type == NalType::SPS ||
+              nal_unit_type == NalType::EOS || nal_unit_type == NalType::EOB)))
             return 1;
         return 0;
     }

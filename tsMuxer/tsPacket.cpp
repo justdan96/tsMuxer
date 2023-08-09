@@ -2170,7 +2170,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
     const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
-    MPLSStreamInfo& streamInfo = MPLSParser::getMainStream();
+    MPLSStreamInfo& streamInfo = getMainStream();
     if (m_marks.empty())
     {
         if (m_chapterLen == 0)

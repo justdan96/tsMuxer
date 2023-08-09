@@ -19,7 +19,7 @@ class GdiPlusPriv
 
     ~GdiPlusPriv() { GdiplusShutdown(m_gdiplusToken); }
 
-    Gdiplus::GdiplusStartupInput m_gdiplusStartupInput;
+    GdiplusStartupInput m_gdiplusStartupInput;
     ULONG_PTR m_gdiplusToken;
 };
 #endif
@@ -33,7 +33,7 @@ TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : m_hbmp(nullptr)
 
     m_pbmpInfo = nullptr;
     m_hdcScreen = CreateDC(TEXT("DISPLAY"), nullptr, nullptr, nullptr);
-    m_dc = ::CreateCompatibleDC(m_hdcScreen);
+    m_dc = CreateCompatibleDC(m_hdcScreen);
 }
 
 TextSubtitlesRenderWin32::~TextSubtitlesRenderWin32()
@@ -41,8 +41,8 @@ TextSubtitlesRenderWin32::~TextSubtitlesRenderWin32()
     delete[] m_pbmpInfo;
     if (m_hbmp)
         DeleteObject(m_hbmp);
-    ::DeleteDC(m_dc);
-    ::DeleteDC(m_hdcScreen);
+    DeleteDC(m_dc);
+    DeleteDC(m_hdcScreen);
 
 #ifndef OLD_WIN32_RENDERER
     delete m_gdiPriv;
@@ -62,12 +62,12 @@ void TextSubtitlesRenderWin32::setRenderSize(const int width, const int height)
     m_pbmpInfo->bmiHeader.biBitCount = 32;
     m_pbmpInfo->bmiHeader.biCompression = BI_RGB;
     m_pbmpInfo->bmiHeader.biClrUsed = 256 * 256 * 256;
-    m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, reinterpret_cast<void**>(&m_pData), nullptr, 0);
+    m_hbmp = CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, reinterpret_cast<void**>(&m_pData), nullptr, 0);
     if (m_hbmp == nullptr)
         THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles");
     SelectObject(m_dc, m_hbmp);
-    ::SetBkColor(m_dc, RGB(0, 0, 0));
-    ::SetBkMode(m_dc, TRANSPARENT);
+    SetBkColor(m_dc, RGB(0, 0, 0));
+    SetBkMode(m_dc, TRANSPARENT);
 }
 
 void TextSubtitlesRenderWin32::setFont(const Font& font)
@@ -103,17 +103,17 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 #ifdef OLD_WIN32_RENDERER
     ::DrawText(m_dc, text.c_str(), text.length(), rect, DT_NOPREFIX);
 #else
-    Gdiplus::Graphics graphics(m_dc);
+    Graphics graphics(m_dc);
     graphics.SetSmoothingMode(SmoothingModeHighQuality);
     graphics.SetInterpolationMode(InterpolationModeHighQualityBicubic);
 
     const FontFamily fontFamily(toWide(m_font.m_name).data());
     const StringFormat strformat;
-    Gdiplus::GraphicsPath path;
+    GraphicsPath path;
 
     const auto text_wide = toWide(text);
     path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, m_font.m_opts & 0xf,
-                   static_cast<float>(m_font.m_size), Gdiplus::Point(rect->left, rect->top), &strformat);
+                   static_cast<float>(m_font.m_size), Point(rect->left, rect->top), &strformat);
 
     const uint8_t alpha = m_font.m_color >> 24;
     const uint8_t outColor = (alpha * 48 + 128) / 255;
@@ -143,11 +143,11 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     const int lineSpacingPixel = static_cast<int>(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
 
     const StringFormat strformat;
-    Gdiplus::GraphicsPath path;
+    GraphicsPath path;
     const auto text_wide = toWide(text);
     path.AddString(text_wide.data(), static_cast<int>(text_wide.size()) - 1, &fontFamily, opts,
-                   static_cast<float>(m_font.m_size), Gdiplus::Point(0, 0), &strformat);
-    Gdiplus::RectF rect;
+                   static_cast<float>(m_font.m_size), Point(0, 0), &strformat);
+    RectF rect;
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
     path.GetBounds(&rect, nullptr, &pen);
@@ -164,7 +164,7 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     return tm.tmAscent;
 #else
     const int opts = m_font.m_opts & 0xf;
-    const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    const FontFamily fontFamily(toWide(m_font.m_name).data());
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(opts);
@@ -181,7 +181,7 @@ int TextSubtitlesRenderWin32::getBaseline()
     return tm.tmAscent;
 #else
     const int opts = m_font.m_opts & 0xf;
-    const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
+    const FontFamily fontFamily(toWide(m_font.m_name).data());
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int descentOffset = fontFamily.GetCellDescent(opts);

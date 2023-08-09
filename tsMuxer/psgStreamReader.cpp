@@ -51,7 +51,7 @@ PGSStreamReader::PGSStreamReader()
     m_scaledRgbBuffer = nullptr;
     m_scaled_width = 0;
     m_scaled_height = 0;
-    m_render = new text_subtitles::TextToPGSConverter(false);
+    m_render = new TextToPGSConverter(false);
     m_renderedData = nullptr;
     m_fontBorder = 0;
     m_offsetId = 0xff;
@@ -137,7 +137,7 @@ void PGSStreamReader::yuvToRgb(const int minY) const
     auto dst = reinterpret_cast<RGBQUAD*>(m_rgbBuffer);
 
     RGBQUAD rgbPal[256]{};
-    text_subtitles::YUVQuad yuvPal[256];
+    YUVQuad yuvPal[256];
     memset(&rgbPal[0], 0, sizeof(rgbPal));
     memset(&rgbPal[0], 0, sizeof(yuvPal));
 
