@@ -237,7 +237,7 @@ void ByteFileWriter::writeDescriptorTag(const DescriptorTag tag, const uint32_t 
 
 void ByteFileWriter::closeDescriptorTag(const int dataSize) const
 {
-    const uint16_t size = dataSize == -1 ? static_cast<uint16_t>(m_curPos - m_tagPos) : static_cast<uint16_t> (dataSize);
+    const uint16_t size = dataSize == -1 ? static_cast<uint16_t>(m_curPos - m_tagPos) : static_cast<uint16_t>(dataSize);
     calcDescriptorCRC(m_tagPos, size);
 }
 
