@@ -215,7 +215,7 @@ uint64_t roundUp64(const uint64_t& value, const uint64_t& roundVal)
 string strPadLeft(const string& str, const size_t newSize, const char filler)
 {
     const int cnt = static_cast<int>(newSize - str.size());
-    string prefix = "";
+    string prefix;
     for (int i = 0; i < cnt; i++) prefix += filler;
     return prefix + str;
 }
@@ -223,7 +223,7 @@ string strPadLeft(const string& str, const size_t newSize, const char filler)
 string strPadRight(const string& str, const size_t newSize, const char filler)
 {
     const int cnt = static_cast<int>(newSize - str.size());
-    string postfix = "";
+    string postfix;
     for (int i = 0; i < cnt; i++) postfix += filler;
     return str + postfix;
 }
