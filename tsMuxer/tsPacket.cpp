@@ -372,7 +372,8 @@ void TS_program_map_section::extractDescriptors(uint8_t* curPos, const int es_in
     }
 }
 
-uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_size, const bool blurayMode, const bool hdmvDescriptors)
+uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_size, const bool blurayMode,
+                                           const bool hdmvDescriptors)
 {
     buffer[0] = 0;
     buffer++;
@@ -748,9 +749,9 @@ void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
-    reader.skipBits(32);                                       // length
-    reader.skipBits(8);                                        // reserved_for_word_align
-    const uint8_t number_of_ATC_sequences = reader.getBits(8); // 1 is tipical value
+    reader.skipBits(32);                                        // length
+    reader.skipBits(8);                                         // reserved_for_word_align
+    const uint8_t number_of_ATC_sequences = reader.getBits(8);  // 1 is tipical value
     for (uint8_t atc_id = 0; atc_id < number_of_ATC_sequences; atc_id++)
     {
         reader.skipBits(32);  // SPN_ATC_start, 0 is tipical value
@@ -2487,8 +2488,8 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 
 // ------------- M2TSStreamInfo -----------------------
 
-void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced, const int width, const int height, const int ar, int* video_format,
-                                        int* frame_rate_index, int* aspect_ratio_index)
+void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced, const int width, const int height,
+                                        const int ar, int* video_format, int* frame_rate_index, int* aspect_ratio_index)
 {
     *video_format = 0;
     *frame_rate_index = 0;

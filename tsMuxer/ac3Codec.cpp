@@ -139,7 +139,8 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
             numblkscod = gbc.getBits(2);
             m_sample_rate = ff_ac3_freqs[fscod];
         }
-        const int number_of_blocks_per_syncframe = numblkscod == 0 ? 1 : (numblkscod == 1 ? 2 : (numblkscod == 2 ? 3 : 6));
+        const int number_of_blocks_per_syncframe =
+            numblkscod == 0 ? 1 : (numblkscod == 1 ? 2 : (numblkscod == 2 ? 3 : 6));
         const int acmod = gbc.getBits(3);
         const int lfeon = gbc.getBit();
 
@@ -191,7 +192,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
                 else if (mixdef == 3)
                 {
                     const int mixdeflen = gbc.getBits(5);  //
-                    if (gbc.getBit())                // mixdata2e
+                    if (gbc.getBit())                      // mixdata2e
                     {
                         gbc.skipBits(5);  // premixcmpsel, drcsrc, premixcmpscl
                         if (gbc.getBit())

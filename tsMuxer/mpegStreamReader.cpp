@@ -123,7 +123,8 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
             return NEED_MORE_DATA;
     }
 
-    const uint8_t* nextNal = NALUnit::findNALWithStartCode((std::min)(m_curPos + 3, m_bufEnd), m_bufEnd, m_longCodesAllowed);
+    const uint8_t* nextNal =
+        NALUnit::findNALWithStartCode((std::min)(m_curPos + 3, m_bufEnd), m_bufEnd, m_longCodesAllowed);
     if (nextNal == m_bufEnd)
     {
         storeBufferRest();

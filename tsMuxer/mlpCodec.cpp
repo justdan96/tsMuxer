@@ -122,10 +122,10 @@ bool MLPCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
             return false;
         if (reader.getBits(2) > 0)  // 6/8ch_multichannel_type: 0 = standard loudspeaker layout
             return false;
-        reader.skipBits(6);                              // reserved, 2ch_presentation_channel_modifier, 6ch_presentation_channel_modifier
-        const int channel_assign_6 = reader.getBits(5);  // 6ch_presentation_channel_assignment
-        reader.skipBits(2);                              // 8ch_presentation_channel_modifier
-        const int channel_assign_8 = reader.getBits(13); // 8ch_presentation_channel_assignment
+        reader.skipBits(6);  // reserved, 2ch_presentation_channel_modifier, 6ch_presentation_channel_modifier
+        const int channel_assign_6 = reader.getBits(5);   // 6ch_presentation_channel_assignment
+        reader.skipBits(2);                               // 8ch_presentation_channel_modifier
+        const int channel_assign_8 = reader.getBits(13);  // 8ch_presentation_channel_assignment
 
         if (channel_assign_8 > 0)
         {

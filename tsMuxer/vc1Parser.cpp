@@ -177,8 +177,8 @@ int VC1SequenceHeader::decode_sequence_header()
             LTRACE(LT_WARN, 0, "LOOPFILTER shell not be enabled in simple profile");
         if (bitReader.getBit())  // reserved res_x8
             LTRACE(LT_WARN, 0, "1 for reserved RES_X8 is forbidden");
-        bitReader.skipBit();                       // multires
-        const int res_fasttx = bitReader.getBit(); // reserved
+        bitReader.skipBit();                        // multires
+        const int res_fasttx = bitReader.getBit();  // reserved
         if (!res_fasttx)
             LTRACE(LT_WARN, 0, "0 for reserved RES_FASTTX is forbidden");
         if (profile == Profile::SIMPLE && !bitReader.getBit())  // fastuvmc

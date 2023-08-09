@@ -589,7 +589,8 @@ struct MPLSParser
    private:
     void composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum, size_t subPathNum,
                             std::vector<PMTIndex>& pmtIndexList) const;
-    void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList, int type) const;
+    void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList,
+                        int type) const;
     int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList) const;
     static void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, uint8_t* dataEnd);

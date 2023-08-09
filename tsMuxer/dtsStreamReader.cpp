@@ -593,7 +593,8 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
                 {
                     const auto exHeader = (uint8_t*)curPtr32;
                     const int dataRest = (int)(buff + i_frame_size - exHeader);
-                    const int frameSize = (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
+                    const int frameSize =
+                        (int)((exHeader[0] << 2) + (exHeader[1] >> 6) - 4);  // remove 4 bytes of ext world
                     if (dataRest - frameSize == 0 || dataRest - frameSize == 1)
                     {
                         m_dtsEsChannels = (int(exHeader[1]) >> 2) & 0x07;

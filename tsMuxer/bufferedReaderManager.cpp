@@ -4,8 +4,8 @@
 
 using namespace std;
 
-BufferedReaderManager::BufferedReaderManager(const uint32_t readersCnt, const uint32_t blockSize, const uint32_t allocSize,
-                                             const uint32_t prereadThreshold)
+BufferedReaderManager::BufferedReaderManager(const uint32_t readersCnt, const uint32_t blockSize,
+                                             const uint32_t allocSize, const uint32_t prereadThreshold)
 {
     init(blockSize, allocSize, prereadThreshold);
 

@@ -364,7 +364,10 @@ void ParsedAC3TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int siz
 
 // ------------ SRT ---------------
 
-ParsedSRTTrackData::ParsedSRTTrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size) { m_packetCnt = 0; }
+ParsedSRTTrackData::ParsedSRTTrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size)
+{
+    m_packetCnt = 0;
+}
 
 void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {

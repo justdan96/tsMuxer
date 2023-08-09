@@ -828,7 +828,8 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                         m_filterBuffer.resize(m_deliveredPacket.size);
                         m_deliveredPacket.data = m_filterBuffer.data();
                         st->parsed_priv_data->extractData(&m_deliveredPacket, &m_tmpChunkBuffer[0], chunkSize);
-                        const int demuxed = filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
+                        const int demuxed =
+                            filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
                         discardSize += (int64_t)chunkSize - demuxed;
                     }
                     else
@@ -1307,7 +1308,7 @@ int MovDemuxer::mov_read_moof(const MOVAtom atom)
 int MovDemuxer::mov_read_mvhd(MOVAtom atom)
 {
     const int version = get_byte();  // version
-    get_be24();                // flags
+    get_be24();                      // flags
     if (version == 1)
     {
         get_be64();
@@ -1318,8 +1319,8 @@ int MovDemuxer::mov_read_mvhd(MOVAtom atom)
         get_be32();  // creation time
         get_be32();  // modification time
     }
-    m_timescale = get_be32();                                           // time scale
-    const uint64_t duration = (version == 1) ? get_be64() : get_be32(); // duration
+    m_timescale = get_be32();                                            // time scale
+    const uint64_t duration = (version == 1) ? get_be64() : get_be32();  // duration
     fileDuration = duration * 1000000000ll / m_timescale;
     get_be32();      // preferred scale
     get_be16();      // preferred volume
@@ -1386,8 +1387,8 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         // enum CodecID id;
         MOVAtom a;
         const int64_t start_pos = m_processedBytes;
-        const int size = get_be32();        // size
-        const uint32_t format = get_le32(); // data format
+        const int size = get_be32();         // size
+        const uint32_t format = get_le32();  // data format
 
         get_be32();  // reserved
         get_be16();  // reserved
@@ -1733,8 +1734,8 @@ if (st->codec->codec_id == CODEC_ID_QDM2) {
 int MovDemuxer::mov_read_elst(MOVAtom atom)
 {
     const int version = get_byte();
-    get_be24();                        // flags
-    const int edit_count = get_be32(); // entries
+    get_be24();                         // flags
+    const int edit_count = get_be32();  // entries
 
     for (int i = 0; i < edit_count; i++)
     {

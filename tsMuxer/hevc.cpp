@@ -452,8 +452,8 @@ int HevcSpsUnit::short_term_ref_pic_set(const unsigned stRpsIdx)
 
         for (int j = 0; j <= num_delta_pocs[refRpsIdx]; j++)
         {
-            const bool used = m_reader.getBit();                         // used_by_curr_pic_flag[j]
-            const bool use_delta_flag = used ? true : m_reader.getBit(); // use_delta_flag[j]
+            const bool used = m_reader.getBit();                          // used_by_curr_pic_flag[j]
+            const bool use_delta_flag = used ? true : m_reader.getBit();  // use_delta_flag[j]
             if (use_delta_flag)
                 numDeltaPocs++;
         }

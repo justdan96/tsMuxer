@@ -212,7 +212,8 @@ uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos) const
     return curPos;
 }
 
-int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUnit &sei, const uint8_t payloadType) const
+int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUnit &sei,
+                                      const uint8_t payloadType) const
 {
     uint8_t *curPos = dstBuffer;
 

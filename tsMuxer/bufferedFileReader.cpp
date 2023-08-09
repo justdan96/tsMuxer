@@ -37,12 +37,14 @@ bool FileReaderData::openStream()
     return rez;
 }
 
-BufferedFileReader::BufferedFileReader(const uint32_t blockSize, const uint32_t allocSize, const uint32_t prereadThreshold)
+BufferedFileReader::BufferedFileReader(const uint32_t blockSize, const uint32_t allocSize,
+                                       const uint32_t prereadThreshold)
     : BufferedReader(blockSize, allocSize, prereadThreshold)
 {
 }
 
-bool BufferedFileReader::openStream(const uint32_t readerID, const char* streamName, int pid, const CodecInfo* codecInfo)
+bool BufferedFileReader::openStream(const uint32_t readerID, const char* streamName, int pid,
+                                    const CodecInfo* codecInfo)
 {
     const auto data = (FileReaderData*)getReader(readerID);
 

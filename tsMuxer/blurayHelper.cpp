@@ -178,7 +178,8 @@ NavigationCommand makeNoBlankCommand()
     return {0x50, 0x40, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 }
 
-NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx, const MuxerManager::SubTrackMode subTrackMode)
+NavigationCommand makeDefaultTrackCommand(int audioTrackIdx, int subTrackIdx,
+                                          const MuxerManager::SubTrackMode subTrackMode)
 {
     NavigationCommand cmd = {0x51, 0xC0, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
     if (audioTrackIdx >= 0)
@@ -348,8 +349,8 @@ bool BlurayHelper::createBluRayDirs() const
     return true;
 }
 
-bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, const bool usedBlankPL, const int mplsNum, const int blankNum,
-                                    const bool stereoMode) const
+bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, const bool usedBlankPL, const int mplsNum,
+                                    const int blankNum, const bool stereoMode) const
 {
     int fileSize = sizeof(bdIndexData);
     const string prefix = m_isoWriter ? "" : m_dstPath;

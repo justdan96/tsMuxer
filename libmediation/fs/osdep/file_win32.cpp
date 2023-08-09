@@ -47,7 +47,8 @@ void makeWin32OpenFlags(const unsigned int oflag, DWORD* const dwDesiredAccess, 
 
 File::File() : AbstractOutputStream(), m_impl(INVALID_HANDLE_VALUE), m_name(""), m_pos(0) {}
 
-File::File(const char* fName, const unsigned int oflag, unsigned int systemDependentFlags) /* throw ( std::runtime_error ) */
+File::File(const char* fName, const unsigned int oflag,
+           unsigned int systemDependentFlags) /* throw ( std::runtime_error ) */
     : AbstractOutputStream(), m_impl(INVALID_HANDLE_VALUE), m_name(fName), m_pos(0)
 {
     DWORD dwDesiredAccess = 0;

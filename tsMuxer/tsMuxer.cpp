@@ -640,8 +640,8 @@ void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
         pesPacket->setPacketLength(avPacket.size + pesPacket->getHeaderLength());
 
     PriorityDataInfo tmpPriorityData;
-    const int additionDataSize = avPacket.codec->writeAdditionData(tmpBuffer + pesPacket->getHeaderLength(),
-                                                                   tmpBuffer + sizeof(tmpBuffer), avPacket, &tmpPriorityData);
+    const int additionDataSize = avPacket.codec->writeAdditionData(
+        tmpBuffer + pesPacket->getHeaderLength(), tmpBuffer + sizeof(tmpBuffer), avPacket, &tmpPriorityData);
     const int bufLen = pesPacket->getHeaderLength() + additionDataSize;
     m_pesData.resize(bufLen);
     memcpy(m_pesData.data(), tmpBuffer, bufLen);
@@ -903,7 +903,8 @@ void TSMuxer::flushTSBuffer()
     m_outBufLen = 0;
 }
 
-void TSMuxer::finishFileBlock(const uint64_t newPts, const uint64_t newPCR, const bool doChangeFile, const bool recursive)
+void TSMuxer::finishFileBlock(const uint64_t newPts, const uint64_t newPCR, const bool doChangeFile,
+                              const bool recursive)
 {
     if (m_processedBlockSize > 0)
     {
@@ -1053,7 +1054,8 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     return true;
 }
 
-int TSMuxer::writeTSFrames(const int pid, uint8_t* buffer, const int64_t len, const bool priorityData, bool payloadStart)
+int TSMuxer::writeTSFrames(const int pid, uint8_t* buffer, const int64_t len, const bool priorityData,
+                           bool payloadStart)
 {
     int result = 0;
 
@@ -1151,7 +1153,8 @@ void TSMuxer::buildPAT()
     m_pat.pmtPids[SIT_PID] = 0;          // add NIT. program number = 0
     m_pat.pmtPids[DEFAULT_PMT_PID] = 1;  // add PMT. program number = 1
     m_pat.transport_stream_id = 0;       // version of transport stream
-    const uint32_t size = m_pat.serialize(m_patBuffer + TSPacket::TS_HEADER_SIZE, TS_FRAME_SIZE - TSPacket::TS_HEADER_SIZE);
+    const uint32_t size =
+        m_pat.serialize(m_patBuffer + TSPacket::TS_HEADER_SIZE, TS_FRAME_SIZE - TSPacket::TS_HEADER_SIZE);
     memset(m_patBuffer + TSPacket::TS_HEADER_SIZE + size, 0xff, TS_FRAME_SIZE - TSPacket::TS_HEADER_SIZE - size);
 }
 
@@ -1162,7 +1165,8 @@ void TSMuxer::buildPMT()
     tsPacket->setPID(DEFAULT_PMT_PID);
     tsPacket->dataExists = 1;
     tsPacket->payloadStart = 1;
-    const uint32_t size = m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, m_bluRayMode, m_hdmvDescriptors);
+    const uint32_t size =
+        m_pmt.serialize(m_pmtBuffer + TSPacket::TS_HEADER_SIZE, 3864, m_bluRayMode, m_hdmvDescriptors);
     uint8_t* pmtEnd = m_pmtBuffer + TSPacket::TS_HEADER_SIZE + size;
     uint8_t* curPos = m_pmtBuffer + TS_FRAME_SIZE;
     for (; curPos < pmtEnd; curPos += TS_FRAME_SIZE)

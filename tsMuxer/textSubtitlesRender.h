@@ -117,7 +117,8 @@ class TextSubtitlesRender
 
    protected:
     int m_borderWidth;
-    std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line, std::vector<Font>& fontStack) const;
+    std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line,
+                                                             std::vector<Font>& fontStack) const;
     static int browserSizeToRealSize(int bSize, double rSize);
 
    private:
