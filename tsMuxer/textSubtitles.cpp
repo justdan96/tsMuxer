@@ -130,16 +130,12 @@ uint8_t TextToPGSConverter::color32To8(uint32_t* buff, const uint32_t colorMask)
                     m_paletteYUV.insert(std::make_pair(yuv, static_cast<uint8_t>(m_paletteYUV.size())));
                 return rez.first->second;
             }
-            else
-            {
-                // find nearest color
-                // if (m_paletteYUV.size() >= 256)
-                THROW(ERR_COMMON, "Can't transform image to YUV: too many colors are used.");
-            }
+            // find nearest color
+            // if (m_paletteYUV.size() >= 256)
+            THROW(ERR_COMMON, "Can't transform image to YUV: too many colors are used.");
             // return m_paletteYUV[yuv];
         }
-        else
-            return itr->second;
+        return itr->second;
     }
 }
 

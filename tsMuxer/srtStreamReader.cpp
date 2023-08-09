@@ -170,8 +170,7 @@ int SRTStreamReader::readPacket(AVPacket& avPacket)
                                      m_lastBlock && m_sourceText.empty());
             return m_dstSubCodec->readPacket(avPacket);
         }
-        else
-            return NEED_MORE_DATA;
+        return NEED_MORE_DATA;
     }
     return rez;
 }
@@ -242,15 +241,12 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         }
         return rez;
     }
-    else
-    {
-        m_sourceText.pop();  // delete empty line (messages separator)
-        m_processedSize += m_origSize.front();
-        m_origSize.pop();
-        rez = m_srtRender->doConvert(m_renderedText, m_animation, m_inTime, m_outTime, renderedLen);
-        m_state = ParseState::PARSE_FIRST_LINE;
-        m_renderedText.clear();
-    }
+    m_sourceText.pop(); // delete empty line (messages separator)
+    m_processedSize += m_origSize.front();
+    m_origSize.pop();
+    rez = m_srtRender->doConvert(m_renderedText, m_animation, m_inTime, m_outTime, renderedLen);
+    m_state = ParseState::PARSE_FIRST_LINE;
+    m_renderedText.clear();
     return rez;
 }
 

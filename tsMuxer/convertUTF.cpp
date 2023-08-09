@@ -60,10 +60,7 @@ ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sou
                     result = ConversionResult::sourceIllegal;
                     break;
                 }
-                else
-                {
-                    *target++ = UNI_REPLACEMENT_CHAR;
-                }
+                *target++ = UNI_REPLACEMENT_CHAR;
             }
             else
             {
@@ -106,12 +103,9 @@ std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32 ch)
     {
         return std::make_tuple(static_cast<UTF16>(ch), 0);
     }
-    else
-    {
-        ch -= halfBase;
-        return std::make_tuple(static_cast<UTF16>((ch >> halfShift) + UNI_SUR_HIGH_START),
-                               static_cast<UTF16>((ch & halfMask) + UNI_SUR_LOW_START));
-    }
+    ch -= halfBase;
+    return std::make_tuple(static_cast<UTF16>((ch >> halfShift) + UNI_SUR_HIGH_START),
+                           static_cast<UTF16>((ch & halfMask) + UNI_SUR_LOW_START));
 }
 
 /* --------------------------------------------------------------------- */
@@ -481,10 +475,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
                     result = ConversionResult::sourceIllegal;
                     break;
                 }
-                else
-                {
-                    *target++ = UNI_REPLACEMENT_CHAR;
-                }
+                *target++ = UNI_REPLACEMENT_CHAR;
             }
             else
             {
@@ -499,10 +490,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
                 source -= (extraBytesToRead + 1); /* return to the start */
                 break;                            /* Bail out; shouldn't continue */
             }
-            else
-            {
-                *target++ = UNI_REPLACEMENT_CHAR;
-            }
+            *target++ = UNI_REPLACEMENT_CHAR;
         }
         else
         {
@@ -679,10 +667,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
                     result = ConversionResult::sourceIllegal;
                     break;
                 }
-                else
-                {
-                    *target++ = UNI_REPLACEMENT_CHAR;
-                }
+                *target++ = UNI_REPLACEMENT_CHAR;
             }
             else
             {

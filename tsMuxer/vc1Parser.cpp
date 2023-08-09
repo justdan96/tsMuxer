@@ -26,8 +26,7 @@ static inline int decode012(BitStreamReader& bitReader)
     const int n = bitReader.getBit();
     if (n == 0)
         return 0;
-    else
-        return bitReader.getBit() + 1;
+    return bitReader.getBit() + 1;
 }
 
 // ---------------------------- VC1Unit ------------------------------------------
@@ -348,8 +347,7 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
         bitReader.setBuffer(buffer, end);  // skip 00 00 01 xx marker
         if (sequenceHdr.profile < Profile::ADVANCED)
             return vc1_parse_frame_header(sequenceHdr);
-        else
-            return vc1_parse_frame_header_adv(sequenceHdr);
+        return vc1_parse_frame_header_adv(sequenceHdr);
     }
     catch (BitStreamException)
     {

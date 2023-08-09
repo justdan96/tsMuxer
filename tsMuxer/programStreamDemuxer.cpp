@@ -246,8 +246,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
         {
             if (readedBytes > 0)
                 return 0;
-            else
-                return BufferedReader::DATA_EOF;
+            return BufferedReader::DATA_EOF;
         }
     }
 
@@ -323,7 +322,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
             const int psmLen = mpegps_psm_parse(curBuf, end);
             if (psmLen == -1)
                 break;
-            else if (psmLen > end - curBuf)
+            if (psmLen > end - curBuf)
             {
                 discardSize += end - curBuf;
                 m_lastPID = 0;

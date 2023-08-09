@@ -133,8 +133,7 @@ int AC3StreamReader::readPacket(AVPacket& avPacket)
 {
     if (m_true_hd_mode && !m_downconvertToAC3)
         return readPacketTHD(avPacket);
-    else
-        return SimplePacketizerReader::readPacket(avPacket);
+    return SimplePacketizerReader::readPacket(avPacket);
 }
 
 int AC3StreamReader::flushPacket(AVPacket& avPacket)
@@ -182,22 +181,19 @@ int AC3StreamReader::readPacketTHD(AVPacket& avPacket)
                 m_nextAc3Time += m_frameDuration;
                 return 0;
             }
-            else
+            if (!m_delayedAc3Buffer.isEmpty())
             {
-                if (!m_delayedAc3Buffer.isEmpty())
-                {
-                    LTRACE(LT_INFO, 2,
-                           getCodecInfo().displayName
-                               << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
-                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
-                               << ". Remove frame.");
-                }
-
-                m_delayedAc3Packet = avPacket;
-                m_delayedAc3Buffer.clear();
-                m_delayedAc3Buffer.append(avPacket.data, avPacket.size);
-                m_delayedAc3Packet.data = m_delayedAc3Buffer.data();
+                LTRACE(LT_INFO, 2,
+                       getCodecInfo().displayName
+                       << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
+                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                       << ". Remove frame.");
             }
+
+            m_delayedAc3Packet = avPacket;
+            m_delayedAc3Buffer.clear();
+            m_delayedAc3Buffer.append(avPacket.data, avPacket.size);
+            m_delayedAc3Packet.data = m_delayedAc3Buffer.data();
         }
         else
         {

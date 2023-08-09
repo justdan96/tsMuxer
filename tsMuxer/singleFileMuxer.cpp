@@ -22,8 +22,7 @@ std::string getNewName(const std::string& oldName, const int cnt)
 {
     if (strEndWith(oldName, ".wav"))
         return oldName.substr(0, oldName.size() - 4) + "." + int32ToStr(cnt) + ".wav";
-    else
-        return oldName + ".wav" + int32ToStr(cnt);
+    return oldName + ".wav" + int32ToStr(cnt);
 }
 
 SingleFileMuxer::SingleFileMuxer(MuxerManager* owner) : AbstractMuxer(owner), m_lastIndex(-1) {}

@@ -132,7 +132,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                 m_curPos = m_bufEnd;
                 return NEED_MORE_DATA;
             }
-            else if (decodeRez + skipBytes + skipBeforeBytes <= 0)
+            if (decodeRez + skipBytes + skipBeforeBytes <= 0)
             {
                 m_curPos++;
                 m_processedBytes++;
@@ -166,13 +166,13 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             m_curPos = m_bufEnd;
             return NEED_MORE_DATA;
         }
-        else if (frameLen + skipBytes + skipBeforeBytes <= 0)
+        if (frameLen + skipBytes + skipBeforeBytes <= 0)
         {
             LTRACE(LT_INFO, 2,
                    getCodecInfo().displayName
-                       << " stream (track " << m_streamIndex << "): bad frame detected at position"
-                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
-                       << ". Resync stream.");
+                   << " stream (track " << m_streamIndex << "): bad frame detected at position"
+                   << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                   << ". Resync stream.");
             m_needSync = true;
             return 0;
         }
@@ -219,10 +219,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                 m_curPts -= getFrameDuration();
                 return readPacket(avPacket);  // ignore overlapped packet, get next one
             }
-            else
-            {
-                doMplsCorrection();
-            }
+            doMplsCorrection();
         }
 
         if (needSkipFrame(avPacket))

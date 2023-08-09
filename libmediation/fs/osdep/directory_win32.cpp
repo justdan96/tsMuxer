@@ -32,10 +32,7 @@ uint64_t getFileSize(const std::string& fileName)
         uint64_t rv;
         return f.size(&rv) ? rv : 0;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 bool createDir(const std::string& dirName, const bool createParentDirs)
@@ -64,11 +61,8 @@ bool deleteFile(const string& fileName)
     {
         return true;
     }
-    else
-    {
-        DWORD err = GetLastError();
-        return false;
-    }
+    DWORD err = GetLastError();
+    return false;
 
     return DeleteFile(toWide(fileName).data()) != 0;
 }

@@ -315,8 +315,7 @@ string extractFileExt(const string& src)
             string rez = src.substr(i + 1);
             if (!rez.empty() && rez[rez.size() - 1] == '\"')
                 return rez.substr(0, rez.size() - 1);
-            else
-                return rez;
+            return rez;
         }
     return "";
 }
@@ -335,8 +334,7 @@ string extractFileName(const string& src)
             string rez = src.substr(i + 1, endPos - i - 1);
             if (!rez.empty() && rez[rez.size() - 1] == '\"')
                 return rez.substr(0, rez.size() - 1);
-            else
-                return rez;
+            return rez;
         }
     return "";
 }
@@ -515,13 +513,10 @@ std::vector<wchar_t> toWide(const char* utf8Str, const int sz)
     {
         return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
     }
-    else
-    {
-        /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
+    /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
          * to keep compatibility with meta files saved by older versions of the GUI which put the file name through
          * QString::toLocal8Bit, which uses the ACP on Windows. */
-        return fromAcp(utf8Str, sz);
-    }
+    return fromAcp(utf8Str, sz);
 }
 
 std::string toUtf8(const wchar_t* wideStr)

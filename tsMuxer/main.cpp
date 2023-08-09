@@ -233,8 +233,7 @@ string getBlurayStreamDir(const string& mplsName)
         }
         return dirName + string("STREAM") + getDirSeparator();
     }
-    else
-        return "";
+    return "";
 }
 
 void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListMap& pidList, DiskType dt, int blankNum)
@@ -302,7 +301,7 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
         muxerManager.parseMuxOpt("MUXOPT --no-pcr-on-video-pid --vbr --avchd --vbv-len=500");
         muxerManager.addStream("V_MPEG4/ISO/AVC", tmpFileName, videoParams);
         string dstFile = blurayHelper.m2tsFileName(blankNum);
-        muxerManager.doMux(dstFile.c_str(), &blurayHelper);
+        muxerManager.doMux(dstFile, &blurayHelper);
 
         auto tsMuxer = dynamic_cast<TSMuxer*>(muxerManager.getMainMuxer());
 

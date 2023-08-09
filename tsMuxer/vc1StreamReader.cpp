@@ -394,10 +394,7 @@ int VC1StreamReader::getNextBFrames(uint8_t* buffer, int64_t& bTiming) const
     {
         return bFrameCnt;
     }
-    else
-    {
-        return -1;
-    }
+    return -1;
 }
 
 uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer) const
@@ -411,8 +408,7 @@ uint8_t* VC1StreamReader::findNextFrame(uint8_t* buffer) const
     }
     if (m_eof)
         return m_bufEnd;
-    else
-        return nullptr;
+    return nullptr;
 }
 
 void VC1StreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, const int oldSpsLen)

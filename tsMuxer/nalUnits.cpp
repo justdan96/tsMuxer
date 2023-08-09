@@ -30,10 +30,7 @@ int NALUnit::calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end)
         }
         return static_cast<int>(end - nalBuffer) * 8 - trailing;
     }
-    else
-    {
-        return 0;
-    }
+    return 0;
 }
 
 void NALUnit::write_byte_align_bits(BitStreamWriter& writer)
@@ -87,8 +84,7 @@ uint8_t* NALUnit::findNALWithStartCode(uint8_t* buffer, uint8_t* end, const bool
         {
             if (longCodesAllowed && buffer - 3 >= bufStart && buffer[-3] == 0)
                 return buffer - 3;
-            else
-                return buffer - 2;
+            return buffer - 2;
         }
         else
             buffer += 3;
@@ -242,8 +238,7 @@ int NALUnit::extractSEGolombCode()
     const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
         return -static_cast<int>(rez / 2);
-    else
-        return static_cast<int>((rez + 1) / 2);
+    return static_cast<int>((rez + 1) / 2);
 }
 
 int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
@@ -285,8 +280,7 @@ int NALUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, const bool wri
     const int encodeRez = NALUnit::encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
     if (encodeRez == -1)
         return -1;
-    else
-        return encodeRez + (writeStartCode ? 4 : 0);
+    return encodeRez + (writeStartCode ? 4 : 0);
 }
 
 int NALUnit::serialize(uint8_t* dstBuffer)
@@ -898,8 +892,7 @@ int SPSUnit::getMaxBitrate() const
 {
     if (nalHrdParams.bit_rate_value_minus1.empty() == 0)
         return 0;
-    else
-        return (nalHrdParams.bit_rate_value_minus1[0] + 1) << (6 + nalHrdParams.bit_rate_scale);
+    return (nalHrdParams.bit_rate_value_minus1[0] + 1) << (6 + nalHrdParams.bit_rate_scale);
 }
 
 int SPSUnit::hrd_parameters(HRDParams& params)
@@ -936,26 +929,20 @@ int SPSUnit::getCropY() const
 {
     if (chroma_format_idc == 0)
         return (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
-    else
-    {
-        int SubHeightC = 1;
-        if (chroma_format_idc == 1)
-            SubHeightC = 2;
-        return SubHeightC * (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
-    }
+    int SubHeightC = 1;
+    if (chroma_format_idc == 1)
+        SubHeightC = 2;
+    return SubHeightC * (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
 }
 
 int SPSUnit::getCropX() const
 {
     if (chroma_format_idc == 0)
         return frame_crop_left_offset + frame_crop_right_offset;
-    else
-    {
-        int SubWidthC = 1;
-        if (chroma_format_idc == 1 || chroma_format_idc == 2)
-            SubWidthC = 2;
-        return SubWidthC * (frame_crop_left_offset + frame_crop_right_offset);
-    }
+    int SubWidthC = 1;
+    if (chroma_format_idc == 1 || chroma_format_idc == 2)
+        SubWidthC = 2;
+    return SubWidthC * (frame_crop_left_offset + frame_crop_right_offset);
 }
 
 double SPSUnit::getFPS() const
@@ -967,8 +954,7 @@ double SPSUnit::getFPS() const
         //	return 23.9760239760;
         return tmp;
     }
-    else
-        return 0;
+    return 0;
 }
 
 void SPSUnit::setFps(const double fps)

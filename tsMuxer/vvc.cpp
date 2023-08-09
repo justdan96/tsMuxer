@@ -28,8 +28,7 @@ int VvcUnit::extractSEGolombCode()
     const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
         return -static_cast<int>(rez / 2);
-    else
-        return static_cast<int>((rez + 1) / 2);
+    return static_cast<int>((rez + 1) / 2);
 }
 
 void VvcUnit::decodeBuffer(const uint8_t* buffer, const uint8_t* end)
@@ -93,8 +92,7 @@ int VvcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
     const int encodeRez = NALUnit::encodeNAL(m_nalBuffer, m_nalBuffer + m_nalBufferLen, dstBuffer, dstEnd - dstBuffer);
     if (encodeRez == -1)
         return -1;
-    else
-        return encodeRez;
+    return encodeRez;
 }
 
 bool VvcUnit::dpb_parameters(const int MaxSubLayersMinus1, const bool subLayerInfoFlag)

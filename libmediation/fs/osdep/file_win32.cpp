@@ -113,15 +113,12 @@ bool File::open(const char* fName, const unsigned int oflag, unsigned int system
     {
         return false;
     }
-    else
+    if (oflag & File::ofAppend)
     {
-        if (oflag & File::ofAppend)
-        {
-            long hiword = 0;
-            const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
-            if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
-                throwFileError();
-        }
+        long hiword = 0;
+        const DWORD newPointerLow = SetFilePointer(m_impl, 0, &hiword, FILE_END);
+        if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
+            throwFileError();
     }
 
     return true;

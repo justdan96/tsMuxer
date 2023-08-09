@@ -211,8 +211,7 @@ string findFontArg(const string& text, const size_t pos)
     }
     if (firstPos != 0)
         return text.substr(firstPos, text.size() - firstPos);
-    else
-        return "";
+    return "";
 }
 
 uint32_t rgbSwap(uint32_t color)

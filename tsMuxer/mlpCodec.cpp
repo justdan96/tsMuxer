@@ -58,8 +58,7 @@ uint8_t* MLPCodec::findFrame(uint8_t* buffer, uint8_t* end)
     {
         if (curBuf[4] == 0xf8 && curBuf[5] == 0x72 && curBuf[6] == 0x6f)
             return curBuf;
-        else
-            curBuf++;
+        curBuf++;
     }
     return nullptr;
 }

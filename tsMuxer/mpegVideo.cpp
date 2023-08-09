@@ -242,8 +242,7 @@ double MPEGSequenceHeader::getFrameRate() const
 {
     if (frame_rate_index > 0 && frame_rate_index < sizeof(frame_rates) / sizeof(double))
         return frame_rates[frame_rate_index];
-    else
-        return 0;
+    return 0;
 }
 
 void MPEGSequenceHeader::setFrameRate(uint8_t* buff, const double fps)

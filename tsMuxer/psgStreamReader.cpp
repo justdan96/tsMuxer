@@ -399,16 +399,14 @@ int64_t getTimeValueNano(uint8_t* pos)
     const auto pts = static_cast<int64_t>(AV_RB32(pos));
     if (pts > 0xff000000u)
         return ptsToInternalClock(pts - 0x100000000ll);
-    else
-        return ptsToInternalClock(pts);
+    return ptsToInternalClock(pts);
 }
 
 int64_t getTimeValueNano(const int64_t pts)
 {
     if (pts > 0x1ff000000ull)
         return ptsToInternalClock(pts - 0x200000000ll);
-    else
-        return ptsToInternalClock(pts);
+    return ptsToInternalClock(pts);
 }
 
 int PGSStreamReader::readPacket(AVPacket& avPacket)
@@ -827,8 +825,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
             *data = 0;
         return 10;
     }
-    else
-        return 0;
+    return 0;
 }
 
 void PGSStreamReader::setVideoInfo(const int width, const int height, const double fps)

@@ -294,11 +294,8 @@ bool BlurayHelper::open(const string& dst, const DiskType dt, const int64_t disk
         m_isoWriter->setLayerBreakPoint(0xBA7200);  // around 25Gb
         return m_isoWriter->open(m_dstPath, diskSize, extraISOBlocks);
     }
-    else
-    {
-        m_dstPath = closeDirPath(m_dstPath, getDirSeparator());
-        return true;
-    }
+    m_dstPath = closeDirPath(m_dstPath, getDirSeparator());
+    return true;
 }
 
 bool BlurayHelper::createBluRayDirs() const
@@ -700,8 +697,7 @@ AbstractOutputStream* BlurayHelper::createFile()
 {
     if (m_isoWriter)
         return m_isoWriter->createFile();
-    else
-        return new File();
+    return new File();
 }
 
 bool BlurayHelper::isVirtualFS() const { return m_isoWriter != nullptr; }

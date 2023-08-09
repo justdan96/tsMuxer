@@ -547,8 +547,7 @@ int ISOFile::write(const void *data, const uint32_t len)
 {
     if (m_entry)
         return m_entry->write(static_cast<const uint8_t *>(data), len);
-    else
-        return -1;
+    return -1;
 }
 
 bool ISOFile::open(const char *name, unsigned int oflag, unsigned int systemDependentFlags)

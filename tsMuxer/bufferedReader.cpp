@@ -50,8 +50,7 @@ bool BufferedReader::incSeek(const uint32_t readerID, const int64_t offset)
         }
         return rez;
     }
-    else
-        return false;
+    return false;
 }
 
 BufferedReader::~BufferedReader()

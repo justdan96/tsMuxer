@@ -11,8 +11,7 @@ uint8_t* DVBSubStreamReader::findFrame(uint8_t* buff, uint8_t* end)
 {
     if (m_firstFrame)
         return buff;
-    else
-        return buff + 1;
+    return buff + 1;
 }
 
 #define READ_OFFSET(a) (m_big_offsets ? AV_RB32(a) : AV_RB16(a))
@@ -183,8 +182,7 @@ const std::string DVBSubStreamReader::getStreamInfo()
 {
     if (m_big_offsets)
         return "HD-DVD subpicture";
-    else
-        return "Subpicture";
+    return "Subpicture";
 }
 
 #endif

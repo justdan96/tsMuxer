@@ -553,8 +553,7 @@ int64_t getTSDuration(const char* fileName)
         file.close();
         if (lastPcrVal < 0)
             return 0;
-        else
-            return lastPcrVal != -1 ? lastPcrVal - firstPcrVal : 0;
+        return lastPcrVal != -1 ? lastPcrVal - firstPcrVal : 0;
     }
     catch (...)
     {

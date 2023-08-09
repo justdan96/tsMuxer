@@ -79,6 +79,5 @@ bool BufferedFileReader::gotoByte(const uint32_t readerID, const uint64_t seekDi
         }
         return rez;
     }
-    else
-        return false;
+    return false;
 }

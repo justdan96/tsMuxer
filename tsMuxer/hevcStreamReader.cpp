@@ -520,16 +520,14 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
                     incTimings();
                     return 0;
                 }
-                else
-                {  // first slice of current frame
-                    m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
-                    rez = m_slice->deserialize(m_sps, m_pps);
-                    if (rez)
-                        return rez;  // not enough buffer or error
-                    if (nalType >= HevcUnit::NalType::BLA_W_LP)
-                        m_lastIFrame = true;
-                    m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);
-                }
+                // first slice of current frame
+                m_slice->decodeBuffer(curPos, FFMIN(curPos + MAX_SLICE_HEADER, nextNal));
+                rez = m_slice->deserialize(m_sps, m_pps);
+                if (rez)
+                    return rez; // not enough buffer or error
+                if (nalType >= HevcUnit::NalType::BLA_W_LP)
+                    m_lastIFrame = true;
+                m_fullPicOrder = toFullPicOrder(m_slice, m_sps->log2_max_pic_order_cnt_lsb);
             }
             sliceFound = true;
         }
@@ -603,8 +601,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
         m_lastDecodedPos = m_bufEnd;
         return 0;
     }
-    else
-        return NEED_MORE_DATA;
+    return NEED_MORE_DATA;
 }
 
 uint8_t* HEVCStreamReader::writeNalPrefix(uint8_t* curPos) const
