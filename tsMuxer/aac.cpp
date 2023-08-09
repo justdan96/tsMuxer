@@ -67,7 +67,7 @@ bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
     catch (BitStreamException e)
     {
         (void)e;
-        return NOT_ENOUGH_BUFFER;
+        return false;
     }
 }
 
