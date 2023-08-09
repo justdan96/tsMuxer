@@ -186,7 +186,7 @@ void BufferedReader::notify(const uint32_t readerID, const uint32_t dataReaded)
 uint32_t BufferedReader::getReaderCount()
 {
     std::lock_guard<std::mutex> lock(m_readersMtx);
-    return (uint32_t)m_readers.size();
+    return static_cast<uint32_t>(m_readers.size());
 }
 
 void BufferedReader::thread_main()

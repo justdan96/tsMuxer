@@ -237,7 +237,7 @@ class BitStreamWriter : public BitStream
         *m_buffer = my_htonl(prevVal);
     }
 
-    inline unsigned getBitsCount() { return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
+    inline int getBitsCount() { return (int)(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
 
    private:
     unsigned m_curVal;

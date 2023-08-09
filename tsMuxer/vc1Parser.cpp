@@ -96,7 +96,7 @@ double VC1SequenceHeader::getFPS() const
 {
     if (time_base_num == 0 || time_base_den == 0)
         return 0;
-    const double fps = time_base_den / (double)time_base_num;
+    const double fps = time_base_den / static_cast<double>(time_base_num);
     // if (fps > 25.0 && pulldown)
     //	fps /= 1.25;
     return fps;
@@ -110,8 +110,8 @@ void VC1SequenceHeader::setFPS(const double value)
     if (m_fpsFieldBitVal > 0)
     {
         int nr;
-        const int time_scale = (int)(value + 0.5) * 1000;
-        const int num_units_in_tick = (int)(time_scale / value + 0.5);
+        const int time_scale = static_cast<int>(value + 0.5) * 1000;
+        const int num_units_in_tick = static_cast<int>(time_scale / value + 0.5);
         if ((time_scale == 24000 || time_scale == 25000 || time_scale == 30000 || time_scale == 50000 ||
              time_scale == 60000) &&
             (num_units_in_tick == 1000 || num_units_in_tick == 1001))
@@ -156,7 +156,7 @@ int VC1SequenceHeader::decode_sequence_header()
     try
     {
         bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen);  // skip 00 00 01 xx marker
-        profile = (Profile)bitReader.getBits(2);
+        profile = static_cast<Profile>(bitReader.getBits(2));
         if (profile == Profile::COMPLEX)
             LTRACE(LT_WARN, 0, "WMV3 Complex Profile is not fully supported");
 
@@ -364,7 +364,7 @@ int VC1Frame::vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr)
     bitReader.skipBits(2);    // framecnt
     if (sequenceHdr.rangered)
         bitReader.skipBit();  // rangeredfrm
-    pict_type = (VC1PictType)bitReader.getBit();
+    pict_type = static_cast<VC1PictType>(bitReader.getBit());
     if (sequenceHdr.max_b_frames > 0)
     {
         if (pict_type == VC1PictType::I_TYPE)

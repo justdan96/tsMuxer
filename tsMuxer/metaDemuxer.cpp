@@ -367,7 +367,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         fileList = extractFileList(codecStreamName);
     }
 
-    for (int i = (int)fileList.size() - 1; i >= 0; --i)
+    for (int i = static_cast<int>(fileList.size()) - 1; i >= 0; --i)
     {
         string trackKey = fileList[i] + string("_#") + int32ToStr(i) + string("_");
         if (addParams.find("subClip") == addParams.end())
@@ -408,7 +408,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     }
 
     AbstractStreamReader* codecReader = createCodec(codec, addParams, fileList[0], mergePlayItems(mplsInfoList));
-    codecReader->setStreamIndex((int)m_codecInfo.size() + 1);
+    codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size()) + 1);
     codecReader->setTimeOffset(m_timeOffset);
 
     if (m_codecInfo.size() == 0)
@@ -425,7 +425,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             dataReader = &m_containerReader;
             codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMultiH264);
             if (listIterator)
-                ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
+                static_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         }
         else
         {
@@ -440,7 +440,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         else
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside TS/M2TS container need track parameter.");
         if (listIterator)
-            ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
+            static_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".ts"))
             codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctTS);
         else
@@ -453,7 +453,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         else
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MPG/VOB/EVO container need track parameter.");
         if (listIterator)
-            ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
+            static_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".evo") || strEndWith(tmpname, ".evo\""))
             codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctEVOB);
         else
@@ -466,7 +466,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         else
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MKV container need track parameter.");
         if (listIterator)
-            ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
+            static_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMKV);
     }
     else if (strEndWith(tmpname, ".mov") || strEndWith(tmpname, ".mp4") || strEndWith(tmpname, ".m4v") ||
@@ -477,7 +477,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         else
             THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MOV/MP4 container need track parameter.");
         if (listIterator)
-            ((ContainerToReaderWrapper*)dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
+            static_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMOV);
     }
     else
@@ -541,7 +541,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
             coeff = 1000000ull;
             value = strToInt32(timeShift.c_str());
         }
-        value = value * (int64_t)coeff / 1000ll * (int64_t)INTERNAL_PTS_FREQ / 1000000ll;
+        value = value * static_cast<int64_t>(coeff) / 1000ll * static_cast<int64_t>(INTERNAL_PTS_FREQ) / 1000000ll;
         streamInfo.m_timeShift = value;
         if (value > 0)
             streamInfo.m_lastDTS = value;
@@ -634,7 +634,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         for (auto& itr : demuxedData)
         {
             StreamData& vect = itr.second;
-            CheckStreamRez trackRez = detectTrackReader(vect.data(), (int)vect.size(), containerType,
+            CheckStreamRez trackRez = detectTrackReader(vect.data(), static_cast<int>(vect.size()), containerType,
                                                         acceptedPidMap[itr.first].m_trackType, itr.first);
             if (trackRez.codecInfo.programName.size() > 0)
             {
@@ -883,35 +883,36 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
-            ((H264StreamReader*)rez)->setFPS(fps);
+            static_cast<H264StreamReader*>(rez)->setFPS(fps);
         }
 
         itr = addParams.find("delPulldown");
         if (itr != addParams.end())
-            ((H264StreamReader*)rez)->setRemovePulldown(true);
+            static_cast<H264StreamReader*>(rez)->setRemovePulldown(true);
 
         itr = addParams.find("level");
         if (itr != addParams.end())
-            ((H264StreamReader*)rez)->setForceLevel((uint8_t)strToDouble(itr->second.c_str()) * 10);
+            static_cast<H264StreamReader*>(rez)->setForceLevel(static_cast<uint8_t>(strToDouble(itr->second.c_str())) *
+                                                               10);
         itr = addParams.find("insertSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
+            static_cast<H264StreamReader*>(rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
         }
         itr = addParams.find("autoSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
+            static_cast<H264StreamReader*>(rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertAuto);
         }
         itr = addParams.find("forceSEI");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertForce);
+            static_cast<H264StreamReader*>(rez)->setInsertSEI(H264StreamReader::SeiMethod::SEI_InsertForce);
         }
         itr = addParams.find("contSPS");
         if (itr != addParams.end())
         {
-            ((H264StreamReader*)rez)->setH264SPSCont(true);
+            static_cast<H264StreamReader*>(rez)->setH264SPSCont(true);
         }
     }
     else if (codecName == "V_MPEGH/ISO/HEVC")
@@ -922,7 +923,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
-            ((HEVCStreamReader*)rez)->setFPS(fps);
+            static_cast<HEVCStreamReader*>(rez)->setFPS(fps);
         }
     }
     else if (codecName == "V_MPEGI/ISO/VVC")
@@ -933,7 +934,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
-            ((VVCStreamReader*)rez)->setFPS(fps);
+            static_cast<VVCStreamReader*>(rez)->setFPS(fps);
         }
     }
     else if (codecName == "V_MS/VFW/WVC1")
@@ -944,12 +945,12 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
-            ((VC1StreamReader*)rez)->setFPS(fps);
+            static_cast<VC1StreamReader*>(rez)->setFPS(fps);
         }
 
         itr = addParams.find("delPulldown");
         if (itr != addParams.end())
-            ((VC1StreamReader*)rez)->setRemovePulldown(true);
+            static_cast<VC1StreamReader*>(rez)->setRemovePulldown(true);
     }
     else if (codecName == "V_MPEG-2")
     {
@@ -959,16 +960,16 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         {
             double fps = strToDouble(itr->second.c_str());
             fps = correctFps(fps);
-            ((MPEG2StreamReader*)rez)->setFPS(fps);
+            static_cast<MPEG2StreamReader*>(rez)->setFPS(fps);
         }
 
         itr = addParams.find("ar");
         if (itr != addParams.end())
-            ((MPEGStreamReader*)rez)->setAspectRatio(arNameToCode(itr->second));
+            static_cast<MPEGStreamReader*>(rez)->setAspectRatio(arNameToCode(itr->second));
 
         itr = addParams.find("delPulldown");
         if (itr != addParams.end())
-            ((MPEG2StreamReader*)rez)->setRemovePulldown(true);
+            static_cast<MPEG2StreamReader*>(rez)->setRemovePulldown(true);
     }
     else if (codecName == "A_AAC")
         rez = new AACStreamReader();
@@ -985,25 +986,25 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         rez = new DTSStreamReader();
         auto itr = addParams.find("down-to-dts");
         if (itr != addParams.end())
-            ((DTSStreamReader*)rez)->setDownconvertToDTS(true);
+            static_cast<DTSStreamReader*>(rez)->setDownconvertToDTS(true);
     }
     else if (codecName == "A_AC3")
     {
         rez = new AC3StreamReader();
         auto itr = addParams.find("down-to-ac3");
         if (itr != addParams.end())
-            ((AC3StreamReader*)rez)->setDownconvertToAC3(true);
+            static_cast<AC3StreamReader*>(rez)->setDownconvertToAC3(true);
     }
     else if (codecName == "S_HDMV/PGS")
     {
         rez = new PGSStreamReader();
         auto itr = addParams.find("bottom-offset");
         if (itr != addParams.end())
-            ((PGSStreamReader*)rez)->setBottomOffset(strToInt32(itr->second.c_str()));
+            static_cast<PGSStreamReader*>(rez)->setBottomOffset(strToInt32(itr->second.c_str()));
 
         itr = addParams.find("3d-plane");
         if (itr != addParams.end())
-            ((PGSStreamReader*)rez)->setOffsetId(strToInt32(itr->second.c_str()));
+            static_cast<PGSStreamReader*>(rez)->setOffsetId(strToInt32(itr->second.c_str()));
 
         double fps = 0.0;
         int width = 0;
@@ -1017,10 +1018,10 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         itr = addParams.find("video-height");
         if (itr != addParams.end())
             height = strToInt32(itr->second.c_str());
-        ((PGSStreamReader*)rez)->setVideoInfo(width, height, fps);
+        static_cast<PGSStreamReader*>(rez)->setVideoInfo(width, height, fps);
         itr = addParams.find("font-border");
         if (itr != addParams.end())
-            ((PGSStreamReader*)rez)->setFontBorder(strToInt32(itr->second.c_str()));
+            static_cast<PGSStreamReader*>(rez)->setFontBorder(strToInt32(itr->second.c_str()));
 
         /*
         map<string,string>::const_iterator itr = addParams.find("fps");
@@ -1121,7 +1122,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                     THROW(ERR_COMMON, "Second argument at stretch parameter can not be 0");
             }
             if (itr != addParams.end())
-                ((SimplePacketizerReader*)rez)->setStretch(stretch);
+                static_cast<SimplePacketizerReader*>(rez)->setStretch(stretch);
         }
     }
     auto itr = addParams.find("secondary");
@@ -1147,7 +1148,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
     rez->setPipParams(pipParams);
 
     if (!mplsInfo.empty() && dynamic_cast<SimplePacketizerReader*>(rez))
-        ((SimplePacketizerReader*)rez)->setMPLSInfo(mplsInfo);
+        static_cast<SimplePacketizerReader*>(rez)->setMPLSInfo(mplsInfo);
 
     return rez;
 }
@@ -1214,7 +1215,7 @@ void METADemuxer::updateReport(const bool checkTime)
         if (m_totalSize > 0)
         {
             currentProcessedSize = getDemuxedSize();
-            progress = currentProcessedSize / (double)m_totalSize * 100.0;
+            progress = currentProcessedSize / static_cast<double>(m_totalSize) * 100.0;
             if (progress > 100.0)
                 progress = 100.0;
         }
@@ -1300,8 +1301,8 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
         for (auto itr1 = demuxerData.m_pids.begin(); itr1 != demuxerData.m_pids.end(); ++itr1)
         {
             MemoryBlock& vect = demuxerData.demuxedData[itr1->first];
-            vect.reserve((int)(nFileBlockSize + m_readBuffOffset));
-            vect.resize((int)(m_readBuffOffset));
+            vect.reserve(static_cast<int>(nFileBlockSize + m_readBuffOffset));
+            vect.resize(static_cast<int>(m_readBuffOffset));
         }
         demuxerData.m_firstRead = false;
     }
@@ -1316,13 +1317,13 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
         if (currentSize > lastReadCnt)
         {
             uint8_t* dataStart = streamData.data() + m_readBuffOffset;
-            memmove(dataStart, dataStart + lastReadCnt, (size_t)currentSize - lastReadCnt);
+            memmove(dataStart, dataStart + lastReadCnt, static_cast<size_t>(currentSize) - lastReadCnt);
         }
-        streamData.resize((int)(m_readBuffOffset + currentSize - lastReadCnt));
+        streamData.resize(static_cast<int>(m_readBuffOffset + currentSize - lastReadCnt));
         demuxerData.lastReadCnt[pid] = 0;
     }
 
-    readCnt = (uint32_t)(FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset);
+    readCnt = static_cast<uint32_t>((FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset));
     const DemuxerReadPolicy policy = demuxerData.m_pids[pid];
     if ((readCnt > 0 &&
          (policy == DemuxerReadPolicy::drpFragmented || demuxerData.lastReadCnt[pid] == BufferedFileReader::DATA_EOF2 ||
@@ -1355,7 +1356,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
                 }
             }
             m_discardedSize += discardSize;
-            readCnt = (uint32_t)(FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset);
+            readCnt = static_cast<uint32_t>((FFMIN(streamData.size(), nFileBlockSize) - m_readBuffOffset));
         } while (demuxRez == 0 && readCnt < MIN_READED_BLOCK && policy != DemuxerReadPolicy::drpFragmented &&
                  !m_terminated);
 

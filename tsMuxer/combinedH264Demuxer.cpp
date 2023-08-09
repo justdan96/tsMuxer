@@ -60,7 +60,7 @@ void CombinedH264Reader::addDataToSecondary(const uint8_t* data, const uint8_t* 
 
 CombinedH264Reader::ReadState CombinedH264Reader::detectStreamByNal(const uint8_t* data, const uint8_t* dataEnd)
 {
-    const auto nalType = (NALUnit::NALType)(*data & 0x1f);
+    const auto nalType = static_cast<NALUnit::NALType>(*data & 0x1f);
 
     switch (nalType)
     {
@@ -286,5 +286,5 @@ int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acce
         nextNal = NALUnit::findNALWithStartCode(curNal + 3, dataEnd, true);
     }
 
-    return avPacket.size - (int)discardSize;
+    return avPacket.size - static_cast<int>(discardSize);
 }

@@ -39,8 +39,8 @@ void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool las
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
     if (m_tmpBuffer.size() > 0)
         memmove(dataBegin, &m_tmpBuffer[0], m_tmpBuffer.size());
-    const int parsedLen = parseText(dataBegin, dataLen + (int)m_tmpBuffer.size());
-    const int rest = dataLen + (int)m_tmpBuffer.size() - parsedLen;
+    const int parsedLen = parseText(dataBegin, dataLen + static_cast<int>(m_tmpBuffer.size()));
+    const int rest = dataLen + static_cast<int>(m_tmpBuffer.size()) - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
         THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)");
     m_tmpBuffer.resize(rest);
@@ -124,13 +124,14 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
     for (; cur < end; cur += m_charSize)
     {
         // if (cur[m_splitterOfs] == '\n')
-        if ((m_charSize == 1 && *cur == '\n') || (m_charSize == 2 && *((uint16_t*)cur) == m_short_N) ||
-            (m_charSize == 4 && *((uint32_t*)cur) == m_long_N))
+        if ((m_charSize == 1 && *cur == '\n') || (m_charSize == 2 && *reinterpret_cast<uint16_t*>(cur) == m_short_N) ||
+            (m_charSize == 4 && *reinterpret_cast<uint32_t*>(cur) == m_long_N))
         {
             int32_t x = 0;
             if (cur >= m_charSize + lastProcessedLine)
-                if ((m_charSize == 1 && cur[-1] == '\r') || (m_charSize == 2 && ((uint16_t*)cur)[-1] == m_short_R) ||
-                    (m_charSize == 4 && ((uint32_t*)cur)[-1] == m_long_R))
+                if ((m_charSize == 1 && cur[-1] == '\r') ||
+                    (m_charSize == 2 && reinterpret_cast<uint16_t*>(cur)[-1] == m_short_R) ||
+                    (m_charSize == 4 && reinterpret_cast<uint32_t*>(cur)[-1] == m_long_R))
                     x = m_charSize;
 
             m_sourceText.emplace(UtfConverter::toUtf8(lastProcessedLine, cur - lastProcessedLine - x, m_srcFormat));
@@ -138,12 +139,12 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
             if (strOnlySpace(tmp))
                 tmp.clear();
 
-            m_origSize.push((uint32_t)(cur + m_charSize - lastProcessedLine + prefixLen));
+            m_origSize.push(static_cast<uint32_t>(cur + m_charSize - lastProcessedLine + prefixLen));
             prefixLen = 0;
             lastProcessedLine = cur + m_charSize;
         }
     }
-    return (int)(lastProcessedLine - dataStart);
+    return static_cast<int>(lastProcessedLine - dataStart);
 }
 
 bool SRTStreamReader::strOnlySpace(std::string& str)

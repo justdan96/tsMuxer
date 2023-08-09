@@ -338,7 +338,7 @@ void MuxerManager::parseMuxOpt(const string& opts)
         if (paramPair[0] == "--start-time" && paramPair.size() > 1)
         {
             if (paramPair[1].find(":") != string::npos)
-                m_ptsOffset = int64_t(timeToFloat(paramPair[1]) * 90000.0 + 0.5);
+                m_ptsOffset = static_cast<int64_t>(timeToFloat(paramPair[1]) * 90000.0 + 0.5);
             else
                 m_ptsOffset = strToInt64u(paramPair[1].c_str()) * 2;  // source in a 45Khz clock
         }

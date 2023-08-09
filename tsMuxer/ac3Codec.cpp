@@ -75,7 +75,7 @@ bool AC3Codec::crc32(uint8_t *buf, const int length)
     const uint8_t *end = buf + length;
 
     int crc = 0;
-    while (buf < end) crc = ctx[(uint8_t)crc ^ *buf++] ^ (crc >> 8);
+    while (buf < end) crc = ctx[static_cast<uint8_t>(crc) ^ *buf++] ^ (crc >> 8);
 
     // the last word of the frame is crc2 = crc for the whole frame except sync_byte
     if (crc != buf[0] + (buf[1] << 8))
@@ -379,7 +379,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
             int trueHDFrameLen = (trueHDData[0] & 0x0f) << 8;
             trueHDFrameLen += trueHDData[1];
             trueHDFrameLen *= 2;
-            if (end - trueHDData < (int64_t)trueHDFrameLen + 7)
+            if (end - trueHDData < static_cast<int64_t>(trueHDFrameLen) + 7)
                 return NOT_ENOUGH_BUFFER;
             if (!m_true_hd_mode)
             {

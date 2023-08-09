@@ -62,7 +62,7 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
         if (decodeRez == 0)
         {
             avPacket.data = m_tmpBuffer;
-            avPacket.size = (int)m_tmpBufferLen;
+            avPacket.size = static_cast<int>(m_tmpBufferLen);
         }
     }
 
@@ -75,16 +75,16 @@ int MPEGStreamReader::flushPacket(AVPacket& avPacket)
     LTRACE(LT_DEBUG, 0, message);
     LTRACE(LT_INFO, 2, message);
     m_processedBytes += avPacket.size;
-    return (int)m_tmpBufferLen;
+    return static_cast<int>(m_tmpBufferLen);
 }
 
 void MPEGStreamReader::onShiftBuffer(int offset) {}
 
 void MPEGStreamReader::storeBufferRest()
 {
-    onShiftBuffer((int)(m_curPos - m_tmpBuffer));
+    onShiftBuffer(static_cast<int>(m_curPos - m_tmpBuffer));
     memmove(m_tmpBuffer, m_curPos, m_bufEnd - m_curPos);
-    m_tmpBufferLen = (int)(m_bufEnd - m_curPos);
+    m_tmpBufferLen = static_cast<int>(m_bufEnd - m_curPos);
     if (m_lastDecodedPos > m_curPos)
         m_lastDecodedPos = m_tmpBuffer + (m_lastDecodedPos - m_curPos);
     else
@@ -116,7 +116,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
         else
             m_curPos = m_bufEnd;
-        const int bytesProcessed = (int)(m_curPos - prevPos);
+        const int bytesProcessed = static_cast<int>(m_curPos - prevPos);
         m_processedBytes += bytesProcessed;
         prevPos = m_curPos;
         if (!m_syncToStream)
@@ -197,7 +197,7 @@ int MPEGStreamReader::readPacket(AVPacket& avPacket)
         }
     }
 
-    const int bytesProcessed = (int)(nal - prevPos);
+    const int bytesProcessed = static_cast<int>(nal - prevPos);
     avPacket.data = m_curPos;
     avPacket.size = bytesProcessed;
     avPacket.pts = m_curPts + m_timeOffset;
@@ -340,7 +340,7 @@ void MPEGStreamReader::fillAspectBySAR(const double sar)
 {
     if (m_streamAR == VideoAspectRatio::AR_KEEP_DEFAULT)
     {
-        const double ar = getStreamWidth() * sar / (double)getStreamHeight();
+        const double ar = getStreamWidth() * sar / static_cast<double>(getStreamHeight());
         static constexpr double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
         double minEps = INT_MAX;
         m_streamAR = VideoAspectRatio::AR_KEEP_DEFAULT;
@@ -349,7 +349,7 @@ void MPEGStreamReader::fillAspectBySAR(const double sar)
             if (fabs(ar - base_ar[i]) < minEps)
             {
                 minEps = fabs(ar - base_ar[i]);
-                m_streamAR = (VideoAspectRatio)i;
+                m_streamAR = static_cast<VideoAspectRatio>(i);
             }
         }
     }

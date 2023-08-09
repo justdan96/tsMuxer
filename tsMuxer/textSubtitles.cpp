@@ -109,8 +109,8 @@ void TextToPGSConverter::setVideoInfo(const int width, const int height, const d
 
 double TextToPGSConverter::alignToGrid(const double value) const
 {
-    const auto frameCnt =
-        (int64_t)(value * m_videoFps + 0.5);  // how many frames have passed until this moment in time (rounded)
+    const auto frameCnt = static_cast<int64_t>(value * m_videoFps +
+                                               0.5);  // how many frames have passed until this moment in time (rounded)
     return frameCnt / m_videoFps;
 }
 
@@ -127,7 +127,7 @@ uint8_t TextToPGSConverter::color32To8(uint32_t* buff, const uint32_t colorMask)
             if (m_paletteYUV.size() < 255)
             {
                 const pair<map<YUVQuad, uint8_t>::iterator, bool> rez =
-                    m_paletteYUV.insert(std::make_pair(yuv, (uint8_t)m_paletteYUV.size()));
+                    m_paletteYUV.insert(std::make_pair(yuv, static_cast<uint8_t>(m_paletteYUV.size())));
                 return rez.first->second;
             }
             else
@@ -174,11 +174,12 @@ int TextToPGSConverter::getRepeatCnt(const uint32_t* pos, const uint32_t* end, c
 
 YUVQuad TextToPGSConverter::RGBAToYUVA(uint32_t data)
 {
-    const auto rgba = (RGBQUAD*)&data;
+    const auto rgba = reinterpret_cast<RGBQUAD*>(&data);
     YUVQuad rez;
-    rez.Y = (int)(65.738 * rgba->rgbRed + 129.057 * rgba->rgbGreen + 25.064 * rgba->rgbBlue + 4224.0) >> 8;
-    rez.Cr = (int)(112.439 * rgba->rgbRed - 94.154 * rgba->rgbGreen - 18.285 * rgba->rgbBlue + 32896.0) >> 8;
-    rez.Cb = (int)(-37.945 * rgba->rgbRed - 74.494 * rgba->rgbGreen + 112.439 * rgba->rgbBlue + 32896.0) >> 8;
+    rez.Y = static_cast<int>(65.738 * rgba->rgbRed + 129.057 * rgba->rgbGreen + 25.064 * rgba->rgbBlue + 4224.0) >> 8;
+    rez.Cr = static_cast<int>(112.439 * rgba->rgbRed - 94.154 * rgba->rgbGreen - 18.285 * rgba->rgbBlue + 32896.0) >> 8;
+    rez.Cb =
+        static_cast<int>(-37.945 * rgba->rgbRed - 74.494 * rgba->rgbGreen + 112.439 * rgba->rgbBlue + 32896.0) >> 8;
     rez.alpha = rgba->rgbReserved;
     return rez;
 }
@@ -186,11 +187,11 @@ YUVQuad TextToPGSConverter::RGBAToYUVA(uint32_t data)
 RGBQUAD TextToPGSConverter::YUVAToRGBA(const YUVQuad& yuv)
 {
     RGBQUAD rez{};
-    int tmp = (int)(298.082 * yuv.Y + 516.412 * yuv.Cb - 70742.016) >> 8;
+    int tmp = static_cast<int>(298.082 * yuv.Y + 516.412 * yuv.Cb - 70742.016) >> 8;
     rez.rgbBlue = FFMAX(FFMIN(tmp, 255), 0);
-    tmp = (int)(298.082 * yuv.Y - 208.120 * yuv.Cr - 100.291 * yuv.Cb + 34835.456) >> 8;
+    tmp = static_cast<int>(298.082 * yuv.Y - 208.120 * yuv.Cr - 100.291 * yuv.Cb + 34835.456) >> 8;
     rez.rgbGreen = FFMAX(FFMIN(tmp, 255), 0);
-    tmp = (int)(298.082 * yuv.Y + 516.412 * yuv.Cr - 56939.776) >> 8;
+    tmp = static_cast<int>(298.082 * yuv.Y + 516.412 * yuv.Cr - 56939.776) >> 8;
     rez.rgbRed = FFMAX(FFMIN(tmp, 255), 0);
     rez.rgbReserved = yuv.alpha;
     return rez;
@@ -200,7 +201,7 @@ void TextToPGSConverter::reduceColors(uint8_t mask) const
 {
     mask = ~mask;
     const uint32_t val = (mask << 24) + (mask << 16) + (mask << 8) + mask;
-    auto dst = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
+    auto dst = reinterpret_cast<uint32_t*>(m_textRender ? m_textRender->m_pData : m_imageBuffer);
     const uint32_t* end = dst + m_videoWidth * m_videoHeight;
     for (; dst < end; ++dst) *dst &= val;
 }
@@ -214,7 +215,7 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
 
         uint8_t* curPtr = m_renderedData;
         const uint8_t* trimPos = m_renderedData;
-        auto srcData = (uint32_t*)(m_textRender ? m_textRender->m_pData : m_imageBuffer);
+        auto srcData = reinterpret_cast<uint32_t*>(m_textRender ? m_textRender->m_pData : m_imageBuffer);
         assert(srcData);
         m_rleLen = 0;
         m_minLine = INT_MAX;
@@ -254,8 +255,8 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
                             *curPtr++ = 0x80 + repCnt;
                         else
                         {
-                            *curPtr++ = (uint8_t)(0xc0 + (repCnt >> 8));
-                            *curPtr++ = (uint8_t)(repCnt & 0xff);
+                            *curPtr++ = static_cast<uint8_t>(0xc0 + (repCnt >> 8));
+                            *curPtr++ = static_cast<uint8_t>(repCnt & 0xff);
                         }
                         *curPtr++ = srcColor;
                         srcData += repCnt;
@@ -278,8 +279,8 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
                         *curPtr++ = repCnt;
                     else
                     {
-                        *curPtr++ = (uint8_t)0x40 + (repCnt >> 8);
-                        *curPtr++ = (uint8_t)(repCnt & 0xff);
+                        *curPtr++ = static_cast<uint8_t>(0x40) + (repCnt >> 8);
+                        *curPtr++ = static_cast<uint8_t>(repCnt & 0xff);
                     }
                     srcData += repCnt;
                 }
@@ -298,7 +299,7 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
         }
         if (m_minLine == INT_MAX)
             m_minLine = m_maxLine = 0;
-        m_rleLen = (int)(trimPos - m_renderedData);
+        m_rleLen = static_cast<int>(trimPos - m_renderedData);
         // sort by colors indexes
         m_paletteByColor.clear();
         for (auto [fst, snd] : m_paletteYUV) m_paletteByColor.insert(std::make_pair(snd, fst));
@@ -341,15 +342,15 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     inTimeSec = alignToGrid(inTimeSec);
     outTimeSec = alignToGrid(outTimeSec);
 
-    const auto inTimePTS = (int64_t)(inTimeSec * 90000);
-    const auto outTimePTS = (int64_t)(outTimeSec * 90000);
+    const auto inTimePTS = static_cast<int64_t>(inTimeSec * 90000);
+    const auto outTimePTS = static_cast<int64_t>(outTimeSec * 90000);
 
     uint32_t mask = 0;
     int step = 0;
     while (!rlePack(mask))
     {
         // reduce colors
-        const auto tmp = (uint8_t*)&mask;
+        const auto tmp = reinterpret_cast<uint8_t*>(&mask);
         const int idx = step++ % 4;
         tmp[idx] <<= 1;
         tmp[idx]++;
@@ -361,8 +362,8 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     const int objectWindowHeight = FFMAX(0, renderedHeight());
     const int objectWindowTop = FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset);
 
-    int fadeInFrames = (int)(animation.fadeInDuration * m_videoFps + 0.5);
-    int fadeOutFrames = (int)(animation.fadeOutDuration * m_videoFps + 0.5);
+    int fadeInFrames = static_cast<int>(animation.fadeInDuration * m_videoFps + 0.5);
+    int fadeOutFrames = static_cast<int>(animation.fadeOutDuration * m_videoFps + 0.5);
     fadeInFrames++;
     fadeOutFrames++;
 
@@ -371,11 +372,11 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
     float opacity = opacityInDelta;
 
     const double decodedObjectSize = (m_maxLine - m_minLine + 1) * m_videoWidth;
-    const auto compositionDecodeTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
-    const auto windowsTransferTime = (int64_t)(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
+    const auto compositionDecodeTime = static_cast<int64_t>(90000.0 * decodedObjectSize / PIXEL_DECODING_RATE + 0.999);
+    const auto windowsTransferTime = static_cast<int64_t>(90000.0 * decodedObjectSize / PIXEL_COMPOSITION_RATE + 0.999);
 
     const auto PLANEINITIALIZATIONTIME =
-        (int64_t)(90000.0 * (m_videoWidth * m_videoHeight) / PIXEL_COMPOSITION_RATE + 0.999);
+        static_cast<int64_t>(90000.0 * (m_videoWidth * m_videoHeight) / PIXEL_COMPOSITION_RATE + 0.999);
     const int64_t PRESENTATION_DTS_DELTA = PLANEINITIALIZATIONTIME + windowsTransferTime;
 
     // 1. show text
@@ -396,9 +397,9 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
 
     // 2.1 fade in palette
     const double fpsPts = 90000.0 / m_videoFps;
-    auto updateTime = (int64_t)alignToGrid(inTimePTS + fpsPts);
+    auto updateTime = static_cast<int64_t>(alignToGrid(inTimePTS + fpsPts));
 
-    const auto lastAnimateTime = (int64_t)alignToGrid(outTimePTS - fpsPts);
+    const auto lastAnimateTime = static_cast<int64_t>(alignToGrid(outTimePTS - fpsPts));
     opacity += opacityInDelta;
     while (updateTime <= lastAnimateTime + FLOAT_EPS && opacity <= 1.0 + FLOAT_EPS)
     {
@@ -410,12 +411,12 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
                                            updateTime - windowsTransferTime);
         curPos += composeEnd(curPos, updateTime - 90, updateTime - 90);
 
-        updateTime = (int64_t)alignToGrid(updateTime + fpsPts);
+        updateTime = static_cast<int64_t>(alignToGrid(updateTime + fpsPts));
         opacity += opacityInDelta;
     }
 
     // 2.2 fade out palette
-    updateTime = (int64_t)alignToGrid(FFMAX(updateTime, outTimePTS - (fadeOutFrames - 1) * fpsPts));
+    updateTime = static_cast<int64_t>(alignToGrid(FFMAX(updateTime, outTimePTS - (fadeOutFrames - 1) * fpsPts)));
     opacity = 1.0f - opacityOutDelta;
     while (updateTime < outTimePTS - FLOAT_EPS)
     {
@@ -428,7 +429,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
                                      (int64_t)updateTime - windowsTransferTime);
         curPos += composeEnd(curPos, (int64_t)updateTime - 90, (int64_t)updateTime - 90);
 
-        updateTime = (int64_t)alignToGrid(updateTime + fpsPts);
+        updateTime = static_cast<int64_t>(alignToGrid(updateTime + fpsPts));
         opacity -= opacityOutDelta;
     }
 
@@ -443,7 +444,7 @@ uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& a
 
     assert(curPos - m_pgsBuffer < PG_BUFFER_SIZE);
 
-    dstBufSize = (uint32_t)(curPos - m_pgsBuffer);
+    dstBufSize = static_cast<uint32_t>(curPos - m_pgsBuffer);
     return m_pgsBuffer;
 }
 
@@ -480,8 +481,8 @@ long TextToPGSConverter::composePresentationSegment(uint8_t* buff, const Composi
         curPos += 2;  // object vertical position
     }
 
-    AV_WB16(startPos - 2, (uint16_t)(curPos - startPos));
-    return (long)(curPos - buff);
+    AV_WB16(startPos - 2, static_cast<uint16_t>(curPos - startPos));
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff) const
@@ -492,7 +493,7 @@ long TextToPGSConverter::composeVideoDescriptor(uint8_t* buff) const
     AV_WB16(curPos, m_videoHeight);
     curPos += 2;
     *curPos++ = PGSStreamReader::calcFpsIndex(m_videoFps) << 4;
-    return (long)(curPos - buff);
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, const int64_t pts, const int64_t dts, const int top,
@@ -506,8 +507,8 @@ long TextToPGSConverter::composeWindowDefinition(uint8_t* buff, const int64_t pt
     uint8_t* startPos = curPos;
     *curPos++ = 1;  // number of windows
     curPos += composeWindow(curPos, top, height);
-    AV_WB16(startPos - 2, (uint16_t)(curPos - startPos));
-    return (long)(curPos - buff);
+    AV_WB16(startPos - 2, static_cast<uint16_t>(curPos - startPos));
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeCompositionDescriptor(uint8_t* buff, const uint16_t number, const uint8_t state)
@@ -516,7 +517,7 @@ long TextToPGSConverter::composeCompositionDescriptor(uint8_t* buff, const uint1
     AV_WB16(curPos, number);
     curPos += 2;
     *curPos++ = state << 6;
-    return (long)(curPos - buff);
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeWindow(uint8_t* buff, const int top, const int height) const
@@ -531,7 +532,7 @@ long TextToPGSConverter::composeWindow(uint8_t* buff, const int top, const int h
     curPos += 2;
     AV_WB16(curPos, height);
     curPos += 2;
-    return (long)(curPos - buff);
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_t* buff, const int64_t pts,
@@ -553,8 +554,8 @@ long TextToPGSConverter::composePaletteDefinition(const Palette& palette, uint8_
         *curPos++ = snd.Cb;
         *curPos++ = snd.alpha;
     }
-    AV_WB16(startPos - 2, (uint16_t)(curPos - startPos));  // correct length field
-    return (long)(curPos - buff);
+    AV_WB16(startPos - 2, static_cast<uint16_t>(curPos - startPos));  // correct length field
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pts, const int64_t dts,
@@ -599,7 +600,7 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pt
         srcProcessed += size;
         curPos += size;
 
-        AV_WB16(fragmentStart - 2, (uint16_t)(curPos - fragmentStart));  // correct length field
+        AV_WB16(fragmentStart - 2, static_cast<uint16_t>(curPos - fragmentStart));  // correct length field
         blocks++;
     } while (srcProcessed < m_rleLen);
     AV_WB24(sizePos, m_rleLen + 4);  // object len
@@ -608,7 +609,7 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pt
         *(seqPos[0]) |= 0x80;
         *(seqPos[seqPos.size() - 1]) |= 0x40;
     }
-    return (long)(curPos - buff);
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::composeEnd(uint8_t* buff, const int64_t pts, const int64_t dts, const bool needPgHeader)
@@ -619,8 +620,8 @@ long TextToPGSConverter::composeEnd(uint8_t* buff, const int64_t pts, const int6
     *curPos++ = END_DEF_SEGMENT;
     curPos += 2;  // skip length field
     uint8_t* startPos = curPos;
-    AV_WB16(startPos - 2, (uint16_t)(curPos - startPos));
-    return (long)(curPos - buff);
+    AV_WB16(startPos - 2, static_cast<uint16_t>(curPos - startPos));
+    return static_cast<long>(curPos - buff);
 }
 
 long TextToPGSConverter::writePGHeader(uint8_t* buff, const int64_t pts, int64_t dts)
@@ -629,10 +630,10 @@ long TextToPGSConverter::writePGHeader(uint8_t* buff, const int64_t pts, int64_t
         dts = pts;
     *buff++ = 'P';
     *buff++ = 'G';
-    auto data = (uint32_t*)buff;
-    *data++ = my_htonl((uint32_t)pts);
+    auto data = reinterpret_cast<uint32_t*>(buff);
+    *data++ = my_htonl(static_cast<uint32_t>(pts));
     if (dts != pts)
-        *data = my_htonl((uint32_t)dts);
+        *data = my_htonl(static_cast<uint32_t>(dts));
     else
         *data = 0;
     return 10;

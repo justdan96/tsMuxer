@@ -17,14 +17,14 @@ double av_int2dbl(const int64_t v)
 {
     if (v + v > 0xFFEULL << 52)
         return 0;  // 0.0/0.0;
-    return ldexp((double)((v & ((1LL << 52) - 1)) + (1LL << 52)) * (v >> 63 | 1), (v >> 52 & 0x7FF) - 1075);
+    return ldexp(static_cast<double>((v & ((1LL << 52) - 1)) + (1LL << 52)) * (v >> 63 | 1), (v >> 52 & 0x7FF) - 1075);
 }
 
 float av_int2flt(const int32_t v)
 {
     if (v + v > 0xFF000000U)
         return 0;  // 0.0/0.0;
-    return ldexp((float)((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1), (v >> 23 & 0xFF) - 150);
+    return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1), (v >> 23 & 0xFF) - 150);
 }
 
 IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
@@ -85,8 +85,8 @@ unsigned int IOContextDemuxer::get_be32()
 
 uint64_t IOContextDemuxer::get_be64()
 {
-    uint64_t val = (uint64_t)get_be32() << 32;
-    val |= (uint64_t)get_be32();
+    uint64_t val = static_cast<uint64_t>(get_be32()) << 32;
+    val |= static_cast<uint64_t>(get_be32());
     return val;
 }
 
@@ -95,7 +95,7 @@ bool IOContextDemuxer::url_fseek(const int64_t offset)
     m_curPos = m_bufEnd = nullptr;
     m_isEOF = false;
     m_processedBytes = offset;
-    return ((BufferedFileReader*)m_bufferedReader)->gotoByte(m_readerID, offset);
+    return static_cast<BufferedFileReader*>(m_bufferedReader)->gotoByte(m_readerID, offset);
 }
 
 uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
@@ -130,7 +130,7 @@ uint32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
         if (readedBytes == 0)
             break;
     }
-    return (uint32_t)(dst - binary);
+    return static_cast<uint32_t>(dst - binary);
 }
 
 void IOContextDemuxer::skip_bytes(const uint64_t size)

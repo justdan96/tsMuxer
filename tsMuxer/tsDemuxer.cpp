@@ -92,7 +92,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                 break;
             }
             m2tsHdrDiscarded = false;
-            auto tsPacket = (TSPacket*)curPos;
+            auto tsPacket = reinterpret_cast<TSPacket*>(curPos);
             int pid = tsPacket->getPID();
 
             if (pid == 0)
@@ -114,18 +114,18 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                     if (TS_program_map_section::isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
-                        if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
+                        if (m_pmt.video_type != static_cast<int>(StreamType::VIDEO_MVC))
                             m_nonMVCVideoFound = true;
                         pmtBufferLen = 0;
                         for (const auto& [fst, snd] : m_pmt.pidList)
-                            trackList.insert(
-                                std::make_pair(snd.m_pid, TrackInfo((int)snd.m_streamType, snd.m_lang, 0)));
+                            trackList.insert(std::make_pair(
+                                snd.m_pid, TrackInfo(static_cast<int>(snd.m_streamType), snd.m_lang, 0)));
                         nonProcPMTPid.erase(pid);
                         if (nonProcPMTPid.size() == 0 && !mvcContinueExpected())
                         {  // all pmt pids processed
                             auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
                             if (br)
-                                br->incSeek(m_readerID, -(int64_t)totalReadedBytes);
+                                br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
                             else
                                 THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!");
                             return;
@@ -136,14 +136,14 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
         }
         if (curPos < data + readedBytes)
         {
-            tmpBufferLen = (uint32_t)(data + readedBytes - curPos);
+            tmpBufferLen = static_cast<uint32_t>(data + readedBytes - curPos);
             memmove(m_tmpBuffer, curPos, tmpBufferLen);
         }
     }
 
     auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
     if (br)
-        br->incSeek(m_readerID, -(int64_t)totalReadedBytes);
+        br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
     else
         THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!");
     return;
@@ -225,7 +225,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     {
         memcpy(data - m_tmpBufferLen, m_tmpBuffer, m_tmpBufferLen);
         data -= m_tmpBufferLen;
-        readedBytes += (uint32_t)m_tmpBufferLen;
+        readedBytes += static_cast<uint32_t>(m_tmpBufferLen);
         m_tmpBufferLen = 0;
     }
 
@@ -233,7 +233,8 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     {
         if (m_curFileNum < m_mplsInfo.size())
             m_prevFileLen +=
-                (int64_t)(m_mplsInfo[m_curFileNum].OUT_time - m_mplsInfo[m_curFileNum].IN_time) * 2;  // in 90Khz clock
+                static_cast<int64_t>(m_mplsInfo[m_curFileNum].OUT_time - m_mplsInfo[m_curFileNum].IN_time) *
+                2;  // in 90Khz clock
         else
         {
             if (m_firstVideoPTS != -1 && m_lastVideoPTS != -1)
@@ -278,7 +279,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 break;
             forpmtm2tsHdrDiscarded = false;
 
-            const auto tsPacket = (TSPacket*)m_curPos;
+            const auto tsPacket = reinterpret_cast<TSPacket*>(m_curPos);
             int pid = tsPacket->getPID();
             if (pid == 0)
             {  // PAT
@@ -294,7 +295,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                     if (TS_program_map_section::isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
-                        if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
+                        if (m_pmt.video_type != static_cast<int>(StreamType::VIDEO_MVC))
                             m_nonMVCVideoFound = true;
                         pmtBufferLen = 0;
                     }
@@ -322,7 +323,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         }
         m_m2tsHdrDiscarded = false;
 
-        const auto tsPacket = (TSPacket*)m_curPos;
+        const auto tsPacket = reinterpret_cast<TSPacket*>(m_curPos);
         int pid = tsPacket->getPID();
         discardSize += TS_FRAME_SIZE;
 
@@ -345,7 +346,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         const bool pesStartCode = frameData[0] == 0 && frameData[1] == 0 && frameData[2] == 1 && tsPacket->payloadStart;
         if (pesStartCode)
         {
-            const auto pesPacket = (PESPacket*)frameData;
+            const auto pesPacket = reinterpret_cast<PESPacket*>(frameData);
             auto streamInfo = m_pmt.pidList.find(pid);
 
             if ((pesPacket->flagsLo & 0x80) == 0x80)
@@ -485,7 +486,7 @@ int64_t getLastPCR(File& file, const int bufferSize, const int frameSize, const 
     int64_t lastPcrVal = -1;
     while (curPtr <= bufferEnd - frameSize)
     {
-        const auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+        const auto tsPacket = reinterpret_cast<TSPacket*>(curPtr + frameSize - 188);
         if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
         {
             lastPcrVal = tsPacket->adaptiveField.getPCR33();
@@ -522,7 +523,7 @@ int64_t getTSDuration(const char* fileName)
         int64_t firstPcrVal = 0;
         while (curPtr <= bufferEnd - frameSize)
         {
-            const auto tsPacket = (TSPacket*)(curPtr + frameSize - 188);
+            const auto tsPacket = reinterpret_cast<TSPacket*>(curPtr + frameSize - 188);
             if (tsPacket->afExists && tsPacket->adaptiveField.length && tsPacket->adaptiveField.pcrExist)
             {
                 firstPcrVal = tsPacket->adaptiveField.getPCR33();

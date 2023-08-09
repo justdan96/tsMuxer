@@ -55,9 +55,9 @@ void moveBits(uint8_t* buffer, const int oldBitOffset, const int newBitOffset, i
         src++;
     }
 
-    for (; len >= (int)INT_BIT; len -= INT_BIT)
+    for (; len >= static_cast<int>(INT_BIT); len -= INT_BIT)
     {
-        writer.putBits(INT_BIT, *((unsigned*)src));
+        writer.putBits(INT_BIT, *reinterpret_cast<unsigned*>(src));
         src += sizeof(unsigned);
     }
     reader.setBuffer(src, src + sizeof(unsigned));

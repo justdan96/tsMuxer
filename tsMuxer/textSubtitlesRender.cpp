@@ -217,7 +217,7 @@ string findFontArg(const string& text, const size_t pos)
 
 uint32_t rgbSwap(uint32_t color)
 {
-    const auto rgb = (uint8_t*)&color;
+    const auto rgb = reinterpret_cast<uint8_t*>(&color);
     const uint8_t tmp = rgb[0];
     rgb[0] = rgb[2];
     rgb[2] = tmp;
@@ -230,7 +230,7 @@ int TextSubtitlesRender::browserSizeToRealSize(const int bSize, double rSize)
         for (int i = DEFAULT_BROWSER_STYLE_FS; i < bSize; i++) rSize *= BROWSER_FONT_STYLE_INC_COEFF;
     else if (bSize < DEFAULT_BROWSER_STYLE_FS)
         for (int i = bSize; i < DEFAULT_BROWSER_STYLE_FS; i++) rSize /= BROWSER_FONT_STYLE_INC_COEFF;
-    return (int)rSize;
+    return static_cast<int>(rSize);
 }
 
 vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack) const
@@ -259,7 +259,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bool endTag = false;
             string tagStr = trimStr(line.substr(bStartPos + 1, i - bStartPos - 1));
             string ltagStr = tagStr;
-            for (auto& j : ltagStr) j = (char)towlower(j);
+            for (auto& j : ltagStr) j = static_cast<char>(towlower(j));
             if (ltagStr == "i" || ltagStr == "italic")
             {
                 curFont.m_opts |= Font::ITALIC;
@@ -368,7 +368,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
             bStartFound = false;
         }
     }
-    if (line.size() > (unsigned)prevTextPos)
+    if (line.size() > static_cast<unsigned>(prevTextPos))
         rez.push_back(make_pair(curFont, line.substr(prevTextPos, line.size() - prevTextPos)));
     double rSize = m_initFont.m_size;
     for (auto& i : rez) i.first.m_size = browserSizeToRealSize(i.first.m_size, rSize);
@@ -378,7 +378,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
 bool TextSubtitlesRender::rasterText(const std::string& text)
 {
     bool forced = false;
-    memset(m_pData, 0, (size_t)m_width * m_height * 4);
+    memset(m_pData, 0, static_cast<size_t>(m_width) * m_height * 4);
     vector<Font> fontStack;
     const vector<string> lines = splitStr(text.c_str(), '\n');
     int curY = 0;
@@ -421,7 +421,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
 
             curX += xSize[j];
         }
-        curY += (int)(ySize * m_font.m_lineSpacing);
+        curY += static_cast<int>(ySize * m_font.m_lineSpacing);
     }
     flushRasterBuffer();
     m_font = m_initFont;
@@ -443,7 +443,7 @@ void TextSubtitlesRender::addBorder(const int borderWidth, uint8_t* data, const 
     // add black border
     for (int i = 0; i < borderWidth; ++i)
     {
-        auto dst = (uint32_t*)data;
+        auto dst = reinterpret_cast<uint32_t*>(data);
         for (int y = 0; y < height; ++y)
         {
             for (int x = 0; x < width; ++x)
@@ -474,7 +474,7 @@ void TextSubtitlesRender::addBorder(const int borderWidth, uint8_t* data, const 
                 dst++;
             }
         }
-        dst = (uint32_t*)data;
+        dst = reinterpret_cast<uint32_t*>(data);
         for (int y = 0; y < height; ++y)
             for (int x = 0; x < width; ++x)
             {

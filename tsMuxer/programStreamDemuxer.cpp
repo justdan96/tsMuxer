@@ -90,7 +90,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
 {
     afterPesHeader = 0;
 
-    const auto pesPacket = (PESPacket*)buff;
+    const auto pesPacket = reinterpret_cast<PESPacket*>(buff);
     uint8_t startcode = buff[3];
 
     // find matching stream
@@ -178,7 +178,7 @@ void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList
     for (int i = 0x20; i < 0xff; i++)
     {
         if (i >= 0xa0 && i <= 0xaf)
-            trackList[i] = TrackInfo((int)StreamType::AUDIO_LPCM, "", 0);  // set track hint
+            trackList[i] = TrackInfo(static_cast<int>(StreamType::AUDIO_LPCM), "", 0);  // set track hint
         else
             trackList[i] = TrackInfo(0, "", 0);  // autodetect
     }
@@ -189,10 +189,10 @@ bool ProgramStreamDemuxer::isVideoPID(const uint32_t pid) const
 {
     return (pid >= 0x55 && pid <= 0x5f) ||  // vc1
            (pid >= 0xe0 && pid <= 0xef) ||  // mpeg video
-           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H264 ||
-           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_MVC ||
-           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H265 ||
-           m_psm_es_type[pid & 0xff] == (int)StreamType::VIDEO_H266;
+           m_psm_es_type[pid & 0xff] == static_cast<int>(StreamType::VIDEO_H264) ||
+           m_psm_es_type[pid & 0xff] == static_cast<int>(StreamType::VIDEO_MVC) ||
+           m_psm_es_type[pid & 0xff] == static_cast<int>(StreamType::VIDEO_H265) ||
+           m_psm_es_type[pid & 0xff] == static_cast<int>(StreamType::VIDEO_H266);
 }
 
 int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
@@ -256,7 +256,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
 
     while (curBuf <= end - 9)
     {
-        const auto pesPacket = (PESPacket*)curBuf;
+        const auto pesPacket = reinterpret_cast<PESPacket*>(curBuf);
         uint8_t startcode = curBuf[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -310,7 +310,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 {
                     discardSize += end - curBuf;
                     m_lastPID = 0;
-                    m_lastPesLen = tmpLen - (int)(end - curBuf);
+                    m_lastPesLen = tmpLen - static_cast<int>(end - curBuf);
                     return 0;
                 }
                 curBuf += tmpLen;
@@ -326,7 +326,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
             {
                 discardSize += end - curBuf;
                 m_lastPID = 0;
-                m_lastPesLen = psmLen - (int)(end - curBuf);
+                m_lastPesLen = psmLen - static_cast<int>(end - curBuf);
                 return 0;
             }
             discardSize += psmLen;
@@ -342,7 +342,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
         curBuf = MPEGHeader::findNextMarker(curBuf, end);
         discardSize += curBuf - prevBuf;
     }
-    m_tmpBufferLen = (uint32_t)(end - curBuf);
+    m_tmpBufferLen = static_cast<uint32_t>(end - curBuf);
     if (m_tmpBufferLen > 0)
         memmove(m_tmpBuffer, curBuf, end - curBuf);
     return 0;
@@ -362,7 +362,7 @@ int64_t getLastPCR(File& file, const int bufferSize, const int64_t fileSize)
     curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
     while (curPtr <= bufEnd - 9)
     {
-        const auto pesPacket = (PESPacket*)curPtr;
+        const auto pesPacket = reinterpret_cast<PESPacket*>(curPtr);
         const uint8_t startcode = curPtr[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
@@ -402,7 +402,7 @@ int64_t getPSDuration(const char* fileName)
         curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
         while (curPtr <= bufEnd - 9)
         {
-            const auto pesPacket = (PESPacket*)curPtr;
+            const auto pesPacket = reinterpret_cast<PESPacket*>(curPtr);
             const uint8_t startcode = curPtr[3];
             if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) ||
                 (startcode == PES_VC1_ID) || (startcode == PES_PRIVATE_DATA2))

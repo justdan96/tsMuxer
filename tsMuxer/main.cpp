@@ -780,7 +780,8 @@ int main(int argc, char** argv)
                     }
                 }
 
-                for (auto& i : customChapterList) i -= (double)muxerManager.getCutStart() / INTERNAL_PTS_FREQ;
+                for (auto& i : customChapterList)
+                    i -= static_cast<double>(muxerManager.getCutStart()) / INTERNAL_PTS_FREQ;
 
                 if (subMuxer)
                     mainMuxer->alignPTS(subMuxer);

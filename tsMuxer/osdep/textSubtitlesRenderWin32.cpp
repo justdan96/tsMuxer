@@ -54,7 +54,7 @@ void TextSubtitlesRenderWin32::setRenderSize(const int width, const int height)
     delete[] m_pbmpInfo;
     m_width = width;
     m_height = height;
-    m_pbmpInfo = (BITMAPINFO*)new uint8_t[sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD)];
+    m_pbmpInfo = reinterpret_cast<BITMAPINFO*>(new uint8_t[sizeof(BITMAPINFOHEADER) + 256 * sizeof(RGBQUAD)]);
     m_pbmpInfo->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     m_pbmpInfo->bmiHeader.biWidth = m_width;
     m_pbmpInfo->bmiHeader.biHeight = -m_height;
@@ -62,7 +62,7 @@ void TextSubtitlesRenderWin32::setRenderSize(const int width, const int height)
     m_pbmpInfo->bmiHeader.biBitCount = 32;
     m_pbmpInfo->bmiHeader.biCompression = BI_RGB;
     m_pbmpInfo->bmiHeader.biClrUsed = 256 * 256 * 256;
-    m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, (void**)&m_pData, nullptr, 0);
+    m_hbmp = ::CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, reinterpret_cast<void**>(&m_pData), nullptr, 0);
     if (m_hbmp == nullptr)
         THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles");
     SelectObject(m_dc, m_hbmp);
@@ -121,7 +121,7 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
     pen.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&pen, &path);
 
-    Pen penInner(Color(alpha, 0, 0, 0), (float)m_font.m_borderWidth);
+    Pen penInner(Color(alpha, 0, 0, 0), static_cast<float>(m_font.m_borderWidth));
     penInner.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&penInner, &path);
 
@@ -137,10 +137,10 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
 #else
     const int opts = m_font.m_opts & 0xf;
     const FontFamily fontFamily(toWide(m_font.m_name).data());
-    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
-    const int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel = static_cast<int>(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
 
     const StringFormat strformat;
     Gdiplus::GraphicsPath path;
@@ -151,7 +151,7 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     Pen pen(Color(0x30, 0, 0, 0), m_font.m_borderWidth * 2.0f);
     pen.SetLineJoin(LineJoinRound);
     path.GetBounds(&rect, nullptr, &pen);
-    mSize->cx = (int)rect.Width;
+    mSize->cx = static_cast<int>(rect.Width);
     mSize->cy = lineSpacingPixel;
 #endif
 }
@@ -165,10 +165,10 @@ int TextSubtitlesRenderWin32::getLineSpacing()
 #else
     const int opts = m_font.m_opts & 0xf;
     const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
-    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(opts);
-    const int lineSpacingPixel = (int)(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel = static_cast<int>(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
     return lineSpacingPixel;
 #endif
 }
@@ -182,10 +182,10 @@ int TextSubtitlesRenderWin32::getBaseline()
 #else
     const int opts = m_font.m_opts & 0xf;
     const Gdiplus::FontFamily fontFamily(toWide(m_font.m_name).data());
-    const ::Font font(&fontFamily, (float)m_font.m_size, opts, UnitPoint);
+    const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int descentOffset = fontFamily.GetCellDescent(opts);
-    const int descentPixel = (int)(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
+    const int descentPixel = static_cast<int>(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
     return descentPixel;
 #endif
 }

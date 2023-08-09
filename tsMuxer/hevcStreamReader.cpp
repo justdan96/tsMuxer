@@ -52,7 +52,7 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, const int len)
     {
         if (*nal & 0x80)
             return rez;  // invalid nal
-        const auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
+        const auto nalType = static_cast<HevcUnit::NalType>((*nal >> 1) & 0x3f);
         uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, end, true);
         if (!m_eof && nextNal == end)
             break;
@@ -141,13 +141,13 @@ CheckStreamRez HEVCStreamReader::checkStream(uint8_t* buffer, const int len)
 int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, const bool hdmvDescriptors)
 {
     if (m_firstFrame)
-        CheckStreamRez rez = checkStream(m_buffer, (int)(m_bufEnd - m_buffer));
+        CheckStreamRez rez = checkStream(m_buffer, static_cast<int>(m_bufEnd - m_buffer));
 
     int lenDoviDesc = 0;
     if (!blurayMode && m_hdr->isDVRPU)
     {
         // 'DOVI' registration descriptor
-        *dstBuff++ = (uint8_t)TSDescriptorTag::REGISTRATION;
+        *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::REGISTRATION);
         *dstBuff++ = 4;  // descriptor length
         *dstBuff++ = 'D';
         *dstBuff++ = 'O';
@@ -159,15 +159,16 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
     if (hdmvDescriptors)
     {
         // 'HDMV' registration descriptor
-        *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // descriptor tag
-        *dstBuff++ = 8;                               // descriptor length
-        memcpy(dstBuff, "HDMV\xff", 5);               // HDMV + stuffing byte
+        *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // descriptor tag
+        *dstBuff++ = 8;                                            // descriptor length
+        memcpy(dstBuff, "HDMV\xff", 5);                            // HDMV + stuffing byte
         dstBuff += 5;
 
-        *dstBuff++ = (uint8_t)StreamType::VIDEO_H265;  // stream_conding_type
+        *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_H265);  // stream_conding_type
         int video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           (int)getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
+                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
+                                           &aspect_ratio_index);
 
         *dstBuff++ = (video_format << 4) + frame_rate_index;
         *dstBuff++ = (aspect_ratio_index << 4) + 0xf;
@@ -179,7 +180,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
         for (uint8_t* nal = NALUnit::findNextNAL(m_buffer, m_bufEnd); nal < m_bufEnd - 4;
              nal = NALUnit::findNextNAL(nal, m_bufEnd))
         {
-            const auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
+            const auto nalType = static_cast<HevcUnit::NalType>((*nal >> 1) & 0x3f);
             const uint8_t* nextNal = NALUnit::findNALWithStartCode(nal, m_bufEnd, true);
 
             if (nalType == HevcUnit::NalType::SPS)
@@ -190,7 +191,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
             }
         }
 
-        *dstBuff++ = (int)TSDescriptorTag::HEVC;
+        *dstBuff++ = static_cast<int>(TSDescriptorTag::HEVC);
         *dstBuff++ = 13;  // descriptor length
         memcpy(dstBuff, tmpBuffer + 3, 12);
         dstBuff += 12;
@@ -236,7 +237,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff) const
         m_hdr->isDVEL = true;
 
     int width = getStreamWidth();
-    auto pixelRate = (uint32_t)(width * getStreamHeight() * getFPS());
+    auto pixelRate = static_cast<uint32_t>(width * getStreamHeight() * getFPS());
 
     if (!isDVBL && V3_flags & FOUR_K)
     {
@@ -365,9 +366,9 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff) const
 
 void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int)
 {
-    const int oldNalSize = (int)(nextNal - buff);
+    const int oldNalSize = static_cast<int>(nextNal - buff);
     m_vpsSizeDiff = 0;
-    const auto vps = (HevcVpsUnit*)nalUnit;
+    const auto vps = static_cast<HevcVpsUnit*>(nalUnit);
     vps->setFPS(m_fps);
     const auto tmpBuffer = new uint8_t[vps->nalBufferLen() + 16];
     const int newSpsLen = vps->serializeBuffer(tmpBuffer, tmpBuffer + vps->nalBufferLen() + 16);
@@ -408,7 +409,7 @@ double HEVCStreamReader::getStreamFPS(void* curNalUnit)
 
 bool HEVCStreamReader::skipNal(uint8_t* nal)
 {
-    const auto nalType = (HevcUnit::NalType)((*nal >> 1) & 0x3f);
+    const auto nalType = static_cast<HevcUnit::NalType>((*nal >> 1) & 0x3f);
 
     if (nalType == HevcUnit::NalType::FD)
         return true;
@@ -488,7 +489,7 @@ void HEVCStreamReader::storeBuffer(MemoryBlock& dst, const uint8_t* data, const 
     while (dataEnd > data && dataEnd[-1] == 0) dataEnd--;
     if (dataEnd > data)
     {
-        dst.resize((int)(dataEnd - data));
+        dst.resize(static_cast<int>(dataEnd - data));
         memcpy(dst.data(), data, dataEnd - data);
     }
 }
@@ -509,7 +510,7 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
 
     while (curPos < m_bufEnd)
     {
-        const auto nalType = (HevcUnit::NalType)((*curPos >> 1) & 0x3f);
+        const auto nalType = static_cast<HevcUnit::NalType>((*curPos >> 1) & 0x3f);
         if (isSlice(nalType))
         {
             if (curPos[2] & 0x80)  // slice.first_slice
@@ -621,8 +622,8 @@ uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer,
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    const int bytesLeft = (int)(dstEnd - dstBuffer);
-    const int requiredBytes = (int)srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
+    const int bytesLeft = static_cast<int>(dstEnd - dstBuffer);
+    const int requiredBytes = static_cast<int>(srcData.size()) + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
 
@@ -640,7 +641,7 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     if (avPacket.size > 4 && avPacket.size < dstEnd - dstBuffer)
     {
         const int offset = avPacket.data[2] == 1 ? 3 : 4;
-        const auto nalType = (HevcUnit::NalType)((avPacket.data[offset] >> 1) & 0x3f);
+        const auto nalType = static_cast<HevcUnit::NalType>((avPacket.data[offset] >> 1) & 0x3f);
         if (nalType == HevcUnit::NalType::AUD)
         {
             // place delimiter at first place
@@ -662,5 +663,5 @@ int HEVCStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     }
 
     m_firstFileFrame = false;
-    return (int)(curPos - dstBuffer);
+    return static_cast<int>(curPos - dstBuffer);
 }

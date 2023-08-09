@@ -23,7 +23,7 @@ uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
     // header
     for (uint8_t* cur = buff; cur < end - 4; cur++)
     {
-        const uint32_t header = my_ntohl(*((uint32_t*)cur));
+        const uint32_t header = my_ntohl(*reinterpret_cast<uint32_t*>(cur));
         if ((header & 0xffe00000) != 0xffe00000)
             continue;
         // layer check
@@ -47,7 +47,7 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
     int mpeg25, lsf;
     if (end - buff < 4)
         return 0;
-    const uint32_t header = my_ntohl(*((uint32_t*)buff));
+    const uint32_t header = my_ntohl(*reinterpret_cast<uint32_t*>(buff));
     if (header & (1 << 20))
     {
         lsf = (header & (1 << 19)) ? 0 : 1;

@@ -25,8 +25,8 @@ std::string toNativeSeparators(const std::string& dirName)
 
 bool isFillerNullPacket(uint8_t* curBuf)
 {
-    const auto endPos = (uint32_t*)(curBuf + TS_FRAME_SIZE);
-    for (auto curBuf32 = (uint32_t*)(curBuf + 4); curBuf32 < endPos; curBuf32++)
+    const auto endPos = reinterpret_cast<uint32_t*>(curBuf + TS_FRAME_SIZE);
+    for (auto curBuf32 = reinterpret_cast<uint32_t*>(curBuf + 4); curBuf32 < endPos; curBuf32++)
         if (*curBuf32 != 0xffffffff && *curBuf32 != 0)
             return false;
     return true;
@@ -80,28 +80,28 @@ std::vector<std::string> extractFileList(const std::string& val)
 }
 
 uint16_t AV_RB16(const uint8_t* buffer) { return (*buffer << 8) + buffer[1]; }
-uint32_t AV_RB32(uint8_t* buffer) { return my_ntohl(*(int32_t*)buffer); }
+uint32_t AV_RB32(uint8_t* buffer) { return my_ntohl(*reinterpret_cast<int32_t*>(buffer)); }
 uint32_t AV_RB24(const uint8_t* buffer) { return (buffer[0] << 16) + (buffer[1] << 8) + buffer[2]; }
 
-void AV_WB16(uint8_t* buffer, const uint16_t value) { *((uint16_t*)buffer) = my_htons(value); }
+void AV_WB16(uint8_t* buffer, const uint16_t value) { *reinterpret_cast<uint16_t*>(buffer) = my_htons(value); }
 
 void AV_WB24(uint8_t* buffer, const uint32_t value)
 {
-    buffer[0] = (uint8_t)(value >> 16);
-    buffer[1] = (uint8_t)(value >> 8);
-    buffer[2] = (uint8_t)value;
+    buffer[0] = static_cast<uint8_t>(value >> 16);
+    buffer[1] = static_cast<uint8_t>(value >> 8);
+    buffer[2] = static_cast<uint8_t>(value);
 }
-void AV_WB32(uint8_t* buffer, const uint32_t value) { *((uint32_t*)buffer) = my_htonl(value); }
+void AV_WB32(uint8_t* buffer, const uint32_t value) { *reinterpret_cast<uint32_t*>(buffer) = my_htonl(value); }
 
 std::string floatToTime(const double time, const char msSeparator)
 {
-    int iTime = (int)time;
+    int iTime = static_cast<int>(time);
     const int hour = iTime / 3600;
     iTime -= hour * 3600;
     const int min = iTime / 60;
     iTime -= min * 60;
     const int sec = iTime;
-    const int msec = (int)((time - (int)time) * 1000.0);
+    const int msec = static_cast<int>((time - static_cast<int>(time)) * 1000.0);
     std::ostringstream str;
     str << strPadLeft(int32ToStr(hour), 2, '0') << ':';
     str << strPadLeft(int32ToStr(min), 2, '0') << ':';

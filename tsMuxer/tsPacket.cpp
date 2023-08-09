@@ -66,10 +66,10 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, const int buf_size)
     bitReader.setBuffer(buffer, buffer + buf_size);
     if (bitReader.getBits(2) != 1)
         return false;  // 0b01 required
-    m_pts = ((uint64_t)bitReader.getBits(3) << 30);
+    m_pts = (static_cast<uint64_t>(bitReader.getBits(3)) << 30);
     if (bitReader.getBit() != 1)
         return false;
-    m_pts += ((uint64_t)bitReader.getBits(15) << 15);
+    m_pts += (static_cast<uint64_t>(bitReader.getBits(15)) << 15);
     if (bitReader.getBit() != 1)
         return false;
     m_pts += bitReader.getBits(15);
@@ -178,7 +178,7 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, const int bu
     bitWriter.putBits(2, 2);  // indicator
     bitWriter.putBits(2, 3);  // reserved
 
-    const auto section_length = (unsigned)(9 + pmtPids.size() * 4);
+    const auto section_length = static_cast<unsigned>(9 + pmtPids.size() * 4);
     bitWriter.putBits(12, section_length);
     bitWriter.putBits(16, transport_stream_id);
     bitWriter.putBits(2, 3);  // reserved
@@ -194,7 +194,7 @@ uint32_t TS_program_association_section::serialize(uint8_t* buffer, const int bu
     }
     bitWriter.flushBits();
     const uint32_t crc = calculateCRC32(buffer, bitWriter.getBitsCount() / 8);
-    const auto crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
+    const auto crcPtr = reinterpret_cast<uint32_t*>(buffer + bitWriter.getBitsCount() / 8);
     *crcPtr = my_htonl(crc);
 
     return bitWriter.getBitsCount() / 8 + 5;
@@ -298,7 +298,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, const int buf_size)
         curPos += program_info_len;
         while (curPos < crcPos)
         {
-            auto stream_type = (StreamType)*curPos++;
+            auto stream_type = static_cast<StreamType>(*curPos++);
             int elementary_pid = get16(&curPos) & 0x1fff;
             switch (stream_type)
             {
@@ -310,7 +310,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, const int buf_size)
             case StreamType::VIDEO_MVC:
             case StreamType::VIDEO_VC1:
                 video_pid = elementary_pid;
-                video_type = (int)stream_type;
+                video_type = static_cast<int>(stream_type);
                 break;
             case StreamType::AUDIO_MPEG1:
             case StreamType::AUDIO_MPEG2:
@@ -320,7 +320,7 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, const int buf_size)
             case StreamType::AUDIO_EAC3_ATSC:
             case StreamType::AUDIO_DTS:
                 audio_pid = elementary_pid;
-                audio_type = (int)stream_type;
+                audio_type = static_cast<int>(stream_type);
                 break;
             case StreamType::SUB_DVB:
                 sub_pid = elementary_pid;
@@ -381,7 +381,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
     bitWriter.setBuffer(buffer, buffer + max_buf_size);
     bitWriter.putBits(8, 2);  // table id
 
-    const auto LengthPos1 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    const auto LengthPos1 = reinterpret_cast<uint16_t*>(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
     bitWriter.putBits(2, 2);   // indicator
     bitWriter.putBits(2, 3);   // reserved
     bitWriter.putBits(12, 0);  // length
@@ -395,7 +395,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
     bitWriter.putBits(3, 7);         // reserved
     bitWriter.putBits(13, pcr_pid);  // reserved
 
-    const auto LengthPos2 = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+    const auto LengthPos2 = reinterpret_cast<uint16_t*>(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
     bitWriter.putBits(4, 15);  // reserved
     bitWriter.putBits(12, 0);  // program info len
     const int beforeCount2 = bitWriter.getBitsCount() / 8;
@@ -403,12 +403,12 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
     if (hdmvDescriptors)
     {
         // put 'HDMV' registration descriptor
-        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::HDMV);
+        bitWriter.putBits(8, static_cast<uint8_t>(TSDescriptorTag::HDMV));
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(32, 0x48444d56);
 
         // put DTCP descriptor
-        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::COPY_CONTROL);
+        bitWriter.putBits(8, static_cast<uint8_t>(TSDescriptorTag::COPY_CONTROL));
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(32, 0x0ffffcfc);
     }
@@ -416,7 +416,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
     if (casPID)
     {
         // put CAS descriptor
-        bitWriter.putBits(8, (uint8_t)TSDescriptorTag::CAS);
+        bitWriter.putBits(8, static_cast<uint8_t>(TSDescriptorTag::CAS));
         bitWriter.putBits(8, 0x04);
         bitWriter.putBits(16, casID);
         bitWriter.putBits(16, casPID);
@@ -443,7 +443,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
 
     if (sub_pid)
     {
-        bitWriter.putBits(8, (uint8_t)StreamType::SUB_DVB);
+        bitWriter.putBits(8, static_cast<uint8_t>(StreamType::SUB_DVB));
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, sub_pid);
         bitWriter.putBits(4, 15);  // reserved
@@ -455,11 +455,11 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
         if (si.m_streamType == StreamType::SUB_PGS && !hdmvDescriptors)
             LTRACE(LT_WARN, 2, "Warning: PGS might not work without HDMV descriptors.");
 
-        bitWriter.putBits(8, (int)si.m_streamType);
+        bitWriter.putBits(8, static_cast<int>(si.m_streamType));
         bitWriter.putBits(3, 7);  // reserved
         bitWriter.putBits(13, si.m_pid);
 
-        const auto esInfoLen = (uint16_t*)(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
+        const auto esInfoLen = reinterpret_cast<uint16_t*>(bitWriter.getBuffer() + bitWriter.getBitsCount() / 8);
         bitWriter.putBits(4, 15);  // reserved
         bitWriter.putBits(12, 0);  // es_info_len
         const int beforeCount = bitWriter.getBitsCount() / 8;
@@ -468,7 +468,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
 
         if (*si.m_lang && !blurayMode)
         {
-            bitWriter.putBits(8, (unsigned)TSDescriptorTag::LANG);           // lang descriptor ID
+            bitWriter.putBits(8, static_cast<unsigned>(TSDescriptorTag::LANG));           // lang descriptor ID
             bitWriter.putBits(8, 4);                                         // lang descriptor len
             for (int k = 0; k < 3; k++) bitWriter.putBits(8, si.m_lang[k]);  // lang code[i]
             bitWriter.putBits(8, 0);
@@ -480,7 +480,7 @@ uint32_t TS_program_map_section::serialize(uint8_t* buffer, const int max_buf_si
 
     const uint32_t crc = calculateCRC32(buffer, bitWriter.getBitsCount() / 8);
 
-    const auto crcPtr = (uint32_t*)(buffer + bitWriter.getBitsCount() / 8);
+    const auto crcPtr = reinterpret_cast<uint32_t*>(buffer + bitWriter.getBitsCount() / 8);
     *crcPtr = my_htonl(crc);
 
     return bitWriter.getBitsCount() / 8 + 5;
@@ -507,7 +507,7 @@ void CLPIStreamInfo::composeISRC(BitStreamWriter& writer)
 void CLPIStreamInfo::parseStreamCodingInfo(BitStreamReader& reader)
 {
     reader.skipBits(8);  // length
-    stream_coding_type = (StreamType)reader.getBits(8);
+    stream_coding_type = static_cast<StreamType>(reader.getBits(8));
 
     if (isVideoStreamType(stream_coding_type))
     {
@@ -558,7 +558,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
     writer.putBits(8, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
-    writer.putBits(8, (int)stream_coding_type);
+    writer.putBits(8, static_cast<int>(stream_coding_type));
 
     if (isVideoStreamType(stream_coding_type))
     {
@@ -643,7 +643,7 @@ void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLP
 
 void CLPIParser::composeProgramInfo(BitStreamWriter& writer, const bool isSsExt)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
 
     const int beforeCount = writer.getBitsCount() / 8;
@@ -696,7 +696,7 @@ void CLPIParser::TS_type_info_block(BitStreamReader& reader)
 
 void CLPIParser::composeTS_type_info_block(BitStreamWriter& writer)
 {
-    const auto lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -725,7 +725,7 @@ void CLPIParser::parseClipInfo(BitStreamReader& reader)
 
 void CLPIParser::composeClipInfo(BitStreamWriter& writer) const
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -769,7 +769,7 @@ void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
 
 void CLPIParser::composeSequenceInfo(BitStreamWriter& writer) const
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -803,7 +803,7 @@ void CLPIParser::EP_map(BitStreamReader& reader) {}
 
 void CLPIParser::composeCPI(BitStreamWriter& writer, const bool isCPIExt)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
 
     if ((isDependStream && !isCPIExt) || (!isDependStream && isCPIExt))
@@ -857,8 +857,8 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
     if (processStream.size() == 0)
         THROW(ERR_COMMON, "Can't create EP map. One audio or video stream is needed.");
     // ------------------
-    writer.putBits(8, 0);                          // reserved_for_word_align
-    writer.putBits(8, (int)processStream.size());  // number_of_stream_PID_entries
+    writer.putBits(8, 0);                                      // reserved_for_word_align
+    writer.putBits(8, static_cast<int>(processStream.size())); // number_of_stream_PID_entries
     std::vector<uint32_t*> epStartAddrPos;
 
     for (auto& i : processStream)
@@ -867,12 +867,12 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
         writer.putBits(10, 0);            // reserved_for_word_align
         writer.putBits(4, EP_stream_type);
         std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(i);
-        writer.putBits(16, (int)coarseInfo.size());  // number_of_EP_coarse_entries[k]
+        writer.putBits(16, static_cast<int>(coarseInfo.size()));  // number_of_EP_coarse_entries[k]
         if (i.m_index.size() > 0)
-            writer.putBits(18, (int)i.m_index[m_clpiNum].size());  // number_of_EP_fine_entries[k]
+            writer.putBits(18, static_cast<int>(i.m_index[m_clpiNum].size()));  // number_of_EP_fine_entries[k]
         else
             writer.putBits(18, 0);
-        epStartAddrPos.push_back((uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8));
+        epStartAddrPos.push_back(reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8));
         writer.putBits(32, 0);  // EP_map_for_one_stream_PID_start_address[k]
     }
     if (writer.getBitsCount() % 16 != 0)
@@ -899,7 +899,7 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
     for (const auto& [fst, snd] : curIndex)
     {
         const PMTIndexData& indexData = snd;
-        const auto newCoarsePts = (uint32_t)(fst >> 19);
+        const auto newCoarsePts = static_cast<uint32_t>(fst >> 19);
         const uint32_t lastCoarseSPN = lastPktCnt & 0xfffe0000;
         const uint32_t newCoarseSPN = indexData.m_pktCnt & 0xfffe0000;
         if (rez.size() == 0 || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
@@ -915,7 +915,7 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
 
 void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSStreamInfo& streamInfo) const
 {
-    const auto epFineStartAddr = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto epFineStartAddr = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     const uint32_t beforePos = writer.getBitsCount() / 8;
     writer.putBits(32, 0);  // EP_fine_table_start_address
     const std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(streamInfo);
@@ -998,7 +998,7 @@ bool CLPIParser::parse(const char* fileName)
     if (!file.size(&fileSize))
         return false;
     const auto buffer = new uint8_t[fileSize];
-    if (!file.read(buffer, (uint32_t)fileSize))
+    if (!file.read(buffer, static_cast<uint32_t>(fileSize)))
     {
         delete[] buffer;
         return false;
@@ -1042,12 +1042,12 @@ void CLPIParser::CPI_SS(uint8_t* buffer, const int dataLength) { parseCPI(buffer
 
 void CLPIParser::composeExtentStartPoint(BitStreamWriter& writer) const
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
     writer.putBits(16, 0);  // reserved
-    writer.putBits(16, (unsigned)interleaveInfo.size());
+    writer.putBits(16, static_cast<unsigned>(interleaveInfo.size()));
 
     uint32_t sum = 0;
     for (const auto& i : interleaveInfo)
@@ -1061,7 +1061,7 @@ void CLPIParser::composeExtentStartPoint(BitStreamWriter& writer) const
 
 void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     const int beforeCount = writer.getBitsCount() / 8;
 
     writer.putBits(32, 0);  // length
@@ -1078,7 +1078,7 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
     // write Extent_Start_Point header
 
     writer.putBits(32, 0x00020004);  // extent start point
-    const auto extentStartPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto extentStartPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
 
     writer.putBits(32, 0);  // skip extent start address
     writer.putBits(32, 0);  // skip extent dataLen
@@ -1089,14 +1089,14 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
     {
         // write ProgramInfo_SS header
         writer.putBits(32, 0x00020005);  // extent start point
-        ProgramInfo_StartPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+        ProgramInfo_StartPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
 
         writer.putBits(32, 0);  // skip extent start address
         writer.putBits(32, 0);  // skip extent dataLen
 
         // write CPI_SS header
         writer.putBits(32, 0x00020006);  // extent start point
-        CPI_SS_StartPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+        CPI_SS_StartPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
 
         writer.putBits(32, 0);  // skip extent start address
         writer.putBits(32, 0);  // skip extent dataLen
@@ -1149,7 +1149,7 @@ void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
         const uint32_t dataAddress = reader.get32Bits();
         const uint32_t dataLength = reader.get32Bits();
 
-        if (dataAddress + dataLength > (uint32_t)(end - buffer))
+        if (dataAddress + dataLength > static_cast<uint32_t>(end - buffer))
         {
             LTRACE(LT_WARN, 2, "Invalid extended clip info entry skipped.");
             continue;
@@ -1208,15 +1208,15 @@ int CLPIParser::compose(uint8_t* buffer, const int bufferSize)
     writer.setBuffer(buffer, buffer + bufferSize);
     CLPIStreamInfo::writeString("HDMV", writer, 4);
     CLPIStreamInfo::writeString(version_number, writer, 4);
-    const auto sequenceInfo_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto sequenceInfo_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // sequenceInfo_start_address
-    const auto programInfo_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto programInfo_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // programInfo_start_address
-    const auto CPI_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto CPI_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // CPI start address
-    const auto clipMark_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto clipMark_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // clipMark
-    const auto extentInfo_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto extentInfo_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extent info
     for (int i = 0; i < 3; i++) writer.putBits(32, 0);  // reserved_for_future_use
 
@@ -1285,14 +1285,14 @@ bool MPLSParser::parse(const char* fileName)
     if (!file.size(&fileSize))
         return false;
     const auto buffer = new uint8_t[fileSize];
-    if (!file.read(buffer, (uint32_t)fileSize))
+    if (!file.read(buffer, static_cast<uint32_t>(fileSize)))
     {
         delete[] buffer;
         return false;
     }
     try
     {
-        parse(buffer, (int)fileSize);
+        parse(buffer, static_cast<int>(fileSize));
         delete[] buffer;
         return true;
     }
@@ -1334,7 +1334,7 @@ void MPLSParser::parse(uint8_t* buffer, const int len)
 
 void MPLSParser::SubPath_extension(BitStreamWriter& writer)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -1345,7 +1345,7 @@ void MPLSParser::SubPath_extension(BitStreamWriter& writer)
     writer.putBits(8, 0);   // reserved
 
     std::vector<PMTIndex> pmtIndexList = getMVCDependStream().m_index;
-    writer.putBits(8, (unsigned)pmtIndexList.size());  // number_of_SubPlayItems
+    writer.putBits(8, static_cast<unsigned>(pmtIndexList.size()));  // number_of_SubPlayItems
     for (size_t i = 0; i < pmtIndexList.size(); ++i) composeSubPlayItem(writer, i, 0, pmtIndexList);
 
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
@@ -1357,7 +1357,7 @@ int MPLSParser::composeSubPathEntryExtension(uint8_t* buffer, const int bufferSi
     writer.setBuffer(buffer, buffer + bufferSize);
     try
     {
-        const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+        const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
         writer.putBits(32, 0);  // length
         const int beforeCount = writer.getBitsCount() / 8;
 
@@ -1448,11 +1448,11 @@ int MPLSParser::compose(uint8_t* buffer, int bufferSize, const DiskType dt)
         version_number = "0100";
     CLPIStreamInfo::writeString(type_indicator.c_str(), writer, 4);
     CLPIStreamInfo::writeString(version_number.c_str(), writer, 4);
-    const auto playList_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto playList_bit_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    const auto playListMark_bit_pos = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto playListMark_bit_pos = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);
-    const auto extDataStartAddr = (uint32_t*)(buffer + writer.getBitsCount() / 8);
+    const auto extDataStartAddr = reinterpret_cast<uint32_t*>(buffer + writer.getBitsCount() / 8);
     writer.putBits(32, 0);                              // extension data start address
     for (int i = 0; i < 5; i++) writer.putBits(32, 0);  // reserved_for_future_use
     composeAppInfoPlayList(writer);
@@ -1532,7 +1532,7 @@ void MPLSParser::AppInfoPlayList(BitStreamReader& reader)
 
 void MPLSParser::composeAppInfoPlayList(BitStreamWriter& writer) const
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -1608,7 +1608,7 @@ int MPLSParser::pgIndexToFullIndex(const int value) const
         if (m_streamInfo[i].stream_coding_type == StreamType::SUB_PGS)
         {
             if (cnt++ == value)
-                return (int)i;
+                return static_cast<int>(i);
         }
     }
     return -1;
@@ -1649,12 +1649,12 @@ MPLSStreamInfo& MPLSParser::getMVCDependStream()
 
 void MPLSParser::composePlayList(BitStreamWriter& writer)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
     writer.putBits(16, 0);  // reserved_for_future_use
     MPLSStreamInfo& mainStreamInfo = getMainStream();
-    writer.putBits(16, (unsigned)mainStreamInfo.m_index.size());  // number_of_PlayItems
+    writer.putBits(16, static_cast<unsigned>(mainStreamInfo.m_index.size()));  // number_of_PlayItems
     writer.putBits(16, number_of_SubPaths);                       // number_of_SubPaths
     // connection_condition = 1;
     for (size_t PlayItem_id = 0; PlayItem_id < mainStreamInfo.m_index.size(); PlayItem_id++)
@@ -1676,7 +1676,7 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
 void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum, std::vector<PMTIndex>& pmtIndexList,
                                 const int type) const
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
@@ -1687,7 +1687,7 @@ void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum
     writer.putBits(1, 0);     // is_repeat_SubPath = false
     writer.putBits(8, 0);     // reserved_for_future_use
 
-    writer.putBits(8, (unsigned)pmtIndexList.size());  // number_of_SubPlayItems
+    writer.putBits(8, static_cast<unsigned>(pmtIndexList.size()));  // number_of_SubPlayItems
     for (size_t i = 0; i < pmtIndexList.size(); i++)
     {
         composeSubPlayItem(writer, i, subPathNum, pmtIndexList);
@@ -1698,11 +1698,11 @@ void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum
 void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playItemNum, size_t subPathNum,
                                     std::vector<PMTIndex>& pmtIndexList) const
 {
-    const auto lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
 
-    int fileNum = (int)playItemNum;
+    int fileNum = static_cast<int>(playItemNum);
     if (isDependStreamExist)
     {
         fileNum *= 2;
@@ -1722,23 +1722,23 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum].begin()->first / 2));
+        writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first / 2));
     else
         writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum + 1].begin()->first / 2));
+        writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
         writer.putBits(32, OUT_time);
 
-    writer.putBits(16, (unsigned)playItemNum);  // sync_PlayItem_id. reference to play_item id.
+    writer.putBits(16, static_cast<unsigned>(playItemNum));  // sync_PlayItem_id. reference to play_item id.
     // sync_start_PTS_of_PlayItem
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first) / 2);
     else
         writer.putBits(32, IN_time);
 
@@ -1751,7 +1751,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
     // The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
     BitStreamWriter writer{};
     writer.setBuffer(buffer, buffer + bufferSize);
-    const auto lengthPos = (uint32_t*)buffer;
+    const auto lengthPos = reinterpret_cast<uint32_t*>(buffer);
     writer.putBits(32, 0);  // length
 
     vector<MPLSStreamInfo> pipStreams;
@@ -1774,8 +1774,8 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
         }
     }
 
-    const auto pipStreamsSize = (unsigned)pipStreams.size();
-    const auto pmtIndexListSize = (unsigned)pmtIndexList.size();
+    const auto pipStreamsSize = static_cast<unsigned>(pipStreams.size());
+    const auto pmtIndexListSize = static_cast<unsigned>(pmtIndexList.size());
 
     writer.putBits(16, pipStreamsSize * pmtIndexListSize);
     vector<uint32_t*> blockDataAddressPos;
@@ -1803,7 +1803,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
                 writer.putBits(8, 0);  // reserved_for_future_use
             }
             writer.putBits(16, 0);  // reserved_for_future_use
-            blockDataAddressPos.push_back((uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8));
+            blockDataAddressPos.push_back(reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8));
             writer.putBits(32, 0);  // metadata_block_data_start_address
         }
     }
@@ -1821,7 +1821,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
                 if (i == 0)
                     writer.putBits(32, IN_time);
                 else if (pmtIndexList[i - 1].size() > 0)
-                    writer.putBits(32, (unsigned)(pmtIndexList[i].begin()->first / 2));
+                    writer.putBits(32, static_cast<unsigned>(pmtIndexList[i].begin()->first / 2));
                 else
                     writer.putBits(32, IN_time);
 
@@ -1833,8 +1833,8 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
                     hPos = pipParams.hOffset;
                     vPos = pipParams.vOffset;
 
-                    const int pipWidth = (int)(pipStreams[k].width * pipParams.getScaleCoeff());
-                    const int pipHeight = (int)(pipStreams[k].height * pipParams.getScaleCoeff());
+                    const int pipWidth = static_cast<int>(pipStreams[k].width * pipParams.getScaleCoeff());
+                    const int pipHeight = static_cast<int>(pipStreams[k].height * pipParams.getScaleCoeff());
 
                     if (pipParams.corner == PIPParams::PipCorner::TopRight ||
                         pipParams.corner == PIPParams::PipCorner::BottomRight)
@@ -1988,13 +1988,13 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
             const uint32_t dataAddress = reader.get32Bits();
             const uint32_t dataLength = reader.get32Bits();
 
-            if (dataAddress + dataLength > (uint32_t)(dataEnd - data))
+            if (dataAddress + dataLength > static_cast<uint32_t>(dataEnd - data))
             {
                 LTRACE(LT_WARN, 2, "Invalid playlist extension entry skipped.");
                 continue;
             }
 
-            if (dataAddress + dataLength > (uint32_t)(dataEnd - data))
+            if (dataAddress + dataLength > static_cast<uint32_t>(dataEnd - data))
                 continue;  // invalid entry
 
             switch (dataID)
@@ -2020,22 +2020,22 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
 {
     vector<uint32_t*> extDataStartAddrPos;
     extDataStartAddrPos.resize(extDataBlockInfo.size());
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int initPos = writer.getBitsCount() / 8;
     if (extDataBlockInfo.size() > 0)
     {
         writer.putBits(32, 0);  // data_block_start_address
         writer.putBits(24, 0);  // reserved_for_word_align
-        const auto extDataBlockInfoSize = (unsigned)extDataBlockInfo.size();
+        const auto extDataBlockInfoSize = static_cast<unsigned>(extDataBlockInfo.size());
         writer.putBits(8, extDataBlockInfoSize);
         for (unsigned i = 0; i < extDataBlockInfoSize; ++i)
         {
             writer.putBits(16, extDataBlockInfo[i].id1);
             writer.putBits(16, extDataBlockInfo[i].id2);
-            extDataStartAddrPos[i] = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
-            writer.putBits(32, 0);                                          // ext_data_start_address
-            writer.putBits(32, (unsigned)extDataBlockInfo[i].data.size());  // ext_data_length
+            extDataStartAddrPos[i] = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
+            writer.putBits(32, 0);                                                      // ext_data_start_address
+            writer.putBits(32, static_cast<unsigned>(extDataBlockInfo[i].data.size())); // ext_data_length
         }
         while ((writer.getBitsCount() / 8 - initPos) % 4 != 0) writer.putBits(16, 0);
         *(lengthPos + 1) = my_htonl(writer.getBitsCount() / 8 - initPos + 4);  // data_block_start_address
@@ -2090,10 +2090,10 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, const int PlayItem_id)
 
 void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemNum, std::vector<PMTIndex>& pmtIndexList)
 {
-    const auto lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
-    int fileNum = (int)playItemNum;
+    int fileNum = static_cast<int>(playItemNum);
     if (isDependStreamExist)
         fileNum *= 2;
     const std::string clip_Information_file_name = strPadLeft(int32ToStr(fileNum + m_m2tsOffset), 5u, '0');
@@ -2108,14 +2108,14 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemN
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
     else if (pmtIndexList[playItemNum - 1].size() > 0)
-        writer.putBits(32, (unsigned)pmtIndexList[playItemNum].begin()->first / 2);
+        writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first) / 2);
     else
         writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);
     else if (pmtIndexList[playItemNum + 1].size() > 0)
-        writer.putBits(32, (unsigned)(pmtIndexList[playItemNum + 1].begin()->first / 2));
+        writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
         writer.putBits(32, OUT_time);
 
@@ -2162,12 +2162,12 @@ int MPLSParser::calcPlayItemID(MPLSStreamInfo& streamInfo, const uint32_t pts)
                 return FFMAX((int)i, 1) - 1;
         }
     }
-    return (int)streamInfo.m_index.size() - 1;
+    return static_cast<int>(streamInfo.m_index.size()) - 1;
 }
 
 void MPLSParser::composePlayListMark(BitStreamWriter& writer)
 {
-    const auto lengthPos = (uint32_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
     MPLSStreamInfo& streamInfo = MPLSParser::getMainStream();
@@ -2180,7 +2180,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
             for (uint32_t i = IN_time; i < OUT_time; i += m_chapterLen * 45000) m_marks.push_back(PlayListMark(-1, i));
         }
     }
-    writer.putBits(16, (unsigned)m_marks.size());
+    writer.putBits(16, static_cast<unsigned>(m_marks.size()));
     for (const auto& i : m_marks)
     {
         writer.putBits(8, 0);  // reserved_for_future_use
@@ -2198,7 +2198,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
 
 void MPLSParser::composeSTN_table(BitStreamWriter& writer, const size_t PlayItem_id, const bool isSSEx)
 {
-    const auto lengthPos = (uint16_t*)(writer.getBuffer() + writer.getBitsCount() / 8);
+    const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
     writer.putBit(0);       // Fixed_offset_during_PopUp_flag for ext mode
@@ -2526,7 +2526,7 @@ void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced,
     else if (fabs(fps - 59.94) < 1e-4)
         *frame_rate_index = 7;
 
-    if (ar == (int)VideoAspectRatio::AR_3_4 || ar == (int)VideoAspectRatio::AR_VGA)
+    if (ar == static_cast<int>(VideoAspectRatio::AR_3_4) || ar == static_cast<int>(VideoAspectRatio::AR_VGA))
         *aspect_ratio_index = 2;  // 4x3
 }
 
@@ -2556,7 +2556,7 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             height = vStream->getStreamHeight();
             HDR = vStream->getStreamHDR();
             VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, (int)ar, &video_format,
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, static_cast<int>(ar), &video_format,
                                &frame_rate_index, &aspect_ratio_index);
             if (ar == VideoAspectRatio::AR_3_4)
                 width = height * 4 / 3;
@@ -2759,7 +2759,7 @@ void MPLSStreamInfo::composeStreamEntry(BitStreamWriter& writer, size_t entryNum
 void MPLSStreamInfo::parseStreamAttributes(BitStreamReader& reader)
 {
     reader.skipBits(8);  // length
-    stream_coding_type = (StreamType)reader.getBits(8);
+    stream_coding_type = static_cast<StreamType>(reader.getBits(8));
     if (isVideoStreamType(stream_coding_type))
     {
         video_format = reader.getBits(4);
@@ -2798,7 +2798,7 @@ void MPLSStreamInfo::composeStreamAttributes(BitStreamWriter& writer)
     writer.putBits(8, 0);  // length
     const int initPos = writer.getBitsCount() / 8;
 
-    writer.putBits(8, (int)stream_coding_type);
+    writer.putBits(8, static_cast<int>(stream_coding_type));
     if (isVideoStreamType(stream_coding_type))
     {
         writer.putBits(4, video_format);

@@ -20,7 +20,7 @@ void AC3StreamReader::writePESExtension(PESPacket* pesPacket, const AVPacket& av
     if (m_useNewStyleAudioPES)
     {
         pesPacket->flagsLo |= 1;  // enable PES extension for AC3 stream
-        uint8_t* data = (uint8_t*)(pesPacket) + pesPacket->getHeaderLength();
+        uint8_t* data = reinterpret_cast<uint8_t*>(pesPacket) + pesPacket->getHeaderLength();
         *data++ = 0x01;
         *data++ = 0x81;
         if (!m_true_hd_mode || m_downconvertToAC3)
@@ -70,14 +70,14 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
     if (isAC3())
     {
         // ATSC A/52 Annex A Table A3.1 AC-3 Registration Descriptor
-        *dstBuff++ = (uint8_t)TSDescriptorTag::REGISTRATION;  // descriptor tag
-        *dstBuff++ = 4;                                       // decriptor length
-        memcpy(dstBuff, "AC-3", 4);                           // format_identifier
+        *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::REGISTRATION);  // descriptor tag
+        *dstBuff++ = 4;                                                    // decriptor length
+        memcpy(dstBuff, "AC-3", 4);                                        // format_identifier
         dstBuff += 4;
 
         // ATSC A/52 Annex A Table A4.1 AC-3 Audio Descriptor Syntax
-        *dstBuff++ = (uint8_t)TSDescriptorTag::AC3;  // AC-3_audio_stream_descriptor
-        *dstBuff++ = 4;                              // descriptor len
+        *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::AC3);  // AC-3_audio_stream_descriptor
+        *dstBuff++ = 4;                                           // descriptor len
 
         bitWriter.setBuffer(dstBuff, dstBuff + 4);
 
@@ -99,14 +99,14 @@ int AC3StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
 
     // Not AC3 => EAC3
     // ATSC A/52 Annex G 2.EAC3 Registration Descriptor
-    *dstBuff++ = (int)TSDescriptorTag::REGISTRATION;  // descriptor tag
-    *dstBuff++ = 4;                                   // descriptor length
-    memcpy(dstBuff, "EAC3", 4);                       // format_identifier
+    *dstBuff++ = static_cast<int>(TSDescriptorTag::REGISTRATION);  // descriptor tag
+    *dstBuff++ = 4;                                                // descriptor length
+    memcpy(dstBuff, "EAC3", 4);                                    // format_identifier
     dstBuff += 4;
 
     // ATSC A/52 Annex G Table G.1
-    *dstBuff++ = (int)TSDescriptorTag::EAC3;  // EAC3_audio_stream_descriptor
-    *dstBuff++ = 4;                           // descriptor len
+    *dstBuff++ = static_cast<int>(TSDescriptorTag::EAC3);  // EAC3_audio_stream_descriptor
+    *dstBuff++ = 4;                                        // descriptor len
 
     bitWriter.setBuffer(dstBuff, dstBuff + 4);
 

@@ -127,7 +127,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
     vector<string> fileList = extractFileList(streamName);
     string fileName;
     if (fileList.size() < 3)
-        for (int i = 0; i < (int)fileList.size(); i++)
+        for (int i = 0; i < static_cast<int>(fileList.size()); i++)
         {
             if (i > 0)
                 fileName += '+';
@@ -160,7 +160,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         fileName += itr->second;
     }
 
-    auto streamInfo = new StreamInfo((unsigned)DEFAULT_FILE_BLOCK_SIZE);
+    auto streamInfo = new StreamInfo(static_cast<unsigned>(DEFAULT_FILE_BLOCK_SIZE));
     streamInfo->m_fileName = fileName + fileExt;
     if (streamInfo->m_fileName.size() > 254)
         LTRACE(LT_ERROR, 2, "Error: File name too long.");

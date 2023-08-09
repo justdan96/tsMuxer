@@ -28,7 +28,7 @@ int NALUnit::calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end)
             data >>= 1;
             trailing++;
         }
-        return (int)(end - nalBuffer) * 8 - trailing;
+        return static_cast<int>(end - nalBuffer) * 8 - trailing;
     }
     else
     {
@@ -106,7 +106,7 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
             srcBuffer += 3;
         else if (srcBuffer[-2] == 0 && srcBuffer[-1] == 0)
         {
-            if (dstBufferSize < (size_t)(srcBuffer - srcStart + 2))
+            if (dstBufferSize < static_cast<size_t>(srcBuffer - srcStart + 2))
                 return -1;
             memcpy(dstBuffer, srcStart, srcBuffer - srcStart);
             dstBuffer += srcBuffer - srcStart;
@@ -126,11 +126,11 @@ int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, 
         else
             srcBuffer++;
     }
-    if (dstBufferSize < (size_t)(srcEnd - srcStart))
+    if (dstBufferSize < static_cast<size_t>(srcEnd - srcStart))
         return -1;
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return (int)(dstBuffer - initDstBuffer);
+    return static_cast<int>(dstBuffer - initDstBuffer);
 }
 
 int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize)
@@ -143,7 +143,7 @@ int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t*
             srcBuffer += 4;
         else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0 && srcBuffer[-1] == 3)
         {
-            if (dstBufferSize < (size_t)(srcBuffer - srcStart))
+            if (dstBufferSize < static_cast<size_t>(srcBuffer - srcStart))
                 return -1;
             memcpy(dstBuffer, srcStart, srcBuffer - srcStart - 1);
             dstBuffer += srcBuffer - srcStart - 1;
@@ -156,7 +156,7 @@ int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t*
     }
     memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return (int)(dstBuffer - initDstBuffer);
+    return static_cast<int>(dstBuffer - initDstBuffer);
 }
 
 int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
@@ -171,7 +171,7 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
             srcBuffer += 4;
         else if (srcBuffer[-3] == 0 && srcBuffer[-2] == 0 && srcBuffer[-1] == 3)
         {
-            if (dstBufferSize < (size_t)(srcBuffer - srcStart))
+            if (dstBufferSize < static_cast<size_t>(srcBuffer - srcStart))
                 return -1;
             memcpy(dstBuffer, srcStart, srcBuffer - srcStart - 1);
             dstBuffer += srcBuffer - srcStart - 1;
@@ -186,7 +186,7 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
     if (!*keepSrcBuffer)
         memcpy(dstBuffer, srcStart, srcEnd - srcStart);
     dstBuffer += srcEnd - srcStart;
-    return (int)(dstBuffer - initDstBuffer);
+    return static_cast<int>(dstBuffer - initDstBuffer);
 }
 
 unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
@@ -241,9 +241,9 @@ int NALUnit::extractSEGolombCode()
 {
     const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
-        return -(int)(rez / 2);
+        return -static_cast<int>(rez / 2);
     else
-        return (int)((rez + 1) / 2);
+        return static_cast<int>((rez + 1) / 2);
 }
 
 int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
@@ -258,7 +258,7 @@ int NALUnit::deserialize(uint8_t* buffer, uint8_t* end)
     }
 
     nal_ref_idc = (*buffer >> 5) & 0x3;
-    nal_unit_type = (NALType)(*buffer & 0x1f);
+    nal_unit_type = static_cast<NALType>(*buffer & 0x1f);
     return 0;
 }
 
@@ -294,7 +294,7 @@ int NALUnit::serialize(uint8_t* dstBuffer)
     *dstBuffer++ = 0;
     *dstBuffer++ = 0;
     *dstBuffer++ = 1;
-    *dstBuffer = ((nal_ref_idc & 3) << 5) + (int)nal_unit_type;
+    *dstBuffer = ((nal_ref_idc & 3) << 5) + static_cast<int>(nal_unit_type);
     return 4;
 }
 
@@ -315,7 +315,7 @@ int NALDelimiter::serialize(uint8_t* buffer)
     uint8_t* curBuf = buffer;
     curBuf += NALUnit::serialize(curBuf);
     *curBuf++ = (primary_pic_type << 5) + 0x10;
-    return (int)(curBuf - buffer);
+    return static_cast<int>(curBuf - buffer);
 }
 
 // -------------------- PPSUnit --------------------------
@@ -963,7 +963,7 @@ double SPSUnit::getFPS() const
 {
     if (num_units_in_tick != 0)
     {
-        const double tmp = time_scale / (float)num_units_in_tick / 2;  //(float)(frame_mbs_only_flag+1);
+        const double tmp = time_scale / static_cast<float>(num_units_in_tick) / 2;  //(float)(frame_mbs_only_flag+1);
         // if (abs(tmp - (double) 23.9760239760) < 3e-3)
         //	return 23.9760239760;
         return tmp;
@@ -974,9 +974,9 @@ double SPSUnit::getFPS() const
 
 void SPSUnit::setFps(const double fps)
 {
-    time_scale = (uint32_t)(fps + 0.5) * 1000000;
+    time_scale = static_cast<uint32_t>(fps + 0.5) * 1000000;
     // time_scale = (uint32_t)(fps+0.5) * 1000;
-    num_units_in_tick = (uint32_t)(time_scale / fps + 0.5);
+    num_units_in_tick = static_cast<uint32_t>(time_scale / fps + 0.5);
     time_scale *= 2;
 
     if (num_units_in_tick_bit_pos > 0)
@@ -1609,7 +1609,7 @@ void SEIUnit::serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& 
 {
     if (seiHeader)
     {
-        writer.putBits(8, (int)NALType::nuSEI);
+        writer.putBits(8, static_cast<int>(NALType::nuSEI));
         writer.putBits(8, SEI_MSG_PIC_TIMING);
     }
     uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
@@ -1645,7 +1645,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
 {
     if (seiHeader)
     {
-        writer.putBits(8, (int)NALType::nuSEI);
+        writer.putBits(8, static_cast<int>(NALType::nuSEI));
         writer.putBits(8, SEI_MSG_BUFFERING_PERIOD);
     }
     uint8_t* size = writer.getBuffer() + writer.getBitsCount() / 8;
@@ -1821,7 +1821,7 @@ void SEIUnit::processBlurayOffsetMetadata()
 {
     bitReader.skipBits(8);
     const uint8_t* ptr = bitReader.getBuffer() + bitReader.getBitsCount() / 8;
-    metadataPtsOffset = (int)(ptr - m_nalBuffer);
+    metadataPtsOffset = static_cast<int>(ptr - m_nalBuffer);
     bitReader.skipBits(24);  // PTS[32..30], marker_bit, PTS[29..15]
     bitReader.skipBits(18);  // marker_bit, PTS[14..0], marker_bit, reserved_for_future_use bit
     number_of_offset_sequences = bitReader.getBits(6);
@@ -1831,11 +1831,11 @@ void SEIUnit::updateMetadataPts(uint8_t* metadataPtsPtr, const int64_t pts)
 {
     metadataPtsPtr[0] = (pts >> 30) & 0x07;
 
-    auto val = (uint16_t)((pts >> 15) & 0x7fff);
+    auto val = static_cast<uint16_t>((pts >> 15) & 0x7fff);
     metadataPtsPtr[1] = 0x80 + (val >> 8);
     metadataPtsPtr[2] = val & 0xff;
 
-    val = (uint16_t)(pts & 0x7fff);
+    val = static_cast<uint16_t>(pts & 0x7fff);
     metadataPtsPtr[3] = 0x80 + (val >> 8);
     metadataPtsPtr[4] = val & 0xff;
 }

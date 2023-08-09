@@ -15,7 +15,8 @@ static constexpr int MAX_HEADER_SIZE = 192;
 
 static uint32_t FOUR_CC(const uint8_t a, const uint8_t b, const uint8_t c, const uint8_t d)
 {
-    return my_ntohl((uint32_t(a) << 24) + (uint32_t(b) << 16) + (uint32_t(c) << 8) + uint32_t(d));
+    return my_ntohl((static_cast<uint32_t>(a) << 24) + (static_cast<uint32_t>(b) << 16) +
+                    (static_cast<uint32_t>(c) << 8) + static_cast<uint32_t>(d));
 }
 
 static const uint32_t RIFF_SMALL = FOUR_CC('r', 'i', 'f', 'f');
@@ -40,21 +41,21 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
 
     // Blu-ray core specifications Table 9-11 - HDMV LPCM audio registration descriptor
     uint8_t* curPos = dstBuff;
-    *curPos++ = (uint8_t)TSDescriptorTag::REGISTRATION;  // descriptor tag
-    *curPos++ = 8;                                       // descriptor length
+    *curPos++ = static_cast<uint8_t>(TSDescriptorTag::REGISTRATION);  // descriptor tag
+    *curPos++ = 8;                                                    // descriptor length
     *curPos++ = 'H';
     *curPos++ = 'D';
     *curPos++ = 'M';
     *curPos++ = 'V';
     *curPos++ = 0xff;  // stuffing_bits
 
-    *curPos++ = (uint8_t)TSDescriptorTag::LPCM;  // descriptor tag
+    *curPos++ = static_cast<uint8_t>(TSDescriptorTag::LPCM);  // descriptor tag
     const int audio_presentation_type = (m_channels > 2) ? 6 : (m_channels == 2) ? 3 : 1;
     const int sampling_frequency = (m_freq == 192000) ? 5 : (m_freq == 96000) ? 4 : 1;
     *curPos++ = (audio_presentation_type << 4) + sampling_frequency;
     *curPos++ = ((m_bitsPerSample - 12) << 4) + 0x3f;  // bits_per_sample (2 bits), stuffing_bits
 
-    return (int)(curPos - dstBuff);
+    return static_cast<int>(curPos - dstBuff);
 }
 
 int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
@@ -179,7 +180,8 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
     // 1. convert byte order to little endian
     if (m_bitsPerSample == 16)
     {
-        for (auto curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_htons(*curPos);
+        for (auto curPos = reinterpret_cast<uint16_t*>(start); curPos < reinterpret_cast<uint16_t*>(end); ++curPos)
+            *curPos = my_htons(*curPos);
     }
     else if (m_bitsPerSample > 16)
     {
@@ -278,7 +280,7 @@ uint32_t LPCMStreamReader::convertWavToPCM(uint8_t* start, uint8_t* end)
         const int bits_per_sample = (m_bitsPerSample - 12) / 4;
         m_tmpFrameBuffer[3] = (bits_per_sample << 6) + (m_firstFrame << 5);
     }
-    return (int)(dst - m_tmpFrameBuffer);
+    return static_cast<int>(dst - m_tmpFrameBuffer);
 }
 
 uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
@@ -293,7 +295,8 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
         // 1. convert byte order to little endian
         if (m_bitsPerSample == 16)
         {
-            for (auto curPos = (uint16_t*)start; curPos < (uint16_t*)end; ++curPos) *curPos = my_ntohs(*curPos);
+            for (auto curPos = reinterpret_cast<uint16_t*>(start); curPos < reinterpret_cast<uint16_t*>(end); ++curPos)
+                *curPos = my_ntohs(*curPos);
         }
         else if (m_bitsPerSample > 16)
         {
@@ -352,7 +355,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
             removeChannel(start, end, 8, mch);
     }
 
-    return (int)(end - start - (m_channels % 2 == 1 ? ch1FullSize : 0));
+    return static_cast<int>(end - start - (m_channels % 2 == 1 ? ch1FullSize : 0));
 }
 
 uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, uint8_t* end)
@@ -382,21 +385,21 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
             if (curPos == nullptr || curPos + sizeof(wave_format::GUID) + 8 >= end)
                 return NOT_ENOUGH_BUFFER;
             uint8_t* tmpPos = curPos + sizeof(wave_format::GUID);
-            fmtSize = *((uint64_t*)tmpPos);
+            fmtSize = *reinterpret_cast<uint64_t*>(tmpPos);
             if (curPos + fmtSize >= end)
                 return NOT_ENOUGH_BUFFER;
-            waveFormatPCMEx = (WAVEFORMATPCMEX*)(tmpPos + 8);
+            waveFormatPCMEx = reinterpret_cast<WAVEFORMATPCMEX*>(tmpPos + 8);
         }
         else
         {
             curPos = findSubstr("fmt ", buff, end);
             if (curPos == nullptr || curPos + 8 >= end)
                 return NOT_ENOUGH_BUFFER;
-            fmtSize = *((uint32_t*)(curPos + 4));
+            fmtSize = *reinterpret_cast<uint32_t*>(curPos + 4);
             if (curPos + 8 + fmtSize >= end)
                 return NOT_ENOUGH_BUFFER;
             curPos += 8;
-            waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
+            waveFormatPCMEx = reinterpret_cast<WAVEFORMATPCMEX*>(curPos);
         }
 
         m_channels = waveFormatPCMEx->nChannels;
@@ -495,7 +498,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
         if (curPos + 8 >= end)
             return NOT_ENOUGH_BUFFER;
         curPos += 4;  // skip 'data' identifier
-        m_curChunkLen = *((uint32_t*)curPos);
+        m_curChunkLen = *reinterpret_cast<uint32_t*>(curPos);
         if (m_curChunkLen == 0)
             m_openSizeWaveFormat = true;
         curPos += 4;
@@ -506,10 +509,10 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
             return NOT_ENOUGH_BUFFER;
         curPos += sizeof(wave_format::GUID);
         // For w64, data length includes data metadata (16 bytes) and size (8 bytes)
-        m_curChunkLen = *((uint64_t*)curPos) - 24;
+        m_curChunkLen = *reinterpret_cast<uint64_t*>(curPos) - 24;
         curPos += 8;
     }
-    return (int)(curPos - buff);
+    return static_cast<int>(curPos - buff);
 }
 
 int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes)
@@ -538,7 +541,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
         if (end - buff < 4)
             return NOT_ENOUGH_BUFFER;
 
-        const auto curPtr32 = (const uint32_t*)buff;
+        const auto curPtr32 = reinterpret_cast<uint32_t*>(buff);
         if (m_curChunkLen == 0 && (*curPtr32 == RIFF_SMALL || *curPtr32 == RIFF_LARGE))
         {
             if (end - buff < 8)
@@ -563,7 +566,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
             int frameLen = reqFrameLen;
             // a chunk can contain several frames, but a frame canot be bigger than a chunck
             if (m_curChunkLen)
-                frameLen = (int)FFMIN(reqFrameLen, m_curChunkLen);
+                frameLen = static_cast<int>(FFMIN(reqFrameLen, m_curChunkLen));
             if (end - buff < frameLen + hdrSize)
                 return NOT_ENOUGH_BUFFER;
             const int sampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8) * m_channels;
@@ -578,7 +581,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
         {
             if (end - buff < m_frameRest + hdrSize)
                 return NOT_ENOUGH_BUFFER;
-            const int frameLen = (int)m_frameRest;
+            const int frameLen = static_cast<int>(m_frameRest);
             m_frameRest = 0;
             m_needPCMHdr = false;
             return frameLen;
@@ -636,10 +639,10 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             // memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt_\x00\x00\x00\x00", 20);
             memcpy(curPos, "RIFF\xff\xff\xff\xffWAVEfmt ", 16);
             curPos += 16;
-            const auto fmtSize = (uint32_t*)curPos;
+            const auto fmtSize = reinterpret_cast<uint32_t*>(curPos);
             *fmtSize = sizeof(WAVEFORMATPCMEX);
             curPos += 4;
-            const auto waveFormatPCMEx = (WAVEFORMATPCMEX*)curPos;
+            const auto waveFormatPCMEx = reinterpret_cast<WAVEFORMATPCMEX*>(curPos);
             waveFormatPCMEx->wFormatTag = WAVE_FORMAT_EXTENSIBLE;
             waveFormatPCMEx->nChannels = m_channels;
             waveFormatPCMEx->nSamplesPerSec = m_freq;
@@ -663,7 +666,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     }
     */
     m_firstFrame = false;
-    return (int)(curPos - dstBuffer);
+    return static_cast<int>(curPos - dstBuffer);
 }
 
 void LPCMStreamReader::setHeadersType(const LPCMStreamReader::LPCMHeaderType value) { m_headerType = value; }
@@ -686,7 +689,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, const int64_t len)
         (curPos[0] == 'r' && curPos[1] == 'i' && curPos[2] == 'f' && curPos[3] == 'f'))
     {
         m_headerType = LPCMHeaderType::htWAVE;
-        const auto testWave64 = (wave_format::GUID*)curPos;
+        const auto testWave64 = reinterpret_cast<wave_format::GUID*>(curPos);
         if (*testWave64 == WAVE64GUID)
             m_headerType = LPCMHeaderType::htWAVE64;
         return true;
@@ -730,14 +733,14 @@ bool LPCMStreamReader::beforeFileCloseEvent(File& file)
     file.size(&fileSize);
     if (fileSize <= 0xfffffffful)
     {
-        uint32_t dataSize = (uint32_t)fileSize - 8;
-        if (file.seek(4, File::SeekMethod::smBegin) == (int64_t)-1)
+        uint32_t dataSize = static_cast<uint32_t>(fileSize) - 8;
+        if (file.seek(4, File::SeekMethod::smBegin) == static_cast<uint64_t>(-1))
             return false;
         if (file.write(&dataSize, 4) != 4)
             return false;
-        if (file.seek(64, File::SeekMethod::smBegin) == (int64_t)-1)
+        if (file.seek(64, File::SeekMethod::smBegin) == static_cast<uint64_t>(-1))
             return false;
-        dataSize = (uint32_t)fileSize - 68;
+        dataSize = static_cast<uint32_t>(fileSize) - 68;
         if (file.write(&dataSize, 4) != 4)
             return false;
     }
@@ -753,7 +756,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     avPacket.data = nullptr;
     avPacket.size = 0;
     avPacket.duration = 0;
-    avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+    avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     assert(m_curPos <= m_bufEnd);
     if (m_curPos == m_bufEnd)
         return NEED_MORE_DATA;
@@ -788,7 +791,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
         m_curPos = frame;
         m_needSync = false;
     }
-    avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+    avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_bufEnd - m_curPos < getHeaderLen())
     {
         memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
@@ -826,7 +829,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     if (frameLen > MAX_AV_PACKET_SIZE)
         THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.");
     avPacket.size = frameLen;
-    avPacket.duration = (int64_t)getFrameDuration();  // m_ptsIncPerFrame;
+    avPacket.duration = static_cast<int64_t>(getFrameDuration());  // m_ptsIncPerFrame;
     m_curPts += avPacket.duration;
     doMplsCorrection();
     if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)
@@ -862,7 +865,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
-    avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+    avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_tmpBuffer.size() > 0)
         avPacket.data = &m_tmpBuffer[0];
     else
@@ -870,7 +873,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
     avPacket.data += skipBeforeBytes;
     if (m_tmpBufferLen > 0)
     {
-        avPacket.size = (int)m_tmpBufferLen;
+        avPacket.size = static_cast<int>(m_tmpBufferLen);
     }
     if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)
     {
@@ -889,7 +892,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
         if (avPacket.data != nullptr && m_frameRest > 0)
         {
             memset(avPacket.data + avPacket.size, 0, m_frameRest);
-            avPacket.size += (int)m_frameRest;
+            avPacket.size += static_cast<int>(m_frameRest);
             m_processedBytes -= m_frameRest;
         }
     }

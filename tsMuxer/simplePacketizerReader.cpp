@@ -39,14 +39,14 @@ void SimplePacketizerReader::doMplsCorrection()
             m_mplsOffset += m_curPts - m_lastMplsTime;
             // m_curPts = m_lastMplsTime; // fix PTS up
         }
-        m_lastMplsTime += (int64_t)((m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) *
-                                    (INTERNAL_PTS_FREQ / 45000.0));
+        m_lastMplsTime += static_cast<int64_t>(
+            (m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) * (INTERNAL_PTS_FREQ / 45000.0));
     }
 }
 
 void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
 {
-    if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
+    if (static_cast<size_t>(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (m_tmpBuffer.size() > 0)
@@ -80,12 +80,12 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
         if (size + skipBytes + skipBeforeBytes <= 0 && size != NOT_ENOUGH_BUFFER)
             return 0;
     }
-    avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+    avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
     if (m_tmpBufferLen > 0)
     {
         avPacket.data = &m_tmpBuffer[0];
         avPacket.data += skipBeforeBytes;
-        avPacket.size = (int)m_tmpBufferLen;
+        avPacket.size = static_cast<int>(m_tmpBufferLen);
         if (isPriorityData(&avPacket))
             avPacket.flags |= AVPacket::PRIORITY_DATA;
         if (isIFrame(&avPacket))
@@ -93,7 +93,7 @@ int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
     }
     LTRACE(LT_DEBUG, 0, "Processed " << m_frameNum << " " << getCodecInfo().displayName << " frames");
     m_processedBytes += avPacket.size + skipBytes + skipBeforeBytes;
-    return (int)m_tmpBufferLen;
+    return static_cast<int>(m_tmpBufferLen);
 }
 
 int SimplePacketizerReader::readPacket(AVPacket& avPacket)
@@ -107,7 +107,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         avPacket.data = nullptr;
         avPacket.size = 0;
         avPacket.duration = 0;
-        avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+        avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
         assert(m_curPos <= m_bufEnd);
         if (m_curPos == m_bufEnd)
             return NEED_MORE_DATA;
@@ -145,7 +145,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             m_curPos = frame;
             m_needSync = false;
         }
-        avPacket.dts = avPacket.pts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+        avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
         if (m_bufEnd - m_curPos < getHeaderLen())
         {
             memmove(&m_tmpBuffer[0], m_curPos, m_bufEnd - m_curPos);
@@ -196,7 +196,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         if (m_halfFrameLen == 0.0)
             m_halfFrameLen = getFrameDuration() / 2.0;
         m_curPts += getFrameDuration();
-        int64_t nextDts = (int64_t)(m_curPts * m_stretch) + m_timeOffset;
+        int64_t nextDts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
         avPacket.duration = nextDts - avPacket.dts;
         // doMplsCorrection();
         m_frameNum++;

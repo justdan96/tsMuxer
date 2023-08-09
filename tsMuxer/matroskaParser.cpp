@@ -78,7 +78,7 @@ int ParsedH264TrackData::writeSPSPPS(uint8_t* dst) const
         memcpy(dst, &i[0], i.size());
         dst += i.size();
     }
-    return (int)(dst - start);
+    return static_cast<int>(dst - start);
 }
 
 bool ParsedH264TrackData::spsppsExists(uint8_t* buff, const int size)
@@ -92,12 +92,12 @@ bool ParsedH264TrackData::spsppsExists(uint8_t* buff, const int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            const auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        const auto nalUnitType = (NALUnit::NALType)(curPos[m_nalSize] & 0x1f);
+        const auto nalUnitType = static_cast<NALUnit::NALType>(curPos[m_nalSize] & 0x1f);
         if (nalUnitType == NALUnit::NALType::nuSPS)
             spsFound = true;
         else if (nalUnitType == NALUnit::NALType::nuPPS)
@@ -118,14 +118,14 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         m_firstExtract = false;
 
     if (m_firstExtract)
-        newBufSize += (int)getSPSPPSLen();
+        newBufSize += static_cast<int>(getSPSPPSLen());
 
     while (curPos <= end - m_nalSize)
     {
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            const auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -158,7 +158,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            const auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
             elSize = my_ntohl(*cur32);
         }
         else if (m_nalSize == 3)
@@ -194,12 +194,12 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, const int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            const auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        const auto nalUnitType = (HevcUnit::NalType)((curPos[m_nalSize] >> 1) & 0x3f);
+        const auto nalUnitType = static_cast<HevcUnit::NalType>((curPos[m_nalSize] >> 1) & 0x3f);
         if (nalUnitType == HevcUnit::NalType::VPS)
             vpsFound = true;
         else if (nalUnitType == HevcUnit::NalType::SPS)
@@ -229,12 +229,12 @@ bool ParsedH266TrackData::spsppsExists(uint8_t* buff, const int size)
         uint32_t elSize = 0;
         if (m_nalSize == 4)
         {
-            const auto cur32 = (uint32_t*)curPos;
+            const auto cur32 = reinterpret_cast<uint32_t*>(curPos);
             elSize = my_ntohl(*cur32);
         }
         else
             elSize = (curPos[0] << 16l) + (curPos[1] << 8l) + curPos[2];
-        const auto nalUnitType = (VvcUnit::NalType)(curPos[m_nalSize + 1] >> 3);
+        const auto nalUnitType = static_cast<VvcUnit::NalType>(curPos[m_nalSize + 1] >> 3);
         if (nalUnitType == VvcUnit::NalType::VPS)
             vpsFound = true;
         else if (nalUnitType == VvcUnit::NalType::SPS)
@@ -261,7 +261,7 @@ ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, const int size) : ParsedTr
 
 void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
-    pkt->size = size + (m_firstPacket ? (int)m_seqHeader.size() : 0);
+    pkt->size = size + (m_firstPacket ? static_cast<int>(m_seqHeader.size()) : 0);
     const bool addFrameHdr = !(size >= 4 && buff[0] == 0 && buff[1] == 0 && buff[2] == 1);
     if (addFrameHdr)
         pkt->size += 4;
@@ -308,7 +308,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
     : ParsedTrackPrivData(track->codec_priv, track->codec_priv_size)
 {
     m_convertBytes = strEndWith(track->codec_id, "/BIG");
-    const auto audiotrack = (MatroskaAudioTrack*)track;
+    const auto audiotrack = reinterpret_cast<MatroskaAudioTrack*>(track);
     m_channels = audiotrack->channels;
     m_bitdepth = audiotrack->bitdepth;
 
@@ -320,7 +320,7 @@ ParsedLPCMTrackData::ParsedLPCMTrackData(MatroskaTrack* track)
 
 void ParsedLPCMTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size)
 {
-    pkt->size = size + (int)m_waveBuffer.size();
+    pkt->size = size + static_cast<int>(m_waveBuffer.size());
     pkt->data = new uint8_t[pkt->size];
     uint8_t* dst = pkt->data;
     if (!m_waveBuffer.isEmpty())
@@ -376,12 +376,12 @@ void ParsedSRTTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int siz
         prefix = "\xEF\xBB\xBF";  // UTF-8 header
     prefix += int32ToStr(++m_packetCnt);
     prefix += "\n";
-    prefix += floatToTime(pkt->pts / (double)INTERNAL_PTS_FREQ, ',');
+    prefix += floatToTime(pkt->pts / static_cast<double>(INTERNAL_PTS_FREQ), ',');
     prefix += " --> ";
-    prefix += floatToTime((pkt->pts + pkt->duration) / (double)INTERNAL_PTS_FREQ, ',');
+    prefix += floatToTime((pkt->pts + pkt->duration) / static_cast<double>(INTERNAL_PTS_FREQ), ',');
     prefix += '\n';
     const std::string postfix = "\n\n";
-    pkt->size = (int)(size + prefix.length() + postfix.length());
+    pkt->size = static_cast<int>(size + prefix.length() + postfix.length());
     pkt->data = new uint8_t[pkt->size];
     memcpy(pkt->data, prefix.c_str(), prefix.length());
     memcpy(pkt->data + prefix.length(), buff, size);
@@ -422,8 +422,8 @@ void ParsedPGTrackData::extractData(AVPacket* pkt, uint8_t* buff, const int size
 
         dst[0] = 'P';
         dst[1] = 'G';
-        const auto ptsDts = (uint32_t*)(dst + 2);
-        ptsDts[0] = my_htonl((uint32_t)internalClockToPts(pkt->pts));
+        const auto ptsDts = reinterpret_cast<uint32_t*>(dst + 2);
+        ptsDts[0] = my_htonl(static_cast<uint32_t>(internalClockToPts(pkt->pts)));
         ptsDts[1] = 0;
         dst += PG_HEADER_SIZE;
         memcpy(dst, curPtr, blockSize);

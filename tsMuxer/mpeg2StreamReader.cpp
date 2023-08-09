@@ -21,7 +21,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             {
                 const uint8_t* nextNal = MPEGHeader::findNextMarker(nal + 4, m_bufEnd);
                 m_sequence.deserialize(nal + 4, nextNal - nal - 4);
-                m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
+                m_streamAR = static_cast<VideoAspectRatio>(m_sequence.aspect_ratio_info);
             }
             else if (nal[3] == EXT_START_SHORT_CODE)
             {
@@ -49,12 +49,12 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
     }
 
     // HDMV registration descriptor
-    *dstBuff++ = (uint8_t)TSDescriptorTag::HDMV;  // registration descriptor tag
-    *dstBuff++ = 8;                               // descriptor length
+    *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::HDMV);  // registration descriptor tag
+    *dstBuff++ = 8;                                            // descriptor length
     memcpy(dstBuff, "HDMV\xff", 5);
     dstBuff += 5;
 
-    *dstBuff++ = (uint8_t)StreamType::VIDEO_MPEG2;  // stream_coding_type
+    *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_MPEG2);  // stream_coding_type
     *dstBuff++ = (m_sequence.video_format << 4) + m_sequence.frame_rate_index;
     *dstBuff++ = (m_sequence.aspect_ratio_info << 4) + 0xf;
 
@@ -116,7 +116,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                     nextNal = MPEGHeader::findNextMarker(nal + 4, end);
                     if (m_sequence.deserialize(nal + 4, nextNal - nal - 4) == nullptr)
                         return rez;
-                    m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
+                    m_streamAR = static_cast<VideoAspectRatio>(m_sequence.aspect_ratio_info);
                     spsFound = true;
                     break;
                 default:
@@ -209,7 +209,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
     {
         if (m_sequence.deserialize(buff + 1, nextNal - buff - 1) == nullptr)
             return NALUnit::UNSUPPORTED_PARAM;
-        m_streamAR = (VideoAspectRatio)m_sequence.aspect_ratio_info;
+        m_streamAR = static_cast<VideoAspectRatio>(m_sequence.aspect_ratio_info);
     }
     catch (BitStreamException)
     {

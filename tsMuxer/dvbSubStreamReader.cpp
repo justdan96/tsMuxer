@@ -43,7 +43,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
     int date;
     int i;
     int is_menu = 0;
-    int buf_size = (int)(end - buff);
+    int buf_size = static_cast<int>(end - buff);
 
     if (buf_size < 10)
         return NOT_ENOUGH_BUFFER;
@@ -97,11 +97,11 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
                 break;
             case 0x01:
                 // set start date
-                m_start_display_time = ((int64_t)date << 10) * TS_FREQ_TO_INT_FREQ_COEFF;
+                m_start_display_time = (static_cast<int64_t>(date) << 10) * TS_FREQ_TO_INT_FREQ_COEFF;
                 break;
             case 0x02:
                 // set end date
-                m_end_display_time = ((int64_t)date << 10) * TS_FREQ_TO_INT_FREQ_COEFF;
+                m_end_display_time = (static_cast<int64_t>(date) << 10) * TS_FREQ_TO_INT_FREQ_COEFF;
                 break;
             case 0x03:
                 // set colormap
@@ -177,7 +177,7 @@ int DVBSubStreamReader::intDecodeFrame(uint8_t* buff, uint8_t* end)
     return NOT_ENOUGH_BUFFER;
 }
 
-double DVBSubStreamReader::getFrameDuration() { return (double)m_frameDuration; }
+double DVBSubStreamReader::getFrameDuration() { return static_cast<double>(m_frameDuration); }
 
 const std::string DVBSubStreamReader::getStreamInfo()
 {

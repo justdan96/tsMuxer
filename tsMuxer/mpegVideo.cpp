@@ -262,7 +262,7 @@ void MPEGSequenceHeader::setFrameRate(uint8_t* buff, const double fps)
 
 void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 {
-    buff[3] = (buff[3] & 0x0f) + ((int)ar << 4);
+    buff[3] = (buff[3] & 0x0f) + (static_cast<int>(ar) << 4);
 }
 
 // --------------- gop header ------------------
@@ -372,7 +372,7 @@ void MPEGPictureHeader::buildHeader()
     bitWriter.putBits(16, PICTURE_START_CODE);
 
     bitWriter.putBits(10, ref);
-    bitWriter.putBits(3, (int)pict_type);
+    bitWriter.putBits(3, static_cast<int>(pict_type));
     bitWriter.putBits(16, vbv_delay);
 
     if (pict_type == PictureCodingType::P_FRAME || pict_type == PictureCodingType::B_FRAME)
@@ -438,7 +438,7 @@ uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, const int64_t buf_size)
     bitReader.setBuffer(buf, buf + buf_size);
 
     ref = bitReader.getBits(10); /* temporal ref */
-    pict_type = (PictureCodingType)bitReader.getBits(3);
+    pict_type = static_cast<PictureCodingType>(bitReader.getBits(3));
     if (pict_type == PictureCodingType::FORBIDDEN || pict_type == PictureCodingType::D_FRAME)
         return nullptr;
 
@@ -459,7 +459,7 @@ uint8_t* MPEGPictureHeader::deserialize(uint8_t* buf, const int64_t buf_size)
         mpeg_f_code[1][1] = f_code;
     }
     uint8_t* new_buff = skipProcessedBytes(bitReader);
-    m_headerSize = (int)(new_buff - buf);
+    m_headerSize = static_cast<int>(new_buff - buf);
     return new_buff;
 }
 

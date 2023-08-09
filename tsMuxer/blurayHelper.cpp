@@ -138,7 +138,7 @@ std::vector<std::uint8_t> makeBdMovieObjectData(const BDMV_VersionNumber version
 
     for (auto&& movieObj : movieObjects)
     {
-        payload_length += (uint32_t)movieObj.serializedSize();
+        payload_length += static_cast<uint32_t>(movieObj.serializedSize());
     }
 
     rv.reserve(header_size + payload_length);
@@ -470,8 +470,8 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
         }
 
         clpiParser.number_of_source_packets = packetCount[i];
-        clpiParser.presentation_start_time = (uint32_t)(firstPts[i] / 2);
-        clpiParser.presentation_end_time = (uint32_t)(lastPts[i] / 2);
+        clpiParser.presentation_start_time = static_cast<uint32_t>(firstPts[i] / 2);
+        clpiParser.presentation_end_time = static_cast<uint32_t>(lastPts[i] / 2);
         clpiParser.m_clpiNum = i;
 
         int fileLen = clpiParser.compose(clpiBuffer, CLPI_BUFFER_SIZE);
@@ -545,8 +545,8 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     mplsParser.m_m2tsOffset = mainMuxer->getFirstFileNum();
     mplsParser.PlayList_playback_type = 1;
     mplsParser.ref_to_STC_id = 0;
-    mplsParser.IN_time = (uint32_t)(firstPts / 2);
-    mplsParser.OUT_time = (uint32_t)(lastPts / 2);
+    mplsParser.IN_time = static_cast<uint32_t>(firstPts / 2);
+    mplsParser.OUT_time = static_cast<uint32_t>(lastPts / 2);
     mplsParser.mvc_base_view_r = isMvcBaseViewR;
 
     if (customChapters.size() == 0)
@@ -557,7 +557,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     {
         for (auto& i : customChapters)
         {
-            auto mark = (uint32_t)(i * 45000.0);
+            auto mark = static_cast<uint32_t>(i * 45000.0);
             if (mark >= 0 && mark <= (mplsParser.OUT_time - mplsParser.IN_time))
                 mplsParser.m_marks.push_back(PlayListMark(-1, mark + mplsParser.IN_time));
         }

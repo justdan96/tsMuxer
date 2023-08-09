@@ -12,9 +12,9 @@ void throwFileError()
     const DWORD dw = GetLastError();
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
-                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&msgBuf, 0, nullptr);
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPTSTR>(&msgBuf), 0, nullptr);
 
-    const std::string str((char*)msgBuf);
+    const std::string str(static_cast<char*>(msgBuf));
     throw std::runtime_error(str);
 }
 
@@ -147,7 +147,7 @@ int File::read(void* buffer, const uint32_t count) const
 
     m_pos += bytesRead;
 
-    return (int)bytesRead;
+    return static_cast<int>(bytesRead);
 }
 
 int File::write(const void* buffer, const uint32_t count)
@@ -166,7 +166,7 @@ int File::write(const void* buffer, const uint32_t count)
 
     m_pos += bytesWritten;
 
-    return (int)bytesWritten;
+    return static_cast<int>(bytesWritten);
 }
 
 void File::sync() { FlushFileBuffers(m_impl); }
@@ -188,7 +188,7 @@ bool File::size(uint64_t* const fileSize) const
 uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
-        return (uint64_t)-1;
+        return static_cast<uint64_t>(-1);
 
     DWORD moveMethod = 0;
     switch (whence)
@@ -204,22 +204,22 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
         break;
     }
 
-    const LONG distanceToMoveLow = (uint32_t)(offset & 0xffffffff);
-    LONG distanceToMoveHigh = (uint32_t)((offset & 0xffffffff00000000ull) >> 32);
+    const LONG distanceToMoveLow = static_cast<LONG>(offset & 0xffffffff);
+    LONG distanceToMoveHigh = static_cast<LONG>((offset & 0xffffffff00000000ull) >> 32);
 
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, moveMethod);
     if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
-        return (uint64_t)-1;
+        return static_cast<uint64_t>(-1);
 
-    m_pos = newPointerLow | ((uint64_t)distanceToMoveHigh << 32);
+    m_pos = newPointerLow | (static_cast<uint64_t>(distanceToMoveHigh) << 32);
 
     return m_pos;
 }
 
 bool File::truncate(const uint64_t newFileSize) const
 {
-    const LONG distanceToMoveLow = (uint32_t)(newFileSize & 0xffffffff);
-    LONG distanceToMoveHigh = (uint32_t)((newFileSize & 0xffffffff00000000ull) >> 32);
+    const LONG distanceToMoveLow = static_cast<LONG>(newFileSize & 0xffffffff);
+    LONG distanceToMoveHigh = static_cast<LONG>((newFileSize & 0xffffffff00000000ull) >> 32);
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
     const int errCode = GetLastError();
     if ((newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR))

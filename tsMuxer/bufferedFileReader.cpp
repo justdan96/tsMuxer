@@ -27,9 +27,9 @@ bool FileReaderData::openStream()
         const DWORD dw = GetLastError();
 
         FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dw,
-                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msgBuf, 0, nullptr);
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&msgBuf), 0, nullptr);
 
-        string str((char*)msgBuf);
+        string str(static_cast<char*>(msgBuf));
         LTRACE(LT_ERROR, 0, str);
 #endif
     }
@@ -46,7 +46,7 @@ BufferedFileReader::BufferedFileReader(const uint32_t blockSize, const uint32_t 
 bool BufferedFileReader::openStream(const uint32_t readerID, const char* streamName, int pid,
                                     const CodecInfo* codecInfo)
 {
-    const auto data = (FileReaderData*)getReader(readerID);
+    const auto data = static_cast<FileReaderData*>(getReader(readerID));
 
     if (data == nullptr)
     {
@@ -66,12 +66,12 @@ bool BufferedFileReader::openStream(const uint32_t readerID, const char* streamN
 }
 bool BufferedFileReader::gotoByte(const uint32_t readerID, const uint64_t seekDist)
 {
-    const auto data = (FileReaderData*)getReader(readerID);
+    const auto data = static_cast<FileReaderData*>(getReader(readerID));
     if (data)
     {
-        data->m_blockSize = m_blockSize - (uint32_t)(seekDist % (uint64_t)m_blockSize);
+        data->m_blockSize = m_blockSize - static_cast<uint32_t>(seekDist % static_cast<uint64_t>(m_blockSize));
         const uint64_t seekRez = data->m_file.seek(seekDist + data->m_fileHeaderSize, File::SeekMethod::smBegin);
-        const bool rez = seekRez != (uint64_t)-1;
+        const bool rez = seekRez != static_cast<uint64_t>(-1);
         if (rez)
         {
             data->m_eof = false;

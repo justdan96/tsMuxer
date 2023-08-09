@@ -27,9 +27,9 @@ int VvcUnit::extractSEGolombCode()
 {
     const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
-        return -(int)(rez / 2);
+        return -static_cast<int>(rez / 2);
     else
-        return (int)((rez + 1) / 2);
+        return static_cast<int>((rez + 1) / 2);
 }
 
 void VvcUnit::decodeBuffer(const uint8_t* buffer, const uint8_t* end)
@@ -46,7 +46,7 @@ int VvcUnit::deserialize()
     {
         m_reader.skipBits(2);  // forbidden_zero_bit, nuh_reserved_zero_bit
         nuh_layer_id = m_reader.getBits(6);
-        nal_unit_type = (NalType)m_reader.getBits(5);
+        nal_unit_type = static_cast<NalType>(m_reader.getBits(5));
         nuh_temporal_id_plus1 = m_reader.getBits(3);
         if (nuh_temporal_id_plus1 == 0 ||
             (nuh_temporal_id_plus1 != 1 && ((nal_unit_type >= NalType::OPI && nal_unit_type <= NalType::SPS) ||
@@ -449,8 +449,8 @@ int VvcVpsUnit::deserialize()
 
 void VvcVpsUnit::setFPS(const double fps)
 {
-    time_scale = (uint32_t)(fps + 0.5) * 1000000;
-    num_units_in_tick = (int)(time_scale / fps + 0.5);
+    time_scale = static_cast<uint32_t>(fps + 0.5) * 1000000;
+    num_units_in_tick = static_cast<int>(time_scale / fps + 0.5);
 
     // num_units_in_tick = time_scale/2 / fps;
     assert(num_units_in_tick_bit_pos > 0);
@@ -458,7 +458,7 @@ void VvcVpsUnit::setFPS(const double fps)
     updateBits(num_units_in_tick_bit_pos + 32, 32, time_scale);
 }
 
-double VvcVpsUnit::getFPS() const { return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0; }
+double VvcVpsUnit::getFPS() const { return num_units_in_tick ? time_scale / static_cast<float>(num_units_in_tick) : 0; }
 
 string VvcVpsUnit::getDescription() const
 {
@@ -552,13 +552,13 @@ int VvcSpsUnit::deserialize()
                     if (!sps_subpic_same_size_flag || i == 0)
                     {
                         if (i != 0 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits((unsigned)ceil(log2(tmpWidthVal)));  // sps_subpic_ctu_top_left_x[i]
+                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_ctu_top_left_x[i]
                         if (i != 0 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits((unsigned)ceil(log2(tmpHeightVal)));  // sps_subpic_ctu_top_left_y[i]
+                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_ctu_top_left_y[i]
                         if (i < sps_num_subpics_minus1 && pic_width_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits((unsigned)ceil(log2(tmpWidthVal)));  // sps_subpic_width_minus1[i]
+                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpWidthVal))));  // sps_subpic_width_minus1[i]
                         if (i < sps_num_subpics_minus1 && pic_height_max_in_luma_samples > CtbSizeY)
-                            m_reader.skipBits((unsigned)ceil(log2(tmpHeightVal)));  // sps_subpic_height_minus1[i]
+                            m_reader.skipBits(static_cast<unsigned>(ceil(log2(tmpHeightVal))));  // sps_subpic_height_minus1[i]
                     }
                     if (!sps_independent_subpics_flag)
                         m_reader.skipBits(
@@ -566,7 +566,7 @@ int VvcSpsUnit::deserialize()
                 }
             }
             const unsigned sps_subpic_id_len = extractUEGolombCode() + 1;
-            if (sps_subpic_id_len > 16 || (unsigned)(1 << sps_subpic_id_len) < (sps_num_subpics_minus1 + 1))
+            if (sps_subpic_id_len > 16 || static_cast<unsigned>(1 << sps_subpic_id_len) < (sps_num_subpics_minus1 + 1))
                 return 1;
             if (m_reader.getBit())  // sps_subpic_id_mapping_explicitly_signalled_flag
             {
@@ -599,7 +599,7 @@ int VvcSpsUnit::deserialize()
                 return 1;
         }
         const unsigned sps_log2_min_luma_coding_block_size_minus2 = extractUEGolombCode();
-        if (sps_log2_min_luma_coding_block_size_minus2 > (unsigned)min(4, (int)sps_log2_ctu_size_minus5 + 3))
+        if (sps_log2_min_luma_coding_block_size_minus2 > static_cast<unsigned>(min(4, static_cast<int>(sps_log2_ctu_size_minus5) + 3)))
             return 1;
         const unsigned MinCbLog2SizeY = sps_log2_min_luma_coding_block_size_minus2 + 2;
         m_reader.skipBit();  // sps_partition_constraints_override_enabled_flag
@@ -678,7 +678,7 @@ int VvcSpsUnit::deserialize()
                 if (sps_qp_table_start_minus26 < (-26 - QpBdOffset) || sps_qp_table_start_minus26 > 36)
                     return 1;
                 const unsigned sps_num_points_in_qp_table_minus1 = extractUEGolombCode();
-                if (sps_num_points_in_qp_table_minus1 > (unsigned)(36 - sps_qp_table_start_minus26))
+                if (sps_num_points_in_qp_table_minus1 > static_cast<unsigned>(36 - sps_qp_table_start_minus26))
                     return 1;
                 for (size_t j = 0; j <= sps_num_points_in_qp_table_minus1; j++)
                 {
@@ -740,7 +740,7 @@ int VvcSpsUnit::deserialize()
                     return 1;
             }
         }
-        if (extractUEGolombCode() + 2 > (unsigned)CtbLog2SizeY)  // sps_log2_parallel_merge_level_minus2
+        if (extractUEGolombCode() + 2 > static_cast<unsigned>(CtbLog2SizeY))  // sps_log2_parallel_merge_level_minus2
             return 1;
 
         m_reader.skipBits(3);  // sps_isp_enabled_flag, sps_mrl_enabled_flag, sps_mip_enabled_flag
@@ -790,7 +790,7 @@ int VvcSpsUnit::deserialize()
             if (m_reader.getBit())  // sps_virtual_boundaries_present_flag
             {
                 const unsigned sps_num_ver_virtual_boundaries = extractUEGolombCode();
-                if (sps_num_ver_virtual_boundaries > (unsigned)(pic_width_max_in_luma_samples <= 8 ? 0 : 3))
+                if (sps_num_ver_virtual_boundaries > static_cast<unsigned>(pic_width_max_in_luma_samples <= 8 ? 0 : 3))
                     return 1;
                 for (size_t i = 0; i < sps_num_ver_virtual_boundaries; i++)
                 {
@@ -799,7 +799,7 @@ int VvcSpsUnit::deserialize()
                         return 1;
                 }
                 const unsigned sps_num_hor_virtual_boundaries = extractUEGolombCode();
-                if (sps_num_hor_virtual_boundaries > (unsigned)(pic_height_max_in_luma_samples <= 8 ? 0 : 3))
+                if (sps_num_hor_virtual_boundaries > static_cast<unsigned>(pic_height_max_in_luma_samples <= 8 ? 0 : 3))
                     return 1;
                 for (size_t i = 0; i < sps_num_hor_virtual_boundaries; i++)
                 {
@@ -872,7 +872,7 @@ int VvcSpsUnit::ref_pic_list_struct(const size_t rplsIdx)
 
 double VvcSpsUnit::getFPS() const
 {
-    return m_sps_hrd.num_units_in_tick ? m_sps_hrd.time_scale / (float)m_sps_hrd.num_units_in_tick : 0;
+    return m_sps_hrd.num_units_in_tick ? m_sps_hrd.time_scale / static_cast<float>(m_sps_hrd.num_units_in_tick) : 0;
 }
 
 string VvcSpsUnit::getDescription() const

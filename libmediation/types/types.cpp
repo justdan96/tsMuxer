@@ -46,7 +46,8 @@ uint64_t my_ntohll(const uint64_t& original)
 #ifdef SPARC_V9  // big endian
     return original;
 #else  // little endian
-    return (((uint64_t)my_ntohl((uint32_t)original)) << 32) | ((uint64_t)my_ntohl((uint32_t)(original >> 32)));
+    return (static_cast<uint64_t>(my_ntohl(static_cast<uint32_t>(original))) << 32) |
+           static_cast<uint64_t>(my_ntohl(static_cast<uint32_t>(original >> 32)));
 #endif
 }
 
@@ -55,7 +56,8 @@ uint64_t my_htonll(const uint64_t& original)
 #ifdef SPARC_V9  // big endian
     return original;
 #else  // little endian
-    return (((uint64_t)my_ntohl((uint32_t)original)) << 32) | ((uint64_t)my_ntohl((uint32_t)(original >> 32)));
+    return (static_cast<uint64_t>(my_ntohl(static_cast<uint32_t>(original))) << 32) |
+           static_cast<uint64_t>(my_ntohl(static_cast<uint32_t>(original >> 32)));
 #endif
 }
 
@@ -89,13 +91,13 @@ uint32_t strToInt32u(const char* const str, const int radix)
     return static_cast<uint32_t>(strtoul(str, nullptr, radix));
 }
 
-int16_t strToInt16(const char* const str) { return (int16_t)strtol(str, nullptr, 10); }
+int16_t strToInt16(const char* const str) { return static_cast<int16_t>(strtol(str, nullptr, 10)); }
 
-uint16_t strToInt16u(const char* const str) { return (uint16_t)strtol(str, nullptr, 10); }
+uint16_t strToInt16u(const char* const str) { return static_cast<uint16_t>(strtol(str, nullptr, 10)); }
 
-int8_t strToInt8(const char* const str) { return (int8_t)strtol(str, nullptr, 10); }
+int8_t strToInt8(const char* const str) { return static_cast<int8_t>(strtol(str, nullptr, 10)); }
 
-uint8_t strToInt8u(const char* const str) { return (uint8_t)strtol(str, nullptr, 10); }
+uint8_t strToInt8u(const char* const str) { return static_cast<uint8_t>(strtol(str, nullptr, 10)); }
 
 double strToDouble(const char* const str) { return strtod(str, nullptr); }
 
@@ -212,7 +214,7 @@ uint64_t roundUp64(const uint64_t& value, const uint64_t& roundVal)
 
 string strPadLeft(const string& str, const size_t newSize, const char filler)
 {
-    const int cnt = (int)(newSize - str.size());
+    const int cnt = static_cast<int>(newSize - str.size());
     string prefix = "";
     for (int i = 0; i < cnt; i++) prefix += filler;
     return prefix + str;
@@ -220,7 +222,7 @@ string strPadLeft(const string& str, const size_t newSize, const char filler)
 
 string strPadRight(const string& str, const size_t newSize, const char filler)
 {
-    const int cnt = (int)(newSize - str.size());
+    const int cnt = static_cast<int>(newSize - str.size());
     string postfix = "";
     for (int i = 0; i < cnt; i++) postfix += filler;
     return str + postfix;
@@ -444,13 +446,13 @@ string strToLowerCase(const string& src)
 
 uint32_t my_ntohl(uint32_t val)
 {
-    const auto* tmp = (uint8_t*)&val;
+    const auto* tmp = reinterpret_cast<uint8_t*>(&val);
     return tmp[3] + (tmp[2] << 8) + (tmp[1] << 16) + (tmp[0] << 24);
 }
 
 uint16_t my_ntohs(uint16_t val)
 {
-    const auto* tmp = (uint8_t*)&val;
+    const auto* tmp = reinterpret_cast<uint8_t*>(&val);
     return tmp[1] + (tmp[0] << 8);
 }
 
@@ -501,7 +503,10 @@ std::vector<wchar_t> fromAcp(const char* acpStr, const int sz)
     return mbtwc_wrapper(CP_ACP, acpStr, sz, requiredSiz);
 }
 
-std::vector<wchar_t> toWide(const std::string& utf8Str) { return toWide(utf8Str.c_str(), (int)utf8Str.size()); }
+std::vector<wchar_t> toWide(const std::string& utf8Str)
+{
+    return toWide(utf8Str.c_str(), static_cast<int>(utf8Str.size()));
+}
 
 std::vector<wchar_t> toWide(const char* utf8Str, const int sz)
 {

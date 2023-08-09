@@ -29,9 +29,9 @@ int HevcUnit::extractSEGolombCode()
 {
     const unsigned rez = extractUEGolombCode();
     if (rez % 2 == 0)
-        return -(int)(rez / 2);
+        return -static_cast<int>(rez / 2);
     else
-        return (int)((rez + 1) / 2);
+        return static_cast<int>((rez + 1) / 2);
 }
 
 void HevcUnit::decodeBuffer(const uint8_t* buffer, const uint8_t* end)
@@ -47,7 +47,7 @@ int HevcUnit::deserialize()
     try
     {
         m_reader.skipBit();
-        nal_unit_type = (NalType)m_reader.getBits(6);
+        nal_unit_type = static_cast<NalType>(m_reader.getBits(6));
         nuh_layer_id = m_reader.getBits(6);
         nuh_temporal_id_plus1 = m_reader.getBits(3);
         if (nuh_temporal_id_plus1 == 0 ||
@@ -232,15 +232,18 @@ int HevcVpsUnit::deserialize()
 
 void HevcVpsUnit::setFPS(const double fps)
 {
-    time_scale = (uint32_t)(fps + 0.5) * 1000000;
-    num_units_in_tick = (unsigned)(time_scale / fps + 0.5);
+    time_scale = static_cast<uint32_t>(fps + 0.5) * 1000000;
+    num_units_in_tick = static_cast<unsigned>(time_scale / fps + 0.5);
 
     assert(num_units_in_tick_bit_pos > 0);
     updateBits(num_units_in_tick_bit_pos, 32, num_units_in_tick);
     updateBits(num_units_in_tick_bit_pos + 32, 32, time_scale);
 }
 
-double HevcVpsUnit::getFPS() const { return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0; }
+double HevcVpsUnit::getFPS() const
+{
+    return num_units_in_tick ? time_scale / static_cast<float>(num_units_in_tick) : 0;
+}
 
 string HevcVpsUnit::getDescription() const
 {
@@ -651,7 +654,10 @@ int HevcSpsUnit::deserialize()
     }
 }
 
-double HevcSpsUnit::getFPS() const { return num_units_in_tick ? time_scale / (float)num_units_in_tick : 0; }
+double HevcSpsUnit::getFPS() const
+{
+    return num_units_in_tick ? time_scale / static_cast<float>(num_units_in_tick) : 0;
+}
 
 string HevcSpsUnit::getDescription() const
 {
