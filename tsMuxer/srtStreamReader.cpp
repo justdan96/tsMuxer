@@ -37,7 +37,7 @@ void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool las
 {
     m_lastBlock = lastBlock;
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
-    if (m_tmpBuffer.size() > 0)
+    if (!m_tmpBuffer.empty())
         memmove(dataBegin, m_tmpBuffer.data(), m_tmpBuffer.size());
     const int parsedLen = parseText(dataBegin, dataLen + static_cast<int>(m_tmpBuffer.size()));
     const int rest = dataLen + static_cast<int>(m_tmpBuffer.size()) - parsedLen;
@@ -167,7 +167,7 @@ int SRTStreamReader::readPacket(AVPacket& avPacket)
         if (renderedBuffer)
         {
             m_dstSubCodec->setBuffer(renderedBuffer - MAX_AV_PACKET_SIZE, renderedLen,
-                                     m_lastBlock && m_sourceText.size() == 0);
+                                     m_lastBlock && m_sourceText.empty());
             return m_dstSubCodec->readPacket(avPacket);
         }
         else
@@ -179,17 +179,17 @@ int SRTStreamReader::readPacket(AVPacket& avPacket)
 uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
 {
     uint8_t* rez = nullptr;
-    if (m_sourceText.size() == 0)
+    if (m_sourceText.empty())
         return nullptr;
     if (m_state == ParseState::PARSE_FIRST_LINE)
     {
-        while (m_sourceText.size() > 0 && m_sourceText.front().size() == 0)
+        while (!m_sourceText.empty() && m_sourceText.front().empty())
         {
             m_sourceText.pop();  // delete empty lines before message
             m_processedSize += m_origSize.front();
             m_origSize.pop();
         }
-        if (m_sourceText.size() == 0)
+        if (m_sourceText.empty())
             return nullptr;
         m_state = ParseState::PARSE_TIME;
         bool isNUmber = true;
@@ -206,7 +206,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
             m_sourceText.pop();
             m_processedSize += m_origSize.front();
             m_origSize.pop();
-            if (m_sourceText.size() == 0)
+            if (m_sourceText.empty())
                 return nullptr;
         }
     }
@@ -218,13 +218,13 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_sourceText.pop();
         m_processedSize += m_origSize.front();
         m_origSize.pop();
-        if (m_sourceText.size() == 0)
+        if (m_sourceText.empty())
             return nullptr;
     }
 
-    while (m_sourceText.size() > 0 && m_sourceText.front().size() > 0)
+    while (!m_sourceText.empty() && !m_sourceText.front().empty())
     {
-        if (m_renderedText.size() > 0)
+        if (!m_renderedText.empty())
             m_renderedText += '\n';
         m_renderedText += m_sourceText.front();
         m_sourceText.pop();
@@ -232,9 +232,9 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
         m_origSize.pop();
     }
 
-    if (m_sourceText.size() == 0)
+    if (m_sourceText.empty())
     {
-        if (m_lastBlock && m_renderedText.size() > 0)
+        if (m_lastBlock && !m_renderedText.empty())
         {
             m_state = ParseState::PARSE_FIRST_LINE;
             m_renderedText.clear();

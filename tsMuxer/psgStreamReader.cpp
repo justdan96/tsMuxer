@@ -159,7 +159,7 @@ void PGSStreamReader::yuvToRgb(const int minY) const
 
 void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset)
 {
-    if (m_dstRle.size() == 0)
+    if (m_dstRle.empty())
         return;
     uint8_t* src = m_dstRle.data();
     const uint8_t* srcEnd = src + m_dstRle.size();
@@ -422,7 +422,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     avPacket.flags = 0;
     avPacket.duration = 0;
 
-    if (m_renderedBlocks.size() > 0)
+    if (!m_renderedBlocks.empty())
     {  // rendered data block (rescaled PGS). send it.
         if (m_firstRenderedPacket)
             avPacket.flags += AVPacket::FORCE_NEW_FRAME;
@@ -703,7 +703,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     avPacket.size = 3ll + avLen;
     if (m_needRescale)
     {
-        if (m_renderedBlocks.size() > 0)
+        if (!m_renderedBlocks.empty())
         {
             avPacket.pts = m_renderedBlocks.begin()->pts * INT_FREQ_TO_TS_FREQ;
             avPacket.dts = m_renderedBlocks.begin()->dts * INT_FREQ_TO_TS_FREQ;
@@ -725,11 +725,11 @@ void PGSStreamReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock
     if ((size_t)(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
-    if (m_tmpBuffer.size() > 0)
+    if (!m_tmpBuffer.empty())
         memmove(m_tmpBuffer.data() + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
     m_tmpBufferLen += dataLen;
 
-    if (m_tmpBuffer.size() > 0)
+    if (!m_tmpBuffer.empty())
         m_curPos = m_buffer = m_tmpBuffer.data();
     else
         m_curPos = m_buffer = nullptr;

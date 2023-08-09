@@ -523,7 +523,7 @@ void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
 
     auto curM2TSPCR = static_cast<double>(m_prevM2TSPCR);
     uint8_t* curPos;
-    if (m_m2tsDelayBlocks.size() > 0)
+    if (!m_m2tsDelayBlocks.empty())
     {
         int offset = m_prevM2TSPCROffset;
         for (const auto& i : m_m2tsDelayBlocks)
@@ -759,7 +759,7 @@ void TSMuxer::gotoNextFile(const uint64_t newPts)
     {
         PMTStreamInfo& pmtInfo = si;
         pmtInfo.m_codecReader->onSplitEvent();
-        if (pmtInfo.m_index.size() == 0)
+        if (pmtInfo.m_index.empty())
             continue;
         pmtInfo.m_index.push_back(PMTIndex());
     }
@@ -1347,7 +1347,7 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
     for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
-        if (paramPair.size() == 0)
+        if (paramPair.empty())
             continue;
         if (paramPair[0] == "--no-pcr-on-video-pid")
             setPCROnVideoPID(false);

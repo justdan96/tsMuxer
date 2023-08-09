@@ -419,7 +419,7 @@ int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, const uint32_t size, i
 
 int MatroskaDemuxer::matroska_deliver_packet(AVPacket *&avPacket)
 {
-    if (packets.size() > 0)
+    if (!packets.empty())
     {
         avPacket = packets.front();
         packets.pop();
@@ -1029,7 +1029,7 @@ void MatroskaDemuxer::readClose()
 {
     delete[] writing_app;
     delete[] muxing_app;
-    while (packets.size() > 0)
+    while (!packets.empty())
     {
         const AVPacket *pkt = packets.front();
         delete[] pkt->data;
@@ -1567,7 +1567,7 @@ int MatroskaDemuxer::matroska_parse_chapters()
             bool uidFound = false;
             char *title = nullptr;
             // if there is more than one chapter edition we take only the first one
-            if (chapters.size() > 0)
+            if (!chapters.empty())
             {
                 ebml_read_skip();
                 break;

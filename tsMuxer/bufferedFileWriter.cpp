@@ -63,7 +63,7 @@ void BufferedFileWriter::thread_main()
             m_lastErrorCode = -1;
             LTRACE(LT_ERROR, 0, "BufferedFileWriter::thread_main() throws unknown exception");
         }
-        m_nothingToExecute = m_writeQueue.size() == 0;
+        m_nothingToExecute = m_writeQueue.empty();
     }
 }
 

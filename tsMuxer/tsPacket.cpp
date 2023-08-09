@@ -840,7 +840,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
                 processStream.push_back(si);
         }
     }
-    if (processStream.size() == 0)
+    if (processStream.empty())
         for (const auto& [index, si] : m_streamInfo)
         {
             const StreamType coding_type = si.stream_coding_type;
@@ -854,7 +854,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
                 break;
             }
         }
-    if (processStream.size() == 0)
+    if (processStream.empty())
         THROW(ERR_COMMON, "Can't create EP map. One audio or video stream is needed.");
     // ------------------
     writer.putBits(8, 0);                                      // reserved_for_word_align
@@ -868,7 +868,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
         writer.putBits(4, EP_stream_type);
         std::vector<BluRayCoarseInfo> coarseInfo = buildCoarseInfo(i);
         writer.putBits(16, static_cast<int>(coarseInfo.size()));  // number_of_EP_coarse_entries[k]
-        if (i.m_index.size() > 0)
+        if (!i.m_index.empty())
             writer.putBits(18, static_cast<int>(i.m_index[m_clpiNum].size()));  // number_of_EP_fine_entries[k]
         else
             writer.putBits(18, 0);
@@ -890,7 +890,7 @@ void CLPIParser::composeEP_map(BitStreamWriter& writer, const bool isSSExt)
 std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& streamInfo) const
 {
     std::vector<BluRayCoarseInfo> rez;
-    if (streamInfo.m_index.size() == 0)
+    if (streamInfo.m_index.empty())
         return rez;
     uint32_t cnt = 0;
     int64_t lastPktCnt = 0;
@@ -902,7 +902,7 @@ std::vector<BluRayCoarseInfo> CLPIParser::buildCoarseInfo(M2TSStreamInfo& stream
         const auto newCoarsePts = static_cast<uint32_t>(fst >> 19);
         const uint32_t lastCoarseSPN = lastPktCnt & 0xfffe0000;
         const uint32_t newCoarseSPN = indexData.m_pktCnt & 0xfffe0000;
-        if (rez.size() == 0 || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
+        if (rez.empty() || newCoarsePts != lastCoarsePts || lastCoarseSPN != newCoarseSPN)
         {
             rez.push_back(BluRayCoarseInfo(newCoarsePts, cnt, indexData.m_pktCnt));
         }
@@ -928,7 +928,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
     if (writer.getBitsCount() % 16 != 0)
         writer.putBits(8, 0);  // padding_word
     *epFineStartAddr = my_htonl(writer.getBitsCount() / 8 - beforePos);
-    if (streamInfo.m_index.size() > 0)
+    if (!streamInfo.m_index.empty())
     {
         const PMTIndex& curIndex = streamInfo.m_index[m_clpiNum];
         for (const auto& [fst, snd] : curIndex)
@@ -1721,14 +1721,14 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
 
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
-    else if (pmtIndexList[playItemNum - 1].size() > 0)
+    else if (!pmtIndexList[playItemNum - 1].empty())
         writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first / 2));
     else
         writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);
-    else if (pmtIndexList[playItemNum + 1].size() > 0)
+    else if (!pmtIndexList[playItemNum + 1].empty())
         writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
         writer.putBits(32, OUT_time);
@@ -1737,7 +1737,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
     // sync_start_PTS_of_PlayItem
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
-    else if (pmtIndexList[playItemNum - 1].size() > 0)
+    else if (!pmtIndexList[playItemNum - 1].empty())
         writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first) / 2);
     else
         writer.putBits(32, IN_time);
@@ -1820,7 +1820,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::
             {
                 if (i == 0)
                     writer.putBits(32, IN_time);
-                else if (pmtIndexList[i - 1].size() > 0)
+                else if (!pmtIndexList[i - 1].empty())
                     writer.putBits(32, static_cast<unsigned>(pmtIndexList[i].begin()->first / 2));
                 else
                     writer.putBits(32, IN_time);
@@ -2023,7 +2023,7 @@ void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlo
     const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
     const int initPos = writer.getBitsCount() / 8;
-    if (extDataBlockInfo.size() > 0)
+    if (!extDataBlockInfo.empty())
     {
         writer.putBits(32, 0);  // data_block_start_address
         writer.putBits(24, 0);  // reserved_for_word_align
@@ -2107,14 +2107,14 @@ void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemN
     writer.putBits(8, ref_to_STC_id);
     if (playItemNum == 0)
         writer.putBits(32, IN_time);
-    else if (pmtIndexList[playItemNum - 1].size() > 0)
+    else if (!pmtIndexList[playItemNum - 1].empty())
         writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum].begin()->first) / 2);
     else
         writer.putBits(32, IN_time);
 
     if (playItemNum == pmtIndexList.size() - 1)
         writer.putBits(32, OUT_time);
-    else if (pmtIndexList[playItemNum + 1].size() > 0)
+    else if (!pmtIndexList[playItemNum + 1].empty())
         writer.putBits(32, static_cast<unsigned>(pmtIndexList[playItemNum + 1].begin()->first / 2));
     else
         writer.putBits(32, OUT_time);
@@ -2156,7 +2156,7 @@ int MPLSParser::calcPlayItemID(MPLSStreamInfo& streamInfo, const uint32_t pts)
 {
     for (size_t i = 0; i < streamInfo.m_index.size(); i++)
     {
-        if (streamInfo.m_index[i].size() > 0)
+        if (!streamInfo.m_index[i].empty())
         {
             if (streamInfo.m_index[i].begin()->first > pts)
                 return FFMAX((int)i, 1) - 1;
@@ -2171,7 +2171,7 @@ void MPLSParser::composePlayListMark(BitStreamWriter& writer)
     writer.putBits(32, 0);  // length
     const int beforeCount = writer.getBitsCount() / 8;
     MPLSStreamInfo& streamInfo = MPLSParser::getMainStream();
-    if (m_marks.size() == 0)
+    if (m_marks.empty())
     {
         if (m_chapterLen == 0)
             m_marks.push_back(PlayListMark(-1, IN_time));

@@ -604,7 +604,7 @@ long TextToPGSConverter::composeObjectDefinition(uint8_t* buff, const int64_t pt
         blocks++;
     } while (srcProcessed < m_rleLen);
     AV_WB24(sizePos, m_rleLen + 4);  // object len
-    if (seqPos.size() > 0)
+    if (!seqPos.empty())
     {
         *(seqPos[0]) |= 0x80;
         *(seqPos[seqPos.size() - 1]) |= 0x40;

@@ -121,7 +121,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                             trackList.insert(std::make_pair(
                                 snd.m_pid, TrackInfo(static_cast<int>(snd.m_streamType), snd.m_lang, 0)));
                         nonProcPMTPid.erase(pid);
-                        if (nonProcPMTPid.size() == 0 && !mvcContinueExpected())
+                        if (nonProcPMTPid.empty() && !mvcContinueExpected())
                         {  // all pmt pids processed
                             auto br = dynamic_cast<BufferedFileReader*>(m_bufferedReader);
                             if (br)
@@ -267,7 +267,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     }
 
     bool forpmtm2tsHdrDiscarded = m_m2tsHdrDiscarded;
-    if (m_pmt.pidList.size() == 0 || mvcContinueExpected())
+    if (m_pmt.pidList.empty() || mvcContinueExpected())
     {
         TS_program_association_section pat;
         for (m_curPos = data; m_curPos <= lastFrameAddr; m_curPos += TS_FRAME_SIZE)

@@ -924,7 +924,7 @@ bool H264StreamReader::skipNal(uint8_t *nal)
 
 int H264StreamReader::processSEI(uint8_t *buff)
 {
-    if (m_spsMap.size() > 0)
+    if (!m_spsMap.empty())
     {
         SEIUnit lastSEI;
         uint8_t *nextNal = NALUnit::findNALWithStartCode(buff, m_bufEnd, true);
@@ -1425,21 +1425,21 @@ int H264StreamReader::processPPS(uint8_t *buff)
 
 int H264StreamReader::getStreamWidth() const
 {
-    if (m_spsMap.size() == 0)
+    if (m_spsMap.empty())
         return 0;
     return m_spsMap.begin()->second->getWidth();
 }
 
 int H264StreamReader::getStreamHeight() const
 {
-    if (m_spsMap.size() == 0)
+    if (m_spsMap.empty())
         return 0;
     return m_spsMap.begin()->second->getHeight();
 }
 
 bool H264StreamReader::getInterlaced()
 {
-    if (m_spsMap.size() == 0)
+    if (m_spsMap.empty())
         return true;
     return !m_spsMap.begin()->second->frame_mbs_only_flag;
 }

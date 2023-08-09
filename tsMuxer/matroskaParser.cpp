@@ -267,7 +267,7 @@ void ParsedVC1TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int siz
         pkt->size += 4;
     pkt->data = new uint8_t[pkt->size];
     uint8_t* dst = pkt->data;
-    if (m_firstPacket && m_seqHeader.size() > 0)
+    if (m_firstPacket && !m_seqHeader.empty())
     {
         memcpy(dst, m_seqHeader.data(), m_seqHeader.size());
         dst += m_seqHeader.size();

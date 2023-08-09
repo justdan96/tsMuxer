@@ -329,7 +329,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
                 string playItemName;
                 if (isSubStream)
                 {
-                    if (mplsInfo.m_mvcFiles.size() == 0)
+                    if (mplsInfo.m_mvcFiles.empty())
                     {
                         THROW(ERR_INVALID_CODEC_FORMAT,
                               "Current playlist file doesn't has MVC track info. Please, remove MVC track from the "
@@ -411,7 +411,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size()) + 1);
     codecReader->setTimeOffset(m_timeOffset);
 
-    if (m_codecInfo.size() == 0)
+    if (m_codecInfo.empty())
         codecReader->m_flags |= AVPacket::PCR_STREAM;
 
     AbstractReader* dataReader;
@@ -636,7 +636,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             StreamData& vect = itr.second;
             CheckStreamRez trackRez = detectTrackReader(vect.data(), static_cast<int>(vect.size()), containerType,
                                                         acceptedPidMap[itr.first].m_trackType, itr.first);
-            if (trackRez.codecInfo.programName.size() > 0)
+            if (!trackRez.codecInfo.programName.empty())
             {
                 if (trackRez.codecInfo.programName[0] != 'S')
                     trackRez.delay = demuxer->getTrackDelay(itr.first);
@@ -1064,7 +1064,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                 const string& s = addParam.second;
                 if (s.size() >= 2 && s[0] == '0' && s[1] == 'x')
                     font.m_color = strToInt32u(s.substr(2, s.size() - 2).c_str(), 16);
-                else if (s.size() >= 1 && s[0] == 'x')
+                else if (!s.empty() && s[0] == 'x')
                     font.m_color = strToInt32u(s.substr(1, s.size() - 1).c_str(), 16);
                 else
                     font.m_color = strToInt32u(s.c_str());

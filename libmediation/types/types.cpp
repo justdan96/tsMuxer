@@ -230,7 +230,7 @@ string strPadRight(const string& str, const size_t newSize, const char filler)
 
 bool strEndWith(const string& str, const string& substr)
 {
-    if (str.size() == 0)
+    if (str.empty())
         return false;
     size_t idx = str.size();
     for (size_t i = substr.size(); i-- > 0;)
@@ -313,7 +313,7 @@ string extractFileExt(const string& src)
         if (src[i] == '.')
         {
             string rez = src.substr(i + 1);
-            if (rez.size() > 0 && rez[rez.size() - 1] == '\"')
+            if (!rez.empty() && rez[rez.size() - 1] == '\"')
                 return rez.substr(0, rez.size() - 1);
             else
                 return rez;
@@ -333,7 +333,7 @@ string extractFileName(const string& src)
         else if (src[i] == '/' || src[i] == '\\')
         {
             string rez = src.substr(i + 1, endPos - i - 1);
-            if (rez.size() > 0 && rez[rez.size() - 1] == '\"')
+            if (!rez.empty() && rez[rez.size() - 1] == '\"')
                 return rez.substr(0, rez.size() - 1);
             else
                 return rez;

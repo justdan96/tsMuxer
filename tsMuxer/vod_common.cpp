@@ -35,9 +35,9 @@ bool isFillerNullPacket(uint8_t* curBuf)
 std::string unquoteStr(const std::string& val)
 {
     std::string tmp = val;
-    if (val.size() > 0 && val[0] == '\"')
+    if (!val.empty() && val[0] == '\"')
         tmp = tmp.substr(1, tmp.size());
-    if (val.size() > 0 && val[val.size() - 1] == '\"')
+    if (!val.empty() && val[val.size() - 1] == '\"')
         tmp = tmp.substr(0, tmp.size() - 1);
     return tmp;
 }
@@ -60,7 +60,7 @@ std::vector<std::string> extractFileList(const std::string& val)
                 std::string tmp = val.substr(lastStartPos, i - lastStartPos);
                 tmp = trimStr(tmp);
                 tmp = unquoteStr(tmp);
-                if (tmp.size() > 0)
+                if (!tmp.empty())
                     rez.push_back(tmp);
             }
             lastStartPos = i + 1;
@@ -73,7 +73,7 @@ std::vector<std::string> extractFileList(const std::string& val)
         std::string tmp = val.substr(lastStartPos, val.size());
         tmp = trimStr(tmp);
         tmp = unquoteStr(tmp);
-        if (tmp.size() > 0)
+        if (!tmp.empty())
             rez.push_back(tmp);
     }
     return rez;
@@ -111,11 +111,11 @@ std::string floatToTime(const double time, const char msSeparator)
 
 double timeToFloat(const std::string& chapterStr)
 {
-    if (chapterStr.size() == 0)
+    if (chapterStr.empty())
         return 0;
     const std::vector<std::string> timeParts = splitStr(chapterStr.c_str(), ':');
     double sec = 0;
-    if (timeParts.size() > 0)
+    if (!timeParts.empty())
         sec = strToDouble(timeParts[timeParts.size() - 1].c_str());
     int min = 0;
     if (timeParts.size() > 1)

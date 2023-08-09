@@ -331,7 +331,7 @@ void SingleFileMuxer::parseMuxOpt(const std::string& opts)
     for (auto& i : params)
     {
         vector<string> paramPair = splitStr(trimStr(i).c_str(), '=');
-        if (paramPair.size() == 0)
+        if (paramPair.empty())
             continue;
         if (paramPair[0] == "--split-duration")
         {

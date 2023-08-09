@@ -58,7 +58,7 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
             for (const auto& param : params)
             {
                 vector<string> paramPair = splitStr(trimStr(param).c_str(), '=');
-                if (paramPair.size() == 0)
+                if (paramPair.empty())
                     continue;
                 if (paramPair[0] == "--auto-chapters")
                     autoChapterLen = strToInt32(paramPair[1].c_str()) * 60;
@@ -198,7 +198,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
     }
 
     AVChapters& chapters = streamInfo.chapters;
-    if (chapters.size() > 0 || streamInfo.fileDurationNano > 0)
+    if (!chapters.empty() || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
     if (streamInfo.fileDurationNano)
         LTRACE(LT_INFO, 2, "Duration: " << floatToTime(streamInfo.fileDurationNano / 1e9));
@@ -212,7 +212,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
         }
         LTRACE2(LT_INFO, floatToTime(time / 1e9) << " ");
     }
-    if (chapters.size() > 0 || streamInfo.fileDurationNano > 0)
+    if (!chapters.empty() || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
 }
 
@@ -612,7 +612,7 @@ int main(int argc, char** argv)
                 std::string ssifExt = shortExt ? ".SIF" : ".ssif";
                 bool mode3D = mplsParser.isDependStreamExist;
                 bool switchToSsif = false;
-                if (mplsParser.m_playItems.size() > 0)
+                if (!mplsParser.m_playItems.empty())
                 {
                     MPLSPlayItem& item = mplsParser.m_playItems[0];
                     string itemName = streamDir + item.fileName + mediaExt;

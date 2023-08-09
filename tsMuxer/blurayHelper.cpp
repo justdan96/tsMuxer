@@ -549,7 +549,7 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     mplsParser.OUT_time = static_cast<uint32_t>(lastPts / 2);
     mplsParser.mvc_base_view_r = isMvcBaseViewR;
 
-    if (customChapters.size() == 0)
+    if (customChapters.empty())
     {
         mplsParser.m_chapterLen = autoChapterLen;
     }

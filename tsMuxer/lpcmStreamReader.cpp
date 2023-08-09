@@ -866,7 +866,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
             return 0;
     }
     avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
-    if (m_tmpBuffer.size() > 0)
+    if (!m_tmpBuffer.empty())
         avPacket.data = m_tmpBuffer.data();
     else
         avPacket.data = nullptr;

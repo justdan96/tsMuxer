@@ -493,7 +493,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             else
                 buff += modifierLen;
         }
-        if (tags.size() > 0)
+        if (!tags.empty())
         {
             sort(tags.begin(), tags.end(), greater<>());
             for (auto i : tags) subtitleText.insert(i.first, i.second);
@@ -781,7 +781,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 url_fseek(m_mdat_pos);
         }
         discardSize += m_mdat_pos - beforeHeadersPos;
-        if (chunks.size() > 0)
+        if (!chunks.empty())
         {
             discardSize += chunks[m_curChunk].first;
             skip_bytes(chunks[m_curChunk].first);

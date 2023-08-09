@@ -154,7 +154,7 @@ const std::unordered_map<std::string, uint32_t> defaultPallette = {make_pair("bl
 
 size_t findUnquotedStr(const string& str, const string& substr)
 {
-    if (substr.size() == 0)
+    if (substr.empty())
         return string::npos;
     bool quote = false;
     for (size_t i = 0; i < str.size(); i++)
@@ -235,7 +235,7 @@ int TextSubtitlesRender::browserSizeToRealSize(const int bSize, double rSize)
 
 vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string& line, vector<Font>& fontStack) const
 {
-    if (fontStack.size() == 0)
+    if (fontStack.empty())
     {
         fontStack.push_back(m_font);
         fontStack[0].m_size = DEFAULT_BROWSER_STYLE_FS;
@@ -321,7 +321,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                     if (it != std::end(defaultPallette))
                     {
                         curFont.m_color = it->second;
-                        if (arg.size() > 0 && (arg[0] == '#' || arg[0] == 'x'))
+                        if (!arg.empty() && (arg[0] == '#' || arg[0] == 'x'))
                             curFont.m_color = strToInt32u(arg.substr(1, 16384).c_str(), 16);
                         else if (arg.size() > 1 && (arg[0] == '0' || arg[1] == 'x'))
                             curFont.m_color = strToInt32u(arg.substr(2, 16384).c_str(), 16);
@@ -335,7 +335,7 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                 if (fontSizePos != string::npos)
                 {
                     string arg = unquoteStr(findFontArg(tagStr, fontSizePos));
-                    if (arg.size() > 0)
+                    if (!arg.empty())
                     {
                         if (arg[0] == '+' || arg[0] == '-')
                             curFont.m_size += strToInt32(arg.c_str(), 10);
