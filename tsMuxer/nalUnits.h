@@ -79,7 +79,7 @@ class NALUnit
     static uint8_t* findNALWithStartCode(const uint8_t* buffer, const uint8_t* end, bool longCodesAllowed);
     static int encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
-    int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
+    static int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
                    bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
     int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
@@ -91,12 +91,12 @@ class NALUnit
     static unsigned extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd);
     static unsigned extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value);
-    void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
+    static void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
     const BitStreamReader& getBitReader() const { return bitReader; }
-    void write_rbsp_trailing_bits(BitStreamWriter& writer);
-    void write_byte_align_bits(BitStreamWriter& writer);
+    static void write_rbsp_trailing_bits(BitStreamWriter& writer);
+    static void write_byte_align_bits(BitStreamWriter& writer);
 
-    int calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end);  // for NAL with rbspTrailingBits only
+    static int calcNalLenInBits(const uint8_t* nalBuffer, const uint8_t* end);  // for NAL with rbspTrailingBits only
 
    protected:
     // GetBitContext getBitContext;
@@ -240,12 +240,12 @@ class SPSUnit : public NALUnit
     int getCropY();
     int getCropX();
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
-    void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
+    static void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
     int deserializeSubSPS();
     int seq_parameter_set_mvc_extension();
-    void seq_parameter_set_svc_extension();
-    void svc_vui_parameters_extension();
+    static void seq_parameter_set_svc_extension();
+    static void svc_vui_parameters_extension();
     int mvc_vui_parameters_extension();
 
    private:
@@ -298,34 +298,34 @@ class SEIUnit : public NALUnit
    private:
     void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuf, int payloadSize,
                      int orig_hrd_parameters_present_flag);
-    void buffering_period(int payloadSize);
+    static void buffering_period(int payloadSize);
     void pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag);
     void pic_timing(SPSUnit& sps, uint8_t* curBuf, int payloadSize, bool orig_hrd_parameters_present_flag);
-    void pan_scan_rect(int payloadSize);
-    void filler_payload(int payloadSize);
-    void user_data_registered_itu_t_t35(int payloadSize);
-    void user_data_unregistered(int payloadSize);
-    void recovery_point(int payloadSize);
-    void dec_ref_pic_marking_repetition(int payloadSize);
-    void spare_pic(int payloadSize);
-    void scene_info(int payloadSize);
-    void sub_seq_info(int payloadSize);
-    void sub_seq_layer_characteristics(int payloadSize);
-    void sub_seq_characteristics(int payloadSize);
-    void full_frame_freeze(int payloadSize);
-    void full_frame_freeze_release(int payloadSize);
-    void full_frame_snapshot(int payloadSize);
-    void progressive_refinement_segment_start(int payloadSize);
-    void progressive_refinement_segment_end(int payloadSize);
-    void motion_constrained_slice_group_set(int payloadSize);
-    void film_grain_characteristics(int payloadSize);
+    static void pan_scan_rect(int payloadSize);
+    static void filler_payload(int payloadSize);
+    static void user_data_registered_itu_t_t35(int payloadSize);
+    static void user_data_unregistered(int payloadSize);
+    static void recovery_point(int payloadSize);
+    static void dec_ref_pic_marking_repetition(int payloadSize);
+    static void spare_pic(int payloadSize);
+    static void scene_info(int payloadSize);
+    static void sub_seq_info(int payloadSize);
+    static void sub_seq_layer_characteristics(int payloadSize);
+    static void sub_seq_characteristics(int payloadSize);
+    static void full_frame_freeze(int payloadSize);
+    static void full_frame_freeze_release(int payloadSize);
+    static void full_frame_snapshot(int payloadSize);
+    static void progressive_refinement_segment_start(int payloadSize);
+    static void progressive_refinement_segment_end(int payloadSize);
+    static void motion_constrained_slice_group_set(int payloadSize);
+    static void film_grain_characteristics(int payloadSize);
     int mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag);
     void processBlurayOffsetMetadata();
-    void processBlurayGopStructure();
-    void deblocking_filter_display_preference(int payloadSize);
-    void stereo_video_info(int payloadSize);
-    void reserved_sei_message(int payloadSize);
-    int getNumClockTS(int pic_struct) const;
+    static void processBlurayGopStructure();
+    static void deblocking_filter_display_preference(int payloadSize);
+    static void stereo_video_info(int payloadSize);
+    static void reserved_sei_message(int payloadSize);
+    static int getNumClockTS(int pic_struct);
 };
 
 class SliceUnit : public NALUnit

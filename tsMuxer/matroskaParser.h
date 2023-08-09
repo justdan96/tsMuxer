@@ -222,7 +222,7 @@ class ParsedH264TrackData : public ParsedTrackPrivData
     bool m_firstExtract;
 
     std::vector<std::vector<uint8_t>> m_spsPpsList;
-    void writeNalHeader(uint8_t*& dst);
+    static void writeNalHeader(uint8_t*& dst);
     size_t getSPSPPSLen();
     int writeSPSPPS(uint8_t* dst);
     virtual bool spsppsExists(uint8_t* buff, int size);

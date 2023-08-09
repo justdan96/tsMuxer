@@ -165,7 +165,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
             {
                 uint8_t tmpBuffer[512];
                 int toDecode = (int)FFMIN(sizeof(tmpBuffer) - 8, nextNal - nal);
-                int decodedLen = slice.decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
+                int decodedLen = SliceUnit::decodeNAL(nal, nal + toDecode, tmpBuffer, sizeof(tmpBuffer));
                 int nalRez = slice.deserialize(tmpBuffer, tmpBuffer + decodedLen, m_spsMap, m_ppsMap);
                 if (nalRez != 0)
                     return rez;
@@ -269,10 +269,10 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUn
             int msgLen = writer.getBitsCount() - beforeMessageLen;
             *sizeField = msgLen / 8;
         }
-        sei.write_rbsp_trailing_bits(writer);
+        SEIUnit::write_rbsp_trailing_bits(writer);
         writer.flushBits();
 
-        int sRez = sei.encodeNAL(tmpBuffer, tmpBuffer + writer.getBitsCount() / 8, curPos, dstEnd - curPos);
+        int sRez = SEIUnit::encodeNAL(tmpBuffer, tmpBuffer + writer.getBitsCount() / 8, curPos, dstEnd - curPos);
         if (sRez == -1)
             THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
         curPos += sRez;
@@ -1074,7 +1074,7 @@ int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, uint8_t *buff, ui
         uint8_t *tmpBuffer = &m_decodedSliceHeader[0];
         int tmpBufferSize = (int)m_decodedSliceHeader.size();
         toDecode = FFMIN(tmpBufferSize - 8, maxHeaderSize);
-        int decodedLen = slice.decodeNAL(buff, buff + toDecode, tmpBuffer, tmpBufferSize);
+        int decodedLen = SliceUnit::decodeNAL(buff, buff + toDecode, tmpBuffer, tmpBufferSize);
         nalRez = slice.deserialize(tmpBuffer, tmpBuffer + decodedLen, m_spsMap, m_ppsMap);
         if (nalRez == NOT_ENOUGH_BUFFER && toDecode < maxHeaderSize)
             m_decodedSliceHeader.resize(m_decodedSliceHeader.size() + 1);

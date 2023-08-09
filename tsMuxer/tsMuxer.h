@@ -90,7 +90,7 @@ class TSMuxer : public AbstractMuxer
     void buildNULL();
     void buildPAT();
     void buildPMT();
-    void buildSIT();
+    static void buildSIT();
     void addData(int pesStreamID, int pid, AVPacket& avPacket);
     void buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid);
     void writePESPacket();

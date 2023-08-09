@@ -19,12 +19,12 @@ class MLPCodec
         : m_channels(0), m_samples(0), m_samplerate(0), m_bitrate(0), m_substreams(0), m_subType(MlpSubType::stUnknown)
     {
     }
-    uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
-    int getFrameSize(uint8_t* buffer);
+    static uint8_t* findFrame(uint8_t* buffer, uint8_t* end);
+    static int getFrameSize(uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);
     bool isMinorSync(uint8_t* buffer, uint8_t* end);
     uint64_t getFrameDuration();
-    int mlp_samplerate(int audio_sampling_frequency);
+    static int mlp_samplerate(int audio_sampling_frequency);
 
    public:
     int m_channels;

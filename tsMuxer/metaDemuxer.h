@@ -176,8 +176,8 @@ class METADemuxer : public AbstractDemuxer
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
     int getLastReadRez() override { return m_lastReadRez; }
     int64_t totalSize() const { return m_totalSize; }
-    std::string mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum);
-    std::string mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum);
+    static std::string mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum);
+    static std::string mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum);
     bool m_HevcFound;
 
    private:
@@ -199,7 +199,7 @@ class METADemuxer : public AbstractDemuxer
 
     friend class ContainerToReaderWrapper;
 
-    AbstractStreamReader* createCodec(const std::string& codecName, const std::map<std::string, std::string>& addParams,
+    static AbstractStreamReader* createCodec(const std::string& codecName, const std::map<std::string, std::string>& addParams,
                                       const std::string& codecStreamName, const std::vector<MPLSPlayItem>& mplsInfo);
     inline void updateReport(bool checkTime);
     void lineBack();
@@ -213,7 +213,7 @@ class METADemuxer : public AbstractDemuxer
     int addPGSubStream(const std::string& codec, const std::string& _codecStreamName,
                        const std::map<std::string, std::string>& addParams, MPLSStreamInfo* subStream);
     static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez);
-    std::vector<MPLSPlayItem> mergePlayItems(const std::vector<MPLSParser>& mplsInfoList);
+    static std::vector<MPLSPlayItem> mergePlayItems(const std::vector<MPLSParser>& mplsInfoList);
 };
 
 #endif

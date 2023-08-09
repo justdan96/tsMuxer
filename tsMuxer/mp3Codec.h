@@ -6,7 +6,7 @@
 class MP3Codec
 {
    public:
-    uint8_t* mp3FindFrame(uint8_t* buff, uint8_t* end);
+    static uint8_t* mp3FindFrame(uint8_t* buff, uint8_t* end);
     int mp3DecodeFrame(uint8_t* buff, uint8_t* end);
 
    protected:

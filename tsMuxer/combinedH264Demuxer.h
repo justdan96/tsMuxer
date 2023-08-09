@@ -26,7 +26,7 @@ class CombinedH264Reader
         Both
     };
 
-    int getPrefixLen(const uint8_t* pos, const uint8_t* end);
+    static int getPrefixLen(const uint8_t* pos, const uint8_t* end);
     void addDataToPrimary(const uint8_t* data, const uint8_t* dataEnd, DemuxedData& demuxedData, int64_t& discardSize);
     void addDataToSecondary(const uint8_t* data, const uint8_t* dataEnd, DemuxedData& demuxedData,
                             int64_t& discardSize);

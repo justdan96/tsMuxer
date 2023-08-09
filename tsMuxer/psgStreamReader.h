@@ -131,12 +131,12 @@ class PGSStreamReader : public AbstractStreamReader
     void video_descriptor(BitStreamReader& bitReader);
     void composition_descriptor(BitStreamReader& bitReader);
     void composition_object(BitStreamReader& bitReader);
-    void pgs_window(BitStreamReader& bitReader);
+    static void pgs_window(BitStreamReader& bitReader);
     void readPalette(uint8_t* pos, uint8_t* end);
     int readObjectDef(uint8_t* pos, uint8_t* end);
     void decodeRleData(int xOffset, int yOffset);
     void yuvToRgb(int minY);
-    void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
+    static void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
     void intDecodeStream(uint8_t* buffer, size_t len);
 
     int m_palleteID;

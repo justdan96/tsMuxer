@@ -1583,7 +1583,7 @@ void SEIUnit::sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int p
 
 void SEIUnit::buffering_period(int payloadSize) {}
 
-int SEIUnit::getNumClockTS(int pic_struct) const
+int SEIUnit::getNumClockTS(int pic_struct)
 {
     int NumClockTS = 0;
     switch (pic_struct)

@@ -82,9 +82,9 @@ class SRTStreamReader : public AbstractStreamReader
     ParseState m_state;
     uint8_t* renderNextMessage(uint32_t& renderedLen);
     bool parseTime(const std::string& text);
-    std::string detectUTF8Lang(uint8_t* buffer, int len);
+    static std::string detectUTF8Lang(uint8_t* buffer, int len);
     bool detectSrcFormat(uint8_t* dataStart, int len, int& prefixLen);
-    bool strOnlySpace(std::string& str);
+    static bool strOnlySpace(std::string& str);
 };
 
 #endif

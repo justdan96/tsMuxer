@@ -496,7 +496,7 @@ void CLPIStreamInfo::ISRC(BitStreamReader& reader)
     readString(recording_number, reader, 5);
 }
 
-void CLPIStreamInfo::composeISRC(BitStreamWriter& writer) const
+void CLPIStreamInfo::composeISRC(BitStreamWriter& writer)
 {
     writeString("\x30\x30", writer, 2);              // country_code
     writeString("\x30\x30\x30", writer, 3);          // copyright_holder

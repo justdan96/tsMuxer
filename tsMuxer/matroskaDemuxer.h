@@ -77,13 +77,13 @@ class MatroskaDemuxer : public IOContextDemuxer
     int ebml_read_skip();
     int ebml_read_uint(uint32_t *id, uint64_t *num);
     int ebml_read_sint(uint32_t *id, int64_t *num);
-    int matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num);
+    static int matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num);
     int matroska_parse_blockgroup(uint64_t cluster_time);
-    int matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
+    static int matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
     int matroska_find_track_by_num(uint64_t num);
     int matroska_parse_block(uint8_t *data, int size, int64_t pos, uint64_t cluster_time, uint64_t duration,
                              int is_keyframe, int is_bframe);
-    int rv_offset(uint8_t *data, int slice, int slices);
+    static int rv_offset(uint8_t *data, int slice, int slices);
     void matroska_queue_packet(AVPacket *pkt);
     int matroska_deliver_packet(AVPacket *&avPacket);
     int matroska_read_header();
@@ -100,7 +100,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int matroska_parse_tracks();
     int matroska_parse_chapters();
     int matroska_add_stream();
-    int getTrackType(MatroskaTrack *track);
+    static int getTrackType(MatroskaTrack *track);
 
     int readTrackEncodings(MatroskaTrack *track);
     int readTrackEncoding(MatroskaTrack *track);

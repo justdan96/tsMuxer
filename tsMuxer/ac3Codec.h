@@ -66,7 +66,7 @@ class AC3Codec
 
    protected:
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes);
-    uint8_t* findFrame(uint8_t* buff, uint8_t* end);
+    static uint8_t* findFrame(uint8_t* buff, uint8_t* end);
     uint64_t getFrameDuration();
     const CodecInfo& getCodecInfo();
     const std::string getStreamInfo();
@@ -99,7 +99,7 @@ class AC3Codec
     uint32_t m_bit_rateExt;
     bool m_extChannelsExists;
 
-    bool crc32(uint8_t* buf, int length);
+    static bool crc32(uint8_t* buf, int length);
     AC3ParseError parseHeader(uint8_t* buf, uint8_t* end);
 
     AC3ParseError testParseHeader(uint8_t* buf, uint8_t* end);

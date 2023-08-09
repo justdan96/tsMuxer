@@ -1054,13 +1054,13 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
             else if (addParam.first == "font-size")
                 font.m_size = strToInt32(addParam.second.c_str());
             else if (addParam.first == "font-bold")
-                font.m_opts |= font.BOLD;
+                font.m_opts |= text_subtitles::Font::BOLD;
             else if (addParam.first == "font-italic")
-                font.m_opts |= font.ITALIC;
+                font.m_opts |= text_subtitles::Font::ITALIC;
             else if (addParam.first == "font-underline")
-                font.m_opts |= font.UNDERLINE;
+                font.m_opts |= text_subtitles::Font::UNDERLINE;
             else if (addParam.first == "font-strike-out")
-                font.m_opts |= font.STRIKE_OUT;
+                font.m_opts |= text_subtitles::Font::STRIKE_OUT;
             else if (addParam.first == "font-color")
             {
                 const string& s = addParam.second;

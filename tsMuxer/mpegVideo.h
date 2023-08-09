@@ -136,11 +136,11 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     ~MPEGSequenceHeader() override{};
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeExtension(BitStreamReader& bitContext);
-    uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
+    static uint8_t* deserializeMatrixExtension(BitStreamReader& bitContext);
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitContext);
     double getFrameRate();
     void setFrameRate(uint8_t* buff, double fps);
-    void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
+    static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
     std::string getStreamDescr();
 };
 
@@ -239,11 +239,11 @@ class MPEGPictureHeader : public MPEGRawDataHeader
 class MPEGSliceHeader : public MPEGHeader
 {
    public:
-    void deserialize(uint8_t* buf, int buf_size);
+    static void deserialize(uint8_t* buf, int buf_size);
 
    private:
-    void macroblocks(BitStreamReader& reader);
-    int readMacroblockAddressIncrement(BitStreamReader& reader);
+    static void macroblocks(BitStreamReader& reader);
+    static int readMacroblockAddressIncrement(BitStreamReader& reader);
 };
 
 class MPEGUserDataHeader : public MPEGHeader

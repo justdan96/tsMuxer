@@ -220,14 +220,14 @@ class IsoWriter
     void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();
 
-    void writeEntity(FileEntryInfo* dir);
+    static void writeEntity(FileEntryInfo* dir);
     int allocateEntity(FileEntryInfo* dir, int sectorNum);
 
     void sectorSeek(Partition partition, int pos);
     void writeSector(uint8_t* sectorData);
     uint32_t absoluteSectorNum();
 
-    void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);
+    static void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);
     void writeDescriptors();
     void allocateMetadata();
     void writeMetadata(int lbn);

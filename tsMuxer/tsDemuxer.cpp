@@ -112,7 +112,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                     memcpy(pmtBuffer + pmtBufferLen, curPos + tsPacket->getHeaderSize(),
                            TS_FRAME_SIZE - tsPacket->getHeaderSize());
                     pmtBufferLen += TS_FRAME_SIZE - tsPacket->getHeaderSize();
-                    if (m_pmt.isFullBuff(pmtBuffer, pmtBufferLen))
+                    if (TS_program_map_section::isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
                         if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)
@@ -292,7 +292,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                     memcpy(pmtBuffer + pmtBufferLen, m_curPos + tsPacket->getHeaderSize(),
                            TS_FRAME_SIZE - tsPacket->getHeaderSize());
                     pmtBufferLen += TS_FRAME_SIZE - tsPacket->getHeaderSize();
-                    if (m_pmt.isFullBuff(pmtBuffer, pmtBufferLen))
+                    if (TS_program_map_section::isFullBuff(pmtBuffer, pmtBufferLen))
                     {
                         m_pmt.deserialize(pmtBuffer, pmtBufferLen);
                         if (m_pmt.video_type != (int)StreamType::VIDEO_MVC)

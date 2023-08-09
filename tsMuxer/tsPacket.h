@@ -291,7 +291,7 @@ struct TS_program_map_section
     uint32_t serialize(uint8_t* buffer, int max_buf_size, bool blurayMode, bool hdmvDescriptors);
 
    private:
-    void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);
+    static void extractDescriptors(uint8_t* curPos, int es_info_len, PMTStreamInfo& pmtInfo);
     void extractPMTDescriptors(uint8_t* curPos, int es_info_len);
     // uint32_t tmpAvCrc[257];
 };
@@ -403,7 +403,7 @@ struct CLPIStreamInfo : public M2TSStreamInfo
         memset(recording_year, 0, sizeof(recording_year));
         memset(recording_number, 0, sizeof(recording_number));
     }
-    void composeISRC(BitStreamWriter& writer) const;
+    static void composeISRC(BitStreamWriter& writer);
     void composeStreamCodingInfo(BitStreamWriter& writer) const;
 
    private:
@@ -461,27 +461,27 @@ class CLPIParser
     bool isDependStream;
 
    private:
-    void HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, int dataLength);
+    static void HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, int dataLength);
     void Extent_Start_Point(uint8_t* buffer, int dataLength);
     void ProgramInfo_SS(uint8_t* buffer, int dataLength);
-    void CPI_SS(uint8_t* buffer, int dataLength);
+    static void CPI_SS(uint8_t* buffer, int dataLength);
 
    private:
-    void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfo,
+    static void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfo,
                           std::map<int, CLPIStreamInfo>& streamInfo);
     void parseSequenceInfo(uint8_t* buffer, uint8_t* end);
-    void parseCPI(uint8_t* buffer, uint8_t* end);
-    void EP_map(BitStreamReader& reader);
-    void parseClipMark(uint8_t* buffer, uint8_t* end);
+    static void parseCPI(uint8_t* buffer, uint8_t* end);
+    static void EP_map(BitStreamReader& reader);
+    static void parseClipMark(uint8_t* buffer, uint8_t* end);
     void parseClipInfo(BitStreamReader& reader);
     void parseExtensionData(uint8_t* buffer, uint8_t* end);
     void TS_type_info_block(BitStreamReader& reader);
     void composeProgramInfo(BitStreamWriter& writer, bool isSsExt);
-    void composeTS_type_info_block(BitStreamWriter& writer);
+    static void composeTS_type_info_block(BitStreamWriter& writer);
     void composeClipInfo(BitStreamWriter& writer);
     void composeSequenceInfo(BitStreamWriter& writer);
     void composeCPI(BitStreamWriter& writer, bool isCPIExt);
-    void composeClipMark(BitStreamWriter& writer);
+    static void composeClipMark(BitStreamWriter& writer);
     void composeExtentInfo(BitStreamWriter& writer);
     void composeExtentStartPoint(BitStreamWriter& writer);
     void composeEP_map(BitStreamWriter& writer, bool isSSExt);
@@ -591,14 +591,14 @@ struct MPLSParser
                             std::vector<PMTIndex>& pmtIndexList);
     void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList, int type);
     int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList);
-    void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
+    static void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, uint8_t* dataEnd);
     void SubPath_extension(BitStreamWriter& writer);
     void parseStnTableSS(uint8_t* data, int dataLength);
 
     void AppInfoPlayList(BitStreamReader& reader);
     void composeAppInfoPlayList(BitStreamWriter& writer);
-    void UO_mask_table(BitStreamReader& reader);
+    static void UO_mask_table(BitStreamReader& reader);
     void parsePlayList(uint8_t* buffer, int len);
     void parsePlayItem(BitStreamReader& reader, int PlayItem_id);
     void parsePlayListMark(uint8_t* buffer, int len);
@@ -611,10 +611,10 @@ struct MPLSParser
     void composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, bool isSSEx);
     int composeSTN_tableSS(uint8_t* buffer, int bufferSize);
     int composeSubPathEntryExtension(uint8_t* buffer, int bufferSize);
-    int composeUHD_metadata(uint8_t* buffer, int bufferSize);
+    static int composeUHD_metadata(uint8_t* buffer, int bufferSize);
     MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
-    int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);
+    static int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);
     int pgIndexToFullIndex(int value);
     void parseSubPathEntryExtension(uint8_t* data, int dataLen);
 };

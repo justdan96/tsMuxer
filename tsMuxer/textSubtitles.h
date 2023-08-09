@@ -78,13 +78,13 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     long composeObjectDefinition(uint8_t* buff, int64_t pts, int64_t dts, int firstLine, int lastLine,
                                  bool needPgHeader);
     long composeVideoDescriptor(uint8_t* buff);
-    long composeCompositionDescriptor(uint8_t* buff, uint16_t number, uint8_t state);
+    static long composeCompositionDescriptor(uint8_t* buff, uint16_t number, uint8_t state);
     long composeEnd(uint8_t* buff, int64_t pts, int64_t dts, bool needPgHeader = true);
-    long writePGHeader(uint8_t* buff, int64_t pts, int64_t dts);
+    static long writePGHeader(uint8_t* buff, int64_t pts, int64_t dts);
     double alignToGrid(double value);
     bool rlePack(uint32_t colorMask);
     void reduceColors(uint8_t mask);
-    int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
+    static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
     uint8_t color32To8(uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
     int renderedHeight() const;

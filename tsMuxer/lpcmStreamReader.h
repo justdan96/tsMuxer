@@ -85,7 +85,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     void restoreChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch);
     void removeChannel(uint8_t* start, uint8_t* end, int cnNum, int mch);
     int decodeWaveHeader(uint8_t* buff, uint8_t* end);
-    uint8_t* findSubstr(const char* pattern, uint8_t* buff, uint8_t* end);
+    static uint8_t* findSubstr(const char* pattern, uint8_t* buff, uint8_t* end);
 };
 
 #endif
