@@ -15,7 +15,7 @@ static constexpr int MB_ESCAPE_CODE = -1;
 // --------------------- MPEGRawDataHeader ---------------------
 
 MPEGRawDataHeader::MPEGRawDataHeader(const int maxBufferLen)
-    : MPEGHeader(), m_headerIncludedToBuff(false), m_data_buffer_len(0), m_max_data_len(maxBufferLen)
+    : m_headerIncludedToBuff(false), m_data_buffer_len(0), m_max_data_len(maxBufferLen)
 {
     if (maxBufferLen > 0)
         m_data_buffer = new uint8_t[maxBufferLen];
@@ -71,7 +71,6 @@ MPEGSequenceHeader::MPEGSequenceHeader(const int bufferSize)
       vert_size_ext(0),
       bit_rate_ext(0),
       low_delay(0),
-      frame_rate_ext(),
       video_format(0),
       color_primaries(0),
       transfer_characteristics(0),
@@ -268,8 +267,7 @@ void MPEGSequenceHeader::setAspectRatio(uint8_t* buff, VideoAspectRatio ar)
 // --------------- gop header ------------------
 
 MPEGGOPHeader::MPEGGOPHeader()
-    : MPEGHeader(),
-      drop_frame_flag(0),
+    : drop_frame_flag(0),
       time_code_hours(0),
       time_code_minutes(0),
       time_code_seconds(0),

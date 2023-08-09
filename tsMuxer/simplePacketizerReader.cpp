@@ -8,7 +8,7 @@
 #include "vodCoreException.h"
 #include "vod_common.h"
 
-SimplePacketizerReader::SimplePacketizerReader() : AbstractStreamReader()
+SimplePacketizerReader::SimplePacketizerReader()
 {
     m_needSync = true;
     m_tmpBufferLen = 0;

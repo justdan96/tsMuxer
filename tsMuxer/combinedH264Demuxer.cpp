@@ -120,7 +120,7 @@ void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, const int pid)
 // --------------------------------------------- CombinedH264Demuxer ---------------------------
 
 CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
-    : AbstractDemuxer(), CombinedH264Reader(), m_readManager(readManager)
+    : m_readManager(readManager)
 {
     m_bufferedReader = m_readManager.getReader(streamName);
     m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
@@ -254,7 +254,7 @@ void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
 
 // ------------------------------ CombinedH264Filter -----------------------------------
 
-CombinedH264Filter::CombinedH264Filter(const int demuxedPID) : SubTrackFilter(demuxedPID), CombinedH264Reader() {}
+CombinedH264Filter::CombinedH264Filter(const int demuxedPID) : SubTrackFilter(demuxedPID) {}
 
 int CombinedH264Filter::demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket)
 {

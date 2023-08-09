@@ -9,7 +9,7 @@
 
 using namespace std;
 
-H264StreamReader::H264StreamReader() : MPEGStreamReader()
+H264StreamReader::H264StreamReader()
 {
     m_frameNum = 0;
     m_lastMessageLen = -1;

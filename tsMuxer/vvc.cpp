@@ -206,8 +206,7 @@ std::string VvcUnitWithProfile::getProfileString() const
 // ------------------------- VvcVpsUnit -------------------
 
 VvcVpsUnit::VvcVpsUnit()
-    : VvcUnitWithProfile(),
-      vps_id(0),
+    : vps_id(0),
       vps_max_layers(0),
       vps_max_sublayers(0),
       num_units_in_tick(0),
@@ -475,8 +474,7 @@ string VvcVpsUnit::getDescription() const
 // ------------------------- VvcSpsUnit ------------------------------
 
 VvcSpsUnit::VvcSpsUnit()
-    : VvcUnitWithProfile(),
-      sps_id(0),
+    : sps_id(0),
       vps_id(0),
       max_sublayers_minus1(0),
       chroma_format_idc(0),
@@ -1029,7 +1027,7 @@ bool VvcUnit::sublayer_hrd_parameters(const VvcHrdUnit m_hrd)
 
 // -----------------------  VvcSliceHeader() -------------------------------------
 
-VvcSliceHeader::VvcSliceHeader() : VvcUnit(), ph_pps_id(-1), pic_order_cnt_lsb(0) {}
+VvcSliceHeader::VvcSliceHeader() : ph_pps_id(-1), pic_order_cnt_lsb(0) {}
 
 int VvcSliceHeader::deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps)
 {

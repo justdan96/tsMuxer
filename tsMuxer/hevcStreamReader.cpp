@@ -13,8 +13,7 @@ using namespace std;
 static constexpr int MAX_SLICE_HEADER = 64;
 
 HEVCStreamReader::HEVCStreamReader()
-    : MPEGStreamReader(),
-      m_vps(nullptr),
+    : m_vps(nullptr),
       m_sps(nullptr),
       m_pps(nullptr),
       m_hdr(new HevcHdrUnit()),

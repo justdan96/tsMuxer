@@ -176,7 +176,7 @@ std::string HevcUnitWithProfile::getProfileString() const
 // ------------------------- HevcVpsUnit -------------------
 
 HevcVpsUnit::HevcVpsUnit()
-    : HevcUnitWithProfile(), vps_id(0), num_units_in_tick(0), time_scale(0), num_units_in_tick_bit_pos(-1)
+    : vps_id(0), num_units_in_tick(0), time_scale(0), num_units_in_tick_bit_pos(-1)
 {
 }
 
@@ -260,8 +260,7 @@ string HevcVpsUnit::getDescription() const
 // ------------------------- HevcSpsUnit ------------------------------
 
 HevcSpsUnit::HevcSpsUnit()
-    : HevcUnitWithProfile(),
-      vps_id(0),
+    : vps_id(0),
       max_sub_layers(0),
       sps_id(0),
       chromaFormat(0),
@@ -793,7 +792,7 @@ int HevcHdrUnit::deserialize()
 
 // -----------------------  HevcSliceHeader() -------------------------------------
 
-HevcSliceHeader::HevcSliceHeader() : HevcUnit(), first_slice(false), pps_id(-1), slice_type(-1), pic_order_cnt_lsb(0) {}
+HevcSliceHeader::HevcSliceHeader() : first_slice(false), pps_id(-1), slice_type(-1), pic_order_cnt_lsb(0) {}
 
 int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
 {

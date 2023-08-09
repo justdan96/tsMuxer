@@ -24,7 +24,7 @@ class GdiPlusPriv
 };
 #endif
 
-TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : TextSubtitlesRender(), m_hbmp(nullptr)
+TextSubtitlesRenderWin32::TextSubtitlesRenderWin32() : m_hbmp(nullptr)
 {
     m_hfont = nullptr;
 #ifndef OLD_WIN32_RENDERER

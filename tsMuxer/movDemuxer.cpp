@@ -90,8 +90,7 @@ int ff_mov_lang_to_iso639(unsigned code, char* to)
 struct MOVStreamContext : public Track
 {
     MOVStreamContext()
-        : Track(),
-          m_indexCur(0),
+        : m_indexCur(0),
           ffindex(0),
           next_chunk(0),
           ctts_count(0),
@@ -155,7 +154,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedAudioTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc), m_aacRaw()
+        : m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc)
     {
         isAAC = false;
     }
@@ -233,7 +232,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedH264TrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_sc(sc), m_demuxer(demuxer), nal_length_size(4)
+        : m_sc(sc), m_demuxer(demuxer), nal_length_size(4)
     {
     }
     void setPrivData(uint8_t* buff, int size) override
@@ -381,7 +380,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
 {
    public:
     MovParsedSRTTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
-        : ParsedTrackPrivData(), m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc), sttsCnt(0)
+        : m_buff(), m_size(0), m_demuxer(demuxer), m_sc(sc), sttsCnt(0)
     {
         m_packetCnt = 0;
         sttsPos = 0;

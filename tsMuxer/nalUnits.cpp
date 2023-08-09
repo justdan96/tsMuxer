@@ -395,8 +395,7 @@ void HRDParams::resetDefault(const bool mvc)
 // -------------------- SPSUnit --------------------------
 
 SPSUnit::SPSUnit()
-    : NALUnit(),
-      m_ready(false),
+    : m_ready(false),
       sar_width(0),
       sar_height(0),
       num_units_in_tick(0),
@@ -1166,8 +1165,7 @@ int SPSUnit::mvc_vui_parameters_extension()
 // --------------------- SliceUnit -----------------------
 
 SliceUnit::SliceUnit()
-    : NALUnit(),
-      m_field_pic_flag(0),
+    : m_field_pic_flag(0),
       non_idr_flag(0),
       memory_management_control_operation(0),
       first_mb_in_slice(0),
