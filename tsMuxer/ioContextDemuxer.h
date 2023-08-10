@@ -39,8 +39,8 @@ enum class IOContextTrackType
     DATA = 0x40
 };
 
-double av_int2dbl(int64_t v);
-float av_int2flt(int32_t v);
+double av_int2dbl(uint64_t v);
+float av_int2flt(uint32_t v);
 
 struct Track
 {
