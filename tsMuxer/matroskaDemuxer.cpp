@@ -360,7 +360,7 @@ int MatroskaDemuxer::matroska_find_track_by_num(const uint64_t num) const
     return -1;
 }
 
-int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const uint32_t size, uint64_t *num)
+unsigned MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const uint32_t size, uint64_t *num)
 {
     unsigned read = 1, n = 1, num_ffs = 0;
     uint64_t len_mask = 0x80;
@@ -1958,7 +1958,7 @@ int MatroskaDemuxer::matroska_add_stream()
             uint64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            track->num = static_cast<uint32_t>(num);
+            track->num = num;
             break;
         }
 

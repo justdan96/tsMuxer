@@ -64,7 +64,7 @@ struct Track
     IOContextTrackType type;
     /* Unique track number and track ID. stream_index is the index that
      * the calling app uses for this track. */
-    int num;
+    uint64_t num;
     uint64_t uid;
     int stream_index;
 

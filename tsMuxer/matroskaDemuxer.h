@@ -59,7 +59,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     char *writing_app;
     char *muxing_app;
     uint64_t time_scale;
-    std::map<int, uint64_t> m_firstTimecode;
+    std::map<uint64_t, uint64_t> m_firstTimecode;
     bool index_parsed;
     bool metadata_parsed;
     int num_streams;
@@ -79,7 +79,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int ebml_read_sint(uint32_t *id, int64_t *num);
     static int matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num);
     int matroska_parse_blockgroup(uint64_t cluster_time);
-    static int matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
+    static unsigned matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
     int matroska_find_track_by_num(uint64_t num) const;
     int matroska_parse_block(uint8_t *data, int size, int64_t pos, uint64_t cluster_time, uint64_t duration,
                              int is_keyframe, int is_bframe);
