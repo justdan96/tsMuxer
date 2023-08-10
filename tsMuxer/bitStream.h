@@ -12,7 +12,7 @@ class BitStreamException : public std::exception
    public:
     // BitStreamException(const char* str): std::exception(str) {}
     // BitStreamException(const std::string& str): std::exception(str.c_str()) {}
-    BitStreamException() : std::exception() {}
+    BitStreamException() {}
 };
 
 // #define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") +

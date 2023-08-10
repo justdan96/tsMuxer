@@ -12,7 +12,7 @@ static constexpr int TMP_BUFFER_SIZE = 1024 * 1024 * 8;
 class MPEGStreamReader : public AbstractStreamReader
 {
    public:
-    MPEGStreamReader() : AbstractStreamReader()
+    MPEGStreamReader()
     {
         m_tmpBufferLen = 0;
         setFPS(0);
@@ -75,7 +75,7 @@ class MPEGStreamReader : public AbstractStreamReader
     virtual double getStreamFPS(void* curNalUnit) = 0;
     void updateFPS(void* curNALUnit, uint8_t* buff, uint8_t* nextNal, int oldSPSLen);
     virtual void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) = 0;
-    virtual void updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen){};
+    virtual void updateStreamAR(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen){}
     void fillAspectBySAR(double sar);
     virtual bool isIFrame() = 0;
 

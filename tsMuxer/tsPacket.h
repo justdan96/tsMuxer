@@ -393,7 +393,7 @@ struct CLPIStreamInfo : public M2TSStreamInfo
     {
         for (int i = 0; i < size; i++) writer.putBits(8, dest[i]);
     }
-    CLPIStreamInfo() : M2TSStreamInfo()
+    CLPIStreamInfo()
     {
         memset(language_code, 0, sizeof(language_code));
         memset(country_code, 0, sizeof(country_code));

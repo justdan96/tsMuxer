@@ -15,7 +15,7 @@ class LPCMStreamReader : public SimplePacketizerReader
         htWAVE64
     };
 
-    LPCMStreamReader() : SimplePacketizerReader(), m_useNewStyleAudioPES(false), m_tmpFrameBuffer()
+    LPCMStreamReader() : m_useNewStyleAudioPES(false), m_tmpFrameBuffer()
     {
         m_bitsPerSample = m_freq = m_channels = 0;
         m_lfeExists = false;

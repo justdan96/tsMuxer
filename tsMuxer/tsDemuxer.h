@@ -22,7 +22,7 @@ class TSDemuxer : public AbstractDemuxer
     uint64_t getDemuxedSize() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
-    int getLastReadRez() override { return m_lastReadRez; };
+    int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
     int64_t getTrackDelay(const uint32_t pid) override
     {

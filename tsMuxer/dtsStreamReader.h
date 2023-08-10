@@ -22,8 +22,7 @@ class DTSStreamReader : public SimplePacketizerReader
     static constexpr uint32_t DTS_HD_PREFIX = 0x64582025;
 
     DTSStreamReader()
-        : SimplePacketizerReader(),
-          nblks(0),
+        : nblks(0),
           i_frame_size(0),
           pi_audio_mode(0),
           pi_bit_rate_index(0),
@@ -51,7 +50,7 @@ class DTSStreamReader : public SimplePacketizerReader
         core_ext_mask = 0;
         m_dtsEsChannels = 0;
         m_testMode = false;
-    };
+    }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     void setDownconvertToDTS(const bool value) { m_downconvertToDTS = value; }
     bool getDownconvertToDTS() const { return m_downconvertToDTS; }
@@ -65,7 +64,7 @@ class DTSStreamReader : public SimplePacketizerReader
     bool isSecondary() override;
 
    protected:
-    int getHeaderLen() override { return DTS_HEADER_SIZE; };
+    int getHeaderLen() override { return DTS_HEADER_SIZE; }
     int decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, int& skipBeforeBytes) override;
     uint8_t* findFrame(uint8_t* buff, uint8_t* end) override;
     double getFrameDuration() override;

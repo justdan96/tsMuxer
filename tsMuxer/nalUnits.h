@@ -121,7 +121,7 @@ class NALDelimiter : public NALUnit
     static constexpr int PCT_I_SI_P_SP_FRAMES = 6;
     static constexpr int PCT_I_SI_P_SP_B_FRAMES = 7;
     int primary_pic_type;
-    NALDelimiter() : NALUnit(), primary_pic_type(0) {}
+    NALDelimiter() : primary_pic_type(0) {}
     int deserialize(uint8_t* buffer, uint8_t* end) override;
     int serialize(uint8_t* buffer) override;
 };

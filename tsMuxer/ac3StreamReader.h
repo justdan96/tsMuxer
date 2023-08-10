@@ -19,7 +19,7 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
         m_demuxedTHDSamples = 0;
         m_totalTHDSamples = 0;
         m_nextAc3Time = 0;
-    };
+    }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     void setNewStyleAudioPES(const bool value) { m_useNewStyleAudioPES = value; }
     void setTestMode(const bool value) override { AC3Codec::setTestMode(value); }

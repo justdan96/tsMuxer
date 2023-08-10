@@ -55,7 +55,7 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     uint64_t getDemuxedSize() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
-    int getLastReadRez() override { return m_lastReadRez; };
+    int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
 
     bool isPidFilterSupported() const override { return true; }

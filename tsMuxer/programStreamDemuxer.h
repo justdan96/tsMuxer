@@ -22,7 +22,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
     void readClose() override;
     uint64_t getDemuxedSize() override;
-    int getLastReadRez() override { return m_lastReadRez; };
+    int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
     int64_t getTrackDelay(const uint32_t pid) override
     {

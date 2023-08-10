@@ -8,7 +8,7 @@
 class VC1StreamReader : public MPEGStreamReader
 {
    public:
-    VC1StreamReader() : MPEGStreamReader()
+    VC1StreamReader()
     {
         m_isFirstFrame = true;
         m_spsFound = 0;
@@ -27,13 +27,13 @@ class VC1StreamReader : public MPEGStreamReader
     bool needSPSForSplit() const override { return true; }
 
    protected:
-    const CodecInfo& getCodecInfo() override { return vc1CodecInfo; };
+    const CodecInfo& getCodecInfo() override { return vc1CodecInfo; }
     int intDecodeNAL(uint8_t* buff) override;
     void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;
-    double getStreamFPS(void* curNalUnit) override { return m_sequence.getFPS(); };
+    double getStreamFPS(void* curNalUnit) override { return m_sequence.getFPS(); }
     int getStreamWidth() const override { return m_sequence.coded_width; }
     int getStreamHeight() const override { return m_sequence.coded_height; }
     int getStreamHDR() const override { return 0; }

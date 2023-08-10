@@ -95,7 +95,7 @@ class IOContextDemuxer : public AbstractDemuxer
     ~IOContextDemuxer() override;
     void setFileIterator(FileNameIterator* itr) override;
     uint64_t getDemuxedSize() override;
-    int getLastReadRez() override { return m_lastReadRez; };
+    int getLastReadRez() override { return m_lastReadRez; }
     int64_t getProcessedBytes() const { return m_processedBytes; }
 
    protected:

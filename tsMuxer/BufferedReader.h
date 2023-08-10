@@ -60,7 +60,7 @@ virtual void deleteNextBlocks()
     {
         init();
         return false;
-    };
+    }
 
     virtual uint32_t readBlock(uint8_t* buffer, int max_size) = 0;
 

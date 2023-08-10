@@ -154,8 +154,7 @@ class VC1SequenceHeader : public VC1Unit
 {
    public:
     VC1SequenceHeader()
-        : VC1Unit(),
-          profile(Profile::SIMPLE),
+        : profile(Profile::SIMPLE),
           rangered(0),
           max_b_frames(0),
           finterpflag(false),
@@ -212,7 +211,7 @@ class VC1SequenceHeader : public VC1Unit
 class VC1Frame : public VC1Unit
 {
    public:
-    VC1Frame() : VC1Unit(), fcm(0), pict_type(VC1PictType::I_TYPE), rptfrm(0), tff(0), rff(0), rptfrmBitPos(0) {}
+    VC1Frame() : fcm(0), pict_type(VC1PictType::I_TYPE), rptfrm(0), tff(0), rff(0), rptfrmBitPos(0) {}
     int fcm;
     VC1PictType pict_type;
     int rptfrm;
