@@ -47,9 +47,9 @@ class PGSStreamReader : public AbstractStreamReader
     // void setVideoHeight(int value);
     // void setFPS(double value);
     void setVideoInfo(int width, int height, double fps);
-    void setFontBorder(int value) { m_fontBorder = value; }
-    void setBottomOffset(int value) { m_render->setBottomOffset(value); }
-    void setOffsetId(int value) { m_offsetId = value; }
+    void setFontBorder(const int value) { m_fontBorder = value; }
+    void setBottomOffset(const int value) const { m_render->setBottomOffset(value); }
+    void setOffsetId(const int value) { m_offsetId = value; }
     uint8_t getOffsetId() const { return m_offsetId; }
 
     // SS PG data

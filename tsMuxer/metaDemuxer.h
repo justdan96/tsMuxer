@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <map>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
@@ -13,7 +12,6 @@
 #include "avPacket.h"
 #include "bufferedReaderManager.h"
 #include "vodCoreException.h"
-#include "vod_common.h"
 
 // META file demuxer
 

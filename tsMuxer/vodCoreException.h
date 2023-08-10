@@ -7,7 +7,7 @@
 class VodCoreException
 {
    public:
-    VodCoreException(const int errCode, const std::string& errStr) : m_errCode(errCode), m_errStr(errStr) {}
+    VodCoreException(const int errCode, std::string errStr) : m_errCode(errCode), m_errStr(std::move(errStr)) {}
     VodCoreException(const int errCode, const char* errStr) : m_errCode(errCode), m_errStr(errStr) {}
 
     int m_errCode;

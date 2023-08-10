@@ -6,7 +6,6 @@
 #include <string>
 
 #include "bitStream.h"
-#include "memory.h"
 #include "vod_common.h"
 
 enum class VC1Code

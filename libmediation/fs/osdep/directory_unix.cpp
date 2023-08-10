@@ -1,3 +1,5 @@
+#if !defined(_WIN32)
+
 #include "../directory.h"
 #include "../directory_priv.h"
 
@@ -114,3 +116,5 @@ bool findFilesRecursive(const string& path, const string& mask, vector<string>* 
     recurseDirectorySearch(findFiles, findDirs, path, mask, fileList);
     return true;
 }
+
+#endif

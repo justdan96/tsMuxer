@@ -2,7 +2,6 @@
 #define MATROSKA_STREAM_READER_H_
 
 #include "ioContextDemuxer.h"
-// #include "tsPacket.h"
 #include "matroskaParser.h"
 
 class MatroskaDemuxer : public IOContextDemuxer

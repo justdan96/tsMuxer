@@ -1,9 +1,6 @@
 #ifndef NAL_UNITS_H_
 #define NAL_UNITS_H_
 
-#include <memory.h>
-#include <types/types.h>
-
 #include <map>
 #include <set>
 #include <unordered_set>
@@ -72,10 +69,8 @@ class NALUnit
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
 
-    NALUnit(uint8_t nalUnitType) : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0), bitReader()
-    {
-    }
-    NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0), bitReader() {}
+    NALUnit(uint8_t nalUnitType) : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
+    NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
     // NALUnit(const NALUnit& other);
     virtual ~NALUnit() { delete[] m_nalBuffer; }
     static uint8_t* findNextNAL(uint8_t* buffer, uint8_t* end);

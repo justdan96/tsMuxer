@@ -10,7 +10,6 @@
 #include "avPacket.h"
 #include "hevc.h"
 #include "limits.h"
-#include "vodCoreException.h"
 
 enum V3Flags
 {

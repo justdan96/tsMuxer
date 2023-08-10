@@ -1,8 +1,6 @@
 #ifndef SUB_TRACK_FILTER_H_
 #define SUB_TRACK_FILTER_H_
 
-#include "abstractreader.h"
-
 class SubTrackFilter
 {
    public:
