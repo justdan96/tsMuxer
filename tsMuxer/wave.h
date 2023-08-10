@@ -74,8 +74,7 @@ typedef struct
     uint16_t wBitsPerSample;
     uint16_t cbSize;
 
-    union
-    {
+    union {
         uint16_t wValidBitsPerSample; /* bits of precision */
         uint16_t wSamplesPerBlock;    /* valid if wBitsPerSample==0 */
         uint16_t wReserved;           /* If neither applies, set to zero. */

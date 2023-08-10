@@ -4,7 +4,7 @@
  *	Date: 13 oct 2006
  ***********************************************************************/
 
-#if !defined(_WIN32) 
+#if !defined(_WIN32)
 
 #include <errno.h>
 #include <fcntl.h>
