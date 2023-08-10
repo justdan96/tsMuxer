@@ -84,7 +84,7 @@ bool AC3Codec::crc32(const uint8_t *buf, const int length)
 }
 
 // returns NO_ERROR, or type of error
-AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, uint8_t *end)
+AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
 {
     if (*buf++ != 0x0B || *buf++ != 0x77)
         return AC3ParseError::SYNC;

@@ -211,7 +211,7 @@ uint8_t *H264StreamReader::writeNalPrefix(uint8_t *curPos) const
     return curPos;
 }
 
-int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, uint8_t *dstEnd, SEIUnit &sei,
+int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, const uint8_t *dstEnd, const SEIUnit &sei,
                                       const uint8_t payloadType) const
 {
     uint8_t *curPos = dstBuffer;
@@ -693,7 +693,7 @@ void H264StreamReader::additionalStreamCheck(uint8_t *buff, uint8_t *end)
     prevPicOrderCntMsb = prevPicOrderCntLsb = 0;
 }
 
-int H264StreamReader::calcPicOrder(SliceUnit &slice)
+int H264StreamReader::calcPicOrder(const SliceUnit &slice)
 {
     if (slice.getSPS()->pic_order_cnt_type != 0)
         THROW(ERR_H264_UNSUPPORTED_PARAMETER,
@@ -1017,7 +1017,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
     return 0;
 }
 
-int H264StreamReader::getNalHrdLen(uint8_t *nal) const
+int H264StreamReader::getNalHrdLen(const uint8_t *nal) const
 {
     if (m_bufEnd - nal >= 3)
     {
@@ -1055,7 +1055,7 @@ bool H264StreamReader::findPPSForward(uint8_t *buff)
     return spsFound && ppsFound;
 }
 
-int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, uint8_t *buff, uint8_t *sliceEnd)
+int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, const uint8_t *buff, const uint8_t *sliceEnd)
 {
     int nalRez, toDecode;
     const int maxHeaderSize = static_cast<int>(sliceEnd - buff);
@@ -1219,7 +1219,7 @@ int H264StreamReader::processSliceNal(uint8_t *buff)
     return 0;
 }
 
-int H264StreamReader::detectPrimaryPicType(SliceUnit &firstSlice, uint8_t *buff)
+int H264StreamReader::detectPrimaryPicType(const SliceUnit &firstSlice, uint8_t *buff)
 {
     SliceUnit slice;
     m_nextFrameFound = false;

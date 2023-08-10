@@ -85,7 +85,7 @@ void VvcUnit::updateBits(const int bitOffset, const int bitLen, const int value)
     bitWriter.flushBits();
 }
 
-int VvcUnit::serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const
+int VvcUnit::serializeBuffer(uint8_t* dstBuffer, const uint8_t* dstEnd) const
 {
     if (m_nalBufferLen == 0)
         return 0;

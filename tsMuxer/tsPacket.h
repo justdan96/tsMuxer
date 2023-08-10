@@ -238,7 +238,7 @@ struct PMTStreamInfo
     {
     }
 
-    PMTStreamInfo(const StreamType streamType, const int pid, uint8_t* esInfoData, const int esInfoLen,
+    PMTStreamInfo(const StreamType streamType, const int pid, const uint8_t* esInfoData, const int esInfoLen,
                   AbstractStreamReader* codecReader, const std::string& lang, const bool secondary)
     {
         m_streamType = streamType;
@@ -465,14 +465,14 @@ class CLPIParser
     static void CPI_SS(uint8_t* buffer, int dataLength);
 
    private:
-    static void parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
+    static void parseProgramInfo(uint8_t* buffer, const uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
                                  std::map<int, CLPIStreamInfo>& streamInfoMap);
-    void parseSequenceInfo(uint8_t* buffer, uint8_t* end);
-    static void parseCPI(uint8_t* buffer, uint8_t* end);
+    void parseSequenceInfo(uint8_t* buffer, const uint8_t* end);
+    static void parseCPI(uint8_t* buffer, const uint8_t* end);
     static void EP_map(BitStreamReader& reader);
-    static void parseClipMark(uint8_t* buffer, uint8_t* end);
+    static void parseClipMark(uint8_t* buffer, const uint8_t* end);
     void parseClipInfo(BitStreamReader& reader);
-    void parseExtensionData(uint8_t* buffer, uint8_t* end);
+    void parseExtensionData(uint8_t* buffer, const uint8_t* end);
     void TS_type_info_block(BitStreamReader& reader);
     void composeProgramInfo(BitStreamWriter& writer, bool isSsExt);
     static void composeTS_type_info_block(BitStreamWriter& writer);
@@ -527,7 +527,7 @@ struct PlayListMark
 
 struct ExtDataBlockInfo
 {
-    ExtDataBlockInfo(uint8_t* a_data, const int a_dataLen, const int a_id1, const int a_id2) : id1(a_id1), id2(a_id2)
+    ExtDataBlockInfo(const uint8_t* a_data, const int a_dataLen, const int a_id1, const int a_id2) : id1(a_id1), id2(a_id2)
     {
         data.resize(a_dataLen);
         if (!data.empty())
@@ -586,12 +586,12 @@ struct MPLSParser
 
    private:
     void composeSubPlayItem(BitStreamWriter& writer, size_t playItemNum, size_t subPathNum,
-                            std::vector<PMTIndex>& pmtIndexList) const;
+                            const std::vector<PMTIndex>& pmtIndexList) const;
     void composeSubPath(BitStreamWriter& writer, size_t subPathNum, std::vector<PMTIndex>& pmtIndexList,
                         int type) const;
-    int composePip_metadata(uint8_t* buffer, int bufferSize, std::vector<PMTIndex>& pmtIndexList) const;
-    static void composeExtensionData(BitStreamWriter& writer, std::vector<ExtDataBlockInfo>& extDataBlockInfo);
-    void parseExtensionData(uint8_t* data, uint8_t* dataEnd);
+    int composePip_metadata(uint8_t* buffer, int bufferSize, const std::vector<PMTIndex>& pmtIndexList) const;
+    static void composeExtensionData(BitStreamWriter& writer, const std::vector<ExtDataBlockInfo>& extDataBlockInfo);
+    void parseExtensionData(uint8_t* data, const uint8_t* dataEnd);
     void SubPath_extension(BitStreamWriter& writer);
     void parseStnTableSS(uint8_t* data, int dataLength);
 
@@ -605,7 +605,7 @@ struct MPLSParser
 
     void composePlayList(BitStreamWriter& writer);
     // void composePlayItem(BitStreamWriter& writer);
-    void composePlayItem(BitStreamWriter& writer, size_t playItemNum, std::vector<PMTIndex>& pmtIndexList);
+    void composePlayItem(BitStreamWriter& writer, size_t playItemNum, const std::vector<PMTIndex>& pmtIndexList);
     void composePlayListMark(BitStreamWriter& writer);
     void composeSTN_table(BitStreamWriter& writer, size_t PlayItem_id, bool isSSEx);
     int composeSTN_tableSS(uint8_t* buffer, int bufferSize);
@@ -613,7 +613,7 @@ struct MPLSParser
     static int composeUHD_metadata(uint8_t* buffer, int bufferSize);
     MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
-    static int calcPlayItemID(MPLSStreamInfo& streamInfo, uint32_t pts);
+    static int calcPlayItemID(const MPLSStreamInfo& streamInfo, uint32_t pts);
     int pgIndexToFullIndex(int value) const;
     void parseSubPathEntryExtension(uint8_t* data, int dataLen);
 };

@@ -274,7 +274,7 @@ bool MuxerManager::openMetaFile(const string& fileName)
     return true;
 }
 
-void MuxerManager::muxBlockFinished(AbstractMuxer* muxer)
+void MuxerManager::muxBlockFinished(const AbstractMuxer* muxer)
 {
     if (muxer == m_subMuxer)
         m_subBlockFinished = true;

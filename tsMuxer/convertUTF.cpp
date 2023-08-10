@@ -36,7 +36,7 @@ static constexpr UTF32 halfMask = 0x3FFUL;
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF32toUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart,
-                                     UTF16* targetEnd, const ConversionFlags flags)
+                                     const UTF16* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF32* source = *sourceStart;
@@ -111,7 +111,7 @@ std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32 ch)
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart,
-                                     UTF32* targetEnd, const ConversionFlags flags)
+                                     const UTF32* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF16* source = *sourceStart;
@@ -201,7 +201,7 @@ static constexpr UTF8 firstByteMark[7] = {0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0x
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sourceEnd, UTF8** targetStart,
-                                    UTF8* targetEnd, const ConversionFlags flags)
+                                    const UTF8* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF16* source = *sourceStart;
@@ -410,7 +410,7 @@ Boolean isLegalUTF8String(const UTF8* string, const int length)
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart,
-                                    UTF16* targetEnd, const ConversionFlags flags)
+                                    const UTF16* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF8* source = *sourceStart;
@@ -518,7 +518,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sourceEnd, UTF8** targetStart,
-                                    UTF8* targetEnd, const ConversionFlags flags)
+                                    const UTF8* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF32* source = *sourceStart;
@@ -603,7 +603,7 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
 /* --------------------------------------------------------------------- */
 
 ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* sourceEnd, UTF32** targetStart,
-                                    UTF32* targetEnd, const ConversionFlags flags)
+                                    const UTF32* targetEnd, const ConversionFlags flags)
 {
     ConversionResult result = ConversionResult::conversionOK;
     const UTF8* source = *sourceStart;

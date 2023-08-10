@@ -80,7 +80,7 @@ class TSMuxer : public AbstractMuxer
    private:
     bool doFlush(uint64_t newPCR, int64_t pcrGAP);
     void flushTSFrame();
-    int writeTSFrames(int pid, uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
+    int writeTSFrames(int pid, const uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
     void writeSIT();
     void writePMT();
     void writePAT();
@@ -106,7 +106,7 @@ class TSMuxer : public AbstractMuxer
     std::string getNextName(std::string curName) override;
     void writeEmptyPacketWithPCRTest(int64_t pcrVal);
     bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited) const;
-    int writeOutFile(uint8_t* buffer, int len) const;
+    int writeOutFile(const uint8_t* buffer, int len) const;
 
     void joinToMasterFile() override;
     void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;

@@ -346,7 +346,7 @@ void FileEntryInfo::addSubDir(FileEntryInfo *dir) { m_subDirs.push_back(dir); }
 
 void FileEntryInfo::addFile(FileEntryInfo *file) { m_files.push_back(file); }
 
-void FileEntryInfo::writeEntity(ByteFileWriter &writer, FileEntryInfo *subDir) const
+void FileEntryInfo::writeEntity(ByteFileWriter &writer, const FileEntryInfo *subDir) const
 {
     const bool isSystemFile = (m_objectId == 0);
 
@@ -972,7 +972,7 @@ int IsoWriter::allocateEntity(FileEntryInfo *entity, int sectorNum)
     return sectorNum;
 }
 
-void IsoWriter::writeAllocationExtentDescriptor(ExtentList *extents, const size_t start, const size_t indexEnd)
+void IsoWriter::writeAllocationExtentDescriptor(const ExtentList *extents, const size_t start, const size_t indexEnd)
 {
     const auto buff32 = reinterpret_cast<uint32_t *>(m_buffer);
     memset(m_buffer, 0, sizeof(m_buffer));
@@ -1403,7 +1403,7 @@ void IsoWriter::writeAnchorVolumeDescriptor(const uint32_t endPartitionAddr)
     m_file.write(m_buffer, SECTOR_SIZE);
 }
 
-void IsoWriter::writeSector(uint8_t *sectorData) { m_file.write(sectorData, SECTOR_SIZE); }
+void IsoWriter::writeSector(const uint8_t *sectorData) { m_file.write(sectorData, SECTOR_SIZE); }
 
 int IsoWriter::writeRawData(const uint8_t *data, const int size) { return m_file.write(data, size); }
 

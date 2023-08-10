@@ -43,7 +43,7 @@ void NALUnit::write_byte_align_bits(BitStreamWriter& writer)
         writer.putBits(rest - 1, 0);
 }
 
-uint8_t* NALUnit::addStartCode(uint8_t* buffer, uint8_t* boundStart)
+uint8_t* NALUnit::addStartCode(uint8_t* buffer, const uint8_t* boundStart)
 {
     uint8_t* rez = buffer;
     if (rez - 3 >= boundStart && rez[-1] == 1 && rez[-2] == 0 && rez[-3] == 0)
@@ -92,7 +92,7 @@ uint8_t* NALUnit::findNALWithStartCode(uint8_t* buffer, uint8_t* end, const bool
     return end;
 }
 
-int NALUnit::encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize)
+int NALUnit::encodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize)
 {
     const uint8_t* srcStart = srcBuffer;
     const uint8_t* initDstBuffer = dstBuffer;
@@ -155,7 +155,7 @@ int NALUnit::decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t*
     return static_cast<int>(dstBuffer - initDstBuffer);
 }
 
-int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
+int NALUnit::decodeNAL2(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
                         bool* keepSrcBuffer)
 {
     const uint8_t* initDstBuffer = dstBuffer;
@@ -185,7 +185,7 @@ int NALUnit::decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer,
     return static_cast<int>(dstBuffer - initDstBuffer);
 }
 
-unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd)
+unsigned NALUnit::extractUEGolombCode(uint8_t* buffer, const uint8_t* bufEnd)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, bufEnd);
@@ -1680,7 +1680,7 @@ void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, const int payloadSize,
     pic_timing(sps, orig_hrd_parameters_present_flag);
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, const bool orig_hrd_parameters_present_flag)
+void SEIUnit::pic_timing(const SPSUnit& sps, const bool orig_hrd_parameters_present_flag)
 {
     const bool CpbDpbDelaysPresentFlag = orig_hrd_parameters_present_flag == 1;
     cpb_removal_delay = dpb_output_delay = 0;

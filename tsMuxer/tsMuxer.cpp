@@ -471,7 +471,7 @@ bool TSMuxer::doFlush(const uint64_t newPCR, const int64_t pcrGAP)
     return true;
 }
 
-int TSMuxer::writeOutFile(uint8_t* buffer, const int len) const
+int TSMuxer::writeOutFile(const uint8_t* buffer, const int len) const
 {
     const int rez = m_muxFile->write(buffer, len);
     return rez;
@@ -1053,7 +1053,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     return true;
 }
 
-int TSMuxer::writeTSFrames(const int pid, uint8_t* buffer, const int64_t len, const bool priorityData,
+int TSMuxer::writeTSFrames(const int pid, const uint8_t* buffer, const int64_t len, const bool priorityData,
                            bool payloadStart)
 {
     int result = 0;

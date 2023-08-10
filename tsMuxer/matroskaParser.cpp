@@ -177,7 +177,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
 }
 
 // ----------- H.265 -----------------
-ParsedH265TrackData::ParsedH265TrackData(uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
+ParsedH265TrackData::ParsedH265TrackData(const uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = hevc_extract_priv_data(buff, size, &m_nalSize);
 }
@@ -212,7 +212,7 @@ bool ParsedH265TrackData::spsppsExists(uint8_t* buff, const int size)
 }
 
 // ----------- H.266 -----------------
-ParsedH266TrackData::ParsedH266TrackData(uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
+ParsedH266TrackData::ParsedH266TrackData(const uint8_t* buff, const int size) : ParsedH264TrackData(nullptr, 0)
 {
     m_spsPpsList = vvc_extract_priv_data(buff, size, &m_nalSize);
 }

@@ -113,7 +113,7 @@ double TextToPGSConverter::alignToGrid(const double value) const
     return frameCnt / m_videoFps;
 }
 
-uint8_t TextToPGSConverter::color32To8(uint32_t* buff, const uint32_t colorMask)
+uint8_t TextToPGSConverter::color32To8(const uint32_t* buff, const uint32_t colorMask)
 {
     // if (*buff == 0) // RESERVED_BACKGROUND_COLOR
     //	return 0xff;
@@ -331,7 +331,7 @@ float toCurve(const float value)
     return result;
 }
 
-uint8_t* TextToPGSConverter::doConvert(std::string& text, const TextAnimation& animation, double inTimeSec,
+uint8_t* TextToPGSConverter::doConvert(const std::string& text, const TextAnimation& animation, double inTimeSec,
                                        double outTimeSec, uint32_t& dstBufSize)
 {
     const bool forced = m_textRender->rasterText(text);

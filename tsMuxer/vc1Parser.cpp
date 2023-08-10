@@ -342,7 +342,7 @@ int VC1SequenceHeader::decode_entry_point()
 
 // -------------------------- VC1Frame ---------------------------
 
-int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t* buffer, uint8_t* end)
+int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t* buffer, const uint8_t* end)
 {
     try
     {

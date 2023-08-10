@@ -52,7 +52,7 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     void setVideoInfo(int width, int height, double fps);
     void enlargeCrop(int width, int height, int* newWidth, int* newHeight) const;
     void setBottomOffset(const int offset) { m_bottomOffset = offset; }
-    uint8_t* doConvert(std::string& text, const TextAnimation& animation, double inTimeSec, double outTimeSec,
+    uint8_t* doConvert(const std::string& text, const TextAnimation& animation, double inTimeSec, double outTimeSec,
                        uint32_t& dstBufSize);
     TextSubtitlesRender* m_textRender;
     static YUVQuad RGBAToYUVA(uint32_t data);
@@ -85,7 +85,7 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     bool rlePack(uint32_t colorMask);
     void reduceColors(uint8_t mask) const;
     static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
-    uint8_t color32To8(uint32_t* buff, uint32_t colorMask);
+    uint8_t color32To8(const uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
     int renderedHeight() const;
     int minLine() const;

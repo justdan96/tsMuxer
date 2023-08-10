@@ -1,7 +1,7 @@
 #ifndef CRC32_H_
 #define CRC32_H_
 
-static uint32_t calculateCRC32(uint8_t *p_begin, uint64_t i_count, uint32_t i_crc = 0)
+static uint32_t calculateCRC32(const uint8_t *p_begin, uint64_t i_count, uint32_t i_crc = 0)
 {
     static uint32_t CRC32[256] = {
         0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005, 0x2608edb8,

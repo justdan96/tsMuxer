@@ -66,7 +66,7 @@ class H264StreamReader : public MPEGStreamReader
 
    private:
     bool replaceToOwnSPS() const;
-    int deserializeSliceHeader(SliceUnit& slice, uint8_t* buff, uint8_t* sliceEnd);
+    int deserializeSliceHeader(SliceUnit& slice, const uint8_t* buff, const uint8_t* sliceEnd);
     void checkPyramid(int frameNum, int* fullPicOrder, bool nextFrameFound);
 
    private:
@@ -119,19 +119,19 @@ class H264StreamReader : public MPEGStreamReader
     int64_t m_startPts;
 
     void additionalStreamCheck(uint8_t* buff, uint8_t* end);
-    int calcPicOrder(SliceUnit& slice);
+    int calcPicOrder(const SliceUnit& slice);
     int getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd);
     int processSliceNal(uint8_t* buff);
     int processSPS(uint8_t* buff);
     int processPPS(uint8_t* buff);
-    int detectPrimaryPicType(SliceUnit& firstSlice, uint8_t* buff);
+    int detectPrimaryPicType(const SliceUnit& firstSlice, uint8_t* buff);
     int sliceTypeToPictType(int slice_type) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;
     bool findPPSForward(uint8_t* buff);
     void updateHRDParam(SPSUnit* sps) const;
     int processSEI(uint8_t* buff);
-    int getNalHrdLen(uint8_t* nal) const;
-    int writeSEIMessage(uint8_t* dstBuffer, uint8_t* dstEnd, SEIUnit& sei, uint8_t payloadType) const;
+    int getNalHrdLen(const uint8_t* nal) const;
+    int writeSEIMessage(uint8_t* dstBuffer, const uint8_t* dstEnd, const SEIUnit& sei, uint8_t payloadType) const;
 
     std::vector<uint8_t> m_bdRomMetaDataMsg;  // copy metadata to buffer, then isert during sei rebuild process
     int m_bdRomMetaDataMsgPtsPos;

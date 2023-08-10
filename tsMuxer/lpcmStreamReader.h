@@ -76,16 +76,16 @@ class LPCMStreamReader : public SimplePacketizerReader
     uint8_t* m_lastChannelRemapPos;
 
     bool detectLPCMType(uint8_t* buffer, int64_t len);
-    int decodeLPCMHeader(uint8_t* buff);
+    int decodeLPCMHeader(const uint8_t* buff);
     uint32_t convertLPCMToWAV(uint8_t* start, uint8_t* end);
     int convertWavToPCM(uint8_t* start, uint8_t* end);
 
-    void storeChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch) const;
-    void copyChannelData(uint8_t* start, uint8_t* end, int chFrom, int chTo, int mch) const;
-    void restoreChannelData(uint8_t* start, uint8_t* end, int chNum, uint8_t* tmpData, int mch) const;
-    void removeChannel(uint8_t* start, uint8_t* end, int cnNum, int mch) const;
+    void storeChannelData(const uint8_t* start, const uint8_t* end, int chNum, uint8_t* tmpData, int mch) const;
+    void copyChannelData(uint8_t* start, const uint8_t* end, int chFrom, int chTo, int mch) const;
+    void restoreChannelData(uint8_t* start, const uint8_t* end, int chNum, const uint8_t* tmpData, int mch) const;
+    void removeChannel(uint8_t* start, const uint8_t* end, int cnNum, int mch) const;
     int decodeWaveHeader(uint8_t* buff, uint8_t* end);
-    static uint8_t* findSubstr(const char* pattern, uint8_t* buff, uint8_t* end);
+    static uint8_t* findSubstr(const char* pattern, uint8_t* buff, const uint8_t* end);
 };
 
 #endif

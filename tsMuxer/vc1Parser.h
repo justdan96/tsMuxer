@@ -65,7 +65,7 @@ class VC1Unit
     VC1Unit() : bitReader(), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
     ~VC1Unit() { delete[] m_nalBuffer; }
 
-    static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
+    static bool isMarker(const uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
 
     static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
     {
@@ -219,7 +219,7 @@ class VC1Frame : public VC1Unit
     int tff;
     int rff;
     int rptfrmBitPos;
-    int decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t* buffer, uint8_t* end);
+    int decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t* buffer, const uint8_t* end);
 
    private:
     int vc1_parse_frame_header(const VC1SequenceHeader& sequenceHdr);

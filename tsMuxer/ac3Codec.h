@@ -102,7 +102,7 @@ class AC3Codec
     bool m_extChannelsExists;
 
     static bool crc32(const uint8_t* buf, int length);
-    AC3ParseError parseHeader(uint8_t* buf, uint8_t* end);
+    AC3ParseError parseHeader(uint8_t* buf, const uint8_t* end);
 
     AC3ParseError testParseHeader(uint8_t* buf, uint8_t* end) const;
     bool testDecodeTestFrame(uint8_t* buf, uint8_t* end) const;

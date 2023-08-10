@@ -16,7 +16,7 @@ static constexpr uint16_t ff_mpa_freq_tab[3] = {44100, 48000, 32000};
 // const static int MPA_DUAL = 2;
 static constexpr int MPA_MONO = 3;
 
-uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
+uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, const uint8_t* end)
 {
     if (buff == nullptr)
         return nullptr;
@@ -40,7 +40,7 @@ uint8_t* MP3Codec::mp3FindFrame(uint8_t* buff, uint8_t* end)
     return nullptr;
 }
 
-int MP3Codec::mp3DecodeFrame(uint8_t* buff, uint8_t* end)
+int MP3Codec::mp3DecodeFrame(uint8_t* buff, const uint8_t* end)
 {
     // int sample_rate, frame_size, mpeg25, padding;
     // int sample_rate_index, bitrate_index;

@@ -30,7 +30,7 @@ int AACCodec::getFrameSize(const uint8_t* buffer)
     return ((buffer[3] & 0x03) << 11) + (buffer[4] << 3) + (buffer[5] >> 5);
 }
 
-bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
+bool AACCodec::decodeFrame(uint8_t* buffer, const uint8_t* end)
 {
     BitStreamReader bits{};
     try

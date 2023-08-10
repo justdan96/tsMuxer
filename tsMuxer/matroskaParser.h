@@ -231,7 +231,7 @@ class ParsedH264TrackData : public ParsedTrackPrivData
 class ParsedH265TrackData : public ParsedH264TrackData
 {
    public:
-    ParsedH265TrackData(uint8_t* buff, int size);
+    ParsedH265TrackData(const uint8_t* buff, int size);
     ~ParsedH265TrackData() override = default;
 
     bool spsppsExists(uint8_t* buff, int size) override;
@@ -240,7 +240,7 @@ class ParsedH265TrackData : public ParsedH264TrackData
 class ParsedH266TrackData : public ParsedH264TrackData
 {
    public:
-    ParsedH266TrackData(uint8_t* buff, int size);
+    ParsedH266TrackData(const uint8_t* buff, int size);
     ~ParsedH266TrackData() override = default;
 
     bool spsppsExists(uint8_t* buff, int size) override;

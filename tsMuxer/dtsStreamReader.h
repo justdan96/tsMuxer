@@ -134,8 +134,8 @@ class DTSStreamReader : public SimplePacketizerReader
     static int buf14To16(uint8_t* p_out, const uint8_t* p_in, int i_in, int i_le);
     static void BufLeToBe(uint8_t* p_out, const uint8_t* p_in, int i_in);
     int getSurroundModeCode() const;
-    int decodeHdInfo(uint8_t* buff, uint8_t* end);
-    void checkIfOnlyHDDataExists(uint8_t* buff, uint8_t* end);
+    int decodeHdInfo(uint8_t* buff, const uint8_t* end);
+    void checkIfOnlyHDDataExists(uint8_t* buff, const uint8_t* end);
 };
 
 #endif

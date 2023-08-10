@@ -360,7 +360,7 @@ int MatroskaDemuxer::matroska_find_track_by_num(const int64_t num) const
     return -1;
 }
 
-int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const int32_t size, uint64_t *num)
+int MatroskaDemuxer::matroska_ebmlnum_uint(const uint8_t *data, const int32_t size, uint64_t *num)
 {
     int read = 1, n = 1, num_ffs = 0;
     uint64_t len_mask = 0x80;
@@ -2440,7 +2440,7 @@ void MatroskaDemuxer::getTrackList(std::map<uint32_t, TrackInfo> &trackList)
     for (int i = 0; i < num_tracks; i++) trackList[i + 1] = TrackInfo(getTrackType(tracks[i]), tracks[i]->language, 0);
 }
 
-int MatroskaDemuxer::getTrackType(MatroskaTrack *track)
+int MatroskaDemuxer::getTrackType(const MatroskaTrack *track)
 {
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
         return TRACKTYPE_SRT;

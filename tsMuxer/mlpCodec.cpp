@@ -51,7 +51,7 @@ static int numChannels8(const int chanmap)
 }
 
 // returns frame position starting with sync_word 0xf8726f
-uint8_t* MLPCodec::findFrame(uint8_t* buffer, uint8_t* end)
+uint8_t* MLPCodec::findFrame(uint8_t* buffer, const uint8_t* end)
 {
     uint8_t* curBuf = buffer;
     while (curBuf < end)
@@ -63,9 +63,9 @@ uint8_t* MLPCodec::findFrame(uint8_t* buffer, uint8_t* end)
     return nullptr;
 }
 
-int MLPCodec::getFrameSize(uint8_t* buffer) { return ((buffer[0] & 0x0f) << 9) + (buffer[1] << 1); }
+int MLPCodec::getFrameSize(const uint8_t* buffer) { return ((buffer[0] & 0x0f) << 9) + (buffer[1] << 1); }
 
-bool MLPCodec::isMinorSync(uint8_t* buffer, uint8_t* end) const
+bool MLPCodec::isMinorSync(const uint8_t* buffer, uint8_t* end) const
 {
     /* The first nibble of a frame is a parity check of the 4-byte
        access unit header and all the 2- or 4-byte substream headers. */

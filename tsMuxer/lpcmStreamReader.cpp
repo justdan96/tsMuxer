@@ -57,7 +57,7 @@ int LPCMStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hd
     return static_cast<int>(curPos - dstBuff);
 }
 
-int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
+int LPCMStreamReader::decodeLPCMHeader(const uint8_t* buff)
 {
     const int audio_data_payload_size = AV_RB16(buff);
     const int channelsIndex = buff[2] >> 4;
@@ -110,7 +110,7 @@ int LPCMStreamReader::decodeLPCMHeader(uint8_t* buff)
     return audio_data_payload_size;
 }
 
-void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData,
+void LPCMStreamReader::storeChannelData(const uint8_t* start, const uint8_t* end, const int chNum, uint8_t* tmpData,
                                         const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
@@ -123,7 +123,7 @@ void LPCMStreamReader::storeChannelData(uint8_t* start, uint8_t* end, const int 
     }
 }
 
-void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const int chNum, uint8_t* tmpData,
+void LPCMStreamReader::restoreChannelData(uint8_t* start, const uint8_t* end, const int chNum, const uint8_t* tmpData,
                                           const int mch) const
 {
     const int ch1SampleSize = (m_bitsPerSample == 20 ? 3 : m_bitsPerSample / 8);
@@ -136,7 +136,7 @@ void LPCMStreamReader::restoreChannelData(uint8_t* start, uint8_t* end, const in
     }
 }
 
-void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, const int chFrom, const int chTo,
+void LPCMStreamReader::copyChannelData(uint8_t* start, const uint8_t* end, const int chFrom, const int chTo,
                                        const int mch) const
 {
     // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
@@ -151,7 +151,7 @@ void LPCMStreamReader::copyChannelData(uint8_t* start, uint8_t* end, const int c
     }
 }
 
-void LPCMStreamReader::removeChannel(uint8_t* start, uint8_t* end, const int cnNum, const int mch) const
+void LPCMStreamReader::removeChannel(uint8_t* start, const uint8_t* end, const int cnNum, const int mch) const
 {
     // int mch = m_channels + (m_channels%2==1 ? 1 : 0);
     assert(mch == cnNum);
@@ -359,7 +359,7 @@ uint32_t LPCMStreamReader::convertLPCMToWAV(uint8_t* start, uint8_t* end)
     return static_cast<int>(end - start - (m_channels % 2 == 1 ? ch1FullSize : 0));
 }
 
-uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, uint8_t* end)
+uint8_t* LPCMStreamReader::findSubstr(const char* pattern, uint8_t* buff, const uint8_t* end)
 {
     const size_t patternLen = strlen(pattern);
     for (uint8_t* curPos = buff; curPos < end - patternLen; curPos++)

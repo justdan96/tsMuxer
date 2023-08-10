@@ -39,9 +39,9 @@ class HEVCStreamReader : public MPEGStreamReader
     bool isSlice(HevcUnit::NalType nalType) const;
     bool isSuffix(HevcUnit::NalType nalType) const;
     void incTimings();
-    int toFullPicOrder(HevcSliceHeader* slice, int pic_bits);
+    int toFullPicOrder(const HevcSliceHeader* slice, int pic_bits);
     static void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);
-    uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd) const;
+    uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, const uint8_t* dstEnd) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;
 
    private:

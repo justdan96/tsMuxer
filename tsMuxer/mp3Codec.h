@@ -20,8 +20,8 @@ class MP3Codec
     {
     }
 
-    static uint8_t* mp3FindFrame(uint8_t* buff, uint8_t* end);
-    int mp3DecodeFrame(uint8_t* buff, uint8_t* end);
+    static uint8_t* mp3FindFrame(uint8_t* buff, const uint8_t* end);
+    int mp3DecodeFrame(uint8_t* buff, const uint8_t* end);
 
    protected:
     int m_frame_size;

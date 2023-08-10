@@ -462,7 +462,7 @@ void HEVCStreamReader::incTimings()
     }
 }
 
-int HEVCStreamReader::toFullPicOrder(HevcSliceHeader* slice, const int pic_bits)
+int HEVCStreamReader::toFullPicOrder(const HevcSliceHeader* slice, const int pic_bits)
 {
     if (slice->isIDR())
     {
@@ -617,7 +617,7 @@ uint8_t* HEVCStreamReader::writeNalPrefix(uint8_t* curPos) const
     return curPos;
 }
 
-uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, uint8_t* dstEnd) const
+uint8_t* HEVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, const uint8_t* dstEnd) const
 {
     if (srcData.isEmpty())
         return dstBuffer;

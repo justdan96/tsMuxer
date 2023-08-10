@@ -181,7 +181,7 @@ bool TSDemuxer::isVideoPID(const StreamType streamType)
 // static uint64_t prevDts = 0;
 // static int ggCnt = 0;
 
-bool TSDemuxer::checkForRealM2ts(uint8_t* buffer, uint8_t* end) const
+bool TSDemuxer::checkForRealM2ts(const uint8_t* buffer, const uint8_t* end) const
 {
     for (const uint8_t* cur = buffer; cur < end; cur += 192)
         if (cur[4] != 0x47)

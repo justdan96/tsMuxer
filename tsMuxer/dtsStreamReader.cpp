@@ -159,7 +159,7 @@ int DTSStreamReader::getSurroundModeCode() const
     return rez;
 }
 
-void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, uint8_t* end)
+void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, const uint8_t* end)
 {
     for (int i = 0; i < 2 && buff < end - 4; ++i)
     {
@@ -275,7 +275,7 @@ uint8_t* DTSStreamReader::findFrame(uint8_t* buff, uint8_t* end)
     return nullptr;
 }
 
-int DTSStreamReader::decodeHdInfo(uint8_t* buff, uint8_t* end)
+int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
 {
     try
     {

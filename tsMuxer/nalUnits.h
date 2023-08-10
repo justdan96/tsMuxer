@@ -80,18 +80,18 @@ class NALUnit
     virtual ~NALUnit() { delete[] m_nalBuffer; }
     static uint8_t* findNextNAL(uint8_t* buffer, uint8_t* end);
     static uint8_t* findNALWithStartCode(uint8_t* buffer, uint8_t* end, bool longCodesAllowed);
-    static int encodeNAL(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
+    static int encodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
-    static int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
+    static int decodeNAL2(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
                           bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
     virtual int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
     virtual int serialize(uint8_t* dstBuffer);
     // void setBuffer(uint8_t* buffer, uint8_t* end);
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
-    static uint8_t* addStartCode(uint8_t* buffer, uint8_t* boundStart);
+    static uint8_t* addStartCode(uint8_t* buffer, const uint8_t* boundStart);
 
-    static unsigned extractUEGolombCode(uint8_t* buffer, uint8_t* bufEnd);
+    static unsigned extractUEGolombCode(uint8_t* buffer, const uint8_t* bufEnd);
     static unsigned extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value);
     static void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
@@ -306,7 +306,7 @@ class SEIUnit final : public NALUnit
     void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
                      int orig_hrd_parameters_present_flag);
     static void buffering_period(int payloadSize);
-    void pic_timing(SPSUnit& sps, bool orig_hrd_parameters_present_flag);
+    void pic_timing(const SPSUnit& sps, bool orig_hrd_parameters_present_flag);
     void pic_timing(SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag);
     static void pan_scan_rect(int payloadSize);
     static void filler_payload(int payloadSize);

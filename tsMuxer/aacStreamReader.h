@@ -2,7 +2,6 @@
 #define AAC_STREAM_READER_H_
 
 #include "aac.h"
-#include "avPacket.h"
 #include "simplePacketizerReader.h"
 
 class AACStreamReader : public SimplePacketizerReader, public AACCodec

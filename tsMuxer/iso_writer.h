@@ -141,7 +141,7 @@ struct FileEntryInfo
     void addFile(FileEntryInfo* file);
     void serialize();  // flush directory tree to a disk
     int allocateEntity(int sectorNum);
-    void writeEntity(ByteFileWriter& writer, FileEntryInfo* subDir) const;
+    void writeEntity(ByteFileWriter& writer, const FileEntryInfo* subDir) const;
     void serializeDir() const;
     void serializeFile();
     bool isFile() const;
@@ -217,14 +217,14 @@ class IsoWriter
     int writeExtendedFileEntryDescriptor(bool namedStream, uint8_t objectId, FileTypes fileType, uint64_t len,
                                          uint32_t pos, uint16_t linkCount, ExtentList* extents = 0);
     void writeFileSetDescriptor();
-    void writeAllocationExtentDescriptor(ExtentList* extents, size_t start, size_t indexEnd);
+    void writeAllocationExtentDescriptor(const ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();
 
     static void writeEntity(FileEntryInfo* dir);
     int allocateEntity(FileEntryInfo* entity, int sectorNum);
 
     void sectorSeek(Partition partition, int pos) const;
-    void writeSector(uint8_t* sectorData);
+    void writeSector(const uint8_t* sectorData);
     uint32_t absoluteSectorNum() const;
 
     static void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);

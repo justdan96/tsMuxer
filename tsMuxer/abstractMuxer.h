@@ -2,12 +2,10 @@
 #define ABSTRACT_MUXER_H_
 
 #include <fs/file.h>
-#include <fs/systemlog.h>
 
 #include <map>
 #include <string>
 
-#include "bufferedFileWriter.h"
 #include "metaDemuxer.h"
 
 class MuxerManager;
@@ -34,7 +32,7 @@ class AbstractMuxer
     virtual void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) {}
     virtual void setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock) {}
 
-    virtual std::string getNextName(const std::string curName) { return curName; }
+    virtual std::string getNextName(std::string curName) { return curName; }
 
     /*
      * inform writer if new block started, round data by blockRound

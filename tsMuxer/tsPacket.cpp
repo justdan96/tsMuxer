@@ -614,7 +614,7 @@ void CLPIStreamInfo::composeStreamCodingInfo(BitStreamWriter& writer) const
     *lengthPos = writer.getBitsCount() / 8 - beforeCount;
 }
 
-void CLPIParser::parseProgramInfo(uint8_t* buffer, uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
+void CLPIParser::parseProgramInfo(uint8_t* buffer, const uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
                                   std::map<int, CLPIStreamInfo>& streamInfoMap)
 {
     BitStreamReader reader{};
@@ -743,7 +743,7 @@ void CLPIParser::composeClipInfo(BitStreamWriter& writer) const
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void CLPIParser::parseSequenceInfo(uint8_t* buffer, uint8_t* end)
+void CLPIParser::parseSequenceInfo(uint8_t* buffer, const uint8_t* end)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
@@ -789,7 +789,7 @@ void CLPIParser::composeSequenceInfo(BitStreamWriter& writer) const
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void CLPIParser::parseCPI(uint8_t* buffer, uint8_t* end)
+void CLPIParser::parseCPI(uint8_t* buffer, const uint8_t* end)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
@@ -978,7 +978,7 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
     }
 }
 
-void CLPIParser::parseClipMark(uint8_t* buffer, uint8_t* end)
+void CLPIParser::parseClipMark(uint8_t* buffer, const uint8_t* end)
 {
     BitStreamReader reader{};
     reader.setBuffer(buffer, end);
@@ -1130,7 +1130,7 @@ void CLPIParser::composeExtentInfo(BitStreamWriter& writer)
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount - 4);
 }
 
-void CLPIParser::parseExtensionData(uint8_t* buffer, uint8_t* end)
+void CLPIParser::parseExtensionData(uint8_t* buffer, const uint8_t* end)
 {
     // added for 3D compatibility
     BitStreamReader reader{};
@@ -1695,7 +1695,7 @@ void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum
 }
 
 void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playItemNum, size_t subPathNum,
-                                    std::vector<PMTIndex>& pmtIndexList) const
+                                    const std::vector<PMTIndex>& pmtIndexList) const
 {
     const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
@@ -1745,7 +1745,7 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
     *lengthPos = my_htons(writer.getBitsCount() / 8 - beforeCount);
 }
 
-int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, std::vector<PMTIndex>& pmtIndexList) const
+int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, const std::vector<PMTIndex>& pmtIndexList) const
 {
     // The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
     BitStreamWriter writer{};
@@ -1969,7 +1969,7 @@ void MPLSParser::parseSubPathEntryExtension(uint8_t* data, const int dataLen)
     }
 }
 
-void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
+void MPLSParser::parseExtensionData(uint8_t* data, const uint8_t* dataEnd)
 {
     try
     {
@@ -2017,7 +2017,7 @@ void MPLSParser::parseExtensionData(uint8_t* data, uint8_t* dataEnd)
     }
 }
 
-void MPLSParser::composeExtensionData(BitStreamWriter& writer, vector<ExtDataBlockInfo>& extDataBlockInfo)
+void MPLSParser::composeExtensionData(BitStreamWriter& writer, const vector<ExtDataBlockInfo>& extDataBlockInfo)
 {
     vector<uint32_t*> extDataStartAddrPos;
     extDataStartAddrPos.resize(extDataBlockInfo.size());
@@ -2089,7 +2089,7 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, const int PlayItem_id)
     STN_table(reader, PlayItem_id);
 }
 
-void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemNum, std::vector<PMTIndex>& pmtIndexList)
+void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemNum, const std::vector<PMTIndex>& pmtIndexList)
 {
     const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length
@@ -2153,7 +2153,7 @@ void MPLSParser::parsePlayListMark(uint8_t* buffer, const int len)
     }
 }
 
-int MPLSParser::calcPlayItemID(MPLSStreamInfo& streamInfo, const uint32_t pts)
+int MPLSParser::calcPlayItemID(const MPLSStreamInfo& streamInfo, const uint32_t pts)
 {
     for (size_t i = 0; i < streamInfo.m_index.size(); i++)
     {

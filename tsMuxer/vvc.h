@@ -56,7 +56,7 @@ struct VvcUnit
 
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     int deserialize();
-    int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd) const;
+    int serializeBuffer(uint8_t* dstBuffer, const uint8_t* dstEnd) const;
 
     int nalBufferLen() const { return m_nalBufferLen; }
 

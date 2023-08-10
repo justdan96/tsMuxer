@@ -48,7 +48,7 @@ void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool las
         memmove(m_tmpBuffer.data(), dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
 }
 
-bool SRTStreamReader::detectSrcFormat(uint8_t* dataStart, const int len, int& prefixLen)
+bool SRTStreamReader::detectSrcFormat(const uint8_t* dataStart, const int len, int& prefixLen)
 {
     prefixLen = 0;
     if (len < 4)
@@ -147,7 +147,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
     return static_cast<int>(lastProcessedLine - dataStart);
 }
 
-bool SRTStreamReader::strOnlySpace(std::string& str)
+bool SRTStreamReader::strOnlySpace(const std::string& str)
 {
     for (const char& c : str)
     {

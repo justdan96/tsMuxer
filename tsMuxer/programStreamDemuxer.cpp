@@ -51,7 +51,7 @@ void ProgramStreamDemuxer::openFile(const std::string& streamName)
     m_dataProcessed = 0;
 }
 
-int ProgramStreamDemuxer::mpegps_psm_parse(uint8_t* buff, uint8_t* end)
+int ProgramStreamDemuxer::mpegps_psm_parse(const uint8_t* buff, const uint8_t* end)
 {
     if (end - buff < 7)
         return -1;

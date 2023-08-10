@@ -79,7 +79,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int ebml_read_sint(uint32_t *id, int64_t *num);
     static int matroska_ebmlnum_sint(uint8_t *data, int32_t size, int64_t *num);
     int matroska_parse_blockgroup(uint64_t cluster_time);
-    static int matroska_ebmlnum_uint(uint8_t *data, int32_t size, uint64_t *num);
+    static int matroska_ebmlnum_uint(const uint8_t *data, int32_t size, uint64_t *num);
     int matroska_find_track_by_num(int64_t num) const;
     int matroska_parse_block(uint8_t *data, unsigned size, int64_t pos, uint64_t cluster_time, uint64_t duration,
                              int is_keyframe, int is_bframe);
@@ -100,7 +100,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int matroska_parse_tracks();
     int matroska_parse_chapters();
     int matroska_add_stream();
-    static int getTrackType(MatroskaTrack *track);
+    static int getTrackType(const MatroskaTrack *track);
 
     int readTrackEncodings(MatroskaTrack *track);
     int readTrackEncoding(MatroskaTrack *track);

@@ -42,7 +42,7 @@ class MuxerManager
 
     virtual void asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
     virtual int syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
-    void muxBlockFinished(AbstractMuxer* muxer);
+    void muxBlockFinished(const AbstractMuxer* muxer);
 
     void parseMuxOpt(const std::string& opts);
     int getTrackCnt() { return static_cast<int>(m_metaDemuxer.getCodecInfo().size()); }
