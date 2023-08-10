@@ -19,7 +19,7 @@ enum class VideoAspectRatio
 struct AVChapter
 {
     AVChapter() : start(0) {}
-    AVChapter(int64_t _start, const std::string _cTitle) : start(_start), cTitle(_cTitle) {}
+    AVChapter(int64_t _start, std::string _cTitle) : start(_start), cTitle(std::move(_cTitle)) {}
     bool operator<(const AVChapter& other) const { return start < other.start; }
     int64_t start;
     std::string cTitle;

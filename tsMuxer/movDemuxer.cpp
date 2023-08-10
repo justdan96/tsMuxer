@@ -138,9 +138,9 @@ struct MOVStreamContext : Track
     unsigned bytes_per_frame;
     unsigned samples_per_frame;
     unsigned pseudo_stream_id;  ///< -1 means demux all ids
-    int audio_cid;     ///< stsd audio compression id
-    int width;             ///< tkhd width
-    int height;            ///< tkhd height
+    int audio_cid;              ///< stsd audio compression id
+    int width;                  ///< tkhd width
+    int height;                 ///< tkhd height
     unsigned bits_per_coded_sample;
     unsigned channels;
     int packet_size;
@@ -1317,7 +1317,7 @@ int MovDemuxer::mov_read_mvhd(MOVAtom atom)
         get_be32();  // creation time
         get_be32();  // modification time
     }
-    m_timescale = get_be32();                                            // time scale
+    m_timescale = get_be32();                                           // time scale
     const int64_t duration = (version == 1) ? get_be64() : get_be32();  // duration
     fileDuration = duration * 1000000000ll / m_timescale;
     get_be32();      // preferred scale
@@ -1733,7 +1733,7 @@ if (st->codec->codec_id == CODEC_ID_QDM2) {
 int MovDemuxer::mov_read_elst(MOVAtom atom)
 {
     const int version = get_byte();
-    get_be24();                         // flags
+    get_be24();                              // flags
     const unsigned edit_count = get_be32();  // entries
 
     for (unsigned i = 0; i < edit_count; i++)

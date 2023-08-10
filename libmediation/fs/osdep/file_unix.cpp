@@ -4,6 +4,8 @@
  *	Date: 13 oct 2006
  ***********************************************************************/
 
+#if !defined(_WIN32) 
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -154,3 +156,5 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
 bool File::truncate(const uint64_t newFileSize) const { return ftruncate(to_fd(m_impl), newFileSize) == 0; }
 
 void File::sync() { ::sync(); }
+
+#endif
