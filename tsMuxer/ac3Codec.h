@@ -56,7 +56,7 @@ class AC3Codec
         m_mixinfoexists = false;
     }
 
-    virtual ~AC3Codec() {}
+    virtual ~AC3Codec() = default;
 
     virtual int getHeaderLen() { return AC3_HEADER_SIZE; }
     bool isEAC3() const { return m_bsid > 10; }

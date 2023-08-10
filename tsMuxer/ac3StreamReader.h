@@ -1,8 +1,6 @@
 #ifndef AC3_STREAM_READER_H_
 #define AC3_STREAM_READER_H_
 
-#include <deque>
-
 #include "abstractDemuxer.h"
 #include "ac3Codec.h"
 #include "avPacket.h"

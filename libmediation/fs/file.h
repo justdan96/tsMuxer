@@ -6,8 +6,8 @@
 class AbstractStream
 {
    public:
-    AbstractStream() {}
-    virtual ~AbstractStream() {}
+    AbstractStream() = default;
+    virtual ~AbstractStream() = default;
 
     static const unsigned int ofRead = 1;
     static const unsigned int ofWrite = 2;
@@ -133,7 +133,7 @@ class File : public AbstractOutputStream
 class FileFactory
 {
    public:
-    virtual ~FileFactory() {}
+    virtual ~FileFactory() = default;
     virtual AbstractOutputStream* createFile() = 0;
     virtual bool isVirtualFS() const = 0;
 };

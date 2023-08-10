@@ -20,9 +20,10 @@ class ParsedTrackPrivData
 {
    public:
     ParsedTrackPrivData(uint8_t* buff, int size) {}
-    ParsedTrackPrivData() {}
+    ParsedTrackPrivData() = default;
+    virtual ~ParsedTrackPrivData() = default;
+
     virtual void setPrivData(uint8_t* buff, int size) {}
-    virtual ~ParsedTrackPrivData() {}
     virtual void extractData(AVPacket* pkt, uint8_t* buff, int size) = 0;
     virtual unsigned newBufferSize(uint8_t* buff, unsigned size) { return 0; }
 };
@@ -45,6 +46,7 @@ float av_int2flt(uint32_t v);
 struct Track
 {
     Track()
+        : num(0), uid(0), stream_index(0), codec_priv_size(0), flags(0)
     {
         name = codec_id = codec_name = nullptr;
         parsed_priv_data = nullptr;
@@ -54,6 +56,7 @@ struct Track
         encodingAlgo = 0;
         type = IOContextTrackType::UNDEFINED;
     }
+
     virtual ~Track()
     {
         delete[] name;

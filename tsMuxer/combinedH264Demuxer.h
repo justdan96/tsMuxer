@@ -15,9 +15,9 @@ class CombinedH264Reader
 {
    public:
     CombinedH264Reader();
-    virtual ~CombinedH264Reader() {}
+    virtual ~CombinedH264Reader() = default;
 
-   protected:
+protected:
     enum class ReadState
     {
         NeedMoreData,
@@ -72,7 +72,7 @@ class CombinedH264Filter : public SubTrackFilter, public CombinedH264Reader
 {
    public:
     CombinedH264Filter(int demuxedPID);
-    ~CombinedH264Filter() override {}
+    ~CombinedH264Filter() override = default;
     int demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket) override;
 };
 

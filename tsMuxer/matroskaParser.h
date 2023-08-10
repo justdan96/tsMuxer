@@ -214,7 +214,7 @@ class ParsedH264TrackData : public ParsedTrackPrivData
 {
    public:
     ParsedH264TrackData(uint8_t* buff, int size);
-    ~ParsedH264TrackData() override {}
+    ~ParsedH264TrackData() override = default;
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 
    protected:
@@ -232,7 +232,7 @@ class ParsedH265TrackData : public ParsedH264TrackData
 {
    public:
     ParsedH265TrackData(uint8_t* buff, int size);
-    ~ParsedH265TrackData() override {}
+    ~ParsedH265TrackData() override = default;
 
     bool spsppsExists(uint8_t* buff, int size) override;
 };
@@ -241,7 +241,7 @@ class ParsedH266TrackData : public ParsedH264TrackData
 {
    public:
     ParsedH266TrackData(uint8_t* buff, int size);
-    ~ParsedH266TrackData() override {}
+    ~ParsedH266TrackData() override = default;
 
     bool spsppsExists(uint8_t* buff, int size) override;
 };
@@ -251,9 +251,9 @@ class ParsedAC3TrackData : public ParsedTrackPrivData
    public:
     ParsedAC3TrackData(uint8_t* buff, int size);
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-    ~ParsedAC3TrackData() override {}
+    ~ParsedAC3TrackData() override = default;
 
-   private:
+private:
     bool m_firstPacket;
     bool m_shortHeaderMode;
 };
@@ -263,9 +263,9 @@ class ParsedAACTrackData : public ParsedTrackPrivData
    public:
     ParsedAACTrackData(uint8_t* buff, int size);
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-    ~ParsedAACTrackData() override {}
+    ~ParsedAACTrackData() override = default;
 
-   private:
+private:
     AACCodec m_aacRaw;
 };
 
@@ -274,9 +274,9 @@ class ParsedLPCMTrackData : public ParsedTrackPrivData
    public:
     ParsedLPCMTrackData(MatroskaTrack* track);
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-    ~ParsedLPCMTrackData() override {}
+    ~ParsedLPCMTrackData() override = default;
 
-   private:
+private:
     bool m_convertBytes;
     int m_bitdepth;
     int m_channels;
@@ -288,9 +288,9 @@ class ParsedSRTTrackData : public ParsedTrackPrivData
    public:
     ParsedSRTTrackData(uint8_t* buff, int size);
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-    ~ParsedSRTTrackData() override {}
+    ~ParsedSRTTrackData() override = default;
 
-   private:
+private:
     int m_packetCnt;
 };
 
@@ -299,9 +299,9 @@ class ParsedVC1TrackData : public ParsedTrackPrivData
    public:
     ParsedVC1TrackData(uint8_t* buff, int size);
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-    ~ParsedVC1TrackData() override {}
+    ~ParsedVC1TrackData() override = default;
 
-   private:
+private:
     std::vector<uint8_t> m_seqHeader;
     bool m_firstPacket;
 };
@@ -309,8 +309,8 @@ class ParsedVC1TrackData : public ParsedTrackPrivData
 class ParsedPGTrackData : public ParsedTrackPrivData
 {
    public:
-    ParsedPGTrackData() {}
-    ~ParsedPGTrackData() override {}
+    ParsedPGTrackData() = default;
+    ~ParsedPGTrackData() override = default;
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 
    private:

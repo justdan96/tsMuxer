@@ -276,7 +276,7 @@ MPEGGOPHeader::MPEGGOPHeader()
 {
 }
 
-MPEGGOPHeader::~MPEGGOPHeader() {}
+MPEGGOPHeader::~MPEGGOPHeader() = default;
 
 uint8_t* MPEGGOPHeader::deserialize(uint8_t* buf, const int64_t buf_size)
 {

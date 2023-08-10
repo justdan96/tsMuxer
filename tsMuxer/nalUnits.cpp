@@ -350,7 +350,7 @@ HRDParams::HRDParams()
     isPresent = false;
 }
 
-HRDParams::~HRDParams() {}
+HRDParams::~HRDParams() = default;
 
 void HRDParams::resetDefault(const bool mvc)
 {

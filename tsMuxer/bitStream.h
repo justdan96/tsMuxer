@@ -22,6 +22,7 @@ class BitStreamException : public std::exception
 class BitStream
 {
    public:
+    BitStream() : m_totalBits(0), m_buffer(nullptr), m_initBuffer(nullptr) {}
     uint8_t* getBuffer() const { return reinterpret_cast<uint8_t*>(m_initBuffer); }
     unsigned getBitsLeft() const { return m_totalBits; }
 
@@ -46,23 +47,9 @@ class BitStream
 
 class BitStreamReader : public BitStream
 {
-   private:
-    unsigned getCurVal(unsigned* buff) const
-    {
-        const auto tmpBuf = reinterpret_cast<uint8_t*>(buff);
-        if (m_totalBits - m_bitLeft >= 32)
-            return my_ntohl(*buff);
-        if (m_totalBits - m_bitLeft >= 24)
-            return (tmpBuf[0] << 24) + (tmpBuf[1] << 16) + (tmpBuf[2] << 8);
-        if (m_totalBits - m_bitLeft >= 16)
-            return (tmpBuf[0] << 24) + (tmpBuf[1] << 16);
-        if (m_totalBits - m_bitLeft >= 8)
-            return tmpBuf[0] << 24;
-
-        THROW_BITSTREAM_ERR;
-    }
-
    public:
+    BitStreamReader() : m_curVal(0), m_bitLeft(0) {}
+
     void setBuffer(uint8_t* buffer, const uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);
@@ -178,11 +165,28 @@ class BitStreamReader : public BitStream
    private:
     unsigned m_curVal;
     unsigned m_bitLeft;
+
+    unsigned getCurVal(unsigned* buff) const
+    {
+        const auto tmpBuf = reinterpret_cast<uint8_t*>(buff);
+        if (m_totalBits - m_bitLeft >= 32)
+            return my_ntohl(*buff);
+        if (m_totalBits - m_bitLeft >= 24)
+            return (tmpBuf[0] << 24) + (tmpBuf[1] << 16) + (tmpBuf[2] << 8);
+        if (m_totalBits - m_bitLeft >= 16)
+            return (tmpBuf[0] << 24) + (tmpBuf[1] << 16);
+        if (m_totalBits - m_bitLeft >= 8)
+            return tmpBuf[0] << 24;
+
+        THROW_BITSTREAM_ERR;
+    }
 };
 
 class BitStreamWriter : public BitStream
 {
    public:
+    BitStreamWriter() : m_curVal(0), m_bitWrited(0) {}
+
     void setBuffer(uint8_t* buffer, const uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);

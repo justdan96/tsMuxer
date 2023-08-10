@@ -50,7 +50,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
           m_secondary(false)
     {
     }
-    virtual ~AbstractStreamReader() {}
+    virtual ~AbstractStreamReader() = default;
     virtual uint64_t getProcessedSize() = 0;
     virtual void setBuffer(uint8_t* data, const int dataLen, bool lastBlock = false)
     {

@@ -115,7 +115,7 @@ struct MOVStreamContext : Track
     {
     }
 
-    ~MOVStreamContext() override {}
+    ~MOVStreamContext() override = default;
 
     vector<int64_t> chunk_offsets;
     vector<uint32_t> m_index;

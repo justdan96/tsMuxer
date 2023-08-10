@@ -20,7 +20,7 @@ class VC1StreamReader : public MPEGStreamReader
         m_longCodesAllowed = false;
         m_nextFrameAddr = nullptr;
     }
-    ~VC1StreamReader() override {}
+    ~VC1StreamReader() override = default;
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool skipNal(uint8_t* nal) override;

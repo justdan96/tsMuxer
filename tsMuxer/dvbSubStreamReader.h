@@ -5,12 +5,11 @@
 
 #if 1
 
-class DVBSubStreamReader : public SimplePacketizerReader
+class DVBSubStreamReader final : public SimplePacketizerReader
 {
    public:
     DVBSubStreamReader()
-        : SimplePacketizerReader(),
-          m_firstFrame(true),
+        : m_firstFrame(true),
           m_big_offsets(0),
           m_offset_size(0),
           m_start_display_time(0),

@@ -76,7 +76,7 @@ class FileNameIterator
 {
    public:
     virtual std::string getNextName() = 0;
-    virtual ~FileNameIterator() {}
+    virtual ~FileNameIterator() = default;
 };
 
 struct TrackInfo

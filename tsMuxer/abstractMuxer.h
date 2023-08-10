@@ -17,7 +17,7 @@ class AbstractMuxer
 {
    public:
     AbstractMuxer(MuxerManager* owner);
-    virtual ~AbstractMuxer() {}
+    virtual ~AbstractMuxer() = default;
 
     virtual void openDstFile() = 0;
     virtual bool doFlush() = 0;
@@ -52,8 +52,8 @@ class AbstractMuxer
 class AbstractMuxerFactory
 {
    public:
-    AbstractMuxerFactory() {}
-    virtual ~AbstractMuxerFactory() {}
+    AbstractMuxerFactory() = default;
+    virtual ~AbstractMuxerFactory() = default;
 
     virtual AbstractMuxer* newInstance(MuxerManager* owner) const = 0;
 };

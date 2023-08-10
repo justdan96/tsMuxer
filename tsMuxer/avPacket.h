@@ -70,8 +70,9 @@ struct AVPacket
 class BaseAbstractStreamReader
 {
    public:
-    BaseAbstractStreamReader() {}
-    virtual ~BaseAbstractStreamReader() {}
+    BaseAbstractStreamReader() = default;
+    virtual ~BaseAbstractStreamReader() = default;
+
     virtual int writeAdditionData(uint8_t* dst, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData)
     {
         return 0;

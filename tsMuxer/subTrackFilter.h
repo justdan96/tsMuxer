@@ -7,7 +7,7 @@ class SubTrackFilter
 {
    public:
     SubTrackFilter(const int pid) : m_srcPID(pid) {}
-    virtual ~SubTrackFilter() {}
+    virtual ~SubTrackFilter() = default;
 
     static int pidToSubPid(const int pid, const int subPid) { return (pid << 16) + subPid; }
     static bool isSubTrack(const int pid) { return pid >= 65536; }

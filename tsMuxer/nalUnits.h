@@ -142,7 +142,7 @@ class PPSUnit final : public NALUnit
           m_ready(false)
     {
     }
-    ~PPSUnit() override {}
+    ~PPSUnit() override = default;
 
     bool isReady() const { return m_ready; }
     int deserialize();
@@ -233,7 +233,7 @@ class SPSUnit final : public NALUnit
     void setFps(double fps);
 
     SPSUnit();
-    ~SPSUnit() override {}
+    ~SPSUnit() override = default;
 
     bool isReady() const { return m_ready; }
     int deserialize();
@@ -275,7 +275,7 @@ class SEIUnit final : public NALUnit
           m_mvcHeaderStart(nullptr)
     {
     }
-    ~SEIUnit() override {}
+    ~SEIUnit() override = default;
 
     void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
     using NALUnit::deserialize;
@@ -362,7 +362,7 @@ class SliceUnit : public NALUnit
     int anchor_pic_flag;
 
     SliceUnit();
-    ~SliceUnit() override {}
+    ~SliceUnit() override = default;
 
     int deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_t, SPSUnit*>& spsMap,
                     const std::map<uint32_t, PPSUnit*>& ppsMap);

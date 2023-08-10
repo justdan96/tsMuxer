@@ -5,10 +5,10 @@
 #include "mlpCodec.h"
 #include "simplePacketizerReader.h"
 
-class MLPStreamReader : public SimplePacketizerReader, public MLPCodec
+class MLPStreamReader final : public SimplePacketizerReader, public MLPCodec
 {
    public:
-    MLPStreamReader() : SimplePacketizerReader()
+    MLPStreamReader()
     {
         m_demuxedTHDSamples = 0;
         m_totalTHDSamples = 0;

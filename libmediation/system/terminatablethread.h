@@ -7,7 +7,7 @@ class TerminatableThread
 {
    public:
     //! After creating the thread object, it's necessary to call run(thread) until the thread's first usage.
-    TerminatableThread() {}
+    TerminatableThread() = default;
     //! The destructor waits until the thread ends its work and destroys the object.
     virtual ~TerminatableThread();
 

@@ -15,7 +15,7 @@ class FileListIterator : public FileNameIterator
 {
    public:
     FileListIterator() : m_index(0) {}
-    ~FileListIterator() override {}
+    ~FileListIterator() override = default;
 
     std::string getNextName() override
     {
@@ -51,7 +51,7 @@ struct FileReaderData : public ReaderData
    public:
     FileReaderData(uint32_t blockSize, uint32_t allocSize) : m_fileHeaderSize(0) {}
 
-    ~FileReaderData() override {}
+    ~FileReaderData() override = default;
 
     uint32_t readBlock(uint8_t* buffer, const int max_size) override
     {

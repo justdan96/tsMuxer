@@ -188,7 +188,7 @@ TextSubtitlesRender::TextSubtitlesRender() : m_width(0), m_height(0)
     m_borderWidth = 0;
 }
 
-TextSubtitlesRender::~TextSubtitlesRender() {}
+TextSubtitlesRender::~TextSubtitlesRender() = default;
 
 string findFontArg(const string& text, const size_t pos)
 {

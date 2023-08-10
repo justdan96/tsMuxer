@@ -63,7 +63,7 @@ class MPEGHeader
 
    protected:
     MPEGHeader() {}
-    virtual ~MPEGHeader() {}
+    virtual ~MPEGHeader() = default;
 
     static uint8_t* skipProcessedBytes(const BitStreamReader& bitContext)
     {
@@ -134,7 +134,7 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     int pan_scan_width;
     int pan_scan_height;
     MPEGSequenceHeader(int bufferSize);
-    ~MPEGSequenceHeader() override {}
+    ~MPEGSequenceHeader() override = default;
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeExtension(BitStreamReader& bitReader);
     static uint8_t* deserializeMatrixExtension(const BitStreamReader& bitReader);
@@ -222,7 +222,7 @@ class MPEGPictureHeader : public MPEGRawDataHeader
 
     // methods
     MPEGPictureHeader(int bufferSize);
-    ~MPEGPictureHeader() override {}
+    ~MPEGPictureHeader() override = default;
 
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeCodingExtension(BitStreamReader& bitReader);

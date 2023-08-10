@@ -251,7 +251,7 @@ struct PMTStreamInfo
         m_pmtPID = -1;
         isSecondary = secondary;
     }
-    virtual ~PMTStreamInfo() {}
+    virtual ~PMTStreamInfo() = default;
 
     StreamType m_streamType;
     int m_pid;

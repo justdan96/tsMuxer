@@ -22,7 +22,7 @@ class AbstractReader
     static constexpr int DATA_NOT_READY2 = 5;
 
     AbstractReader() : m_blockSize(0), m_allocSize(0), m_prereadThreshold(0) {}
-    virtual ~AbstractReader() {}
+    virtual ~AbstractReader() = default;
     virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) = 0;
     virtual void notify(uint32_t readerID, uint32_t dataReaded) = 0;
     virtual int32_t createReader(int readBuffOffset = 0) = 0;
