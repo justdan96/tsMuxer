@@ -65,8 +65,8 @@ class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
     MemoryBlock m_delayedAc3Buffer;
     AVPacket m_delayedAc3Packet;
     int m_demuxedTHDSamples;
-    uint64_t m_totalTHDSamples;
-    uint64_t m_nextAc3Time;
+    int64_t m_totalTHDSamples;
+    int64_t m_nextAc3Time;
 };
 
 #endif

@@ -107,7 +107,7 @@ class AC3Codec
 
    protected:
     bool m_testMode;
-    uint64_t m_frameDuration;
+    int64_t m_frameDuration;
 };
 
 #endif

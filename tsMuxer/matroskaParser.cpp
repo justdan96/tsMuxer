@@ -51,8 +51,9 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : Parsed
             }
         }
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
         THROW(ERR_MATROSKA_PARSE, "Can't parse H.264 private data");
     }
 };

@@ -44,8 +44,9 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             }
         }
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
     }
 
     // HDMV registration descriptor
@@ -119,8 +120,9 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                     return rez;
                 }
         }
-        catch (BitStreamException)
+        catch (BitStreamException &e)
         {
+            (void)e;
             // return rez;
         }
     }
@@ -206,8 +208,9 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
             return NALUnit::UNSUPPORTED_PARAM;
         m_streamAR = static_cast<VideoAspectRatio>(m_sequence.aspect_ratio_info);
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
     const int oldSpsLen = 0;
@@ -231,8 +234,9 @@ int MPEG2StreamReader::processExtStartCode(uint8_t* buff)
         }
         return 0;
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 }
@@ -253,8 +257,9 @@ int MPEG2StreamReader::decodePicture(uint8_t* buff)
         if (m_frame.deserialize(buff + 1, m_bufEnd - buff - 1) == nullptr)
             return NALUnit::UNSUPPORTED_PARAM;
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
         return NOT_ENOUGH_BUFFER;
     }
 
@@ -330,8 +335,9 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
                     return 0;
                 }
             }
-            catch (BitStreamException)
+            catch (BitStreamException &e)
             {
+                (void)e;
                 return NOT_ENOUGH_BUFFER;
             }
         }

@@ -301,8 +301,9 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
         assert(m_paletteByColor.size() == m_paletteYUV.size());
         return true;
     }
-    catch (VodCoreException)
+    catch (VodCoreException &e)
     {
+        (void)e;
         return false;
     }
 }

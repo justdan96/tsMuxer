@@ -87,8 +87,9 @@ bool PS_stream_pack::deserialize(uint8_t* buffer, const int buf_size)
         m_pack_stuffing_length = bitReader.getBits(3);
         return true;
     }
-    catch (BitStreamException)
+    catch (BitStreamException &e)
     {
+        (void)e;
         return false;
     }
 }
