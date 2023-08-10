@@ -51,7 +51,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int level_up;
     int peek_id;
     bool done;
-    char title[1024];
+    char m_title[1024];
 
     uint64_t segment_start;
     uint64_t created;

@@ -189,7 +189,7 @@ int MatroskaDemuxer::matroska_parse_index()
 }
 
 MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
-    : IOContextDemuxer(readManager), levels(), title(), created(0), fileDuration(0)
+    : IOContextDemuxer(readManager), levels(), m_title(), created(0), fileDuration(0)
 {
     m_lastDeliveryPacket = nullptr;
     num_levels = 0;
@@ -678,7 +678,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                     pkt->data = new uint8_t[slice_size + offset];
                     pkt->size = slice_size + offset;
                     // TODO : check compiler warning 'Reading invalid data from curPtr'
-                    memcpy(pkt->data, curPtr, static_cast<size_t>(slice_size + offset));
+                    memcpy(pkt->data, curPtr, slice_size + offset);
                 }
                 if (offset)
                     memcpy(curPtr, m_tmpBuffer.data(), offset);  // restore data
@@ -708,7 +708,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
     int is_keyframe = PKT_FLAG_KEY;
     const size_t last_num_packets = packets.size();
     uint64_t duration = AV_NOPTS_VALUE;
-    uint8_t *data;
+    uint8_t *data = nullptr;
     int size = 0;
     int64_t pos = 0;
 
@@ -777,7 +777,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const uint64_t cluster_time)
     if (res)
         return res;
 
-    if (size > 0)
+    if (data != nullptr)
         res = matroska_parse_block(data, size, pos, cluster_time, duration, is_keyframe, is_bframe);
 
     return res;
@@ -1407,7 +1407,7 @@ int MatroskaDemuxer::matroska_parse_info()
             char *text;
             if ((res = ebml_read_utf8(&id, &text)) < 0)
                 break;
-            strncpy(title, text, sizeof(title) - 1);
+            strncpy(m_title, text, sizeof(title) - 1);
             delete[] text;
             break;
         }
