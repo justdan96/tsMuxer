@@ -1,12 +1,7 @@
 #ifndef ABSTRACT_READER_H_
 #define ABSTRACT_READER_H_
 
-#include <types/types.h>
-
 #include <string>
-
-#include "abstractDemuxer.h"
-#include "avPacket.h"
 
 struct CodecInfo;
 

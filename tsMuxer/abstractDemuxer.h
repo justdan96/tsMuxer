@@ -2,7 +2,6 @@
 #define ABSTRACT_DEMUXER_H_
 
 #include <assert.h>
-#include <memory.h>
 #include <types/types.h>
 
 #include <map>
@@ -39,7 +38,7 @@ class MemoryBlock
         m_size += num;
         if (m_data.size() < m_size)
         {
-            m_data.resize(FFMIN(m_size * 2, m_size + 1024 * 1024));
+            m_data.resize(FFMIN(m_size * 2, m_size + 1024LL * 1024));
         }
     }
 

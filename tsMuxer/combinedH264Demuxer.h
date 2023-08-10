@@ -2,10 +2,8 @@
 #define COMBINED_H264_DEMUXER_H
 
 #include <map>
-#include <set>
 #include <string>
 
-#include "BufferedReader.h"
 #include "abstractDemuxer.h"
 #include "abstractreader.h"
 #include "bufferedReaderManager.h"
@@ -61,7 +59,7 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     bool isPidFilterSupported() const override { return true; }
 
    private:
-    BufferedReaderManager& m_readManager;
+    BufferedReaderManager m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;

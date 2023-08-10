@@ -2,10 +2,7 @@
 #define AV_CODECS_H_
 
 #include <types/types.h>
-
 #include <string>
-
-#include "avPacket.h"
 
 static constexpr int CODEC_ID_NONE = 0;
 static constexpr int CODEC_V_MPEG4_H264 = 1;

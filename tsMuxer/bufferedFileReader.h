@@ -3,7 +3,6 @@
 
 #include <fs/file.h>
 #include <fs/systemlog.h>
-#include <memory.h>
 #include <types/types.h>
 
 #include "BufferedReader.h"
@@ -55,10 +54,7 @@ struct FileReaderData : public ReaderData
 
     uint32_t readBlock(uint8_t* buffer, const int max_size) override
     {
-        int rez = 0;
-        rez = m_file.read(buffer, max_size);
-
-        return rez;
+        return m_file.read(buffer, max_size);
     }
 
     bool openStream() override;

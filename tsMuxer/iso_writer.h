@@ -6,24 +6,24 @@
 #include <map>
 #include <string>
 
-static const int SECTOR_SIZE = 2048;
-static const int ALLOC_BLOCK_SIZE = 1024 * 64;
-static const int METADATA_START_ADDR = 1024 * 640 / SECTOR_SIZE;
-static const int MAX_EXTENT_SIZE = 0x40000000;
-static const uint32_t NEXT_EXTENT = 0xc0000000;
+static constexpr int SECTOR_SIZE = 2048;
+static constexpr int ALLOC_BLOCK_SIZE = 1024 * 64;
+static constexpr int METADATA_START_ADDR = 1024 * 640 / SECTOR_SIZE;
+static constexpr int MAX_EXTENT_SIZE = 0x40000000;
+static constexpr uint32_t NEXT_EXTENT = 0xc0000000;
 
-static const int64_t META_BLOCK_PER_DATA = 16 * 1000000000ll;
+static constexpr int64_t META_BLOCK_PER_DATA = 16 * 1000000000ll;
 
 // it can be allocated inside single sector of a extended file
-static const unsigned MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
-static const unsigned MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
+static constexpr unsigned MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
+static constexpr unsigned MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
 
-static const int MAIN_INTERLEAVE_BLOCKSIZE = 6144 * 3168;
-static const int SUB_INTERLEAVE_BLOCKSIZE = 6144 * 1312;
+static constexpr int MAIN_INTERLEAVE_BLOCKSIZE = 6144 * 3168;
+static constexpr int SUB_INTERLEAVE_BLOCKSIZE = 6144 * 1312;
 
-static const int MAX_MAIN_MUXER_RATE = 48000000;
-static const int MAX_4K_MUXER_RATE = 109000000;
-static const int MAX_SUBMUXER_RATE = 35000000;
+static constexpr int MAX_MAIN_MUXER_RATE = 48000000;
+static constexpr int MAX_4K_MUXER_RATE = 109000000;
+static constexpr int MAX_SUBMUXER_RATE = 35000000;
 
 enum class DescriptorTag
 {
@@ -115,7 +115,7 @@ typedef std::vector<Extent> ExtentList;
 struct MappingEntry
 {
     MappingEntry() : parentLBN(0), LBN(0) {}
-    MappingEntry(int _parentLBN, int _LBN) : parentLBN(_parentLBN), LBN(_LBN) {}
+    MappingEntry(const int _parentLBN, const int _lbn) : parentLBN(_parentLBN), LBN(_lbn) {}
 
     int parentLBN;
     int LBN;

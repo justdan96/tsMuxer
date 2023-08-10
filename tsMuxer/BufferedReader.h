@@ -3,7 +3,6 @@
 
 #include <containers/safequeue.h>
 #include <system/terminatablethread.h>
-#include <types/types.h>
 
 #include <map>
 #include <string>

@@ -1,8 +1,6 @@
 #ifndef BUFFERED_READER_MANAGER_H_
 #define BUFFERED_READER_MANAGER_H_
 
-#include <types/types.h>
-
 #include <vector>
 
 #include "bufferedFileReader.h"

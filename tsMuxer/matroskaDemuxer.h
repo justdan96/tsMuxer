@@ -55,11 +55,11 @@ class MatroskaDemuxer : public IOContextDemuxer
 
     uint64_t segment_start;
     uint64_t created;
-    uint64_t fileDuration;
+    int64_t fileDuration;
     char *writing_app;
     char *muxing_app;
     uint64_t time_scale;
-    std::map<uint64_t, uint64_t> m_firstTimecode;
+    std::map<int64_t, int64_t> m_firstTimecode;
     bool index_parsed;
     bool metadata_parsed;
     int num_streams;

@@ -3,8 +3,6 @@
 
 #include "simplePacketizerReader.h"
 
-#if 1
-
 class DVBSubStreamReader final : public SimplePacketizerReader
 {
    public:
@@ -38,7 +36,5 @@ class DVBSubStreamReader final : public SimplePacketizerReader
     int64_t m_frameDuration;
     int intDecodeFrame(uint8_t* buff, uint8_t* end);
 };
-
-#endif
 
 #endif

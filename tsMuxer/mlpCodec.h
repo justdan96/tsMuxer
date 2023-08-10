@@ -1,7 +1,7 @@
-#include <types/types.h>
-
 #ifndef MLP_CODEC_H_
 #define MLP_CODEC_H_
+
+#include <types/types.h>
 
 static constexpr int MLP_HEADER_LEN = 7;
 

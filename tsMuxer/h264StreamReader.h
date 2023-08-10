@@ -1,7 +1,6 @@
 #ifndef H264_STREAM_READER_H_
 #define H264_STREAM_READER_H_
 
-#include <iostream>
 #include <map>
 
 #include "avPacket.h"

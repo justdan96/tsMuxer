@@ -6,8 +6,6 @@
 #include <system/terminatablethread.h>
 #include <types/types.h>
 
-#include <map>
-
 #include "vod_common.h"
 
 constexpr unsigned WRITE_QUEUE_MAX_SIZE = 400 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;  // 400 Mb max queue size

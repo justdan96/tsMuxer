@@ -1,7 +1,6 @@
 #include "blurayHelper.h"
 
 #include <fs/directory.h>
-
 #include <array>
 
 #include "iso_writer.h"

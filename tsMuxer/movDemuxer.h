@@ -2,12 +2,10 @@
 #define MOV_DEMUXER_H_
 
 #include <map>
-#include <queue>
 #include <set>
 #include <string>
 #include <vector>
 
-#include "BufferedReader.h"
 #include "bufferedReaderManager.h"
 #include "ioContextDemuxer.h"
 

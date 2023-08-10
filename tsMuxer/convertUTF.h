@@ -1,3 +1,6 @@
+#ifndef CONVERT_UTF_
+#define CONVERT_UTF_
+
 /*
  * Copyright 2001-2004 Unicode, Inc.
  *
@@ -212,4 +215,5 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
 
 }  // namespace convertUTF
 
+#endif
 /* --------------------------------------------------------------------- */

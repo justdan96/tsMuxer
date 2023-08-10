@@ -5,8 +5,6 @@
 
 #include <types/types.h>
 
-#include <iostream>
-
 #include "avPacket.h"
 #include "bitStream.h"
 #include "vod_common.h"
@@ -47,14 +45,10 @@ class MPEGHeader
         // uint8_t* bufStart = buffer;
         for (buffer += 2; buffer < end;)
         {
-            if (*buffer > 1)
-                buffer += 3;
-            else if (*buffer == 0)
+            if (*buffer == 0)
                 buffer++;
-            else if (buffer[-2] == 0 && buffer[-1] == 0)
-            {
+            else if (buffer[-2] == 0 && buffer[-1] == 0 && buffer[0] == 1)
                 return buffer - 2;
-            }
             else
                 buffer += 3;
         }

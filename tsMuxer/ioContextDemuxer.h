@@ -1,10 +1,6 @@
 #ifndef IO_CONTEXT_DEMUXER_H_
 #define IO_CONTEXT_DEMUXER_H_
 
-#include <map>
-#include <queue>
-#include <set>
-#include <string>
 #include <vector>
 
 #include "BufferedReader.h"
@@ -103,7 +99,7 @@ class IOContextDemuxer : public AbstractDemuxer
     Track* tracks[MAX_STREAMS];
     int num_tracks;
 
-    BufferedReaderManager& m_readManager;
+    BufferedReaderManager m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;

@@ -74,7 +74,7 @@ class BitStreamReader : public BitStream
             m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
-        return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
+        return static_cast<int>(prevVal + (m_curVal >> m_bitLeft) & m_masks[num]);
     }
 
     unsigned get32Bits()
@@ -110,7 +110,7 @@ class BitStreamReader : public BitStream
             curVal = getCurVal(m_buffer + 1);
             bitLeft += INT_BIT - num;
         }
-        return prevVal + (curVal >> bitLeft) & m_masks[num];
+        return static_cast<int>(prevVal + (curVal >> bitLeft) & m_masks[num]);
     }
 
     int getBit()
@@ -126,7 +126,7 @@ class BitStreamReader : public BitStream
             m_bitLeft = INT_BIT - 1;
         }
         m_totalBits--;
-        return (m_curVal >> m_bitLeft) & 1;
+        return static_cast<int>(m_curVal >> m_bitLeft) & 1;
     }
 
     void skipBits(const unsigned num)
