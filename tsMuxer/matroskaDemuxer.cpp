@@ -1148,7 +1148,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
         memcpy(&avPacket, newPacket, sizeof(AVPacket));
     }
     else
-        memset(&avPacket, 0, sizeof(avPacket));
+        memset(&avPacket, 0, sizeof(AVPacket));
     m_lastDeliveryPacket = newPacket;
     return 0;
 }
@@ -1398,7 +1398,7 @@ int MatroskaDemuxer::matroska_parse_info()
             double num;
             if ((res = ebml_read_float(&id, &num)) < 0)
                 break;
-            fileDuration = static_cast<uint64_t>(num * time_scale);
+            fileDuration = static_cast<uint64_t>(num * static_cast<double>(time_scale));
             break;
         }
 
@@ -1407,7 +1407,7 @@ int MatroskaDemuxer::matroska_parse_info()
             char *text;
             if ((res = ebml_read_utf8(&id, &text)) < 0)
                 break;
-            strncpy(m_title, text, sizeof(title) - 1);
+            strncpy(m_title, text, sizeof(m_title) - 1);
             delete[] text;
             break;
         }

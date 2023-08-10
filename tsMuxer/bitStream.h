@@ -108,9 +108,9 @@ class BitStreamReader : public BitStream
         return prevVal + (m_curVal >> m_bitLeft);
     }
 
-    inline unsigned showBits(unsigned num)
+    inline int showBits(unsigned num)
     {
-        if (num > INT_BIT || m_totalBits < num)
+        if (num > INT_BIT - 1 || m_totalBits < num)
             THROW_BITSTREAM_ERR;
         unsigned prevVal = 0;
         unsigned bitLeft = m_bitLeft;
