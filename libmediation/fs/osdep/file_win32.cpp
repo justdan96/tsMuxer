@@ -197,6 +197,8 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
     case SeekMethod::smEnd:
         moveMethod = FILE_END;
         break;
+    default: 
+        break;
     }
 
     const LONG distanceToMoveLow = static_cast<LONG>(offset & 0xffffffff);

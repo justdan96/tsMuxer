@@ -11,10 +11,10 @@
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"
 
-const static int TRACKTYPE_PCM = 0x080;
-const static int TRACKTYPE_PGS = 0x090;
-const static int TRACKTYPE_SRT = 0x190;
-const static int TRACKTYPE_WAV = 0x180;
+static constexpr int TRACKTYPE_PCM = 0x080;
+static constexpr int TRACKTYPE_PGS = 0x090;
+static constexpr int TRACKTYPE_SRT = 0x190;
+static constexpr int TRACKTYPE_WAV = 0x180;
 
 class ParsedTrackPrivData
 {
@@ -46,9 +46,9 @@ struct Track
 {
     Track()
     {
-        name = codec_id = codec_name = 0;
-        parsed_priv_data = 0;
-        codec_priv = 0;
+        name = codec_id = codec_name = nullptr;
+        parsed_priv_data = nullptr;
+        codec_priv = nullptr;
         memset(language, 0, sizeof(language));
         default_duration = 0;
         encodingAlgo = 0;
@@ -88,19 +88,19 @@ struct Track
 class IOContextDemuxer : public AbstractDemuxer
 {
    public:
-    IOContextDemuxer(const BufferedReaderManager& readManager);
+    IOContextDemuxer(BufferedReaderManager& readManager);
     ~IOContextDemuxer() override;
     void setFileIterator(FileNameIterator* itr) override;
     uint64_t getDemuxedSize() override;
     int getLastReadRez() override { return m_lastReadRez; };
-    int64_t getProcessedBytes() { return m_processedBytes; }
+    int64_t getProcessedBytes() const { return m_processedBytes; }
 
    protected:
-    const static int MAX_STREAMS = 64;
+    static constexpr int MAX_STREAMS = 64;
     Track* tracks[MAX_STREAMS];
     int num_tracks;
 
-    const BufferedReaderManager& m_readManager;
+    BufferedReaderManager& m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;

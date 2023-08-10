@@ -278,7 +278,7 @@ int VC1StreamReader::decodeFrame(uint8_t* buff)
 
     m_curDts += m_prevDtsInc;
 
-    int64_t pcrIncVal = m_pcrIncPerFrame;
+    const int64_t pcrIncVal = m_pcrIncPerFrame;
     // if (m_frame.fcm == 2) // coded field
     //	pcrIncVal = m_pcrIncPerField;
 

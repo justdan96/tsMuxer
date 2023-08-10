@@ -156,7 +156,7 @@ void PGSStreamReader::yuvToRgb(const int minY) const
     }
 }
 
-void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset)
+void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset) const
 {
     if (m_dstRle.empty())
         return;

@@ -23,7 +23,7 @@ struct ReaderData
           m_lastBlock(false),
           m_eof(false),
           m_atQueue(0),
-          itr(0),
+          itr(nullptr),
           m_blockSize(0),
           m_allocSize(0),
           m_readOffset(0)
@@ -50,9 +50,9 @@ virtual void deleteNextBlocks()
     virtual void init()
     {
         // deleteNextBlocks();
-        if (m_nextBlock[0] == 0)
+        if (m_nextBlock[0] == nullptr)
             m_nextBlock[0] = new uint8_t[m_allocSize];
-        if (m_nextBlock[1] == 0)
+        if (m_nextBlock[1] == nullptr)
             m_nextBlock[1] = new uint8_t[m_allocSize];
     }
 
@@ -86,12 +86,12 @@ virtual void deleteNextBlocks()
 class BufferedReader : public AbstractReader, TerminatableThread
 {
    public:
-    const static int UNKNOWN_READERID = 3;
+    static constexpr int UNKNOWN_READERID = 3;
     BufferedReader(uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
     ~BufferedReader() override;
     int32_t createReader(int readBuffOffset = 0) override;
     void deleteReader(uint32_t readerID) override;  // unregister readed
-    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
+    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
     void notify(uint32_t readerID,
                 uint32_t dataReaded) override;  // reader must call notificate when part of data handled
     uint32_t getReaderCount();
@@ -100,7 +100,7 @@ class BufferedReader : public AbstractReader, TerminatableThread
     bool incSeek(uint32_t readerID, int64_t offset);
     bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
 
-    void setId(int value) { m_id = value; }
+    void setId(const int value) { m_id = value; }
 
    protected:
     virtual ReaderData* intCreateReader() = 0;

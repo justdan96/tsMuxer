@@ -24,7 +24,7 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual int getFreq() = 0;
     virtual int getAltFreq() { return getFreq(); }
     virtual int getChannels() = 0;
-    void setStretch(double value) { m_stretch = value; }
+    void setStretch(const double value) { m_stretch = value; }
     void setMPLSInfo(const std::vector<MPLSPlayItem>& mplsInfo)
     {
         m_mplsInfo = mplsInfo;

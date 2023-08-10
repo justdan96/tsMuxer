@@ -22,16 +22,16 @@ class BitStreamException : public std::exception
 class BitStream
 {
    public:
-    inline uint8_t* getBuffer() const { return (uint8_t*)m_initBuffer; }
-    inline unsigned getBitsLeft() const { return m_totalBits; }
+    uint8_t* getBuffer() const { return reinterpret_cast<uint8_t*>(m_initBuffer); }
+    unsigned getBitsLeft() const { return m_totalBits; }
 
    protected:
-    inline void setBuffer(uint8_t* buffer, uint8_t* end)
+    void setBuffer(uint8_t* buffer, const uint8_t* end)
     {
         if (buffer >= end)
             THROW_BITSTREAM_ERR;
-        m_totalBits = (unsigned)(end - buffer) * 8;
-        m_initBuffer = m_buffer = (unsigned*)buffer;
+        m_totalBits = static_cast<unsigned>(end - buffer) * 8;
+        m_initBuffer = m_buffer = reinterpret_cast<unsigned*>(buffer);
     }
     unsigned m_totalBits;
     unsigned* m_buffer;
@@ -47,23 +47,23 @@ class BitStream
 class BitStreamReader : public BitStream
 {
    private:
-    inline unsigned getCurVal(unsigned* buff)
+    unsigned getCurVal(unsigned* buff) const
     {
-        auto tmpBuf = (uint8_t*)buff;
+        const auto tmpBuf = reinterpret_cast<uint8_t*>(buff);
         if (m_totalBits - m_bitLeft >= 32)
             return my_ntohl(*buff);
-        else if (m_totalBits - m_bitLeft >= 24)
+        if (m_totalBits - m_bitLeft >= 24)
             return (tmpBuf[0] << 24) + (tmpBuf[1] << 16) + (tmpBuf[2] << 8);
-        else if (m_totalBits - m_bitLeft >= 16)
+        if (m_totalBits - m_bitLeft >= 16)
             return (tmpBuf[0] << 24) + (tmpBuf[1] << 16);
-        else if (m_totalBits - m_bitLeft >= 8)
+        if (m_totalBits - m_bitLeft >= 8)
             return tmpBuf[0] << 24;
-        else
-            THROW_BITSTREAM_ERR;
+
+        THROW_BITSTREAM_ERR;
     }
 
    public:
-    inline void setBuffer(uint8_t* buffer, uint8_t* end)
+    void setBuffer(uint8_t* buffer, const uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);
         m_bitLeft = 0;
@@ -71,7 +71,7 @@ class BitStreamReader : public BitStream
         m_bitLeft = INT_BIT;
     }
 
-    inline int getBits(unsigned num)
+    int getBits(const unsigned num)
     {
         if (num > INT_BIT || m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -90,7 +90,7 @@ class BitStreamReader : public BitStream
         return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
     }
 
-    inline unsigned get32Bits()
+    unsigned get32Bits()
     {
         if (m_totalBits < INT_BIT)
             THROW_BITSTREAM_ERR;
@@ -108,7 +108,7 @@ class BitStreamReader : public BitStream
         return prevVal + (m_curVal >> m_bitLeft);
     }
 
-    inline int showBits(unsigned num)
+    int showBits(const unsigned num) const
     {
         if (num > INT_BIT - 1 || m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -126,7 +126,7 @@ class BitStreamReader : public BitStream
         return prevVal + (curVal >> bitLeft) & m_masks[num];
     }
 
-    inline int getBit()
+    int getBit()
     {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
@@ -142,7 +142,7 @@ class BitStreamReader : public BitStream
         return (m_curVal >> m_bitLeft) & 1;
     }
 
-    inline void skipBits(unsigned num)
+    void skipBits(const unsigned num)
     {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -158,7 +158,7 @@ class BitStreamReader : public BitStream
         m_totalBits -= num;
     }
 
-    inline void skipBit()
+    void skipBit()
     {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
@@ -173,7 +173,7 @@ class BitStreamReader : public BitStream
         m_totalBits--;
     }
 
-    inline int getBitsCount() const { return (int)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft; }
+    int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft); }
 
    private:
     unsigned m_curVal;
@@ -183,22 +183,22 @@ class BitStreamReader : public BitStream
 class BitStreamWriter : public BitStream
 {
    public:
-    inline void setBuffer(uint8_t* buffer, uint8_t* end)
+    void setBuffer(uint8_t* buffer, const uint8_t* end)
     {
         BitStream::setBuffer(buffer, end);
         m_curVal = 0;
         m_bitWrited = 0;
     }
 
-    inline void skipBits(unsigned cnt)
+    void skipBits(const unsigned cnt)
     {
         assert(m_bitWrited % INT_BIT == 0);
         BitStreamReader reader{};
-        reader.setBuffer((uint8_t*)m_buffer, (uint8_t*)(m_buffer + 1));
+        reader.setBuffer(reinterpret_cast<uint8_t*>(m_buffer), reinterpret_cast<uint8_t*>(m_buffer + 1));
         putBits(cnt, reader.getBits(cnt));
     }
 
-    inline void putBits(unsigned num, unsigned value)
+    void putBits(const unsigned num, unsigned value)
     {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -223,9 +223,9 @@ class BitStreamWriter : public BitStream
         m_totalBits -= num;
     }
 
-    inline void putBit(unsigned value) { putBits(1, value); }
+    void putBit(const unsigned value) { putBits(1, value); }
 
-    inline void flushBits()
+    void flushBits()
     {
         if (m_bitWrited != 0)
         {
@@ -237,17 +237,17 @@ class BitStreamWriter : public BitStream
         *m_buffer = my_htonl(prevVal);
     }
 
-    inline int getBitsCount() { return (int)(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
+    unsigned getBitsCount() const { return static_cast<unsigned>(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
 
    private:
     unsigned m_curVal;
     unsigned m_bitWrited;
 };
 
-void updateBits(const BitStreamReader& bitReader, const int bitOffset, const int bitLen, const int value);
-void updateBits(uint8_t* buffer, const int bitOffset, const int bitLen, const int value);
+void updateBits(const BitStreamReader& bitReader, int bitOffset, int bitLen, int value);
+void updateBits(uint8_t* buffer, int bitOffset, int bitLen, int value);
 
 // move len bits from oldBitOffset position to newBitOffset
-void moveBits(uint8_t* buffer, const int oldBitOffset, const int newBitOffset, const int len);
+void moveBits(uint8_t* buffer, int oldBitOffset, int newBitOffset, int len);
 
 #endif

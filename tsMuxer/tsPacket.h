@@ -31,10 +31,10 @@ enum class TSDescriptorTag
     EAC3 = 0xCC
 };
 
-const static int SYSTEM_START_CODE = 0xb9;
+static constexpr int SYSTEM_START_CODE = 0xb9;
 
-static const int DEFAULT_PCR_PID = 4097;
-static const int DEFAULT_PMT_PID = 256;
+static constexpr int DEFAULT_PCR_PID = 4097;
+static constexpr int DEFAULT_PMT_PID = 256;
 
 // IUT Rec. H.222 Table 2-22 - Stream_id assignments
 enum PesStreamId
@@ -107,7 +107,7 @@ enum class StreamType
 
 struct AdaptiveField
 {
-    static const unsigned ADAPTIVE_FIELD_LEN = 2;
+    static constexpr unsigned ADAPTIVE_FIELD_LEN = 2;
 
     unsigned int length : 8;
 
@@ -120,26 +120,26 @@ struct AdaptiveField
     unsigned int randomAccessIndicator : 1;
     unsigned int discontinuityIndicator : 1;
 
-    inline unsigned getPCR32()
+    unsigned getPCR32()
     {
-        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
+        const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         return my_ntohl(*pcr);
         // return my_ntohl(*pcr) * 0.95;
     }
 
-    inline uint64_t getPCR33()
+    uint64_t getPCR33()
     {
-        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
-        auto pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
-        return ((uint64_t)(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
+        const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
+        const auto pcrLo = reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
+        return (static_cast<uint64_t>(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
     }
 
-    inline void setPCR33(uint64_t value)
+    void setPCR33(const uint64_t value)
     {
-        auto pcr = (uint32_t*)((uint8_t*)this + ADAPTIVE_FIELD_LEN);
-        *pcr = my_htonl((uint32_t)(value >> 1));
-        auto pcrLo = (uint8_t*)this + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
-        pcrLo[0] = (((uint8_t)value & 1) << 7) + 0x7e;
+        const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
+        *pcr = my_htonl(static_cast<uint32_t>(value >> 1));
+        const auto pcrLo = reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
+        pcrLo[0] = ((static_cast<uint8_t>(value) & 1) << 7) + 0x7e;
         pcrLo[1] = 0;  // 41-42 bits of pcr
     }
 };
@@ -147,11 +147,11 @@ struct AdaptiveField
 struct TSPacket
 {
     // static const unsigned TS_FRAME_SIZE = 188;
-    static const unsigned TS_FRAME_SYNC_BYTE = 0x47;
-    static const unsigned TS_HEADER_SIZE = 4;
+    static constexpr unsigned TS_FRAME_SYNC_BYTE = 0x47;
+    static constexpr unsigned TS_HEADER_SIZE = 4;
 
-    static const unsigned DATA_EXIST_BIT_VAL = 0x10000000;
-    static const unsigned PCR_BIT_VAL = 0x1000;
+    static constexpr unsigned DATA_EXIST_BIT_VAL = 0x10000000;
+    static constexpr unsigned PCR_BIT_VAL = 0x1000;
 
     unsigned int syncByte : 8;
     unsigned int PIDHi : 5;
@@ -172,33 +172,31 @@ struct TSPacket
     unsigned int afExists : 1;  // adaptive field exist
     unsigned int sc : 2;        // scrambling control
 
-    inline uint16_t getPID() { return (uint16_t)(PIDHi << 8) + PIDLow; }
+    uint16_t getPID() const { return static_cast<uint16_t>(PIDHi << 8) + PIDLow; }
 
-    inline void setPID(uint16_t pid)
+    void setPID(const uint16_t pid)
     {
         PIDHi = pid >> 8;
         PIDLow = pid & 0xff;
     }
 
-    inline unsigned getHeaderSize() { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
+    unsigned getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
 
-    static inline uint32_t getPCRDif32(uint32_t nextPCR, uint32_t curPCR)
+    static uint32_t getPCRDif32(const uint32_t nextPCR, const uint32_t curPCR)
     {
         if (nextPCR >= curPCR)
             return nextPCR - curPCR;
-        else
-            return nextPCR + (UINT_MAX - curPCR);
+        return nextPCR + (UINT_MAX - curPCR);
     }
 
-    static inline int64_t getPCRDif33(int64_t nextPCR, int64_t curPCR)
+    static int64_t getPCRDif33(const int64_t nextPCR, const int64_t curPCR)
     {
         if (nextPCR >= curPCR)
             return nextPCR - curPCR;
-        else if (nextPCR < 0x40000000LL && curPCR > 0x1c0000000LL)
+        if (nextPCR < 0x40000000LL && curPCR > 0x1c0000000LL)
             return nextPCR + (0x1ffffffffLL - curPCR) + 1;
-        else
-            return nextPCR - curPCR;
-        // return -(curPCR - nextPCR);
+
+        return nextPCR - curPCR;
     }
 
     AdaptiveField adaptiveField;
@@ -211,7 +209,7 @@ struct BluRayCoarseInfo
     uint32_t m_coarsePts;
     uint32_t m_fineRefID;
     uint32_t m_pktCnt;
-    BluRayCoarseInfo(uint32_t coarsePts, uint32_t fineRefID, uint32_t pktCnt)
+    BluRayCoarseInfo(const uint32_t coarsePts, const uint32_t fineRefID, const uint32_t pktCnt)
         : m_coarsePts(coarsePts), m_fineRefID(fineRefID), m_pktCnt(pktCnt)
     {
     }
@@ -221,7 +219,7 @@ struct PMTIndexData
 {
     uint32_t m_pktCnt;
     int64_t m_frameLen;
-    PMTIndexData(uint32_t pktCnt, int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
+    PMTIndexData(const uint32_t pktCnt, const int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;
@@ -240,8 +238,8 @@ struct PMTStreamInfo
     {
     }
 
-    PMTStreamInfo(StreamType streamType, int pid, uint8_t* esInfoData, int esInfoLen, AbstractStreamReader* codecReader,
-                  const std::string& lang, bool secondary)
+    PMTStreamInfo(const StreamType streamType, const int pid, uint8_t* esInfoData, const int esInfoLen,
+                  AbstractStreamReader* codecReader, const std::string& lang, const bool secondary)
     {
         m_streamType = streamType;
         m_pid = pid;
@@ -386,12 +384,12 @@ struct CLPIStreamInfo : public M2TSStreamInfo
 
     void ISRC(BitStreamReader& reader);
     void parseStreamCodingInfo(BitStreamReader& reader);
-    static void readString(char* dest, BitStreamReader& reader, int size)
+    static void readString(char* dest, BitStreamReader& reader, const int size)
     {
         for (int i = 0; i < size; i++) dest[i] = reader.getBits(8);
         dest[size] = 0;
     }
-    static void writeString(const char* dest, BitStreamWriter& writer, int size)
+    static void writeString(const char* dest, BitStreamWriter& writer, const int size)
     {
         for (int i = 0; i < size; i++) writer.putBits(8, dest[i]);
     }
@@ -524,12 +522,12 @@ struct PlayListMark
 {
     int m_playItemID;
     uint32_t m_markTime;
-    PlayListMark(int playItemID, uint32_t markTime) : m_playItemID(playItemID), m_markTime(markTime) {}
+    PlayListMark(const int playItemID, const uint32_t markTime) : m_playItemID(playItemID), m_markTime(markTime) {}
 };
 
 struct ExtDataBlockInfo
 {
-    ExtDataBlockInfo(uint8_t* a_data, int a_dataLen, int a_id1, int a_id2) : id1(a_id1), id2(a_id2)
+    ExtDataBlockInfo(uint8_t* a_data, const int a_dataLen, const int a_id1, const int a_id2) : id1(a_id1), id2(a_id2)
     {
         data.resize(a_dataLen);
         if (!data.empty())

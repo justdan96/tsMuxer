@@ -36,7 +36,7 @@ using namespace std;
 static constexpr int MAX_DEMUX_BUFFER_SIZE = 1024 * 1024 * 192;
 static constexpr int MIN_READED_BLOCK = 16384;
 
-METADemuxer::METADemuxer(const BufferedReaderManager& readManager)
+METADemuxer::METADemuxer(BufferedReaderManager& readManager)
     : m_containerReader(*this, readManager), m_readManager(readManager)
 {
     m_flushDataMode = false;
@@ -202,9 +202,9 @@ void METADemuxer::openFile(const string& streamName)
     }
 
     H264StreamReader::SeiMethod primarySEI = H264StreamReader::SeiMethod::SEI_NotDefined;
-    for (auto& i : m_codecInfo)
+    for (const auto& i : m_codecInfo)
     {
-        auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
+        const auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
         if (reader && !reader->isSubStream())
         {
             primarySEI = reader->getInsertSEI();
@@ -215,9 +215,9 @@ void METADemuxer::openFile(const string& streamName)
     bool warned = false;
     if (primarySEI != H264StreamReader::SeiMethod::SEI_NotDefined)
     {
-        for (auto& i : m_codecInfo)
+        for (const auto& i : m_codecInfo)
         {
-            auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
+            const auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
             if (reader && reader->isSubStream())
             {
                 if (!warned && reader->getInsertSEI() != primarySEI)
@@ -238,7 +238,7 @@ std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, st
     string path = toNativeSeparators(extractFilePath(mplsFileName));
     const size_t tmp = path.find_last_of(getDirSeparator());
     if (tmp == string::npos)
-        return string();
+        return {};
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator();
 
     const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
@@ -256,7 +256,7 @@ std::string METADemuxer::mplsTrackToSSIFName(const std::string& mplsFileName, st
     string path = toNativeSeparators(extractFilePath(mplsFileName));
     const size_t tmp = path.find_last_of(getDirSeparator());
     if (tmp == string::npos)
-        return string();
+        return {};
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator() + string("SSIF") + getDirSeparator();
 
     const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
@@ -678,7 +678,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         File file;
         containerType = AbstractStreamReader::ContainerType::ctNone;
         if (!file.open(fileName.c_str(), File::ofRead))
-            return DetectStreamRez();
+            return {};
         auto tmpBuffer = new uint8_t[DETECT_STREAM_BUFFER_SIZE];
         int len = file.read(tmpBuffer, DETECT_STREAM_BUFFER_SIZE);
         if (fileExt == "sup")

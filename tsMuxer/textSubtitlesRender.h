@@ -12,8 +12,9 @@
 
 namespace text_subtitles
 {
-const static int DEFAULT_BROWSER_STYLE_FS = 3;
-const static double BROWSER_FONT_STYLE_INC_COEFF = 1.4142135623730950488016887242097;  // example: font 2 > font1 to 20%
+static constexpr int DEFAULT_BROWSER_STYLE_FS = 3;
+static constexpr double BROWSER_FONT_STYLE_INC_COEFF =
+    1.4142135623730950488016887242097;  // example: font 2 > font1 to 20%
 
 #ifndef _WIN32
 struct RGBQUAD
@@ -58,22 +59,22 @@ struct YUVQuad
     {
         if (Y != second.Y)
             return Y < second.Y;
-        else if (Cr != second.Cr)
+        if (Cr != second.Cr)
             return Cr < second.Cr;
-        else if (Cb != second.Cb)
+        if (Cb != second.Cb)
             return Cb < second.Cb;
-        else
-            return alpha < second.alpha;
+
+        return alpha < second.alpha;
     }
 };
 
 struct Font
 {
-    const static int BOLD = 1;
-    const static int ITALIC = 2;
-    const static int UNDERLINE = 4;
-    const static int STRIKE_OUT = 8;
-    const static int FORCED = 16;
+    static constexpr int BOLD = 1;
+    static constexpr int ITALIC = 2;
+    static constexpr int UNDERLINE = 4;
+    static constexpr int STRIKE_OUT = 8;
+    static constexpr int FORCED = 16;
     Font() : m_size(18), m_opts(0), m_borderWidth(0), m_charset(0), m_color(0x00ffffff), m_lineSpacing(1.0) {}
     bool operator!=(const Font& other) const
     {

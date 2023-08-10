@@ -27,7 +27,7 @@ float av_int2flt(const uint32_t v)
     return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1), (v >> 23 & 0xFF) - 150);
 }
 
-IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
+IOContextDemuxer::IOContextDemuxer(BufferedReaderManager& readManager)
     : tracks(), m_readManager(readManager), m_lastReadRez(0)
 {
     m_lastProcessedBytes = 0;

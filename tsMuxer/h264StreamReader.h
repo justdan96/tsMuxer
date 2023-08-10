@@ -22,21 +22,21 @@ class H264StreamReader : public MPEGStreamReader
 
     H264StreamReader();
     ~H264StreamReader() override;
-    void setForceLevel(uint8_t value) { m_forcedLevel = value; }
+    void setForceLevel(const uint8_t value) { m_forcedLevel = value; }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
-    void setH264SPSCont(bool val) { m_h264SPSCont = val; }
+    void setH264SPSCont(const bool val) { m_h264SPSCont = val; }
 
-    void setInsertSEI(SeiMethod value) { m_insertSEIMethod = value; }
+    void setInsertSEI(const SeiMethod value) { m_insertSEIMethod = value; }
     SeiMethod getInsertSEI() const { return m_insertSEIMethod; }
 
-    void setIsSubStream(bool value) { m_mvcSubStream = value; }
+    void setIsSubStream(const bool value) { m_mvcSubStream = value; }
     bool isSubStream() const { return m_mvcSubStream; }
 
     int getOffsetSeqCnt() const { return number_of_offset_sequences; }
 
     // used for correction offset metadata
-    virtual void setStartPTS(int64_t pts) { m_startPts = pts; }
+    virtual void setStartPTS(const int64_t pts) { m_startPts = pts; }
     bool needSPSForSplit() const override { return true; }
 
    protected:
@@ -46,9 +46,9 @@ class H264StreamReader : public MPEGStreamReader
     void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     double getStreamFPS(void* curNalUnit) override
     {
-        auto sps = (SPSUnit*)curNalUnit;
+        const auto sps = static_cast<SPSUnit*>(curNalUnit);
         return sps->getFPS();
-    };
+    }
 
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;

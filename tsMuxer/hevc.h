@@ -6,11 +6,10 @@
 struct HevcUnit
 {
     HevcUnit()
-        : nal_unit_type(), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(0), m_nalBufferLen(0), m_reader()
+        : nal_unit_type(), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(nullptr), m_nalBufferLen(0), m_reader()
     {
     }
 
-   public:
     enum class NalType
     {
         TRAIL_N = 0,  // first slice
@@ -54,7 +53,6 @@ struct HevcUnit
 
     int nalBufferLen() const { return m_nalBufferLen; }
 
-   public:
     NalType nal_unit_type;
     int nuh_layer_id;
     int nuh_temporal_id_plus1;
@@ -64,13 +62,12 @@ struct HevcUnit
     int extractSEGolombCode();
     void updateBits(int bitOffset, int bitLen, int value) const;
 
-   protected:
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
     BitStreamReader m_reader;
 };
 
-struct HevcUnitWithProfile : public HevcUnit
+struct HevcUnitWithProfile : HevcUnit
 {
     HevcUnitWithProfile();
     std::string getProfileString() const;
@@ -84,7 +81,7 @@ struct HevcUnitWithProfile : public HevcUnit
     int profile_tier_level(int subLayers);
 };
 
-struct HevcVpsUnit : public HevcUnitWithProfile
+struct HevcVpsUnit : HevcUnitWithProfile
 {
     HevcVpsUnit();
     int deserialize();
@@ -92,7 +89,6 @@ struct HevcVpsUnit : public HevcUnitWithProfile
     void setFPS(double fps);
     std::string getDescription() const;
 
-   public:
     int vps_id;
     unsigned num_units_in_tick;
     unsigned time_scale;
@@ -106,7 +102,6 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     double getFPS() const;
     std::string getDescription() const;
 
-   public:
     int vps_id;
     int max_sub_layers;
     unsigned sps_id;
@@ -142,12 +137,11 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     int scaling_list_data();
 };
 
-struct HevcPpsUnit : public HevcUnit
+struct HevcPpsUnit : HevcUnit
 {
     HevcPpsUnit();
     int deserialize();
 
-   public:
     unsigned pps_id;
     unsigned sps_id;
     bool dependent_slice_segments_enabled_flag;
@@ -160,7 +154,6 @@ struct HevcHdrUnit : public HevcUnit
     HevcHdrUnit();
     int deserialize();
 
-   public:
     bool isHDR10;
     bool isHDR10plus;
     bool isDVRPU;
@@ -173,7 +166,6 @@ struct HevcSliceHeader : public HevcUnit
     int deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps);
     bool isIDR() const;
 
-   public:
     bool first_slice;
     unsigned pps_id;
     unsigned slice_type;

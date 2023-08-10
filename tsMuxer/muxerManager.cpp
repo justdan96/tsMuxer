@@ -35,7 +35,7 @@ int seekDefaultTrack(const std::vector<StreamInfo>& tracks, std::string& param, 
 }
 }  // namespace
 
-MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
+MuxerManager::MuxerManager(BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
     : m_metaDemuxer(readManager), m_factory(factory)
 {
     m_asyncMode = true;

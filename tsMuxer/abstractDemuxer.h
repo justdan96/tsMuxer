@@ -11,7 +11,7 @@
 
 #include "avPacket.h"
 #include "vod_common.h"
-//#include <system/dynamiclink.h>
+// #include <system/dynamiclink.h>
 
 class SubTrackFilter;
 
@@ -25,16 +25,16 @@ class MemoryBlock
     }
 
     MemoryBlock() : m_size(0) {}
-    void reserve(int num) { m_data.resize(num); }
+    void reserve(const int num) { m_data.resize(num); }
 
-    void resize(unsigned num)
+    void resize(const unsigned num)
     {
         m_size = num;
         if (m_data.size() < m_size)
             m_data.resize(m_size);
     }
 
-    void grow(int64_t num)
+    void grow(const int64_t num)
     {
         m_size += num;
         if (m_data.size() < m_size)
@@ -43,7 +43,7 @@ class MemoryBlock
         }
     }
 
-    void append(const uint8_t* data, int64_t num)
+    void append(const uint8_t* data, const int64_t num)
     {
         if (num > 0)
         {
@@ -54,7 +54,7 @@ class MemoryBlock
 
     size_t size() const { return m_size; }
 
-    uint8_t* data() { return m_data.empty() ? 0 : &m_data[0]; }
+    uint8_t* data() { return m_data.empty() ? nullptr : &m_data[0]; }
 
     bool isEmpty() const { return m_size == 0; }
 
@@ -85,7 +85,10 @@ struct TrackInfo
     std::string m_lang;  // tracl language code
     int64_t m_delay;     // auto delay for audio
     TrackInfo() : m_trackType(0), m_delay(0) {}
-    TrackInfo(int trackType, const char* lang, int64_t delay) : m_trackType(trackType), m_lang(lang), m_delay(delay) {}
+    TrackInfo(const int trackType, const char* lang, const int64_t delay)
+        : m_trackType(trackType), m_lang(lang), m_delay(delay)
+    {
+    }
 };
 
 class AbstractDemuxer
@@ -105,7 +108,7 @@ class AbstractDemuxer
     virtual uint64_t getDemuxedSize() = 0;
 
     virtual uint64_t getDuration() { return 0; }
-    virtual void setTimeOffset(uint64_t offset) { m_timeOffset = offset; }
+    virtual void setTimeOffset(const uint64_t offset) { m_timeOffset = offset; }
     virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
     {
         discardSize = 0;
@@ -120,15 +123,15 @@ class AbstractDemuxer
     virtual uint32_t getFileBlockSize() { return m_fileBlockSize; }
 
     virtual int64_t getTrackDelay(uint32_t pid) { return 0; }
-    virtual std::vector<AVChapter> getChapters() { return std::vector<AVChapter>(); }
+    virtual std::vector<AVChapter> getChapters() { return {}; }
     virtual double getTrackFps(uint32_t trackId) { return 0.0; }
 
-    SubTrackFilter* getPidFilter(int pid)
+    SubTrackFilter* getPidFilter(const int pid)
     {
-        PIDFilters::const_iterator itr = m_pidFilters.find(pid);
-        return itr != m_pidFilters.end() ? itr->second : 0;
+        const PIDFilters::const_iterator itr = m_pidFilters.find(pid);
+        return itr != m_pidFilters.end() ? itr->second : nullptr;
     }
-    void setPidFilter(int pid, SubTrackFilter* pidFilter) { m_pidFilters[pid] = pidFilter; }
+    void setPidFilter(const int pid, SubTrackFilter* pidFilter) { m_pidFilters[pid] = pidFilter; }
     virtual bool isPidFilterSupported() const { return false; }
     virtual int64_t getFileDurationNano() const { return 0; }
 

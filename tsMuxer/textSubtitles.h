@@ -30,17 +30,17 @@ struct TextAnimation
     float fadeOutDuration;
 };
 
-const static uint8_t PCS_DEF_SEGMENT = 0x16;
-const static uint8_t WINDOWS_DEF_SEGMENT = 0x17;
-const static uint8_t PALETTE_DEF_SEGMENT = 0x14;
-const static uint8_t OBJECT_DEF_SEGMENT = 0x15;
-const static uint8_t END_DEF_SEGMENT = 0x80;
+static constexpr uint8_t PCS_DEF_SEGMENT = 0x16;
+static constexpr uint8_t WINDOWS_DEF_SEGMENT = 0x17;
+static constexpr uint8_t PALETTE_DEF_SEGMENT = 0x14;
+static constexpr uint8_t OBJECT_DEF_SEGMENT = 0x15;
+static constexpr uint8_t END_DEF_SEGMENT = 0x80;
 
-const static uint8_t EPOTH_NORMAL = 0;
-const static uint8_t EPOTH_START = 2;
+static constexpr uint8_t EPOTH_NORMAL = 0;
+static constexpr uint8_t EPOTH_START = 2;
 
-static const double PIXEL_DECODING_RATE = 128 * 1000000 / 8;  // in bytes
-static const double PIXEL_COMPOSITION_RATE = 256 * 1000000 / 8;
+static constexpr double PIXEL_DECODING_RATE = 128 * 1000000 / 8;  // in bytes
+static constexpr double PIXEL_COMPOSITION_RATE = 256 * 1000000 / 8;
 
 class TextToPGSConverter  //: public TextSubtitlesRenderWin32
 {
@@ -51,7 +51,7 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     ~TextToPGSConverter();
     void setVideoInfo(int width, int height, double fps);
     void enlargeCrop(int width, int height, int* newWidth, int* newHeight) const;
-    void setBottomOffset(int offset) { m_bottomOffset = offset; }
+    void setBottomOffset(const int offset) { m_bottomOffset = offset; }
     uint8_t* doConvert(std::string& text, const TextAnimation& animation, double inTimeSec, double outTimeSec,
                        uint32_t& dstBufSize);
     TextSubtitlesRender* m_textRender;

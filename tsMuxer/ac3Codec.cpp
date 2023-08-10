@@ -69,7 +69,7 @@ const CodecInfo &AC3Codec::getCodecInfo()
 }
 
 // returns true if ok, or false if error
-bool AC3Codec::crc32(uint8_t *buf, const int length)
+bool AC3Codec::crc32(const uint8_t *buf, const int length)
 {
     const uint8_t *end = buf + length;
 
@@ -502,7 +502,7 @@ uint64_t AC3Codec::getFrameDuration() const
     return m_frameDuration;
 }
 
-std::string AC3Codec::getStreamInfo()
+const std::string AC3Codec::getStreamInfo()
 {
     std::ostringstream str;
     std::string hd_type;
@@ -550,7 +550,7 @@ std::string AC3Codec::getStreamInfo()
     return str.str();
 }
 
-uint8_t *AC3Codec::findFrame(uint8_t *buffer, uint8_t *end)
+uint8_t *AC3Codec::findFrame(uint8_t *buffer, const uint8_t *end)
 {
     if (buffer == nullptr)
         return nullptr;

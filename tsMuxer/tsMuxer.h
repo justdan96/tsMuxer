@@ -29,7 +29,7 @@ extern int HDR10_metadata[6];
 extern bool isV3();
 extern bool is4K();
 
-const static int MAX_PES_HEADER_LEN = 512;
+static constexpr int MAX_PES_HEADER_LEN = 512;
 
 class TSMuxer : public AbstractMuxer
 {
@@ -43,12 +43,12 @@ class TSMuxer : public AbstractMuxer
     bool doFlush() override;
     bool close() override;
 
-    int64_t getVBVLength() { return m_vbvLen / 90; }
-    void setNewStyleAudioPES(bool val) { m_useNewStyleAudioPES = val; }
-    void setM2TSMode(bool val) { m_m2tsMode = val; }
-    void setPCROnVideoPID(bool val) { m_pcrOnVideo = val; }
-    void setMaxBitrate(int val) { m_cbrBitrate = val; }
-    void setMinBitrate(int val) { m_minBitrate = val; }
+    int64_t getVBVLength() const { return m_vbvLen / 90; }
+    void setNewStyleAudioPES(const bool val) { m_useNewStyleAudioPES = val; }
+    void setM2TSMode(const bool val) { m_m2tsMode = val; }
+    void setPCROnVideoPID(const bool val) { m_pcrOnVideo = val; }
+    void setMaxBitrate(const int val) { m_cbrBitrate = val; }
+    void setMinBitrate(const int val) { m_minBitrate = val; }
     void openDstFile() override;
     void setVBVBufferLen(int value);
     const PIDListMap& getPidList() const { return m_pmt.pidList; }
@@ -57,8 +57,8 @@ class TSMuxer : public AbstractMuxer
     std::vector<int64_t> getLastPts() const;
     const std::vector<uint32_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
     size_t splitFileCnt() const { return m_fileNames.size(); }
-    void setSplitDuration(int64_t value) { m_splitDuration = value; }
-    void setSplitSize(int64_t value) { m_splitSize = value; }
+    void setSplitDuration(const int64_t value) { m_splitDuration = value; }
+    void setSplitSize(const int64_t value) { m_splitSize = value; }
     void parseMuxOpt(const std::string& opts) override;
 
     void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
@@ -96,14 +96,14 @@ class TSMuxer : public AbstractMuxer
     void writePESPacket();
     void processM2TSPCR(int64_t pcrVal, int64_t pcrGAP);
     inline int calcM2tsFrameCnt() const;
-    inline void writeM2TSHeader(uint8_t* buffer, uint64_t m2tsPCR)
+    static void writeM2TSHeader(uint8_t* buffer, const uint64_t m2tsPCR)
     {
-        auto cur = (uint32_t*)buffer;
+        const auto cur = reinterpret_cast<uint32_t*>(buffer);
         *cur = my_htonl(m2tsPCR & 0x3fffffff);
     }
     void writePATPMT(int64_t pcr, bool force = false);
     void writePCR(uint64_t newPCR);
-    std::string getNextName(const std::string curName) override;
+    std::string getNextName(std::string curName) override;
     void writeEmptyPacketWithPCRTest(int64_t pcrVal);
     bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited) const;
     int writeOutFile(uint8_t* buffer, int len) const;
@@ -112,7 +112,7 @@ class TSMuxer : public AbstractMuxer
     void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;
     void setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock) override;
 
-    AbstractOutputStream* getDstFile() { return m_muxFile; }
+    AbstractOutputStream* getDstFile() const { return m_muxFile; }
     void flushTSBuffer();
     void finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFile, bool recursive = true);
     void gotoNextFile(uint64_t newPts);

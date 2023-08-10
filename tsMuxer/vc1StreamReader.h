@@ -18,7 +18,7 @@ class VC1StreamReader : public MPEGStreamReader
         m_firstFileFrame = false;
         m_prevDtsInc = false;
         m_longCodesAllowed = false;
-        m_nextFrameAddr = 0;
+        m_nextFrameAddr = nullptr;
     }
     ~VC1StreamReader() override {}
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;

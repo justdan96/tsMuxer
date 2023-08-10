@@ -11,14 +11,16 @@
 
 #include "bitStream.h"
 
-const static int Extended_SAR = 255;
-const static double h264_ar_coeff[] = {0.0,         1.0,          12.0 / 11.0, 10.0 / 11.0, 16.0 / 11.0, 40.0 / 33.0,
-                                       24.0 / 11.0, 20.0 / 11.0,  32.0 / 11.0, 80.0 / 33.0, 18.0 / 11.0, 15.0 / 11.0,
-                                       64.0 / 33.0, 160.0 / 99.0, 4.0 / 3.0,   3.0 / 2.0,   2.0 / 1.0};
+static constexpr int Extended_SAR = 255;
+static constexpr double h264_ar_coeff[] = {
+    0.0,         1.0,          12.0 / 11.0, 10.0 / 11.0, 16.0 / 11.0, 40.0 / 33.0,
+    24.0 / 11.0, 20.0 / 11.0,  32.0 / 11.0, 80.0 / 33.0, 18.0 / 11.0, 15.0 / 11.0,
+    64.0 / 33.0, 160.0 / 99.0, 4.0 / 3.0,   3.0 / 2.0,   2.0 / 1.0,
+};
 
-const static int SEI_MSG_BUFFERING_PERIOD = 0;
-const static int SEI_MSG_PIC_TIMING = 1;
-const static int SEI_MSG_MVC_SCALABLE_NESTING = 37;
+static constexpr int SEI_MSG_BUFFERING_PERIOD = 0;
+static constexpr int SEI_MSG_PIC_TIMING = 1;
+static constexpr int SEI_MSG_MVC_SCALABLE_NESTING = 37;
 
 class NALUnit
 {
@@ -59,11 +61,10 @@ class NALUnit
         nuDummy
     };
 
-   public:
-    const static int SPS_OR_PPS_NOT_READY = 1;
+    static constexpr int SPS_OR_PPS_NOT_READY = 1;
     // const static int NOT_ENOUGH_BUFFER = 2;
-    const static int UNSUPPORTED_PARAM = 3;
-    const static int NOT_FOUND = 4;
+    static constexpr int UNSUPPORTED_PARAM = 3;
+    static constexpr int NOT_FOUND = 4;
 
     NALType nal_unit_type;
     int nal_ref_idc;
@@ -71,8 +72,10 @@ class NALUnit
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
 
-    NALUnit(uint8_t nalUnitType) : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
-    NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(0), m_nalBufferLen(0), bitReader() {}
+    NALUnit(uint8_t nalUnitType) : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0), bitReader()
+    {
+    }
+    NALUnit() : nal_unit_type(), nal_ref_idc(0), m_nalBuffer(nullptr), m_nalBufferLen(0), bitReader() {}
     // NALUnit(const NALUnit& other);
     virtual ~NALUnit() { delete[] m_nalBuffer; }
     static uint8_t* findNextNAL(uint8_t* buffer, uint8_t* end);
@@ -81,9 +84,9 @@ class NALUnit
     static int decodeNAL(const uint8_t* srcBuffer, const uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize);
     static int decodeNAL2(uint8_t* srcBuffer, uint8_t* srcEnd, uint8_t* dstBuffer, size_t dstBufferSize,
                           bool* keepSrcBuffer);  // do not copy buffer if nothink to decode
-    int deserialize(uint8_t* buffer, uint8_t* end);
+    virtual int deserialize(uint8_t* buffer, uint8_t* end);
     virtual int serializeBuffer(uint8_t* dstBuffer, uint8_t* dstEnd, bool writeStartCode) const;
-    int serialize(uint8_t* dstBuffer);
+    virtual int serialize(uint8_t* dstBuffer);
     // void setBuffer(uint8_t* buffer, uint8_t* end);
     void decodeBuffer(const uint8_t* buffer, const uint8_t* end);
     static uint8_t* addStartCode(uint8_t* buffer, uint8_t* boundStart);
@@ -103,31 +106,28 @@ class NALUnit
     BitStreamReader bitReader;
     inline unsigned extractUEGolombCode();
     inline int extractSEGolombCode();
-    void updateBits(const int bitOffset, const int bitLen, const int value) const;
+    void updateBits(int bitOffset, int bitLen, int value) const;
 };
 
 class NALDelimiter : public NALUnit
 {
    public:
-    const static int PCT_I_FRAMES = 0;
-    const static int PCT_IP_FRAMES = 1;
-    const static int PCT_IPB_FRAMES = 2;
-    const static int PCT_SI_FRAMES = 3;
-    const static int PCT_SI_SP_FRAMES = 4;
-    const static int PCT_I_SI_FRAMES = 5;
-    const static int PCT_I_SI_P_SP_FRAMES = 6;
-    const static int PCT_I_SI_P_SP_B_FRAMES = 7;
+    static constexpr int PCT_I_FRAMES = 0;
+    static constexpr int PCT_IP_FRAMES = 1;
+    static constexpr int PCT_IPB_FRAMES = 2;
+    static constexpr int PCT_SI_FRAMES = 3;
+    static constexpr int PCT_SI_SP_FRAMES = 4;
+    static constexpr int PCT_I_SI_FRAMES = 5;
+    static constexpr int PCT_I_SI_P_SP_FRAMES = 6;
+    static constexpr int PCT_I_SI_P_SP_B_FRAMES = 7;
     int primary_pic_type;
     NALDelimiter() : NALUnit(), primary_pic_type(0) {}
-    int deserialize(uint8_t* buffer, uint8_t* end);
-    int serialize(uint8_t* buffer);
+    int deserialize(uint8_t* buffer, uint8_t* end) override;
+    int serialize(uint8_t* buffer) override;
 };
 
-class PPSUnit : public NALUnit
+class PPSUnit final : public NALUnit
 {
-   private:
-    bool m_ready;
-
    public:
     unsigned pic_parameter_set_id;
     unsigned seq_parameter_set_id;
@@ -135,17 +135,21 @@ class PPSUnit : public NALUnit
     int pic_order_present_flag;
 
     PPSUnit()
-        : NALUnit(),
-          m_ready(false),
-          pic_parameter_set_id(0),
+        : pic_parameter_set_id(0),
           seq_parameter_set_id(0),
           entropy_coding_mode_flag(true),
-          pic_order_present_flag(true)
+          pic_order_present_flag(true),
+          m_ready(false)
     {
     }
     ~PPSUnit() override {}
-    bool isReady() { return m_ready; }
+
+    bool isReady() const { return m_ready; }
     int deserialize();
+
+   private:
+    bool m_ready;
+    using NALUnit::deserialize;
 };
 
 struct HRDParams
@@ -170,7 +174,7 @@ struct HRDParams
     int time_offset_length;
 };
 
-class SPSUnit : public NALUnit
+class SPSUnit final : public NALUnit
 {
    public:
     bool m_ready;
@@ -222,16 +226,18 @@ class SPSUnit : public NALUnit
     // subSPS (SVC/MVC) extension
     std::vector<unsigned> view_id;
 
-    std::string getStreamDescr();
-    int getWidth() { return pic_width_in_mbs * 16 - getCropX(); }
-    int getHeight() { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
+    std::string getStreamDescr() const;
+    unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
+    unsigned getHeight() const { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
     double getFPS() const;
     void setFps(double fps);
 
     SPSUnit();
     ~SPSUnit() override {}
-    bool isReady() { return m_ready; }
+
+    bool isReady() const { return m_ready; }
     int deserialize();
+    using NALUnit::deserialize;
     void insertHrdParameters();
     void updateTimingInfo();
     int getMaxBitrate() const;
@@ -254,12 +260,11 @@ class SPSUnit : public NALUnit
 
 const static char* sliceTypeStr[5] = {"P_TYPE", "B_TYPE", "I_TYPE", "SP_TYPE", "SI_TYPE"};
 
-class SEIUnit : public NALUnit
+class SEIUnit final : public NALUnit
 {
    public:
     SEIUnit()
-        : NALUnit(),
-          pic_struct(0),
+        : pic_struct(0),
           cpb_removal_delay(0),
           dpb_output_delay(0),
           initial_cpb_removal_delay(),
@@ -267,11 +272,13 @@ class SEIUnit : public NALUnit
           number_of_offset_sequences(-1),
           metadataPtsOffset(0),
           m_mvcHeaderLen(0),
-          m_mvcHeaderStart(0)
+          m_mvcHeaderStart(nullptr)
     {
     }
     ~SEIUnit() override {}
+
     void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
+    using NALUnit::deserialize;
 
     void serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader) const;
     void serialize_buffering_period_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader) const;
@@ -293,7 +300,7 @@ class SEIUnit : public NALUnit
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
 
-    bool hasProcessedMessage(int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
+    bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
 
    private:
     void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
@@ -355,9 +362,11 @@ class SliceUnit : public NALUnit
     int anchor_pic_flag;
 
     SliceUnit();
-    ~SliceUnit() override { ; }
+    ~SliceUnit() override {}
+
     int deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_t, SPSUnit*>& spsMap,
                     const std::map<uint32_t, PPSUnit*>& ppsMap);
+    using NALUnit::deserialize;
 
     const SPSUnit* getSPS() const { return sps; }
     const PPSUnit* getPPS() const { return pps; }

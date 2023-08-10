@@ -3,7 +3,7 @@
 #ifndef __MLP_CODEC_H
 #define __MLP_CODEC_H
 
-const static int MLP_HEADER_LEN = 7;
+static constexpr int MLP_HEADER_LEN = 7;
 
 enum class MlpSubType
 {

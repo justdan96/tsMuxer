@@ -12,7 +12,7 @@
 // Used to synchronize and mux data streams
 // PTS and DTS of the returned AV packet is measured in nanoseconds.
 
-const static int PTS_CONST_OFFSET = 0;
+static constexpr int PTS_CONST_OFFSET = 0;
 
 // class AbstractStreamReader;
 
@@ -35,16 +35,15 @@ class AbstractStreamReader : public BaseAbstractStreamReader
         ctExternal
     };
 
-    const static int NEED_MORE_DATA = 1;
-    const static int INTERNAL_READ_ERROR = 2;
+    static constexpr int NEED_MORE_DATA = 1;
+    static constexpr int INTERNAL_READ_ERROR = 2;
     AbstractStreamReader()
-        : BaseAbstractStreamReader(),
-          m_flags(0),
+        : m_flags(0),
           m_containerType(ContainerType::ctNone),
           m_timeOffset(0),
-          m_buffer(0),
-          m_curPos(0),
-          m_bufEnd(0),
+          m_buffer(nullptr),
+          m_curPos(nullptr),
+          m_bufEnd(nullptr),
           m_streamIndex(0),
           m_tmpBufferLen(0),
           m_demuxMode(false),
@@ -53,7 +52,7 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     }
     virtual ~AbstractStreamReader() {}
     virtual uint64_t getProcessedSize() = 0;
-    virtual void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false)
+    virtual void setBuffer(uint8_t* data, const int dataLen, bool lastBlock = false)
     {
         m_curPos = m_buffer = data;
         m_bufEnd = m_buffer + dataLen;
@@ -64,21 +63,21 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) { return 0; }
     virtual int getStreamHDR() const { return 0; }
     virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) {}
-    virtual void setStreamIndex(int index) { m_streamIndex = index; }
+    virtual void setStreamIndex(const int index) { m_streamIndex = index; }
     int getStreamIndex() const { return m_streamIndex; }
-    virtual void setTimeOffset(int64_t offset) { m_timeOffset = offset; }
+    virtual void setTimeOffset(const int64_t offset) { m_timeOffset = offset; }
     unsigned m_flags;
     virtual const CodecInfo& getCodecInfo() = 0;  // get codecInfo struct. (CodecID, codec name)
-    void setSrcContainerType(ContainerType containerType) { m_containerType = containerType; }
+    void setSrcContainerType(const ContainerType containerType) { m_containerType = containerType; }
     virtual bool beforeFileCloseEvent(File& file) { return true; }
     virtual void onSplitEvent() {}
-    virtual void setDemuxMode(bool value) { m_demuxMode = value; }
+    virtual void setDemuxMode(const bool value) { m_demuxMode = value; }
     virtual bool isPriorityData(AVPacket* packet) { return false; }
     virtual bool needSPSForSplit() const { return false; }
     virtual bool isSecondary() { return m_secondary; }
-    void setIsSecondary(bool value) { m_secondary = value; }
+    void setIsSecondary(const bool value) { m_secondary = value; }
     void setPipParams(const PIPParams& params) { m_pipParams = params; }
-    PIPParams getPipParams() { return m_pipParams; }
+    PIPParams getPipParams() const { return m_pipParams; }
 
    protected:
     ContainerType m_containerType;

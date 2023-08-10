@@ -29,14 +29,14 @@ class LPCMStreamReader : public SimplePacketizerReader
         m_frameRest = 0;
         m_needPCMHdr = true;
         m_openSizeWaveFormat = false;  // WAVE data size unknown and zero
-        m_lastChannelRemapPos = 0;
+        m_lastChannelRemapPos = nullptr;
     }
-    void setNewStyleAudioPES(bool value) { m_useNewStyleAudioPES = value; }
+    void setNewStyleAudioPES(const bool value) { m_useNewStyleAudioPES = value; }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     int getFreq() override { return m_freq; }
     int getChannels() override { return m_channels; }
     // void setDemuxMode(bool value) {m_demuxMode = value;}
-    void setFirstFrame(bool value) { m_firstFrame = value; }
+    void setFirstFrame(const bool value) { m_firstFrame = value; }
     bool beforeFileCloseEvent(File& file) override;
     void setHeadersType(LPCMHeaderType value);
 
@@ -48,7 +48,7 @@ class LPCMStreamReader : public SimplePacketizerReader
     const CodecInfo& getCodecInfo() override;
     const std::string getStreamInfo() override;
     void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) override;
-    void setTestMode(bool value) override { m_testMode = value; }
+    void setTestMode(const bool value) override { m_testMode = value; }
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;
     int readPacket(AVPacket& avPacket) override;

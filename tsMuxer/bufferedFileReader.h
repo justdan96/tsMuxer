@@ -53,7 +53,7 @@ struct FileReaderData : public ReaderData
 
     ~FileReaderData() override {}
 
-    uint32_t readBlock(uint8_t* buffer, int max_size) override
+    uint32_t readBlock(uint8_t* buffer, const int max_size) override
     {
         int rez = 0;
         rez = m_file.read(buffer, max_size);
@@ -63,7 +63,10 @@ struct FileReaderData : public ReaderData
 
     bool openStream() override;
     bool closeStream() override { return m_file.close(); }
-    bool incSeek(int64_t offset) override { return m_file.seek(offset, File::SeekMethod::smCurrent) != uint64_t(-1); }
+    bool incSeek(const int64_t offset) override
+    {
+        return m_file.seek(offset, File::SeekMethod::smCurrent) != static_cast<uint64_t>(-1);
+    }
 
    public:
     File m_file;
@@ -75,7 +78,8 @@ class BufferedFileReader : public BufferedReader
    public:
     BufferedFileReader(uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
 
-    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
+    bool openStream(uint32_t readerID, const char* streamName, int pid = 0,
+                    const CodecInfo* codecInfo = nullptr) override;
     bool gotoByte(uint32_t readerID, uint64_t seekDist) override;
 
    protected:

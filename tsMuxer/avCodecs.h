@@ -7,29 +7,29 @@
 
 #include "avPacket.h"
 
-const static int CODEC_ID_NONE = 0;
-const static int CODEC_V_MPEG4_H264 = 1;
-const static int CODEC_A_AAC = 2;
-const static int CODEC_A_AC3 = 3;
-const static int CODEC_A_EAC3 = 4;
-const static int CODEC_A_DTS = 5;
-const static int CODEC_V_VC1 = 6;
-const static int CODEC_V_MPEG2 = 7;
-const static int CODEC_A_HDAC3 = 8;
-const static int CODEC_A_MPEG_AUDIO = 9;
-const static int CODEC_A_LPCM = 10;
-const static int CODEC_S_SUP = 11;
-const static int CODEC_S_PGS = 12;
-const static int CODEC_S_SRT = 13;
-const static int CODEC_V_MPEG4_H264_DEP = 14;
-const static int CODEC_V_MPEG4_H265 = 15;
-const static int CODEC_V_MPEG4_H266 = 16;
-const static int CODEC_A_MLP = 17;
+static constexpr int CODEC_ID_NONE = 0;
+static constexpr int CODEC_V_MPEG4_H264 = 1;
+static constexpr int CODEC_A_AAC = 2;
+static constexpr int CODEC_A_AC3 = 3;
+static constexpr int CODEC_A_EAC3 = 4;
+static constexpr int CODEC_A_DTS = 5;
+static constexpr int CODEC_V_VC1 = 6;
+static constexpr int CODEC_V_MPEG2 = 7;
+static constexpr int CODEC_A_HDAC3 = 8;
+static constexpr int CODEC_A_MPEG_AUDIO = 9;
+static constexpr int CODEC_A_LPCM = 10;
+static constexpr int CODEC_S_SUP = 11;
+static constexpr int CODEC_S_PGS = 12;
+static constexpr int CODEC_S_SRT = 13;
+static constexpr int CODEC_V_MPEG4_H264_DEP = 14;
+static constexpr int CODEC_V_MPEG4_H265 = 15;
+static constexpr int CODEC_V_MPEG4_H266 = 16;
+static constexpr int CODEC_A_MLP = 17;
 
 struct CodecInfo
 {
     CodecInfo() : codecID(0) {}
-    CodecInfo(int codecID, const std::string& displayName, const std::string& programName)
+    CodecInfo(const int codecID, const std::string& displayName, const std::string& programName)
     {
         this->codecID = codecID;
         this->displayName = displayName;

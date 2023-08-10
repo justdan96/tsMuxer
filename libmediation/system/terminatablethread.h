@@ -12,7 +12,7 @@ class TerminatableThread
     virtual ~TerminatableThread();
 
     //! Launch the thread. Should be called immediately after creating the thread object.
-    static void run(TerminatableThread* const);
+    static void run(TerminatableThread*);
 
     void join()
     {

@@ -242,12 +242,12 @@ class IsoWriter
     friend class ISOFile;
 
     std::string m_volumeLabel;
-    const std::string m_impId;
-    const std::string m_appId;
-    const uint32_t m_volumeId;
+    std::string m_impId;
+    std::string m_appId;
+    uint32_t m_volumeId;
     File m_file;
     uint8_t m_buffer[SECTOR_SIZE];
-    const time_t m_currentTime;
+    time_t m_currentTime;
 
     uint32_t m_objectUniqId;
     uint32_t m_totalFiles;
@@ -284,7 +284,7 @@ class ISOFile : public AbstractOutputStream
     int write(const void* data, uint32_t len) override;
     bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0) override;
     void sync() override;
-    bool close() override final;
+    bool close() final;
     int64_t size() const override;
     void setSubMode(bool value) const;
 

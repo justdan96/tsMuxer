@@ -14,7 +14,7 @@ bool isM2TSExt(const std::string& streamName)
     return strEndWith(sName, ".m2ts") || strEndWith(sName, ".mts") || strEndWith(sName, ".ssif");
 }
 
-TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* streamName)
+TSDemuxer::TSDemuxer(BufferedReaderManager& readManager, const char* streamName)
     : m_readManager(readManager),
       m_curPos(nullptr),
       m_pmtPid(0),

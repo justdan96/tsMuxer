@@ -21,8 +21,8 @@ void recurseDirectorySearch(F&& findFilesFn, D&& findDirsFn, const std::string& 
 }
 
 template <typename SkipParentDirFn, typename CreateParentDirFn>
-bool preCreateDir(SkipParentDirFn&& skipParentFn, CreateParentDirFn&& createParentFn, char dirSeparator,
-                  const std::string& dirName, bool createParentDirs)
+bool preCreateDir(SkipParentDirFn&& skipParentFn, CreateParentDirFn&& createParentFn, const char dirSeparator,
+                  const std::string& dirName, const bool createParentDirs)
 {
     if (dirName.empty())
         return false;

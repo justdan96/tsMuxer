@@ -18,7 +18,7 @@ class VVCStreamReader : public MPEGStreamReader
 
    protected:
     const CodecInfo& getCodecInfo() override { return vvcCodecInfo; }
-    virtual int intDecodeNAL(uint8_t* buff) override;
+    int intDecodeNAL(uint8_t* buff) override;
 
     double getStreamFPS(void* curNalUnit) override;
     int getStreamWidth() const override;
@@ -28,8 +28,8 @@ class VVCStreamReader : public MPEGStreamReader
 
     void updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nextNal, int oldSpsLen) override;
     int getFrameDepth() override { return m_frameDepth; }
-    virtual int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
-                                  PriorityDataInfo* priorityData) override;
+    int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
+                          PriorityDataInfo* priorityData) override;
     void onSplitEvent() override { m_firstFileFrame = true; }
     bool skipNal(uint8_t* nal) override;
 

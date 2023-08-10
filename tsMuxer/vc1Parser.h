@@ -34,7 +34,7 @@ enum class Profile
 };
 
 const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
-const int ff_vc1_fps_dr[2] = {1000, 1001};
+constexpr int ff_vc1_fps_dr[2] = {1000, 1001};
 
 /*
 struct AVRational {
@@ -62,11 +62,12 @@ extern const char* pict_type_str[4];
 class VC1Unit
 {
    public:
-    VC1Unit() : bitReader(), m_nalBuffer(0), m_nalBufferLen(0) {}
+    VC1Unit() : bitReader(), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
     ~VC1Unit() { delete[] m_nalBuffer; }
 
-    inline static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
-    inline static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
+    static bool isMarker(uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
+
+    static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
     {
         for (buffer += 2; buffer < end;)
         {
@@ -83,7 +84,8 @@ class VC1Unit
         }
         return end;
     }
-    inline int64_t vc1_unescape_buffer(uint8_t* src, int64_t size)
+
+    int64_t vc1_unescape_buffer(uint8_t* src, const int64_t size)
     {
         delete[] m_nalBuffer;
         m_nalBuffer = new uint8_t[size];
@@ -108,12 +110,13 @@ class VC1Unit
         m_nalBufferLen = dsize;
         return dsize;
     }
-    inline int64_t vc1_escape_buffer(uint8_t* dst)
+
+    int64_t vc1_escape_buffer(uint8_t* dst) const
     {
-        uint8_t* srcStart = m_nalBuffer;
-        uint8_t* initDstBuffer = dst;
-        uint8_t* srcBuffer = m_nalBuffer;
-        uint8_t* srcEnd = m_nalBuffer + m_nalBufferLen;
+        const uint8_t* srcStart = m_nalBuffer;
+        const uint8_t* initDstBuffer = dst;
+        const uint8_t* srcBuffer = m_nalBuffer;
+        const uint8_t* srcEnd = m_nalBuffer + m_nalBufferLen;
         for (srcBuffer += 2; srcBuffer < srcEnd;)
         {
             if (*srcBuffer > 3)
@@ -138,7 +141,7 @@ class VC1Unit
         dst += srcEnd - srcStart;
         return dst - initDstBuffer;
     }
-    const BitStreamReader& getBitReader() { return bitReader; }
+    const BitStreamReader& getBitReader() const { return bitReader; }
 
    protected:
     void updateBits(int bitOffset, int bitLen, int value) const;

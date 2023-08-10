@@ -164,7 +164,8 @@ const char trailingBytesForUTF8[256] = {
  * This table contains as many values as there might be trailing bytes
  * in a UTF-8 sequence.
  */
-const UTF32 offsetsFromUTF8[6] = {0x00000000UL, 0x00003080UL, 0x000E2080UL, 0x03C82080UL, 0xFA082080UL, 0x82082080UL};
+constexpr UTF32 offsetsFromUTF8[6] = {0x00000000UL, 0x00003080UL, 0x000E2080UL,
+                                      0x03C82080UL, 0xFA082080UL, 0x82082080UL};
 
 template <typename Fn>
 void IterateUTF8Chars(const std::string& utf8String, Fn f)
@@ -174,7 +175,7 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
     while (keep_going && it != std::end(utf8String))
     {
         UTF32 ch = 0;
-        unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
+        const unsigned short extraBytesToRead = trailingBytesForUTF8[static_cast<unsigned char>(*it)];
         auto get_as_uchar = [&]() mutable { return static_cast<unsigned char>(*it++); };
         switch (extraBytesToRead)
         {
@@ -200,6 +201,9 @@ void IterateUTF8Chars(const std::string& utf8String, Fn f)
             [[fallthrough]];
         case 0:
             ch += get_as_uchar();
+            break;
+        default:
+            break;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
         keep_going = f(ch);

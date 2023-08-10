@@ -40,7 +40,7 @@ static uint32_t calculateCRC32(uint8_t *p_begin, uint64_t i_count, uint32_t i_cr
     /* Calculate the CRC */
     while (i_count > 0)
     {
-        i_crc = (i_crc << 8) ^ CRC32[(i_crc >> 24) ^ ((uint32_t)*p_begin)];
+        i_crc = (i_crc << 8) ^ CRC32[(i_crc >> 24) ^ static_cast<uint32_t>(*p_begin)];
         p_begin++;
         i_count--;
     }

@@ -213,7 +213,7 @@ int MPEG2StreamReader::processSeqStartCode(uint8_t* buff)
         (void)e;
         return NOT_ENOUGH_BUFFER;
     }
-    const int oldSpsLen = 0;
+    constexpr int oldSpsLen = 0;
     updateFPS(nullptr, buff, nextNal, oldSpsLen);
     spsFound = true;
     m_lastIFrame = true;

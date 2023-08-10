@@ -7,10 +7,10 @@
 class MpegAudioStreamReader : public SimplePacketizerReader, MP3Codec
 {
    public:
-    const static uint32_t DTS_HD_PREFIX = 0x64582025;
+    static constexpr uint32_t DTS_HD_PREFIX = 0x64582025;
     MpegAudioStreamReader() : SimplePacketizerReader() {}
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    int getLayer() { return m_layer; }
+    int getLayer() const { return m_layer; }
     int getFreq() override { return m_sample_rate; }
     int getChannels() override { return 2; }
 
@@ -23,7 +23,7 @@ class MpegAudioStreamReader : public SimplePacketizerReader, MP3Codec
     const std::string getStreamInfo() override;
 
    private:
-    static const int MPEG_AUDIO_HEADER_SIZE = 4;
+    static constexpr int MPEG_AUDIO_HEADER_SIZE = 4;
 };
 
 #endif

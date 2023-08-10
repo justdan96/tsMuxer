@@ -15,7 +15,7 @@
 class TSDemuxer : public AbstractDemuxer
 {
    public:
-    TSDemuxer(const BufferedReaderManager& readManager, const char* streamName);
+    TSDemuxer(BufferedReaderManager& readManager, const char* streamName);
     ~TSDemuxer() override;
     void openFile(const std::string& streamName) override;
     void readClose() override;
@@ -24,16 +24,15 @@ class TSDemuxer : public AbstractDemuxer
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
     int getLastReadRez() override { return m_lastReadRez; };
     void setFileIterator(FileNameIterator* itr) override;
-    int64_t getTrackDelay(uint32_t pid) override
+    int64_t getTrackDelay(const uint32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
         {
-            int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
-            return (int64_t)(clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5));  // convert to ms
+            const int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
+            return static_cast<int64_t>(clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5));  // convert to ms
         }
 
-        else
-            return 0;
+        return 0;
     }
     void setMPLSInfo(const std::vector<MPLSPlayItem>& mplsInfo) { m_mplsInfo = mplsInfo; }
     int64_t getFileDurationNano() const override;
@@ -48,7 +47,7 @@ class TSDemuxer : public AbstractDemuxer
     bool m_m2tsMode;
     int m_scale;
     int m_nptPos;
-    const BufferedReaderManager& m_readManager;
+    BufferedReaderManager& m_readManager;
     std::string m_streamName;
     std::string m_streamNameLow;
     std::map<int, int64_t> m_lastPesPts;

@@ -5,7 +5,7 @@
 
 #include "vod_common.h"
 
-const static int MAX_AV_PACKET_SIZE = 32768 /*16 * 1024*/;
+static constexpr int MAX_AV_PACKET_SIZE = 32768 /*16 * 1024*/;
 
 enum class VideoAspectRatio
 {
@@ -19,7 +19,7 @@ enum class VideoAspectRatio
 struct AVChapter
 {
     AVChapter() : start(0) {}
-    AVChapter(int64_t _start, std::string _cTitle) : start(_start), cTitle(std::move(_cTitle)) {}
+    AVChapter(const int64_t _start, std::string _cTitle) : start(_start), cTitle(std::move(_cTitle)) {}
     bool operator<(const AVChapter& other) const { return start < other.start; }
     int64_t start;
     std::string cTitle;
@@ -56,22 +56,22 @@ struct AVPacket
                        // RTP/RTSP mode
     BaseAbstractStreamReader* codec;
     int codecID;
-    const static unsigned PCR_STREAM = 1;
-    const static unsigned IS_COMPLETE_FRAME = 2;
-    const static unsigned FORCE_NEW_FRAME = 4;
-    const static unsigned IS_IFRAME = 8;
-    const static unsigned PRIORITY_DATA = 16;
-    const static unsigned IS_SPS_PPS_IN_GOP = 32;
+    static constexpr unsigned PCR_STREAM = 1;
+    static constexpr unsigned IS_COMPLETE_FRAME = 2;
+    static constexpr unsigned FORCE_NEW_FRAME = 4;
+    static constexpr unsigned IS_IFRAME = 8;
+    static constexpr unsigned PRIORITY_DATA = 16;
+    static constexpr unsigned IS_SPS_PPS_IN_GOP = 32;
 
     // filled for THD only. need refactor for DTS as well
-    const static unsigned IS_CORE_PACKET = 64;
+    static constexpr unsigned IS_CORE_PACKET = 64;
 };
 
 class BaseAbstractStreamReader
 {
    public:
     BaseAbstractStreamReader() {}
-    ~BaseAbstractStreamReader() {}
+    virtual ~BaseAbstractStreamReader() {}
     virtual int writeAdditionData(uint8_t* dst, uint8_t* dstEnd, AVPacket& avPacket, PriorityDataInfo* priorityData)
     {
         return 0;

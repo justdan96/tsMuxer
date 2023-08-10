@@ -7,7 +7,7 @@
 #include "limits.h"
 #include "vod_common.h"
 
-const static int TMP_BUFFER_SIZE = 1024 * 1024 * 8;
+static constexpr int TMP_BUFFER_SIZE = 1024 * 1024 * 8;
 
 class MPEGStreamReader : public AbstractStreamReader
 {
@@ -19,7 +19,7 @@ class MPEGStreamReader : public AbstractStreamReader
         m_eof = false;
         m_lastDecodeOffset = LONG_MAX;
         m_tmpBuffer = new uint8_t[TMP_BUFFER_SIZE];
-        m_lastDecodedPos = 0;
+        m_lastDecodedPos = nullptr;
         m_curPts = m_curDts = PTS_CONST_OFFSET;
         m_processedBytes = 0;
         m_totalFrameNum = 0;
@@ -36,18 +36,18 @@ class MPEGStreamReader : public AbstractStreamReader
         m_spsPpsFound = false;
     }
     ~MPEGStreamReader() override { delete[] m_tmpBuffer; }
-    void setFPS(double fps)
+    void setFPS(const double fps)
     {
         m_fps = fps;
         if (fps > 0)
-            m_pcrIncPerFrame = (int64_t)((double)INTERNAL_PTS_FREQ / fps);
+            m_pcrIncPerFrame = static_cast<int64_t>(static_cast<double>(INTERNAL_PTS_FREQ) / fps);
         else
             m_pcrIncPerFrame = 0;
         m_pcrIncPerField = m_pcrIncPerFrame / 2;
     }
     double getFPS() const { return m_fps; }
-    VideoAspectRatio getStreamAR() { return m_streamAR; }
-    void setAspectRatio(VideoAspectRatio ar) { m_ar = ar; }
+    VideoAspectRatio getStreamAR() const { return m_streamAR; }
+    void setAspectRatio(const VideoAspectRatio ar) { m_ar = ar; }
     uint64_t getProcessedSize() override;
     void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
     int readPacket(AVPacket& avPacket) override;
@@ -55,7 +55,7 @@ class MPEGStreamReader : public AbstractStreamReader
     virtual int getStreamWidth() const = 0;
     virtual int getStreamHeight() const = 0;
     virtual bool getInterlaced() = 0;
-    void setRemovePulldown(bool value) { m_removePulldown = value; }
+    void setRemovePulldown(const bool value) { m_removePulldown = value; }
     virtual int getFrameDepth() { return 1; }
     virtual void onShiftBuffer(int offset);
 

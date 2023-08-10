@@ -2,23 +2,23 @@
 #define __MATROSKA_STREAM_READER_H
 
 #include "ioContextDemuxer.h"
-//#include "tsPacket.h"
+// #include "tsPacket.h"
 #include "matroskaParser.h"
 
 class MatroskaDemuxer : public IOContextDemuxer
 {
    public:
-    MatroskaDemuxer(const BufferedReaderManager &readManager);
+    MatroskaDemuxer(BufferedReaderManager &readManager);
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented
-    void readClose() override final;
+    void readClose() final;
     int simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo> &trackList) override;
     std::vector<AVChapter> getChapters() override;
 
     bool isPidFilterSupported() const override { return true; }
-    int64_t getTrackDelay(uint32_t pid) override
+    int64_t getTrackDelay(const uint32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }

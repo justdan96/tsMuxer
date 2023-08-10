@@ -123,7 +123,7 @@ std::vector<std::uint8_t> serializeDString(const std::string &str, const size_t 
 {
     if (str.empty())
     {
-        return std::vector<std::uint8_t>(fieldLen, 0);
+        return {};
     }
     std::vector<std::uint8_t> rv;
 #ifdef _WIN32

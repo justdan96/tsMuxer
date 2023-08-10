@@ -22,7 +22,7 @@ class SingleFileMuxer : public AbstractMuxer
     void parseMuxOpt(const std::string& opts) override;
 
    private:
-    const static int ADD_DATA_SIZE = 2048;
+    static constexpr int ADD_DATA_SIZE = 2048;
     struct StreamInfo
     {
         File m_file;
@@ -34,14 +34,14 @@ class SingleFileMuxer : public AbstractMuxer
         int m_bufLen;
         uint64_t m_totalWrited;
         AbstractStreamReader* m_codecReader;
-        StreamInfo(int blockSize)
+        StreamInfo(const int blockSize)
         {
             m_buffer = new uint8_t[blockSize + MAX_AV_PACKET_SIZE +
                                    ADD_DATA_SIZE];  // reserv extra ADD_DATA_SIZE bytes for stream additional data
             m_bufLen = 0;
             m_dts = -1;
             m_pts = -1;
-            m_codecReader = 0;
+            m_codecReader = nullptr;
             m_totalWrited = 0;
             m_part = 1;
         }

@@ -13,7 +13,7 @@ using namespace std;
 
 const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
-static inline int get_unary(BitStreamReader& bitReader, const int stop, const int len)
+static int get_unary(BitStreamReader& bitReader, const int stop, const int len)
 {
     int i;
     for (i = 0; i < len && bitReader.getBit() != stop; i++)
@@ -21,7 +21,7 @@ static inline int get_unary(BitStreamReader& bitReader, const int stop, const in
     return i;
 }
 
-static inline int decode012(BitStreamReader& bitReader)
+static int decode012(BitStreamReader& bitReader)
 {
     const int n = bitReader.getBit();
     if (n == 0)

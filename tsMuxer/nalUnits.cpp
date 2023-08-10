@@ -973,7 +973,7 @@ void SPSUnit::setFps(const double fps)
     }
 }
 
-std::string SPSUnit::getStreamDescr()
+std::string SPSUnit::getStreamDescr() const
 {
     std::ostringstream rez;
 

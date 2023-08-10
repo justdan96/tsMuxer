@@ -3,7 +3,7 @@
 #ifndef __AAC_CODEC_H
 #define __AAC_CODEC_H
 
-const static int AAC_HEADER_LEN = 7;
+static constexpr int AAC_HEADER_LEN = 7;
 
 class AACCodec
 {
@@ -23,11 +23,11 @@ class AACCodec
           m_rdb(0)
     {
     }
-    static uint8_t* findAacFrame(uint8_t* buffer, uint8_t* end);
-    static int getFrameSize(uint8_t* buffer);
+    static uint8_t* findAacFrame(uint8_t* buffer, const uint8_t* end);
+    static int getFrameSize(const uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);
     void buildADTSHeader(uint8_t* buffer, unsigned frameSize);
-    inline void setSampleRate(int value) { m_sample_rate = value; }
+    void setSampleRate(const int value) { m_sample_rate = value; }
     void readConfig(uint8_t* buff, int size);
 
    public:

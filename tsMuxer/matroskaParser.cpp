@@ -112,7 +112,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
 {
     int newBufSize = size;
     uint8_t* curPos = buff;
-    uint8_t* end = buff + size;
+    const uint8_t* end = buff + size;
     int elements = 0;
 
     if (m_firstExtract && spsppsExists(buff, size))

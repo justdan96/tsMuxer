@@ -1,7 +1,7 @@
 #ifndef MATROSKA_PARSER_H
 #define MATROSKA_PARSER_H
 
-//#include "avcodecs.h"
+// #include "avcodecs.h"
 #include <vector>
 
 #include "aac.h"
@@ -15,139 +15,139 @@ typedef IOContextTrackType MatroskaTrackType;
 typedef Track MatroskaTrack;
 
 /* EBML version supported */
-const static int EBML_VERSION = 1;
+static constexpr int EBML_VERSION = 1;
 
 /* top-level master-IDs */
-const static uint32_t EBML_ID_HEADER = 0x1A45DFA3;
+static constexpr uint32_t EBML_ID_HEADER = 0x1A45DFA3;
 
 /* IDs in the HEADER master */
-const static uint16_t EBML_ID_EBMLVERSION = 0x4286;
-const static uint16_t EBML_ID_EBMLREADVERSION = 0x42F7;
-const static uint16_t EBML_ID_EBMLMAXIDLENGTH = 0x42F2;
-const static uint16_t EBML_ID_EBMLMAXSIZELENGTH = 0x42F3;
-const static uint16_t EBML_ID_DOCTYPE = 0x4282;
-const static uint16_t EBML_ID_DOCTYPEVERSION = 0x4287;
-const static uint16_t EBML_ID_DOCTYPEREADVERSION = 0x4285;
+static constexpr uint16_t EBML_ID_EBMLVERSION = 0x4286;
+static constexpr uint16_t EBML_ID_EBMLREADVERSION = 0x42F7;
+static constexpr uint16_t EBML_ID_EBMLMAXIDLENGTH = 0x42F2;
+static constexpr uint16_t EBML_ID_EBMLMAXSIZELENGTH = 0x42F3;
+static constexpr uint16_t EBML_ID_DOCTYPE = 0x4282;
+static constexpr uint16_t EBML_ID_DOCTYPEVERSION = 0x4287;
+static constexpr uint16_t EBML_ID_DOCTYPEREADVERSION = 0x4285;
 
 /* IDs in the chapters master */
-const static uint16_t MATROSKA_ID_EDITIONENTRY = 0x45B9;
-const static uint16_t MATROSKA_ID_CHAPTERATOM = 0xB6;
-const static uint16_t MATROSKA_ID_CHAPTERTIMESTART = 0x91;
-const static uint16_t MATROSKA_ID_CHAPTERTIMEEND = 0x92;
-const static uint16_t MATROSKA_ID_CHAPTERDISPLAY = 0x80;
-const static uint16_t MATROSKA_ID_CHAPSTRING = 0x85;
-const static uint16_t MATROSKA_ID_EDITIONUID = 0x45BC;
-const static uint16_t MATROSKA_ID_EDITIONFLAGHIDDEN = 0x45BD;
-const static uint16_t MATROSKA_ID_EDITIONFLAGDEFAULT = 0x45DB;
-const static uint16_t MATROSKA_ID_CHAPTERUID = 0x73C4;
-const static uint16_t MATROSKA_ID_CHAPTERFLAGHIDDEN = 0x98;
+static constexpr uint16_t MATROSKA_ID_EDITIONENTRY = 0x45B9;
+static constexpr uint16_t MATROSKA_ID_CHAPTERATOM = 0xB6;
+static constexpr uint16_t MATROSKA_ID_CHAPTERTIMESTART = 0x91;
+static constexpr uint16_t MATROSKA_ID_CHAPTERTIMEEND = 0x92;
+static constexpr uint16_t MATROSKA_ID_CHAPTERDISPLAY = 0x80;
+static constexpr uint16_t MATROSKA_ID_CHAPSTRING = 0x85;
+static constexpr uint16_t MATROSKA_ID_EDITIONUID = 0x45BC;
+static constexpr uint16_t MATROSKA_ID_EDITIONFLAGHIDDEN = 0x45BD;
+static constexpr uint16_t MATROSKA_ID_EDITIONFLAGDEFAULT = 0x45DB;
+static constexpr uint16_t MATROSKA_ID_CHAPTERUID = 0x73C4;
+static constexpr uint16_t MATROSKA_ID_CHAPTERFLAGHIDDEN = 0x98;
 
 /* general EBML types */
-const static uint8_t EBML_ID_VOID = 0xEC;
-const static uint8_t EBML_ID_CRC32 = 0xBF;
+static constexpr uint8_t EBML_ID_VOID = 0xEC;
+static constexpr uint8_t EBML_ID_CRC32 = 0xBF;
 
 /*
  * Matroska element IDs. max. 32-bit.
  */
 
 /* toplevel segment */
-const static uint32_t MATROSKA_ID_SEGMENT = 0x18538067;
+static constexpr uint32_t MATROSKA_ID_SEGMENT = 0x18538067;
 
 /* matroska top-level master IDs */
-const static uint32_t MATROSKA_ID_INFO = 0x1549A966;
-const static uint32_t MATROSKA_ID_TRACKS = 0x1654AE6B;
-const static uint32_t MATROSKA_ID_CUES = 0x1C53BB6B;
-const static uint32_t MATROSKA_ID_TAGS = 0x1254C367;
-const static uint32_t MATROSKA_ID_SEEKHEAD = 0x114D9B74;
-const static uint32_t MATROSKA_ID_CLUSTER = 0x1F43B675;
-const static uint32_t MATROSKA_ID_CHAPTERS = 0x1043A770;
+static constexpr uint32_t MATROSKA_ID_INFO = 0x1549A966;
+static constexpr uint32_t MATROSKA_ID_TRACKS = 0x1654AE6B;
+static constexpr uint32_t MATROSKA_ID_CUES = 0x1C53BB6B;
+static constexpr uint32_t MATROSKA_ID_TAGS = 0x1254C367;
+static constexpr uint32_t MATROSKA_ID_SEEKHEAD = 0x114D9B74;
+static constexpr uint32_t MATROSKA_ID_CLUSTER = 0x1F43B675;
+static constexpr uint32_t MATROSKA_ID_CHAPTERS = 0x1043A770;
 
 /* IDs in the info master */
-const static uint32_t MATROSKA_ID_TIMECODESCALE = 0x2AD7B1;
-const static uint16_t MATROSKA_ID_DURATION = 0x4489;
-const static uint16_t MATROSKA_ID_TITLE = 0x7BA9;
-const static uint16_t MATROSKA_ID_WRITINGAPP = 0x5741;
-const static uint16_t MATROSKA_ID_MUXINGAPP = 0x4D80;
-const static uint16_t MATROSKA_ID_DATEUTC = 0x4461;
-const static uint16_t MATROSKA_ID_SEGMENTUID = 0x73A4;
+static constexpr uint32_t MATROSKA_ID_TIMECODESCALE = 0x2AD7B1;
+static constexpr uint16_t MATROSKA_ID_DURATION = 0x4489;
+static constexpr uint16_t MATROSKA_ID_TITLE = 0x7BA9;
+static constexpr uint16_t MATROSKA_ID_WRITINGAPP = 0x5741;
+static constexpr uint16_t MATROSKA_ID_MUXINGAPP = 0x4D80;
+static constexpr uint16_t MATROSKA_ID_DATEUTC = 0x4461;
+static constexpr uint16_t MATROSKA_ID_SEGMENTUID = 0x73A4;
 
 /* ID in the tracks master */
-const static uint8_t MATROSKA_ID_TRACKENTRY = 0xAE;
+static constexpr uint8_t MATROSKA_ID_TRACKENTRY = 0xAE;
 
 /* IDs in the trackentry master */
-const static uint8_t MATROSKA_ID_TRACKNUMBER = 0xD7;
-const static uint16_t MATROSKA_ID_TRACKUID = 0x73C5;
-const static uint8_t MATROSKA_ID_TRACKTYPE = 0x83;
-const static uint8_t MATROSKA_ID_TRACKAUDIO = 0xE1;
-const static uint8_t MATROSKA_ID_TRACKVIDEO = 0xE0;
-const static uint8_t MATROSKA_ID_CODECID = 0x86;
-const static uint16_t MATROSKA_ID_CODECPRIVATE = 0x63A2;
-const static uint32_t MATROSKA_ID_CODECNAME = 0x258688;
-const static uint32_t MATROSKA_ID_CODECINFOURL = 0x3B4040;
-const static uint32_t MATROSKA_ID_CODECDOWNLOADURL = 0x26B240;
-const static uint16_t MATROSKA_ID_TRACKNAME = 0x536E;
-const static uint32_t MATROSKA_ID_TRACKLANGUAGE = 0x22B59C;
-const static uint8_t MATROSKA_ID_TRACKFLAGENABLED = 0xB9;
-const static uint8_t MATROSKA_ID_TRACKFLAGDEFAULT = 0x88;
-const static uint8_t MATROSKA_ID_TRACKFLAGLACING = 0x9C;
-const static uint16_t MATROSKA_ID_TRACKMINCACHE = 0x6DE7;
-const static uint16_t MATROSKA_ID_TRACKMAXCACHE = 0x6DF8;
-const static uint32_t MATROSKA_ID_TRACKDEFAULTDURATION = 0x23E383;
+static constexpr uint8_t MATROSKA_ID_TRACKNUMBER = 0xD7;
+static constexpr uint16_t MATROSKA_ID_TRACKUID = 0x73C5;
+static constexpr uint8_t MATROSKA_ID_TRACKTYPE = 0x83;
+static constexpr uint8_t MATROSKA_ID_TRACKAUDIO = 0xE1;
+static constexpr uint8_t MATROSKA_ID_TRACKVIDEO = 0xE0;
+static constexpr uint8_t MATROSKA_ID_CODECID = 0x86;
+static constexpr uint16_t MATROSKA_ID_CODECPRIVATE = 0x63A2;
+static constexpr uint32_t MATROSKA_ID_CODECNAME = 0x258688;
+static constexpr uint32_t MATROSKA_ID_CODECINFOURL = 0x3B4040;
+static constexpr uint32_t MATROSKA_ID_CODECDOWNLOADURL = 0x26B240;
+static constexpr uint16_t MATROSKA_ID_TRACKNAME = 0x536E;
+static constexpr uint32_t MATROSKA_ID_TRACKLANGUAGE = 0x22B59C;
+static constexpr uint8_t MATROSKA_ID_TRACKFLAGENABLED = 0xB9;
+static constexpr uint8_t MATROSKA_ID_TRACKFLAGDEFAULT = 0x88;
+static constexpr uint8_t MATROSKA_ID_TRACKFLAGLACING = 0x9C;
+static constexpr uint16_t MATROSKA_ID_TRACKMINCACHE = 0x6DE7;
+static constexpr uint16_t MATROSKA_ID_TRACKMAXCACHE = 0x6DF8;
+static constexpr uint32_t MATROSKA_ID_TRACKDEFAULTDURATION = 0x23E383;
 
-const static uint32_t MATROSKA_ID_TRACKCONTENTENCODINGS = 0x6D80;
-const static uint32_t MATROSKA_ID_TRACKCONTENTENCODING = 0x6240;
-const static uint32_t MATROSKA_ID_ENCODINGCOMPRESSION = 0x5034;
-const static uint32_t MATROSKA_ID_ENCODINGCOMPALGO = 0x4254;
-const static uint32_t MATROSKA_ID_ENCODINGCOMPSETTINGS = 0x4255;
+static constexpr uint32_t MATROSKA_ID_TRACKCONTENTENCODINGS = 0x6D80;
+static constexpr uint32_t MATROSKA_ID_TRACKCONTENTENCODING = 0x6240;
+static constexpr uint32_t MATROSKA_ID_ENCODINGCOMPRESSION = 0x5034;
+static constexpr uint32_t MATROSKA_ID_ENCODINGCOMPALGO = 0x4254;
+static constexpr uint32_t MATROSKA_ID_ENCODINGCOMPSETTINGS = 0x4255;
 
 /* IDs in the trackvideo master */
-const static uint32_t MATROSKA_ID_VIDEOFRAMERATE = 0x2383E3;
-const static uint16_t MATROSKA_ID_VIDEODISPLAYWIDTH = 0x54B0;
-const static uint16_t MATROSKA_ID_VIDEODISPLAYHEIGHT = 0x54BA;
-const static uint8_t MATROSKA_ID_VIDEOPIXELWIDTH = 0xB0;
-const static uint8_t MATROSKA_ID_VIDEOPIXELHEIGHT = 0xBA;
-const static uint8_t MATROSKA_ID_VIDEOFLAGINTERLACED = 0x9A;
-const static uint16_t MATROSKA_ID_VIDEOSTEREOMODE = 0x53B9;
-const static uint16_t MATROSKA_ID_VIDEOASPECTRATIO = 0x54B3;
-const static uint32_t MATROSKA_ID_VIDEOCOLOURSPACE = 0x2EB524;
+static constexpr uint32_t MATROSKA_ID_VIDEOFRAMERATE = 0x2383E3;
+static constexpr uint16_t MATROSKA_ID_VIDEODISPLAYWIDTH = 0x54B0;
+static constexpr uint16_t MATROSKA_ID_VIDEODISPLAYHEIGHT = 0x54BA;
+static constexpr uint8_t MATROSKA_ID_VIDEOPIXELWIDTH = 0xB0;
+static constexpr uint8_t MATROSKA_ID_VIDEOPIXELHEIGHT = 0xBA;
+static constexpr uint8_t MATROSKA_ID_VIDEOFLAGINTERLACED = 0x9A;
+static constexpr uint16_t MATROSKA_ID_VIDEOSTEREOMODE = 0x53B9;
+static constexpr uint16_t MATROSKA_ID_VIDEOASPECTRATIO = 0x54B3;
+static constexpr uint32_t MATROSKA_ID_VIDEOCOLOURSPACE = 0x2EB524;
 
 /* IDs in the trackaudio master */
-const static uint8_t MATROSKA_ID_AUDIOSAMPLINGFREQ = 0xB5;
-const static uint16_t MATROSKA_ID_AUDIOOUTSAMPLINGFREQ = 0x78B5;
+static constexpr uint8_t MATROSKA_ID_AUDIOSAMPLINGFREQ = 0xB5;
+static constexpr uint16_t MATROSKA_ID_AUDIOOUTSAMPLINGFREQ = 0x78B5;
 
-const static uint16_t MATROSKA_ID_AUDIOBITDEPTH = 0x6264;
-const static uint8_t MATROSKA_ID_AUDIOCHANNELS = 0x9F;
+static constexpr uint16_t MATROSKA_ID_AUDIOBITDEPTH = 0x6264;
+static constexpr uint8_t MATROSKA_ID_AUDIOCHANNELS = 0x9F;
 
 /* ID in the cues master */
-const static uint8_t MATROSKA_ID_POINTENTRY = 0xBB;
+static constexpr uint8_t MATROSKA_ID_POINTENTRY = 0xBB;
 
 /* IDs in the pointentry master */
-const static uint8_t MATROSKA_ID_CUETIME = 0xB3;
-const static uint8_t MATROSKA_ID_CUETRACKPOSITION = 0xB7;
+static constexpr uint8_t MATROSKA_ID_CUETIME = 0xB3;
+static constexpr uint8_t MATROSKA_ID_CUETRACKPOSITION = 0xB7;
 
 /* IDs in the cuetrackposition master */
-const static uint8_t MATROSKA_ID_CUETRACK = 0xF7;
-const static uint8_t MATROSKA_ID_CUECLUSTERPOSITION = 0xF1;
+static constexpr uint8_t MATROSKA_ID_CUETRACK = 0xF7;
+static constexpr uint8_t MATROSKA_ID_CUECLUSTERPOSITION = 0xF1;
 
 /* IDs in the tags master */
 /* TODO */
 
 /* IDs in the seekhead master */
-const static uint16_t MATROSKA_ID_SEEKENTRY = 0x4DBB;
+static constexpr uint16_t MATROSKA_ID_SEEKENTRY = 0x4DBB;
 
 /* IDs in the seekpoint master */
-const static uint16_t MATROSKA_ID_SEEKID = 0x53AB;
-const static uint16_t MATROSKA_ID_SEEKPOSITION = 0x53AC;
+static constexpr uint16_t MATROSKA_ID_SEEKID = 0x53AB;
+static constexpr uint16_t MATROSKA_ID_SEEKPOSITION = 0x53AC;
 
 /* IDs in the cluster master */
-const static uint8_t MATROSKA_ID_CLUSTERTIMECODE = 0xE7;
-const static uint8_t MATROSKA_ID_BLOCKGROUP = 0xA0;
-const static uint8_t MATROSKA_ID_SIMPLEBLOCK = 0xA3;
+static constexpr uint8_t MATROSKA_ID_CLUSTERTIMECODE = 0xE7;
+static constexpr uint8_t MATROSKA_ID_BLOCKGROUP = 0xA0;
+static constexpr uint8_t MATROSKA_ID_SIMPLEBLOCK = 0xA3;
 
 /* IDs in the blockgroup master */
-const static uint8_t MATROSKA_ID_BLOCK = 0xA1;
-const static uint8_t MATROSKA_ID_BLOCKDURATION = 0x9B;
-const static uint8_t MATROSKA_ID_BLOCKREFERENCE = 0xFB;
+static constexpr uint8_t MATROSKA_ID_BLOCK = 0xA1;
+static constexpr uint8_t MATROSKA_ID_BLOCKDURATION = 0x9B;
+static constexpr uint8_t MATROSKA_ID_BLOCKREFERENCE = 0xFB;
 
 enum class MatroskaEyeMode
 {

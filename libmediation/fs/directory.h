@@ -18,6 +18,6 @@ uint64_t getFileSize(const std::string& fileName);
 /** remove file. cerr contains error code */
 bool deleteFile(const std::string& fileName);
 
-bool findFilesRecursive(const std::string& path, const std::string& mask, std::vector<std::string>* const fileList);
+bool findFilesRecursive(const std::string& path, const std::string& mask, std::vector<std::string>* fileList);
 
 #endif  // directory_h

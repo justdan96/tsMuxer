@@ -14,18 +14,18 @@
 class MovDemuxer : public IOContextDemuxer
 {
    public:
-    MovDemuxer(const BufferedReaderManager& readManager);
+    MovDemuxer(BufferedReaderManager& readManager);
     ~MovDemuxer() override { readClose(); }
     void openFile(const std::string& streamName) override;
-    void readClose() override final;
+    void readClose() final;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
-    int64_t getTrackDelay(uint32_t pid) override
+    int64_t getTrackDelay(const uint32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }
     double getTrackFps(uint32_t trackId) override;
-    int readPacket(AVPacket&) { return 0; }
+    static int readPacket(AVPacket&) { return 0; }
     void setFileIterator(FileNameIterator* itr) override;
     bool isPidFilterSupported() const override { return true; }
     int64_t getFileDurationNano() const override;
@@ -35,7 +35,10 @@ class MovDemuxer : public IOContextDemuxer
     struct MOVAtom
     {
         MOVAtom() : type(0), offset(0), size(0) {}
-        MOVAtom(uint32_t _type, int64_t _offset, int64_t _size) : type(_type), offset(_offset), size(_size) {}
+        MOVAtom(const uint32_t _type, const int64_t _offset, const int64_t _size)
+            : type(_type), offset(_offset), size(_size)
+        {
+        }
         uint32_t type;
         int64_t offset;
         int64_t size;  // total size (excluding the size and type fields)
@@ -67,7 +70,7 @@ class MovDemuxer : public IOContextDemuxer
     int64_t m_mdat_size;
     int64_t m_fileSize;
     uint32_t m_timescale;
-    std::map<uint32_t, uint64_t> m_firstTimecode;
+    std::map<uint32_t, int64_t> m_firstTimecode;
     std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;

@@ -11,38 +11,38 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-static const double frame_rates[] = {0.0,  23.97602397602397, 24.0, 25.0, 29.97002997002997, 30,
-                                     50.0, 59.94005994005994, 60.0};
+static constexpr double frame_rates[] = {0.0,  23.97602397602397, 24.0, 25.0, 29.97002997002997, 30,
+                                         50.0, 59.94005994005994, 60.0};
 
-const static unsigned SEQ_END_CODE = 0x00001b7;
-const static unsigned SEQ_START_CODE = 0x00001b3;
-const static unsigned GOP_START_CODE = 0x00001b8;
-const static unsigned PICTURE_START_CODE = 0x0000100;
-const static unsigned SLICE_MIN_START_CODE = 0x0000101;
-const static unsigned SLICE_MAX_START_CODE = 0x00001af;
-const static unsigned EXT_START_CODE = 0x00001b5;
-const static unsigned USER_START_CODE = 0x00001b2;
+static constexpr unsigned SEQ_END_CODE = 0x00001b7;
+static constexpr unsigned SEQ_START_CODE = 0x00001b3;
+static constexpr unsigned GOP_START_CODE = 0x00001b8;
+static constexpr unsigned PICTURE_START_CODE = 0x0000100;
+static constexpr unsigned SLICE_MIN_START_CODE = 0x0000101;
+static constexpr unsigned SLICE_MAX_START_CODE = 0x00001af;
+static constexpr unsigned EXT_START_CODE = 0x00001b5;
+static constexpr unsigned USER_START_CODE = 0x00001b2;
 
-const static unsigned SEQ_END_SHORT_CODE = 0xb7;
-const static unsigned SEQ_START_SHORT_CODE = 0xb3;
-const static unsigned GOP_START_SHORT_CODE = 0xb8;
-const static unsigned PICTURE_START_SHORT_CODE = 0x00;
-const static unsigned SLICE_MIN_START_SHORT_CODE = 0x01;
-const static unsigned SLICE_MAX_START_SHORT_CODE = 0xaf;
-const static unsigned EXT_START_SHORT_CODE = 0xb5;
-const static unsigned USER_START_SHORT_CODE = 0xb2;
+static constexpr unsigned SEQ_END_SHORT_CODE = 0xb7;
+static constexpr unsigned SEQ_START_SHORT_CODE = 0xb3;
+static constexpr unsigned GOP_START_SHORT_CODE = 0xb8;
+static constexpr unsigned PICTURE_START_SHORT_CODE = 0x00;
+static constexpr unsigned SLICE_MIN_START_SHORT_CODE = 0x01;
+static constexpr unsigned SLICE_MAX_START_SHORT_CODE = 0xaf;
+static constexpr unsigned EXT_START_SHORT_CODE = 0xb5;
+static constexpr unsigned USER_START_SHORT_CODE = 0xb2;
 
-const static unsigned PICTURE_CODING_EXT = 0x08;
-const static unsigned SEQUENCE_EXT = 0x01;
-const static unsigned SEQUENCE_DISPLAY_EXT = 0x02;
+static constexpr unsigned PICTURE_CODING_EXT = 0x08;
+static constexpr unsigned SEQUENCE_EXT = 0x01;
+static constexpr unsigned SEQUENCE_DISPLAY_EXT = 0x02;
 
-static const unsigned MAX_PICTURE_SIZE = 256 * 1024;
-static const unsigned MAX_HEADER_SIZE = 1024 * 4;
+static constexpr unsigned MAX_PICTURE_SIZE = 256 * 1024;
+static constexpr unsigned MAX_HEADER_SIZE = 1024 * 4;
 
 class MPEGHeader
 {
    public:
-    inline static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
+    static uint8_t* findNextMarker(uint8_t* buffer, uint8_t* end)
     {
         // uint8_t* bufStart = buffer;
         for (buffer += 2; buffer < end;)
@@ -62,13 +62,14 @@ class MPEGHeader
     }
 
    protected:
-    MPEGHeader(){};
-    virtual ~MPEGHeader(){};
-    inline static uint8_t* skipProcessedBytes(BitStreamReader& bitContext)
+    MPEGHeader() {}
+    virtual ~MPEGHeader() {}
+
+    static uint8_t* skipProcessedBytes(const BitStreamReader& bitContext)
     {
         // int bytes_readed = ((get_bits_count(&bitContext) | 0x7) + 1) >> 3;
-        int bytes_readed = ((bitContext.getBitsCount() | 0x7) + 1) >> 3;
-        return (uint8_t*)bitContext.getBuffer() + bytes_readed;
+        const int bytes_readed = ((bitContext.getBitsCount() | 0x7) + 1) >> 3;
+        return bitContext.getBuffer() + bytes_readed;
     }
 };
 
@@ -80,8 +81,8 @@ class MPEGRawDataHeader : public MPEGHeader
     MPEGRawDataHeader(int maxBufferLen);
     ~MPEGRawDataHeader() override;
     virtual uint32_t serialize(uint8_t* buffer);
-    uint32_t getDataBufferLen() { return m_data_buffer_len; }
-    void clearRawBuffer() { m_data_buffer_len = 0; }
+    uint32_t getDataBufferLen() const { return m_data_buffer_len; }
+    virtual void clearRawBuffer() { m_data_buffer_len = 0; }
 
    protected:
     bool m_headerIncludedToBuff;
@@ -133,15 +134,15 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     int pan_scan_width;
     int pan_scan_height;
     MPEGSequenceHeader(int bufferSize);
-    ~MPEGSequenceHeader() override{};
+    ~MPEGSequenceHeader() override {}
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeExtension(BitStreamReader& bitReader);
-    static uint8_t* deserializeMatrixExtension(BitStreamReader& bitReader);
+    static uint8_t* deserializeMatrixExtension(const BitStreamReader& bitReader);
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitReader);
     double getFrameRate() const;
     void setFrameRate(uint8_t* buff, double fps);
     static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
-    std::string getStreamDescr() const;
+    std::string getStreamDescr();
 };
 
 class MPEGGOPHeader : public MPEGHeader
@@ -215,13 +216,13 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     int repeat_first_field_bitpos;
     int top_field_first_bitpos;
 
-    void clearRawBuffer() { m_picture_data_len = m_headerSize = m_data_buffer_len = 0; }
+    void clearRawBuffer() override { m_picture_data_len = m_headerSize = m_data_buffer_len = 0; }
 
     BitStreamReader bitReader;
 
     // methods
     MPEGPictureHeader(int bufferSize);
-    ~MPEGPictureHeader() override{};
+    ~MPEGPictureHeader() override {}
 
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
     uint8_t* deserializeCodingExtension(BitStreamReader& bitReader);

@@ -8,7 +8,7 @@ const int AACCodec::aac_sample_rates[16] = {96000, 88200, 64000, 48000, 44100, 3
 
 const int AACCodec::aac_channels[8] = {0, 1, 2, 3, 4, 5, 6, 8};
 
-uint8_t* AACCodec::findAacFrame(uint8_t* buffer, uint8_t* end)
+uint8_t* AACCodec::findAacFrame(uint8_t* buffer, const uint8_t* end)
 {
     uint8_t* curBuf = buffer;
     while (curBuf < end)
@@ -25,7 +25,10 @@ uint8_t* AACCodec::findAacFrame(uint8_t* buffer, uint8_t* end)
     return nullptr;
 }
 
-int AACCodec::getFrameSize(uint8_t* buffer) { return ((buffer[3] & 0x03) << 11) + (buffer[4] << 3) + (buffer[5] >> 5); }
+int AACCodec::getFrameSize(const uint8_t* buffer)
+{
+    return ((buffer[3] & 0x03) << 11) + (buffer[4] << 3) + (buffer[5] >> 5);
+}
 
 bool AACCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
 {

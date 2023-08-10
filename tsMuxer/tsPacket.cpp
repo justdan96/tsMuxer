@@ -1620,7 +1620,7 @@ MPLSStreamInfo MPLSParser::getStreamByPID(const int pid) const
         if (i.streamPID == pid)
             return i;
     }
-    return MPLSStreamInfo();
+    return {};
 }
 
 std::vector<MPLSStreamInfo> MPLSParser::getPgStreams() const

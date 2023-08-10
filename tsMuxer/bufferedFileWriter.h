@@ -10,7 +10,7 @@
 
 #include "vod_common.h"
 
-const unsigned WRITE_QUEUE_MAX_SIZE = 400 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;  // 400 Mb max queue size
+constexpr unsigned WRITE_QUEUE_MAX_SIZE = 400 * 1024 * 1024 / DEFAULT_FILE_BLOCK_SIZE;  // 400 Mb max queue size
 
 struct WriterData
 {
@@ -28,7 +28,7 @@ struct WriterData
     Commands m_command;
 
    public:
-    WriterData() : m_buffer(0), m_bufferLen(0), m_mainFile(), m_command() {}
+    WriterData() : m_buffer(nullptr), m_bufferLen(0), m_mainFile(), m_command() {}
 
     void execute() const;
 };
@@ -39,21 +39,18 @@ class BufferedFileWriter : public TerminatableThread
     BufferedFileWriter();
     ~BufferedFileWriter() override;
     void terminate();
-    inline int getQueueSize() { return (int)m_writeQueue.size(); }
-    inline bool addWriterData(const WriterData& data)
+    int getQueueSize() const { return static_cast<int>(m_writeQueue.size()); }
+
+    bool addWriterData(const WriterData& data)
     {
         if (m_lastErrorCode == 0)
         {
             m_nothingToExecute = false;
             return m_writeQueue.push(data);
         }
-        else
-        {
-            throw std::runtime_error(m_lastErrorStr);
-            return false;
-        }
+        throw std::runtime_error(m_lastErrorStr);
     }
-    bool isQueueEmpty() { return m_nothingToExecute; }
+    bool isQueueEmpty() const { return m_nothingToExecute; }
 
    protected:
     void thread_main() override;

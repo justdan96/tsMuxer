@@ -11,15 +11,15 @@ class FileFactory;
 class MuxerManager
 {
    public:
-    static const uint32_t PHYSICAL_SECTOR_SIZE =
+    static constexpr uint32_t PHYSICAL_SECTOR_SIZE =
         2048;  // minimum write align requirement. Should be readed from OS in a next version
-    static const int BLURAY_SECTOR_SIZE =
+    static constexpr int BLURAY_SECTOR_SIZE =
         PHYSICAL_SECTOR_SIZE * 3;  // real sector size is 2048, but M2TS frame required addition rounding by 3 blocks
 
-    MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
+    MuxerManager(BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
     virtual ~MuxerManager();
 
-    void setAsyncMode(bool val) { m_asyncMode = val; }
+    void setAsyncMode(const bool val) { m_asyncMode = val; }
 
     // void setFileBlockSize ( uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
     // int32_t getFileBlockSize() const { return m_fileBlockSize; }
@@ -32,10 +32,10 @@ class MuxerManager
 
     void doMux(const std::string& outFileName, FileFactory* fileFactory);
 
-    void setCutStart(int64_t value) { m_cutStart = value; }
+    void setCutStart(const int64_t value) { m_cutStart = value; }
     int64_t getCutStart() const { return m_cutStart; }
 
-    void setCutEnd(int64_t value) { m_cutEnd = value; }
+    void setCutEnd(const int64_t value) { m_cutEnd = value; }
     int64_t getCutEnd() const { return m_cutEnd; }
 
     void waitForWriting() const;
@@ -45,8 +45,8 @@ class MuxerManager
     void muxBlockFinished(AbstractMuxer* muxer);
 
     void parseMuxOpt(const std::string& opts);
-    int getTrackCnt() { return (int)m_metaDemuxer.getCodecInfo().size(); }
-    bool getHevcFound() { return m_metaDemuxer.m_HevcFound; }
+    int getTrackCnt() { return static_cast<int>(m_metaDemuxer.getCodecInfo().size()); }
+    bool getHevcFound() const { return m_metaDemuxer.m_HevcFound; }
     AbstractMuxer* getMainMuxer() const;
     AbstractMuxer* getSubMuxer() const;
     bool isStereoMode() const;

@@ -11,7 +11,7 @@ static constexpr uint32_t LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
 
 // #define min(a,b) a<=b?a:b
 
-ProgramStreamDemuxer::ProgramStreamDemuxer(const BufferedReaderManager& readManager)
+ProgramStreamDemuxer::ProgramStreamDemuxer(BufferedReaderManager& readManager)
     : m_tmpBuffer{}, m_readManager(readManager), m_dataProcessed(0)
 {
     memset(m_psm_es_type, 0, sizeof(m_psm_es_type));

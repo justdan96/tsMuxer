@@ -112,7 +112,7 @@ class ContainerToReaderWrapper : public AbstractReader
         const uint32_t m_pid;
     };
 
-    ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
+    ContainerToReaderWrapper(const METADemuxer& owner, BufferedReaderManager& readManager)
         : m_readBuffOffset(0), m_readManager(readManager), m_owner(owner)
     {
         auto& brm = const_cast<BufferedReaderManager&>(readManager);
@@ -142,7 +142,7 @@ class ContainerToReaderWrapper : public AbstractReader
     int64_t m_discardedSize;
     int m_readerCnt;
     size_t m_readBuffOffset;
-    const BufferedReaderManager& m_readManager;
+    BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
     const METADemuxer& m_owner;
     bool m_terminated;
@@ -162,7 +162,7 @@ struct DetectStreamRez
 class METADemuxer : public AbstractDemuxer
 {
    public:
-    METADemuxer(const BufferedReaderManager& readManager);
+    METADemuxer(BufferedReaderManager& readManager);
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
     void readClose() override final;

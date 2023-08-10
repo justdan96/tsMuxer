@@ -171,7 +171,10 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
     return skipProcessedBytes(bitReader);
 }
 
-uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(BitStreamReader& bitReader) { return bitReader.getBuffer(); }
+uint8_t* MPEGSequenceHeader::deserializeMatrixExtension(const BitStreamReader& bitReader)
+{
+    return bitReader.getBuffer();
+}
 
 uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitReader)
 {
@@ -194,7 +197,7 @@ uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitRea
     return skipProcessedBytes(bitReader);
 }
 
-std::string MPEGSequenceHeader::getStreamDescr() const
+std::string MPEGSequenceHeader::getStreamDescr()
 {
     std::ostringstream rez;
     rez << "Profile: ";

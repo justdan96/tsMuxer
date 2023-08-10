@@ -2,8 +2,6 @@
 #include "tsMuxer.h"
 
 #include <fs/textfile.h>
-#include "pesPacket.h"
-#include "tsPacket.h"
 
 #include "ac3StreamReader.h"
 #include "dtsStreamReader.h"
@@ -11,6 +9,8 @@
 #include "mpegAudioStreamReader.h"
 #include "mpegStreamReader.h"
 #include "muxerManager.h"
+#include "pesPacket.h"
+#include "tsPacket.h"
 #include "vodCoreException.h"
 
 #ifdef _WIN32
@@ -1484,7 +1484,7 @@ std::string TSMuxer::getFileNameByIdx(const size_t idx)
     if (idx < m_fileNames.size())
         return m_fileNames[idx];
     assert(1);
-    return std::string();
+    return {};
 }
 
 void TSMuxer::setMuxFormat(const std::string& format)

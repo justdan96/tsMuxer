@@ -17,9 +17,9 @@ class BufferedReaderManager
 
     void init(uint32_t blockSize = 0, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
 
-    inline uint32_t getBlockSize() { return m_blockSize; }
-    inline uint32_t getAllocSize() { return m_allocSize; }
-    inline uint32_t getPreReadThreshold() { return m_prereadThreshold; }
+    uint32_t getBlockSize() const { return m_blockSize; }
+    uint32_t getAllocSize() const { return m_allocSize; }
+    uint32_t getPreReadThreshold() const { return m_prereadThreshold; }
 
    private:
     std::vector<BufferedReader*> m_fileReaders;

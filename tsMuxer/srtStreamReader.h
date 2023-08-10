@@ -22,28 +22,28 @@ class SRTStreamReader : public AbstractStreamReader
     CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType,
                                int containerStreamIndex);
     const CodecInfo& getCodecInfo() override { return pgsCodecInfo; }
-    void setStreamIndex(int index) override
+    void setStreamIndex(const int index) override
     {
         m_streamIndex = index;
         m_dstSubCodec->setStreamIndex(index);
     }
-    void setDemuxMode(bool value) override
+    void setDemuxMode(const bool value) override
     {
         m_demuxMode = value;
-        PGSStreamReader* pgsReader = dynamic_cast<PGSStreamReader*>(m_dstSubCodec);
+        const auto pgsReader = dynamic_cast<PGSStreamReader*>(m_dstSubCodec);
         if (pgsReader)
             pgsReader->setDemuxMode(value);
     }
-    void setVideoInfo(int width, int height, double fps)
+    void setVideoInfo(const int width, const int height, const double fps) const
     {
         m_srtRender->setVideoInfo(width, height, fps);
-        PGSStreamReader* pgsReader = dynamic_cast<PGSStreamReader*>(m_dstSubCodec);
+        const auto pgsReader = dynamic_cast<PGSStreamReader*>(m_dstSubCodec);
         if (pgsReader)
             pgsReader->setVideoInfo(0, 0, fps);
     }
-    void setFont(const text_subtitles::Font& font) { m_srtRender->m_textRender->setFont(font); }
+    void setFont(const text_subtitles::Font& font) const { m_srtRender->m_textRender->setFont(font); }
     void setAnimation(const text_subtitles::TextAnimation& animation);
-    void setBottomOffset(int offset) { m_srtRender->setBottomOffset(offset); }
+    void setBottomOffset(const int offset) const { m_srtRender->setBottomOffset(offset); }
 
    protected:
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
