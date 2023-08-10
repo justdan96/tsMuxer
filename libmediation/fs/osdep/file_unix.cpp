@@ -114,7 +114,7 @@ int File::write(const void* buffer, uint32_t count)
 
 bool File::isOpen() const { return to_fd(m_impl) != -1; }
 
-bool File::size(uint64_t* const fileSize) const
+bool File::size(int64_t* const fileSize) const
 {
     bool res = false;
 
