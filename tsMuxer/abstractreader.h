@@ -1,5 +1,5 @@
-#ifndef __ABSTRACT_READER_H
-#define __ABSTRACT_READER_H
+#ifndef ABSTRACT_READER_H_
+#define ABSTRACT_READER_H_
 
 #include <types/types.h>
 

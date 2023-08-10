@@ -1,5 +1,5 @@
-#ifndef __MPEG_VIDEO_H
-#define __MPEG_VIDEO_H
+#ifndef MPEG_VIDEO_H_
+#define MPEG_VIDEO_H_
 
 /* Start codes. */
 

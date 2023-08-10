@@ -1,5 +1,5 @@
-#ifndef __ABSTRACT_MUXER_H
-#define __ABSTRACT_MUXER_H
+#ifndef ABSTRACT_MUXER_H_
+#define ABSTRACT_MUXER_H_
 
 #include <fs/file.h>
 #include <fs/systemlog.h>

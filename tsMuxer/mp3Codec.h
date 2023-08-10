@@ -1,5 +1,5 @@
-#ifndef __MP3_CODEC_H
-#define __MP3_CODEC_H
+#ifndef MP3_CODEC_H_
+#define MP3_CODEC_H_
 
 #include <types/types.h>
 

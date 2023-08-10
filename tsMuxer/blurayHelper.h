@@ -1,5 +1,5 @@
-#ifndef _BLURAY_HELPER_H__
-#define _BLURAY_HELPER_H__
+#ifndef BLURAY_HELPER_H_
+#define BLURAY_HELPER_H_
 
 #include <string>
 #include <vector>
@@ -46,4 +46,4 @@ class BlurayHelper : public FileFactory
     IsoWriter* m_isoWriter;
 };
 
-#endif  // _BLURAY_HELPER_H__
+#endif  // _BLURAY_HELPER_H_

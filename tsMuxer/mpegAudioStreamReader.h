@@ -1,5 +1,5 @@
-#ifndef __MPEG_AUDIO_STREAM_READER
-#define __MPEG_AUDIO_STREAM_READER
+#ifndef MPEG_AUDIO_STREAM_READER_
+#define MPEG_AUDIO_STREAM_READER_
 
 #include "mp3Codec.h"
 #include "simplePacketizerReader.h"

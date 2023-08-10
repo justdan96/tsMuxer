@@ -1,5 +1,5 @@
-#ifndef __SUB_TRACK_FILTER_H__
-#define __SUB_TRACK_FILTER_H__
+#ifndef SUB_TRACK_FILTER_H_
+#define SUB_TRACK_FILTER_H_
 
 #include "abstractreader.h"
 
@@ -19,4 +19,4 @@ class SubTrackFilter
     int m_srcPID;
 };
 
-#endif  // __SUB_TRACK_FILTER_H__
+#endif  // SUB_TRACK_FILTER_H_

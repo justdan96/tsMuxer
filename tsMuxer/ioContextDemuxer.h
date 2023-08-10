@@ -1,5 +1,5 @@
-#ifndef __IO_CONTEXT_DEMUXER_H
-#define __IO_CONTEXT_DEMUXER_H
+#ifndef IO_CONTEXT_DEMUXER_H_
+#define IO_CONTEXT_DEMUXER_H_
 
 #include <map>
 #include <queue>

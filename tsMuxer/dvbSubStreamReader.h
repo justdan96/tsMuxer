@@ -1,5 +1,5 @@
-#ifndef __DVB_SUB_STREAM_READRE
-#define __DVB_SUB_STREAM_READRE
+#ifndef DVB_SUB_STREAM_READER_
+#define DVB_SUB_STREAM_READER_
 
 #include "simplePacketizerReader.h"
 

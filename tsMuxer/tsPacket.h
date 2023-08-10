@@ -1,5 +1,5 @@
-#ifndef __TS_PACKET_H
-#define __TS_PACKET_H
+#ifndef TS_PACKET_H_
+#define TS_PACKET_H_
 
 #include <memory.h>
 #include <types/types.h>

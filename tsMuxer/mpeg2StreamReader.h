@@ -1,5 +1,5 @@
-#ifndef __MPEG2_STREAM_READER_H
-#define __MPEG2_STREAM_READER_H
+#ifndef MPEG2_STREAM_READER_H_
+#define MPEG2_STREAM_READER_H_
 
 #include "avCodecs.h"
 #include "mpegStreamReader.h"

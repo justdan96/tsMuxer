@@ -1,5 +1,5 @@
-#ifndef __TEXT_SUBTITLES_RENDER_FT_H
-#define __TEXT_SUBTITLES_RENDER_FT_H
+#ifndef TEXT_SUBTITLES_RENDER_FT_H_
+#define TEXT_SUBTITLES_RENDER_FT_H_
 
 #include <ft2build.h>
 

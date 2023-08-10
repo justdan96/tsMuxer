@@ -1,5 +1,5 @@
-#ifndef __BUFFERED_FILE_READER_H
-#define __BUFFERED_FILE_READER_H
+#ifndef BUFFERED_FILE_READER_H_
+#define BUFFERED_FILE_READER_H_
 
 #include <fs/file.h>
 #include <fs/systemlog.h>

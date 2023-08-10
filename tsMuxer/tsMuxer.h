@@ -1,5 +1,5 @@
-#ifndef __TS_MUXER_H
-#define __TS_MUXER_H
+#ifndef TS_MUXER_H_
+#define TS_MUXER_H_
 
 #include <types/types.h>
 

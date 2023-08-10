@@ -1,5 +1,5 @@
-#ifndef __MUXER_MANAGER_H
-#define __MUXER_MANAGER_H
+#ifndef MUXER_MANAGER_H_
+#define MUXER_MANAGER_H_
 
 #include "abstractMuxer.h"
 #include "bufferedFileWriter.h"
@@ -102,4 +102,4 @@ class MuxerManager
     bool m_reproducibleIsoHeader = false;
 };
 
-#endif  // __MUXER_MANAGER_H
+#endif  // _MUXER_MANAGER_H_

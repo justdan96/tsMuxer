@@ -1,5 +1,5 @@
-#ifndef __VC1_STREAM_READER_H
-#define __VC1_STREAM_READER_H
+#ifndef VC1_STREAM_READER_H_
+#define VC1_STREAM_READER_H_
 
 #include "avCodecs.h"
 #include "mpegStreamReader.h"

@@ -1,5 +1,5 @@
-#ifndef __DTS_STREAM_READER
-#define __DTS_STREAM_READER
+#ifndef DTS_STREAM_READER_
+#define DTS_STREAM_READER_
 
 #include <algorithm>
 

@@ -1,5 +1,5 @@
-#ifndef __BITSTREAM_H
-#define __BITSTREAM_H
+#ifndef BITSTREAM_H_
+#define BITSTREAM_H_
 
 #include <assert.h>
 #include <limits.h>

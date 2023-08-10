@@ -1,5 +1,5 @@
-#ifndef __BUFFERED_READER_H
-#define __BUFFERED_READER_H
+#ifndef BUFFERED_READER_H_
+#define BUFFERED_READER_H_
 
 #include <containers/safequeue.h>
 #include <system/terminatablethread.h>

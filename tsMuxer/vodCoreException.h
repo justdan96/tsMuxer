@@ -1,5 +1,5 @@
-#ifndef __VOD_CORE_EXCEPTION_H
-#define __VOD_CORE_EXCEPTION_H
+#ifndef VOD_CORE_EXCEPTION_H_
+#define VOD_CORE_EXCEPTION_H_
 
 #include <sstream>
 #include <string>

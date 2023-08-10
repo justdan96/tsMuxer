@@ -1,5 +1,5 @@
-#ifndef __SRT_STREAM_READER
-#define __SRT_STREAM_READER
+#ifndef SRT_STREAM_READER_
+#define SRT_STREAM_READER_
 
 #include <queue>
 

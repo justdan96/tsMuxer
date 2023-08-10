@@ -1,5 +1,5 @@
-#ifndef __H264_STREAM_READER_H
-#define __H264_STREAM_READER_H
+#ifndef H264_STREAM_READER_H_
+#define H264_STREAM_READER_H_
 
 #include <iostream>
 #include <map>

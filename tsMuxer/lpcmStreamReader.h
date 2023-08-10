@@ -1,5 +1,5 @@
-#ifndef __LPCM_STREAM_READER_H
-#define __LPCM_STREAM_READER_H
+#ifndef LPCM_STREAM_READER_H_
+#define LPCM_STREAM_READER_H_
 
 #include "avPacket.h"
 #include "simplePacketizerReader.h"

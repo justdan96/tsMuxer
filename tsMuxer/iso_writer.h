@@ -1,5 +1,5 @@
-#ifndef __ISO_WRITER_H__
-#define __ISO_WRITER_H__
+#ifndef ISO_WRITER_H_
+#define ISO_WRITER_H_
 
 #include <fs/file.h>
 
@@ -293,4 +293,4 @@ class ISOFile : public AbstractOutputStream
     FileEntryInfo* m_entry;
 };
 
-#endif  // __ISO_WRITER_H__
+#endif  // ISO_WRITER_H_

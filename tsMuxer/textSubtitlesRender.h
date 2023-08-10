@@ -1,5 +1,5 @@
-#ifndef __TEXT_SUBTITLES_RENDER
-#define __TEXT_SUBTITLES_RENDER
+#ifndef TEXT_SUBTITLES_RENDER_
+#define TEXT_SUBTITLES_RENDER_
 
 #include <types/types.h>
 

@@ -1,5 +1,5 @@
-#ifndef __PGS_STREAM_READER_H
-#define __PGS_STREAM_READER_H
+#ifndef PGS_STREAM_READER_H_
+#define PGS_STREAM_READER_H_
 
 #include <vector>
 

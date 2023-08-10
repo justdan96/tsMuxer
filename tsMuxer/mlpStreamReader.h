@@ -1,5 +1,5 @@
-#ifndef __MLP_STREAM_READER_H
-#define __MLP_STREAM_READER_H
+#ifndef MLP_STREAM_READER_H_
+#define MLP_STREAM_READER_H_
 
 #include "avPacket.h"
 #include "mlpCodec.h"

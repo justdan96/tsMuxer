@@ -1,5 +1,5 @@
-#ifndef __MOV_DEMUXER_H
-#define __MOV_DEMUXER_H
+#ifndef MOV_DEMUXER_H_
+#define MOV_DEMUXER_H_
 
 #include <map>
 #include <queue>

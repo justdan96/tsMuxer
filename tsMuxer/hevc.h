@@ -1,5 +1,5 @@
-#ifndef __HEVC_H_
-#define __HEVC_H_
+#ifndef HEVC_H_
+#define HEVC_H_
 
 #include "nalUnits.h"
 
@@ -179,4 +179,4 @@ struct HevcSliceHeader : public HevcUnit
 
 std::vector<std::vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size);
 
-#endif  // __HEVC_H_
+#endif  // _HEVC_H_

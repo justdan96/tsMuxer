@@ -1,5 +1,5 @@
-#ifndef __HEVC_STREAM_READER_H__
-#define __HEVC_STREAM_READER_H__
+#ifndef HEVC_STREAM_READER_H_
+#define HEVC_STREAM_READER_H_
 
 #include <map>
 
@@ -71,4 +71,4 @@ class HEVCStreamReader : public MPEGStreamReader
     int m_vpsSizeDiff;
 };
 
-#endif  // __HEVC_STREAM_READER_H__
+#endif  // _HEVC_STREAM_READER_H_

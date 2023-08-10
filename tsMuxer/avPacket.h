@@ -1,5 +1,5 @@
-#ifndef __AV_PACKET_H
-#define __AV_PACKET_H
+#ifndef AV_PACKET_H_
+#define AV_PACKET_H_
 
 #include <types/types.h>
 

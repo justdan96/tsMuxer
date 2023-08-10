@@ -1,5 +1,5 @@
-#ifndef __PROGRAM_STREAM_DEMUXER_H
-#define __PROGRAM_STREAM_DEMUXER_H
+#ifndef PROGRAM_STREAM_DEMUXER_H_
+#define PROGRAM_STREAM_DEMUXER_H_
 
 #include <set>
 #include <vector>

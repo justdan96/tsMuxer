@@ -1,7 +1,7 @@
-#include <types/types.h>
+#ifndef AAC_CODEC_H_
+#define AAC_CODEC_H_
 
-#ifndef __AAC_CODEC_H
-#define __AAC_CODEC_H
+#include <types/types.h>
 
 static constexpr int AAC_HEADER_LEN = 7;
 

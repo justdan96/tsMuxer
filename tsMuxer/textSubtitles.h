@@ -1,5 +1,5 @@
-#ifndef __TEXT_SUBTITLES_H
-#define __TEXT_SUBTITLES_H
+#ifndef TEXT_SUBTITLES_H_
+#define TEXT_SUBTITLES_H_
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN  // Exclude rarely-used stuff from Windows headers

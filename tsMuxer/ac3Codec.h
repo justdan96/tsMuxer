@@ -1,5 +1,5 @@
-#ifndef __AC3_CODEC_H
-#define __AC3_CODEC_H
+#ifndef AC3_CODEC_H_
+#define AC3_CODEC_H_
 
 #include "avPacket.h"
 #include "mlpCodec.h"

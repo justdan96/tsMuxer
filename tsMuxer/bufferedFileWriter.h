@@ -1,5 +1,5 @@
-#ifndef __BUFFERED_FILE_WRITER_H
-#define __BUFFERED_FILE_WRITER_H
+#ifndef BUFFERED_FILE_WRITER_H_
+#define BUFFERED_FILE_WRITER_H_
 
 #include <containers/safequeue.h>
 #include <fs/file.h>

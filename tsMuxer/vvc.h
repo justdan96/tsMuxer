@@ -1,5 +1,5 @@
-#ifndef __VVC_H_
-#define __VVC_H_
+#ifndef VVC_H_
+#define VVC_H_
 
 #include "nalUnits.h"
 
@@ -177,4 +177,4 @@ struct VvcSliceHeader : public VvcUnit
 
 std::vector<std::vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int* nal_size);
 
-#endif  // __VVC_H_
+#endif  // VVC_H_

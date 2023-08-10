@@ -1,5 +1,5 @@
-#ifndef __WAVE_FORMAT_H
-#define __WAVE_FORMAT_H
+#ifndef WAVE_FORMAT_H_
+#define WAVE_FORMAT_H_
 
 #include <types/types.h>
 

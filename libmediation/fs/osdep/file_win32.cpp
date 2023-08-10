@@ -194,7 +194,7 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
     case SeekMethod::smCurrent:
         moveMethod = FILE_CURRENT;
         break;
-    default: // SeekMethod::smEnd:
+    default:  // SeekMethod::smEnd:
         moveMethod = FILE_END;
         break;
     }

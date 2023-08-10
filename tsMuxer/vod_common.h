@@ -1,5 +1,5 @@
-#ifndef __VOD_COMMON_H
-#define __VOD_COMMON_H
+#ifndef VOD_COMMON_H_
+#define VOD_COMMON_H_
 
 #include <types/types.h>
 

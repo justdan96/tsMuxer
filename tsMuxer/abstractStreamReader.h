@@ -1,5 +1,5 @@
-#ifndef __ABSTRACT_STREAM_READER_H
-#define __ABSTRACT_STREAM_READER_H
+#ifndef ABSTRACT_STREAM_READER_H_
+#define ABSTRACT_STREAM_READER_H_
 
 #include <fs/file.h>
 #include <types/types.h>

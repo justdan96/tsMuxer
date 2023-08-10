@@ -1,5 +1,5 @@
-#ifndef __SINGLE_FILE_MUXER_H
-#define __SINGLE_FILE_MUXER_H
+#ifndef SINGLE_FILE_MUXER_H_
+#define SINGLE_FILE_MUXER_H_
 
 #include <types/types.h>
 

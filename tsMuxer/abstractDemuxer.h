@@ -1,5 +1,5 @@
-#ifndef __ABSTRACT_DEMUXER_H
-#define __ABSTRACT_DEMUXER_H
+#ifndef ABSTRACT_DEMUXER_H_
+#define ABSTRACT_DEMUXER_H_
 
 #include <assert.h>
 #include <memory.h>

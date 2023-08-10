@@ -1,5 +1,5 @@
-#ifndef __AAC_STREAM_READER_H
-#define __AAC_STREAM_READER_H
+#ifndef AAC_STREAM_READER_H_
+#define AAC_STREAM_READER_H_
 
 #include "aac.h"
 #include "avPacket.h"

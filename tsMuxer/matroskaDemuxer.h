@@ -1,5 +1,5 @@
-#ifndef __MATROSKA_STREAM_READER_H
-#define __MATROSKA_STREAM_READER_H
+#ifndef MATROSKA_STREAM_READER_H_
+#define MATROSKA_STREAM_READER_H_
 
 #include "ioContextDemuxer.h"
 // #include "tsPacket.h"

@@ -1,5 +1,5 @@
-#ifndef __MPEG_STREAM_READER_H
-#define __MPEG_STREAM_READER_H
+#ifndef MPEG_STREAM_READER_H_
+#define MPEG_STREAM_READER_H_
 
 #include <algorithm>
 

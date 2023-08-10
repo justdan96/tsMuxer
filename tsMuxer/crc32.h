@@ -1,5 +1,5 @@
-#ifndef __CRC32_H
-#define __CRC32_H
+#ifndef CRC32_H_
+#define CRC32_H_
 
 static uint32_t calculateCRC32(uint8_t *p_begin, uint64_t i_count, uint32_t i_crc = 0)
 {

@@ -1,5 +1,5 @@
-#ifndef __SIMPLE_PACKETIZER_READER_H
-#define __SIMPLE_PACKETIZER_READER_H
+#ifndef SIMPLE_PACKETIZER_READER_H_
+#define SIMPLE_PACKETIZER_READER_H_
 
 #include "abstractStreamReader.h"
 #include "avCodecs.h"

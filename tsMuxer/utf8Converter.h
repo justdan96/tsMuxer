@@ -1,5 +1,5 @@
-#ifndef __UTFCONVERTER__H__
-#define __UTFCONVERTER__H__
+#ifndef UTFCONVERTER_H_
+#define UTFCONVERTER_H_
 
 #include <types/types.h>
 

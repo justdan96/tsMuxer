@@ -1,5 +1,5 @@
-#ifndef __T_TYPES_H
-#define __T_TYPES_H
+#ifndef T_TYPES_H_
+#define T_TYPES_H_
 
 #include <cstdint>
 #include <regex>
@@ -113,4 +113,4 @@ std::vector<wchar_t> toWide(const std::string&);
 std::string toUtf8(const wchar_t*);
 #endif
 
-#endif  //__T_TYPES_H
+#endif  //_T_TYPES_H_

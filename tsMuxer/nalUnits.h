@@ -1,5 +1,5 @@
-#ifndef __NAL_UNITS_H
-#define __NAL_UNITS_H
+#ifndef NAL_UNITS_H_
+#define NAL_UNITS_H_
 
 #include <memory.h>
 #include <types/types.h>

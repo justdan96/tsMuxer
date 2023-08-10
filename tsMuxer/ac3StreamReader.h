@@ -1,5 +1,5 @@
-#ifndef __AC3_STREAM_READER_H
-#define __AC3_STREAM_READER_H
+#ifndef AC3_STREAM_READER_H_
+#define AC3_STREAM_READER_H_
 
 #include <deque>
 
