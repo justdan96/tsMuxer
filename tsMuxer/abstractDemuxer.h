@@ -27,10 +27,10 @@ class MemoryBlock
     MemoryBlock() : m_size(0) {}
     void reserve(int num) { m_data.resize(num); }
 
-    void resize(int num)
+    void resize(unsigned num)
     {
         m_size = num;
-        if ((int)m_data.size() < m_size)
+        if (m_data.size() < m_size)
             m_data.resize(m_size);
     }
 

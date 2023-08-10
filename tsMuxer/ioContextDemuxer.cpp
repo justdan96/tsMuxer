@@ -63,16 +63,16 @@ int IOContextDemuxer::get_byte()
     return *m_curPos++;
 }
 
-unsigned int IOContextDemuxer::get_be16()
+int IOContextDemuxer::get_be16()
 {
-    unsigned int val = get_byte() << 8;
+    int val = get_byte() << 8;
     val |= get_byte();
     return val;
 }
 
-unsigned int IOContextDemuxer::get_be24()
+int IOContextDemuxer::get_be24()
 {
-    unsigned int val = get_be16() << 8;
+    int val = get_be16() << 8;
     val |= get_byte();
     return val;
 }
@@ -83,10 +83,10 @@ unsigned int IOContextDemuxer::get_be32()
     return val;
 }
 
-uint64_t IOContextDemuxer::get_be64()
+int64_t IOContextDemuxer::get_be64()
 {
-    uint64_t val = static_cast<uint64_t>(get_be32()) << 32;
-    val |= static_cast<uint64_t>(get_be32());
+    int64_t val = static_cast<int64_t>(get_be32()) << 32;
+    val |= static_cast<int64_t>(get_be32());
     return val;
 }
 
@@ -98,7 +98,7 @@ bool IOContextDemuxer::url_fseek(const uint64_t offset)
     return dynamic_cast<BufferedFileReader*>(m_bufferedReader)->gotoByte(m_readerID, offset);
 }
 
-int32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
+unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;
@@ -106,7 +106,7 @@ int32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
     const uint8_t* dstEnd = dst + size;
     if (m_curPos < m_bufEnd)
     {
-        const int copyLen = min((int)(m_bufEnd - m_curPos), size);
+        const unsigned copyLen = min((unsigned)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -121,7 +121,7 @@ int32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
 
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        const int copyLen = min((int)(m_bufEnd - m_curPos), size);
+        const unsigned copyLen = min((unsigned)(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
@@ -130,7 +130,7 @@ int32_t IOContextDemuxer::get_buffer(uint8_t* binary, int size)
         if (readedBytes == 0)
             break;
     }
-    return static_cast<int32_t>(dst - binary);
+    return static_cast<uint32_t>(dst - binary);
 }
 
 void IOContextDemuxer::skip_bytes(const uint64_t size)

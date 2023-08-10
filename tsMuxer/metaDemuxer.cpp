@@ -397,7 +397,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         {
             if (!tmpFile.open(fileName.c_str(), File::ofRead))
                 THROW(ERR_INVALID_CODEC_FORMAT, "Can't open file: " << fileName.c_str());
-            uint64_t tmpSize = 0;
+            int64_t tmpSize = 0;
             tmpFile.size(&tmpSize);
             fileSize += tmpSize;
             tmpFile.close();

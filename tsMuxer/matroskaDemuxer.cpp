@@ -352,7 +352,7 @@ int MatroskaDemuxer::rv_offset(uint8_t *data, const int slice, const int slices)
 /* Read signed/unsigned "EBML" numbers.
  * Return: number of bytes processed, < 0 on error.
  * XXX: use ebml_read_num(). */
-int MatroskaDemuxer::matroska_find_track_by_num(const uint64_t num) const
+int MatroskaDemuxer::matroska_find_track_by_num(const int64_t num) const
 {
     for (int i = 0; i < num_tracks; i++)
         if (tracks[i]->num == num)
@@ -360,9 +360,9 @@ int MatroskaDemuxer::matroska_find_track_by_num(const uint64_t num) const
     return -1;
 }
 
-unsigned MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const uint32_t size, uint64_t *num)
+int MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const int32_t size, uint64_t *num)
 {
-    unsigned read = 1, n = 1, num_ffs = 0;
+    int read = 1, n = 1, num_ffs = 0;
     uint64_t len_mask = 0x80;
 
     if (size <= 0)
@@ -390,14 +390,14 @@ unsigned MatroskaDemuxer::matroska_ebmlnum_uint(uint8_t *data, const uint32_t si
     }
 
     if (read == num_ffs)
-        *num = static_cast<uint64_t>(-1);
+        *num = ULLONG_MAX;
     else
         *num = total;
 
     return read;
 }
 
-int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, const uint32_t size, int64_t *num)
+int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, const int32_t size, int64_t *num)
 {
     uint64_t unum;
     int res;
@@ -407,10 +407,10 @@ int MatroskaDemuxer::matroska_ebmlnum_sint(uint8_t *data, const uint32_t size, i
         return res;
 
     /* make signed (weird way) */
-    if (unum == static_cast<uint64_t>(-1))
+    if (unum == ULLONG_MAX)
         *num = LLONG_MAX;
     else
-        *num = unum - ((1LL << ((7 * res) - 1)) - 1);
+        *num = static_cast<int64_t>(unum - ((1 << ((7 * res) - 1)) - 1));
 
     return res;
 }
@@ -482,7 +482,7 @@ void MatroskaDemuxer::decompressData(uint8_t *data, const int size)
         m_tmpBuffer.clear();
 }
 
-int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t pos, const uint64_t cluster_time,
+int MatroskaDemuxer::matroska_parse_block(uint8_t *data, unsigned size, const int64_t pos, const uint64_t cluster_time,
                                           const uint64_t duration, int is_keyframe, int is_bframe)
 {
     int res = 0;

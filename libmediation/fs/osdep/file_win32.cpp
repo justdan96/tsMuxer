@@ -168,7 +168,7 @@ void File::sync() { FlushFileBuffers(m_impl); }
 
 bool File::isOpen() const { return m_impl != INVALID_HANDLE_VALUE; }
 
-bool File::size(uint64_t* const fileSize) const
+bool File::size(int64_t* const fileSize) const
 {
     DWORD highDw;
     const DWORD lowDw = GetFileSize(m_impl, &highDw);

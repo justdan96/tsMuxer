@@ -47,7 +47,7 @@ struct AVPacket
     int64_t pts;  // presentation time stamp in time_base units
     int64_t dts;  // decompression time stamp in time_base units
     uint8_t* data;
-    int size;  // data len
+    unsigned size;  // data len
     int stream_index;
     int flags;
     int64_t duration;  //  presentation duration in time_base units (0 if not available)

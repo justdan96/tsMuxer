@@ -24,7 +24,7 @@ class ParsedTrackPrivData
     virtual void setPrivData(uint8_t* buff, int size) {}
     virtual ~ParsedTrackPrivData() {}
     virtual void extractData(AVPacket* pkt, uint8_t* buff, int size) = 0;
-    virtual int newBufferSize(uint8_t* buff, int size) { return 0; }
+    virtual unsigned newBufferSize(uint8_t* buff, unsigned size) { return 0; }
 };
 
 enum class IOContextTrackType
@@ -64,7 +64,7 @@ struct Track
     IOContextTrackType type;
     /* Unique track number and track ID. stream_index is the index that
      * the calling app uses for this track. */
-    uint64_t num;
+    int64_t num;
     uint64_t uid;
     int stream_index;
 
@@ -107,16 +107,16 @@ class IOContextDemuxer : public AbstractDemuxer
     uint8_t* m_curPos;
     uint8_t* m_bufEnd;
     bool m_isEOF;
-    uint64_t m_processedBytes;
-    uint64_t m_lastProcessedBytes;
+    int64_t m_processedBytes;
+    int64_t m_lastProcessedBytes;
 
     void skip_bytes(uint64_t size);
-    int32_t get_buffer(uint8_t* binary, int size);
+    unsigned get_buffer(uint8_t* binary, unsigned size);
     bool url_fseek(uint64_t offset);
-    uint64_t get_be64();
+    int64_t get_be64();
     unsigned int get_be32();
-    unsigned int get_be16();
-    unsigned int get_be24();
+    int get_be16();
+    int get_be24();
     int get_byte();
 
     unsigned int get_le16();

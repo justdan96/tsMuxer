@@ -722,7 +722,7 @@ bool LPCMStreamReader::detectLPCMType(uint8_t* buffer, const int64_t len)
 bool LPCMStreamReader::beforeFileCloseEvent(File& file)
 {
     file.sync();
-    uint64_t fileSize = 0;
+    int64_t fileSize = 0;
     file.size(&fileSize);
     if (fileSize <= 0xfffffffful)
     {

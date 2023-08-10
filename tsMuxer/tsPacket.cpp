@@ -992,7 +992,7 @@ bool CLPIParser::parse(const char* fileName)
     File file;
     if (!file.open(fileName, File::ofRead))
         return false;
-    uint64_t fileSize;
+    int64_t fileSize;
     if (!file.size(&fileSize))
         return false;
     const auto buffer = new uint8_t[fileSize];
@@ -1280,7 +1280,7 @@ bool MPLSParser::parse(const char* fileName)
     File file;
     if (!file.open(fileName, File::ofRead))
         return false;
-    uint64_t fileSize;
+    int64_t fileSize;
     if (!file.size(&fileSize))
         return false;
     const auto buffer = new uint8_t[fileSize];

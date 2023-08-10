@@ -33,8 +33,8 @@ class AACCodec
    public:
     int m_id;
     int m_layer;
-    int m_channels;
-    int m_sample_rate;
+    unsigned m_channels;
+    unsigned m_sample_rate;
     int m_samples;
     int m_bit_rate;
     int m_sample_rates_index;

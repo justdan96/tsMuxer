@@ -97,15 +97,12 @@ class File : public AbstractOutputStream
     /*!
             \return Current size of the file
     */
-    bool size(uint64_t* const fileSize) const;
+    bool size(int64_t* const fileSize) const;
 
     int64_t size() const override
     {
-        uint64_t result;
-        if (size(&result))
-            return (int64_t)result;
-        else
-            return -1;
+        int64_t result;
+        return size(&result) ? result : -1;
     }
 
     //! Relocate the file cursor

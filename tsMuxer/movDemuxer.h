@@ -44,8 +44,8 @@ class MovDemuxer : public IOContextDemuxer
     struct MOVFragment
     {
         int track_id;
-        uint64_t base_data_offset;
-        uint64_t moof_offset;
+        int64_t base_data_offset;
+        int64_t moof_offset;
         unsigned stsd_id;
         unsigned duration;
         unsigned size;
@@ -54,7 +54,7 @@ class MovDemuxer : public IOContextDemuxer
 
     struct MOVTrackExt
     {
-        unsigned track_id;
+        int track_id;
         unsigned stsd_id;
         unsigned duration;
         unsigned size;
@@ -63,11 +63,11 @@ class MovDemuxer : public IOContextDemuxer
 
     int found_moov;  // when both 'moov' and 'mdat' sections has been found
     bool found_moof;
-    uint64_t m_mdat_pos;
+    int64_t m_mdat_pos;
     int64_t m_mdat_size;
-    uint64_t m_fileSize;
+    int64_t m_fileSize;
     uint32_t m_timescale;
-    std::map<int, uint64_t> m_firstTimecode;
+    std::map<uint32_t, uint64_t> m_firstTimecode;
     std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;

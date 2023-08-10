@@ -43,7 +43,7 @@ static const char* const mov_mdhd_language_map[] = {
 struct MOVStts
 {
     uint32_t count;
-    uint64_t duration;
+    int64_t duration;
 };
 
 struct MOVDref
@@ -54,9 +54,9 @@ struct MOVDref
 
 struct MOVStsc
 {
-    int first;
-    int count;
-    int id;
+    unsigned first;
+    unsigned count;
+    unsigned id;
 };
 
 /*
@@ -117,11 +117,11 @@ struct MOVStreamContext : Track
 
     ~MOVStreamContext() override {}
 
-    vector<uint64_t> chunk_offsets;
+    vector<int64_t> chunk_offsets;
     vector<uint32_t> m_index;
     uint32_t m_indexCur;
 
-    int ffindex;  // the ffmpeg stream id
+    unsigned ffindex;  // the ffmpeg stream id
     int next_chunk;
     unsigned int ctts_count;
     vector<MOVStsc> stsc_data;
@@ -129,22 +129,22 @@ struct MOVStreamContext : Track
 
     int ctts_index;
     int ctts_sample;
-    unsigned int sample_size;
-    unsigned int sample_count;
-    unsigned int keyframe_count;
-    int time_scale;
+    unsigned sample_size;
+    unsigned sample_count;
+    unsigned keyframe_count;
+    unsigned time_scale;
     // int time_rate;
     int current_sample;
-    unsigned int bytes_per_frame;
-    unsigned int samples_per_frame;
-    int pseudo_stream_id;  ///< -1 means demux all ids
-    int16_t audio_cid;     ///< stsd audio compression id
+    unsigned bytes_per_frame;
+    unsigned samples_per_frame;
+    unsigned pseudo_stream_id;  ///< -1 means demux all ids
+    int audio_cid;     ///< stsd audio compression id
     int width;             ///< tkhd width
     int height;            ///< tkhd height
-    int bits_per_coded_sample;
-    int channels;
+    unsigned bits_per_coded_sample;
+    unsigned channels;
     int packet_size;
-    int sample_rate;
+    unsigned sample_rate;
     vector<uint32_t> keyframes;
     // vector<MOVDref> drefs;
     vector<MOVStts> stts_data;
@@ -196,9 +196,10 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
             buff += frameSize;
         }
     }
-    int newBufferSize(uint8_t* buff, const int size) override
+
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
-        int left = size;
+        unsigned left = size;
         unsigned i = 0;
         for (; left > 4; ++i)
         {
@@ -211,7 +212,7 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
                 left -= m_sc->m_index[m_sc->m_indexCur + i];
             }
         }
-        if (left < 0 || left > 4)
+        if (left > 4)
             THROW(ERR_MOV_PARSE, "Invalid AAC frame for track #" << m_sc->ffindex << " at position "
                                                                  << m_demuxer->getProcessedBytes());
         if (!isAAC)
@@ -323,7 +324,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         }
     }
 
-    int newBufferSize(uint8_t* buff, const int size) override
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         const uint8_t* end = buff + size;
         size_t nalCnt = 0;
@@ -392,7 +393,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         if (sttsCnt == 0)
         {
             sttsPos++;
-            if (sttsPos >= m_sc->stts_data.size())
+            if (sttsPos >= static_cast<unsigned>(m_sc->stts_data.size()))
                 THROW(ERR_MOV_PARSE, "MP4/MOV error: invalid stts index for SRT track #"
                                          << m_sc->ffindex << " at position " << m_demuxer->getProcessedBytes());
 
@@ -423,9 +424,9 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         int64_t endTime = startTime + getSttsVal();
         prefix += int32ToStr(++m_packetCnt);
         prefix += "\n";
-        prefix += floatToTime(startTime / 1e3, ',');
+        prefix += floatToTime(static_cast<double>(startTime) / 1e3, ',');
         prefix += " --> ";
-        prefix += floatToTime(endTime / 1e3, ',');
+        prefix += floatToTime(static_cast<double>(endTime) / 1e3, ',');
         prefix += '\n';
         uint8_t* dst = pkt->data;
         memcpy(dst, prefix.c_str(), prefix.length());
@@ -505,7 +506,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         m_timeOffset = endTime;
     }
 
-    int newBufferSize(uint8_t* buff, const int size) override
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         const int64_t stored_sttsCnt = sttsCnt;
         const int64_t stored_sttsPos = sttsPos;
@@ -522,12 +523,11 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
         }
         prefix += int32ToStr(m_packetCnt + 1);
         prefix += "\n";
-        prefix += floatToTime(startTime / 1e3, ',');
+        prefix += floatToTime(static_cast<double>(startTime) / 1e3, ',');
         prefix += " --> ";
-        prefix += floatToTime(endTime / 1e3, ',');
+        prefix += floatToTime(static_cast<double>(endTime) / 1e3, ',');
         prefix += '\n';
-        int textLen = 0;
-        uint32_t unitSize = 0;
+        int textLen = 0, unitSize = 0;
 
         try
         {
@@ -597,7 +597,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
     MOVStreamContext* m_sc;
     int m_packetCnt;
-    size_t sttsPos;
+    int64_t sttsPos;
     int64_t sttsCnt;
     int64_t m_timeOffset;
 };
@@ -787,7 +787,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             skip_bytes(chunks[m_curChunk].first);
         }
     }
-    const uint64_t startPos = m_processedBytes;
+    const int64_t startPos = m_processedBytes;
     while (m_processedBytes - startPos < m_fileBlockSize && m_curChunk < chunks.size())
     {
         const int64_t offset = chunks[m_curChunk].first;
@@ -800,10 +800,10 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             m_firstDemux = true;
             m_mdat_pos = 0;
         }
-        const int chunkSize = static_cast<int>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
+        const unsigned chunkSize = static_cast<int>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
         const int trackId = static_cast<int>(chunks[m_curChunk].second);
-        auto filterItr = m_pidFilters.find(trackId + 1ll);
-        if (filterItr == m_pidFilters.end() && acceptedPIDs.find(trackId + 1ll) == acceptedPIDs.end())
+        auto filterItr = m_pidFilters.find(trackId + 1);
+        if (filterItr == m_pidFilters.end() && acceptedPIDs.find(trackId + 1) == acceptedPIDs.end())
         {
             discardSize += chunkSize;
             skip_bytes(chunkSize);
@@ -812,10 +812,10 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
         {
             MemoryBlock& vect = demuxedData[trackId + 1ll];
             const auto st = dynamic_cast<MOVStreamContext*>(tracks[trackId]);
-            const int64_t oldSize = vect.size();
+            const size_t oldSize = vect.size();
             if (st->parsed_priv_data)
             {
-                if (chunkSize > static_cast<int>(m_tmpChunkBuffer.size()))
+                if (chunkSize > m_tmpChunkBuffer.size())
                     m_tmpChunkBuffer.resize(chunkSize);
                 const int64_t readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
                 if (readed == 0)
@@ -850,7 +850,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 if (filterItr != m_pidFilters.end())
                 {
                     m_filterBuffer.resize(chunkSize);
-                    const int readed = get_buffer(m_filterBuffer.data(), chunkSize);
+                    const unsigned readed = get_buffer(m_filterBuffer.data(), chunkSize);
                     if (readed < chunkSize)
                         m_filterBuffer.grow(readed - chunkSize);
                     if (readed == 0)
@@ -863,7 +863,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 else
                 {
                     vect.grow(chunkSize);
-                    const int readed = get_buffer(vect.data() + oldSize, chunkSize);
+                    const unsigned readed = get_buffer(vect.data() + oldSize, chunkSize);
                     if (readed < chunkSize)
                     {
                         vect.grow(readed - chunkSize);
@@ -974,12 +974,12 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
 {
     char str[1024]{}, language[4] = {0};
     const char* key = nullptr;
-    int str_size;
+    unsigned str_size;
 
     if (itunes_metadata)
     {
-        const int data_size = get_be32();
-        const int tag = get_le32();
+        const unsigned data_size = get_be32();
+        const unsigned tag = get_le32();
         if (tag == MKTAG('d', 'a', 't', 'a'))
         {
             get_be32();  // type
@@ -1082,7 +1082,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     MOVFragment* frag = &fragment;
     unsigned data_offset = 0;
 
-    if (!frag->track_id || frag->track_id > num_tracks)
+    if (frag->track_id == 0 || frag->track_id > num_tracks)
         return -1;
     Track* st = tracks[frag->track_id - 1];
     const auto sc = dynamic_cast<MOVStreamContext*>(st);
@@ -1095,7 +1095,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
         data_offset = get_be32();
     if (flags & 0x004)
         get_be32();  // first_sample_flags
-    uint64_t offset = frag->base_data_offset + data_offset;
+    int64_t offset = frag->base_data_offset + data_offset;
     sc->chunk_offsets.push_back(offset);
     for (size_t i = 0; i < entries; i++)
     {
@@ -1136,7 +1136,7 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
     MOVTrackExt& trex = trex_data[trex_data.size() - 1];
     get_byte();  // version
     get_be24();  // flags
-    trex.track_id = get_be32();
+    trex.track_id = static_cast<int>(get_be32());
     trex.stsd_id = get_be32();
     trex.duration = get_be32();
     trex.size = get_be32();
@@ -1162,7 +1162,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     get_byte();  // version
     const int flags = get_be24();
 
-    const int track_id = get_be32();
+    const int track_id = static_cast<int>(get_be32());
     if (!track_id || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
@@ -1197,9 +1197,9 @@ int MovDemuxer::mov_read_ctts(MOVAtom atom)
     const auto st = dynamic_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
-    const int entries = get_be32();
+    const unsigned entries = get_be32();
     st->ctts_data.resize(entries);
-    for (int i = 0; i < entries; i++)
+    for (unsigned i = 0; i < entries; i++)
     {
         st->ctts_data[i].count = get_be32();
         st->ctts_data[i].duration = get_be32();
@@ -1213,9 +1213,9 @@ int MovDemuxer::mov_read_stts(MOVAtom atom)
     const auto st = dynamic_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
     get_byte();  // version
     get_be24();  // flags
-    const int entries = get_be32();
+    const unsigned entries = get_be32();
     st->stts_data.resize(entries);
-    for (int i = 0; i < entries; i++)
+    for (unsigned i = 0; i < entries; i++)
     {
         st->stts_data[i].count = get_be32();
         st->stts_data[i].duration = get_be32();
@@ -1318,7 +1318,7 @@ int MovDemuxer::mov_read_mvhd(MOVAtom atom)
         get_be32();  // modification time
     }
     m_timescale = get_be32();                                            // time scale
-    const uint64_t duration = (version == 1) ? get_be64() : get_be32();  // duration
+    const int64_t duration = (version == 1) ? get_be64() : get_be32();  // duration
     fileDuration = duration * 1000000000ll / m_timescale;
     get_be32();      // preferred scale
     get_be16();      // preferred volume
@@ -1338,7 +1338,7 @@ int64_t MovDemuxer::getFileDurationNano() const { return fileDuration; }
 
 int MovDemuxer::mov_read_mdhd(MOVAtom atom)
 {
-    if (num_tracks == -1)
+    if (num_tracks == 0)
         return -1;
     const auto st = dynamic_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
     const int version = get_byte();
@@ -1359,7 +1359,7 @@ int MovDemuxer::mov_read_mdhd(MOVAtom atom)
     st->time_scale = get_be32();  // time_scale
 
     const int64_t duration = version == 1 ? get_be64() : get_be32();
-    fileDuration = FFMAX(fileDuration, (int64_t)(duration / double(st->time_scale) * 1000000000ll));
+    fileDuration = FFMAX(fileDuration, (int64_t)((double)duration / st->time_scale * 1000000000));
 
     const unsigned lang = get_be16();  // language
     ff_mov_lang_to_iso639(lang, st->language);
@@ -1370,22 +1370,22 @@ int MovDemuxer::mov_read_mdhd(MOVAtom atom)
 
 int MovDemuxer::mov_read_stsd(MOVAtom atom)
 {
-    if (num_tracks == -1)
+    if (num_tracks == 0)
         return -1;
     const auto st = dynamic_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
 
     get_byte();  // version
     get_be24();  // flags
 
-    const int entries = get_be32();
+    const unsigned entries = get_be32();
 
-    for (int pseudo_stream_id = 0; pseudo_stream_id < entries; pseudo_stream_id++)
+    for (unsigned pseudo_stream_id = 0; pseudo_stream_id < entries; pseudo_stream_id++)
     {
         // Parsing Sample description table
         // enum CodecID id;
         MOVAtom a;
         const int64_t start_pos = m_processedBytes;
-        const int size = get_be32();         // size
+        const unsigned size = get_be32();    // size
         const uint32_t format = get_le32();  // data format
 
         get_be32();  // reserved
@@ -1445,14 +1445,14 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
         }
         else if (st->type == IOContextTrackType::AUDIO)
         {
-            const uint16_t version = get_be16();
+            const int version = get_be16();
             get_be16();                              // revision level
             get_be32();                              // vendor
             st->channels = get_be16();               // channel count
             st->bits_per_coded_sample = get_be16();  // sample size
             st->audio_cid = get_be16();
             st->packet_size = get_be16();  // packet size = 0
-            st->sample_rate = ((get_be32() >> 16));
+            st->sample_rate = (get_be32() >> 16);
             // Read QT version 1 fields. In version 0 these do not exist.
             if (!isom)
             {
@@ -1552,7 +1552,7 @@ int MovDemuxer::mov_read_stco(const MOVAtom atom)
     get_byte();  // version
     get_be24();  // flags
 
-    const int entries = get_be32();
+    const unsigned entries = get_be32();
 
     if (entries >= UINT_MAX / sizeof(int64_t))
         return -1;
@@ -1560,9 +1560,9 @@ int MovDemuxer::mov_read_stco(const MOVAtom atom)
     // sc->chunk_count = entries;
 
     if (atom.type == MKTAG('s', 't', 'c', 'o'))
-        for (int i = 0; i < entries; i++) sc->chunk_offsets.push_back(get_be32());
+        for (unsigned i = 0; i < entries; i++) sc->chunk_offsets.push_back(get_be32());
     else if (atom.type == MKTAG('c', 'o', '6', '4'))
-        for (int i = 0; i < entries; i++) sc->chunk_offsets.push_back(get_be64());
+        for (unsigned i = 0; i < entries; i++) sc->chunk_offsets.push_back(get_be64());
     else
         return -1;
 
@@ -1589,7 +1589,7 @@ int MovDemuxer::mov_read_hdlr(const MOVAtom atom)
     get_be24();  // flags
 
     // component type
-    const int ctype = get_le32();
+    const unsigned ctype = get_le32();
     if (!ctype)
         isom = 1;
 
@@ -1691,10 +1691,10 @@ int MovDemuxer::mov_read_stsc(MOVAtom atom)
     get_byte();  // version
     get_be24();  // flags
 
-    const int entries = get_be32();
+    const unsigned entries = get_be32();
     st->stsc_data.resize(entries);
 
-    for (int i = 0; i < entries; i++)
+    for (unsigned i = 0; i < entries; i++)
     {
         st->stsc_data[i].first = get_be32();
         st->stsc_data[i].count = get_be32();
@@ -1734,9 +1734,9 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
 {
     const int version = get_byte();
     get_be24();                         // flags
-    const int edit_count = get_be32();  // entries
+    const unsigned edit_count = get_be32();  // entries
 
-    for (int i = 0; i < edit_count; i++)
+    for (unsigned i = 0; i < edit_count; i++)
     {
         if (version == 1)
         {
@@ -1748,8 +1748,8 @@ int MovDemuxer::mov_read_elst(MOVAtom atom)
         else
         {
             const uint64_t duration = get_be32();
-            const int32_t time = get_be32();
-            if (time == -1)
+            const unsigned time = get_be32();
+            if (time == UINT_MAX)
                 m_firstTimecode[num_tracks] = duration * 1000 / m_timescale;
         }
     }

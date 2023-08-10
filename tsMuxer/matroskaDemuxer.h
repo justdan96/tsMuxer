@@ -31,15 +31,15 @@ class MatroskaDemuxer : public IOContextDemuxer
 
     typedef struct MatroskaLevel
     {
-        uint64_t start;
-        uint64_t length;
+        int64_t start;
+        int64_t length;
     } MatroskaLevel;
 
     typedef struct MatroskaDemuxIndex
     {
-        uint64_t pos;   /* of the corresponding *cluster*! */
-        uint16_t track; /* reference to 'num' */
-        uint64_t time;  /* in nanoseconds */
+        int64_t pos;   /* of the corresponding *cluster*! */
+        int16_t track; /* reference to 'num' */
+        int64_t time;  /* in nanoseconds */
     } MatroskaDemuxIndex;
 
     // ffmpeg matroska vars
@@ -77,11 +77,11 @@ class MatroskaDemuxer : public IOContextDemuxer
     int ebml_read_skip();
     int ebml_read_uint(uint32_t *id, uint64_t *num);
     int ebml_read_sint(uint32_t *id, int64_t *num);
-    static int matroska_ebmlnum_sint(uint8_t *data, uint32_t size, int64_t *num);
+    static int matroska_ebmlnum_sint(uint8_t *data, int32_t size, int64_t *num);
     int matroska_parse_blockgroup(uint64_t cluster_time);
-    static unsigned matroska_ebmlnum_uint(uint8_t *data, uint32_t size, uint64_t *num);
-    int matroska_find_track_by_num(uint64_t num) const;
-    int matroska_parse_block(uint8_t *data, int size, int64_t pos, uint64_t cluster_time, uint64_t duration,
+    static int matroska_ebmlnum_uint(uint8_t *data, int32_t size, uint64_t *num);
+    int matroska_find_track_by_num(int64_t num) const;
+    int matroska_parse_block(uint8_t *data, unsigned size, int64_t pos, uint64_t cluster_time, uint64_t duration,
                              int is_keyframe, int is_bframe);
     static int rv_offset(uint8_t *data, int slice, int slices);
     void matroska_queue_packet(AVPacket *pkt);

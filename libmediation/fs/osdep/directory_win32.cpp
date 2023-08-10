@@ -29,7 +29,7 @@ uint64_t getFileSize(const std::string& fileName)
     File f;
     if (f.open(fileName.c_str(), File::ofRead | File::ofOpenExisting))
     {
-        uint64_t rv;
+        int64_t rv;
         return f.size(&rv) ? rv : 0;
     }
     return 0;

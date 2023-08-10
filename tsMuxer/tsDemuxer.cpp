@@ -512,7 +512,7 @@ int64_t getTSDuration(const char* fileName)
         int frameSize = 188;
         if (isM2TSExt(fileName))
             frameSize = 192;
-        uint64_t fileSize;
+        int64_t fileSize;
         File file(fileName, File::ofRead);
         if (!file.size(&fileSize))
             return -1;

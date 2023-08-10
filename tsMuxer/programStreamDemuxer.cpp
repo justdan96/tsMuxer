@@ -381,7 +381,7 @@ int64_t getPSDuration(const char* fileName)
 
     try
     {
-        uint64_t fileSize;
+        int64_t fileSize;
         File file(fileName, File::ofRead);
         if (!file.size(&fileSize))
             return 0;
