@@ -336,7 +336,7 @@ int PPSUnit::deserialize()
         m_ready = true;
         return 0;
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -558,7 +558,7 @@ int SPSUnit::deserialize()
 
         return 0;
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -1226,7 +1226,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
 
         return 0;
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -1261,7 +1261,7 @@ int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_
         return rez;
         // return deserializeSliceData();
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -1379,7 +1379,7 @@ void SEIUnit::deserialize(SPSUnit& sps, const int orig_hrd_parameters_present_fl
             curBuff += payloadSize;
         }
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
@@ -1420,7 +1420,7 @@ int SEIUnit::isMVCSEI()
             curBuff += payloadSize;
         }
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
     }

@@ -175,7 +175,7 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
                     rez.codecInfo = h264CodecInfo;
                 rez.streamDescr = tmpDescr;
             }
-            catch (BitStreamException &e)
+            catch (BitStreamException& e)
             {
                 (void)e;
                 return rez;

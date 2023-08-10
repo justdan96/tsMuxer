@@ -213,7 +213,7 @@ int VC1SequenceHeader::decode_sequence_header()
             bitReader.skipBits(16);
         return 0;
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -333,7 +333,7 @@ int VC1SequenceHeader::decode_entry_point()
         }
         return 0;
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
@@ -351,7 +351,7 @@ int VC1Frame::decode_frame_direct(const VC1SequenceHeader& sequenceHdr, uint8_t*
             return vc1_parse_frame_header(sequenceHdr);
         return vc1_parse_frame_header_adv(sequenceHdr);
     }
-    catch (BitStreamException &e)
+    catch (BitStreamException& e)
     {
         (void)e;
         return NOT_ENOUGH_BUFFER;
