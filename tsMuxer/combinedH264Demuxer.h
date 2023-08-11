@@ -46,7 +46,7 @@ protected:
 class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
 {
    public:
-    CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName);
+    CombinedH264Demuxer(BufferedReaderManager& readManager, const char* streamName);
     ~CombinedH264Demuxer() override;
     void openFile(const std::string& streamName) override;
     void readClose() override;
@@ -59,7 +59,7 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     bool isPidFilterSupported() const override { return true; }
 
    private:
-    BufferedReaderManager m_readManager;
+    BufferedReaderManager& m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;

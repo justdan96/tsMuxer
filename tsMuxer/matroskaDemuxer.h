@@ -7,7 +7,7 @@
 class MatroskaDemuxer : public IOContextDemuxer
 {
    public:
-    MatroskaDemuxer(const BufferedReaderManager &readManager);
+    MatroskaDemuxer(BufferedReaderManager &readManager);
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented

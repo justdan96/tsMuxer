@@ -12,7 +12,7 @@
 class MovDemuxer : public IOContextDemuxer
 {
    public:
-    MovDemuxer(const BufferedReaderManager& readManager);
+    MovDemuxer(BufferedReaderManager& readManager);
     ~MovDemuxer() override { readClose(); }
     void openFile(const std::string& streamName) override;
     void readClose() final;

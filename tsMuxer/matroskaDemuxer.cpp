@@ -185,7 +185,7 @@ int MatroskaDemuxer::matroska_parse_index()
     return res;
 }
 
-MatroskaDemuxer::MatroskaDemuxer(const BufferedReaderManager &readManager)
+MatroskaDemuxer::MatroskaDemuxer(BufferedReaderManager &readManager)
     : IOContextDemuxer(readManager), levels(), m_title(), created(0), fileDuration(0)
 {
     m_lastDeliveryPacket = nullptr;

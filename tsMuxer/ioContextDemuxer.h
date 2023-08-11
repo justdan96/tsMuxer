@@ -88,7 +88,7 @@ struct Track
 class IOContextDemuxer : public AbstractDemuxer
 {
    public:
-    IOContextDemuxer(const BufferedReaderManager& readManager);
+    IOContextDemuxer(BufferedReaderManager& readManager);
     ~IOContextDemuxer() override;
     void setFileIterator(FileNameIterator* itr) override;
     uint64_t getDemuxedSize() override;
@@ -100,7 +100,7 @@ class IOContextDemuxer : public AbstractDemuxer
     Track* tracks[MAX_STREAMS];
     int num_tracks;
 
-    BufferedReaderManager m_readManager;
+    BufferedReaderManager& m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;
