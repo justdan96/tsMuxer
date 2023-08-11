@@ -997,7 +997,7 @@ void IsoWriter::writeAllocationExtentDescriptor(const ExtentList *extents, const
 
 int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const uint8_t objectId,
                                                 const FileTypes fileType, const uint64_t len, const uint32_t pos,
-                                                const uint16_t linkCount, ExtentList *extents)
+                                                const uint16_t linkCount, const ExtentList *extents)
 {
     int sectorsWrited = 0;
 

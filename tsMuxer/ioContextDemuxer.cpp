@@ -27,7 +27,7 @@ float av_int2flt(const uint32_t v)
     return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1), (v >> 23 & 0xFF) - 150);
 }
 
-IOContextDemuxer::IOContextDemuxer(BufferedReaderManager& readManager)
+IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
     : tracks(), m_readManager(readManager), m_lastReadRez(0)
 {
     m_lastProcessedBytes = 0;
@@ -90,7 +90,7 @@ int64_t IOContextDemuxer::get_be64()
     return val;
 }
 
-bool IOContextDemuxer::url_fseek(const uint64_t offset)
+bool IOContextDemuxer::url_fseek(const int64_t offset)
 {
     m_curPos = m_bufEnd = nullptr;
     m_isEOF = false;
@@ -133,14 +133,14 @@ unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
     return static_cast<uint32_t>(dst - binary);
 }
 
-void IOContextDemuxer::skip_bytes(const uint64_t size)
+void IOContextDemuxer::skip_bytes(const int64_t size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;
-    uint64_t skipLeft = size;
+    int64_t skipLeft = size;
     if (m_curPos < m_bufEnd)
     {
-        const uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
+        const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
         skipLeft -= copyLen;
         m_curPos += copyLen;
         m_processedBytes += copyLen;
@@ -152,7 +152,7 @@ void IOContextDemuxer::skip_bytes(const uint64_t size)
             m_bufferedReader->notify(m_readerID, readedBytes);
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        const uint64_t copyLen = min((uint64_t)(m_bufEnd - m_curPos), skipLeft);
+        const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
         m_curPos += copyLen;
         m_processedBytes += copyLen;
         skipLeft -= copyLen;

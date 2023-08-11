@@ -1343,7 +1343,7 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
 }
 
 // --------------- SEI UNIT ------------------------
-void SEIUnit::deserialize(SPSUnit& sps, const int orig_hrd_parameters_present_flag)
+void SEIUnit::deserialize(const SPSUnit& sps, const int orig_hrd_parameters_present_flag)
 {
     pic_struct = -1;
 
@@ -1489,7 +1489,7 @@ int SEIUnit::removePicTimingSEI(SPSUnit& sps)
     return tmpBufferLen;
 }
 
-void SEIUnit::sei_payload(SPSUnit& sps, const int payloadType, uint8_t* curBuff, const int payloadSize,
+void SEIUnit::sei_payload(const SPSUnit& sps, const int payloadType, uint8_t* curBuff, const int payloadSize,
                           const int orig_hrd_parameters_present_flag)
 {
     switch (payloadType)
@@ -1673,7 +1673,7 @@ void SEIUnit::serialize_buffering_period_message(const SPSUnit& sps, BitStreamWr
         write_rbsp_trailing_bits(writer);
 }
 
-void SEIUnit::pic_timing(SPSUnit& sps, uint8_t* curBuff, const int payloadSize,
+void SEIUnit::pic_timing(const SPSUnit& sps, uint8_t* curBuff, const int payloadSize,
                          const bool orig_hrd_parameters_present_flag)
 {
     bitReader.setBuffer(curBuff, curBuff + payloadSize);
@@ -1723,7 +1723,7 @@ void SEIUnit::deblocking_filter_display_preference(int payloadSize) {}
 void SEIUnit::stereo_video_info(int payloadSize) {}
 void SEIUnit::reserved_sei_message(int payloadSize) {}
 
-int SEIUnit::mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, const int size,
+int SEIUnit::mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, const int size,
                                   const int orig_hrd_parameters_present_flag)
 {
     try

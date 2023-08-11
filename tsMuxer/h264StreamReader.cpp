@@ -729,7 +729,7 @@ int H264StreamReader::calcPicOrder(const SliceUnit &slice)
     return (PicOrderCntMsb + PicOrderCntLsb) >> m_forceLsbDiv;
 }
 
-int H264StreamReader::getIdrPrevFrames(uint8_t *buff, uint8_t *bufEnd)
+int H264StreamReader::getIdrPrevFrames(uint8_t *buff, const uint8_t *bufEnd)
 {
     int prevPicCnt = 0;
     int deserializeRez;

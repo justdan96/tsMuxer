@@ -44,6 +44,7 @@ struct AVPacket
           codecID(0)
     {
     }
+
     int64_t pts;  // presentation time stamp in time_base units
     int64_t dts;  // decompression time stamp in time_base units
     uint8_t* data;

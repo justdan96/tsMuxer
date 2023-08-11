@@ -7,7 +7,7 @@
 class MatroskaDemuxer : public IOContextDemuxer
 {
    public:
-    MatroskaDemuxer(BufferedReaderManager &readManager);
+    MatroskaDemuxer(const BufferedReaderManager &readManager);
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented
@@ -36,9 +36,9 @@ class MatroskaDemuxer : public IOContextDemuxer
 
     typedef struct MatroskaDemuxIndex
     {
-        int64_t pos;   /* of the corresponding *cluster*! */
+        uint64_t pos;   /* of the corresponding *cluster*! */
         int16_t track; /* reference to 'num' */
-        int64_t time;  /* in nanoseconds */
+        uint64_t time;  /* in nanoseconds */
     } MatroskaDemuxIndex;
 
     // ffmpeg matroska vars
@@ -65,24 +65,24 @@ class MatroskaDemuxer : public IOContextDemuxer
 
     AVPacket *m_lastDeliveryPacket;
 
-    uint32_t ebml_peek_id(int *level_up);
-    int ebml_read_element_id(uint32_t *id, int *level_up);
-    int ebml_read_num(int max_size, uint64_t *number);
+    uint32_t ebml_peek_id(int *levelUp);
+    int ebml_read_element_id(uint32_t *id, int *levelUp);
+    int ebml_read_num(int max_size, int64_t *number);
     int ebml_read_element_level_up();
     int matroska_parse_cluster();
     int ebml_read_binary(uint32_t *id, uint8_t **binary, int *size);
-    int ebml_read_element_length(uint64_t *length);
+    int ebml_read_element_length(int64_t *length);
     int ebml_read_master(uint32_t *id);
     int ebml_read_skip();
-    int ebml_read_uint(uint32_t *id, uint64_t *num);
+    int ebml_read_uint(uint32_t *id, int64_t *num);
     int ebml_read_sint(uint32_t *id, int64_t *num);
-    static int matroska_ebmlnum_sint(uint8_t *data, int32_t size, int64_t *num);
-    int matroska_parse_blockgroup(uint64_t cluster_time);
+    static int matroska_ebmlnum_sint(const uint8_t *data, int32_t size, int64_t *num);
+    int matroska_parse_blockgroup(int64_t cluster_time);
     static int matroska_ebmlnum_uint(const uint8_t *data, int32_t size, uint64_t *num);
     int matroska_find_track_by_num(int64_t num) const;
-    int matroska_parse_block(uint8_t *data, unsigned size, int64_t pos, uint64_t cluster_time, uint64_t duration,
+    int matroska_parse_block(uint8_t *data, int size, int64_t pos, int64_t cluster_time, int64_t duration,
                              int is_keyframe, int is_bframe);
-    static int rv_offset(uint8_t *data, int slice, int slices);
+    static int rv_offset(const uint8_t *data, int slice, int slices);
     void matroska_queue_packet(AVPacket *pkt);
     int matroska_deliver_packet(AVPacket *&avPacket);
     int matroska_read_header();

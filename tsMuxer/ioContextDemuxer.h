@@ -53,13 +53,14 @@ struct Track
         type = IOContextTrackType::UNDEFINED;
     }
 
-    virtual ~Track()
+    ~Track()
     {
         delete[] name;
         delete[] codec_id;
         delete[] codec_name;
         delete parsed_priv_data;
     }
+
     IOContextTrackType type;
     /* Unique track number and track ID. stream_index is the index that
      * the calling app uses for this track. */
@@ -87,7 +88,7 @@ struct Track
 class IOContextDemuxer : public AbstractDemuxer
 {
    public:
-    IOContextDemuxer(BufferedReaderManager& readManager);
+    IOContextDemuxer(const BufferedReaderManager& readManager);
     ~IOContextDemuxer() override;
     void setFileIterator(FileNameIterator* itr) override;
     uint64_t getDemuxedSize() override;
@@ -109,9 +110,9 @@ class IOContextDemuxer : public AbstractDemuxer
     int64_t m_processedBytes;
     int64_t m_lastProcessedBytes;
 
-    void skip_bytes(uint64_t size);
+    void skip_bytes(int64_t size);
     unsigned get_buffer(uint8_t* binary, unsigned size);
-    bool url_fseek(uint64_t offset);
+    bool url_fseek(int64_t offset);
     int64_t get_be64();
     unsigned int get_be32();
     int get_be16();

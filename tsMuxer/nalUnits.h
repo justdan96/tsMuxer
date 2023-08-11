@@ -272,7 +272,7 @@ class SEIUnit final : public NALUnit
     }
     ~SEIUnit() override = default;
 
-    void deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag);
+    void deserialize(const SPSUnit& sps, int orig_hrd_parameters_present_flag);
     using NALUnit::deserialize;
 
     void serialize_pic_timing_message(const SPSUnit& sps, BitStreamWriter& writer, bool seiHeader) const;
@@ -298,11 +298,11 @@ class SEIUnit final : public NALUnit
     bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
 
    private:
-    void sei_payload(SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
+    void sei_payload(const SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
                      int orig_hrd_parameters_present_flag);
     static void buffering_period(int payloadSize);
     void pic_timing(const SPSUnit& sps, bool orig_hrd_parameters_present_flag);
-    void pic_timing(SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag);
+    void pic_timing(const SPSUnit& sps, uint8_t* curBuff, int payloadSize, bool orig_hrd_parameters_present_flag);
     static void pan_scan_rect(int payloadSize);
     static void filler_payload(int payloadSize);
     static void user_data_registered_itu_t_t35(int payloadSize);
@@ -321,7 +321,7 @@ class SEIUnit final : public NALUnit
     static void progressive_refinement_segment_end(int payloadSize);
     static void motion_constrained_slice_group_set(int payloadSize);
     static void film_grain_characteristics(int payloadSize);
-    int mvc_scalable_nesting(SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag);
+    int mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, int size, int orig_hrd_parameters_present_flag);
     void processBlurayOffsetMetadata();
     static void processBlurayGopStructure();
     static void deblocking_filter_display_preference(int payloadSize);

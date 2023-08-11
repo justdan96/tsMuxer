@@ -1672,7 +1672,7 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum, std::vector<PMTIndex>& pmtIndexList,
+void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum, const std::vector<PMTIndex>& pmtIndexList,
                                 const int type) const
 {
     const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);

@@ -119,7 +119,7 @@ class H264StreamReader : public MPEGStreamReader
 
     void additionalStreamCheck(uint8_t* buff, uint8_t* end);
     int calcPicOrder(const SliceUnit& slice);
-    int getIdrPrevFrames(uint8_t* buff, uint8_t* bufEnd);
+    int getIdrPrevFrames(uint8_t* buff, const uint8_t* bufEnd);
     int processSliceNal(uint8_t* buff);
     int processSPS(uint8_t* buff);
     int processPPS(uint8_t* buff);

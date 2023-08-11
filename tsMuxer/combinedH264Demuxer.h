@@ -46,7 +46,7 @@ protected:
 class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
 {
    public:
-    CombinedH264Demuxer(BufferedReaderManager& readManager, const char* streamName);
+    CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName);
     ~CombinedH264Demuxer() override;
     void openFile(const std::string& streamName) override;
     void readClose() override;

@@ -215,7 +215,7 @@ class IsoWriter
     void writeTerminationDescriptor();
     void writeLogicalVolumeIntegrityDescriptor();
     int writeExtendedFileEntryDescriptor(bool namedStream, uint8_t objectId, FileTypes fileType, uint64_t len,
-                                         uint32_t pos, uint16_t linkCount, ExtentList* extents = 0);
+                                         uint32_t pos, uint16_t linkCount, const ExtentList* extents = nullptr);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(const ExtentList* extents, size_t start, size_t indexEnd);
     // void writeFileIdentifierDescriptor();
@@ -232,7 +232,7 @@ class IsoWriter
     void allocateMetadata();
     void writeMetadata(int lbn);
 
-    FileEntryInfo* mkdir(const char* name, FileEntryInfo* parent = 0);
+    FileEntryInfo* mkdir(const char* name, FileEntryInfo* parent = nullptr);
     FileEntryInfo* getEntryByName(const std::string& name, FileTypes fileType);
     FileEntryInfo* createFileEntry(FileEntryInfo* parent, FileTypes fileType);
 
@@ -278,7 +278,7 @@ class IsoWriter
 class ISOFile : public AbstractOutputStream
 {
    public:
-    ISOFile(IsoWriter* owner) : AbstractOutputStream(), m_owner(owner), m_entry(0) {}
+    ISOFile(IsoWriter* owner) : AbstractOutputStream(), m_owner(owner), m_entry(nullptr) {}
     ~ISOFile() override { close(); }
 
     int write(const void* data, uint32_t len) override;
