@@ -114,7 +114,7 @@ void CombinedH264Reader::fillPids(const PIDSet& acceptedPIDs, const int pid)
 
 // --------------------------------------------- CombinedH264Demuxer ---------------------------
 
-CombinedH264Demuxer::CombinedH264Demuxer(BufferedReaderManager& readManager, const char* streamName)
+CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName)
     : m_readManager(readManager)
 {
     m_bufferedReader = m_readManager.getReader(streamName);

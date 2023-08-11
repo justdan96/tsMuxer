@@ -10,7 +10,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
    public:
     static constexpr int MAX_PES_HEADER_SIZE = 1018;  // buffer for PES header and program stream map
 
-    ProgramStreamDemuxer(BufferedReaderManager& readManager);
+    ProgramStreamDemuxer(const BufferedReaderManager& readManager);
     void openFile(const std::string& streamName) override;
     virtual int readPacket(AVPacket& avPacket) { return 0; }
     ~ProgramStreamDemuxer() override;
@@ -38,7 +38,7 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     uint8_t m_tmpBuffer[MAX_PES_HEADER_SIZE];  // TS_FRAME_SIZE
     uint32_t m_lastPesLen;
     uint32_t m_lastPID;
-    BufferedReaderManager& m_readManager;
+    const BufferedReaderManager& m_readManager;
     uint64_t m_dataProcessed;
     std::string m_streamName;
     int m_readerID;

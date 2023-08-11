@@ -669,7 +669,7 @@ const MovDemuxer::MOVParseTableEntry MovDemuxer::mov_default_parse_table[] = {
 
     {0, nullptr}};
 
-MovDemuxer::MovDemuxer(BufferedReaderManager& readManager)
+MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager)
     : IOContextDemuxer(readManager), m_mdat_size(0), m_fileSize(0), m_timescale(0), fragment()
 {
     found_moov = 0;

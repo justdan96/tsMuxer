@@ -140,7 +140,7 @@ class ContainerToReaderWrapper : public AbstractReader
     int64_t m_discardedSize;
     int m_readerCnt;
     size_t m_readBuffOffset;
-    BufferedReaderManager& m_readManager;
+    const BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
     const METADemuxer& m_owner;
     bool m_terminated;

@@ -1672,8 +1672,8 @@ void MPLSParser::composePlayList(BitStreamWriter& writer)
     *lengthPos = my_htonl(writer.getBitsCount() / 8 - beforeCount);
 }
 
-void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum, const std::vector<PMTIndex>& pmtIndexList,
-                                const int type) const
+void MPLSParser::composeSubPath(BitStreamWriter& writer, const size_t subPathNum,
+                                const std::vector<PMTIndex>& pmtIndexList, const int type) const
 {
     const auto lengthPos = reinterpret_cast<uint32_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(32, 0);  // length
@@ -1745,7 +1745,8 @@ void MPLSParser::composeSubPlayItem(BitStreamWriter& writer, const size_t playIt
     *lengthPos = my_htons(writer.getBitsCount() / 8 - beforeCount);
 }
 
-int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize, const std::vector<PMTIndex>& pmtIndexList) const
+int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize,
+                                    const std::vector<PMTIndex>& pmtIndexList) const
 {
     // The ID1 value and the ID2 value of the ExtensionData() shall be set to 0x0001 and 0x0001
     BitStreamWriter writer{};
@@ -2089,7 +2090,8 @@ void MPLSParser::parsePlayItem(BitStreamReader& reader, const int PlayItem_id)
     STN_table(reader, PlayItem_id);
 }
 
-void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemNum, const std::vector<PMTIndex>& pmtIndexList)
+void MPLSParser::composePlayItem(BitStreamWriter& writer, const size_t playItemNum,
+                                 const std::vector<PMTIndex>& pmtIndexList)
 {
     const auto lengthPos = reinterpret_cast<uint16_t*>(writer.getBuffer() + writer.getBitsCount() / 8);
     writer.putBits(16, 0);  // length

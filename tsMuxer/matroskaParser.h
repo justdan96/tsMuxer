@@ -251,7 +251,7 @@ class ParsedAC3TrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
     ~ParsedAC3TrackData() override = default;
 
-private:
+   private:
     bool m_firstPacket;
     bool m_shortHeaderMode;
 };
@@ -263,7 +263,7 @@ class ParsedAACTrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
     ~ParsedAACTrackData() override = default;
 
-private:
+   private:
     AACCodec m_aacRaw;
 };
 
@@ -274,7 +274,7 @@ class ParsedLPCMTrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
     ~ParsedLPCMTrackData() override = default;
 
-private:
+   private:
     bool m_convertBytes;
     int m_bitdepth;
     int m_channels;
@@ -288,7 +288,7 @@ class ParsedSRTTrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
     ~ParsedSRTTrackData() override = default;
 
-private:
+   private:
     int m_packetCnt;
 };
 
@@ -299,7 +299,7 @@ class ParsedVC1TrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
     ~ParsedVC1TrackData() override = default;
 
-private:
+   private:
     std::vector<uint8_t> m_seqHeader;
     bool m_firstPacket;
 };

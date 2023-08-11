@@ -15,7 +15,7 @@
 class TSDemuxer : public AbstractDemuxer
 {
    public:
-    TSDemuxer(BufferedReaderManager& readManager, const char* streamName);
+    TSDemuxer(const BufferedReaderManager& readManager, const char* streamName);
     ~TSDemuxer() override;
     void openFile(const std::string& streamName) override;
     void readClose() override;
@@ -47,7 +47,7 @@ class TSDemuxer : public AbstractDemuxer
     bool m_m2tsMode;
     int m_scale;
     int m_nptPos;
-    BufferedReaderManager& m_readManager;
+    const BufferedReaderManager& m_readManager;
     std::string m_streamName;
     std::string m_streamNameLow;
     std::map<int, int64_t> m_lastPesPts;

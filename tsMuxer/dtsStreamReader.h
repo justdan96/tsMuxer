@@ -19,12 +19,7 @@ class DTSStreamReader : public SimplePacketizerReader
 
     static constexpr uint32_t DTS_HD_PREFIX = 0x64582025;
 
-    DTSStreamReader()
-        : nblks(0),
-          i_frame_size(0),
-          pi_audio_mode(0),
-          pi_bit_rate_index(0),
-          pi_channels_conf(0)
+    DTSStreamReader() : nblks(0), i_frame_size(0), pi_audio_mode(0), pi_bit_rate_index(0), pi_channels_conf(0)
     {
         pi_sample_rate_index = 0;
         pi_bit_rate = 0;

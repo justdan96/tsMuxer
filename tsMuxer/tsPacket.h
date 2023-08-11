@@ -527,7 +527,8 @@ struct PlayListMark
 
 struct ExtDataBlockInfo
 {
-    ExtDataBlockInfo(const uint8_t* a_data, const int a_dataLen, const int a_id1, const int a_id2) : id1(a_id1), id2(a_id2)
+    ExtDataBlockInfo(const uint8_t* a_data, const int a_dataLen, const int a_id1, const int a_id2)
+        : id1(a_id1), id2(a_id2)
     {
         data.resize(a_dataLen);
         if (!data.empty())

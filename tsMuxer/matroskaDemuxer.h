@@ -7,7 +7,7 @@
 class MatroskaDemuxer : public IOContextDemuxer
 {
    public:
-    MatroskaDemuxer(BufferedReaderManager &readManager);
+    MatroskaDemuxer(const BufferedReaderManager &readManager);
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented
@@ -36,9 +36,9 @@ class MatroskaDemuxer : public IOContextDemuxer
 
     typedef struct MatroskaDemuxIndex
     {
-        uint64_t pos;   /* of the corresponding *cluster*! */
+        uint64_t pos;  /* of the corresponding *cluster*! */
         int16_t track; /* reference to 'num' */
-        uint64_t time;  /* in nanoseconds */
+        uint64_t time; /* in nanoseconds */
     } MatroskaDemuxIndex;
 
     // ffmpeg matroska vars

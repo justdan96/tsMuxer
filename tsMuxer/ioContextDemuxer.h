@@ -41,8 +41,7 @@ float av_int2flt(uint32_t v);
 
 struct Track
 {
-    Track()
-        : num(0), uid(0), stream_index(0), codec_priv_size(0), flags(0)
+    Track() : num(0), uid(0), stream_index(0), codec_priv_size(0), flags(0)
     {
         name = codec_id = codec_name = nullptr;
         parsed_priv_data = nullptr;
@@ -88,7 +87,7 @@ struct Track
 class IOContextDemuxer : public AbstractDemuxer
 {
    public:
-    IOContextDemuxer(BufferedReaderManager& readManager);
+    IOContextDemuxer(const BufferedReaderManager& readManager);
     ~IOContextDemuxer() override;
     void setFileIterator(FileNameIterator* itr) override;
     uint64_t getDemuxedSize() override;
@@ -100,7 +99,7 @@ class IOContextDemuxer : public AbstractDemuxer
     Track* tracks[MAX_STREAMS];
     int num_tracks;
 
-    BufferedReaderManager& m_readManager;
+    const BufferedReaderManager& m_readManager;
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;

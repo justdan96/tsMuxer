@@ -52,10 +52,7 @@ struct FileReaderData : public ReaderData
 
     ~FileReaderData() override = default;
 
-    uint32_t readBlock(uint8_t* buffer, const int max_size) override
-    {
-        return m_file.read(buffer, max_size);
-    }
+    uint32_t readBlock(uint8_t* buffer, const int max_size) override { return m_file.read(buffer, max_size); }
 
     bool openStream() override;
     bool closeStream() override { return m_file.close(); }
