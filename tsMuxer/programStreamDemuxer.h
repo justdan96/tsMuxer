@@ -15,9 +15,9 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     virtual int readPacket(AVPacket& avPacket) { return 0; }
     ~ProgramStreamDemuxer() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
-    void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
+    void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
     void readClose() override;
-    uint64_t getDemuxedSize() override;
+    int64_t getDemuxedSize() override;
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
 

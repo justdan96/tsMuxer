@@ -43,7 +43,7 @@ struct CheckStreamRez
     CodecInfo codecInfo;
     std::string streamDescr;
     std::string lang;
-    uint32_t trackID;
+    int32_t trackID;
     int64_t delay;  // auto delay for audio
 
     bool multiSubStream;

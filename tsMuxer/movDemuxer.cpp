@@ -1,3 +1,5 @@
+// ReSharper disable CppPassValueParameterByConstReference
+
 #include "movDemuxer.h"
 
 #include <algorithm>
@@ -14,19 +16,8 @@
 
 using namespace std;
 
-struct MovDemuxer::MOVParseTableEntry
-{
-    uint32_t type;
-    int (MovDemuxer::*parse)(MOVAtom atom);
-};
-
-static constexpr int MP4ESDescrTag = 0x03;
-static constexpr int MP4DecConfigDescrTag = 0x04;
-static constexpr int MP4DecSpecificDescrTag = 0x05;
-
-#define MKTAG(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
-
-static const char* const mov_mdhd_language_map[] = {
+namespace {
+const char* mov_mdhd_language_map[] = {
     // see https :  // developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap4/qtff4.html
     "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "ell", "isl",
     "mlt", "tur", "hrv", "zho", "urd", "hin", "tha", "kor", "lit", "pol", "hun", "est", "lav", "smi", "fao", "fas",
@@ -39,6 +30,21 @@ static const char* const mov_mdhd_language_map[] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     nullptr, nullptr, "cym", "eus", "cat", "lat", "que", "grn", "aym", "crh", "uig", "dzo", "jav"};
+}
+
+struct MovDemuxer::MOVParseTableEntry
+{
+    uint32_t type;
+    int (MovDemuxer::*parse)(MOVAtom atom);
+};
+
+static constexpr int MP4ESDescrTag = 0x03;
+static constexpr int MP4DecConfigDescrTag = 0x04;
+static constexpr int MP4DecSpecificDescrTag = 0x05;
+
+#define MKTAG(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+
+
 
 struct MOVStts
 {
@@ -213,8 +219,8 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
             }
         }
         if (left > 4)
-            THROW(ERR_MOV_PARSE, "Invalid AAC frame for track #" << m_sc->ffindex << " at position "
-                                                                 << m_demuxer->getProcessedBytes())
+            THROW(ERR_MOV_PARSE,
+                  "Invalid AAC frame for track #" << m_sc->ffindex << " at position " << m_demuxer->getProcessedBytes())
         if (!isAAC)
             i = 0;
         return (size - left) + i * AAC_HEADER_LEN;
@@ -443,7 +449,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
 
         while (buff < end)
         {
-            uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
+            int64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
             uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
             buff += 8;
             modifierLen -= 8;
@@ -541,7 +547,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
 
             while (buff < end)
             {
-                uint64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
+                int64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
                 const uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
                 buff += 8;
                 modifierLen -= 8;
@@ -800,7 +806,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             m_firstDemux = true;
             m_mdat_pos = 0;
         }
-        const unsigned chunkSize = static_cast<int>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
+        const auto chunkSize = static_cast<unsigned>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
         const int trackId = static_cast<int>(chunks[m_curChunk].second);
         auto filterItr = m_pidFilters.find(trackId + 1);
         if (filterItr == m_pidFilters.end() && acceptedPIDs.find(trackId + 1) == acceptedPIDs.end())
@@ -810,14 +816,14 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
         }
         else if (chunkSize)
         {
-            MemoryBlock& vect = demuxedData[trackId + 1ll];
+            MemoryBlock& vect = demuxedData[trackId + 1];
             const auto st = reinterpret_cast<MOVStreamContext*>(tracks[trackId]);
             const size_t oldSize = vect.size();
             if (st->parsed_priv_data)
             {
                 if (chunkSize > m_tmpChunkBuffer.size())
                     m_tmpChunkBuffer.resize(chunkSize);
-                const int64_t readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
+                const unsigned readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
                 if (readed == 0)
                     break;
                 m_deliveredPacket.size = st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize);
@@ -827,7 +833,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                     {
                         m_filterBuffer.resize(m_deliveredPacket.size);
                         m_deliveredPacket.data = m_filterBuffer.data();
-                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), chunkSize);
+                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), calloc()hunkSize);
                         const int demuxed =
                             filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
                         discardSize += static_cast<int64_t>(chunkSize) - demuxed;
@@ -894,7 +900,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
     return m_lastReadRez;
 }
 
-void MovDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
+void MovDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
 {
     for (int i = 0; i < num_tracks; i++)
     {
@@ -915,7 +921,7 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
     if (atom.size < 0)
         atom.size = LLONG_MAX;
 
-    while (((total_size + 8) < atom.size) && !m_isEOF && !err)
+    while (total_size + 8 < atom.size && !m_isEOF && !err)
     {
         a.size = atom.size;
         a.type = 0;
@@ -1040,6 +1046,7 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
     return 0;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 int MovDemuxer::mov_read_cmov(MOVAtom atom) { THROW(ERR_MOV_PARSE, "Compressed MOV not supported in current version") }
 
 int MovDemuxer::mov_read_wide(MOVAtom atom)
@@ -1144,7 +1151,7 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_trak(const MOVAtom atom)
+int MovDemuxer::mov_read_trak(MOVAtom atom)
 {
     const auto sc = new MOVStreamContext();
     Track* st = tracks[num_tracks] = sc;
@@ -1190,6 +1197,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     return 0;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 int MovDemuxer::mov_read_tkhd(MOVAtom atom) { return 0; }
 
 int MovDemuxer::mov_read_ctts(MOVAtom atom)
@@ -1221,8 +1229,6 @@ int MovDemuxer::mov_read_stts(MOVAtom atom)
         st->stts_data[i].duration = get_be32();
         if (i == 0)
         {
-            // int64_t tmp = (int64_t) st->time_scale * (int64_t)1000000ll / st->stts_data[i].duration;
-            // st->fps = tmp / 1000000.0;
             st->fps = st->time_scale / static_cast<double>(st->stts_data[i].duration);
         }
     }
@@ -1259,7 +1265,7 @@ int MovDemuxer::mov_read_stss(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_extradata(const MOVAtom atom)
+int MovDemuxer::mov_read_extradata(MOVAtom atom)
 {
     if (num_tracks < 1)  // will happen with jp2 files
         return 0;
@@ -1287,7 +1293,7 @@ int MovDemuxer::mov_read_extradata(const MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_moov(const MOVAtom atom)
+int MovDemuxer::mov_read_moov(MOVAtom atom)
 {
     if (mov_read_default(atom) < 0)
         return -1;
@@ -1295,7 +1301,7 @@ int MovDemuxer::mov_read_moov(const MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_moof(const MOVAtom atom)
+int MovDemuxer::mov_read_moof(MOVAtom atom)
 {
     MOVFragment* frag = &fragment;
     found_moof = true;
@@ -1545,7 +1551,7 @@ if (bits_per_sample) {
     return 0;
 }
 
-int MovDemuxer::mov_read_stco(const MOVAtom atom)
+int MovDemuxer::mov_read_stco(MOVAtom atom)
 {
     const auto sc = reinterpret_cast<MOVStreamContext*>(tracks[num_tracks - 1]);
 
@@ -1569,7 +1575,7 @@ int MovDemuxer::mov_read_stco(const MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_glbl(const MOVAtom atom)
+int MovDemuxer::mov_read_glbl(MOVAtom atom)
 {
     if (static_cast<uint64_t>(atom.size) > (1 << 30))
         return -1;
@@ -1583,7 +1589,7 @@ int MovDemuxer::mov_read_glbl(const MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_hdlr(const MOVAtom atom)
+int MovDemuxer::mov_read_hdlr(MOVAtom atom)
 {
     get_byte();  // version
     get_be24();  // flags
@@ -1602,7 +1608,7 @@ int MovDemuxer::mov_read_hdlr(const MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_ftyp(const MOVAtom atom)
+int MovDemuxer::mov_read_ftyp(MOVAtom atom)
 {
     const uint32_t type = get_le32();
     if (type != MKTAG('q', 't', ' ', ' '))
@@ -1664,6 +1670,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
     return 0;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 int MovDemuxer::mov_read_dref(MOVAtom atom)
 {
     /*
@@ -1703,9 +1710,10 @@ int MovDemuxer::mov_read_stsc(MOVAtom atom)
     return 0;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 int MovDemuxer::mov_read_smi(MOVAtom atom) { return 0; }
 
-int MovDemuxer::mov_read_wave(const MOVAtom atom)
+int MovDemuxer::mov_read_wave(MOVAtom atom)
 {
     if (static_cast<uint64_t>(atom.size) > (1 << 30))
         return -1;

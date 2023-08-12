@@ -9,15 +9,15 @@
 #include "bufferedReaderManager.h"
 #include "ioContextDemuxer.h"
 
-class MovDemuxer : public IOContextDemuxer
+class MovDemuxer final : public IOContextDemuxer
 {
    public:
     MovDemuxer(const BufferedReaderManager& readManager);
     ~MovDemuxer() override { readClose(); }
     void openFile(const std::string& streamName) override;
-    void readClose() final;
+    void readClose() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
-    void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
+    void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
     int64_t getTrackDelay(const uint32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
@@ -69,6 +69,7 @@ class MovDemuxer : public IOContextDemuxer
     int64_t m_fileSize;
     uint32_t m_timescale;
     std::map<uint32_t, int64_t> m_firstTimecode;
+    // List<chunk offset, chunk size>
     std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style
     int64_t moof_offset;

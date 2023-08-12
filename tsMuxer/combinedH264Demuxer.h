@@ -50,9 +50,9 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     ~CombinedH264Demuxer() override;
     void openFile(const std::string& streamName) override;
     void readClose() override;
-    uint64_t getDemuxedSize() override;
+    int64_t getDemuxedSize() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
-    void getTrackList(std::map<uint32_t, TrackInfo>& trackList) override;
+    void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
 
@@ -63,7 +63,7 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     AbstractReader* m_bufferedReader;
     int m_readerID;
     int m_lastReadRez;
-    uint64_t m_dataProcessed;
+    int64_t m_dataProcessed;
 };
 
 class CombinedH264Filter : public SubTrackFilter, public CombinedH264Reader

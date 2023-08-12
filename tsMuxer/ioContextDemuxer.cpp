@@ -17,14 +17,16 @@ double av_int2dbl(const uint64_t v)
 {
     if (v + v > 0xFFEULL << 52)
         return 0;  // 0.0/0.0;
-    return ldexp(static_cast<double>((v & ((1LL << 52) - 1)) + (1LL << 52)) * (v >> 63 | 1), (v >> 52 & 0x7FF) - 1075);
+    return ldexp(static_cast<double>((v & (1LL << 52) - 1) + (1LL << 52) * (v >> 63 | 1)),
+                 static_cast<int>(v >> 52 & 0x7FF) - 1075);
 }
 
 float av_int2flt(const uint32_t v)
 {
     if (v + v > 0xFF000000U)
         return 0;  // 0.0/0.0;
-    return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1), (v >> 23 & 0xFF) - 150);
+    return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23) * (v >> 31 | 1)),
+                 static_cast<int>(v >> 23 & 0xFF) - 150);
 }
 
 IOContextDemuxer::IOContextDemuxer(const BufferedReaderManager& readManager)
@@ -133,11 +135,11 @@ unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
     return static_cast<uint32_t>(dst - binary);
 }
 
-void IOContextDemuxer::skip_bytes(const int64_t size)
+void IOContextDemuxer::skip_bytes(const uint64_t size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;
-    int64_t skipLeft = size;
+    uint64_t skipLeft = size;
     if (m_curPos < m_bufEnd)
     {
         const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
@@ -170,7 +172,7 @@ void IOContextDemuxer::setFileIterator(FileNameIterator* itr)
         THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.")
 }
 
-uint64_t IOContextDemuxer::getDemuxedSize() { return 0; }
+int64_t IOContextDemuxer::getDemuxedSize() { return 0; }
 
 unsigned int IOContextDemuxer::get_le16()
 {

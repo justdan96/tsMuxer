@@ -53,7 +53,7 @@ TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* strea
 
 bool TSDemuxer::mvcContinueExpected() const { return !m_nonMVCVideoFound && strEndWith(m_streamNameLow, "ssif"); }
 
-void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
+void TSDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
 {
     uint8_t pmtBuffer[4096]{0};
     int pmtBufferLen = 0;
@@ -469,7 +469,7 @@ void TSDemuxer::readClose() {}
 
 TSDemuxer::~TSDemuxer() { m_bufferedReader->deleteReader(m_readerID); }
 
-uint64_t TSDemuxer::getDemuxedSize() { return m_dataProcessed; }
+int64_t TSDemuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void TSDemuxer::setFileIterator(FileNameIterator* itr)
 {

@@ -24,7 +24,7 @@ class MemoryBlock
     }
 
     MemoryBlock() : m_size(0) {}
-    void reserve(const int num) { m_data.resize(num); }
+    void reserve(const unsigned num) { m_data.resize(num); }
 
     void resize(const unsigned num)
     {
@@ -104,7 +104,7 @@ class AbstractDemuxer
     virtual void openFile(const std::string& streamName) = 0;
 
     virtual void readClose() = 0;
-    virtual uint64_t getDemuxedSize() = 0;
+    virtual int64_t getDemuxedSize() = 0;
 
     virtual uint64_t getDuration() { return 0; }
     virtual void setTimeOffset(const uint64_t offset) { m_timeOffset = offset; }
@@ -115,7 +115,7 @@ class AbstractDemuxer
     }
     virtual void terminate() {}
     virtual int getLastReadRez() = 0;
-    virtual void getTrackList(std::map<uint32_t, TrackInfo>& trackList) {}
+    virtual void getTrackList(std::map<int32_t, TrackInfo>& trackList) {}
     virtual void setFileIterator(FileNameIterator*) {}
 
     // virtual void setFileBlockSize(uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
@@ -135,7 +135,7 @@ class AbstractDemuxer
     virtual int64_t getFileDurationNano() const { return 0; }
 
    protected:
-    uint64_t m_timeOffset;
+    int64_t m_timeOffset;
     uint32_t m_fileBlockSize;
     PIDFilters m_pidFilters;  // todo: refactor in case if several pidFilters required (>1 3D tracks)
 };

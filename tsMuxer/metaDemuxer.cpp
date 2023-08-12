@@ -52,9 +52,9 @@ METADemuxer::~METADemuxer()
     for (FileListIterator*& m_iterator : m_iterators) delete m_iterator;
 }
 
-uint64_t METADemuxer::getDemuxedSize()
+int64_t METADemuxer::getDemuxedSize()
 {
-    uint64_t rez = 0;
+    int64_t rez = 0;
     for (const StreamInfo& si : m_codecInfo)
         rez += si.m_streamReader->getProcessedSize();  // m_codecInfo[i].m_dataProcessed;
     return rez + m_containerReader.getDiscardedSize();
@@ -75,7 +75,7 @@ int METADemuxer::readPacket(AVPacket& avPacket)
         bool allDataDelayed = true;
         while (allDataDelayed)
         {
-            for (unsigned i = 0; i < m_codecInfo.size(); i++)
+            for (int i = 0; i < static_cast<int>(m_codecInfo.size()); i++)
             {
                 StreamInfo& streamInfo = m_codecInfo[i];
                 if (!m_flushDataMode)
@@ -380,7 +380,7 @@ int METADemuxer::addStream(const string& codec, const string& codecStreamName, c
         for (const string& fileName : fileList) listIterator->addFile(fileName);
     }
 
-    uint64_t fileSize = 0;
+    int64_t fileSize = 0;
 
     if (m_containerReader.m_demuxers.find(fileList[0]) == m_containerReader.m_demuxers.end())
     {
@@ -508,29 +508,29 @@ int METADemuxer::addStream(const string& codec, const string& codecStreamName, c
     {
         string timeShift = itr->second;
         size_t pos = 0;
-        uint64_t coeff = 1;
+        int64_t coeff = 1;
         int64_t value = 0;
         if ((pos = timeShift.find("ms")) != std::string::npos)
         {
-            coeff = 1000000ull;
+            coeff = 1000000;
             value = strToInt32(timeShift.substr(0, pos).c_str());
         }
-        else if ((pos = timeShift.find("s")) != std::string::npos)
+        else if ((pos = timeShift.find('s')) != std::string::npos)
         {
-            coeff = 1000000000ull;
+            coeff = 1000000000;
             value = strToInt32(timeShift.substr(0, pos).c_str());
         }
         else if ((pos = timeShift.find("ns")) != std::string::npos)
         {
-            coeff = 1ull;
+            coeff = 1;
             value = strToInt32(timeShift.substr(0, pos).c_str());
         }
         else
         {
-            coeff = 1000000ull;
+            coeff = 1000000;
             value = strToInt32(timeShift.c_str());
         }
-        value = value * static_cast<int64_t>(coeff) / 1000ll * static_cast<int64_t>(INTERNAL_PTS_FREQ) / 1000000ll;
+        value = value * coeff / 1000 * INTERNAL_PTS_FREQ / 1000000;
         streamInfo.m_timeShift = value;
         if (value > 0)
             streamInfo.m_lastDTS = value;
@@ -607,7 +607,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
         demuxer->openFile(fileName);
         int64_t discardedSize = 0;
         DemuxedData demuxedData;
-        map<uint32_t, TrackInfo> acceptedPidMap;
+        map<int32_t, TrackInfo> acceptedPidMap;
         demuxer->getTrackList(acceptedPidMap);
         PIDSet acceptedPidSet;
         for (const auto& itr : acceptedPidMap) acceptedPidSet.insert(itr.first);
@@ -617,7 +617,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
             vect.reserve(fileBlockSize);
         }
 
-        for (int i = 0; i < DETECT_STREAM_BUFFER_SIZE / fileBlockSize; i++)
+        for (unsigned i = 0; i < DETECT_STREAM_BUFFER_SIZE / fileBlockSize; i++)
             demuxer->simpleDemuxBlock(demuxedData, acceptedPidSet, discardedSize);
 
         for (auto& itr : demuxedData)
@@ -1203,7 +1203,7 @@ void METADemuxer::updateReport(const bool checkTime)
         double progress = 100.0;
         if (m_totalSize > 0)
         {
-            const uint64_t currentProcessedSize = getDemuxedSize();
+            const int64_t currentProcessedSize = getDemuxedSize();
             progress = currentProcessedSize / static_cast<double>(m_totalSize) * 100.0;
             if (progress > 100.0)
                 progress = 100.0;

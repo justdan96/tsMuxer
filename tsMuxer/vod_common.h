@@ -37,9 +37,8 @@ class Process
 #define FFMAX(a, b) ((a) > (b) ? (a) : (b))
 #define FFMIN(a, b) ((a) > (b) ? (b) : (a))
 #define bswap_32(x) my_ntohl(x)
-// #define fabs(a) ((a)>=0?(a):-(a))
 
-static constexpr int DETECT_STREAM_BUFFER_SIZE = 1024 * 1024 * 64;
+static constexpr unsigned DETECT_STREAM_BUFFER_SIZE = 1024 * 1024 * 64;
 static constexpr unsigned TS_PID_NULL = 8191;
 static constexpr unsigned TS_PID_PAT = 0;
 static constexpr unsigned TS_PID_PMT = 1;

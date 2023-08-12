@@ -39,7 +39,7 @@ ProgramStreamDemuxer::~ProgramStreamDemuxer() { m_bufferedReader->deleteReader(m
 
 void ProgramStreamDemuxer::readClose() {}
 
-uint64_t ProgramStreamDemuxer::getDemuxedSize() { return m_dataProcessed; }
+int64_t ProgramStreamDemuxer::getDemuxedSize() { return m_dataProcessed; }
 
 void ProgramStreamDemuxer::openFile(const std::string& streamName)
 {
@@ -173,7 +173,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
     return startcode;
 }
 
-void ProgramStreamDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
+void ProgramStreamDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
 {
     for (int i = 0x20; i < 0xff; i++)
     {

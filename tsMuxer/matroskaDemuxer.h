@@ -13,7 +13,7 @@ class MatroskaDemuxer : public IOContextDemuxer
     int readPacket(AVPacket &avPacket);  // not implemented
     void readClose() final;
     int simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize) override;
-    void getTrackList(std::map<uint32_t, TrackInfo> &trackList) override;
+    void getTrackList(std::map<int32_t, TrackInfo> &trackList) override;
     std::vector<AVChapter> getChapters() override;
 
     bool isPidFilterSupported() const override { return true; }

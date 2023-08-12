@@ -113,7 +113,7 @@ class ContainerToReaderWrapper : public AbstractReader
     ContainerToReaderWrapper(const METADemuxer& owner, BufferedReaderManager& readManager)
         : m_readBuffOffset(0), m_readManager(readManager), m_owner(owner)
     {
-        auto& brm = const_cast<BufferedReaderManager&>(readManager);
+        const auto& brm = const_cast<BufferedReaderManager&>(readManager);
 
         m_blockSize = brm.getBlockSize();
         m_allocSize = brm.getAllocSize();
@@ -140,7 +140,7 @@ class ContainerToReaderWrapper : public AbstractReader
     int64_t m_discardedSize;
     int m_readerCnt;
     size_t m_readBuffOffset;
-    const BufferedReaderManager& m_readManager;
+    BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
     const METADemuxer& m_owner;
     bool m_terminated;
@@ -164,7 +164,7 @@ class METADemuxer : public AbstractDemuxer
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
     void readClose() final;
-    uint64_t getDemuxedSize() override;
+    int64_t getDemuxedSize() override;
     int addStream(const std::string& codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;

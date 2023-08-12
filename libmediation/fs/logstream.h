@@ -32,10 +32,10 @@ class loglevel
 class LogStream : public AlternativeFileStream
 {
    public:
-    static const uint32_t MessageLevel = 0x01;
-    static const uint32_t MessageDate = 0x02;
-    static const uint32_t MessageTime = 0x04;
-    static const uint32_t MessageThreadID = 0x08;
+    static constexpr uint32_t MessageLevel = 0x01;
+    static constexpr uint32_t MessageDate = 0x02;
+    static constexpr uint32_t MessageTime = 0x04;
+    static constexpr uint32_t MessageThreadID = 0x08;
 
     LogStream(uint32_t logLevel, const std::string& fileName, const std::string& oldFilesDir,
               const uint32_t secRotationPeriod, const uint32_t maxFileSizeBytes = 128 * 1024 * 1024,
