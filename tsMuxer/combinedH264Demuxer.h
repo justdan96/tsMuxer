@@ -32,7 +32,6 @@ class CombinedH264Reader
     ReadState detectStreamByNal(const uint8_t* data, const uint8_t* dataEnd);
     void fillPids(const PIDSet& acceptedPIDs, int pid);
 
-   protected:
     bool m_firstDemuxCall;
 
     unsigned m_mvcSPS;

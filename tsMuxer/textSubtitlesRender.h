@@ -116,7 +116,6 @@ class TextSubtitlesRender
    protected:
     Font m_font;
 
-   protected:
     int m_borderWidth;
     std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line,
                                                              std::vector<Font>& fontStack) const;

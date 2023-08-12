@@ -283,7 +283,6 @@ class SEIUnit final : public NALUnit
     static void updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts);
     int isMVCSEI();
 
-   public:
     int pic_struct;
     std::unordered_set<int> m_processedMessages;
 

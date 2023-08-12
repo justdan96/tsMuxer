@@ -356,7 +356,7 @@ struct M2TSStreamInfo
                                    int* frame_rate_index, int* aspect_ratio_index);
 };
 
-struct CLPIStreamInfo : public M2TSStreamInfo
+struct CLPIStreamInfo : M2TSStreamInfo
 {
     CLPIStreamInfo(const PMTStreamInfo& pmtStreamInfo) : M2TSStreamInfo(pmtStreamInfo)
     {
@@ -459,7 +459,6 @@ class CLPIParser
     void ProgramInfo_SS(uint8_t* buffer, int dataLength);
     static void CPI_SS(uint8_t* buffer, int dataLength);
 
-   private:
     static void parseProgramInfo(uint8_t* buffer, const uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
                                  std::map<int, CLPIStreamInfo>& streamInfoMap);
     void parseSequenceInfo(uint8_t* buffer, const uint8_t* end);
@@ -482,7 +481,7 @@ class CLPIParser
     void composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSStreamInfo& streamInfo) const;
 };
 
-struct MPLSStreamInfo : public M2TSStreamInfo
+struct MPLSStreamInfo : M2TSStreamInfo
 {
     MPLSStreamInfo();
     MPLSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
@@ -495,7 +494,6 @@ struct MPLSStreamInfo : public M2TSStreamInfo
     void composeStreamEntry(BitStreamWriter& writer, size_t entryNum, int subPathID = 0) const;
     void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum) const;
 
-   public:
     int type;
     uint8_t offsetId;
     bool isSSPG;

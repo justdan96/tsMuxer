@@ -123,7 +123,6 @@ struct MappingEntry
 
 struct FileEntryInfo
 {
-   public:
     FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint32_t objectId, FileTypes fileType);
     ~FileEntryInfo();
 
@@ -146,7 +145,6 @@ struct FileEntryInfo
     void serializeFile();
     bool isFile() const;
 
-   private:
     friend class IsoWriter;
     friend class ISOFile;
 
@@ -236,7 +234,6 @@ class IsoWriter
     FileEntryInfo* getEntryByName(const std::string& name, FileTypes fileType);
     FileEntryInfo* createFileEntry(FileEntryInfo* parent, FileTypes fileType);
 
-   private:
     friend class ByteFileWriter;
     friend struct FileEntryInfo;
     friend class ISOFile;

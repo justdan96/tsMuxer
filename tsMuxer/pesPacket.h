@@ -177,7 +177,6 @@ struct PESPacket
     void serialize(uint64_t pts, uint8_t streamID);
     void serialize(uint64_t pts, uint64_t dts, uint8_t streamID);
 
-   public:
     static constexpr int HEADER_SIZE = 9;
     static constexpr int PTS_SIZE = 5;
 };

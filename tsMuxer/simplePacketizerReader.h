@@ -53,7 +53,6 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual bool needMPLSCorrection() const { return true; }
     virtual bool needSkipFrame(const AVPacket& packet) { return false; }
 
-   protected:
     // uint8_t* m_tmpBuffer;
     unsigned m_curMplsIndex;
     double m_stretch;

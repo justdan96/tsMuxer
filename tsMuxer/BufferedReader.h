@@ -12,7 +12,6 @@
 
 struct ReaderData
 {
-   public:
     ReaderData()
         : m_bufferIndex(0),
           m_notified(false),
@@ -65,7 +64,6 @@ virtual void deleteNextBlocks()
 
     virtual bool closeStream() = 0;
 
-   public:
     uint8_t m_bufferIndex;
     bool m_notified;
     int m_nextBlockSize;
@@ -105,7 +103,6 @@ class BufferedReader : public AbstractReader, TerminatableThread
     virtual ReaderData* intCreateReader() = 0;
     void thread_main() override;
 
-   protected:
     bool m_started;
     bool m_terminated;
     WaitableSafeQueue<uint32_t> m_readQueue;

@@ -116,9 +116,6 @@ class TSMuxer final : public AbstractMuxer
     void finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFile, bool recursive = true);
     void gotoNextFile(uint64_t newPts);
 
-   private:
-    // bool m_iFrameFound;
-    // File* m_muxFile;
     AbstractOutputStream* m_muxFile;
     bool m_isExternalFile;
 

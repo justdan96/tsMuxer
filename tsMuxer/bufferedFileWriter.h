@@ -25,7 +25,6 @@ struct WriterData
     AbstractOutputStream* m_mainFile;
     Commands m_command;
 
-   public:
     WriterData() : m_buffer(nullptr), m_bufferLen(0), m_mainFile(), m_command() {}
 
     void execute() const;

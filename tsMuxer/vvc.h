@@ -7,7 +7,6 @@ struct VvcHrdUnit
 {
     VvcHrdUnit();
 
-   public:
     unsigned num_units_in_tick;
     unsigned time_scale;
     bool general_nal_hrd_params_present_flag;
@@ -27,7 +26,6 @@ struct VvcUnit
     {
     }
 
-   public:
     enum class NalType
     {
         TRAIL = 0,
@@ -59,7 +57,6 @@ struct VvcUnit
 
     int nalBufferLen() const { return m_nalBufferLen; }
 
-   public:
     NalType nal_unit_type;
     int nuh_layer_id;
     int nuh_temporal_id_plus1;
@@ -73,18 +70,16 @@ struct VvcUnit
     bool ols_timing_hrd_parameters(VvcHrdUnit m_hrd, int firstSubLayer, int MaxSubLayersVal);
     bool sublayer_hrd_parameters(VvcHrdUnit m_hrd);
 
-   protected:
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
     BitStreamReader m_reader;
 };
 
-struct VvcUnitWithProfile : public VvcUnit
+struct VvcUnitWithProfile : VvcUnit
 {
     VvcUnitWithProfile();
     std::string getProfileString() const;
 
-   public:
     int profile_idc;
     int tier_flag;
     int level_idc;
@@ -96,7 +91,7 @@ struct VvcUnitWithProfile : public VvcUnit
     int profile_tier_level(bool profileTierPresentFlag, int MaxNumSubLayersMinus1);
 };
 
-struct VvcVpsUnit : public VvcUnitWithProfile
+struct VvcVpsUnit : VvcUnitWithProfile
 {
     VvcVpsUnit();
     int deserialize();
@@ -104,7 +99,6 @@ struct VvcVpsUnit : public VvcUnitWithProfile
     void setFPS(double fps);
     std::string getDescription() const;
 
-   public:
     int vps_id;
     int vps_max_layers;
     int vps_max_sublayers;
@@ -114,14 +108,13 @@ struct VvcVpsUnit : public VvcUnitWithProfile
     VvcHrdUnit m_vps_hrd;
 };
 
-struct VvcSpsUnit : public VvcUnitWithProfile
+struct VvcSpsUnit : VvcUnitWithProfile
 {
     VvcSpsUnit();
     int deserialize();
     double getFPS() const;
     std::string getDescription() const;
 
-   public:
     int sps_id;
     int vps_id;
     int max_sublayers_minus1;

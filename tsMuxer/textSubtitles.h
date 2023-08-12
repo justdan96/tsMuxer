@@ -59,7 +59,6 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     static RGBQUAD YUVAToRGBA(const YUVQuad& yuv);
     void setImageBuffer(uint8_t* value) { m_imageBuffer = value; }
 
-   public:
     int m_rleLen;
     int m_bottomOffset;
     int m_composition_number;

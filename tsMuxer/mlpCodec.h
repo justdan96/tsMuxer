@@ -26,7 +26,6 @@ class MLPCodec
     uint64_t getFrameDuration() const;
     static int mlp_samplerate(int ratebits);
 
-   public:
     int m_channels;
     int m_samples;
     int m_samplerate;  // Sample rate of first substream

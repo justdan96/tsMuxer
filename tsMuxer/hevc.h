@@ -69,7 +69,6 @@ struct HevcUnitWithProfile : HevcUnit
     HevcUnitWithProfile();
     std::string getProfileString() const;
 
-   public:
     int profile_idc;
     int level_idc;
     int interlaced_source_flag;
@@ -92,7 +91,7 @@ struct HevcVpsUnit : HevcUnitWithProfile
     int num_units_in_tick_bit_pos;
 };
 
-struct HevcSpsUnit : public HevcUnitWithProfile
+struct HevcSpsUnit : HevcUnitWithProfile
 {
     HevcSpsUnit();
     int deserialize();
@@ -146,7 +145,7 @@ struct HevcPpsUnit : HevcUnit
     int num_extra_slice_header_bits;
 };
 
-struct HevcHdrUnit : public HevcUnit
+struct HevcHdrUnit : HevcUnit
 {
     HevcHdrUnit();
     int deserialize();
@@ -157,7 +156,7 @@ struct HevcHdrUnit : public HevcUnit
     bool isDVEL;
 };
 
-struct HevcSliceHeader : public HevcUnit
+struct HevcSliceHeader : HevcUnit
 {
     HevcSliceHeader();
     int deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps);

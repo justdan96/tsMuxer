@@ -30,7 +30,6 @@ class AACCodec
     void setSampleRate(const int value) { m_sample_rate = value; }
     void readConfig(uint8_t* buff, int size);
 
-   public:
     int m_id;
     int m_layer;
     int m_channels;

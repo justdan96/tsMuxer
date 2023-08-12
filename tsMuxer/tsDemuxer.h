@@ -40,7 +40,6 @@ class TSDemuxer final : public AbstractDemuxer
    private:
     bool mvcContinueExpected() const;
 
-   private:
     int64_t m_firstPCRTime;
     bool m_m2tsHdrDiscarded;
     int m_lastReadRez;

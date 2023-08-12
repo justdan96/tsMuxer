@@ -81,7 +81,6 @@ class MPEGStreamReader : public AbstractStreamReader
 
     virtual bool skipNal(uint8_t* nal) { return false; }
 
-   protected:
     // virtual CodecInfo getCodecInfo() = 0;
     virtual int intDecodeNAL(uint8_t* buff) = 0;
     // static int bufFromNAL(const uint8_t* buff, const uint8_t* bufEnd, bool longCodesAllowed);

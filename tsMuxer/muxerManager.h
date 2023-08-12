@@ -73,7 +73,6 @@ class MuxerManager final
     void asyncWriteBlock(const WriterData& data) const;
     void checkTrackList(const std::vector<StreamInfo>& ci) const;
 
-   private:
     AbstractMuxer* m_mainMuxer;
     AbstractMuxer* m_subMuxer;
 

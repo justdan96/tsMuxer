@@ -44,7 +44,6 @@ class HEVCStreamReader final : public MPEGStreamReader
     uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, const uint8_t* dstEnd) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;
 
-   private:
     typedef std::map<int, HevcVpsUnit*> VPSMap;
 
     HevcVpsUnit* m_vps;

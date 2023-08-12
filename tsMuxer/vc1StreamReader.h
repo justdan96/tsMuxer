@@ -46,7 +46,6 @@ class VC1StreamReader final : public MPEGStreamReader
     int decodeEntryPoint(uint8_t* buff);
     int decodeSeqHeader(uint8_t* buff);
 
-   private:
     int64_t m_prevDtsInc;
     bool m_lastIFrame;
     std::vector<uint8_t> m_entryPointBuffer;
