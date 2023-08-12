@@ -75,10 +75,10 @@ class ByteFileWriter
     void setBuffer(uint8_t* buffer, int len);
     void writeLE8(uint8_t value);
     void writeLE16(uint16_t value);
-    void writeLE32(uint16_t value);
+    void writeLE32(uint32_t value);
 
     void writeDescriptorTag(DescriptorTag tag, uint32_t tagLocation);
-    void closeDescriptorTag(const int dataSize = -1) const;
+    void closeDescriptorTag(int dataSize = -1) const;
 
     void writeIcbTag(uint8_t fileType);
     void writeLongAD(uint32_t lenBytes, uint32_t pos, uint16_t partition, uint32_t id);

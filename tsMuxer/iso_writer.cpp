@@ -221,7 +221,7 @@ void ByteFileWriter::writeLE16(const uint16_t value)
     m_curPos += 2;
 }
 
-void ByteFileWriter::writeLE32(const uint16_t value)
+void ByteFileWriter::writeLE32(const uint32_t value)
 {
     const auto pos32 = reinterpret_cast<uint32_t *>(m_curPos);
     *pos32 = value;

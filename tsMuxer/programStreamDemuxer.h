@@ -5,14 +5,14 @@
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"
 
-class ProgramStreamDemuxer : public AbstractDemuxer
+class ProgramStreamDemuxer final : public AbstractDemuxer
 {
    public:
     static constexpr int MAX_PES_HEADER_SIZE = 1018;  // buffer for PES header and program stream map
 
     ProgramStreamDemuxer(const BufferedReaderManager& readManager);
     void openFile(const std::string& streamName) override;
-    virtual int readPacket(AVPacket& avPacket) { return 0; }
+    static int readPacket(AVPacket& avPacket) { return 0; }
     ~ProgramStreamDemuxer() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
@@ -52,7 +52,6 @@ class ProgramStreamDemuxer : public AbstractDemuxer
     MemoryBlock m_lpcmWaveHeader[16];
     bool m_lpcpHeaderAdded[16];
 
-   private:
     bool isVideoPID(uint32_t pid) const;
     int mpegps_psm_parse(const uint8_t* buff, const uint8_t* end);
     uint8_t processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);

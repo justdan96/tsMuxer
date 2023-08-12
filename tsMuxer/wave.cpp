@@ -46,8 +46,7 @@ void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const int ch
     waveBuffer.clear();
     waveBuffer.grow(40 + 28);
     uint8_t* curPos = waveBuffer.data();
-    memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt ", 16);
-    curPos += 16;
+    for (const char c : "RIFF\x00\x00\x00\x00WAVEfmt ") *curPos++ = c;
     const auto fmtSize = reinterpret_cast<uint32_t*>(curPos);
     *fmtSize = sizeof(WAVEFORMATPCMEX);
     curPos += 4;
@@ -65,7 +64,7 @@ void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const int ch
     waveFormatPCMEx->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
 
     curPos += sizeof(WAVEFORMATPCMEX);
-    memcpy(curPos, "data\x00\x00\x00\x0", 8);
+    for (const char c : "data\x00\x00\x00\x00") *curPos++ = c;
 }
 
 void toLittleEndian(uint8_t* dstData, uint8_t* srcData, const int size, const int bitdepth)

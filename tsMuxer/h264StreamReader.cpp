@@ -181,9 +181,6 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
                 return rez;
             }
             break;
-        case NALUnit::NALType::STAP_A:
-            // unknown blu-ray nal before subSps
-            break;
         default:
             break;
         }
@@ -225,7 +222,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, const uint8_t *dstEnd,
     writer.setBuffer(tmpBuffer, tmpBuffer + sizeof(tmpBuffer));
 
     uint8_t *sizeField = nullptr;
-    int beforeMessageLen = 0;
+    unsigned beforeMessageLen = 0;
     if (m_mvcSubStream)
     {
         writer.putBits(8, static_cast<int>(NALUnit::NALType::nuSEI));
@@ -265,7 +262,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, const uint8_t *dstEnd,
 
         if (sizeField)
         {
-            const int msgLen = writer.getBitsCount() - beforeMessageLen;
+            const unsigned msgLen = writer.getBitsCount() - beforeMessageLen;
             *sizeField = static_cast<uint8_t>(msgLen / 8);
         }
         SEIUnit::write_rbsp_trailing_bits(writer);
@@ -1075,7 +1072,7 @@ int H264StreamReader::deserializeSliceHeader(SliceUnit &slice, const uint8_t *bu
 int H264StreamReader::processSliceNal(uint8_t *buff)
 {
     SliceUnit slice;
-    uint8_t *sliceEnd = m_bufEnd;
+    const uint8_t *sliceEnd = m_bufEnd;
 
     int nalRez = deserializeSliceHeader(slice, buff, sliceEnd);
 
@@ -1276,29 +1273,21 @@ int H264StreamReader::sliceTypeToPictType(const int slice_type) const
     {
     case SliceUnit::P_TYPE:
     {
-        if (m_pict_type < 3)
-            return 1;
-        return 6;
+        return (m_pict_type < 3) ? 1 : 6;
     }
     case SliceUnit::B_TYPE:
     {
-        if (m_pict_type < 3)
-            return 2;
-        return 7;
+        return (m_pict_type < 3) ? 2 : 7;
     }
     case SliceUnit::I_TYPE:
     {
-        if (m_pict_type < 3)
-            return 0;
-        return 5;
+        return (m_pict_type < 3) ? 0 : 5;
     }
     case SliceUnit::SP_TYPE:
     {
         if (m_pict_type == -1 || m_pict_type == 3)
             return 4;
-        if (m_pict_type == 2)
-            return 7;
-        return 6;
+        return (m_pict_type == 2) ? 7 : 6;
     }
     case SliceUnit::SI_TYPE:
     {
@@ -1306,9 +1295,7 @@ int H264StreamReader::sliceTypeToPictType(const int slice_type) const
             return 3;
         if (m_pict_type == 0)
             return 5;
-        if (m_pict_type == 2)
-            return 7;
-        return 6;
+        return (m_pict_type == 2) ? 7 : 6;
     }
     default:;
     }

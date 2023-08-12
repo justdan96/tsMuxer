@@ -6,7 +6,7 @@
 #include "avPacket.h"
 #include "simplePacketizerReader.h"
 
-class AC3StreamReader : public SimplePacketizerReader, public AC3Codec
+class AC3StreamReader final : public SimplePacketizerReader, public AC3Codec
 {
    public:
     AC3StreamReader() : m_useNewStyleAudioPES(false)

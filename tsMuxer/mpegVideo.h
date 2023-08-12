@@ -45,12 +45,16 @@ class MPEGHeader
         // uint8_t* bufStart = buffer;
         for (buffer += 2; buffer < end;)
         {
-            if (*buffer == 0)
-                buffer++;
-            else if (buffer[-2] == 0 && buffer[-1] == 0 && buffer[0] == 1)
-                return buffer - 2;
-            else
+            if (*buffer > 1)
                 buffer += 3;
+            else if (*buffer == 0)
+                buffer++;
+            else  // *buffer == 1
+            {
+                if (buffer[-2] == 0 && buffer[-1] == 0)
+                    return buffer - 2;
+                buffer += 3;
+            }
         }
         return end;
     }
@@ -143,7 +147,7 @@ class MPEGGOPHeader : public MPEGHeader
 {
    public:
     MPEGGOPHeader();
-    ~MPEGGOPHeader();
+    ~MPEGGOPHeader() override;
     int drop_frame_flag;
     uint8_t time_code_hours;
     uint8_t time_code_minutes;

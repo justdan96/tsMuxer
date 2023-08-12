@@ -5,7 +5,7 @@
 #include "mpegStreamReader.h"
 #include "mpegVideo.h"
 
-class MPEG2StreamReader : public MPEGStreamReader
+class MPEG2StreamReader final : public MPEGStreamReader
 {
    public:
     MPEG2StreamReader() : m_sequence(0), m_frame(0)

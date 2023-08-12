@@ -8,7 +8,7 @@
 #include "nalUnits.h"
 #include "vod_common.h"
 
-class H264StreamReader : public MPEGStreamReader
+class H264StreamReader final : public MPEGStreamReader
 {
    public:
     enum class SeiMethod
@@ -23,7 +23,7 @@ class H264StreamReader : public MPEGStreamReader
     ~H264StreamReader() override;
     void setForceLevel(const uint8_t value) { m_forcedLevel = value; }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
+    CheckStreamRez checkStream(uint8_t* buffer, int len);
     void setH264SPSCont(const bool val) { m_h264SPSCont = val; }
 
     void setInsertSEI(const SeiMethod value) { m_insertSEIMethod = value; }
@@ -35,7 +35,7 @@ class H264StreamReader : public MPEGStreamReader
     int getOffsetSeqCnt() const { return number_of_offset_sequences; }
 
     // used for correction offset metadata
-    virtual void setStartPTS(const int64_t pts) { m_startPts = pts; }
+    void setStartPTS(const int64_t pts) { m_startPts = pts; }
     bool needSPSForSplit() const override { return true; }
 
    protected:
@@ -68,11 +68,9 @@ class H264StreamReader : public MPEGStreamReader
     int deserializeSliceHeader(SliceUnit& slice, const uint8_t* buff, const uint8_t* sliceEnd);
     void checkPyramid(int frameNum, int* fullPicOrder, bool nextFrameFound);
 
-   private:
     bool m_nextFrameFound;
     bool m_nextFrameIdr;
 
-    // bool m_idrSliceFound;
     uint32_t m_idrSliceCnt;
     bool m_bSliceFound;
     int m_picOrderOffset;
@@ -102,7 +100,6 @@ class H264StreamReader : public MPEGStreamReader
     bool m_lastIFrame;
     bool m_firstDecodeNal;
     int m_lastPictStruct;
-    // bool m_openGOP;
     bool m_firstFileFrame;
     std::map<uint32_t, SPSUnit*> m_spsMap;
     std::map<uint32_t, PPSUnit*> m_ppsMap;

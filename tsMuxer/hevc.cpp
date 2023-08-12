@@ -11,7 +11,7 @@
 using namespace std;
 static constexpr int EXTENDED_SAR = 255;
 
-int ceilDiv(const int a, const int b) { return (a / b) + ((a % b) ? 1 : 0); }
+unsigned ceilDiv(const unsigned a, const unsigned b) { return (a / b) + ((a % b) ? 1 : 0); }
 
 // ------------------------- HevcUnit -------------------
 
@@ -62,7 +62,7 @@ int HevcUnit::deserialize()
     }
 }
 
-void HevcUnit::updateBits(const int bitOffset, const int bitLen, const int value) const
+void HevcUnit::updateBits(const int bitOffset, const int bitLen, const unsigned value) const
 {
     uint8_t* ptr = m_reader.getBuffer() + bitOffset / 8;
     BitStreamWriter bitWriter{};
@@ -226,8 +226,8 @@ int HevcVpsUnit::deserialize()
 
 void HevcVpsUnit::setFPS(const double fps)
 {
-    time_scale = static_cast<uint32_t>(fps + 0.5) * 1000000;
-    num_units_in_tick = static_cast<unsigned>(time_scale / fps + 0.5);
+    time_scale = lround(fps) * 1000000;
+    num_units_in_tick = lround(time_scale / fps);
 
     assert(num_units_in_tick_bit_pos > 0);
     updateBits(num_units_in_tick_bit_pos, 32, num_units_in_tick);
@@ -236,7 +236,7 @@ void HevcVpsUnit::setFPS(const double fps)
 
 double HevcVpsUnit::getFPS() const
 {
-    return num_units_in_tick ? time_scale / static_cast<float>(num_units_in_tick) : 0;
+    return num_units_in_tick ? static_cast<double>(time_scale) / num_units_in_tick : 0;
 }
 
 string HevcVpsUnit::getDescription() const
@@ -329,19 +329,19 @@ int HevcSpsUnit::hrd_parameters(const bool commonInfPresentFlag, const int maxNu
 }
 
 // returns 0 on parse success, 1 on error
-int HevcSpsUnit::sub_layer_hrd_parameters(const int cpb_cnt_minus1)
+int HevcSpsUnit::sub_layer_hrd_parameters(const unsigned cpb_cnt_minus1)
 {
-    for (int i = 0; i <= cpb_cnt_minus1; i++)
+    for (unsigned i = 0; i <= cpb_cnt_minus1; i++)
     {
-        if (extractUEGolombCode() == 0xffffffff)  // bit_rate_value_minus1[i]
+        if (extractUEGolombCode() == UINT32_MAX)  // bit_rate_value_minus1[i]
             return 1;
-        if (extractUEGolombCode() == 0xffffffff)  // cpb_size_value_minus1[i]
+        if (extractUEGolombCode() == UINT32_MAX)  // cpb_size_value_minus1[i]
             return 1;
         if (sub_pic_hrd_params_present_flag)
         {
-            if (extractUEGolombCode() == 0xffffffff)  // cpb_size_du_value_minus1[i]
+            if (extractUEGolombCode() == UINT32_MAX)  // cpb_size_du_value_minus1[i]
                 return 1;
-            if (extractUEGolombCode() == 0xffffffff)  // bit_rate_du_value_minus1[i]
+            if (extractUEGolombCode() == UINT32_MAX)  // bit_rate_du_value_minus1[i]
                 return 1;
         }
         m_reader.skipBit();  // cbr_flag[i]
@@ -427,13 +427,12 @@ int HevcSpsUnit::vui_parameters()
 
 int HevcSpsUnit::short_term_ref_pic_set(const unsigned stRpsIdx)
 {
-    int numDeltaPocs = 0;
-
-    const bool inter_ref_pic_set_prediction_flag = stRpsIdx ? m_reader.getBit() : false;
+    unsigned numDeltaPocs = 0;
+    const bool inter_ref_pic_set_prediction_flag = stRpsIdx && m_reader.getBit();
 
     if (inter_ref_pic_set_prediction_flag)
     {
-        int refRpsIdx = stRpsIdx - 1;
+        unsigned refRpsIdx = stRpsIdx - 1;
 
         if (stRpsIdx == num_short_term_ref_pic_sets)
         {
@@ -446,7 +445,7 @@ int HevcSpsUnit::short_term_ref_pic_set(const unsigned stRpsIdx)
         m_reader.skipBit();     // delta_rps_sign
         extractUEGolombCode();  // abs_delta_rps_minus1
 
-        for (int j = 0; j <= num_delta_pocs[refRpsIdx]; j++)
+        for (unsigned j = 0; j <= num_delta_pocs[refRpsIdx]; j++)
         {
             const bool used = m_reader.getBit();                          // used_by_curr_pic_flag[j]
             const bool use_delta_flag = used ? true : m_reader.getBit();  // use_delta_flag[j]
@@ -461,7 +460,7 @@ int HevcSpsUnit::short_term_ref_pic_set(const unsigned stRpsIdx)
         if (numDeltaPocs > 64)
             return 1;
 
-        for (int i = 0; i < numDeltaPocs; i++)
+        for (unsigned i = 0; i < numDeltaPocs; i++)
         {
             if (extractUEGolombCode() >= 0x8000)  // delta_poc_minus1[i]
                 return 1;
@@ -572,14 +571,14 @@ int HevcSpsUnit::deserialize()
         extractUEGolombCode();  // max_transform_hierarchy_depth_inter ue(v)
         extractUEGolombCode();  // max_transform_hierarchy_depth_intra ue(v)
 
-        const int MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
-        const int CtbLog2SizeY = MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
-        const int CtbSizeY = 1 << CtbLog2SizeY;
-        const int PicWidthInCtbsY = ceilDiv(pic_width_in_luma_samples, CtbSizeY);
-        const int PicHeightInCtbsY = ceilDiv(pic_height_in_luma_samples, CtbSizeY);
-        int PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
+        const unsigned MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
+        const unsigned CtbLog2SizeY = MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
+        const unsigned CtbSizeY = 1 << CtbLog2SizeY;
+        const unsigned PicWidthInCtbsY = ceilDiv(pic_width_in_luma_samples, CtbSizeY);
+        const unsigned PicHeightInCtbsY = ceilDiv(pic_height_in_luma_samples, CtbSizeY);
+        unsigned PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
         PicSizeInCtbsY_bits = 0;
-        int count1bits = 0;
+        unsigned count1bits = 0;
 
         // Ceil( Log2( PicSizeInCtbsY ))
         while (PicSizeInCtbsY)
@@ -649,19 +648,19 @@ int HevcSpsUnit::deserialize()
 
 double HevcSpsUnit::getFPS() const
 {
-    return num_units_in_tick ? time_scale / static_cast<float>(num_units_in_tick) : 0;
+    return num_units_in_tick ? static_cast<double>(time_scale) / num_units_in_tick : 0;
 }
 
 string HevcSpsUnit::getDescription() const
 {
     string result = getProfileString();
-    result += string(" Resolution: ") + int32ToStr(pic_width_in_luma_samples) + string(":") +
-              int32ToStr(pic_height_in_luma_samples);
-    result += (interlaced_source_flag ? string("i") : string("p"));
+    result += string(" Resolution: ") + int32uToStr(pic_width_in_luma_samples) + string(":") +
+              int32uToStr(pic_height_in_luma_samples);
+    result += interlaced_source_flag ? string("i") : string("p");
 
     const double fps = getFPS();
     result += "  Frame rate: ";
-    result += (fps ? doubleToStr(fps) : string("not found"));
+    result += fps != 0.0 ? doubleToStr(fps) : string("not found");
     return result;
 }
 

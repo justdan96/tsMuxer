@@ -21,6 +21,7 @@ struct StreamInfo
     AbstractStreamReader* m_streamReader;
     StreamInfo(AbstractReader* dataReader, AbstractStreamReader* streamReader, const std::string& streamName,
                const std::string& fullStreamName, int pid, bool isSubStream = false)
+        : m_data(nullptr)
     {
         m_streamName = streamName;
         m_fullStreamName = fullStreamName;
@@ -42,6 +43,7 @@ struct StreamInfo
         m_blockSize = 0;
         m_isSubStream = isSubStream;
     }
+
     ~StreamInfo()
     {
         // delete m_streamReader;
@@ -130,7 +132,7 @@ class ContainerToReaderWrapper : public AbstractReader
     bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
     void resetDelayedMark() const;
-    int64_t getDiscardedSize() { return m_discardedSize; };
+    int64_t getDiscardedSize() const { return m_discardedSize; };
 
     bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
     void terminate();

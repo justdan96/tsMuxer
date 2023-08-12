@@ -35,14 +35,6 @@ enum class Profile
 const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
 constexpr int ff_vc1_fps_dr[2] = {1000, 1001};
 
-/*
-struct AVRational {
-        int w, h;
-        AVRational() {w = h =0;}
-        AVRational(int _w, int _h) {w = _w; h = _h;}
-};
-*/
-
 const AVRational ff_vc1_pixel_aspect[16] = {
     AVRational(0, 1),   AVRational(1, 1),    AVRational(12, 11), AVRational(10, 11),
     AVRational(16, 11), AVRational(40, 33),  AVRational(24, 11), AVRational(20, 11),
@@ -61,7 +53,7 @@ extern const char* pict_type_str[4];
 class VC1Unit
 {
    public:
-    VC1Unit() : bitReader(), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
+    VC1Unit() : m_nalBuffer(nullptr), m_nalBufferLen(0) {}
     ~VC1Unit() { delete[] m_nalBuffer; }
 
     static bool isMarker(const uint8_t* ptr) { return ptr[0] == ptr[1] == 0 && ptr[2] == 1; }
@@ -74,12 +66,12 @@ class VC1Unit
                 buffer += 3;
             else if (*buffer == 0)
                 buffer++;
-            else if (buffer[-2] == 0 && buffer[-1] == 0)
+            else  // *buffer == 1
             {
-                return buffer - 2;
-            }
-            else
+                if (buffer[-2] == 0 && buffer[-1] == 0)
+                    return buffer - 2;
                 buffer += 3;
+            }
         }
         return end;
     }
@@ -90,7 +82,7 @@ class VC1Unit
         m_nalBuffer = new uint8_t[size];
         if (size < 4)
         {
-            std::copy(src, src + size, m_nalBuffer);
+            std::copy_n(src, size, m_nalBuffer);
             m_nalBufferLen = size;
             return size;
         }
@@ -163,7 +155,7 @@ class VC1SequenceHeader : public VC1Unit
           display_width(0),
           display_height(0),
           pulldown(0),
-          interlace(0),
+          interlace(false),
           tfcntrflag(false),
           psf(0),
           time_base_num(0),

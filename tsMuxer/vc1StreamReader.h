@@ -5,7 +5,7 @@
 #include "mpegStreamReader.h"
 #include "vc1Parser.h"
 
-class VC1StreamReader : public MPEGStreamReader
+class VC1StreamReader final : public MPEGStreamReader
 {
    public:
     VC1StreamReader()

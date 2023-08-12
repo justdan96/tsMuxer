@@ -4,7 +4,7 @@
 #include "avPacket.h"
 #include "simplePacketizerReader.h"
 
-class LPCMStreamReader : public SimplePacketizerReader
+class LPCMStreamReader final : public SimplePacketizerReader
 {
    public:
     enum class LPCMHeaderType

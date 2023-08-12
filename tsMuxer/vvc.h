@@ -13,7 +13,7 @@ struct VvcHrdUnit
     bool general_nal_hrd_params_present_flag;
     bool general_vcl_hrd_params_present_flag;
     bool general_du_hrd_params_present_flag;
-    int hrd_cpb_cnt_minus1;
+    unsigned hrd_cpb_cnt_minus1;
 };
 
 struct VvcUnit
@@ -23,8 +23,7 @@ struct VvcUnit
           nuh_layer_id(0),
           nuh_temporal_id_plus1(0),
           m_nalBuffer(nullptr),
-          m_nalBufferLen(0),
-          m_reader()
+          m_nalBufferLen(0)
     {
     }
 
@@ -154,24 +153,21 @@ struct VvcSpsUnit : public VvcUnitWithProfile
     int vui_parameters();
 };
 
-struct VvcPpsUnit : public VvcUnit
+struct VvcPpsUnit : VvcUnit
 {
     VvcPpsUnit();
     int deserialize();
 
-   public:
     int pps_id;
     int sps_id;
 };
 
-struct VvcSliceHeader : public VvcUnit
+struct VvcSliceHeader : VvcUnit
 {
     VvcSliceHeader();
     int deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps);
     bool isIDR() const;
 
-   public:
-    unsigned ph_pps_id;
     int pic_order_cnt_lsb;
 };
 

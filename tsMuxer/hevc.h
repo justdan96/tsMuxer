@@ -57,7 +57,7 @@ struct HevcUnit
    protected:
     unsigned extractUEGolombCode();
     int extractSEGolombCode();
-    void updateBits(int bitOffset, int bitLen, int value) const;
+    void updateBits(int bitOffset, int bitLen, unsigned value) const;
 
     uint8_t* m_nalBuffer;
     int m_nalBufferLen;
@@ -113,7 +113,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
     bool vcl_hrd_parameters_present_flag;
     bool sub_pic_hrd_params_present_flag;
 
-    std::vector<int> num_delta_pocs;
+    std::vector<unsigned> num_delta_pocs;
 
     int colour_primaries;
     int transfer_characteristics;
@@ -128,7 +128,7 @@ struct HevcSpsUnit : public HevcUnitWithProfile
 
    private:
     int hrd_parameters(bool commonInfPresentFlag, int maxNumSubLayersMinus1);
-    int sub_layer_hrd_parameters(int cpb_cnt_minus1);
+    int sub_layer_hrd_parameters(unsigned cpb_cnt_minus1);
     int short_term_ref_pic_set(unsigned stRpsIdx);
     int vui_parameters();
     int scaling_list_data();

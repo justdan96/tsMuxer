@@ -4,7 +4,7 @@
 #include "mp3Codec.h"
 #include "simplePacketizerReader.h"
 
-class MpegAudioStreamReader : public SimplePacketizerReader, MP3Codec
+class MpegAudioStreamReader final : public SimplePacketizerReader, MP3Codec
 {
    public:
     static constexpr uint32_t DTS_HD_PREFIX = 0x64582025;

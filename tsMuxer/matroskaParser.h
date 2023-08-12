@@ -310,8 +310,6 @@ class ParsedPGTrackData : public ParsedTrackPrivData
     ParsedPGTrackData() = default;
     ~ParsedPGTrackData() override = default;
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
-
-   private:
 };
 
 typedef struct MatroskaVideoTrack

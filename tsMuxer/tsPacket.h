@@ -303,9 +303,6 @@ struct TS_program_association_section
     TS_program_association_section();
     bool deserialize(uint8_t* buffer, int buf_size);
     uint32_t serialize(uint8_t* buffer, int buf_size);
-
-   private:
-    // uint32_t tmpAvCrc[257];
 };
 
 struct PS_stream_pack
@@ -403,8 +400,6 @@ struct CLPIStreamInfo : public M2TSStreamInfo
     }
     static void composeISRC(BitStreamWriter& writer);
     void composeStreamCodingInfo(BitStreamWriter& writer) const;
-
-   private:
 };
 
 struct CLPIProgramInfo

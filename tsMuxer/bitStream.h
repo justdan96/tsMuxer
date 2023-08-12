@@ -7,16 +7,12 @@
 
 static constexpr unsigned INT_BIT = CHAR_BIT * sizeof(unsigned);
 
-class BitStreamException : public std::exception
+class BitStreamException final : public std::exception
 {
    public:
-    // BitStreamException(const char* str): std::exception(str) {}
-    // BitStreamException(const std::string& str): std::exception(str.c_str()) {}
-    BitStreamException() {}
+    BitStreamException() = default;
 };
 
-// #define THROW_BITSTREAM_ERR throw BitStreamException(std::string(__FILE__) + std::string(" ") +
-//  std::string(__FUNCTION__) + std::string(" at line ") + int32ToStr(__LINE__))
 #define THROW_BITSTREAM_ERR throw BitStreamException()
 
 class BitStream
@@ -113,7 +109,7 @@ class BitStreamReader : public BitStream
         return static_cast<int>(prevVal + (curVal >> bitLeft) & m_masks[num]);
     }
 
-    int getBit()
+    uint8_t getBit()
     {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
@@ -126,7 +122,7 @@ class BitStreamReader : public BitStream
             m_bitLeft = INT_BIT - 1;
         }
         m_totalBits--;
-        return static_cast<int>(m_curVal >> m_bitLeft) & 1;
+        return m_curVal >> m_bitLeft & 1;
     }
 
     void skipBits(const unsigned num)

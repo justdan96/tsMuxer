@@ -7,7 +7,7 @@
 #include "mpegStreamReader.h"
 #include "vvc.h"
 
-class VVCStreamReader : public MPEGStreamReader
+class VVCStreamReader final : public MPEGStreamReader
 {
    public:
     VVCStreamReader();

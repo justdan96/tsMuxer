@@ -7,7 +7,7 @@
 #include "hevc.h"
 #include "mpegStreamReader.h"
 
-class HEVCStreamReader : public MPEGStreamReader
+class HEVCStreamReader final : public MPEGStreamReader
 {
    public:
     HEVCStreamReader();

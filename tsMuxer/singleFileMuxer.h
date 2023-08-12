@@ -6,7 +6,7 @@
 #include "abstractMuxer.h"
 #include "avPacket.h"
 
-class SingleFileMuxer : public AbstractMuxer
+class SingleFileMuxer final : public AbstractMuxer
 {
    public:
     SingleFileMuxer(MuxerManager* owner);

@@ -3,7 +3,7 @@
 
 #include "simplePacketizerReader.h"
 
-class DTSStreamReader : public SimplePacketizerReader
+class DTSStreamReader final : public SimplePacketizerReader
 {
    public:
     enum class DTSHD_SUBTYPE

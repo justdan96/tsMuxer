@@ -1204,7 +1204,7 @@ void METADemuxer::updateReport(const bool checkTime)
         if (m_totalSize > 0)
         {
             const int64_t currentProcessedSize = getDemuxedSize();
-            progress = currentProcessedSize / static_cast<double>(m_totalSize) * 100.0;
+            progress = static_cast<double>(currentProcessedSize) / m_totalSize * 100.0;
             if (progress > 100.0)
                 progress = 100.0;
         }

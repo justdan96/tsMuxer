@@ -4,7 +4,7 @@
 #include "ioContextDemuxer.h"
 #include "matroskaParser.h"
 
-class MatroskaDemuxer : public IOContextDemuxer
+class MatroskaDemuxer final : public IOContextDemuxer
 {
    public:
     MatroskaDemuxer(const BufferedReaderManager &readManager);

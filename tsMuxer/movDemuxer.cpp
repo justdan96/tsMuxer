@@ -833,7 +833,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                     {
                         m_filterBuffer.resize(m_deliveredPacket.size);
                         m_deliveredPacket.data = m_filterBuffer.data();
-                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), calloc()hunkSize);
+                        st->parsed_priv_data->extractData(&m_deliveredPacket, m_tmpChunkBuffer.data(), chunkSize);
                         const int demuxed =
                             filterItr->second->demuxPacket(demuxedData, acceptedPIDs, m_deliveredPacket);
                         discardSize += static_cast<int64_t>(chunkSize) - demuxed;
