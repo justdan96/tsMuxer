@@ -36,14 +36,14 @@ int VC1StreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
         if (!m_seqBuffer.empty())
         {
             if (static_cast<size_t>(dstEnd - curPtr) < m_seqBuffer.size())
-                THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
+                THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers")
             memcpy(curPtr, m_seqBuffer.data(), m_seqBuffer.size());
             curPtr += m_seqBuffer.size();
         }
         if (!m_entryPointBuffer.empty())
         {
             if (static_cast<size_t>(dstEnd - curPtr) < m_entryPointBuffer.size())
-                THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers");
+                THROW(ERR_COMMON, "VC1 stream error: Not enough buffer for write headers")
             memcpy(curPtr, m_entryPointBuffer.data(), m_entryPointBuffer.size());
             curPtr += m_entryPointBuffer.size();
         }
@@ -243,7 +243,7 @@ int VC1StreamReader::decodeSeqHeader(uint8_t* buff)
     }
     if (m_sequence.profile != Profile::ADVANCED)
         THROW(ERR_VC1_ERR_PROFILE,
-              "Only ADVANCED profile are supported now. For feature request contat to: r_vasilenko@smlabs.net.");
+              "Only ADVANCED profile are supported now. For feature request contat to: r_vasilenko@smlabs.net.")
 
     m_spsFound++;
     nextNal = VC1Unit::findNextMarker(buff, m_bufEnd);

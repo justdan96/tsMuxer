@@ -1,5 +1,5 @@
-#ifndef META_DEMUXER_H
-#define META_DEMUXER_H
+#ifndef META_DEMUXER_H_
+#define META_DEMUXER_H_
 
 #include <chrono>
 #include <map>
@@ -27,7 +27,7 @@ struct StreamInfo
         m_dataReader = dataReader;
         m_readerID = dataReader->createReader(streamReader->getTmpBufferSize());
         if (!dataReader->openStream(m_readerID, m_streamName.c_str(), pid, &streamReader->getCodecInfo()))
-            THROW(ERR_CANT_OPEN_STREAM, "Can't open stream: " << m_streamName);
+            THROW(ERR_CANT_OPEN_STREAM, "Can't open stream: " << m_streamName)
         m_streamReader = streamReader;
         m_pid = pid;
         m_readCnt = 0;
@@ -94,9 +94,9 @@ class ContainerToReaderWrapper : public AbstractReader
         std::map<uint32_t, uint32_t> lastReadRez;
         DemuxerData()
         {
-            m_demuxer = 0;
+            m_demuxer = nullptr;
             m_firstRead = true;
-            m_iterator = 0;
+            m_iterator = nullptr;
             m_allFragmented = true;
         }
         bool m_firstRead;
@@ -107,7 +107,7 @@ class ContainerToReaderWrapper : public AbstractReader
     {
         ReaderInfo(DemuxerData& demuxerData, const uint32_t pid) : m_demuxerData(demuxerData), m_pid(pid) {}
         DemuxerData& m_demuxerData;
-        const uint32_t m_pid;
+        uint32_t m_pid;
     };
 
     ContainerToReaderWrapper(const METADemuxer& owner, BufferedReaderManager& readManager)
@@ -123,11 +123,11 @@ class ContainerToReaderWrapper : public AbstractReader
         m_discardedSize = 0;
         m_terminated = false;
     }
-    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = 0) override;
+    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
     void notify(uint32_t readerID, uint32_t dataReaded) override { return; }
     int32_t createReader(int readBuffOffset = 0) override;
     void deleteReader(uint32_t readerID) override;
-    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = 0) override;
+    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
     void resetDelayedMark() const;
     int64_t getDiscardedSize() { return m_discardedSize; };
@@ -163,9 +163,9 @@ class METADemuxer : public AbstractDemuxer
     METADemuxer(BufferedReaderManager& readManager);
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
-    void readClose() override final;
+    void readClose() final;
     uint64_t getDemuxedSize() override;
-    int addStream(const std::string codec, const std::string& codecStreamName,
+    int addStream(const std::string& codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
     const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
@@ -174,8 +174,8 @@ class METADemuxer : public AbstractDemuxer
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
     int getLastReadRez() override { return m_lastReadRez; }
     int64_t totalSize() const { return m_totalSize; }
-    static std::string mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum);
-    static std::string mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum);
+    static std::string mplsTrackToFullName(const std::string& mplsFileName, const std::string& mplsNum);
+    static std::string mplsTrackToSSIFName(const std::string& mplsFileName, const std::string& mplsNum);
     bool m_HevcFound;
 
    private:
@@ -184,7 +184,7 @@ class METADemuxer : public AbstractDemuxer
     ContainerToReaderWrapper m_containerReader;
     int m_lastProgressY;
     std::chrono::steady_clock::time_point m_lastReportTime;
-    uint64_t m_totalSize;
+    int64_t m_totalSize;
     bool m_flushDataMode;
     const BufferedReaderManager& m_readManager;
     std::string m_streamName;
@@ -211,7 +211,7 @@ class METADemuxer : public AbstractDemuxer
     std::vector<MPLSParser> getMplsInfo(const std::string& mplsFileName);
 
     int addPGSubStream(const std::string& codec, const std::string& _codecStreamName,
-                       const std::map<std::string, std::string>& addParams, MPLSStreamInfo* subStream);
+                       const std::map<std::string, std::string>& addParams, const MPLSStreamInfo* subStream);
     static void addTrack(std::vector<CheckStreamRez>& rez, CheckStreamRez trackRez);
     static std::vector<MPLSPlayItem> mergePlayItems(const std::vector<MPLSParser>& mplsInfoList);
 };

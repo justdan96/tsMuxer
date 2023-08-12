@@ -108,7 +108,7 @@ int PGSStreamReader::calcFpsIndex(const double fps)
     for (int i = 0; i < 16; i++)
         if (fabs(pgs_frame_rates[i] - fps) < 1e-4)
             return i;
-    THROW(ERR_COMMON, "Non standard fps value are not supported for PGS streams");
+    THROW(ERR_COMMON, "Non standard fps value are not supported for PGS streams")
 }
 
 void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)
@@ -227,7 +227,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
         if (pos >= end)
         {
             if (*pos != OBJECT_DEF_SEGMENT)
-                THROW(ERR_COMMON, "Unexpected byte " << *pos << " during parsing Object definition segment");
+                THROW(ERR_COMMON, "Unexpected byte " << *pos << " during parsing Object definition segment")
             pos++;  // skip OBJECT_DEF_SEGMENT
             end = pos + AV_RB16(pos);
             pos += 2;
@@ -808,7 +808,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     if (!m_demuxMode)
         return 0;
     if (dstEnd - dstBuffer < 10)
-        THROW(ERR_COMMON, "PGS stream error: Not enough buffer for write headers");
+        THROW(ERR_COMMON, "PGS stream error: Not enough buffer for write headers")
     if (!m_needRescale)
     {
         *dstBuffer++ = 'P';

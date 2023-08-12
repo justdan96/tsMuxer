@@ -217,7 +217,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, const uint8_t *dstEnd,
     uint8_t *curPos = dstBuffer;
 
     if (dstEnd - curPos < 4)
-        THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+        THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
 
     uint8_t tmpBuffer[256];
     BitStreamWriter writer{};
@@ -273,7 +273,7 @@ int H264StreamReader::writeSEIMessage(uint8_t *dstBuffer, const uint8_t *dstEnd,
 
         const int sRez = SEIUnit::encodeNAL(tmpBuffer, tmpBuffer + writer.getBitsCount() / 8, curPos, dstEnd - curPos);
         if (sRez == -1)
-            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
         curPos += sRez;
     }
 
@@ -306,7 +306,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
             LTRACE(LT_INFO, 2, "H264 bitstream changed: insert nal unit delimiters");
         }
         if (dstEnd - curPos < 6)
-            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
         curPos = writeNalPrefix(curPos);
         if (m_mvcSubStream && m_blurayMode)
         {
@@ -350,11 +350,11 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         }
         SPSUnit *sps = m_spsMap.find(m_lastSliceSPS)->second;
         if (dstEnd - curPos < 4)
-            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
         curPos = writeNalPrefix(curPos);
         int sRez = sps->serializeBuffer(curPos, dstEnd, false);
         if (sRez == -1)
-            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+            THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
         curPos += sRez;
 
         // PPSUnit* pps = m_ppsMap.find(m_lastSlicePPS)->second;
@@ -363,11 +363,11 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         for (auto [index, pps] : m_ppsMap)
         {
             if (dstEnd - curPos < 4)
-                THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+                THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
             curPos = writeNalPrefix(curPos);
             sRez = pps->serializeBuffer(curPos, dstEnd, false);
             if (sRez == -1)
-                THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers");
+                THROW(ERR_COMMON, "H264 stream error: Not enough buffer for write headers")
             curPos += sRez;
         }
     }
@@ -488,12 +488,12 @@ void H264StreamReader::updateStreamFps(void *nalUnit, uint8_t *buff, uint8_t *ne
     const auto tmpBuffer = new uint8_t[oldSpsLen + 16];
     const long newSpsLen = sps->serializeBuffer(tmpBuffer, tmpBuffer + oldSpsLen + 16, false);
     if (newSpsLen == -1)
-        THROW(ERR_COMMON, "Not enough buffer");
+        THROW(ERR_COMMON, "Not enough buffer")
     if (newSpsLen != oldSpsLen)
     {
         const int sizeDiff = newSpsLen - oldSpsLen;
         if (m_bufEnd + sizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
-            THROW(ERR_COMMON, "Not enough buffer");
+            THROW(ERR_COMMON, "Not enough buffer")
         memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
         m_bufEnd += sizeDiff;
         // m_dataLen += sizeDiff;
@@ -697,7 +697,7 @@ int H264StreamReader::calcPicOrder(const SliceUnit &slice)
 {
     if (slice.getSPS()->pic_order_cnt_type != 0)
         THROW(ERR_H264_UNSUPPORTED_PARAMETER,
-              "SPS picture order " << slice.getSPS()->pic_order_cnt_type << " not supported.");
+              "SPS picture order " << slice.getSPS()->pic_order_cnt_type << " not supported.")
 
     if (slice.isIDR())
         prevPicOrderCntMsb = prevPicOrderCntLsb = 0;
@@ -952,7 +952,6 @@ int H264StreamReader::processSEI(uint8_t *buff)
             }
             else if (msg == SEI_MSG_MVC_SCALABLE_NESTING)
             {
-                ;
             }
             else
             {
@@ -999,7 +998,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
             uint8_t tmpBuff[1024 * 3];
             int newSize = lastSEI.serializeBuffer(tmpBuff, tmpBuff + sizeof(tmpBuff), false);
             if (newSize == -1)
-                THROW(ERR_COMMON, "Not enough buffer");
+                THROW(ERR_COMMON, "Not enough buffer")
 
             assert(newSize > 2);
 
@@ -1007,7 +1006,7 @@ int H264StreamReader::processSEI(uint8_t *buff)
             if (sizeDiff != 0)
             {
                 if (m_bufEnd + sizeDiff > m_tmpBuffer + TMP_BUFFER_SIZE)
-                    THROW(ERR_COMMON, "Not enough buffer");
+                    THROW(ERR_COMMON, "Not enough buffer")
                 memmove(nextNal + sizeDiff, nextNal, m_bufEnd - nextNal);
                 m_bufEnd += sizeDiff;
             }

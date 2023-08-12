@@ -29,7 +29,7 @@ TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* strea
     m_readerID = m_bufferedReader->createReader(TS_FRAME_SIZE);
     if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,
-              "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
+              "TS demuxer can't accept reader because this reader does not support BufferedReader interface")
     m_scale = 1;
     m_nptPos = 0;
     m_tmpBufferLen = 0;
@@ -135,7 +135,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
                             if (br)
                                 br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
                             else
-                                THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!");
+                                THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!")
                             return;
                         }
                     }
@@ -153,7 +153,7 @@ void TSDemuxer::getTrackList(std::map<uint32_t, TrackInfo>& trackList)
     if (br)
         br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
     else
-        THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!");
+        THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!")
     return;
 }
 
@@ -249,7 +249,6 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 m_prevFileLen += (m_lastVideoPTS - m_firstVideoPTS + m_videoDtsGap);
             else  // no video file
                 m_prevFileLen += (m_lastPTS - m_firstPTS);
-            ;
         }
         m_firstPTS = -1;
         m_lastPTS = -1;
@@ -457,7 +456,7 @@ void TSDemuxer::openFile(const std::string& streamName)
     m_m2tsMode = isM2TSExt(streamName);
 
     if (!m_bufferedReader->openStream(m_readerID, m_streamName.c_str()))
-        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName);
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName)
 
     m_pmtPid = -1;
     m_codecReady = false;
@@ -478,7 +477,7 @@ void TSDemuxer::setFileIterator(FileNameIterator* itr)
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
-        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
+        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.")
 }
 
 int64_t getLastPCR(const File& file, const int bufferSize, const int frameSize, const int64_t fileSize)

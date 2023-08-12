@@ -71,19 +71,19 @@ DiskType checkBluRayMux(const char* metaFileName, int& autoChapterLen, vector<do
                 {
                     firstMplsOffset = strToInt32(paramPair[1].c_str());
                     if (firstMplsOffset > 1999)
-                        THROW(ERR_COMMON, "Too large m2ts offset " << firstMplsOffset);
+                        THROW(ERR_COMMON, "Too large m2ts offset " << firstMplsOffset)
                 }
                 else if (paramPair[0] == "--blankOffset")
                 {
                     blankNum = strToInt32(paramPair[1].c_str());
                     if (blankNum > 1999)
-                        THROW(ERR_COMMON, "Too large black playlist offset " << blankNum);
+                        THROW(ERR_COMMON, "Too large black playlist offset " << blankNum)
                 }
                 else if (paramPair[0] == "--m2tsOffset")
                 {
                     firstM2tsOffset = strToInt32(paramPair[1].c_str());
                     if (firstM2tsOffset > 99999)
-                        THROW(ERR_COMMON, "Too large m2ts offset " << firstM2tsOffset);
+                        THROW(ERR_COMMON, "Too large m2ts offset " << firstM2tsOffset)
                 }
                 else if (paramPair[0] == "--insertBlankPL")
                     insertBlankPL = true;
@@ -208,9 +208,9 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
         if (j % 5 == 0)
         {
             LTRACE(LT_INFO, 2, "");
-            LTRACE2(LT_INFO, "Marks: ");
+            LTRACE2(LT_INFO, "Marks: ")
         }
-        LTRACE2(LT_INFO, floatToTime(time / 1e9) << " ");
+        LTRACE2(LT_INFO, floatToTime(time / 1e9) << " ")
     }
     if (!chapters.empty() || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
@@ -283,13 +283,13 @@ void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListM
     string tmpFileName = appDir + string("blank_") + std::to_string(fname_time) + string(".264");
     File file;
     if (!file.open(tmpFileName.c_str(), File::ofWrite))
-        THROW(ERR_COMMON, "can't create file " << tmpFileName);
+        THROW(ERR_COMMON, "can't create file " << tmpFileName)
     for (int i = 0; i < 3; ++i)
     {
         if (file.write(pattern, patternSize) != patternSize)
         {
             deleteFile(tmpFileName);
-            THROW(ERR_COMMON, "can't write data to file " << tmpFileName);
+            THROW(ERR_COMMON, "can't write data to file " << tmpFileName)
         }
     }
     file.close();
@@ -681,10 +681,10 @@ int main(int argc, char** argv)
                         {
                             if (marksPerFile > 0)
                                 LTRACE(LT_INFO, 2, "");
-                            LTRACE2(LT_INFO, "Marks: ");
+                            LTRACE2(LT_INFO, "Marks: ")
                         }
                         marksPerFile++;
-                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << " ");
+                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << " ")
                     }
                     if (marksPerFile > 0)
                         LTRACE(LT_INFO, 2, "");
@@ -751,7 +751,7 @@ int main(int argc, char** argv)
                 dstFile = blurayHelper.m2tsFileName(firstM2tsOffset);
             }
             if (muxerManager.getTrackCnt() == 0)
-                THROW(ERR_COMMON, "No tracks selected");
+                THROW(ERR_COMMON, "No tracks selected")
             muxerManager.doMux(dstFile, dt != DiskType::NONE ? &blurayHelper : nullptr);
             if (dt != DiskType::NONE)
             {
@@ -802,7 +802,7 @@ int main(int argc, char** argv)
             MuxerManager sMuxer(readManager, singleFileMuxerFactory);
             sMuxer.openMetaFile(argv[1]);
             if (sMuxer.getTrackCnt() == 0)
-                THROW(ERR_COMMON, "No tracks selected");
+                THROW(ERR_COMMON, "No tracks selected")
 
             // output path - is checked for invalid characters on our platform
             string dstFile = unquoteStr(argv[2]);
@@ -820,13 +820,13 @@ int main(int argc, char** argv)
         auto minutes = std::chrono::duration_cast<std::chrono::minutes>(totalTime);
         if (muxMode)
         {
-            LTRACE2(LT_INFO, "Muxing time: ");
+            LTRACE2(LT_INFO, "Muxing time: ")
         }
         else
-            LTRACE2(LT_INFO, "Demuxing time: ");
+            LTRACE2(LT_INFO, "Demuxing time: ")
         if (minutes.count() > 0)
         {
-            LTRACE2(LT_INFO, minutes.count() << " min ");
+            LTRACE2(LT_INFO, minutes.count() << " min ")
             seconds -= minutes;
         }
         LTRACE(LT_INFO, 2, seconds.count() << " sec");
@@ -836,28 +836,28 @@ int main(int argc, char** argv)
     catch (runtime_error& e)
     {
         if (argc == 2)
-            LTRACE2(LT_ERROR, "Error: ");
-        LTRACE2(LT_ERROR, e.what());
+            LTRACE2(LT_ERROR, "Error: ")
+        LTRACE2(LT_ERROR, e.what())
         return -1;
     }
     catch (VodCoreException& e)
     {
         if (argc == 2)
-            LTRACE2(LT_ERROR, "Error: ");
+            LTRACE2(LT_ERROR, "Error: ")
         LTRACE(LT_ERROR, 2, e.m_errStr.c_str());
         return -2;
     }
     catch (BitStreamException& e)
     {
         if (argc == 2)
-            LTRACE2(LT_ERROR, "Error: ");
+            LTRACE2(LT_ERROR, "Error: ")
         LTRACE(LT_ERROR, 2, "Bitstream exception " << e.what() << EXCEPTION_ERR_MSG);
         return -3;
     }
     catch (...)
     {
         if (argc == 2)
-            LTRACE2(LT_ERROR, "Error: ");
+            LTRACE2(LT_ERROR, "Error: ")
         LTRACE(LT_ERROR, 2, "Unknnown exception" << EXCEPTION_ERR_MSG);
         return -4;
     }

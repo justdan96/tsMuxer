@@ -401,7 +401,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             PMTStreamInfo(audioType, tsStreamIndex, descrBuffer, descriptorLen, codecReader, lang, isSecondary);
     }
     else
-        THROW(ERR_UNKNOWN_CODEC, "Unsupported codec " << codecName << " for TS/M2TS muxing.");
+        THROW(ERR_UNKNOWN_CODEC, "Unsupported codec " << codecName << " for TS/M2TS muxing.")
 
     m_streamInfo[DEFAULT_PCR_PID].m_tsCnt = 0;
     buildNULL();
@@ -661,7 +661,7 @@ void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
     const int oldLen = static_cast<int>(m_pesData.size());
     const int pesHeaderLen = oldLen - beforePesLen;
     if (oldLen > 100000000)
-        THROW(ERR_COMMON, "Pes packet len too large ( >100Mb). Bad stream or invalid codec speciffed.");
+        THROW(ERR_COMMON, "Pes packet len too large ( >100Mb). Bad stream or invalid codec speciffed.")
     m_pesData.grow(avPacket.size /*+ additionDataSize*/);
     uint8_t* dst = m_pesData.data() + oldLen;
     // memcpy(dst, tmpBuffer, additionDataSize);
@@ -890,14 +890,14 @@ void TSMuxer::flushTSBuffer()
 
     const uint64_t fileSize = m_muxFile->size();
     if (fileSize == -1)
-        THROW(ERR_FILE_COMMON, "Can't determine size for file " << m_outFileName);
+        THROW(ERR_FILE_COMMON, "Can't determine size for file " << m_outFileName)
     m_muxFile->close();
 
     if (!m_muxFile->open(m_outFileName.c_str(), File::ofWrite + File::ofAppend))
-        THROW(ERR_FILE_COMMON, "Can't reopen file " << m_outFileName);
+        THROW(ERR_FILE_COMMON, "Can't reopen file " << m_outFileName)
 
     if (writeOutFile(m_outBuf, m_outBufLen) != m_outBufLen)
-        THROW(ERR_FILE_COMMON, "Can't write last data block to file " << m_outFileName);
+        THROW(ERR_FILE_COMMON, "Can't write last data block to file " << m_outFileName)
     delete[] m_outBuf;
     m_outBufLen = 0;
 }
@@ -986,7 +986,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
 
     const int tsIndex = m_extIndexToTSIndex[avPacket.stream_index];
     if (tsIndex == 0)
-        THROW(ERR_TS_COMMON, "Unknown track number " << avPacket.stream_index);
+        THROW(ERR_TS_COMMON, "Unknown track number " << avPacket.stream_index)
 
     auto newPCR = (avPacket.dts - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
     if (m_lastPCR == -1)
@@ -1438,7 +1438,7 @@ void TSMuxer::openDstFile()
         systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif
     if (!m_muxFile->open(m_outFileName.c_str(), File::ofWrite, systemFlags))
-        THROW(ERR_CANT_CREATE_FILE, "Can't create file " << m_outFileName);
+        THROW(ERR_CANT_CREATE_FILE, "Can't create file " << m_outFileName)
 }
 
 vector<int64_t> TSMuxer::getFirstPts() const

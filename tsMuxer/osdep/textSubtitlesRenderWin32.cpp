@@ -64,7 +64,7 @@ void TextSubtitlesRenderWin32::setRenderSize(const int width, const int height)
     m_pbmpInfo->bmiHeader.biClrUsed = 256 * 256 * 256;
     m_hbmp = CreateDIBSection(m_dc, m_pbmpInfo, DIB_RGB_COLORS, reinterpret_cast<void**>(&m_pData), nullptr, 0);
     if (m_hbmp == nullptr)
-        THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles");
+        THROW(ERR_COMMON, "Can't initialize graphic subsystem for render text subtitles")
     SelectObject(m_dc, m_hbmp);
     SetBkColor(m_dc, RGB(0, 0, 0));
     SetBkMode(m_dc, TRANSPARENT);

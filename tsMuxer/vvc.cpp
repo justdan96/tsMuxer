@@ -1052,7 +1052,6 @@ int VvcSliceHeader::deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps)
             if (ph_pps_id > 63)
                 return 1;
             pic_order_cnt_lsb = m_reader.getBits(sps->log2_max_pic_order_cnt_lsb);
-            ;
         }
 
         return 0;
@@ -1085,7 +1084,7 @@ vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int
     for (int i = 0; i < num_arrays; ++i)
     {
         if (src + 3 > end)
-            THROW(ERR_MOV_PARSE, "Invalid VVC extra data format");
+            THROW(ERR_MOV_PARSE, "Invalid VVC extra data format")
         src++;  // type
         int cnt = AV_RB16(src);
         src += 2;
@@ -1093,11 +1092,11 @@ vector<vector<uint8_t>> vvc_extract_priv_data(const uint8_t* buff, int size, int
         for (int j = 0; j < cnt; ++j)
         {
             if (src + 2 > end)
-                THROW(ERR_MOV_PARSE, "Invalid VVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid VVC extra data format")
             int nalSize = (src[0] << 8) + src[1];
             src += 2;
             if (src + nalSize > end)
-                THROW(ERR_MOV_PARSE, "Invalid VVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid VVC extra data format")
             if (nalSize > 0)
             {
                 spsPps.emplace_back();

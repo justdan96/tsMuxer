@@ -208,13 +208,13 @@ class MovParsedAudioTrackData : public ParsedTrackPrivData
             {
                 if (m_sc->m_indexCur + i >= static_cast<unsigned>(m_sc->m_index.size()))
                     THROW(ERR_MOV_PARSE, "Out of index for AAC track #" << m_sc->ffindex << " at position "
-                                                                        << m_demuxer->getProcessedBytes());
+                                                                        << m_demuxer->getProcessedBytes())
                 left -= m_sc->m_index[m_sc->m_indexCur + i];
             }
         }
         if (left > 4)
             THROW(ERR_MOV_PARSE, "Invalid AAC frame for track #" << m_sc->ffindex << " at position "
-                                                                 << m_demuxer->getProcessedBytes());
+                                                                 << m_demuxer->getProcessedBytes())
         if (!isAAC)
             i = 0;
         return (size - left) + i * AAC_HEADER_LEN;
@@ -240,7 +240,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     {
         spsPpsList.clear();
         if (size < 6)
-            THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
+            THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format")
         nal_length_size = (buff[4] & 0x03) + 1;
         int spsCnt = buff[5] & 0x1f;
         if (spsCnt == 0)
@@ -250,11 +250,11 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         for (; spsCnt > 0; spsCnt--)
         {
             if (src + 2 > end)
-                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format")
             int nalSize = (src[0] << 8) + src[1];
             src += 2;
             if (src + nalSize > end)
-                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format")
             if (nalSize > 0)
             {
                 spsPpsList.emplace_back();
@@ -265,11 +265,11 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         for (; ppsCnt > 0; ppsCnt--)
         {
             if (src + 2 > end)
-                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format")
             int nalSize = (src[0] << 8) + src[1];
             src += 2;
             if (src + nalSize > end)
-                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid H.264/AVC extra data format")
             if (nalSize > 0)
             {
                 spsPpsList.emplace_back();
@@ -289,7 +289,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         if (nal_length_size == 4)
             return (buff[0] << 24) + (buff[1] << 16) + (buff[2] << 8) + buff[3];
 
-        THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size);
+        THROW(ERR_MOV_PARSE, "MP4/MOV error: Unsupported H.264/AVC frame length field value " << nal_length_size)
     }
 
     void extractData(AVPacket* pkt, uint8_t* buff, const int size) override
@@ -332,12 +332,12 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         {
             if (buff + nal_length_size > end)
                 THROW(ERR_MOV_PARSE,
-                      "MP4/MOV error: Invalid H.264/AVC frame at position " << m_demuxer->getProcessedBytes());
+                      "MP4/MOV error: Invalid H.264/AVC frame at position " << m_demuxer->getProcessedBytes())
             const uint32_t nalSize = getNalSize(buff);
             buff += nal_length_size;
             if (buff + nalSize > end)
                 THROW(ERR_MOV_PARSE,
-                      "MP4/MOV error: Invalid H.264/AVC frame at position " << m_demuxer->getProcessedBytes());
+                      "MP4/MOV error: Invalid H.264/AVC frame at position " << m_demuxer->getProcessedBytes())
             buff += nalSize;
             ++nalCnt;
         }
@@ -395,7 +395,7 @@ class MovParsedSRTTrackData : public ParsedTrackPrivData
             sttsPos++;
             if (sttsPos >= static_cast<unsigned>(m_sc->stts_data.size()))
                 THROW(ERR_MOV_PARSE, "MP4/MOV error: invalid stts index for SRT track #"
-                                         << m_sc->ffindex << " at position " << m_demuxer->getProcessedBytes());
+                                         << m_sc->ffindex << " at position " << m_demuxer->getProcessedBytes())
 
             sttsCnt = m_sc->stts_data[sttsPos].count;
         }
@@ -708,7 +708,7 @@ void MovDemuxer::openFile(const std::string& streamName)
     readClose();
 
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
-        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName)
 
     File tmpFile;
     tmpFile.open(streamName.c_str(), File::ofRead);
@@ -742,7 +742,7 @@ void MovDemuxer::buildIndex()
             {
                 if (!found_moof)
                     if (j < m_mdat_pos || j > m_mdat_pos + m_mdat_size)
-                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << j);
+                        THROW(ERR_MOV_PARSE, "Invalid chunk offset " << j)
                 chunks.emplace_back(j - m_mdat_pos, i);
             }
         }
@@ -757,9 +757,9 @@ void MovDemuxer::readHeaders()
     atom.size = LLONG_MAX;
     m_mdat_pos = 0;
     if (mov_read_default(atom) < 0)
-        THROW(ERR_MOV_PARSE, "error reading header");
+        THROW(ERR_MOV_PARSE, "error reading header")
     if (!found_moov)
-        THROW(ERR_MOV_PARSE, "moov atom not found");
+        THROW(ERR_MOV_PARSE, "moov atom not found")
 }
 
 int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
@@ -1040,7 +1040,7 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
     return 0;
 }
 
-int MovDemuxer::mov_read_cmov(MOVAtom atom) { THROW(ERR_MOV_PARSE, "Compressed MOV not supported in current version"); }
+int MovDemuxer::mov_read_cmov(MOVAtom atom) { THROW(ERR_MOV_PARSE, "Compressed MOV not supported in current version") }
 
 int MovDemuxer::mov_read_wide(MOVAtom atom)
 {
@@ -1173,7 +1173,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
             break;
         }
     if (!trex)
-        THROW(ERR_COMMON, "could not find corresponding trex");
+        THROW(ERR_COMMON, "could not find corresponding trex")
 
     if (flags & 0x01)
         frag->base_data_offset = get_be64();

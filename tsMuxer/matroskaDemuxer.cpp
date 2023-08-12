@@ -217,12 +217,12 @@ int MatroskaDemuxer::ebml_read_ascii(uint32_t *id, char **str)
     *str = new char[size + 1];
     if (size < 0 || *str == nullptr)
     {
-        THROW(ERR_MATROSKA_PARSE, "Memory allocation failed");
+        THROW(ERR_MATROSKA_PARSE, "Memory allocation failed")
     }
     if (static_cast<int32_t>(get_buffer(reinterpret_cast<uint8_t *>(*str), size)) != size)
     {
         const offset_t pos = m_processedBytes;
-        THROW(ERR_MATROSKA_PARSE, "Read error at pos. " << pos);
+        THROW(ERR_MATROSKA_PARSE, "Read error at pos. " << pos)
     }
     (*str)[size] = '\0';
     return 0;
@@ -241,7 +241,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
 
     if ((id = ebml_peek_id(&levelUp)) == 0 || levelUp != 0 || id != EBML_ID_HEADER)
     {
-        THROW(ERR_MATROSKA_PARSE, "This is not an EBML file (id=" << id << "/" << EBML_ID_HEADER);
+        THROW(ERR_MATROSKA_PARSE, "This is not an EBML file (id=" << id << "/" << EBML_ID_HEADER)
     }
     if ((res = ebml_read_master(&id)) < 0)
         return res;
@@ -265,7 +265,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
                 return res;
             if (num > EBML_VERSION)
             {
-                THROW(ERR_MATROSKA_PARSE, "EBML version " << num << " > " << EBML_VERSION << " is not supported");
+                THROW(ERR_MATROSKA_PARSE, "EBML version " << num << " > " << EBML_VERSION << " is not supported")
             }
             break;
         }
@@ -279,7 +279,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
                 return res;
             if (num > 8)
             {
-                THROW(ERR_MATROSKA_PARSE, "Integers of size " << num << " (> 8) not supported");
+                THROW(ERR_MATROSKA_PARSE, "Integers of size " << num << " (> 8) not supported")
             }
             break;
         }
@@ -293,7 +293,7 @@ int MatroskaDemuxer::ebml_read_header(char **doctype, int *version)
                 return res;
             if (num > 8)
             {
-                THROW(ERR_MATROSKA_PARSE, "IDs of size " << num << " (> 8) not supported");
+                THROW(ERR_MATROSKA_PARSE, "IDs of size " << num << " (> 8) not supported")
             }
             break;
         }
@@ -436,7 +436,7 @@ int MatroskaDemuxer::ebml_read_sint(uint32_t *id, int64_t *num)
     if (size < 1 || size > 8)
     {
         const offset_t pos = m_processedBytes;
-        THROW(ERR_MATROSKA_PARSE, "Invalid sint element size " << size << " at position " << pos);
+        THROW(ERR_MATROSKA_PARSE, "Invalid sint element size " << size << " at position " << pos)
     }
     if ((*num = get_byte()) & 0x80)
     {
@@ -795,7 +795,7 @@ int MatroskaDemuxer::ebml_read_uint(uint32_t *id, int64_t *num)
     const uint64_t size = rlength;
     if (size < 1 || size > 8)
     {
-        THROW(ERR_MATROSKA_PARSE, "Invalid uint element size " << size << " at position " << m_processedBytes);
+        THROW(ERR_MATROSKA_PARSE, "Invalid uint element size " << size << " at position " << m_processedBytes)
     }
 
     /* big-endian ordening; build up number */
@@ -860,7 +860,7 @@ int MatroskaDemuxer::ebml_read_master(uint32_t *id)
     /* protect... (Heaven forbids that the '>' is true) */
     if (num_levels >= EBML_MAX_DEPTH)
     {
-        THROW(ERR_MATROSKA_PARSE, "File moves beyond max. allowed depth (" << EBML_MAX_DEPTH << ")");
+        THROW(ERR_MATROSKA_PARSE, "File moves beyond max. allowed depth (" << EBML_MAX_DEPTH << ")")
     }
 
     /* remember level */
@@ -894,12 +894,12 @@ int MatroskaDemuxer::ebml_read_binary(uint32_t *id, uint8_t **binary, int *size)
     *binary = new uint8_t[*size];
     if (!(*binary))
     {
-        THROW(ERR_COMMON_MEMORY, "Memory allocation error");
+        THROW(ERR_COMMON_MEMORY, "Memory allocation error")
     }
 
     if (static_cast<int>(get_buffer(*binary, *size)) != *size)
     {
-        THROW(ERR_MATROSKA_PARSE, "Matroska parser: read error at pos " << m_processedBytes);
+        THROW(ERR_MATROSKA_PARSE, "Matroska parser: read error at pos " << m_processedBytes)
     }
     return 0;
 }
@@ -1002,7 +1002,7 @@ void MatroskaDemuxer::openFile(const std::string &streamName)
 {
     readClose();
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
-        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName)
     m_curPos = m_bufEnd = nullptr;
     m_processedBytes = 0;
     m_isEOF = false;
@@ -1055,7 +1055,7 @@ int MatroskaDemuxer::ebml_read_num(const int max_size, int64_t *number)
         /* we might encounter EOS here */
         if (!m_isEOF)
             THROW(ERR_MATROSKA_PARSE,
-                  "Matroska parse error: Invalid EBML number size " << total << " at pos " << m_processedBytes - 1);
+                  "Matroska parse error: Invalid EBML number size " << total << " at pos " << m_processedBytes - 1)
         return -BufferedReader::DATA_EOF;
     }
 
@@ -1068,7 +1068,7 @@ int MatroskaDemuxer::ebml_read_num(const int max_size, int64_t *number)
     if (read > max_size)
     {
         const offset_t pos = m_processedBytes - 1;
-        THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid EBML number size " << total << " at pos " << pos);
+        THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid EBML number size " << total << " at pos " << pos)
     }
 
     /* read out length */
@@ -1167,11 +1167,11 @@ int MatroskaDemuxer::matroska_read_header()
         return res;
     if ((doctype == nullptr) || strcmp(doctype, "matroska") != 0)
     {
-        THROW(ERR_MATROSKA_PARSE, "Wrong EBML doctype ('" << (doctype ? doctype : "(none)") << "' != 'matroska').");
+        THROW(ERR_MATROSKA_PARSE, "Wrong EBML doctype ('" << (doctype ? doctype : "(none)") << "' != 'matroska').")
     }
     if (version > 2)
     {
-        THROW(ERR_MATROSKA_PARSE, "Matroska demuxer version 2 too old for file version " << version);
+        THROW(ERR_MATROSKA_PARSE, "Matroska demuxer version 2 too old for file version " << version)
     }
 
     /* The next thing is a segment. */
@@ -1474,7 +1474,7 @@ int MatroskaDemuxer::ebml_read_float(uint32_t *id, double *num)
     else
     {
         const offset_t pos = m_processedBytes;
-        THROW(ERR_MATROSKA_PARSE, "Invalid float element size " << size << " at position " << pos);
+        THROW(ERR_MATROSKA_PARSE, "Invalid float element size " << size << " at position " << pos)
     }
     return 0;
 }
@@ -1893,7 +1893,7 @@ int MatroskaDemuxer::matroska_add_stream()
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
-        THROW(ERR_COMMON, "Too many tracks. Max supported tracks count: " << MAX_STREAMS);
+        THROW(ERR_COMMON, "Too many tracks. Max supported tracks count: " << MAX_STREAMS)
     strcpy(track->language, "eng");
 
     /* start with the master */

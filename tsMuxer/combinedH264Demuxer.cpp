@@ -121,7 +121,7 @@ CombinedH264Demuxer::CombinedH264Demuxer(const BufferedReaderManager& readManage
     m_readerID = m_bufferedReader->createReader(MAX_TMP_BUFFER_SIZE);
     if (m_bufferedReader == nullptr)
         THROW(ERR_COMMON,
-              "TS demuxer can't accept reader because this reader does not support BufferedReader interface");
+              "TS demuxer can't accept reader because this reader does not support BufferedReader interface")
     m_lastReadRez = 0;
     m_dataProcessed = 0;
 }
@@ -226,7 +226,7 @@ void CombinedH264Demuxer::openFile(const std::string& streamName)
     readClose();
 
     if (!m_bufferedReader->openStream(m_readerID, streamName.c_str()))
-        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName);
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << streamName)
 
     m_dataProcessed = 0;
 }
@@ -241,7 +241,7 @@ void CombinedH264Demuxer::setFileIterator(FileNameIterator* itr)
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
-        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
+        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.")
 }
 
 // ------------------------------ CombinedH264Filter -----------------------------------

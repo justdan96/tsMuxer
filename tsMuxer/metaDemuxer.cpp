@@ -184,7 +184,7 @@ void METADemuxer::openFile(const string& streamName)
         }
         vector<string> params = splitQuotedStr(str.c_str(), ',');
         if (params.size() < 2)
-            THROW(ERR_INVALID_CODEC_FORMAT, "Invalid codec format: " << str);
+            THROW(ERR_INVALID_CODEC_FORMAT, "Invalid codec format: " << str)
         map<string, string> addParams;
         for (unsigned i = 2; i < params.size(); i++)
         {
@@ -201,10 +201,10 @@ void METADemuxer::openFile(const string& streamName)
         file.readLine(str);
     }
 
-    H264StreamReader::SeiMethod primarySEI = H264StreamReader::SeiMethod::SEI_NotDefined;
-    for (const auto& i : m_codecInfo)
+    auto primarySEI = H264StreamReader::SeiMethod::SEI_NotDefined;
+    for (const auto& si : m_codecInfo)
     {
-        const auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
+        const auto reader = dynamic_cast<H264StreamReader*>(si.m_streamReader);
         if (reader && !reader->isSubStream())
         {
             primarySEI = reader->getInsertSEI();
@@ -212,9 +212,9 @@ void METADemuxer::openFile(const string& streamName)
         }
     }
 
-    bool warned = false;
     if (primarySEI != H264StreamReader::SeiMethod::SEI_NotDefined)
     {
+        bool warned = false;
         for (const auto& i : m_codecInfo)
         {
             const auto reader = dynamic_cast<H264StreamReader*>(i.m_streamReader);
@@ -233,7 +233,7 @@ void METADemuxer::openFile(const string& streamName)
     }
 }
 
-std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, std::string& mplsNum)
+std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, const std::string& mplsNum)
 {
     string path = toNativeSeparators(extractFilePath(mplsFileName));
     const size_t tmp = path.find_last_of(getDirSeparator());
@@ -242,16 +242,12 @@ std::string METADemuxer::mplsTrackToFullName(const std::string& mplsFileName, st
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator();
 
     const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
-    string m2tsExt;
-    if (mplsExt == "mpls")
-        m2tsExt = "m2ts";
-    else
-        m2tsExt = "mts";
+    const string m2tsExt = (mplsExt == "mpls") ? "m2ts" : "mts";
 
     return path + mplsNum + string(".") + m2tsExt;
 }
 
-std::string METADemuxer::mplsTrackToSSIFName(const std::string& mplsFileName, std::string& mplsNum)
+std::string METADemuxer::mplsTrackToSSIFName(const std::string& mplsFileName, const std::string& mplsNum)
 {
     string path = toNativeSeparators(extractFilePath(mplsFileName));
     const size_t tmp = path.find_last_of(getDirSeparator());
@@ -260,17 +256,13 @@ std::string METADemuxer::mplsTrackToSSIFName(const std::string& mplsFileName, st
     path = path.substr(0, tmp + 1) + string("STREAM") + getDirSeparator() + string("SSIF") + getDirSeparator();
 
     const string mplsExt = strToLowerCase(extractFileExt(mplsFileName));
-    string ssifExt;
-    if (mplsExt == "mpls")
-        ssifExt = "ssif";
-    else
-        ssifExt = "sif";
+    const string ssifExt = mplsExt == "mpls" ? "ssif" : "sif";
 
     return path + mplsNum + string(".") + ssifExt;
 }
 
 int METADemuxer::addPGSubStream(const string& codec, const string& _codecStreamName,
-                                const map<string, string>& addParams, MPLSStreamInfo* subStream)
+                                const map<string, string>& addParams, const MPLSStreamInfo* subStream)
 {
     map<string, string> params = addParams;
     params["track"] = int32ToStr(subStream->streamPID);
@@ -289,9 +281,9 @@ std::vector<MPLSPlayItem> METADemuxer::mergePlayItems(const std::vector<MPLSPars
     return result;
 }
 
-int METADemuxer::addStream(const string codec, const string& codecStreamName, const map<string, string>& addParams)
+int METADemuxer::addStream(const string& codec, const string& codecStreamName, const map<string, string>& addParams)
 {
-    uint32_t pid = 0;
+    int32_t pid = 0;
     auto tmpitr = addParams.find("track");
     if (tmpitr != addParams.end())
         pid = strToInt32(tmpitr->second.c_str());
@@ -330,11 +322,11 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
                     {
                         THROW(ERR_INVALID_CODEC_FORMAT,
                               "Current playlist file doesn't has MVC track info. Please, remove MVC track from the "
-                              "track list");
+                              "track list")
                     }
                     if (mplsInfo.m_mvcFiles.size() <= i)
                         THROW(ERR_INVALID_CODEC_FORMAT,
-                              "Bad playlist file: number of CLPI files for AVC and VMC parts do not match");
+                              "Bad playlist file: number of CLPI files for AVC and VMC parts do not match")
                     playItemName = mplsInfo.m_mvcFiles[i];
                 }
                 else
@@ -396,7 +388,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         for (const string& fileName : fileList)
         {
             if (!tmpFile.open(fileName.c_str(), File::ofRead))
-                THROW(ERR_INVALID_CODEC_FORMAT, "Can't open file: " << fileName.c_str());
+                THROW(ERR_INVALID_CODEC_FORMAT, "Can't open file: " << fileName.c_str())
             int64_t tmpSize = 0;
             tmpFile.size(&tmpSize);
             fileSize += tmpSize;
@@ -435,7 +427,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (pid)
             dataReader = &m_containerReader;
         else
-            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside TS/M2TS container need track parameter.");
+            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside TS/M2TS container need track parameter.")
         if (listIterator)
             dynamic_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".ts"))
@@ -448,7 +440,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (pid)
             dataReader = &m_containerReader;
         else
-            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MPG/VOB/EVO container need track parameter.");
+            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MPG/VOB/EVO container need track parameter.")
         if (listIterator)
             dynamic_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         if (strEndWith(tmpname, ".evo") || strEndWith(tmpname, ".evo\""))
@@ -461,7 +453,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (pid)
             dataReader = &m_containerReader;
         else
-            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MKV container need track parameter.");
+            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MKV container need track parameter.")
         if (listIterator)
             dynamic_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMKV);
@@ -472,7 +464,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
         if (pid)
             dataReader = &m_containerReader;
         else
-            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MOV/MP4 container need track parameter.");
+            THROW(ERR_INVALID_CODEC_FORMAT, "For streams inside MOV/MP4 container need track parameter.")
         if (listIterator)
             dynamic_cast<ContainerToReaderWrapper*>(dataReader)->setFileIterator(fileList[0].c_str(), listIterator);
         codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctMOV);
@@ -484,7 +476,7 @@ int METADemuxer::addStream(const string codec, const string& codecStreamName, co
     if (dataReader == nullptr)
     {
         delete codecReader;
-        THROW(ERR_INVALID_CODEC_FORMAT, "This version do not support multicast or other network steams for muxing");
+        THROW(ERR_INVALID_CODEC_FORMAT, "This version do not support multicast or other network steams for muxing")
     }
 
     m_codecInfo.emplace_back(dataReader, codecReader, fileList[0], codecStreamName, pid, isSubStream);
@@ -610,7 +602,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
 
     if (demuxer)
     {
-        int fileBlockSize = demuxer->getFileBlockSize();
+        uint32_t fileBlockSize = demuxer->getFileBlockSize();
 
         demuxer->openFile(fileName);
         int64_t discardedSize = 0;
@@ -647,12 +639,14 @@ DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManag
                     trackRez.lang = clpiStream->second.language_code;
             }
             // correct ISO 639-2/B codes to ISO 639-2/T
-            std::string langB[24] = {"alb", "arm", "baq", "bur", "cze", "chi", "dut", "ger",
-                                     "gre", "fre", "geo", "ice", "jaw", "mac", "mao", "may",
-                                     "mol", "per", "rum", "scc", "scr", "slo", "tib", "wel"};
-            std::string langT[24] = {"sqi", "hye", "eus", "mya", "ces", "zho", "nld", "deu",
-                                     "ell", "fra", "kat", "isl", "jav", "mkd", "mri", "fas",
-                                     "rom", "msa", "ron", "srp", "hrv", "slk", "bod", "cym"};
+            static const std::string langB[24] = {
+                "alb", "arm", "baq", "bur", "cze", "chi", "dut", "ger", "gre", "fre", "geo", "ice",
+                "jaw", "mac", "mao", "may", "mol", "per", "rum", "scc", "scr", "slo", "tib", "wel",
+            };
+            static const std::string langT[24] = {
+                "sqi", "hye", "eus", "mya", "ces", "zho", "nld", "deu", "ell", "fra", "kat", "isl",
+                "jav", "mkd", "mri", "fas", "rom", "msa", "ron", "srp", "hrv", "slk", "bod", "cym",
+            };
             for (int i = 0; i < 24; i++)
                 if (trackRez.lang == langB[i])
                     trackRez.lang = langT[i];
@@ -1089,13 +1083,13 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                 animation.fadeOutDuration = strToFloat(addParam.second.c_str());
         }
         if (srtWidth == 0 || srtHeight == 0 || fps == 0.0)
-            THROW(ERR_COMMON, "video-width, video-height and fps parameters MUST be provided for SRT tracks");
+            THROW(ERR_COMMON, "video-width, video-height and fps parameters MUST be provided for SRT tracks")
         srtReader->setVideoInfo(srtWidth, srtHeight, fps);
         srtReader->setFont(font);
         srtReader->setAnimation(animation);
     }
     else
-        THROW(ERR_UNKNOWN_CODEC, "Unsupported codec " << codecName);
+        THROW(ERR_UNKNOWN_CODEC, "Unsupported codec " << codecName)
 
     if (codecName[0] == 'A')
     {
@@ -1115,7 +1109,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
                 if (dSecond != 0.0)
                     stretch = dFirst / dSecond;
                 else
-                    THROW(ERR_COMMON, "Second argument at stretch parameter can not be 0");
+                    THROW(ERR_COMMON, "Second argument at stretch parameter can not be 0")
             }
             if (itr != addParams.end())
                 dynamic_cast<SimplePacketizerReader*>(rez)->setStretch(stretch);
@@ -1163,7 +1157,7 @@ std::vector<MPLSParser> METADemuxer::getMplsInfo(const string& mplsFileName)
         {
             MPLSParser parser;
             if (!parser.parse(unquoteStr(i).c_str()))
-                THROW(ERR_COMMON, "Can't parse play list file " << i);
+                THROW(ERR_COMMON, "Can't parse play list file " << i)
             m_mplsStreamMap[i] = parser;
             result.push_back(parser);
         }
@@ -1346,7 +1340,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
                         THROW(ERR_CONTAINER_STREAM_NOT_SYNC,
                               "Reading buffer overflow. Possible container streams are not syncronized. Please, verify "
                               "stream fps. File name: "
-                                  << demuxerData.m_streamName);
+                                  << demuxerData.m_streamName)
                 }
             }
             m_discardedSize += discardSize;
@@ -1449,7 +1443,7 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
             m_demuxers[streamName].m_streamName = streamName;
         }
         else
-            THROW(ERR_UNSUPPORTER_CONTAINER_FORMAT, "Unsupported container format: " << streamName);
+            THROW(ERR_UNSUPPORTER_CONTAINER_FORMAT, "Unsupported container format: " << streamName)
         demuxer->setFileIterator(m_demuxers[streamName].m_iterator);
 
         demuxer->openFile(streamName);
@@ -1458,14 +1452,14 @@ bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamN
     if (SubTrackFilter::isSubTrack(pid))
     {
         if (!demuxer || !demuxer->isPidFilterSupported())
-            THROW(ERR_INVALID_CODEC_FORMAT, "Unsupported parameter subTrack for format " << extractFileExt(streamName));
+            THROW(ERR_INVALID_CODEC_FORMAT, "Unsupported parameter subTrack for format " << extractFileExt(streamName))
         int srcPID = pid >> 16;
         if (demuxer->getPidFilter(srcPID) == nullptr)
         {
             if (codecInfo->codecID == CODEC_V_MPEG4_H264 || codecInfo->codecID == CODEC_V_MPEG4_H264_DEP)
                 demuxer->setPidFilter(srcPID, new CombinedH264Filter(srcPID));
             else
-                THROW(ERR_INVALID_CODEC_FORMAT, "Unsupported parameter subTrack for codec " << codecInfo->displayName);
+                THROW(ERR_INVALID_CODEC_FORMAT, "Unsupported parameter subTrack for codec " << codecInfo->displayName)
         }
     }
 

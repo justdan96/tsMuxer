@@ -54,7 +54,7 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : Parsed
     catch (BitStreamException& e)
     {
         (void)e;
-        THROW(ERR_MATROSKA_PARSE, "Can't parse H.264 private data");
+        THROW(ERR_MATROSKA_PARSE, "Can't parse H.264 private data")
     }
 };
 
@@ -134,7 +134,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         else if (m_nalSize == 2)
             elSize = (curPos[0] << 8l) + curPos[1];
         else
-            THROW(ERR_COMMON, "Unsupported nal unit size " << elSize);
+            THROW(ERR_COMMON, "Unsupported nal unit size " << elSize)
         elements++;
         curPos += elSize + m_nalSize;
     }
@@ -166,7 +166,7 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         else if (m_nalSize == 2)
             elSize = (curPos[0] << 8l) + curPos[1];
         else
-            THROW(ERR_COMMON, "Unsupported nal unit size " << elSize);
+            THROW(ERR_COMMON, "Unsupported nal unit size " << elSize)
         writeNalHeader(dst);
         assert((curPos[m_nalSize] & 0x80) == 0);
         memcpy(dst, curPos + m_nalSize, FFMIN(elSize, (uint32_t)(end - curPos)));
@@ -252,7 +252,7 @@ static constexpr int MS_BIT_MAP_HEADER_SIZE = 40;
 ParsedVC1TrackData::ParsedVC1TrackData(uint8_t* buff, const int size) : ParsedTrackPrivData(buff, size)
 {
     if (size < MS_BIT_MAP_HEADER_SIZE)
-        THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid or unsupported VC-1 stream");
+        THROW(ERR_MATROSKA_PARSE, "Matroska parse error: Invalid or unsupported VC-1 stream")
     const uint8_t* curBuf = buff + MS_BIT_MAP_HEADER_SIZE;
     const uint8_t dataLen = *curBuf++;
     for (int i = 0; i < dataLen; i++) m_seqHeader.push_back(*curBuf++);

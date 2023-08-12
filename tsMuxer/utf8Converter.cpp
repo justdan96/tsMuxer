@@ -25,7 +25,7 @@ auto make_vector(const uint8_t *start, size_t numBytes, F func) -> std::vector<d
     const auto elem_size = sizeof(typename decltype(rv)::value_type);
     if (numBytes % elem_size)
     {
-        THROW(ERR_COMMON, "Cannot convert string : size " << numBytes << " should be divisible by " << elem_size);
+        THROW(ERR_COMMON, "Cannot convert string : size " << numBytes << " should be divisible by " << elem_size)
     }
     rv.reserve(numBytes);
     const auto end = (start + numBytes);
@@ -50,7 +50,7 @@ std::string from_utf_nn(std::vector<InputType> &&vec, F conversionFn)
     auto result = conversionFn(&sourceStart, sourceEnd, &targetStart_out, targetEnd, ConversionFlags::strictConversion);
     if (result != ConversionResult::conversionOK)
     {
-        THROW(ERR_COMMON, "Cannot convert string : invalid source text");
+        THROW(ERR_COMMON, "Cannot convert string : invalid source text")
     }
     rv.resize(targetStart_out - targetStart);
     return rv;
@@ -80,7 +80,7 @@ std::string toUtf8(const uint8_t *start, const size_t numBytes, const SourceForm
     }
 #endif
     default:
-        THROW(ERR_COMMON, "Unknown parameter to UtfConverter::toUtf8");
+        THROW(ERR_COMMON, "Unknown parameter to UtfConverter::toUtf8")
     }
 }
 }  // namespace UtfConverter

@@ -79,7 +79,7 @@ string VC1SequenceHeader::getStreamDescr() const
     default:
         rez << "Unknown";
         break;
-    };
+    }
     rez << " Resolution: " << coded_width << ':' << coded_height;
     rez << (interlace ? 'i' : 'p') << "  ";
     rez << "Frame rate: ";
@@ -120,7 +120,7 @@ void VC1SequenceHeader::setFPS(const double value)
         }
         else
             THROW(ERR_VC1_ERR_FPS,
-                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
+                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
 
         switch (time_scale)
         {
@@ -141,7 +141,7 @@ void VC1SequenceHeader::setFPS(const double value)
             break;
         default:
             THROW(ERR_VC1_ERR_FPS,
-                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams");
+                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
         }
         const int dr = (num_units_in_tick == 1000) ? 1 : 2;
 

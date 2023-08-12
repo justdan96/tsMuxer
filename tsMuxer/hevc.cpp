@@ -860,7 +860,7 @@ vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, in
     for (int i = 0; i < num_arrays; ++i)
     {
         if (src + 3 > end)
-            THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format");
+            THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format")
         src++;  // type
         int cnt = AV_RB16(src);
         src += 2;
@@ -868,11 +868,11 @@ vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, in
         for (int j = 0; j < cnt; ++j)
         {
             if (src + 2 > end)
-                THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format")
             int nalSize = (src[0] << 8) + src[1];
             src += 2;
             if (src + nalSize > end)
-                THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format");
+                THROW(ERR_MOV_PARSE, "Invalid HEVC extra data format")
             if (nalSize > 0)
             {
                 spsPps.emplace_back();

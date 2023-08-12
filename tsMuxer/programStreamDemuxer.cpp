@@ -32,7 +32,7 @@ void ProgramStreamDemuxer::setFileIterator(FileNameIterator* itr)
     if (br)
         br->setFileIterator(itr, m_readerID);
     else if (itr != nullptr)
-        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.");
+        THROW(ERR_COMMON, "Can not set file iterator. Reader does not support bufferedReader interface.")
 }
 
 ProgramStreamDemuxer::~ProgramStreamDemuxer() { m_bufferedReader->deleteReader(m_readerID); }
@@ -47,7 +47,7 @@ void ProgramStreamDemuxer::openFile(const std::string& streamName)
     readClose();
     // BufferedFileReader* fileReader = dynamic_cast <BufferedFileReader*> (m_bufferedReader);
     if (!m_bufferedReader->openStream(m_readerID, m_streamName.c_str()))
-        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName);
+        THROW(ERR_FILE_NOT_FOUND, "Can't open stream " << m_streamName)
     m_dataProcessed = 0;
 }
 
@@ -61,7 +61,7 @@ int ProgramStreamDemuxer::mpegps_psm_parse(const uint8_t* buff, const uint8_t* e
     if (psm_length > MAX_PES_HEADER_SIZE)
     {
         THROW(ERR_COMMON,
-              "Can't parse Program Stream Map. Too large size " << psm_length << ". Max allowed size 1018 bytes.");
+              "Can't parse Program Stream Map. Too large size " << psm_length << ". Max allowed size 1018 bytes.")
     }
     if (end - buff < psm_length + 7)
         return -1;

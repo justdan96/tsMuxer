@@ -131,7 +131,7 @@ uint8_t TextToPGSConverter::color32To8(const uint32_t* buff, const uint32_t colo
             }
             // find nearest color
             // if (m_paletteYUV.size() >= 256)
-            THROW(ERR_COMMON, "Can't transform image to YUV: too many colors are used.");
+            THROW(ERR_COMMON, "Can't transform image to YUV: too many colors are used.")
             // return m_paletteYUV[yuv];
         }
         return itr->second;
@@ -286,7 +286,7 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
                 *curPtr++ = 0;  // end of line signal
                 if (curPtr >= dstLineEnd)
                 {
-                    THROW(ERR_COMMON, "Not enough RLE buffer for encoding picture (RLE line length > width + 16)");
+                    THROW(ERR_COMMON, "Not enough RLE buffer for encoding picture (RLE line length > width + 16)")
                 }
             }
             if (!isEmptyLine)

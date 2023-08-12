@@ -127,7 +127,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             {
                 if (m_bufEnd - frame > DEFAULT_FILE_BLOCK_SIZE)
                     THROW(ERR_COMMON,
-                          getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.");
+                          getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.")
                 memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
                 m_tmpBufferLen = m_bufEnd - m_curPos;
                 m_curPos = m_bufEnd;
@@ -161,7 +161,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         {
             if (m_bufEnd - m_curPos > DEFAULT_FILE_BLOCK_SIZE)
                 THROW(ERR_COMMON,
-                      getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.");
+                      getCodecInfo().displayName << " stream (track " << m_streamIndex << "): invalid stream.")
             memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
             m_tmpBufferLen = m_bufEnd - m_curPos;
             m_curPos = m_bufEnd;
@@ -187,7 +187,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
         avPacket.data = m_curPos;
         avPacket.data += skipBeforeBytes;
         if (frameLen > MAX_AV_PACKET_SIZE)
-            THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.");
+            THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.")
         avPacket.size = frameLen;
         if (isPriorityData(&avPacket))
             avPacket.flags |= AVPacket::PRIORITY_DATA;

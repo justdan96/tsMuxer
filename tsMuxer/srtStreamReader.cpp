@@ -42,7 +42,7 @@ void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool las
     const int parsedLen = parseText(dataBegin, dataLen + static_cast<int>(m_tmpBuffer.size()));
     const int rest = dataLen + static_cast<int>(m_tmpBuffer.size()) - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
-        THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)");
+        THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)")
     m_tmpBuffer.resize(rest);
     if (rest > 0)
         memmove(m_tmpBuffer.data(), dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
@@ -212,7 +212,7 @@ uint8_t* SRTStreamReader::renderNextMessage(uint32_t& renderedLen)
     if (m_state == ParseState::PARSE_TIME)
     {
         if (!parseTime(m_sourceText.front()))
-            THROW(ERR_COMMON, "Invalid SRT format. \"" << m_sourceText.front().c_str() << "\" is invalid timing info");
+            THROW(ERR_COMMON, "Invalid SRT format. \"" << m_sourceText.front().c_str() << "\" is invalid timing info")
         m_state = ParseState::PARSE_TEXT;
         m_sourceText.pop();
         m_processedSize += m_origSize.front();

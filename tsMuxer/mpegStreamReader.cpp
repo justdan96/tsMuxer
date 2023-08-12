@@ -23,7 +23,7 @@ void MPEGStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool la
 
     if (m_tmpBufferLen + dataLen > TMP_BUFFER_SIZE)
         THROW(ERR_COMMON_SMALL_BUFFER,
-              "Not enough buffer for parse video stream. Current frame num " << m_totalFrameNum);
+              "Not enough buffer for parse video stream. Current frame num " << m_totalFrameNum)
     memcpy(m_tmpBuffer + m_tmpBufferLen, data + MAX_AV_PACKET_SIZE, dataLen);
     m_tmpBufferLen += dataLen;
 

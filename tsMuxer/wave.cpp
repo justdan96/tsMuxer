@@ -94,7 +94,7 @@ void toLittleEndian(uint8_t* dstData, uint8_t* srcData, const int size, const in
     }
     else
     {
-        THROW(ERR_WAV_PARSE, "Unsupported LPCM big depth " << bitdepth << " for /LIT codec");
+        THROW(ERR_WAV_PARSE, "Unsupported LPCM big depth " << bitdepth << " for /LIT codec")
     }
 }
 

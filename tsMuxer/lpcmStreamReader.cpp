@@ -407,18 +407,18 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
 
         m_channels = waveFormatPCMEx->nChannels;
         if (m_channels > 8)
-            THROW(ERR_COMMON, "Too many channels: " << m_channels << ". Maximum supported value is 8(7.1)");
+            THROW(ERR_COMMON, "Too many channels: " << m_channels << ". Maximum supported value is 8(7.1)")
         if (m_channels == 0)
-            THROW(ERR_COMMON, "Invalid channels count: 0. WAVE header is invalid.");
+            THROW(ERR_COMMON, "Invalid channels count: 0. WAVE header is invalid.")
         m_freq = waveFormatPCMEx->nSamplesPerSec;
         if (m_freq != 48000 && m_freq != 96000 && m_freq != 192000)
             THROW(ERR_COMMON, "Sample rate "
                                   << m_freq
-                                  << " is not supported for LPCM format. Allowed values: 48000, 96000, 192000");
+                                  << " is not supported for LPCM format. Allowed values: 48000, 96000, 192000")
         m_bitsPerSample = waveFormatPCMEx->wBitsPerSample;
         if (m_bitsPerSample != 16 && m_bitsPerSample != 20 && m_bitsPerSample != 24)
             THROW(ERR_COMMON, "Bit depth " << m_bitsPerSample
-                                           << " is not supported for LPCM format. Allowed values: 16bit, 20bit, 24bit");
+                                           << " is not supported for LPCM format. Allowed values: 16bit, 20bit, 24bit")
         m_lfeExists = false;
         if (waveFormatPCMEx->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
         {
@@ -426,7 +426,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
                 m_bitsPerSample = waveFormatPCMEx->Samples.wValidBitsPerSample;
             m_lfeExists = waveFormatPCMEx->dwChannelMask & SPEAKER_LOW_FREQUENCY;
             if (!(waveFormatPCMEx->SubFormat == KSDATAFORMAT_SUBTYPE_PCM))
-                THROW(ERR_COMMON, "Unsupported WAVE format. Only PCM audio is supported.");
+                THROW(ERR_COMMON, "Unsupported WAVE format. Only PCM audio is supported.")
         }
         else if (waveFormatPCMEx->wFormatTag == 0x01)
         {  // standard format
@@ -627,7 +627,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
         if (m_firstFrame)
         {
             if (dstEnd - dstBuffer < sizeof(WAVEFORMATPCMEX) + 8)
-                THROW(ERR_COMMON, "LPCM stream error: Not enough buffer for writing headers");
+                THROW(ERR_COMMON, "LPCM stream error: Not enough buffer for writing headers")
             // write wave header
             // memcpy(curPos, "RIFF\x00\x00\x00\x00WAVEfmt_\x00\x00\x00\x00", 20);
             memcpy(curPos, "RIFF\xff\xff\xff\xffWAVEfmt ", 16);
@@ -820,7 +820,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
     if (m_curChunkLen)
         m_curChunkLen -= frameLen;
     if (frameLen > MAX_AV_PACKET_SIZE)
-        THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.");
+        THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.")
     avPacket.size = frameLen;
     avPacket.duration = static_cast<int64_t>(getFrameDuration());  // m_ptsIncPerFrame;
     m_curPts += avPacket.duration;

@@ -198,7 +198,7 @@ void MuxerManager::checkTrackList(const vector<StreamInfo>& ci) const
     }
     if (!avcFound && mvcFound)
         THROW(ERR_INVALID_STREAMS_SELECTED,
-              "Fatal error: MVC depended view track can't be muxed without AVC base view track");
+              "Fatal error: MVC depended view track can't be muxed without AVC base view track")
 }
 
 void MuxerManager::doMux(const string& outFileName, FileFactory* fileFactory)

@@ -32,7 +32,7 @@ class TextFile : public File
                 line += ch;
             else
                 break;
-        };
+        }
         return readCnt == 1 || !line.empty();
     }
     bool writeLine(const std::string& line)
