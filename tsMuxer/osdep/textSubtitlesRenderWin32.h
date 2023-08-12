@@ -8,7 +8,7 @@ namespace text_subtitles
 {
 class GdiPlusPriv;
 
-class TextSubtitlesRenderWin32 : public TextSubtitlesRender
+class TextSubtitlesRenderWin32 final : public TextSubtitlesRender
 {
    public:
     TextSubtitlesRenderWin32();

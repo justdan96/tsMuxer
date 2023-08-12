@@ -89,7 +89,7 @@ class MPEGRawDataHeader : public MPEGHeader
     // buffer for general copying into the output stream
 };
 
-class MPEGSequenceHeader : public MPEGRawDataHeader
+class MPEGSequenceHeader final : public MPEGRawDataHeader
 {
    public:
     int width;
@@ -143,7 +143,7 @@ class MPEGSequenceHeader : public MPEGRawDataHeader
     std::string getStreamDescr();
 };
 
-class MPEGGOPHeader : public MPEGHeader
+class MPEGGOPHeader final : public MPEGHeader
 {
    public:
     MPEGGOPHeader();
@@ -170,7 +170,7 @@ enum class PictureCodingType
     D_FRAME
 };
 
-class MPEGPictureHeader : public MPEGRawDataHeader
+class MPEGPictureHeader final : public MPEGRawDataHeader
 {
    public:
     uint16_t ref;
@@ -235,7 +235,7 @@ class MPEGPictureHeader : public MPEGRawDataHeader
     void buildCodingExtension();
 };
 
-class MPEGSliceHeader : public MPEGHeader
+class MPEGSliceHeader final : public MPEGHeader
 {
    public:
     static void deserialize(uint8_t* buf, int buf_size);
@@ -245,7 +245,7 @@ class MPEGSliceHeader : public MPEGHeader
     static int readMacroblockAddressIncrement(BitStreamReader& reader);
 };
 
-class MPEGUserDataHeader : public MPEGHeader
+class MPEGUserDataHeader final : public MPEGHeader
 {
 };
 

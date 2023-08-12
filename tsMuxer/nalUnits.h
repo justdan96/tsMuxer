@@ -104,7 +104,7 @@ class NALUnit
     void updateBits(int bitOffset, int bitLen, unsigned value) const;
 };
 
-class NALDelimiter : public NALUnit
+class NALDelimiter final : public NALUnit
 {
    public:
     static constexpr int PCT_I_FRAMES = 0;
@@ -115,6 +115,7 @@ class NALDelimiter : public NALUnit
     static constexpr int PCT_I_SI_FRAMES = 5;
     static constexpr int PCT_I_SI_P_SP_FRAMES = 6;
     static constexpr int PCT_I_SI_P_SP_B_FRAMES = 7;
+
     int primary_pic_type;
     NALDelimiter() : primary_pic_type(0) {}
     int deserialize(uint8_t* buffer, uint8_t* end) override;
@@ -330,7 +331,7 @@ class SEIUnit final : public NALUnit
     static int getNumClockTS(int pic_struct);
 };
 
-class SliceUnit : public NALUnit
+class SliceUnit final : public NALUnit
 {
    public:
     enum SliceType

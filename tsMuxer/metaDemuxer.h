@@ -81,7 +81,7 @@ enum class DemuxerReadPolicy
 
 class METADemuxer;
 
-class ContainerToReaderWrapper : public AbstractReader
+class ContainerToReaderWrapper final : public AbstractReader
 {
    public:
     struct DemuxerData
@@ -108,11 +108,12 @@ class ContainerToReaderWrapper : public AbstractReader
     struct ReaderInfo
     {
         ReaderInfo(DemuxerData& demuxerData, const uint32_t pid) : m_demuxerData(demuxerData), m_pid(pid) {}
+
         DemuxerData& m_demuxerData;
         uint32_t m_pid;
     };
 
-    ContainerToReaderWrapper(const METADemuxer& owner, BufferedReaderManager& readManager)
+    ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
         : m_readBuffOffset(0), m_readManager(readManager), m_owner(owner)
     {
         const auto& brm = const_cast<BufferedReaderManager&>(readManager);
@@ -142,7 +143,7 @@ class ContainerToReaderWrapper : public AbstractReader
     int64_t m_discardedSize;
     int m_readerCnt;
     size_t m_readBuffOffset;
-    BufferedReaderManager& m_readManager;
+    const BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
     const METADemuxer& m_owner;
     bool m_terminated;
@@ -159,10 +160,10 @@ struct DetectStreamRez
     int64_t fileDurationNano;
 };
 
-class METADemuxer : public AbstractDemuxer
+class METADemuxer final : public AbstractDemuxer
 {
    public:
-    METADemuxer(BufferedReaderManager& readManager);
+    METADemuxer(const BufferedReaderManager& readManager);
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
     void readClose() final;
@@ -171,7 +172,7 @@ class METADemuxer : public AbstractDemuxer
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
     const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
-    static DetectStreamRez DetectStreamReader(BufferedReaderManager& readManager, const std::string& fileName,
+    static DetectStreamRez DetectStreamReader(const BufferedReaderManager& readManager, const std::string& fileName,
                                               bool calcDuration);
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
     int getLastReadRez() override { return m_lastReadRez; }

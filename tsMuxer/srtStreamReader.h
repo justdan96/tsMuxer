@@ -10,7 +10,7 @@
 #include "textSubtitles.h"
 #include "utf8Converter.h"
 
-class SRTStreamReader : public AbstractStreamReader
+class SRTStreamReader final : public AbstractStreamReader
 {
    public:
     SRTStreamReader();

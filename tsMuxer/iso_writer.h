@@ -275,7 +275,7 @@ class IsoWriter
     int m_layerBreakPoint;  // in sectors
 };
 
-class ISOFile : public AbstractOutputStream
+class ISOFile final : public AbstractOutputStream
 {
    public:
     ISOFile(IsoWriter* owner) : AbstractOutputStream(), m_owner(owner), m_entry(nullptr) {}

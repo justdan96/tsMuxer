@@ -12,7 +12,7 @@
 
 namespace text_subtitles
 {
-class TextSubtitlesRenderFT : public TextSubtitlesRender
+class TextSubtitlesRenderFT final : public TextSubtitlesRender
 {
    public:
     TextSubtitlesRenderFT();

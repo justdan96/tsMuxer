@@ -139,7 +139,7 @@ struct AdaptiveField
         const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         *pcr = my_htonl(static_cast<uint32_t>(value >> 1));
         const auto pcrLo = reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
-        pcrLo[0] = ((static_cast<uint8_t>(value) & 1) << 7) + 0x7e;
+        pcrLo[0] = static_cast<uint8_t>((value & 1) << 7 | 0x7e);
         pcrLo[1] = 0;  // 41-42 bits of pcr
     }
 };
@@ -224,7 +224,7 @@ struct PMTIndexData
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;
 
-struct PMTStreamInfo
+struct PMTStreamInfo final
 {
     PMTStreamInfo()
         : m_streamType(),

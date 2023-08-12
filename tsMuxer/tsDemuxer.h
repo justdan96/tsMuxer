@@ -12,7 +12,7 @@
 #include "tsPacket.h"
 
 // typedef StreamReaderMap std::map<int, AbstractStreamReader*>;
-class TSDemuxer : public AbstractDemuxer
+class TSDemuxer final : public AbstractDemuxer
 {
    public:
     TSDemuxer(const BufferedReaderManager& readManager, const char* streamName);

@@ -157,7 +157,7 @@ struct MOVStreamContext : Track
     vector<MOVStts> ctts_data;
 };
 
-class MovParsedAudioTrackData : public ParsedTrackPrivData
+class MovParsedAudioTrackData final : public ParsedTrackPrivData
 {
    public:
     MovParsedAudioTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)
@@ -361,7 +361,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     int nal_length_size;
 };
 
-class MovParsedH265TrackData : public MovParsedH264TrackData
+class MovParsedH265TrackData final : public MovParsedH264TrackData
 {
    public:
     MovParsedH265TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : MovParsedH264TrackData(demuxer, sc) {}
@@ -372,7 +372,7 @@ class MovParsedH265TrackData : public MovParsedH264TrackData
     }
 };
 
-class MovParsedH266TrackData : public MovParsedH264TrackData
+class MovParsedH266TrackData final : public MovParsedH264TrackData
 {
    public:
     MovParsedH266TrackData(MovDemuxer* demuxer, MOVStreamContext* sc) : MovParsedH264TrackData(demuxer, sc) {}
@@ -383,7 +383,7 @@ class MovParsedH266TrackData : public MovParsedH264TrackData
     }
 };
 
-class MovParsedSRTTrackData : public ParsedTrackPrivData
+class MovParsedSRTTrackData final : public ParsedTrackPrivData
 {
    public:
     MovParsedSRTTrackData(MovDemuxer* demuxer, MOVStreamContext* sc)

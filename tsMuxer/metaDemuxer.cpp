@@ -36,7 +36,7 @@ using namespace std;
 static constexpr int MAX_DEMUX_BUFFER_SIZE = 1024 * 1024 * 192;
 static constexpr int MIN_READED_BLOCK = 16384;
 
-METADemuxer::METADemuxer(BufferedReaderManager& readManager)
+METADemuxer::METADemuxer(const BufferedReaderManager& readManager)
     : m_containerReader(*this, readManager), m_readManager(readManager)
 {
     m_flushDataMode = false;
@@ -554,7 +554,7 @@ void METADemuxer::readClose()
     m_codecInfo.clear();
 }
 
-DetectStreamRez METADemuxer::DetectStreamReader(BufferedReaderManager& readManager, const string& fileName,
+DetectStreamRez METADemuxer::DetectStreamReader(const BufferedReaderManager& readManager, const string& fileName,
                                                 bool calcDuration)
 {
     AVChapters chapters;

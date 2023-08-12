@@ -29,7 +29,7 @@ class loglevel
 //			LogStream class declaration
 //------------------------------------------------------------------------------------
 // This class is thread-safe
-class LogStream : public AlternativeFileStream
+class LogStream final : public AlternativeFileStream
 {
    public:
     static constexpr uint32_t MessageLevel = 0x01;

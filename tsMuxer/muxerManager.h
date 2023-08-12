@@ -8,7 +8,7 @@
 
 class FileFactory;
 
-class MuxerManager
+class MuxerManager final
 {
    public:
     static constexpr uint32_t PHYSICAL_SECTOR_SIZE =

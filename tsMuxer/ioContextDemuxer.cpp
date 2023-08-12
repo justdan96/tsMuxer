@@ -135,11 +135,11 @@ unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
     return static_cast<uint32_t>(dst - binary);
 }
 
-void IOContextDemuxer::skip_bytes(const uint64_t size)
+void IOContextDemuxer::skip_bytes(const int64_t size)
 {
     uint32_t readedBytes = 0;
     int readRez = 0;
-    uint64_t skipLeft = size;
+    int64_t skipLeft = size;
     if (m_curPos < m_bufEnd)
     {
         const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);

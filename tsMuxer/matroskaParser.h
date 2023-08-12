@@ -226,7 +226,7 @@ class ParsedH264TrackData : public ParsedTrackPrivData
     virtual bool spsppsExists(uint8_t* buff, int size);
 };
 
-class ParsedH265TrackData : public ParsedH264TrackData
+class ParsedH265TrackData final : public ParsedH264TrackData
 {
    public:
     ParsedH265TrackData(const uint8_t* buff, int size);
@@ -235,7 +235,7 @@ class ParsedH265TrackData : public ParsedH264TrackData
     bool spsppsExists(uint8_t* buff, int size) override;
 };
 
-class ParsedH266TrackData : public ParsedH264TrackData
+class ParsedH266TrackData final : public ParsedH264TrackData
 {
    public:
     ParsedH266TrackData(const uint8_t* buff, int size);
@@ -244,7 +244,7 @@ class ParsedH266TrackData : public ParsedH264TrackData
     bool spsppsExists(uint8_t* buff, int size) override;
 };
 
-class ParsedAC3TrackData : public ParsedTrackPrivData
+class ParsedAC3TrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedAC3TrackData(uint8_t* buff, int size);
@@ -256,7 +256,7 @@ class ParsedAC3TrackData : public ParsedTrackPrivData
     bool m_shortHeaderMode;
 };
 
-class ParsedAACTrackData : public ParsedTrackPrivData
+class ParsedAACTrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedAACTrackData(uint8_t* buff, int size);
@@ -267,7 +267,7 @@ class ParsedAACTrackData : public ParsedTrackPrivData
     AACCodec m_aacRaw;
 };
 
-class ParsedLPCMTrackData : public ParsedTrackPrivData
+class ParsedLPCMTrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedLPCMTrackData(MatroskaTrack* track);
@@ -281,7 +281,7 @@ class ParsedLPCMTrackData : public ParsedTrackPrivData
     MemoryBlock m_waveBuffer;
 };
 
-class ParsedSRTTrackData : public ParsedTrackPrivData
+class ParsedSRTTrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedSRTTrackData(uint8_t* buff, int size);
@@ -292,7 +292,7 @@ class ParsedSRTTrackData : public ParsedTrackPrivData
     int m_packetCnt;
 };
 
-class ParsedVC1TrackData : public ParsedTrackPrivData
+class ParsedVC1TrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedVC1TrackData(uint8_t* buff, int size);
@@ -304,7 +304,7 @@ class ParsedVC1TrackData : public ParsedTrackPrivData
     bool m_firstPacket;
 };
 
-class ParsedPGTrackData : public ParsedTrackPrivData
+class ParsedPGTrackData final : public ParsedTrackPrivData
 {
    public:
     ParsedPGTrackData() = default;

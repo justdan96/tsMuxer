@@ -10,7 +10,7 @@
 #include "textSubtitles.h"
 #include "textSubtitlesRender.h"
 
-class PGSStreamReader : public AbstractStreamReader
+class PGSStreamReader final : public AbstractStreamReader
 {
    public:
     struct BitmapInfo

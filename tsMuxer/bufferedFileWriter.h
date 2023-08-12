@@ -31,7 +31,7 @@ struct WriterData
     void execute() const;
 };
 
-class BufferedFileWriter : public TerminatableThread
+class BufferedFileWriter final : public TerminatableThread
 {
    public:
     BufferedFileWriter();

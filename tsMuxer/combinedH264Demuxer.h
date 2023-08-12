@@ -43,7 +43,7 @@ class CombinedH264Reader
     int m_demuxedPID;
 };
 
-class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
+class CombinedH264Demuxer final : public AbstractDemuxer, public CombinedH264Reader
 {
    public:
     CombinedH264Demuxer(const BufferedReaderManager& readManager, const char* streamName);
@@ -66,7 +66,7 @@ class CombinedH264Demuxer : public AbstractDemuxer, public CombinedH264Reader
     int64_t m_dataProcessed;
 };
 
-class CombinedH264Filter : public SubTrackFilter, public CombinedH264Reader
+class CombinedH264Filter final : public SubTrackFilter, public CombinedH264Reader
 {
    public:
     CombinedH264Filter(int demuxedPID);

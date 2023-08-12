@@ -30,7 +30,7 @@ extern bool is4K();
 
 static constexpr int MAX_PES_HEADER_LEN = 512;
 
-class TSMuxer : public AbstractMuxer
+class TSMuxer final : public AbstractMuxer
 {
     typedef AbstractMuxer base_class;
 
@@ -222,7 +222,7 @@ class TSMuxer : public AbstractMuxer
 #endif
 };
 
-class TSMuxerFactory : public AbstractMuxerFactory
+class TSMuxerFactory final : public AbstractMuxerFactory
 {
    public:
     AbstractMuxer* newInstance(MuxerManager* owner) const override { return new TSMuxer(owner); }

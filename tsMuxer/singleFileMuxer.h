@@ -55,7 +55,7 @@ class SingleFileMuxer final : public AbstractMuxer
     void writeOutBuffer(StreamInfo* streamInfo);
 };
 
-class SingleFileMuxerFactory : public AbstractMuxerFactory
+class SingleFileMuxerFactory final : public AbstractMuxerFactory
 {
    public:
     AbstractMuxer* newInstance(MuxerManager* owner) const override { return new SingleFileMuxer(owner); }

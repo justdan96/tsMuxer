@@ -13,7 +13,7 @@ class TSMuxer;
 class AbstractOutputStream;
 class MuxerManager;
 
-class BlurayHelper : public FileFactory
+class BlurayHelper final : public FileFactory
 {
    public:
     BlurayHelper();
