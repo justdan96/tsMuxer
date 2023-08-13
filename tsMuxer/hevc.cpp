@@ -3,6 +3,7 @@
 #include <fs/systemlog.h>
 
 #include <algorithm>
+#include <cmath>
 
 #include "tsMuxer.h"
 #include "vodCoreException.h"
