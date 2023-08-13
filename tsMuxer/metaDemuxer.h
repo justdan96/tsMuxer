@@ -44,11 +44,6 @@ struct StreamInfo
         m_isSubStream = isSubStream;
     }
 
-    ~StreamInfo()
-    {
-        // delete m_streamReader;
-    }
-
     int read();
 
     int m_lastAVRez;
@@ -126,22 +121,22 @@ class ContainerToReaderWrapper final : public AbstractReader
         m_discardedSize = 0;
         m_terminated = false;
     }
-    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
-    void notify(uint32_t readerID, uint32_t dataReaded) override { return; }
-    int32_t createReader(int readBuffOffset = 0) override;
-    void deleteReader(uint32_t readerID) override;
-    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
+    uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
+    void notify(int readerID, uint32_t dataReaded) override {}
+    int createReader(int readBuffOffset = 0) override;
+    void deleteReader(int readerID) override;
+    bool openStream(int readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
     void resetDelayedMark() const;
-    int64_t getDiscardedSize() const { return m_discardedSize; };
+    int64_t getDiscardedSize() const { return m_discardedSize; }
 
-    bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
+    bool gotoByte(int readerID, int64_t seekDist) override { return false; }
     void terminate();
     std::map<std::string, DemuxerData> m_demuxers;
 
    private:
     int64_t m_discardedSize;
-    int m_readerCnt;
+    int32_t m_readerCnt;
     size_t m_readBuffOffset;
     const BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;

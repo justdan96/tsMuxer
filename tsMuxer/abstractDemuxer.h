@@ -10,7 +10,6 @@
 
 #include "avPacket.h"
 #include "vod_common.h"
-// #include <system/dynamiclink.h>
 
 class SubTrackFilter;
 
@@ -53,7 +52,7 @@ class MemoryBlock
 
     size_t size() const { return m_size; }
 
-    uint8_t* data() { return m_data.empty() ? nullptr : &m_data[0]; }
+    uint8_t* data() { return m_data.empty() ? nullptr : m_data.data(); }
 
     bool isEmpty() const { return m_size == 0; }
 
@@ -107,7 +106,7 @@ class AbstractDemuxer
     virtual int64_t getDemuxedSize() = 0;
 
     virtual uint64_t getDuration() { return 0; }
-    virtual void setTimeOffset(const uint64_t offset) { m_timeOffset = offset; }
+    virtual void setTimeOffset(const int64_t offset) { m_timeOffset = offset; }
     virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
     {
         discardSize = 0;

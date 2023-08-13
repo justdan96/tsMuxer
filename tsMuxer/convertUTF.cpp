@@ -307,6 +307,8 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
     return result;
 }
 
+namespace
+{
 /* --------------------------------------------------------------------- */
 
 /*
@@ -320,7 +322,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-static Boolean isLegalUTF8(const UTF8* source, const int length)
+Boolean isLegalUTF8(const UTF8* source, const int length)
 {
     UTF8 a;
     const UTF8* srcptr = source + length;
@@ -372,7 +374,7 @@ static Boolean isLegalUTF8(const UTF8* source, const int length)
         return false;
     return true;
 }
-
+}  // namespace
 /* --------------------------------------------------------------------- */
 
 /*
@@ -418,7 +420,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const uint8_t extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;
@@ -611,7 +613,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const uint8_t extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;

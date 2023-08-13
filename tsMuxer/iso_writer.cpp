@@ -43,7 +43,7 @@ unsigned short crc16(const unsigned char *pcBlock, unsigned short len)
 {
     unsigned short crc = 0;
 
-    while (len--) crc = (crc << 8) ^ Crc16Table[(crc >> 8) ^ *pcBlock++];
+    while (len--) crc = static_cast<uint16_t>(crc << 8) ^ Crc16Table[(crc >> 8) ^ *pcBlock++];
 
     return crc;
 }
@@ -140,7 +140,7 @@ std::vector<std::uint8_t> serializeDString(const std::string &str, const size_t 
     if (canUse8BitUnicode(utf8Str))
     {
         rv.push_back(8);
-        IterateUTF8Chars(utf8Str, [&](auto c) {
+        IterateUTF8Chars(utf8Str, [&](const uint8_t c) {
             rv.push_back(c);
             return rv.size() < maxHeaderAndContentLength;
         });
@@ -278,7 +278,7 @@ void ByteFileWriter::writeDString(const std::string &value, const int64_t len) {
 void ByteFileWriter::doPadding(const int padSize)
 {
     m_curPos--;
-    int rest = (m_curPos - m_buffer) % padSize;
+    auto rest = static_cast<int>((m_curPos - m_buffer) % padSize);
     if (rest)
     {
         rest = padSize - rest;
@@ -310,7 +310,7 @@ int64_t ByteFileWriter::size() const { return m_curPos - m_buffer; }
 
 // ------------------------------ FileEntryInfo ------------------------------------
 
-FileEntryInfo::FileEntryInfo(IsoWriter *owner, FileEntryInfo *parent, const uint32_t objectId, const FileTypes fileType)
+FileEntryInfo::FileEntryInfo(IsoWriter *owner, FileEntryInfo *parent, const uint8_t objectId, const FileTypes fileType)
     : m_owner(owner),
       m_parent(parent),
       m_sectorNum(0),
@@ -362,7 +362,7 @@ void FileEntryInfo::writeEntity(ByteFileWriter &writer, const FileEntryInfo *sub
     writer.closeDescriptorTag();
 }
 
-void FileEntryInfo::serialize()
+void FileEntryInfo::serialize() const
 {
     m_owner->sectorSeek(IsoWriter::Partition::MetadataPartition, m_sectorNum);
 
@@ -381,13 +381,13 @@ int FileEntryInfo::allocateEntity(const int sectorNum)
         m_sectorsUsed = 1;
     else
     {
-        const int sz = static_cast<int>(m_extents.size()) - 1 - MAX_EXTENTS_IN_EXTFILE;
+        const int sz = static_cast<int>(m_extents.size() - 1 - MAX_EXTENTS_IN_EXTFILE);
         m_sectorsUsed = 1 + (sz + MAX_EXTENTS_IN_EXTCONT - 1) / MAX_EXTENTS_IN_EXTCONT;
     }
     return m_sectorsUsed;
 }
 
-void FileEntryInfo::serializeFile()
+void FileEntryInfo::serializeFile() const
 {
     const int writed = m_owner->writeExtendedFileEntryDescriptor(m_name == "*UDF Unique ID Mapping Data", m_objectId,
                                                                  m_fileType, m_fileSize, m_sectorNum, 1, &m_extents);
@@ -442,16 +442,10 @@ void FileEntryInfo::addExtent(const Extent &extent)
     m_fileSize += extent.size;
 }
 
-int FileEntryInfo::write(const uint8_t *data, const int32_t len)
+int32_t FileEntryInfo::write(const uint8_t *data, const int32_t len)
 {
     if (m_owner->m_lastWritedObjectID != m_objectId)
     {
-#if 0
-        if (m_fileType == FileType_RealtimeFile) {
-            if (m_subMode)
-                m_owner->checkLayerBreakPoint((SUB_INTERLEAVE_BLOCKSIZE + MAIN_INTERLEAVE_BLOCKSIZE) / SECTOR_SIZE);
-        }
-#endif
         m_extents.emplace_back(m_owner->absoluteSectorNum(), len);
     }
     else
@@ -466,11 +460,11 @@ int FileEntryInfo::write(const uint8_t *data, const int32_t len)
     }
     m_owner->m_lastWritedObjectID = m_objectId;
     m_fileSize += len;
-    int writeLen = len;
+    int32_t writeLen = len;
 
     if (m_sectorBufferSize)
     {
-        const uint32_t toCopy = FFMIN(SECTOR_SIZE - m_sectorBufferSize, writeLen);
+        const int toCopy = FFMIN(SECTOR_SIZE - m_sectorBufferSize, writeLen);
         memcpy(m_sectorBuffer + m_sectorBufferSize, data, toCopy);
         m_sectorBufferSize += toCopy;
         if (m_sectorBufferSize == SECTOR_SIZE)
@@ -536,7 +530,7 @@ FileEntryInfo *FileEntryInfo::fileByName(const std::string &name) const
 int ISOFile::write(const void *data, const uint32_t len)
 {
     if (m_entry)
-        return m_entry->write(static_cast<const uint8_t *>(data), len);
+        return m_entry->write(static_cast<const uint8_t *>(data), static_cast<int32_t>(len));
     return -1;
 }
 
@@ -665,7 +659,7 @@ bool IsoWriter::open(const std::string &fileName, const int64_t diskSize, const 
     // 576K align
 
     memset(m_buffer, 0, SECTOR_SIZE);
-    while (m_file.size() < 1024 * 576) m_file.write(m_buffer, SECTOR_SIZE);
+    while (m_file.size() < 1024LL * 576) m_file.write(m_buffer, SECTOR_SIZE);
 
     m_partitionStartAddress = static_cast<int>(m_file.size() / SECTOR_SIZE);
     m_tagLocationBaseAddr = m_partitionStartAddress;
@@ -849,7 +843,7 @@ void IsoWriter::allocateMetadata()
         writer.writeLE16(1);  // object partition
     }
 
-    m_metadataMappingFile->write(buffer, static_cast<uint32_t>(writer.size()));
+    m_metadataMappingFile->write(buffer, static_cast<int32_t>(writer.size()));
     m_metadataMappingFile->close();
     delete[] buffer;
 }
@@ -860,7 +854,7 @@ void IsoWriter::close()
         return;
 
     memset(m_buffer, 0, sizeof(m_buffer));
-    while (m_file.size() % ALLOC_BLOCK_SIZE != 62 * 1024) m_file.write(m_buffer, SECTOR_SIZE);
+    while (m_file.size() % ALLOC_BLOCK_SIZE != 1024LL * 62) m_file.write(m_buffer, SECTOR_SIZE);
 
     // mirror metadata file location and length
     m_metadataMirrorLBN = static_cast<int>(m_file.size() / SECTOR_SIZE + 1);
@@ -870,7 +864,7 @@ void IsoWriter::close()
 
     // allocate space for metadata mirror file
     memset(m_buffer, 0, sizeof(m_buffer));
-    for (size_t i = 0; i < m_metadataFileLen / SECTOR_SIZE; ++i) m_file.write(m_buffer, SECTOR_SIZE);
+    for (int i = 0; i < m_metadataFileLen / SECTOR_SIZE; ++i) m_file.write(m_buffer, SECTOR_SIZE);
 
     m_partitionEndAddress = static_cast<int>(m_file.size() / SECTOR_SIZE);
 
@@ -938,9 +932,9 @@ void IsoWriter::writeDescriptors()
     writeAnchorVolumeDescriptor(m_partitionEndAddress + ALLOC_BLOCK_SIZE / SECTOR_SIZE);
 }
 
-uint32_t IsoWriter::absoluteSectorNum() const
+int32_t IsoWriter::absoluteSectorNum() const
 {
-    return static_cast<uint32_t>(m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr);
+    return static_cast<int32_t>(m_file.pos() / SECTOR_SIZE - m_tagLocationBaseAddr);
 }
 
 void IsoWriter::sectorSeek(const Partition partition, const int pos) const
@@ -949,7 +943,7 @@ void IsoWriter::sectorSeek(const Partition partition, const int pos) const
     m_file.seek((offset + pos) * SECTOR_SIZE, File::SeekMethod::smBegin);
 }
 
-void IsoWriter::writeEntity(FileEntryInfo *dir)
+void IsoWriter::writeEntity(const FileEntryInfo *dir)
 {
     dir->serialize();
     for (const auto &i : dir->m_files) writeEntity(i);
@@ -1181,7 +1175,7 @@ void IsoWriter::writePrimaryVolumeDescriptor()
     writer.writeLE32(0x01);  // Character Set List
     writer.writeLE32(0x01);  // Maximum Character Set List
 
-    std::string volId = strToUpperCase(int32ToHex(m_volumeId));
+    std::string volId = strToUpperCase(int32uToHex(m_volumeId));
     volId = strPadLeft(volId, 8, '0');
     const std::string volumeSetIdentifier = volId + std::string("        ") + m_volumeLabel;
     writer.writeDString(volumeSetIdentifier.c_str(), 128);
@@ -1413,9 +1407,10 @@ void IsoWriter::checkLayerBreakPoint(const int maxExtentSize)
     if (lbn < m_layerBreakPoint && lbn + maxExtentSize > m_layerBreakPoint)
     {
         const int rest = m_layerBreakPoint - lbn;
-        const auto tmpBuffer = new uint8_t[rest * SECTOR_SIZE];
-        memset(tmpBuffer, 0, rest * SECTOR_SIZE);
-        m_file.write(tmpBuffer, rest * SECTOR_SIZE);
+        const int size = rest * SECTOR_SIZE;
+        const auto tmpBuffer = new uint8_t[size];
+        memset(tmpBuffer, 0, size);
+        m_file.write(tmpBuffer, size);
         delete[] tmpBuffer;
         m_lastWritedObjectID = -1;
     }
@@ -1425,7 +1420,7 @@ void IsoWriter::setLayerBreakPoint(const int lbn) { m_layerBreakPoint = lbn; }
 
 IsoHeaderData IsoHeaderData::normal()
 {
-    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32ToHex(random32()), time(nullptr),
+    return IsoHeaderData{"*tsMuxeR " TSMUXER_VERSION, std::string("*tsMuxeR ") + int32uToHex(random32()), time(nullptr),
                          random32()};
 }
 

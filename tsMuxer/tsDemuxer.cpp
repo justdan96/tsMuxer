@@ -1,5 +1,6 @@
-
 #include "tsDemuxer.h"
+
+#include <fs/systemlog.h>
 
 #include "aac.h"
 #include "abstractStreamReader.h"
@@ -154,11 +155,7 @@ void TSDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
         br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
     else
         THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!")
-    return;
 }
-
-// static int64_t prevPCR = -1;
-// static int pcrFrames = 0;
 
 bool TSDemuxer::isVideoPID(const StreamType streamType)
 {

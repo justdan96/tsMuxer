@@ -147,8 +147,8 @@ struct PIPParams
 
     int scaleIndex;
     PipCorner corner;
-    int hOffset;
-    int vOffset;
+    unsigned hOffset;
+    unsigned vOffset;
     int lumma;
 };
 

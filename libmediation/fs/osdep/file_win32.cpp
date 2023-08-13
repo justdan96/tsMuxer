@@ -180,10 +180,10 @@ bool File::size(int64_t* const fileSize) const
     return true;
 }
 
-uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
+int64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
-        return static_cast<uint64_t>(-1);
+        return -1;
 
     DWORD moveMethod = 0;
     switch (whence)
@@ -199,14 +199,14 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
         break;
     }
 
-    const LONG distanceToMoveLow = static_cast<LONG>(offset & 0xffffffff);
-    LONG distanceToMoveHigh = static_cast<LONG>((offset & 0xffffffff00000000ull) >> 32);
+    const LONG distanceToMoveLow = static_cast<LONG>(offset);
+    LONG distanceToMoveHigh = static_cast<LONG>(offset >> 32);
 
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, moveMethod);
     if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
-        return static_cast<uint64_t>(-1);
+        return -1;
 
-    m_pos = newPointerLow | (static_cast<uint64_t>(distanceToMoveHigh) << 32);
+    m_pos = static_cast<int64_t>(distanceToMoveHigh) << 32 | newPointerLow;
 
     return m_pos;
 }

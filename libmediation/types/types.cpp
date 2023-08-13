@@ -200,6 +200,11 @@ uint32_t roundUp(const uint32_t& value, const uint32_t& roundVal)
     return roundVal ? ((value + roundVal - 1) / roundVal) * roundVal : 0;
 }
 
+int32_t roundUp(const int32_t& value, const int32_t& roundVal)
+{
+    return roundVal ? ((value + roundVal - 1) / roundVal) * roundVal : 0;
+}
+
 uint64_t roundDown64(const uint64_t& value, const uint64_t& roundVal)
 {
     return roundVal ? (value / roundVal) * roundVal : 0;

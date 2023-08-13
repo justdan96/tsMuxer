@@ -1,12 +1,13 @@
 
 #include <fs/systemlog.h>
+#include <cmath>
 #include <sstream>
 
 #include "bitStream.h"
 #include "nalUnits.h"
 #include "vod_common.h"
 
-uint8_t BDROM_METADATA_GUID[] = "\x17\xee\x8c\x60\xf8\x4d\x11\xd9\x8c\xd6\x08\x00\x20\x0c\x9a\x66";
+static constexpr uint8_t BDROM_METADATA_GUID[] = "\x17\xee\x8c\x60\xf8\x4d\x11\xd9\x8c\xd6\x08\x00\x20\x0c\x9a\x66";
 
 void NALUnit::write_rbsp_trailing_bits(BitStreamWriter& writer)
 {
@@ -328,10 +329,10 @@ int PPSUnit::deserialize()
     try
     {
         bitReader.setBuffer(m_nalBuffer + 1, nalEnd);
-        pic_parameter_set_id = extractUEGolombCode();
+        pic_parameter_set_id = static_cast<int>(extractUEGolombCode());
         if (pic_parameter_set_id >= 256)
             return 1;
-        seq_parameter_set_id = extractUEGolombCode();
+        seq_parameter_set_id = static_cast<int>(extractUEGolombCode());
         if (seq_parameter_set_id >= 32)
             return 1;
         entropy_coding_mode_flag = bitReader.getBit();
@@ -461,7 +462,7 @@ int SPSUnit::deserialize()
     try
     {
         bitReader.setBuffer(m_nalBuffer + 4, m_nalBuffer + m_nalBufferLen);
-        seq_parameter_set_id = extractUEGolombCode();
+        seq_parameter_set_id = static_cast<int>(extractUEGolombCode());
         if (seq_parameter_set_id >= 32)
             return 1;
         pic_order_cnt_type = 0;
@@ -1089,7 +1090,7 @@ int SPSUnit::mvc_vui_parameters_extension()
     const unsigned vui_mvc_num_ops = extractUEGolombCode() + 1;
     if (vui_mvc_num_ops > 1 << 10)
         return 1;
-    std::vector <uint8_t> vui_mvc_temporal_id;
+    std::vector<uint8_t> vui_mvc_temporal_id;
     vui_mvc_temporal_id.resize(vui_mvc_num_ops);
     mvcHrdParamsBitPos.resize(vui_mvc_num_ops);
     mvcNalHrdParams.resize(vui_mvc_num_ops);
@@ -1204,9 +1205,10 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
 
         bitReader.setBuffer(buffer + offset, end);
         first_mb_in_slice = extractUEGolombCode();
-        orig_slice_type = slice_type = extractUEGolombCode();
-        if (slice_type > 9)
+        const unsigned sliceType = extractUEGolombCode();
+        if (sliceType > 9)
             return 1;
+        orig_slice_type = slice_type = static_cast<int>(sliceType);
         if (slice_type > 4)
             slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
 
@@ -1219,8 +1221,8 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
     }
 };
 
-int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_t, SPSUnit*>& spsMap,
-                           const std::map<uint32_t, PPSUnit*>& ppsMap)
+int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<int, SPSUnit*>& spsMap,
+                           const std::map<int, PPSUnit*>& ppsMap)
 {
     if (end - buffer < 2)
         return NOT_ENOUGH_BUFFER;
@@ -1280,16 +1282,16 @@ void NALUnit::updateBits(const int bitOffset, const int bitLen, const unsigned v
     bitWriter.flushBits();
 }
 
-int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap,
-                                      const std::map<uint32_t, PPSUnit*>& ppsMap)
+int SliceUnit::deserializeSliceHeader(const std::map<int, SPSUnit*>& spsMap, const std::map<int, PPSUnit*>& ppsMap)
 {
     first_mb_in_slice = extractUEGolombCode();
-    orig_slice_type = slice_type = extractUEGolombCode();
-    if (slice_type > 9)
+    const unsigned sliceType = extractUEGolombCode();
+    if (sliceType > 9)
         return 1;
+    orig_slice_type = slice_type = static_cast<int>(sliceType);
     if (slice_type > 4)
         slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
-    pic_parameter_set_id = extractUEGolombCode();
+    pic_parameter_set_id = static_cast<int>(extractUEGolombCode());
     if (pic_parameter_set_id >= 256)
         return 1;
     const auto itr = ppsMap.find(pic_parameter_set_id);
@@ -1370,7 +1372,6 @@ void SEIUnit::deserialize(const SPSUnit& sps, const int orig_hrd_parameters_pres
         (void)e;
         LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
     }
-    return;
 }
 
 int SEIUnit::isMVCSEI()
@@ -1673,7 +1674,7 @@ void SEIUnit::pic_timing(const SPSUnit& sps, const bool orig_hrd_parameters_pres
     }
     if (sps.pic_struct_present_flag)
     {
-        pic_struct = bitReader.getBits<uint8_t>(4);
+        pic_struct = bitReader.getBits<int8_t>(4);
         const int numClockTS = getNumClockTS(pic_struct);
 
         for (int i = 0; i < numClockTS; i++)

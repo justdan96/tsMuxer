@@ -127,7 +127,7 @@ class MPEGSequenceHeader final : public MPEGRawDataHeader
 
     uint8_t color_primaries;
     uint8_t transfer_characteristics;
-    uint8_tint matrix_coefficients;
+    uint8_t matrix_coefficients;
 
     unsigned pan_scan_width;
     unsigned pan_scan_height;

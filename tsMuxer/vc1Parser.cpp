@@ -16,7 +16,7 @@ const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 namespace
 {
 
-int get_unary(BitStreamReader& bitReader, const int stop, const int len)
+int get_unary(BitStreamReader& bitReader, const bool stop, const int len)
 {
     int i;
     for (i = 0; i < len && bitReader.getBit() != stop; i++)
@@ -417,7 +417,7 @@ int VC1Frame::vc1_parse_frame_header_adv(const VC1SequenceHeader& sequenceHdr)
     }
     else
     {
-        switch (get_unary(bitReader, 0, 4))
+        switch (get_unary(bitReader, false, 4))
         {
         case 0:
             pict_type = VC1PictType::P_TYPE;

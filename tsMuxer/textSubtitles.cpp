@@ -305,11 +305,11 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
     }
 }
 
-uint16_t TextToPGSConverter::renderedHeight() const { return m_maxLine - m_minLine + 1; }
+int TextToPGSConverter::renderedHeight() const { return m_maxLine - m_minLine + 1; }
 
-uint16_t TextToPGSConverter::maxLine() const { return m_maxLine; }
+int TextToPGSConverter::maxLine() const { return m_maxLine; }
 
-uint16_t TextToPGSConverter::minLine() const { return m_minLine; }
+int TextToPGSConverter::minLine() const { return m_minLine; }
 
 TextToPGSConverter::Palette TextToPGSConverter::buildPalette(const float opacity)
 {

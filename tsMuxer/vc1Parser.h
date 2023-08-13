@@ -171,8 +171,8 @@ class VC1SequenceHeader : public VC1Unit
     uint8_t max_b_frames;
     int finterpflag;  ///< INTERPFRM present
     uint8_t level;
-    int coded_width;
-    int coded_height;
+    uint16_t coded_width;
+    uint16_t coded_height;
     uint16_t display_width;
     uint16_t display_height;
     int pulldown;     ///< TFF/RFF present

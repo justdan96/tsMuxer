@@ -1,7 +1,6 @@
 #include "aacStreamReader.h"
 #include "nalUnits.h"
 #include "vodCoreException.h"
-#include "vod_common.h"
 
 int AACStreamReader::getHeaderLen() { return AAC_HEADER_LEN; }
 

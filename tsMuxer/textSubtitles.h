@@ -86,9 +86,9 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
     uint8_t color32To8(const uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
-    uint16_t renderedHeight() const;
-    uint16_t minLine() const;
-    uint16_t maxLine() const;
+    int renderedHeight() const;
+    int minLine() const;
+    int maxLine() const;
 
     // std::vector<uint32_t> m_rleLineLen;
     std::map<YUVQuad, uint8_t> m_paletteYUV;
@@ -98,8 +98,8 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     bool palette_update_flag;
     uint8_t m_paletteID;
     uint8_t m_paletteVersion;
-    uint16_t m_minLine;
-    uint16_t m_maxLine;
+    int m_minLine;
+    int m_maxLine;
 };
 };  // namespace text_subtitles
 

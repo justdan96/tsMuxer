@@ -13,7 +13,7 @@ class VVCStreamReader final : public MPEGStreamReader
     VVCStreamReader();
     ~VVCStreamReader() override;
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
+    CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool needSPSForSplit() const override { return false; }
 
    protected:
@@ -21,8 +21,8 @@ class VVCStreamReader final : public MPEGStreamReader
     int intDecodeNAL(uint8_t* buff) override;
 
     double getStreamFPS(void* curNalUnit) override;
-    int getStreamWidth() const override;
-    int getStreamHeight() const override;
+    unsigned getStreamWidth() const override;
+    unsigned getStreamHeight() const override;
     bool getInterlaced() override { return false; }
     bool isIFrame() override { return m_lastIFrame; }
 

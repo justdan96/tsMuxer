@@ -21,12 +21,13 @@ class BlurayHelper final : public FileFactory
 
     bool open(const std::string& dst, DiskType dt, int64_t diskSize = 0, int extraISOBlocks = 0,
               bool useReproducibleIsoHeader = false);
-    bool createBluRayDirs() const;
+    void createBluRayDirs() const;
     bool writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum,
                           bool stereoMode) const;
     bool createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const;
-    bool createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen, std::vector<double> customChapters,
-                        DiskType dt, int mplsOffset, bool isMvcBaseViewR) const;
+    bool createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
+                        const std::vector<double>& customChapters, DiskType dt, int mplsOffset,
+                        bool isMvcBaseViewR) const;
 
     std::string m2tsFileName(int num) const;
     std::string ssifFileName(int num) const;

@@ -1,8 +1,7 @@
 ﻿#include "vvc.h"
 
-#include <cmath>
-
 #include <algorithm>
+#include <cmath>
 
 #include "tsMuxer.h"
 #include "vodCoreException.h"

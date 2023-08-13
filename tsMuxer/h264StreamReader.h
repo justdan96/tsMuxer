@@ -2,6 +2,7 @@
 #define H264_STREAM_READER_H_
 
 #include <map>
+#include <set>
 
 #include "avPacket.h"
 #include "mpegStreamReader.h"
@@ -52,8 +53,8 @@ class H264StreamReader final : public MPEGStreamReader
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;
     int getFrameDepth() override { return m_frameDepth; }
-    int getStreamWidth() const override;
-    int getStreamHeight() const override;
+    unsigned getStreamWidth() const override;
+    unsigned getStreamHeight() const override;
     int getStreamHDR() const override { return 0; }
     bool getInterlaced() override;
     bool isIFrame() override { return m_lastIFrame; }
@@ -99,11 +100,11 @@ class H264StreamReader final : public MPEGStreamReader
     int m_frameNum;
     bool m_lastIFrame;
     bool m_firstDecodeNal;
-    int m_lastPictStruct;
+    int8_t m_lastPictStruct;
     bool m_firstFileFrame;
-    std::map<uint32_t, SPSUnit*> m_spsMap;
-    std::map<uint32_t, PPSUnit*> m_ppsMap;
-    std::set<uint32_t> updatedSPSList;
+    std::map<int, SPSUnit*> m_spsMap;
+    std::map<int, PPSUnit*> m_ppsMap;
+    std::set<int> updatedSPSList;
     std::vector<uint8_t> m_lastSeiMvcHeader;
     int m_lastPicStruct;
     int64_t m_lastDtsInc;

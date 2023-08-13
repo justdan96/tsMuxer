@@ -60,13 +60,13 @@ virtual void deleteNextBlocks()
         return false;
     }
 
-    virtual uint32_t readBlock(uint8_t* buffer, int max_size) = 0;
+    virtual uint32_t readBlock(uint8_t* buffer, uint32_t max_size) = 0;
 
     virtual bool closeStream() = 0;
 
     uint8_t m_bufferIndex;
     bool m_notified;
-    int m_nextBlockSize;
+    uint32_t m_nextBlockSize;
     bool m_deleted;
     bool m_firstBlock;
     bool m_lastBlock;
@@ -86,16 +86,16 @@ class BufferedReader : public AbstractReader, TerminatableThread
     static constexpr int UNKNOWN_READERID = 3;
     BufferedReader(uint32_t blockSize, uint32_t allocSize = 0, uint32_t prereadThreshold = 0);
     ~BufferedReader() override;
-    int32_t createReader(int readBuffOffset = 0) override;
-    void deleteReader(uint32_t readerID) override;  // unregister readed
-    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
-    void notify(uint32_t readerID,
+    int createReader(int readBuffOffset = 0) override;
+    void deleteReader(int readerID) override;  // unregister readed
+    uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
+    void notify(int readerID,
                 uint32_t dataReaded) override;  // reader must call notificate when part of data handled
     uint32_t getReaderCount();
     void terminate();
     void setFileIterator(FileNameIterator* itr, int readerID);
-    bool incSeek(uint32_t readerID, int64_t offset);
-    bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
+    bool incSeek(int readerID, int64_t offset);
+    bool gotoByte(int readerID, int64_t seekDist) override { return false; }
 
     void setId(const int value) { m_id = value; }
 
@@ -105,17 +105,17 @@ class BufferedReader : public AbstractReader, TerminatableThread
 
     bool m_started;
     bool m_terminated;
-    WaitableSafeQueue<uint32_t> m_readQueue;
-    ReaderData* getReader(uint32_t readerID);
+    WaitableSafeQueue<int> m_readQueue;
+    ReaderData* getReader(int readerID);
     std::condition_variable m_readCond;
     std::mutex m_readMtx;
 
    private:
     int m_id;
     std::mutex m_readersMtx;
-    std::map<uint32_t, ReaderData*> m_readers;
-    static uint32_t m_newReaderID;
-    static uint32_t createNewReaderID();
+    std::map<int, ReaderData*> m_readers;
+    static int m_newReaderID;
+    static int createNewReaderID();
     static std::mutex m_genReaderMtx;
 };
 

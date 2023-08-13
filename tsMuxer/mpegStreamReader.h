@@ -52,8 +52,8 @@ class MPEGStreamReader : public AbstractStreamReader
     void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
-    virtual int getStreamWidth() const = 0;
-    virtual int getStreamHeight() const = 0;
+    virtual unsigned getStreamWidth() const = 0;
+    virtual unsigned getStreamHeight() const = 0;
     virtual bool getInterlaced() = 0;
     void setRemovePulldown(const bool value) { m_removePulldown = value; }
     virtual int getFrameDepth() { return 1; }

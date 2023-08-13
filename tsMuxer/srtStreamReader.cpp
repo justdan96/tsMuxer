@@ -7,6 +7,7 @@
 #include "matroskaParser.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
+#include "fs/systemlog.h"
 
 using namespace std;
 

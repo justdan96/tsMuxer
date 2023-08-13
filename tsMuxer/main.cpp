@@ -1,4 +1,5 @@
 #include <fs/directory.h>
+#include <fs/systemlog.h>
 #include <fs/textfile.h>
 
 #include <iostream>
@@ -25,9 +26,6 @@ SingleFileMuxerFactory singleFileMuxerFactory;
 
 static constexpr char EXCEPTION_ERR_MSG[] =
     ". It does not have to be! Please contact application support team for more information.";
-
-// const static uint32_t BLACK_PL_NUM = 1900;
-// const static uint32_t BLACK_FILE_NUM = 1900;
 
 #define LTRACE2(level, msg)              \
     {                                    \
@@ -116,10 +114,6 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
     DetectStreamRez streamInfo = METADemuxer::DetectStreamReader(readManager, fileName, mplsParser == nullptr);
     vector<CheckStreamRez>& streams = streamInfo.streams;
 
-    std::vector<MPLSStreamInfo> pgStreams3D;
-    if (mplsParser && mplsParser->isDependStreamExist)
-        pgStreams3D = mplsParser->getPgStreams();
-
     for (unsigned i = 0; i < streams.size(); i++)
     {
         if (streams[i].trackID != 0)
@@ -201,7 +195,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
     if (!chapters.empty() || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
     if (streamInfo.fileDurationNano)
-        LTRACE(LT_INFO, 2, "Duration: " << floatToTime(streamInfo.fileDurationNano / 1e9));
+        LTRACE(LT_INFO, 2, "Duration: " << floatToTime((double)streamInfo.fileDurationNano / 1e9));
     for (size_t j = 0; j < chapters.size(); j++)
     {
         uint64_t time = chapters[j].start;
@@ -210,7 +204,7 @@ void detectStreamReader(const char* fileName, MPLSParser* mplsParser, bool isSub
             LTRACE(LT_INFO, 2, "");
             LTRACE2(LT_INFO, "Marks: ")
         }
-        LTRACE2(LT_INFO, floatToTime(time / 1e9) << " ")
+        LTRACE2(LT_INFO, floatToTime((double)time / 1e9) << " ")
     }
     if (!chapters.empty() || streamInfo.fileDurationNano > 0)
         LTRACE(LT_INFO, 2, "");
@@ -238,8 +232,8 @@ string getBlurayStreamDir(const string& mplsName)
 
 void muxBlankPL(const string& appDir, BlurayHelper& blurayHelper, const PIDListMap& pidList, DiskType dt, int blankNum)
 {
-    int videoWidth = 1920;
-    int videoHeight = 1080;
+    unsigned videoWidth = 1920;
+    unsigned videoHeight = 1080;
     double fps = 23.976;
     for (const auto& [pid, si] : pidList)
     {
@@ -649,7 +643,7 @@ int main(int argc, char** argv)
                     if (mode3D)
                         itemName = streamDir + string("SSIF") + getDirSeparator() + item.fileName + ".ssif";
                     else
-                        itemName = streamDir + item.fileName + mediaExt;  // 2d mode
+                        itemName = streamDir.append(item.fileName).append(mediaExt);  // 2d mode
 
                     LTRACE(LT_INFO, 2, "");
                     LTRACE(LT_INFO, 2, "File #" << strPadLeft(int64ToStr(i), 5, '0') << " name=" << itemName);
@@ -674,7 +668,7 @@ int main(int argc, char** argv)
                     for (; markIndex < mplsParser.m_marks.size(); markIndex++)
                     {
                         PlayListMark& curMark = mplsParser.m_marks[markIndex];
-                        if (curMark.m_playItemID > i)
+                        if (static_cast<unsigned>(curMark.m_playItemID) > i)
                             break;
                         uint64_t time = curMark.m_markTime - mplsParser.m_playItems[i].IN_time + prevFileOffset;
                         if (marksPerFile % 5 == 0)
@@ -684,7 +678,7 @@ int main(int argc, char** argv)
                             LTRACE2(LT_INFO, "Marks: ")
                         }
                         marksPerFile++;
-                        LTRACE2(LT_INFO, floatToTime(time / 45000.0) << " ")
+                        LTRACE2(LT_INFO, floatToTime((double)time / 45000.0) << " ")
                     }
                     if (marksPerFile > 0)
                         LTRACE(LT_INFO, 2, "");

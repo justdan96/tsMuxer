@@ -21,7 +21,7 @@ class AC3Codec
 
     enum class AC3ParseError
     {
-        NO_ERROR2 = 0,
+        NO_ERROR = 0,
         SYNC = -1,
         BSID = -2,
         SAMPLE_RATE = -3,

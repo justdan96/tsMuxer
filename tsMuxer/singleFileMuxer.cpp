@@ -1,6 +1,7 @@
 #include "singleFileMuxer.h"
 
 #include <fs/directory.h>
+#include <fs/systemlog.h>
 #include <fs/textfile.h>
 
 #include "abstractMuxer.h"

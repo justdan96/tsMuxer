@@ -1,6 +1,7 @@
 #include "blurayHelper.h"
 
 #include <fs/directory.h>
+#include <fs/systemlog.h>
 #include <array>
 
 #include "iso_writer.h"
@@ -293,7 +294,7 @@ bool BlurayHelper::open(const string& dst, const DiskType dt, const int64_t disk
     return true;
 }
 
-bool BlurayHelper::createBluRayDirs() const
+void BlurayHelper::createBluRayDirs() const
 {
     if (m_dt == DiskType::BLURAY)
     {
@@ -337,8 +338,6 @@ bool BlurayHelper::createBluRayDirs() const
         createDir(m_dstPath + toNativeSeparators("BDMV/BACKUP/CLIPINF"), true);
         createDir(m_dstPath + toNativeSeparators("BDMV/BACKUP/PLAYLIST"), true);
     }
-
-    return true;
 }
 
 bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, const bool usedBlankPL, const int mplsNum,
@@ -359,13 +358,15 @@ bool BlurayHelper::writeBluRayFiles(const MuxerManager& muxer, const bool usedBl
             bdIndexData[5] = '3';
             fileSize = 0x9C;         // add 36 bytes for UHD data extension
             bdIndexData[15] = 0x78;  // start address of UHD data extension
-            uint8_t* V3metaData = bdIndexData + 0x78;
+
             // UHD data extension
-            memcpy(V3metaData,
-                   "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
-                   "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
-                   "\x00\x00\x00\x08\x20\x00\x00\x00\x00\x00\x00\x00",
-                   36);
+            uint8_t* V3metaData = bdIndexData + 0x78;
+            static constexpr char metaData[37] =
+                "\x00\x00\x00\x20\x00\x00\x00\x18\x00\x00\x00\x01"
+                "\x00\x03\x00\x01\x00\x00\x00\x18\x00\x00\x00\x0C"
+                "\x00\x00\x00\x08\x20\x00\x00\x00\x00\x00\x00\x00";
+            for (int i = 0; i < 36; i++) V3metaData[i] = metaData[i];
+
             // 4K => 66/100 GB Disk, 109 MB/s Recording_Rate
             if (is4K())
                 bdIndexData[0x94] = 0x51;
@@ -479,7 +480,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
 
         string dstDir = string("BDMV") + getDirSeparator() + string("CLIPINF") + getDirSeparator();
         string clipName = extractFileName(muxer->getFileNameByIdx(i));
-        if (!file->open((prefix + dstDir + clipName + string(".clpi")).c_str(), File::ofWrite))
+        if (!file->open(prefix.append(dstDir).append(clipName).append(".clpi").c_str(), File::ofWrite))
         {
             delete[] clpiBuffer;
             delete file;
@@ -496,7 +497,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
 
         dstDir = string("BDMV") + getDirSeparator() + string("BACKUP") + getDirSeparator() + string("CLIPINF") +
                  getDirSeparator();
-        if (!file->open((prefix + dstDir + clipName + string(".clpi")).c_str(), File::ofWrite))
+        if (!file->open(prefix.append(dstDir).append(clipName).append(".clpi").c_str(), File::ofWrite))
         {
             delete[] clpiBuffer;
             delete file;
@@ -528,7 +529,8 @@ const PMTStreamInfo* streamByIndex(const int index, const PIDListMap& pidList)
 }
 
 bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
-                                  vector<double> customChapters, DiskType dt, int mplsOffset, bool isMvcBaseViewR) const
+                                  const vector<double>& customChapters, DiskType dt, int mplsOffset,
+                                  bool isMvcBaseViewR) const
 {
     int64_t firstPts = *(mainMuxer->getFirstPts().begin());
     int64_t lastPts = *(mainMuxer->getLastPts().rbegin());

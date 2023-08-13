@@ -1,5 +1,6 @@
 #include "hevc.h"
 
+#include <cmath>
 #include <fs/systemlog.h>
 
 #include <algorithm>
@@ -560,7 +561,7 @@ int HevcSpsUnit::deserialize()
             if (sps_max_num_reorder_pics > sps_max_dec_pic_buffering_minus1)
                 return 1;
             const unsigned sps_max_latency_increase_plus1 = extractUEGolombCode();
-            if (sps_max_latency_increase_plus1 == 0xffffffff)
+            if (sps_max_latency_increase_plus1 == UINT_MAX)
                 return 1;
         }
 

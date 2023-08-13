@@ -6,6 +6,7 @@
 
 #include <map>
 
+#include "avPacket.h"
 #include "bitStream.h"
 #include "vod_common.h"
 
@@ -251,7 +252,6 @@ struct PMTStreamInfo final
         m_pmtPID = -1;
         isSecondary = secondary;
     }
-    ~PMTStreamInfo() = default;
 
     StreamType m_streamType;
     uint16_t m_pid;
@@ -341,8 +341,8 @@ struct M2TSStreamInfo
     uint8_t video_format;
     uint8_t frame_rate_index;
     int number_of_offset_sequences;
-    int width;
-    int height;
+    unsigned width;
+    unsigned height;
     int HDR;
     uint8_t aspect_ratio_index;
     uint8_t audio_presentation_type;
@@ -352,8 +352,8 @@ struct M2TSStreamInfo
     bool isSecondary;
     std::vector<PMTIndex> m_index;
 
-    static void blurayStreamParams(double fps, bool interlaced, int width, int height, int ar, uint8_t* video_format,
-                                   uint8_t* frame_rate_index, uint8_t* aspect_ratio_index);
+    static void blurayStreamParams(double fps, bool interlaced, unsigned width, unsigned height, VideoAspectRatio ar,
+                                   uint8_t* video_format, uint8_t* frame_rate_index, uint8_t* aspect_ratio_index);
 };
 
 struct CLPIStreamInfo : M2TSStreamInfo
@@ -587,7 +587,7 @@ struct MPLSParser
     static void composeExtensionData(BitStreamWriter& writer, const std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, const uint8_t* dataEnd);
     void SubPath_extension(BitStreamWriter& writer);
-    void parseStnTableSS(uint8_t* data, int dataLength);
+    void parseStnTableSS(uint8_t* data, unsigned dataLength);
 
     void AppInfoPlayList(BitStreamReader& reader);
     void composeAppInfoPlayList(BitStreamWriter& writer) const;
@@ -609,7 +609,7 @@ struct MPLSParser
     MPLSStreamInfo& getMVCDependStream();
     static int calcPlayItemID(const MPLSStreamInfo& streamInfo, uint32_t pts);
     int pgIndexToFullIndex(int value) const;
-    void parseSubPathEntryExtension(uint8_t* data, int dataLen);
+    void parseSubPathEntryExtension(uint8_t* data, uint32_t dataLen);
 };
 
 #endif

@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <climits>
 
+#include <fs/systemlog.h>
+
 #include "aac.h"
 #include "abstractStreamReader.h"
 #include "avPacket.h"
@@ -358,7 +360,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
 
     vector<vector<uint8_t>> spsPpsList;
-    int nal_length_size;
+    uint8_t nal_length_size;
 };
 
 class MovParsedH265TrackData final : public MovParsedH264TrackData

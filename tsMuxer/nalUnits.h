@@ -2,7 +2,6 @@
 #define NAL_UNITS_H_
 
 #include <map>
-#include <set>
 #include <unordered_set>
 #include <vector>
 
@@ -125,8 +124,8 @@ class NALDelimiter final : public NALUnit
 class PPSUnit final : public NALUnit
 {
    public:
-    unsigned pic_parameter_set_id;
-    unsigned seq_parameter_set_id;
+    int pic_parameter_set_id;
+    int seq_parameter_set_id;
     int entropy_coding_mode_flag;
     int pic_order_present_flag;
 
@@ -193,15 +192,14 @@ class SPSUnit final : public NALUnit
     unsigned num_views;
 
     int level_idc;
-    std::vector <uint8_t> level_idc_ext;
-    unsigned seq_parameter_set_id;
+    std::vector<uint8_t> level_idc_ext;
+    int seq_parameter_set_id;
     unsigned chroma_format_idc;
     unsigned log2_max_frame_num;
     unsigned pic_order_cnt_type;
     unsigned log2_max_pic_order_cnt_lsb;
     int delta_pic_order_always_zero_flag;
     int offset_for_non_ref_pic;
-    // int offset_for_ref_frame[256];
     unsigned num_ref_frames;
     unsigned pic_width_in_mbs;
     unsigned pic_height_in_map_units;
@@ -283,14 +281,14 @@ class SEIUnit final : public NALUnit
     static void updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts);
     int isMVCSEI();
 
-    uint8_t pic_struct;
+    int8_t pic_struct;
     std::unordered_set<int> m_processedMessages;
 
     uint32_t cpb_removal_delay;
     uint32_t dpb_output_delay;
     int initial_cpb_removal_delay[32];
     int initial_cpb_removal_delay_offset[32];
-    uint8_t number_of_offset_sequences;  // used for bluray MVC metadata
+    int number_of_offset_sequences;  // used for bluray MVC metadata
     int metadataPtsOffset;
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
@@ -348,9 +346,9 @@ class SliceUnit final : public NALUnit
     int memory_management_control_operation;
 
     unsigned first_mb_in_slice;
-    unsigned slice_type;
-    unsigned orig_slice_type;
-    unsigned pic_parameter_set_id;
+    int slice_type;
+    int orig_slice_type;
+    int pic_parameter_set_id;
     uint16_t frame_num;
     int bottom_field_flag;
     uint16_t pic_order_cnt_lsb;
@@ -359,8 +357,8 @@ class SliceUnit final : public NALUnit
     SliceUnit();
     ~SliceUnit() override = default;
 
-    int deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_t, SPSUnit*>& spsMap,
-                    const std::map<uint32_t, PPSUnit*>& ppsMap);
+    int deserialize(uint8_t* buffer, uint8_t* end, const std::map<int, SPSUnit*>& spsMap,
+                    const std::map<int, PPSUnit*>& ppsMap);
     using NALUnit::deserialize;
 
     const SPSUnit* getSPS() const { return sps; }
@@ -368,7 +366,7 @@ class SliceUnit final : public NALUnit
     bool isIDR() const;
     bool isIFrame() const;
     int deserializeSliceType(uint8_t* buffer, uint8_t* end);
-    int deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap, const std::map<uint32_t, PPSUnit*>& ppsMap);
+    int deserializeSliceHeader(const std::map<int, SPSUnit*>& spsMap, const std::map<int, PPSUnit*>& ppsMap);
     void nal_unit_header_svc_extension();
     void nal_unit_header_mvc_extension();
 

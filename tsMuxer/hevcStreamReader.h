@@ -14,7 +14,7 @@ class HEVCStreamReader final : public MPEGStreamReader
     ~HEVCStreamReader() override;
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     int setDoViDescriptor(uint8_t* dstBuff) const;
-    virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
+    CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool needSPSForSplit() const override { return false; }
 
    protected:
@@ -22,8 +22,8 @@ class HEVCStreamReader final : public MPEGStreamReader
     int intDecodeNAL(uint8_t* buff) override;
 
     double getStreamFPS(void* curNalUnit) override;
-    int getStreamWidth() const override;
-    int getStreamHeight() const override;
+    unsigned getStreamWidth() const override;
+    unsigned getStreamHeight() const override;
     int getStreamHDR() const override;
     bool getInterlaced() override { return false; }
     bool isIFrame() override { return m_lastIFrame; }
@@ -39,7 +39,7 @@ class HEVCStreamReader final : public MPEGStreamReader
     bool isSlice(HevcUnit::NalType nalType) const;
     bool isSuffix(HevcUnit::NalType nalType) const;
     void incTimings();
-    int toFullPicOrder(const HevcSliceHeader* slice, int pic_bits);
+    int toFullPicOrder(const HevcSliceHeader* slice, unsigned pic_bits);
     static void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);
     uint8_t* writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, const uint8_t* dstEnd) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;

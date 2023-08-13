@@ -1,6 +1,8 @@
 #include "muxerManager.h"
 
+#include <fs/systemlog.h>
 #include "fs/textfile.h"
+
 #include "h264StreamReader.h"
 #include "iso_writer.h"
 #include "tsMuxer.h"

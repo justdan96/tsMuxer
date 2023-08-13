@@ -634,7 +634,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
     {
         if (m_firstFrame)
         {
-            if (dstEnd - dstBuffer < sizeof(WAVEFORMATPCMEX) + 8)
+            if (static_cast<unsigned>(dstEnd - dstBuffer) < sizeof(WAVEFORMATPCMEX) + 8)
                 THROW(ERR_COMMON, "LPCM stream error: Not enough buffer for writing headers")
             // write wave header
             for (const char c : "RIFF\xff\xff\xff\xffWAVEfmt ") *curPos++ = c;
@@ -729,14 +729,14 @@ bool LPCMStreamReader::beforeFileCloseEvent(File& file)
     file.sync();
     int64_t fileSize = 0;
     file.size(&fileSize);
-    if (fileSize <= 0xfffffffful)
+    if (fileSize <= UINT_MAX)
     {
         uint32_t dataSize = static_cast<uint32_t>(fileSize) - 8;
-        if (file.seek(4, File::SeekMethod::smBegin) == static_cast<uint64_t>(-1))
+        if (file.seek(4, File::SeekMethod::smBegin) == -1)
             return false;
         if (file.write(&dataSize, 4) != 4)
             return false;
-        if (file.seek(64, File::SeekMethod::smBegin) == static_cast<uint64_t>(-1))
+        if (file.seek(64, File::SeekMethod::smBegin) == -1)
             return false;
         dataSize = static_cast<uint32_t>(fileSize) - 68;
         if (file.write(&dataSize, 4) != 4)
@@ -789,7 +789,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
         m_curPos = frame;
         m_needSync = false;
     }
-    avPacket.dts = avPacket.pts = static_cast<int64_t>(m_curPts * m_stretch) + m_timeOffset;
+    avPacket.dts = avPacket.pts = llround(m_curPts * m_stretch) + m_timeOffset;
     if (m_bufEnd - m_curPos < getHeaderLen())
     {
         memmove(m_tmpBuffer.data(), m_curPos, m_bufEnd - m_curPos);
@@ -828,7 +828,7 @@ int LPCMStreamReader::readPacket(AVPacket& avPacket)
         THROW(ERR_AV_FRAME_TOO_LARGE, "AV frame too large (" << frameLen << " bytes). Increase AV buffer.")
     avPacket.size = frameLen;
     avPacket.duration = static_cast<int64_t>(getFrameDuration());  // m_ptsIncPerFrame;
-    m_curPts += avPacket.duration;
+    m_curPts += static_cast<double>(avPacket.duration);
     doMplsCorrection();
     if ((m_headerType == LPCMHeaderType::htWAVE || m_headerType == LPCMHeaderType::htWAVE64) && !m_demuxMode)
     {

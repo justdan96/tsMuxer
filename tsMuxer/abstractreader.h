@@ -18,11 +18,11 @@ class AbstractReader
 
     AbstractReader() : m_blockSize(0), m_allocSize(0), m_prereadThreshold(0) {}
     virtual ~AbstractReader() = default;
-    virtual uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) = 0;
-    virtual void notify(uint32_t readerID, uint32_t dataReaded) = 0;
-    virtual int32_t createReader(int readBuffOffset = 0) = 0;
-    virtual void deleteReader(uint32_t readerID) = 0;
-    virtual bool openStream(uint32_t readerID, const char* streamName, int pid = 0,
+    virtual uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) = 0;
+    virtual void notify(int readerID, uint32_t dataReaded) = 0;
+    virtual int createReader(int readBuffOffset = 0) = 0;
+    virtual void deleteReader(int readerID) = 0;
+    virtual bool openStream(int readerID, const char* streamName, int pid = 0,
                             const CodecInfo* codecInfo = nullptr) = 0;
 
     virtual void setBlockSize(const uint32_t nBlockSize) { m_blockSize = nBlockSize; }
@@ -31,7 +31,7 @@ class AbstractReader
 
     virtual uint32_t getPreReadThreshold() { return m_prereadThreshold; }
 
-    virtual bool gotoByte(uint32_t readerID, uint64_t seekDist) = 0;
+    virtual bool gotoByte(int readerID, int64_t seekDist) = 0;
 
    protected:
     uint32_t m_blockSize;

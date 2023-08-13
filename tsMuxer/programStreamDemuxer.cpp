@@ -182,7 +182,6 @@ void ProgramStreamDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
         else
             trackList[i] = TrackInfo(0, "", 0);  // autodetect
     }
-    return;
 }
 
 bool ProgramStreamDemuxer::isVideoPID(const uint32_t pid) const

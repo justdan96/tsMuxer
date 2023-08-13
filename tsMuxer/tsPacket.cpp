@@ -137,8 +137,8 @@ bool TS_program_association_section::deserialize(uint8_t* buffer, const int buf_
 
         transport_stream_id = bitReader.getBits<uint16_t>(16);
         bitReader.skipBits(2);  // reserved
-        bitReader.skipBits(5);   // int version_number
-        bitReader.skipBit();     // int current_next_indicator
+        bitReader.skipBits(5);  // int version_number
+        bitReader.skipBit();    // int current_next_indicator
 
         bitReader.skipBits(8);  // int section_number
         bitReader.skipBits(8);  // int last_section_number
@@ -1729,21 +1729,20 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize,
     writer.putBits(32, 0);  // length
 
     vector<MPLSStreamInfo> pipStreams;
-    int mainVSize = 0;
-    int mainHSize = 0;
-    for (auto& i : m_streamInfo)
+    unsigned mainVSize = 0, mainHSize = 0;
+    for (auto& si : m_streamInfo)
     {
-        const StreamType stream_coding_type = i.stream_coding_type;
+        const StreamType stream_coding_type = si.stream_coding_type;
         if (isVideoStreamType(stream_coding_type))
         {
-            if (i.isSecondary)
+            if (si.isSecondary)
             {
-                pipStreams.push_back(i);
+                pipStreams.push_back(si);
             }
             else
             {
-                mainHSize = i.width;
-                mainVSize = i.height;
+                mainHSize = si.width;
+                mainVSize = si.height;
             }
         }
     }
@@ -1797,8 +1796,8 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize,
                 else
                     writer.putBits(32, IN_time);
 
-                int hPos = 0;
-                int vPos = 0;
+                unsigned hPos = 0;
+                unsigned vPos = 0;
 
                 if (!pipParams.isFullScreen())
                 {
@@ -1833,7 +1832,7 @@ int MPLSParser::composePip_metadata(uint8_t* buffer, const int bufferSize,
     return writer.getBitsCount() / 8;
 }
 
-void MPLSParser::parseStnTableSS(uint8_t* data, int dataLength)
+void MPLSParser::parseStnTableSS(uint8_t* data, uint32_t dataLength)
 {
     try
     {
@@ -1890,7 +1889,7 @@ void MPLSParser::parseStnTableSS(uint8_t* data, int dataLength)
     }
 }
 
-void MPLSParser::parseSubPathEntryExtension(uint8_t* data, const int dataLen)
+void MPLSParser::parseSubPathEntryExtension(uint8_t* data, const uint32_t dataLen)
 {
     BitStreamReader reader{};
     reader.setBuffer(data, data + dataLen);
@@ -2462,9 +2461,9 @@ void MPLSParser::STN_table(BitStreamReader& reader, int PlayItem_id)
 
 // ------------- M2TSStreamInfo -----------------------
 
-void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced, const int width, const int height,
-                                        const int ar, uint8_t* video_format, uint8_t* frame_rate_index,
-                                        uint8_t* aspect_ratio_index)
+void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced, const unsigned width,
+                                        const unsigned height, const VideoAspectRatio ar, uint8_t* video_format,
+                                        uint8_t* frame_rate_index, uint8_t* aspect_ratio_index)
 {
     *video_format = 0;
     *frame_rate_index = 0;
@@ -2501,7 +2500,7 @@ void M2TSStreamInfo::blurayStreamParams(const double fps, const bool interlaced,
     else if (fabs(fps - 59.94) < 1e-4)
         *frame_rate_index = 7;
 
-    if (ar == static_cast<int>(VideoAspectRatio::AR_3_4) || ar == static_cast<int>(VideoAspectRatio::AR_VGA))
+    if (ar == VideoAspectRatio::AR_3_4 || ar == VideoAspectRatio::AR_VGA)
         *aspect_ratio_index = 2;  // 4x3
 }
 
@@ -2530,8 +2529,8 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             width = vStream->getStreamWidth();
             height = vStream->getStreamHeight();
             HDR = vStream->getStreamHDR();
-            VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, static_cast<int>(ar),
+            const VideoAspectRatio ar = vStream->getStreamAR();
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar,
                                &video_format, &frame_rate_index, &aspect_ratio_index);
             if (ar == VideoAspectRatio::AR_3_4)
                 width = height * 4 / 3;

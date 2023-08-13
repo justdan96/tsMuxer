@@ -3,7 +3,7 @@
 #include "bitStream.h"
 #include "vod_common.h"
 
-static constexpr unsigned aac_sample_rates[16] = {
+static constexpr int aac_sample_rates[16] = {
     96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350,
 };
 
@@ -121,7 +121,7 @@ void AACCodec::readConfig(uint8_t* buff, const int size)
         object_type = 32 + reader.getBits<uint8_t>(6);
     m_profile = (object_type & 0x3) - 1;
     m_sample_rates_index = reader.getBits<uint8_t>(4);
-    m_sample_rate = m_sample_rates_index == 0x0f ? reader.getBits(24) : aac_sample_rates[m_sample_rates_index];
+    m_sample_rate = m_sample_rates_index == 0x0f ? reader.getBits<int>(24) : aac_sample_rates[m_sample_rates_index];
     m_channels_index = reader.getBits<uint8_t>(4);
     m_channels = aac_channels[m_channels_index];
     // return specific_config_bitindex;

@@ -2,6 +2,8 @@
 #include "metaDemuxer.h"
 
 #include <fs/directory.h>
+#include <fs/systemlog.h>
+
 #include <fs/textfile.h>
 #include <types/types.h>
 #include <climits>
@@ -1273,7 +1275,7 @@ int StreamInfo::read()
 
 // ------------------------------ ContainerToReaderWrapper --------------------------------
 
-uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
+uint8_t* ContainerToReaderWrapper::readBlock(const int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
     rez = 0;
     uint8_t* data = nullptr;
@@ -1389,13 +1391,13 @@ void ContainerToReaderWrapper::resetDelayedMark() const
     }
 }
 
-int32_t ContainerToReaderWrapper::createReader(const int readBuffOffset)
+int ContainerToReaderWrapper::createReader(const int readBuffOffset)
 {
     m_readBuffOffset = readBuffOffset;
     return ++m_readerCnt;
 }
 
-void ContainerToReaderWrapper::deleteReader(const uint32_t readerID)
+void ContainerToReaderWrapper::deleteReader(const int readerID)
 {
     const auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())
@@ -1410,7 +1412,7 @@ void ContainerToReaderWrapper::deleteReader(const uint32_t readerID)
     m_readerInfo.erase(itr);
 }
 
-bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamName, int pid,
+bool ContainerToReaderWrapper::openStream(int readerID, const char* streamName, int pid,
                                           const CodecInfo* codecInfo)
 {
     AbstractDemuxer* demuxer = m_demuxers[streamName].m_demuxer;

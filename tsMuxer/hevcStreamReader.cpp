@@ -169,8 +169,7 @@ int HEVCStreamReader::getTSDescriptor(uint8_t* dstBuff, const bool blurayMode, c
         *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_H265);  // stream_conding_type
         uint8_t video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
-                                           &aspect_ratio_index);
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
         *dstBuff++ = static_cast<uint8_t>(video_format << 4 | frame_rate_index);
         *dstBuff++ = static_cast<uint8_t>(aspect_ratio_index << 4 | 0xf);
@@ -238,7 +237,7 @@ int HEVCStreamReader::setDoViDescriptor(uint8_t* dstBuff) const
     if (!isDVBL)
         m_hdr->isDVEL = true;
 
-    int width = getStreamWidth();
+    unsigned width = getStreamWidth();
     auto pixelRate = static_cast<uint32_t>(width * getStreamHeight() * getFPS());
 
     if (!isDVBL && V3_flags & FOUR_K)
@@ -390,9 +389,9 @@ void HEVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* ne
     delete[] tmpBuffer;
 }
 
-int HEVCStreamReader::getStreamWidth() const { return m_sps ? m_sps->pic_width_in_luma_samples : 0; }
+unsigned HEVCStreamReader::getStreamWidth() const { return m_sps ? m_sps->pic_width_in_luma_samples : 0; }
 
-int HEVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height_in_luma_samples : 0; }
+unsigned HEVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height_in_luma_samples : 0; }
 
 int HEVCStreamReader::getStreamHDR() const
 {
@@ -462,7 +461,7 @@ void HEVCStreamReader::incTimings()
     }
 }
 
-int HEVCStreamReader::toFullPicOrder(const HevcSliceHeader* slice, const int pic_bits)
+int HEVCStreamReader::toFullPicOrder(const HevcSliceHeader* slice, const unsigned pic_bits)
 {
     if (slice->isIDR())
     {

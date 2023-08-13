@@ -312,7 +312,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
         m_bit_rate = (ff_ac3_bitratetab[m_frmsizecod >> 1] * 1000) >> m_halfratecod;
         m_channels = static_cast<uint8_t>(ff_ac3_channels[m_acmod] + m_lfeon);
     }
-    return AC3ParseError::NO_ERROR2;
+    return AC3ParseError::NO_ERROR;
 }
 
 // returns frame length, or zero (error), or NOT_ENOUGH_BUFFER
@@ -338,7 +338,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
             if (err == AC3ParseError::NOT_ENOUGH_BUFFER)
                 return NOT_ENOUGH_BUFFER;
 
-            if (err != AC3ParseError::NO_ERROR2)
+            if (err != AC3ParseError::NO_ERROR)
                 return 0;  // parse error
 
             m_frameDuration = (INTERNAL_PTS_FREQ * m_samples) / m_sample_rate;
@@ -476,12 +476,12 @@ AC3Codec::AC3ParseError AC3Codec::testParseHeader(uint8_t *buf, uint8_t *end) co
     if (test_halfratecod != m_halfratecod || test_sample_rate != m_sample_rate || test_bit_rate != m_bit_rate ||
         test_channels != m_channels || test_frame_size != m_frame_size)
         return AC3ParseError::SYNC;
-    return AC3ParseError::NO_ERROR2;
+    return AC3ParseError::NO_ERROR;
 }
 
 bool AC3Codec::testDecodeTestFrame(uint8_t *buf, uint8_t *end) const
 {
-    return testParseHeader(buf, end) == AC3ParseError::NO_ERROR2;
+    return testParseHeader(buf, end) == AC3ParseError::NO_ERROR;
 }
 
 uint64_t AC3Codec::getFrameDuration() const

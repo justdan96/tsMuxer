@@ -1,8 +1,10 @@
 #include "matroskaDemuxer.h"
 
-#include <types/types.h>
 #include <algorithm>
 #include <climits>
+
+#include <fs/systemlog.h>
+#include <types/types.h>
 
 #include "abstractDemuxer.h"
 #include "avPacket.h"
@@ -16,7 +18,7 @@ extern "C"
 
 typedef uint64_t offset_t;
 
-int64_t AV_NOPTS_VALUE = 0x8000000000000000LL;
+static constexpr int64_t AV_NOPTS_VALUE = 0x8000000000000000LL;
 
 static constexpr int PKT_FLAG_KEY = 1;
 static constexpr int AVERROR_INVALIDDATA = -1;

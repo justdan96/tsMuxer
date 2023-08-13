@@ -482,7 +482,6 @@ void TextSubtitlesRender::addBorder(const int borderWidth, uint8_t* data, const 
                 dst++;
             }
     }
-    return;
 }
 
 }  // namespace text_subtitles
