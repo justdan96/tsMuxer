@@ -66,9 +66,9 @@ PGSStreamReader::PGSStreamReader()
 
 void PGSStreamReader::video_descriptor(BitStreamReader& bitReader)
 {
-    m_video_width = bitReader.getBits(16);
-    m_video_height = bitReader.getBits(16);
-    const int frame_rate_index = bitReader.getBits(4);
+    m_video_width = bitReader.getBits<uint16_t>(16);
+    m_video_height = bitReader.getBits<uint16_t>(16);
+    const auto frame_rate_index = bitReader.getBits<uint8_t>(4);
     m_frame_rate = pgs_frame_rates[frame_rate_index];
     bitReader.skipBits(4);
 }
@@ -82,13 +82,13 @@ void PGSStreamReader::composition_descriptor(BitStreamReader& bitReader)
 
 void PGSStreamReader::composition_object(BitStreamReader& bitReader)
 {
-    const int object_id_ref = bitReader.getBits(16);
+    const auto object_id_ref = bitReader.getBits<uint16_t>(16);
     bitReader.skipBits(8);  // window_id_ref
     const bool object_cropped_flag = bitReader.getBit();
     m_forced_on_flag = bitReader.getBit();
     bitReader.skipBits(6);
-    composition_object_horizontal_position[object_id_ref] = bitReader.getBits(16);
-    composition_object_vertical_position[object_id_ref] = bitReader.getBits(16);
+    composition_object_horizontal_position[object_id_ref] = bitReader.getBits<uint16_t>(16);
+    composition_object_vertical_position[object_id_ref] = bitReader.getBits<uint16_t>(16);
     if (object_cropped_flag)
     {
         bitReader.skipBits(32);  // object_cropping_horizontal_position, object_cropping_vertical_position
@@ -111,7 +111,7 @@ int PGSStreamReader::calcFpsIndex(const double fps)
     THROW(ERR_COMMON, "Non standard fps value are not supported for PGS streams")
 }
 
-void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)
+void PGSStreamReader::readPalette(const uint8_t* pos, const uint8_t* end)
 {
     m_palette.clear();
     m_palleteID = *pos++;
@@ -132,8 +132,8 @@ void PGSStreamReader::readPalette(uint8_t* pos, uint8_t* end)
 void PGSStreamReader::yuvToRgb(const int minY) const
 {
     const uint8_t* src = m_imgBuffer;
-    const uint8_t* end = src + m_video_width * m_video_height;
-    // uint8_t* dst = m_rgbBuffer;
+    const int size = m_video_width * m_video_height;
+    const uint8_t* end = src + size;
     auto dst = reinterpret_cast<RGBQUAD*>(m_rgbBuffer);
 
     RGBQUAD rgbPal[256]{};
@@ -204,7 +204,7 @@ void PGSStreamReader::decodeRleData(const int xOffset, const int yOffset) const
 
 static constexpr int Y_THRESHOLD = 33;
 
-int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
+int PGSStreamReader::readObjectDef(const uint8_t* pos, const uint8_t* end)
 {
     pos += 4;  // skip object ID and version number
     const uint32_t objectSize = AV_RB24(pos);
@@ -221,7 +221,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
     pos += 2;
     object_height = AV_RB16(pos);
     pos += 2;
-    int object_id = 0;
+    uint16_t object_id = 0;
     while (pos < objEnd)
     {
         if (pos >= end)
@@ -262,7 +262,7 @@ int PGSStreamReader::readObjectDef(uint8_t* pos, uint8_t* end)
     return 0;
 }
 
-void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
+void PGSStreamReader::rescaleRGB(const BitmapInfo* bmpDest, const BitmapInfo* bmpRef)
 {
     const double xFactor = static_cast<double>(bmpRef->Width) / static_cast<double>(bmpDest->Width);
     const double yFactor = static_cast<double>(bmpRef->Height) / static_cast<double>(bmpDest->Height);
@@ -280,11 +280,13 @@ void PGSStreamReader::rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef)
             const double fraction_y = yDest * yFactor - floor_y;
             const double one_minus_x = 1.0 - fraction_x;
             const double one_minus_y = 1.0 - fraction_y;
-            const RGBQUAD* c1 = bmpRef->buffer + floor_y * bmpRef->Width;
+            int offset = floor_y * bmpRef->Width;
+            const RGBQUAD* c1 = bmpRef->buffer + offset;
             const RGBQUAD* c2 = c1;
             c1 += floor_x;
             c2 += ceil_x;
-            const RGBQUAD* c3 = bmpRef->buffer + ceil_y * bmpRef->Width;
+            offset = ceil_y * bmpRef->Width;
+            const RGBQUAD* c3 = bmpRef->buffer + offset;
             const RGBQUAD* c4 = c3;
             c3 += floor_x;
             c4 += ceil_x;
@@ -393,15 +395,15 @@ void PGSStreamReader::renderTextHide(int64_t outTime)
 int64_t getTimeValueNano(uint8_t* pos)
 {
     const auto pts = static_cast<int64_t>(AV_RB32(pos));
-    if (pts > 0xff000000u)
-        return ptsToInternalClock(pts - 0x100000000ll);
+    if (pts > 0xff000000)
+        return ptsToInternalClock(pts - 0x100000000);
     return ptsToInternalClock(pts);
 }
 
 int64_t getTimeValueNano(const int64_t pts)
 {
-    if (pts > 0x1ff000000ull)
-        return ptsToInternalClock(pts - 0x200000000ll);
+    if (pts > 0x1ff000000)
+        return ptsToInternalClock(pts - 0x200000000);
     return ptsToInternalClock(pts);
 }
 
@@ -445,21 +447,19 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         if (m_video_height == 0)
             return NEED_MORE_DATA;
 
-        int tmpWidth;
-        int tmpHeight;
+        uint16_t tmpWidth;
+        uint16_t tmpHeight;
         m_render->enlargeCrop(m_video_width, m_video_height, &tmpWidth, &tmpHeight);
         m_needRescale =
             (m_scaled_width && m_scaled_width != tmpWidth) || (m_scaled_height && m_scaled_height != tmpHeight);
         if (m_needRescale)
         {
-            m_imgBuffer = new uint8_t[m_video_width * m_video_height];
-            m_rgbBuffer = new uint8_t[m_video_width * m_video_height * 4];
-            m_scaledRgbBuffer = new uint8_t[m_scaled_width * m_scaled_height * 4];
+            const unsigned size = m_video_width * m_video_height;
+            const unsigned scaled_size = m_scaled_width * m_scaled_height;
+            m_imgBuffer = new uint8_t[size] {0xff};
+            m_rgbBuffer = new uint8_t[size << 2] {};
+            m_scaledRgbBuffer = new uint8_t[scaled_size << 2] {};
             m_renderedData = new uint8_t[(m_scaled_width + 16) * m_scaled_height + 16384];
-
-            memset(m_imgBuffer, 0xff, static_cast<size_t>(m_video_width) * m_video_height);
-            memset(m_rgbBuffer, 0x00, static_cast<size_t>(m_video_width) * m_video_height * 4);
-            memset(m_scaledRgbBuffer, 0x00, static_cast<size_t>(m_scaled_width) * m_scaled_height * 4);
             m_render->setImageBuffer(m_scaledRgbBuffer);
         }
         LTRACE(LT_INFO, 2,
@@ -517,9 +517,9 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
             memmove(m_tmpBuffer.data(), m_curPos, m_tmpBufferLen);
             return NEED_MORE_DATA;
         }
-        m_lastPTS = static_cast<int64_t>(getTimeValueNano(m_curPos + 2) * m_scale);
+        m_lastPTS = static_cast<int64_t>(static_cast<double>(getTimeValueNano(m_curPos + 2)) * m_scale);
         m_maxPTS = FFMAX(m_maxPTS, m_lastPTS);
-        m_lastDTS = static_cast<int64_t>(getTimeValueNano(m_curPos + 6) * m_scale);
+        m_lastDTS = static_cast<int64_t>(static_cast<double>(getTimeValueNano(m_curPos + 6)) * m_scale);
         if (m_lastDTS == 0)
             m_lastDTS = m_lastPTS;
         m_curPos += 10;
@@ -598,7 +598,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
     BitStreamReader bitReader{};
     try
     {
-        int number_of_composition_objects, number_of_windows;
+        uint8_t number_of_composition_objects, number_of_windows;
         switch (segment_type)
         {
         case PALETTE_DEF_SEGMENT:
@@ -630,13 +630,13 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         case PCS_DEF_SEGMENT:
             // Presentation Composition Segment
             if (fabs(m_scale - 1.0) > 1e-4)
-                m_curPos[4] = calcFpsIndex(m_newFps) << 4;
+                m_curPos[4] = static_cast<uint8_t>(calcFpsIndex(m_newFps) << 4);
             bitReader.setBuffer(m_curPos, m_bufEnd);
             video_descriptor(bitReader);
             composition_descriptor(bitReader);
 
             bitReader.skipBits(16);  // palette_update_flag, palette_id_ref
-            number_of_composition_objects = bitReader.getBits(8);
+            number_of_composition_objects = bitReader.getBits<uint8_t>(8);
             for (int i = 0; i < number_of_composition_objects; i++)
             {
                 composition_object(bitReader);
@@ -647,25 +647,22 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         case WINDOWS_DEF_SEGMENT:
             // Window Definition Segment
             bitReader.setBuffer(m_curPos, m_bufEnd);
-            number_of_windows = bitReader.getBits(8);
+            number_of_windows = bitReader.getBits<uint8_t>(8);
             for (int i = 0; i < number_of_windows; i++) pgs_window(bitReader);
             // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " Window Definition Segment");
             break;
         case 0x18:
             // Interactive Composition Segment
             // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " Interactive Composition Segment");
-            break;
         case 0x80:
             // End of Display Set Segment
             // m_end_display_time = get_pts(curPos);
             // curPos += 5;
             // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " END");
-            break;
         case 0x81:
         case 0x82:
             // Used by HDMV Text subtitle streams
             // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " TEXT DATA");
-            break;
         default:
             // LTRACE(LT_INFO, 2, "PGS #" << m_streamIndex << " unknown type " << (int)segment_type);
             break;
@@ -769,7 +766,7 @@ CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerT
 
 void PGSStreamReader::intDecodeStream(uint8_t* buffer, const size_t len)
 {
-    uint8_t* bufEnd = buffer + len;
+    const uint8_t* bufEnd = buffer + len;
     uint8_t* curPos = buffer;
     while (curPos < bufEnd)
     {
@@ -824,7 +821,7 @@ int PGSStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPa
     return 0;
 }
 
-void PGSStreamReader::setVideoInfo(const int width, const int height, const double fps)
+void PGSStreamReader::setVideoInfo(const uint16_t width, const uint16_t height, const double fps)
 {
     m_scaled_width = width;
     m_scaled_height = height;

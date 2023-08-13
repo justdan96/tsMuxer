@@ -23,12 +23,12 @@ class SimplePacketizerReader : public AbstractStreamReader
                                        int containerStreamIndex);
     virtual int getFreq() = 0;
     virtual int getAltFreq() { return getFreq(); }
-    virtual int getChannels() = 0;
+    virtual uint8_t getChannels() = 0;
     void setStretch(const double value) { m_stretch = value; }
     void setMPLSInfo(const std::vector<MPLSPlayItem>& mplsInfo)
     {
         m_mplsInfo = mplsInfo;
-        if (m_mplsInfo.size() > 0)
+        if (!m_mplsInfo.empty())
         {
             m_curMplsIndex = 0;
             m_lastMplsTime = (m_mplsInfo[0].OUT_time - m_mplsInfo[0].IN_time) * (INTERNAL_PTS_FREQ / 45000.0);

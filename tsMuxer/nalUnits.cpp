@@ -592,11 +592,11 @@ int SPSUnit::deserializeVuiParameters()
     aspect_ratio_info_present_flag = bitReader.getBit();
     if (aspect_ratio_info_present_flag)
     {
-        aspect_ratio_idc = bitReader.getBits(8);
+        aspect_ratio_idc = bitReader.getBits<uint8_t>(8);
         if (aspect_ratio_idc == Extended_SAR)
         {
-            sar_width = bitReader.getBits(16);
-            sar_height = bitReader.getBits(16);
+            sar_width = bitReader.getBits<uint16_t>(16);
+            sar_height = bitReader.getBits<uint16_t>(16);
         }
     }
     if (bitReader.getBit())   // overscan_info_present_flag
@@ -618,8 +618,8 @@ int SPSUnit::deserializeVuiParameters()
     if (timing_info_present_flag)
     {
         num_units_in_tick_bit_pos = bitReader.getBitsCount();
-        num_units_in_tick = bitReader.get32Bits();
-        time_scale = bitReader.get32Bits();
+        num_units_in_tick = bitReader.getBits(32);
+        time_scale = bitReader.getBits(32);
         fixed_frame_rate_flag = bitReader.getBit();
     }
     hrdParamsBitPos = bitReader.getBitsCount() + 32;
@@ -845,7 +845,7 @@ void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int v
         if (reader.getBit())
         {  // source nal_hrd_parameters_present_flag
             // nal hrd already exists, copy from a source stream
-            for (int i = 0; i < nal_hrd_len / 32; ++i) writer.putBits(32, reader.get32Bits());
+            for (int i = 0; i < nal_hrd_len / 32; ++i) writer.putBits(32, reader.getBits(32));
             writer.putBits(nal_hrd_len % 32, reader.getBits(nal_hrd_len % 32));
         }
         else
@@ -857,7 +857,7 @@ void SPSUnit::insertHrdData(const int bitPos, const int nal_hrd_len, const int v
         if (reader.getBit())
         {  // source vcl_hrd_parameters_present_flag
             // vcl hrd already exists, copy from a source stream
-            for (int i = 0; i < vcl_hrd_len / 32; ++i) writer.putBits(32, reader.get32Bits());
+            for (int i = 0; i < vcl_hrd_len / 32; ++i) writer.putBits(32, reader.getBits(32));
             writer.putBits(vcl_hrd_len % 32, reader.getBits(vcl_hrd_len % 32));
         }
         else
@@ -904,8 +904,8 @@ int SPSUnit::hrd_parameters(HRDParams& params)
     params.cpb_cnt_minus1 = extractUEGolombCode();
     if (params.cpb_cnt_minus1 >= 32)
         return 1;
-    params.bit_rate_scale = bitReader.getBits(4);
-    params.cpb_size_scale = bitReader.getBits(4);
+    params.bit_rate_scale = bitReader.getBits<uint8_t>(4);
+    params.cpb_size_scale = bitReader.getBits<uint8_t>(4);
 
     params.bit_rate_value_minus1.resize(params.cpb_cnt_minus1 + 1);
     params.cpb_size_value_minus1.resize(params.cpb_cnt_minus1 + 1);
@@ -914,17 +914,17 @@ int SPSUnit::hrd_parameters(HRDParams& params)
     for (size_t SchedSelIdx = 0; SchedSelIdx <= params.cpb_cnt_minus1; SchedSelIdx++)
     {
         params.bit_rate_value_minus1[SchedSelIdx] = extractUEGolombCode();
-        if (params.bit_rate_value_minus1[SchedSelIdx] == 0xffffffff)
+        if (params.bit_rate_value_minus1[SchedSelIdx] == UINT_MAX)
             return 1;
         params.cpb_size_value_minus1[SchedSelIdx] = extractUEGolombCode();
-        if (params.cpb_size_value_minus1[SchedSelIdx] == 0xffffffff)
+        if (params.cpb_size_value_minus1[SchedSelIdx] == UINT_MAX)
             return 1;
         params.cbr_flag[SchedSelIdx] = bitReader.getBit();
     }
-    params.initial_cpb_removal_delay_length_minus1 = bitReader.getBits(5);
-    params.cpb_removal_delay_length_minus1 = bitReader.getBits(5);
-    params.dpb_output_delay_length_minus1 = bitReader.getBits(5);
-    params.time_offset_length = bitReader.getBits(5);
+    params.initial_cpb_removal_delay_length_minus1 = bitReader.getBits<uint8_t>(5);
+    params.cpb_removal_delay_length_minus1 = bitReader.getBits<uint8_t>(5);
+    params.dpb_output_delay_length_minus1 = bitReader.getBits<uint8_t>(5);
+    params.time_offset_length = bitReader.getBits<uint8_t>(5);
 
     return 0;
 }
@@ -1060,7 +1060,7 @@ int SPSUnit::seq_parameter_set_mvc_extension()
     level_idc_ext.resize(num_level_values_signalled_minus1 + 1);
     for (unsigned i = 0; i <= num_level_values_signalled_minus1; i++)
     {
-        level_idc_ext[i] = bitReader.getBits(8);
+        level_idc_ext[i] = bitReader.getBits<uint8_t>(8);
         num_applicable_ops_minus1[i] = extractUEGolombCode();
         if (num_applicable_ops_minus1[i] >= 1 << 10)
             return 1;
@@ -1089,7 +1089,7 @@ int SPSUnit::mvc_vui_parameters_extension()
     const unsigned vui_mvc_num_ops = extractUEGolombCode() + 1;
     if (vui_mvc_num_ops > 1 << 10)
         return 1;
-    std::vector<int> vui_mvc_temporal_id;
+    std::vector <uint8_t> vui_mvc_temporal_id;
     vui_mvc_temporal_id.resize(vui_mvc_num_ops);
     mvcHrdParamsBitPos.resize(vui_mvc_num_ops);
     mvcNalHrdParams.resize(vui_mvc_num_ops);
@@ -1097,7 +1097,7 @@ int SPSUnit::mvc_vui_parameters_extension()
 
     for (size_t i = 0; i < vui_mvc_num_ops; i++)
     {
-        vui_mvc_temporal_id[i] = bitReader.getBits(3);
+        vui_mvc_temporal_id[i] = bitReader.getBits<uint8_t>(3);
         const unsigned vui_mvc_num_target_output_views = extractUEGolombCode() + 1;
         if (vui_mvc_num_target_output_views > 1 << 10)
             return 1;
@@ -1305,7 +1305,7 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
     if (sps->separate_colour_plane_flag)
         bitReader.skipBits(2);  // colour_plane_id
 
-    frame_num = bitReader.getBits(sps->log2_max_frame_num);
+    frame_num = bitReader.getBits<uint16_t>(sps->log2_max_frame_num);
     bottom_field_flag = 0;
     m_field_pic_flag = 0;
     if (sps->frame_mbs_only_flag == 0)
@@ -1321,7 +1321,7 @@ int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap
     }
     if (sps->pic_order_cnt_type == 0)
     {
-        pic_order_cnt_lsb = bitReader.getBits(sps->log2_max_pic_order_cnt_lsb);
+        pic_order_cnt_lsb = bitReader.getBits<uint16_t>(sps->log2_max_pic_order_cnt_lsb);
         if (pps->pic_order_present_flag && !m_field_pic_flag)
             extractSEGolombCode();  // delta_pic_order_cnt_bottom
     }
@@ -1673,7 +1673,7 @@ void SEIUnit::pic_timing(const SPSUnit& sps, const bool orig_hrd_parameters_pres
     }
     if (sps.pic_struct_present_flag)
     {
-        pic_struct = bitReader.getBits(4);
+        pic_struct = bitReader.getBits<uint8_t>(4);
         const int numClockTS = getNumClockTS(pic_struct);
 
         for (int i = 0; i < numClockTS; i++)
@@ -1719,7 +1719,7 @@ int SEIUnit::mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, const int
                 const unsigned num_view_components_minus1 = extractUEGolombCode();
                 if (num_view_components_minus1 >= 1 << 10)
                     return 1;
-                for (size_t i = 0; i <= num_view_components_minus1; i++) bitReader.getBits(10);  // sei_view_id[ i ]
+                for (size_t i = 0; i <= num_view_components_minus1; i++) bitReader.skipBits(10);  // sei_view_id[ i ]
             }
         }
         else
@@ -1729,7 +1729,7 @@ int SEIUnit::mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, const int
                 return 1;
             for (size_t i = 0; i <= num_view_components_op_minus1; i++)
             {
-                bitReader.getBits(13);  // sei_op_view_id[ i ], sei_op_temporal_id
+                bitReader.skipBits(13);  // sei_op_view_id[ i ], sei_op_temporal_id
             }
         }
         const int byteBits = bitReader.getBitsCount() % 8;
@@ -1739,12 +1739,12 @@ int SEIUnit::mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, const int
         m_mvcHeaderStart = bitReader.getBuffer();
         m_mvcHeaderLen = bitReader.getBitsCount() / 8;
 
-        const int payloadType = bitReader.getBits(8);
+        const auto payloadType = bitReader.getBits<uint8_t>(8);
         int payloadSize = 0;
-        int sizePart;
+        uint8_t sizePart;
         do
         {
-            sizePart = bitReader.getBits(8);
+            sizePart = bitReader.getBits<uint8_t>(8);
             payloadSize += sizePart;
         } while (sizePart == 0xff);
 
@@ -1757,7 +1757,7 @@ int SEIUnit::mvc_scalable_nesting(const SPSUnit& sps, uint8_t* curBuf, const int
                 {
                     // process bd rom meta data
                     for (int i = 0; i < 4; ++i) bitReader.skipBits(32);
-                    const int type_indicator = bitReader.getBits(32);
+                    const auto type_indicator = bitReader.getBits(32);
                     switch (type_indicator)
                     {
                     case 0x4F464D44:
@@ -1797,7 +1797,7 @@ void SEIUnit::processBlurayOffsetMetadata()
     metadataPtsOffset = static_cast<int>(ptr - m_nalBuffer);
     bitReader.skipBits(24);  // PTS[32..30], marker_bit, PTS[29..15]
     bitReader.skipBits(18);  // marker_bit, PTS[14..0], marker_bit, reserved_for_future_use bit
-    number_of_offset_sequences = bitReader.getBits(6);
+    number_of_offset_sequences = bitReader.getBits<uint8_t>(6);
 }
 
 void SEIUnit::updateMetadataPts(uint8_t* metadataPtsPtr, const int64_t pts)

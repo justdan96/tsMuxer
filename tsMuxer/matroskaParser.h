@@ -216,7 +216,7 @@ class ParsedH264TrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 
    protected:
-    int m_nalSize;
+    uint8_t m_nalSize;
     bool m_firstExtract;
 
     std::vector<std::vector<uint8_t>> m_spsPpsList;

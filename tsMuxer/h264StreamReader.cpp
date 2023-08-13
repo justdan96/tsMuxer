@@ -442,7 +442,7 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
         *dstBuff++ = 'V';
         *dstBuff++ = 0xff;  // stuffing byte
 
-        int video_format, frame_rate_index, aspect_ratio_index;
+        uint8_t video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
                                            static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
                                            &aspect_ratio_index);

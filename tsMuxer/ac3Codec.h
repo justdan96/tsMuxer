@@ -21,13 +21,13 @@ class AC3Codec
 
     enum class AC3ParseError
     {
-        NO_ERROR = 0,
+        NO_ERROR2 = 0,
         SYNC = -1,
         BSID = -2,
         SAMPLE_RATE = -3,
         FRAME_SIZE = -4,
         CRC2 = -5,
-        NOT_ENOUGH_BUFFER = -10,
+        NOT_ENOUGH_BUFFER = -10
     };
 
     AC3Codec()
@@ -78,19 +78,19 @@ class AC3Codec
     bool m_waitMoreData;
     bool m_downconvertToAC3;
     bool m_true_hd_mode;
-    int m_fscod;
+    uint8_t m_fscod;
     int m_frmsizecod;
     uint8_t m_bsid;
     uint8_t m_bsidBase;
-    int m_strmtyp;
-    int m_bsmod;
-    int m_acmod;
-    int m_dsurmod;
-    int m_lfeon;
+    uint8_t m_strmtyp;
+    uint8_t m_bsmod;
+    uint8_t m_acmod;
+    uint8_t m_dsurmod;
+    uint8_t m_lfeon;
     uint8_t m_halfratecod;
     int m_sample_rate;
     int m_bit_rate;
-    int m_channels;
+    uint8_t m_channels;
     int m_frame_size;
     bool m_mixinfoexists;
 

@@ -24,7 +24,7 @@ enum V3Flags
 };
 
 extern int V3_flags;
-extern int HDR10_metadata[6];
+extern unsigned HDR10_metadata[6];
 extern bool isV3();
 extern bool is4K();
 

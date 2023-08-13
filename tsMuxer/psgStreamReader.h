@@ -46,7 +46,7 @@ class PGSStreamReader final : public AbstractStreamReader
     // void setVideoWidth(int value);
     // void setVideoHeight(int value);
     // void setFPS(double value);
-    void setVideoInfo(int width, int height, double fps);
+    void setVideoInfo(uint16_t width, uint16_t height, double fps);
     void setFontBorder(const int value) { m_fontBorder = value; }
     void setBottomOffset(const int value) const { m_render->setBottomOffset(value); }
     void setOffsetId(const int value) { m_offsetId = value; }
@@ -71,7 +71,7 @@ class PGSStreamReader final : public AbstractStreamReader
         }
         int64_t pts;
         int64_t dts;
-        int len;
+        unsigned len;
         uint8_t* data;
     };
 
@@ -101,8 +101,8 @@ class PGSStreamReader final : public AbstractStreamReader
     int m_afterPesByte;
     int m_fontBorder;
 
-    int m_video_width;
-    int m_video_height;
+    uint16_t m_video_width;
+    uint16_t m_video_height;
     double m_frame_rate;
     double m_newFps;
     double m_scale;
@@ -115,16 +115,16 @@ class PGSStreamReader final : public AbstractStreamReader
     uint8_t* m_rgbBuffer;
     uint8_t* m_scaledRgbBuffer;
     std::map<uint8_t, text_subtitles::YUVQuad> m_palette;
-    int m_scaled_width;
-    int m_scaled_height;
+    uint16_t m_scaled_width;
+    uint16_t m_scaled_height;
     bool m_firstRenderedPacket;
 
     text_subtitles::TextToPGSConverter* m_render;
     uint8_t* m_renderedData;
     std::vector<PGSRenderedBlock> m_renderedBlocks;
 
-    std::map<int, int> composition_object_horizontal_position;
-    std::map<int, int> composition_object_vertical_position;
+    std::map<uint16_t, uint16_t> composition_object_horizontal_position;
+    std::map<uint16_t, uint16_t> composition_object_vertical_position;
     void renderTextShow(int64_t inTime);
     void renderTextHide(int64_t outTime);
 
@@ -132,18 +132,18 @@ class PGSStreamReader final : public AbstractStreamReader
     void composition_descriptor(BitStreamReader& bitReader);
     void composition_object(BitStreamReader& bitReader);
     static void pgs_window(BitStreamReader& bitReader);
-    void readPalette(uint8_t* pos, uint8_t* end);
-    int readObjectDef(uint8_t* pos, uint8_t* end);
+    void readPalette(const uint8_t* pos, const uint8_t* end);
+    int readObjectDef(const uint8_t* pos, const uint8_t* end);
     void decodeRleData(int xOffset, int yOffset) const;
     void yuvToRgb(int minY) const;
-    static void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
+    static void rescaleRGB(const BitmapInfo* bmpDest, const BitmapInfo* bmpRef);
     void intDecodeStream(uint8_t* buffer, size_t len);
 
     int m_palleteID;
     int m_paletteVersion;
     bool m_isNewFrame;
-    int m_objectWindowHeight;
-    int m_objectWindowTop;
+    uint16_t m_objectWindowHeight;
+    uint16_t m_objectWindowTop;
     uint8_t m_offsetId;
     bool m_forced_on_flag;
 

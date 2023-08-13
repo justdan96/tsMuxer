@@ -26,28 +26,28 @@ ParsedH264TrackData::ParsedH264TrackData(uint8_t* buff, const int size) : Parsed
         bitReader.setBuffer(buff, buff + size);
         bitReader.skipBits(24);  // reserved 8, profile 8, reserved 8
         bitReader.skipBits(14);  // level 8, reserved 6
-        m_nalSize = bitReader.getBits(2) + 1;
+        m_nalSize = bitReader.getBits<uint8_t>(2) + 1;
         bitReader.skipBits(3);  // reserved
-        const int spsCnt = bitReader.getBits(5);
+        const auto spsCnt = bitReader.getBits<uint8_t>(5);
         for (int i = 0; i < spsCnt; i++)
         {
-            const int spsLen = bitReader.getBits(16);
+            const auto spsLen = bitReader.getBits<uint16_t>(16);
             if (spsLen > 0)
             {
                 m_spsPpsList.emplace_back();
                 std::vector<uint8_t>& curData = m_spsPpsList[m_spsPpsList.size() - 1];
-                for (int j = 0; j < spsLen; j++) curData.push_back(bitReader.getBits(8) & 0xff);
+                for (int j = 0; j < spsLen; j++) curData.push_back(bitReader.getBits<uint8_t>(8));
             }
         }
-        const int ppsCnt = bitReader.getBits(8);
+        const auto ppsCnt = bitReader.getBits<uint8_t>(8);
         for (int i = 0; i < ppsCnt; i++)
         {
-            const int ppsLen = bitReader.getBits(16);
+            const auto ppsLen = bitReader.getBits<uint16_t>(16);
             if (ppsLen > 0)
             {
                 m_spsPpsList.emplace_back();
                 std::vector<uint8_t>& curData = m_spsPpsList[m_spsPpsList.size() - 1];
-                for (int j = 0; j < ppsLen; j++) curData.push_back(bitReader.getBits(8) & 0xff);
+                for (int j = 0; j < ppsLen; j++) curData.push_back(bitReader.getBits<uint8_t>(8));
             }
         }
     }

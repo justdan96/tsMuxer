@@ -21,7 +21,7 @@
 using namespace std;
 
 int V3_flags = 0;
-int HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
+unsigned HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
 bool isV3() { return V3_flags & HDMV_V3; }
 bool is4K() { return V3_flags & FOUR_K; }
 

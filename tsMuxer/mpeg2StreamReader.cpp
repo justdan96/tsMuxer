@@ -27,7 +27,7 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
             {
                 BitStreamReader bitReader{};
                 bitReader.setBuffer(nal + 4, m_bufEnd);
-                const int extType = bitReader.getBits(4);
+                const auto extType = bitReader.getBits<uint8_t>(4);
                 if (extType == SEQUENCE_EXT)
                 {
                     m_sequence.deserializeExtension(bitReader);
@@ -59,8 +59,8 @@ int MPEG2StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool h
     *dstBuff++ = 0xff;
 
     *dstBuff++ = static_cast<uint8_t>(StreamType::VIDEO_MPEG2);  // stream_coding_type
-    *dstBuff++ = (m_sequence.video_format << 4) + m_sequence.frame_rate_index;
-    *dstBuff = (m_sequence.aspect_ratio_info << 4) + 0xf;
+    *dstBuff++ = static_cast<uint8_t>(m_sequence.video_format << 4 | m_sequence.frame_rate_index);
+    *dstBuff = static_cast<uint8_t>(m_sequence.aspect_ratio_info << 4 | 0xf);
 
     return 10;  // total descriptor length
 }
@@ -74,7 +74,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
     bool sliceFound = false;
     bool pictureFound = false;
     bool pulldownFound = false;
-    int extType = 0;
+    uint8_t extType = 0;
     MPEGPictureHeader frame(0);
     for (uint8_t* nal = MPEGHeader::findNextMarker(buffer, end); nal <= end - 32;
          nal = MPEGHeader::findNextMarker(nal + 4, end))
@@ -89,7 +89,7 @@ CheckStreamRez MPEG2StreamReader::checkStream(uint8_t* buffer, int len)
                 {
                 case EXT_START_SHORT_CODE:
                     bitReader.setBuffer(nal + 4, end);
-                    extType = bitReader.getBits(4);
+                    extType = bitReader.getBits<uint8_t>(4);
                     if (extType == SEQUENCE_EXT)
                     {
                         m_sequence.deserializeExtension(bitReader);
@@ -226,7 +226,7 @@ int MPEG2StreamReader::processExtStartCode(uint8_t* buff)
     try
     {
         bitReader.setBuffer(buff + 1, m_bufEnd);
-        const int extType = bitReader.getBits(4);
+        const auto extType = bitReader.getBits<uint8_t>(4);
         if (extType == SEQUENCE_EXT)
         {
             m_sequence.deserializeExtension(bitReader);
@@ -321,7 +321,7 @@ int MPEG2StreamReader::findFrameExt(uint8_t* buffer)
             try
             {
                 bitReader.setBuffer(nal + 4, m_bufEnd);
-                const int extType = bitReader.getBits(4);
+                const auto extType = bitReader.getBits<uint8_t>(4);
                 if (extType == PICTURE_CODING_EXT)
                 {
                     m_frame.deserializeCodingExtension(bitReader);

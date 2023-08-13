@@ -92,15 +92,15 @@ class MPEGRawDataHeader : public MPEGHeader
 class MPEGSequenceHeader final : public MPEGRawDataHeader
 {
    public:
-    int width;
-    int height;
+    uint16_t width;
+    uint16_t height;
 
     // int frameRate;
-    int aspect_ratio_info;
-    unsigned frame_rate_index;
-    int bit_rate;
+    uint8_t aspect_ratio_info;
+    uint8_t frame_rate_index;
+    unsigned bit_rate;
 
-    int rc_buffer_size;
+    unsigned rc_buffer_size;
 
     int vbv_buffer_size : 10;
     int constParameterFlag : 1;
@@ -112,25 +112,25 @@ class MPEGSequenceHeader final : public MPEGRawDataHeader
     uint8_t non_intra_matrix[64];
 
     // sequence extension
-    int profile;
-    int level;
-    int progressive_sequence;
-    int chroma_format;
-    int horiz_size_ext;
-    int vert_size_ext;
-    int bit_rate_ext;
-    int low_delay;
+    int8_t profile;
+    int8_t level;
+    uint8_t progressive_sequence;
+    uint8_t chroma_format;
+    uint8_t horiz_size_ext;
+    uint8_t vert_size_ext;
+    uint16_t bit_rate_ext;
+    bool low_delay;
     AVRational frame_rate_ext;
 
     // sequence display extension
-    int video_format;
+    uint8_t video_format;
 
-    int color_primaries;
-    int transfer_characteristics;
-    int matrix_coefficients;
+    uint8_t color_primaries;
+    uint8_t transfer_characteristics;
+    uint8_tint matrix_coefficients;
 
-    int pan_scan_width;
-    int pan_scan_height;
+    unsigned pan_scan_width;
+    unsigned pan_scan_height;
     MPEGSequenceHeader(int bufferSize);
     ~MPEGSequenceHeader() override = default;
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
@@ -140,7 +140,7 @@ class MPEGSequenceHeader final : public MPEGRawDataHeader
     double getFrameRate() const;
     void setFrameRate(uint8_t* buff, double fps);
     static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
-    std::string getStreamDescr();
+    std::string getStreamDescr() const;
 };
 
 class MPEGGOPHeader final : public MPEGHeader
@@ -223,11 +223,11 @@ class MPEGPictureHeader final : public MPEGRawDataHeader
     ~MPEGPictureHeader() override = default;
 
     uint8_t* deserialize(uint8_t* buf, int64_t buf_size);
-    uint8_t* deserializeCodingExtension(BitStreamReader& bitReader);
+    uint8_t* deserializeCodingExtension(BitStreamReader& reader);
 
     uint32_t serialize(uint8_t* buffer) override;
     uint32_t getPictureSize() const;
-    void setTempRef(uint32_t number);
+    void setTempRef(uint16_t number);
     void setVbvDelay(uint16_t val);
 
     bool addRawData(uint8_t* buffer, int len, bool headerIncluded, bool isHeader) override;

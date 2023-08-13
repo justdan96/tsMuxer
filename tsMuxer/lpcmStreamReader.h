@@ -34,7 +34,7 @@ class LPCMStreamReader final : public SimplePacketizerReader
     void setNewStyleAudioPES(const bool value) { m_useNewStyleAudioPES = value; }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     int getFreq() override { return m_freq; }
-    int getChannels() override { return m_channels; }
+    uint8_t getChannels() override { return m_channels; }
     // void setDemuxMode(bool value) {m_demuxMode = value;}
     void setFirstFrame(const bool value) { m_firstFrame = value; }
     bool beforeFileCloseEvent(File& file) override;
@@ -68,8 +68,8 @@ class LPCMStreamReader final : public SimplePacketizerReader
     bool m_needPCMHdr;
 
     uint16_t m_bitsPerSample;
-    int m_freq;
-    uint16_t m_channels;
+    int32_t m_freq;
+    uint8_t m_channels;
     bool m_lfeExists;
     int64_t m_curChunkLen;
     bool m_openSizeWaveFormat;
@@ -77,7 +77,7 @@ class LPCMStreamReader final : public SimplePacketizerReader
 
     bool detectLPCMType(uint8_t* buffer, int64_t len);
     int decodeLPCMHeader(const uint8_t* buff);
-    uint32_t convertLPCMToWAV(uint8_t* start, uint8_t* end);
+    int convertLPCMToWAV(uint8_t* start, uint8_t* end);
     int convertWavToPCM(uint8_t* start, uint8_t* end);
 
     void storeChannelData(const uint8_t* start, const uint8_t* end, int chNum, uint8_t* tmpData, int mch) const;

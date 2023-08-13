@@ -18,7 +18,7 @@ unsigned ceilDiv(const unsigned a, const unsigned b) { return (a / b) + ((a % b)
 unsigned HevcUnit::extractUEGolombCode()
 {
     unsigned cnt = 0;
-    for (; m_reader.getBit() == 0; cnt++)
+    for (; !m_reader.getBit(); cnt++)
         ;
     if (cnt > INT_BIT)
         THROW_BITSTREAM_ERR;
@@ -47,8 +47,8 @@ int HevcUnit::deserialize()
     {
         m_reader.skipBit();
         nal_unit_type = static_cast<NalType>(m_reader.getBits(6));
-        nuh_layer_id = m_reader.getBits(6);
-        nuh_temporal_id_plus1 = m_reader.getBits(3);
+        nuh_layer_id = m_reader.getBits<uint8_t>(6);
+        nuh_temporal_id_plus1 = m_reader.getBits<uint8_t>(3);
         if (nuh_temporal_id_plus1 == 0 ||
             (nuh_temporal_id_plus1 != 1 && (nal_unit_type == NalType::VPS || nal_unit_type == NalType::SPS ||
                                             nal_unit_type == NalType::EOS || nal_unit_type == NalType::EOB)))
@@ -99,7 +99,7 @@ int HevcUnit::serializeBuffer(uint8_t* dstBuffer, const uint8_t* dstEnd) const
 
 // ------------------------- HevcUnitWithProfile  -------------------
 
-HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), interlaced_source_flag(0) {}
+HevcUnitWithProfile::HevcUnitWithProfile() : profile_idc(0), level_idc(0), interlaced_source_flag(false) {}
 
 int HevcUnitWithProfile::profile_tier_level(const int subLayers)
 {
@@ -109,13 +109,13 @@ int HevcUnitWithProfile::profile_tier_level(const int subLayers)
         bool sub_layer_level_present_flag[7]{false};
 
         m_reader.skipBits(3);  // profile_space, tier_flag
-        profile_idc = m_reader.getBits(5);
+        profile_idc = m_reader.getBits<uint8_t>(5);
         m_reader.skipBits(32);  // general_profile_compatibility_flag
         m_reader.skipBit();     // progressive_source_flag
         interlaced_source_flag = m_reader.getBit();
         m_reader.skipBits(32);  // unused flags
         m_reader.skipBits(14);  // unused flags
-        level_idc = m_reader.getBits(8);
+        level_idc = m_reader.getBits<uint8_t>(8);
 
         for (int i = 0; i < subLayers - 1; i++)
         {
@@ -183,7 +183,7 @@ int HevcVpsUnit::deserialize()
     try
     {
         m_reader.skipBits(12);  // vps_id, reserved, vps_max_layers
-        const int vps_max_sub_layers = m_reader.getBits(3) + 1;
+        const uint8_t vps_max_sub_layers = m_reader.getBits<uint8_t>(3) + 1;
         if (vps_max_sub_layers > 7)
             return 1;
         m_reader.skipBits(17);  // vps_temporal_id_nesting_flag, vps_reserved_0xffff_16bits
@@ -200,7 +200,7 @@ int HevcVpsUnit::deserialize()
             if (extractUEGolombCode() == 0xffffffff)  // vps_max_latency_increase_plus1
                 return 1;
         }
-        const int vps_max_layer_id = m_reader.getBits(6);
+        const auto vps_max_layer_id = m_reader.getBits<uint8_t>(6);
         const unsigned vps_num_layer_sets_minus1 = extractUEGolombCode();
         if (vps_num_layer_sets_minus1 > 1023)
             return 1;
@@ -211,8 +211,8 @@ int HevcVpsUnit::deserialize()
         if (m_reader.getBit())  // vps_timing_info_present_flag
         {
             num_units_in_tick_bit_pos = m_reader.getBitsCount();
-            num_units_in_tick = m_reader.get32Bits();
-            time_scale = m_reader.get32Bits();
+            num_units_in_tick = m_reader.getBits(32);
+            time_scale = m_reader.getBits(32);
         }
 
         return rez;
@@ -365,9 +365,9 @@ int HevcSpsUnit::vui_parameters()
         m_reader.skipBits(4);   // video_format, video_full_range_flag
         if (m_reader.getBit())  // colour_description_present_flag
         {
-            colour_primaries = m_reader.getBits(8);
-            transfer_characteristics = m_reader.getBits(8);
-            matrix_coeffs = m_reader.getBits(8);
+            colour_primaries = m_reader.getBits<uint8_t>(8);
+            transfer_characteristics = m_reader.getBits<uint8_t>(8);
+            matrix_coeffs = m_reader.getBits<uint8_t>(8);
         }
     }
 
@@ -393,12 +393,12 @@ int HevcSpsUnit::vui_parameters()
 
     if (m_reader.getBit())  // vui_timing_info_present_flag
     {
-        num_units_in_tick = m_reader.get32Bits();
-        time_scale = m_reader.get32Bits();
+        num_units_in_tick = m_reader.getBits(32);
+        time_scale = m_reader.getBits(32);
 
         if (m_reader.getBit())  // vui_poc_proportional_to_timing_flag
         {
-            if (extractUEGolombCode() == 0xffffffff)  // vui_num_ticks_poc_diff_one_minus1
+            if (extractUEGolombCode() == UINT_MAX)  // vui_num_ticks_poc_diff_one_minus1
                 return 1;
         }
         if (m_reader.getBit())  // vui_hrd_parameters_present_flag
@@ -511,8 +511,8 @@ int HevcSpsUnit::deserialize()
         return rez;
     try
     {
-        vps_id = m_reader.getBits(4);
-        max_sub_layers = m_reader.getBits(3) + 1;
+        vps_id = m_reader.getBits<uint8_t>(4);
+        max_sub_layers = m_reader.getBits<uint8_t>(3) + 1;
         if (max_sub_layers > 7)
             return 1;
         m_reader.skipBit();  // temporal_id_nesting_flag
@@ -690,7 +690,7 @@ int HevcPpsUnit::deserialize()
             return 1;
         dependent_slice_segments_enabled_flag = m_reader.getBit();
         output_flag_present_flag = m_reader.getBit();
-        num_extra_slice_header_bits = m_reader.getBits(3);
+        num_extra_slice_header_bits = m_reader.getBits<uint8_t>(3);
 
         return 0;
     }
@@ -715,16 +715,16 @@ int HevcHdrUnit::deserialize()
         {
             int payloadType = 0;
             unsigned payloadSize = 0;
-            int nbyte = 0xFF;
-            while (nbyte == 0xFF)
+            uint8_t nbyte = 0xff;
+            while (nbyte == 0xff)
             {
-                nbyte = m_reader.getBits(8);
+                nbyte = m_reader.getBits<uint8_t>(8);
                 payloadType += nbyte;
             }
-            nbyte = 0xFF;
-            while (nbyte == 0xFF)
+            nbyte = 0xff;
+            while (nbyte == 0xff)
             {
-                nbyte = m_reader.getBits(8);
+                nbyte = m_reader.getBits<uint8_t>(8);
                 payloadSize += nbyte;
             }
             if (m_reader.getBitsLeft() < payloadSize * 8)
@@ -745,12 +745,12 @@ int HevcHdrUnit::deserialize()
             }
             else if (payloadType == 144)  // content_light_level_info
             {
-                int maxCLL = m_reader.getBits(16);
-                int maxFALL = m_reader.getBits(16);
+                auto maxCLL = m_reader.getBits<uint32_t>(16);
+                auto maxFALL = m_reader.getBits<uint32_t>(16);
                 if (maxCLL > (HDR10_metadata[5] >> 16) || maxFALL > (HDR10_metadata[5] & 0x0000ffff))
                 {
                     maxCLL = (std::max)(maxCLL, HDR10_metadata[5] >> 16);
-                    maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0x0000ffff);
+                    maxFALL = (std::max)(maxFALL, HDR10_metadata[5] & 0xffff);
                     HDR10_metadata[5] = (maxCLL << 16) + maxFALL;
                 }
             }
@@ -758,9 +758,9 @@ int HevcHdrUnit::deserialize()
             {                           // HDR10Plus Metadata
                 m_reader.skipBits(8);   // country_code
                 m_reader.skipBits(32);  // terminal_provider
-                const int application_identifier = m_reader.getBits(8);
-                const int application_version = m_reader.getBits(8);
-                const int num_windows = m_reader.getBits(2);
+                const auto application_identifier = m_reader.getBits<uint8_t>(8);
+                const auto application_version = m_reader.getBits<uint8_t>(8);
+                const auto num_windows = m_reader.getBits<uint8_t>(2);
                 m_reader.skipBits(6);
                 if (application_identifier == 4 && application_version == 1 && num_windows == 1)
                 {
@@ -825,7 +825,7 @@ int HevcSliceHeader::deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps)
             }
             if (!isIDR())
             {
-                pic_order_cnt_lsb = m_reader.getBits(sps->log2_max_pic_order_cnt_lsb);
+                pic_order_cnt_lsb = m_reader.getBits<uint16_t>(sps->log2_max_pic_order_cnt_lsb);
             }
         }
 
@@ -843,7 +843,7 @@ bool HevcSliceHeader::isIDR() const
     return nal_unit_type == NalType::IDR_W_RADL || nal_unit_type == NalType::IDR_N_LP;
 }
 
-vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size)
+vector<vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, uint8_t* nal_size)
 {
     *nal_size = 4;
 

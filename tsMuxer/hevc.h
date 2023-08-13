@@ -51,8 +51,8 @@ struct HevcUnit
     int nalBufferLen() const { return m_nalBufferLen; }
 
     NalType nal_unit_type;
-    int nuh_layer_id;
-    int nuh_temporal_id_plus1;
+    uint8_t nuh_layer_id;
+    uint8_t nuh_temporal_id_plus1;
 
    protected:
     unsigned extractUEGolombCode();
@@ -69,9 +69,9 @@ struct HevcUnitWithProfile : HevcUnit
     HevcUnitWithProfile();
     std::string getProfileString() const;
 
-    int profile_idc;
-    int level_idc;
-    int interlaced_source_flag;
+    uint8_t profile_idc;
+    uint8_t level_idc;
+    bool interlaced_source_flag;
 
    protected:
     int profile_tier_level(int subLayers);
@@ -98,8 +98,8 @@ struct HevcSpsUnit : HevcUnitWithProfile
     double getFPS() const;
     std::string getDescription() const;
 
-    int vps_id;
-    int max_sub_layers;
+    uint8_t vps_id;
+    uint8_t max_sub_layers;
     unsigned sps_id;
     unsigned chromaFormat;
     bool separate_colour_plane_flag;
@@ -114,9 +114,9 @@ struct HevcSpsUnit : HevcUnitWithProfile
 
     std::vector<unsigned> num_delta_pocs;
 
-    int colour_primaries;
-    int transfer_characteristics;
-    int matrix_coeffs;
+    uint8_t colour_primaries;
+    uint8_t transfer_characteristics;
+    uint8_t matrix_coeffs;
     unsigned chroma_sample_loc_type_top_field;
     unsigned chroma_sample_loc_type_bottom_field;
 
@@ -142,7 +142,7 @@ struct HevcPpsUnit : HevcUnit
     unsigned sps_id;
     bool dependent_slice_segments_enabled_flag;
     bool output_flag_present_flag;
-    int num_extra_slice_header_bits;
+    uint8_t num_extra_slice_header_bits;
 };
 
 struct HevcHdrUnit : HevcUnit
@@ -165,9 +165,9 @@ struct HevcSliceHeader : HevcUnit
     bool first_slice;
     unsigned pps_id;
     unsigned slice_type;
-    int pic_order_cnt_lsb;
+    uint16_t pic_order_cnt_lsb;
 };
 
-std::vector<std::vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, int* nal_size);
+std::vector<std::vector<uint8_t>> hevc_extract_priv_data(const uint8_t* buff, int size, uint8_t* nal_size);
 
 #endif  // _HEVC_H_

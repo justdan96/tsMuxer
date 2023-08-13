@@ -54,7 +54,13 @@ class BitStreamReader : public BitStream
         m_bitLeft = INT_BIT;
     }
 
-    int getBits(const unsigned num)
+    template <typename T>
+    [[nodiscard]] T getBits(const unsigned num)
+    {
+        return static_cast<T>(getBits(num));
+    }
+
+    [[nodiscard]] unsigned getBits(const unsigned num)
     {
         if (num > INT_BIT || m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -70,28 +76,10 @@ class BitStreamReader : public BitStream
             m_bitLeft += INT_BIT - num;
         }
         m_totalBits -= num;
-        return static_cast<int>(prevVal + (m_curVal >> m_bitLeft) & m_masks[num]);
+        return prevVal + (m_curVal >> m_bitLeft) & m_masks[num];
     }
 
-    unsigned get32Bits()
-    {
-        if (m_totalBits < INT_BIT)
-            THROW_BITSTREAM_ERR;
-        unsigned prevVal = 0;
-        if (m_bitLeft >= INT_BIT)
-            m_bitLeft -= INT_BIT;
-        else
-        {
-            if (m_bitLeft != 0)
-                prevVal = (m_curVal & m_masks[m_bitLeft]) << (INT_BIT - m_bitLeft);
-            m_buffer++;
-            m_curVal = getCurVal(m_buffer);
-        }
-        m_totalBits -= INT_BIT;
-        return prevVal + (m_curVal >> m_bitLeft);
-    }
-
-    int showBits(const unsigned num) const
+    [[nodiscard]] int showBits(const unsigned num) const
     {
         if (num > INT_BIT - 1 || m_totalBits < num)
             THROW_BITSTREAM_ERR;
@@ -109,7 +97,7 @@ class BitStreamReader : public BitStream
         return static_cast<int>(prevVal + (curVal >> bitLeft) & m_masks[num]);
     }
 
-    uint8_t getBit()
+    [[nodiscard]] bool getBit()
     {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
@@ -156,7 +144,10 @@ class BitStreamReader : public BitStream
         m_totalBits--;
     }
 
-    int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft); }
+    [[nodiscard]] int getBitsCount() const
+    {
+        return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft);
+    }
 
    private:
     unsigned m_curVal;
@@ -237,7 +228,7 @@ class BitStreamWriter : public BitStream
         *m_buffer = my_htonl(prevVal);
     }
 
-    unsigned getBitsCount() const { return static_cast<unsigned>(m_buffer - m_initBuffer) * INT_BIT + m_bitWrited; }
+    int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + m_bitWrited); }
 
    private:
     unsigned m_curVal;

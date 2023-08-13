@@ -158,24 +158,24 @@ struct HRDParams
     int bitLen;
 
     unsigned cpb_cnt_minus1;
-    int bit_rate_scale;
-    int cpb_size_scale;
+    uint8_t bit_rate_scale;
+    uint8_t cpb_size_scale;
     std::vector<unsigned> bit_rate_value_minus1;
     std::vector<unsigned> cpb_size_value_minus1;
     std::vector<uint8_t> cbr_flag;
 
-    int initial_cpb_removal_delay_length_minus1;
-    int cpb_removal_delay_length_minus1;
-    int dpb_output_delay_length_minus1;
-    int time_offset_length;
+    uint8_t initial_cpb_removal_delay_length_minus1;
+    uint8_t cpb_removal_delay_length_minus1;
+    uint8_t dpb_output_delay_length_minus1;
+    uint8_t time_offset_length;
 };
 
 class SPSUnit final : public NALUnit
 {
    public:
     bool m_ready;
-    int sar_width;
-    int sar_height;
+    uint16_t sar_width;
+    uint16_t sar_height;
     uint32_t num_units_in_tick;
     uint32_t time_scale;
     int fixed_frame_rate_flag;
@@ -193,7 +193,7 @@ class SPSUnit final : public NALUnit
     unsigned num_views;
 
     int level_idc;
-    std::vector<int> level_idc_ext;
+    std::vector <uint8_t> level_idc_ext;
     unsigned seq_parameter_set_id;
     unsigned chroma_format_idc;
     unsigned log2_max_frame_num;
@@ -210,7 +210,7 @@ class SPSUnit final : public NALUnit
 
     int timing_info_present_flag;
     int aspect_ratio_info_present_flag;
-    int aspect_ratio_idc;
+    uint8_t aspect_ratio_idc;
 
     int hrdParamsBitPos;
     HRDParams nalHrdParams;
@@ -283,14 +283,14 @@ class SEIUnit final : public NALUnit
     static void updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts);
     int isMVCSEI();
 
-    int pic_struct;
+    uint8_t pic_struct;
     std::unordered_set<int> m_processedMessages;
 
-    int cpb_removal_delay;
-    int dpb_output_delay;
+    uint32_t cpb_removal_delay;
+    uint32_t dpb_output_delay;
     int initial_cpb_removal_delay[32];
     int initial_cpb_removal_delay_offset[32];
-    int number_of_offset_sequences;  // used for bluray MVC metadata
+    uint8_t number_of_offset_sequences;  // used for bluray MVC metadata
     int metadataPtsOffset;
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
@@ -351,9 +351,9 @@ class SliceUnit final : public NALUnit
     unsigned slice_type;
     unsigned orig_slice_type;
     unsigned pic_parameter_set_id;
-    int frame_num;
+    uint16_t frame_num;
     int bottom_field_flag;
-    int pic_order_cnt_lsb;
+    uint16_t pic_order_cnt_lsb;
     int anchor_pic_flag;
 
     SliceUnit();

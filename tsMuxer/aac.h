@@ -8,8 +8,6 @@ static constexpr int AAC_HEADER_LEN = 7;
 class AACCodec
 {
    public:
-    static const int aac_sample_rates[16];
-    static const int aac_channels[8];
     AACCodec()
         : m_id(0),
           m_layer(0),
@@ -32,14 +30,14 @@ class AACCodec
 
     int m_id;
     int m_layer;
-    int m_channels;
-    int m_sample_rate;
+    uint8_t m_channels;
+    unsigned m_sample_rate;
     int m_samples;
     int m_bit_rate;
-    int m_sample_rates_index;
-    int m_channels_index;
-    int m_profile;
-    int m_rdb;  // ch, sr;
+    uint8_t m_sample_rates_index;
+    uint8_t m_channels_index;
+    uint8_t m_profile;
+    uint8_t m_rdb;  // ch, sr;
 };
 
 #endif

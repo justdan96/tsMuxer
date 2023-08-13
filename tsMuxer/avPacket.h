@@ -50,7 +50,7 @@ struct AVPacket
     uint8_t* data;
     unsigned size;  // data len
     int stream_index;
-    int flags;
+    unsigned flags;
     int64_t duration;  //  presentation duration in time_base units (0 if not available)
     int64_t pos;       //  byte position in stream, -1 if unknown
     int64_t pcr;       // last program clock reference if packet demuxed from TS container. used for VBV streaming in

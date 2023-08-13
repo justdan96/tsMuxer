@@ -15,7 +15,7 @@ class MLPStreamReader final : public SimplePacketizerReader, public MLPCodec
     }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     int getFreq() override { return m_samplerate; }
-    int getChannels() override { return m_channels; }
+    uint8_t getChannels() override { return m_channels; }
 
    protected:
     int getHeaderLen() override;

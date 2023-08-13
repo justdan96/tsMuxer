@@ -159,8 +159,8 @@ struct PESPacket
         flagsLo = 0;
     }
 
-    uint64_t getPts() { return get_pts(reinterpret_cast<uint8_t *>(this) + HEADER_SIZE); }
-    uint64_t getDts() { return get_pts(reinterpret_cast<uint8_t *>(this) + HEADER_SIZE + PTS_SIZE); }
+    int64_t getPts() { return get_pts(reinterpret_cast<uint8_t *>(this) + HEADER_SIZE); }
+    int64_t getDts() { return get_pts(reinterpret_cast<uint8_t *>(this) + HEADER_SIZE + PTS_SIZE); }
 
     void setPts(const int64_t pts)
     {

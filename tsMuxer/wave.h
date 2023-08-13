@@ -68,7 +68,7 @@ typedef struct
     // WAVEFORMATEX  Format;
     uint16_t wFormatTag;
     uint16_t nChannels;
-    uint32_t nSamplesPerSec;
+    int32_t nSamplesPerSec;
     uint32_t nAvgBytesPerSec;
     uint16_t nBlockAlign;
     uint16_t wBitsPerSample;

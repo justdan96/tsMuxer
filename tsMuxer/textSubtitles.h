@@ -49,8 +49,8 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
 
     TextToPGSConverter(bool sourceIsText);
     ~TextToPGSConverter();
-    void setVideoInfo(int width, int height, double fps);
-    void enlargeCrop(int width, int height, int* newWidth, int* newHeight) const;
+    void setVideoInfo(uint16_t width, uint16_t height, double fps);
+    void enlargeCrop(uint16_t width, uint16_t height, uint16_t* newWidth, uint16_t* newHeight) const;
     void setBottomOffset(const int offset) { m_bottomOffset = offset; }
     uint8_t* doConvert(const std::string& text, const TextAnimation& animation, double inTimeSec, double outTimeSec,
                        uint32_t& dstBufSize);
@@ -61,17 +61,17 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
 
     int m_rleLen;
     int m_bottomOffset;
-    int m_composition_number;
-    int m_videoWidth;
-    int m_videoHeight;
+    uint16_t m_composition_number;
+    uint16_t m_videoWidth;
+    uint16_t m_videoHeight;
     double m_videoFps;
     uint8_t* m_pgsBuffer;
     uint8_t* m_imageBuffer;
-    long composePresentationSegment(uint8_t* buff, CompositionMode mode, int64_t pts, int64_t dts, int top,
+    long composePresentationSegment(uint8_t* buff, CompositionMode mode, int64_t pts, int64_t dts, uint16_t top,
                                     bool needPgHeader, bool forced);
-    long composeWindowDefinition(uint8_t* buff, int64_t pts, int64_t dts, int top, int height,
+    long composeWindowDefinition(uint8_t* buff, int64_t pts, int64_t dts, uint16_t top, uint16_t height,
                                  bool needPgHeader = true) const;
-    long composeWindow(uint8_t* buff, int top, int height) const;
+    long composeWindow(uint8_t* buff, uint16_t top, uint16_t height) const;
     long composePaletteDefinition(const Palette& palette, uint8_t* buff, int64_t pts, int64_t dts,
                                   bool needPgHeader = true) const;
     long composeObjectDefinition(uint8_t* buff, int64_t pts, int64_t dts, int firstLine, int lastLine,
@@ -86,20 +86,20 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
     uint8_t color32To8(const uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
-    int renderedHeight() const;
-    int minLine() const;
-    int maxLine() const;
+    uint16_t renderedHeight() const;
+    uint16_t minLine() const;
+    uint16_t maxLine() const;
 
     // std::vector<uint32_t> m_rleLineLen;
     std::map<YUVQuad, uint8_t> m_paletteYUV;
     uint8_t* m_renderedData;
 
     Palette m_paletteByColor;
-    uint8_t palette_update_flag;
+    bool palette_update_flag;
     uint8_t m_paletteID;
     uint8_t m_paletteVersion;
-    int m_minLine;
-    int m_maxLine;
+    uint16_t m_minLine;
+    uint16_t m_maxLine;
 };
 };  // namespace text_subtitles
 
