@@ -1885,7 +1885,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    MatroskaTrack *track{};
+    auto *track = new MatroskaTrack();
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
