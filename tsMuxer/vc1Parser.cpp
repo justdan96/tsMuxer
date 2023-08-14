@@ -1,8 +1,9 @@
 #include "vc1Parser.h"
 
-#include <fs/systemlog.h>
-
+#include <cmath>
 #include <sstream>
+
+#include <fs/systemlog.h>
 
 #include "nalUnits.h"
 #include "vodCoreException.h"
@@ -123,8 +124,7 @@ void VC1SequenceHeader::setFPS(const double value)
             time_base_num = num_units_in_tick;
         }
         else
-            THROW(ERR_VC1_ERR_FPS,
-                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
+            THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
 
         switch (time_scale)
         {
@@ -144,8 +144,7 @@ void VC1SequenceHeader::setFPS(const double value)
             nr = 5;
             break;
         default:
-            THROW(ERR_VC1_ERR_FPS,
-                  "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
+            THROW(ERR_VC1_ERR_FPS, "Can't overwrite stream fps. Non standard fps values not supported for VC-1 streams")
         }
         const int dr = (num_units_in_tick == 1000) ? 1 : 2;
 
@@ -253,7 +252,7 @@ if(psf) { //PsF, 6.1.13
         display_height = h = bitReader.getBits<uint16_t>(14) + 1;
         if (bitReader.getBit())
             ar = bitReader.getBits<uint8_t>(4);
-        if (ar >  0 && ar < 14)
+        if (ar > 0 && ar < 14)
         {
             sample_aspect_ratio = ff_vc1_pixel_aspect[ar];
         }

@@ -456,9 +456,9 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         {
             const unsigned size = m_video_width * m_video_height;
             const unsigned scaled_size = m_scaled_width * m_scaled_height;
-            m_imgBuffer = new uint8_t[size] {0xff};
-            m_rgbBuffer = new uint8_t[size << 2] {};
-            m_scaledRgbBuffer = new uint8_t[scaled_size << 2] {};
+            m_imgBuffer = new uint8_t[size]{0xff};
+            m_rgbBuffer = new uint8_t[size << 2]{};
+            m_scaledRgbBuffer = new uint8_t[scaled_size << 2]{};
             m_renderedData = new uint8_t[(m_scaled_width + 16) * m_scaled_height + 16384];
             m_render->setImageBuffer(m_scaledRgbBuffer);
         }

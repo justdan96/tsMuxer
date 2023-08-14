@@ -15,19 +15,22 @@ static constexpr int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core s
 // static constexpr int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
 // static constexpr int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
 
-static constexpr int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
-                                                   -1,          -1, DCA_EXT_XXCH, -1,};
+static constexpr int dca_ext_audio_descr_mask[] = {
+    DCA_EXT_XCH, -1, DCA_EXT_X96, DCA_EXT_XCH | DCA_EXT_X96, -1, -1, DCA_EXT_XXCH, -1,
+};
 
-static constexpr int ppi_dts_samplerate[] = {0,     8000, 16000, 32000, 0,     0,     11025, 22050,
-                                                  44100, 0,    0,     12000, 24000, 48000, 96000, 192000,};
+static constexpr int ppi_dts_samplerate[] = {
+    0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 96000, 192000,
+};
 
-static constexpr int dtshd_samplerate[] = {0x1F40,  0x3E80,  0x7D00,  0x0FA00, 0x1F400, 0x5622,
-                                                    0x0AC44, 0x15888,
-                                                0x2B110, 0x56220, 0x2EE0, 0x5DC0,  0x0BB80, 0x17700, 0x2EE00, 0x5DC00,};
+static constexpr int dtshd_samplerate[] = {
+    0x1F40,  0x3E80,  0x7D00, 0x0FA00, 0x1F400, 0x5622,  0x0AC44, 0x15888,
+    0x2B110, 0x56220, 0x2EE0, 0x5DC0,  0x0BB80, 0x17700, 0x2EE00, 0x5DC00,
+};
 
 static constexpr int ppi_dts_bitrate[] = {
-    32000,   56000,   64000,   96000,   112000,  128000,  192000,  224000,     256000,         320000,  384000,
-    448000,  512000,  576000,  640000,  768000,  896000,  1024000, 1152000,    1280000,        1344000, 1408000,
+    32000,   56000,   64000,   96000,   112000,  128000,  192000,  224000,     256000,         320000,         384000,
+    448000,  512000,  576000,  640000,  768000,  896000,  1024000, 1152000,    1280000,        1344000,        1408000,
     1411200, 1472000, 1536000, 1920000, 2048000, 3072000, 3840000, 1 /*open*/, 2 /*variable*/, 3 /*lossless*/,
 };
 
@@ -406,8 +409,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
                     m_frameDuration = static_cast<double>(pi_frame_length) * INTERNAL_PTS_FREQ / hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                    m_hdBitrate = static_cast<int>(static_cast<double>(hd_pi_sample_rate) / pi_frame_length *
-                                                        hdFrameSize * 8);
+                    m_hdBitrate =
+                        static_cast<int>(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
 
                 hd_pi_lfeCnt = 0;
 

@@ -11,10 +11,10 @@ class AbstractStream
 
     static constexpr unsigned int ofRead = 1;
     static constexpr unsigned int ofWrite = 2;
-    static constexpr unsigned int ofAppend = 4;       // file can be exist
-    static constexpr unsigned int ofOpenExisting = 8; // do not create file if absent
-    static constexpr unsigned int ofCreateNew = 16;   // create new file. Return error If file exist
-    static constexpr unsigned int ofNoTruncate = 32;  // keep file data while opening
+    static constexpr unsigned int ofAppend = 4;        // file can be exist
+    static constexpr unsigned int ofOpenExisting = 8;  // do not create file if absent
+    static constexpr unsigned int ofCreateNew = 16;    // create new file. Return error If file exist
+    static constexpr unsigned int ofNoTruncate = 32;   // keep file data while opening
 
     virtual bool open(const char* fName, unsigned int oflag, unsigned int systemDependentFlags = 0) = 0;
     virtual bool close() = 0;

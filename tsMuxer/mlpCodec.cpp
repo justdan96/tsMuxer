@@ -26,12 +26,10 @@ uint8_t numChannels8(const uint16_t chanmap)
 }
 }  // namespace
 
-
 static constexpr int HD_SYNC_WORD = 0xf8726f;
 
 static constexpr uint8_t mlp_channels[32] = {1, 2, 3, 4, 3, 4, 5, 3, 4, 5, 4, 5, 6, 4, 5, 4,
-                                         5, 6, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
+                                             5, 6, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // returns 48/96/192/44.1/88.2/176.4 kHz, or 0 on error
 int MLPCodec::mlp_samplerate(const int ratebits)
@@ -56,7 +54,6 @@ int MLPCodec::mlp_samplerate(const int ratebits)
 }
 
 uint64_t MLPCodec::getFrameDuration() const { return INTERNAL_PTS_FREQ * m_samples / m_samplerate; }
-
 
 // returns frame position starting with sync_word 0xf8726f
 uint8_t* MLPCodec::findFrame(uint8_t* buffer, const uint8_t* end)
@@ -130,8 +127,8 @@ bool MLPCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
         if (reader.getBits(2) > 0)  // 6/8ch_multichannel_type: 0 = standard loudspeaker layout
             return false;
         reader.skipBits(6);  // reserved, 2ch_presentation_channel_modifier, 6ch_presentation_channel_modifier
-        const auto channel_assign_6 = reader.getBits<uint8_t>(5);  // 6ch_presentation_channel_assignment
-        reader.skipBits(2);                               // 8ch_presentation_channel_modifier
+        const auto channel_assign_6 = reader.getBits<uint8_t>(5);    // 6ch_presentation_channel_assignment
+        reader.skipBits(2);                                          // 8ch_presentation_channel_modifier
         const auto channel_assign_8 = reader.getBits<uint16_t>(13);  // 8ch_presentation_channel_assignment
 
         if (channel_assign_8 > 0)
@@ -153,9 +150,10 @@ bool MLPCodec::decodeFrame(uint8_t* buffer, uint8_t* end)
     m_samples = 40 << (ratebits & 7);
     if (reader.getBits(16) != 0xB752)  // signature
         return false;
-    reader.skipBits(32);                                                            // flags, reserved
-    reader.skipBit();                                                               // is_vbr
-    m_bitrate = (reader.getBits<uint16_t>(15) /* peak_data_rate */ * m_samplerate + 8) >> 4;  // + 8 is for rounding to nearest
+    reader.skipBits(32);  // flags, reserved
+    reader.skipBit();     // is_vbr
+    m_bitrate =
+        (reader.getBits<uint16_t>(15) /* peak_data_rate */ * m_samplerate + 8) >> 4;  // + 8 is for rounding to nearest
     m_substreams = reader.getBits<uint8_t>(4);
     return true;
 }

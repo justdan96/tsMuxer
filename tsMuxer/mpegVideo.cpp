@@ -148,7 +148,7 @@ uint8_t* MPEGSequenceHeader::deserializeExtension(BitStreamReader& bitReader)
     profile = bitReader.getBits<int8_t>(3);
     level = bitReader.getBits<int8_t>(4);
 
-    progressive_sequence = bitReader.getBit(); /* progressive_sequence */
+    progressive_sequence = bitReader.getBit();     /* progressive_sequence */
     chroma_format = bitReader.getBits<uint8_t>(2); /* chroma_format 1=420, 2=422, 3=444 */
 
     horiz_size_ext = bitReader.getBits<uint8_t>(2);
@@ -183,7 +183,7 @@ uint8_t* MPEGSequenceHeader::deserializeDisplayExtension(BitStreamReader& bitRea
 
     if (bitReader.getBit())  // color_description
     {
-        color_primaries = bitReader.getBits<uint8_t>(8);  /* color primaries */
+        color_primaries = bitReader.getBits<uint8_t>(8);          /* color primaries */
         transfer_characteristics = bitReader.getBits<uint8_t>(8); /* transfer_characteristics */
         matrix_coefficients = bitReader.getBits<uint8_t>(8);      /* matrix_coefficients */
     }

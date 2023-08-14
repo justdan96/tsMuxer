@@ -1047,9 +1047,9 @@ int VvcSliceHeader::deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps)
             const bool ph_gdr_or_irap_pic_flag = m_reader.getBit();
             m_reader.skipBit();  // ph_non_ref_pic_flag
             if (ph_gdr_or_irap_pic_flag)
-                m_reader.skipBit();  // ph_gdr_pic_flag
-            if (m_reader.getBit())   // ph_inter_slice_allowed_flag
-                m_reader.skipBit();  // ph_intra_slice_allowed_flag
+                m_reader.skipBit();          // ph_gdr_pic_flag
+            if (m_reader.getBit())           // ph_inter_slice_allowed_flag
+                m_reader.skipBit();          // ph_intra_slice_allowed_flag
             if (extractUEGolombCode() > 63)  // ph_pps_id
                 return 1;
             pic_order_cnt_lsb = m_reader.getBits<uint16_t>(sps->log2_max_pic_order_cnt_lsb);

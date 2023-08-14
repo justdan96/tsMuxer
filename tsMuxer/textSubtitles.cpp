@@ -353,7 +353,8 @@ uint8_t* TextToPGSConverter::doConvert(const std::string& text, const TextAnimat
         return nullptr;  // empty text
 
     const auto objectWindowHeight = static_cast<uint16_t>(FFMAX(0, renderedHeight()));
-    const auto objectWindowTop = static_cast<uint16_t>(FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset));
+    const auto objectWindowTop =
+        static_cast<uint16_t>(FFMAX(0, m_textRender->m_height - objectWindowHeight - m_bottomOffset));
 
     int fadeInFrames = lround(animation.fadeInDuration * m_videoFps);
     int fadeOutFrames = lround(animation.fadeOutDuration * m_videoFps);

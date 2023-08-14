@@ -43,8 +43,7 @@ BufferedFileReader::BufferedFileReader(const uint32_t blockSize, const uint32_t 
 {
 }
 
-bool BufferedFileReader::openStream(const int readerID, const char* streamName, int pid,
-                                    const CodecInfo* codecInfo)
+bool BufferedFileReader::openStream(const int readerID, const char* streamName, int pid, const CodecInfo* codecInfo)
 {
     const auto data = dynamic_cast<FileReaderData*>(getReader(readerID));
 

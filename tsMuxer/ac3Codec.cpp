@@ -22,8 +22,9 @@ static constexpr uint8_t ff_ac3_channels[8] = {2, 1, 2, 3, 3, 4, 4, 5};
 static constexpr uint16_t ff_ac3_freqs[3] = {48000, 44100, 32000};
 
 // possible bitrates
-static constexpr uint16_t ff_ac3_bitratetab[19] = {32,  40,  48,  56,  64,  80,  96,  112, 128, 160,
-                                                   192, 224, 256, 320, 384, 448, 512, 576, 640};
+static constexpr uint16_t ff_ac3_bitratetab[19] = {
+    32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512, 576, 640,
+};
 
 static constexpr uint16_t ff_ac3_frame_sizes[38][3] = {
     {64, 69, 96},       {64, 70, 96},       {80, 87, 120},      {80, 88, 120},      {96, 104, 144},
@@ -33,7 +34,8 @@ static constexpr uint16_t ff_ac3_frame_sizes[38][3] = {
     {384, 417, 576},    {384, 418, 576},    {448, 487, 672},    {448, 488, 672},    {512, 557, 768},
     {512, 558, 768},    {640, 696, 960},    {640, 697, 960},    {768, 835, 1152},   {768, 836, 1152},
     {896, 975, 1344},   {896, 976, 1344},   {1024, 1114, 1536}, {1024, 1115, 1536}, {1152, 1253, 1728},
-    {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920}};
+    {1152, 1254, 1728}, {1280, 1393, 1920}, {1280, 1394, 1920},
+};
 
 static const uint16_t ctx[256] = {
     0x0000, 0x0580, 0x0F80, 0x0A00, 0x1B80, 0x1E00, 0x1400, 0x1180, 0x3380, 0x3600, 0x3C00, 0x3980, 0x2800, 0x2D80,
@@ -54,7 +56,8 @@ static const uint16_t ctx[256] = {
     0xEC02, 0xE982, 0xF802, 0xFD82, 0xF782, 0xF202, 0xD002, 0xD582, 0xDF82, 0xDA02, 0xCB82, 0xCE02, 0xC402, 0xC182,
     0x4382, 0x4602, 0x4C02, 0x4982, 0x5802, 0x5D82, 0x5782, 0x5202, 0x7002, 0x7582, 0x7F82, 0x7A02, 0x6B82, 0x6E02,
     0x6402, 0x6182, 0x2002, 0x2582, 0x2F82, 0x2A02, 0x3B82, 0x3E02, 0x3402, 0x3182, 0x1382, 0x1602, 0x1C02, 0x1982,
-    0x0802, 0x0D82, 0x0782, 0x0202};
+    0x0802, 0x0D82, 0x0782, 0x0202,
+};
 
 static constexpr int AC3_ACMOD_MONO = 1;
 static constexpr int AC3_ACMOD_STEREO = 2;
@@ -191,7 +194,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                 else if (mixdef == 3)
                 {
                     const auto mixdeflen = gbc.getBits<uint8_t>(5);  //
-                    if (gbc.getBit())                      // mixdata2e
+                    if (gbc.getBit())                                // mixdata2e
                     {
                         gbc.skipBits(5);  // premixcmpsel, drcsrc, premixcmpscl
                         if (gbc.getBit())

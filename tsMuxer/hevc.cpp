@@ -1,7 +1,7 @@
 #include "hevc.h"
 
-#include <cmath>
 #include <fs/systemlog.h>
+#include <cmath>
 
 #include <algorithm>
 

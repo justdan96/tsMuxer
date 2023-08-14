@@ -2530,8 +2530,8 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             height = vStream->getStreamHeight();
             HDR = vStream->getStreamHDR();
             const VideoAspectRatio ar = vStream->getStreamAR();
-            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar,
-                               &video_format, &frame_rate_index, &aspect_ratio_index);
+            blurayStreamParams(vStream->getFPS(), vStream->getInterlaced(), width, height, ar, &video_format,
+                               &frame_rate_index, &aspect_ratio_index);
             if (ar == VideoAspectRatio::AR_3_4)
                 width = height * 4 / 3;
             else if (ar == VideoAspectRatio::AR_16_9)

@@ -17,14 +17,7 @@ struct VvcHrdUnit
 
 struct VvcUnit
 {
-    VvcUnit()
-        : nal_unit_type(),
-          nuh_layer_id(0),
-          nuh_temporal_id_plus1(0),
-          m_nalBuffer(nullptr),
-          m_nalBufferLen(0)
-    {
-    }
+    VvcUnit() : nal_unit_type(), nuh_layer_id(0), nuh_temporal_id_plus1(0), m_nalBuffer(nullptr), m_nalBufferLen(0) {}
 
     enum class NalType
     {
