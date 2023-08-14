@@ -772,7 +772,7 @@ void MovDemuxer::readHeaders()
 
 int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
 {
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
     discardSize = m_firstHeaderSize;
     m_firstHeaderSize = 0;
     if (m_firstDemux)

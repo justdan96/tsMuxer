@@ -254,7 +254,7 @@ struct PMTStreamInfo final
     }
 
     StreamType m_streamType;
-    uint16_t m_pid;
+    int m_pid;
     int m_esInfoLen;
     int m_pmtPID;
     uint8_t m_esInfoData[128];
@@ -333,10 +333,11 @@ struct M2TSStreamInfo
           isSecondary(false)
     {
     }
+
     M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
     M2TSStreamInfo(const M2TSStreamInfo& other);
 
-    uint16_t streamPID;
+    int streamPID;
     StreamType stream_coding_type;  // ts type
     uint8_t video_format;
     uint8_t frame_rate_index;

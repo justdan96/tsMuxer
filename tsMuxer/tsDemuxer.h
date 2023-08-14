@@ -61,8 +61,8 @@ class TSDemuxer final : public AbstractDemuxer
     int m_pmtPid;
     bool m_codecReady;
     bool m_firstCall;
-    uint64_t m_readCnt;
-    uint64_t m_dataProcessed;
+    int64_t m_readCnt;
+    int64_t m_dataProcessed;
     bool m_notificated;
     TS_program_map_section m_pmt;
     uint8_t m_tmpBuffer[TS_FRAME_SIZE + 4];

@@ -2552,7 +2552,6 @@ M2TSStreamInfo::M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo)
             else if (audio_presentation_type > 3)
                 audio_presentation_type = 6;
             const int freq = aStream->getFreq();
-            // todo: add index 12 and 14. 12: 48Khz core, 192Khz mpl, 14: 48Khz core, 96Khz mlp
             switch (freq)
             {
             case 48000:
@@ -2644,27 +2643,20 @@ void MPLSStreamInfo::parseStreamEntry(BitStreamReader& reader)
     type = reader.getBits<uint8_t>(8);
     if (type == 1)
     {
-        streamPID = reader.getBits<uint16_t>(16);
+        streamPID = reader.getBits<int>(16);
         reader.skipBits(32);
         reader.skipBits(16);
     }
     else if (type == 2)
     {
         reader.skipBits(16);  // ref_to_SubPath_id, ref_to_subClip_entry_id
-        streamPID = reader.getBits<uint16_t>(32);
-        reader.skipBits(16);
+        streamPID = reader.getBits<int>(16);
+        reader.skipBits(32);
     }
-    else if (type == 3)
+    else if (type == 3 || type == 4)
     {
         reader.skipBits(8);  // ref_to_SubPath_id
-        streamPID = reader.getBits<uint16_t>(8);
-        reader.skipBits(32);
-        reader.skipBits(16);
-    }
-    else if (type == 4)
-    {
-        reader.skipBits(8);
-        streamPID = reader.getBits<uint16_t>(16);
+        streamPID = reader.getBits<int>(16);
         reader.skipBits(32);
         reader.skipBits(8);
     }

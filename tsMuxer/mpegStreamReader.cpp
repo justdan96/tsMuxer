@@ -16,7 +16,7 @@ static constexpr int UNIT_SKIPPED = 5;
 
 using namespace std;
 
-void MPEGStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
+void MPEGStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, const bool lastBlock)
 {
     if (lastBlock)
         m_eof = true;
@@ -248,7 +248,7 @@ int MPEGStreamReader::bufFromNAL(const uint8_t* buff, const uint8_t* bufEnd, boo
 }
 */
 
-uint64_t MPEGStreamReader::getProcessedSize() { return m_processedBytes; }
+int64_t MPEGStreamReader::getProcessedSize() { return m_processedBytes; }
 
 int MPEGStreamReader::decodeNal(uint8_t* buff)
 {
@@ -327,7 +327,7 @@ void MPEGStreamReader::checkPulldownSync()
         LTRACE(LT_ERROR, 2,
                "Warning! Source stream contain irregular pulldown marks. Mistiming between original fps and "
                "fps/1.25 (without pulldown) exceeds "
-                   << (int64_t)(asyncValue / 5000000ll) << "ms.");
+                   << (asyncValue / 5000000ll) << "ms.");
         m_pulldownWarnCnt *= 2;
     }
 }
@@ -340,7 +340,7 @@ void MPEGStreamReader::fillAspectBySAR(const double sar)
         static constexpr double base_ar[] = {0.0, 1.0, 4.0 / 3.0, 16.0 / 9.0, 221.0 / 100.0};
         double minEps = INT_MAX;
         m_streamAR = VideoAspectRatio::AR_KEEP_DEFAULT;
-        for (int i = 0; i < sizeof(base_ar) / sizeof(double); ++i)
+        for (unsigned i = 0; i < std::size(base_ar); ++i)
         {
             if (fabs(ar - base_ar[i]) < minEps)
             {

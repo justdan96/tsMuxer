@@ -35,8 +35,8 @@ class PGSStreamReader final : public AbstractStreamReader
     }
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
-    uint64_t getProcessedSize() override;
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
+    int64_t getProcessedSize() override;
     CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType,
                                int containerStreamIndex);
     const CodecInfo& getCodecInfo() override { return pgsCodecInfo; }
@@ -96,7 +96,7 @@ class PGSStreamReader final : public AbstractStreamReader
     int64_t m_lastPTS;
     int64_t m_maxPTS;
     int64_t m_lastDTS;
-    uint64_t m_processedSize;
+    int64_t m_processedSize;
     uint8_t* m_avFragmentEnd;
     int m_afterPesByte;
     int m_fontBorder;

@@ -30,7 +30,7 @@ class AACCodec
 
     int m_id;
     int m_layer;
-    uint8_t m_channels;
+    int m_channels;
     int m_sample_rate;
     int m_samples;
     int m_bit_rate;

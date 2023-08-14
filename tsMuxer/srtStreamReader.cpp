@@ -34,14 +34,14 @@ SRTStreamReader::~SRTStreamReader()
 
 void SRTStreamReader::setAnimation(const TextAnimation& animation) { m_animation = animation; }
 
-void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
+void SRTStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, const bool lastBlock)
 {
     m_lastBlock = lastBlock;
     uint8_t* dataBegin = data + MAX_AV_PACKET_SIZE - m_tmpBuffer.size();
     if (!m_tmpBuffer.empty())
         memmove(dataBegin, m_tmpBuffer.data(), m_tmpBuffer.size());
-    const int parsedLen = parseText(dataBegin, dataLen + static_cast<int>(m_tmpBuffer.size()));
-    const int rest = dataLen + static_cast<int>(m_tmpBuffer.size()) - parsedLen;
+    const int parsedLen = parseText(dataBegin, dataLen + m_tmpBuffer.size());
+    const size_t rest = dataLen + m_tmpBuffer.size() - parsedLen;
     if (rest > MAX_AV_PACKET_SIZE)
         THROW(ERR_COMMON, "Invalid SRT file or too large text message (>" << MAX_AV_PACKET_SIZE << " bytes)")
     m_tmpBuffer.resize(rest);
@@ -49,7 +49,7 @@ void SRTStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool las
         memmove(m_tmpBuffer.data(), dataBegin + dataLen + m_tmpBuffer.size() - rest, rest);
 }
 
-bool SRTStreamReader::detectSrcFormat(const uint8_t* dataStart, const int len, int& prefixLen)
+bool SRTStreamReader::detectSrcFormat(const uint8_t* dataStart, const size_t len, int& prefixLen)
 {
     prefixLen = 0;
     if (len < 4)
@@ -109,7 +109,7 @@ bool SRTStreamReader::detectSrcFormat(const uint8_t* dataStart, const int len, i
     return true;
 }
 
-int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
+int SRTStreamReader::parseText(uint8_t* dataStart, const size_t len)
 {
     int prefixLen = 0;
     if (m_srcFormat == UtfConverter::SourceFormat::sfUnknown)
@@ -118,7 +118,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
             return false;
     }
     uint8_t* cur = dataStart + prefixLen;
-    const int roundLen = len & (~(m_charSize - 1));
+    const size_t roundLen = len & (~(m_charSize - 1));
     const uint8_t* end = cur + roundLen;
     const uint8_t* lastProcessedLine = cur;
     vector<string> rez;
@@ -140,7 +140,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
             if (strOnlySpace(tmp))
                 tmp.clear();
 
-            m_origSize.push(static_cast<uint32_t>(cur + m_charSize - lastProcessedLine + prefixLen));
+            m_origSize.push(static_cast<int32_t>(cur + m_charSize - lastProcessedLine + prefixLen));
             prefixLen = 0;
             lastProcessedLine = cur + m_charSize;
         }
@@ -150,12 +150,7 @@ int SRTStreamReader::parseText(uint8_t* dataStart, const int len)
 
 bool SRTStreamReader::strOnlySpace(const std::string& str)
 {
-    for (const char& c : str)
-    {
-        if (c != ' ')
-            return false;
-    }
-    return true;
+    return std::all_of(str.begin(), str.end(), [](const char c) { return c == ' '; });
 }
 
 int SRTStreamReader::readPacket(AVPacket& avPacket)
@@ -278,6 +273,7 @@ bool SRTStreamReader::parseTime(const string& text)
     return false;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 CheckStreamRez SRTStreamReader::checkStream(uint8_t* buffer, const int len, const ContainerType containerType,
                                             const int containerDataType, int containerStreamIndex)
 {

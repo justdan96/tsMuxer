@@ -51,13 +51,12 @@ struct StreamInfo
     bool m_notificated;
     int m_readerID;
     uint32_t m_blockSize;
-    // int m_readRez;
     int64_t m_lastDTS;
     uint8_t* m_data;
     std::string m_streamName;
     std::string m_fullStreamName;
     int lastReadRez;
-    uint32_t m_pid;
+    int m_pid;
     bool m_flushed;
     int64_t m_timeShift;
     std::string m_lang;
@@ -81,7 +80,7 @@ class ContainerToReaderWrapper final : public AbstractReader
    public:
     struct DemuxerData
     {
-        std::map<uint32_t, DemuxerReadPolicy> m_pids;
+        std::map<int32_t, DemuxerReadPolicy> m_pids;
         PIDSet m_pidSet;  // same as pids
         AbstractDemuxer* m_demuxer;
         std::string m_streamName;
@@ -102,10 +101,10 @@ class ContainerToReaderWrapper final : public AbstractReader
 
     struct ReaderInfo
     {
-        ReaderInfo(DemuxerData& demuxerData, const uint32_t pid) : m_demuxerData(demuxerData), m_pid(pid) {}
+        ReaderInfo(DemuxerData& demuxerData, const int pid) : m_demuxerData(demuxerData), m_pid(pid) {}
 
         DemuxerData& m_demuxerData;
-        uint32_t m_pid;
+        int m_pid;
     };
 
     ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
@@ -161,7 +160,7 @@ class METADemuxer final : public AbstractDemuxer
     METADemuxer(const BufferedReaderManager& readManager);
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
-    void readClose() final;
+    void readClose() override;
     int64_t getDemuxedSize() override;
     int addStream(const std::string& codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);

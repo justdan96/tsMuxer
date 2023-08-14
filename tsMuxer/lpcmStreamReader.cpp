@@ -902,7 +902,7 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
 
 const CodecInfo& LPCMStreamReader::getCodecInfo() { return lpcmCodecInfo; }
 
-void LPCMStreamReader::setBuffer(uint8_t* data, const int dataLen, const bool lastBlock)
+void LPCMStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, const bool lastBlock)
 {
     m_lastChannelRemapPos = nullptr;
     SimplePacketizerReader::setBuffer(data, dataLen, lastBlock);

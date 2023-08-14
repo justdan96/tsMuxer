@@ -711,7 +711,7 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
 
 int PGSStreamReader::flushPacket(AVPacket& avPacket) { return 0; }
 
-void PGSStreamReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
+void PGSStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock)
 {
     if (m_tmpBufferLen + dataLen > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
@@ -728,7 +728,7 @@ void PGSStreamReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock
     m_tmpBufferLen = 0;
 }
 
-uint64_t PGSStreamReader::getProcessedSize() { return m_processedSize; }
+int64_t PGSStreamReader::getProcessedSize() { return m_processedSize; }
 
 CheckStreamRez PGSStreamReader::checkStream(uint8_t* buffer, int len, ContainerType containerType,
                                             int containerDataType, int containerStreamIndex)

@@ -196,7 +196,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 {
     if (m_firstDemuxCall)
     {
-        for (const unsigned int acceptedPID : acceptedPIDs) m_acceptedPidCache[acceptedPID] = 1;
+        for (const int acceptedPID : acceptedPIDs) m_acceptedPidCache[acceptedPID] = 1;
         m_firstDemuxCall = false;
     }
 
@@ -205,7 +205,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     MemoryBlock* vect = nullptr;
     int lastPid = -1;
 
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     discardSize = 0;
     uint32_t readedBytes;

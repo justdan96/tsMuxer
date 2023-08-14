@@ -17,8 +17,8 @@ class SimplePacketizerReader : public AbstractStreamReader
     }
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
-    uint64_t getProcessedSize() override;
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
+    int64_t getProcessedSize() override;
     virtual CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType,
                                        int containerStreamIndex);
     virtual int getFreq() = 0;
@@ -54,10 +54,10 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual bool needSkipFrame(const AVPacket& packet) { return false; }
 
     // uint8_t* m_tmpBuffer;
-    unsigned m_curMplsIndex;
+    int m_curMplsIndex;
     double m_stretch;
     std::vector<uint8_t> m_tmpBuffer;
-    uint64_t m_processedBytes;
+    int64_t m_processedBytes;
     uint64_t m_frameNum;
     bool m_needSync;
     double m_curPts;

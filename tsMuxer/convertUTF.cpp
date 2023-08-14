@@ -391,7 +391,7 @@ Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
     return isLegalUTF8(source, length);
 }
 
-Boolean isLegalUTF8String(const UTF8* string, const int length)
+Boolean isLegalUTF8String(const UTF8* string, const size_t length)
 {
     /* same as above, but verify if the whole passed bytestream consists of valid UTF-8 sequences only. */
     const auto stringEnd = string + length;

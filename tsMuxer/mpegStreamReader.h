@@ -48,8 +48,8 @@ class MPEGStreamReader : public AbstractStreamReader
     double getFPS() const { return m_fps; }
     VideoAspectRatio getStreamAR() const { return m_streamAR; }
     void setAspectRatio(const VideoAspectRatio ar) { m_ar = ar; }
-    uint64_t getProcessedSize() override;
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+    int64_t getProcessedSize() override;
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
     virtual unsigned getStreamWidth() const = 0;
@@ -65,7 +65,7 @@ class MPEGStreamReader : public AbstractStreamReader
     bool m_shortStartCodes;
     int64_t m_curPts;
     int64_t m_curDts;
-    uint64_t m_processedBytes;
+    int64_t m_processedBytes;
     bool m_eof;
     double m_fps;
     int64_t m_pcrIncPerFrame;

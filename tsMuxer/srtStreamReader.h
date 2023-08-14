@@ -17,8 +17,8 @@ class SRTStreamReader final : public AbstractStreamReader
     ~SRTStreamReader() override;
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override { return m_dstSubCodec->flushPacket(avPacket); }
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
-    uint64_t getProcessedSize() override { return m_processedSize; }
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
+    int64_t getProcessedSize() override { return m_processedSize; }
     CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType,
                                int containerStreamIndex);
     const CodecInfo& getCodecInfo() override { return pgsCodecInfo; }
@@ -34,7 +34,7 @@ class SRTStreamReader final : public AbstractStreamReader
         if (pgsReader)
             pgsReader->setDemuxMode(value);
     }
-    void setVideoInfo(const int width, const int height, const double fps) const
+    void setVideoInfo(const uint16_t width, const uint16_t height, const double fps) const
     {
         m_srtRender->setVideoInfo(width, height, fps);
         const auto pgsReader = dynamic_cast<PGSStreamReader*>(m_dstSubCodec);
@@ -61,10 +61,10 @@ class SRTStreamReader final : public AbstractStreamReader
     AbstractStreamReader* m_dstSubCodec;
     text_subtitles::TextToPGSConverter* m_srtRender;
     bool m_lastBlock;
-    int parseText(uint8_t* dataStart, int len);
+    int parseText(uint8_t* dataStart, size_t len);
     std::vector<uint8_t> m_tmpBuffer;
     std::queue<std::string> m_sourceText;
-    std::queue<uint32_t> m_origSize;
+    std::queue<int32_t> m_origSize;
     std::string m_renderedText;
     long m_splitterOfs;
     uint16_t m_short_R;
@@ -83,7 +83,7 @@ class SRTStreamReader final : public AbstractStreamReader
     uint8_t* renderNextMessage(uint32_t& renderedLen);
     bool parseTime(const std::string& text);
     static std::string detectUTF8Lang(uint8_t* buffer, int len);
-    bool detectSrcFormat(const uint8_t* dataStart, int len, int& prefixLen);
+    bool detectSrcFormat(const uint8_t* dataStart, size_t len, int& prefixLen);
     static bool strOnlySpace(const std::string& str);
 };
 

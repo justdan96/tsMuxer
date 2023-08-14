@@ -64,8 +64,8 @@ class MemoryBlock
 };
 
 typedef MemoryBlock StreamData;
-typedef std::map<uint32_t, StreamData> DemuxedData;
-typedef std::set<uint32_t> PIDSet;
+typedef std::map<int32_t, StreamData> DemuxedData;
+typedef std::set<int32_t> PIDSet;
 // typedef std::map<uint32_t, std::vector<uint8_t> > DemuxedData;
 
 // Used to automatically switch to reading the next file while the current one ends.

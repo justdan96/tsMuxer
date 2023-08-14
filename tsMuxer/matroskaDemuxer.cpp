@@ -28,11 +28,6 @@ static constexpr int COMPRESSION_ZLIB = 0;
 
 #define AV_RL32(x) ((x)[3] << 24 | (x)[2] << 16 | (x)[1] << 8 | (x)[0])
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-static constexpr int MAX_TRACK_SIZE =
-    (MAX(MAX(sizeof(MatroskaVideoTrack), sizeof(MatroskaAudioTrack)), sizeof(MatroskaSubtitleTrack)));
-
 int MatroskaDemuxer::matroska_parse_index()
 {
     int res = 0;
@@ -1890,7 +1885,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    MatroskaTrack *track {};
+    MatroskaTrack *track{};
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
@@ -2367,7 +2362,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
 int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize)
 {
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     AVPacket packet;
     uint32_t demuxedSize = 0;
@@ -2427,7 +2422,8 @@ int MatroskaDemuxer::getTrackType(const MatroskaTrack *track)
 std::vector<AVChapter> MatroskaDemuxer::getChapters()
 {
     std::vector<AVChapter> rez;
-    for (const auto &chapter : chapters) rez.push_back(chapter.second);
+    rez.reserve(chapters.size());
+    for (const auto &[index, avChapter] : chapters) rez.push_back(avChapter);
     std::sort(rez.begin(), rez.end());
     return rez;
 }

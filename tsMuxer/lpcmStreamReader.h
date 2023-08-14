@@ -54,7 +54,7 @@ class LPCMStreamReader final : public SimplePacketizerReader
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
     void onSplitEvent() override { m_firstFrame = true; }
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
 
    private:
     LPCMHeaderType m_headerType;

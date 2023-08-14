@@ -52,8 +52,8 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     }
 
     ~AbstractStreamReader() override = default;
-    virtual uint64_t getProcessedSize() = 0;
-    virtual void setBuffer(uint8_t* data, const int dataLen, bool lastBlock = false)
+    virtual int64_t getProcessedSize() = 0;
+    virtual void setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock = false)
     {
         m_curPos = m_buffer = data;
         m_bufEnd = m_buffer + dataLen;

@@ -44,7 +44,7 @@ void SimplePacketizerReader::doMplsCorrection()
     }
 }
 
-void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
+void SimplePacketizerReader::setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock)
 {
     if (static_cast<size_t>(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
@@ -61,7 +61,7 @@ void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool la
     m_tmpBufferLen = 0;
 }
 
-uint64_t SimplePacketizerReader::getProcessedSize() { return m_processedBytes; }
+int64_t SimplePacketizerReader::getProcessedSize() { return m_processedBytes; }
 
 int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
 {

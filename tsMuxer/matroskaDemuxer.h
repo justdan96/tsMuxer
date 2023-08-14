@@ -11,7 +11,7 @@ class MatroskaDemuxer final : public IOContextDemuxer
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented
-    void readClose() final;
+    void readClose() override;
     int simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize) override;
     void getTrackList(std::map<int32_t, TrackInfo> &trackList) override;
     std::vector<AVChapter> getChapters() override;
