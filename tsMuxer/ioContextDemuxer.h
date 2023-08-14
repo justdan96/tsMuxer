@@ -78,7 +78,7 @@ struct Track
     ParsedTrackPrivData* parsed_priv_data;
     uint64_t default_duration;
 
-    uint32_t encodingAlgo;                  // compression algorithm
+    int32_t encodingAlgo;                  // compression algorithm
     std::vector<uint8_t> encodingAlgoPriv;  // compression parameters
     // MatroskaTrackFlags flags;
     int flags;

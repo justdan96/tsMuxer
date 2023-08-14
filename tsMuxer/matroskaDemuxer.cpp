@@ -28,6 +28,11 @@ static constexpr int COMPRESSION_ZLIB = 0;
 
 #define AV_RL32(x) ((x)[3] << 24 | (x)[2] << 16 | (x)[1] << 8 | (x)[0])
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+static constexpr int MAX_TRACK_SIZE =
+    (MAX(MAX(sizeof(MatroskaVideoTrack), sizeof(MatroskaAudioTrack)), sizeof(MatroskaSubtitleTrack)));
+
 int MatroskaDemuxer::matroska_parse_index()
 {
     int res = 0;
@@ -1788,7 +1793,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
             int64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            track->encodingAlgo = static_cast<uint32_t>(num);
+            track->encodingAlgo = static_cast<int32_t>(num);
             break;
         }
         case MATROSKA_ID_ENCODINGCOMPSETTINGS:
@@ -1885,7 +1890,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    auto *track = new MatroskaTrack();
+    auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]{});
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
@@ -1895,7 +1900,7 @@ int MatroskaDemuxer::matroska_add_stream()
     /* start with the master */
     if ((res = ebml_read_master(&id)) < 0)
     {
-        delete track;
+        delete[] track;
         return res;
     }
 
