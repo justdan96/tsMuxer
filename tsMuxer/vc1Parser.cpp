@@ -16,7 +16,6 @@ const char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
 namespace
 {
-
 int get_unary(BitStreamReader& bitReader, const bool stop, const int len)
 {
     int i;

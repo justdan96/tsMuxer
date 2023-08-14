@@ -6,7 +6,6 @@
 
 namespace
 {
-
 constexpr uint8_t thd_chancount[13] = {
     //  LR    C   LFE  LRs LRvh  LRc LRrs  Cs   Ts  LRsd  LRw  Cvh  LFE2
     2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 1, 1};
