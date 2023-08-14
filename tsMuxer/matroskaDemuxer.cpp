@@ -1890,8 +1890,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]);
-    memset(track, 0, MAX_TRACK_SIZE);
+    MatroskaTrack *track {};
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
@@ -1901,7 +1900,7 @@ int MatroskaDemuxer::matroska_add_stream()
     /* start with the master */
     if ((res = ebml_read_master(&id)) < 0)
     {
-        delete[] track;
+        delete track;
         return res;
     }
 

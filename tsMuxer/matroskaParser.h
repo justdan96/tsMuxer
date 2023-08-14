@@ -312,10 +312,8 @@ class ParsedPGTrackData final : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 };
 
-typedef struct MatroskaVideoTrack
+typedef struct MatroskaVideoTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
     int pixel_width;
     int pixel_height;
     int display_width;
@@ -329,10 +327,8 @@ typedef struct MatroskaVideoTrack
     //..
 } MatroskaVideoTrack;
 
-typedef struct MatroskaAudioTrack
+typedef struct MatroskaAudioTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
     int channels;
     int bitdepth;
     int internal_samplerate;
@@ -350,10 +346,8 @@ typedef struct MatroskaAudioTrack
     //..
 } MatroskaAudioTrack;
 
-typedef struct MatroskaSubtitleTrack
+typedef struct MatroskaSubtitleTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
     int ass;
     //..
 } MatroskaSubtitleTrack;
