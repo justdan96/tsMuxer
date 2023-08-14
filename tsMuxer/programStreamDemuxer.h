@@ -1,6 +1,8 @@
 #ifndef PROGRAM_STREAM_DEMUXER_H_
 #define PROGRAM_STREAM_DEMUXER_H_
 
+#include <cmath>
+
 #include "BufferedReader.h"
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"

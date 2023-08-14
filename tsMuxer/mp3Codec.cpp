@@ -63,21 +63,21 @@ int MP3Codec::mp3DecodeFrame(uint8_t* buff, const uint8_t* end)
         mpeg25 = 1;
     }
 
-    m_layer =  static_cast<int8_t>(4 - ((header >> 17) & 3));
+    m_layer = static_cast<int8_t>(4 - ((header >> 17) & 3));
     if (m_layer == 4)
         return 0;
     /* extract frequency */
-    m_sample_rate_index =  static_cast<uint8_t>((header >> 10) & 3);
+    m_sample_rate_index = static_cast<uint8_t>((header >> 10) & 3);
     if (m_sample_rate_index == 3)
         return 0;  // invalid sample rate
     m_sample_rate = ff_mpa_freq_tab[m_sample_rate_index] >> (lsf + mpeg25);
     m_sample_rate_index += 3 * (lsf + mpeg25);
     // error_protection = ((header >> 16) & 1) ^ 1;
 
-    m_bitrate_index =  static_cast<uint8_t>((header >> 12) & 0xf);
+    m_bitrate_index = static_cast<uint8_t>((header >> 12) & 0xf);
     if (m_bitrate_index == 15)
         return 0;  // invalid bitrate index
-    const auto padding =  static_cast<uint8_t>((header >> 9) & 1);
+    const auto padding = static_cast<uint8_t>((header >> 9) & 1);
     // extension = (header >> 8) & 1;
     m_mode = static_cast<uint8_t>((header >> 6) & 3);
     m_mode_ext = static_cast<uint8_t>((header >> 4) & 3);

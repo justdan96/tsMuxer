@@ -264,43 +264,29 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                 curFont.m_opts |= Font::ITALIC;
                 isTag = true;
             }
-            else if (ltagStr == "/i" || ltagStr == "/italic")
-            {
-                endTag = true;
-            }
             else if (ltagStr == "b" || ltagStr == "bold")
             {
                 curFont.m_opts |= Font::BOLD;
                 isTag = true;
-            }
-            else if (ltagStr == "/b" || ltagStr == "/bold")
-            {
-                endTag = true;
             }
             else if (ltagStr == "u" || ltagStr == "underline")
             {
                 curFont.m_opts |= Font::UNDERLINE;
                 isTag = true;
             }
-            else if (ltagStr == "/u" || ltagStr == "/underline")
-            {
-                endTag = true;
-            }
             else if (ltagStr == "f" || ltagStr == "force")
             {
                 curFont.m_opts |= Font::FORCED;
                 isTag = true;
-            }
-            else if (ltagStr == "/f" || ltagStr == "/force")
-            {
-                endTag = true;
             }
             else if (ltagStr == "strike")
             {
                 curFont.m_opts |= Font::STRIKE_OUT;
                 isTag = true;
             }
-            else if (ltagStr == "/strike")
+            else if ((ltagStr == "/i" || ltagStr == "/italic") || (ltagStr == "/b" || ltagStr == "/bold") ||
+                     (ltagStr == "/u" || ltagStr == "/underline") || (ltagStr == "/f" || ltagStr == "/force") ||
+                     ltagStr == "/strike" || strStartWith(tagStr, "/font"))
             {
                 endTag = true;
             }
@@ -339,14 +325,10 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                         if (arg[0] == '+' || arg[0] == '-')
                             curFont.m_size += strToInt32(arg.c_str(), 10);
                         else
-                            curFont.m_size = strToInt32u(arg.c_str(), 10);
+                            curFont.m_size = strToInt32(arg.c_str(), 10);
                     }
                 }
                 isTag = true;
-            }
-            else if (strStartWith(tagStr, "/font"))
-            {
-                endTag = true;
             }
             if (isTag || endTag)
             {

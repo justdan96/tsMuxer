@@ -213,7 +213,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                     LTRACE(LT_INFO, 2,
                            getCodecInfo().displayName
                                << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
-                            << floatToTime((double)(avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
+                               << floatToTime((double)(avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
                                << ". Remove frame.");
                 m_mplsOffset -= getFrameDuration();
                 m_curPts -= getFrameDuration();
