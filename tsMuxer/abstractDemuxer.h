@@ -41,7 +41,7 @@ class MemoryBlock
         }
     }
 
-    void append(const uint8_t* data, const int64_t num)
+    void append(const uint8_t* data, const size_t num)
     {
         if (num > 0)
         {
@@ -119,7 +119,7 @@ class AbstractDemuxer
 
     virtual uint32_t getFileBlockSize() { return m_fileBlockSize; }
 
-    virtual int64_t getTrackDelay(uint32_t pid) { return 0; }
+    virtual int64_t getTrackDelay(int32_t pid) { return 0; }
     virtual std::vector<AVChapter> getChapters() { return {}; }
     virtual double getTrackFps(uint32_t trackId) { return 0.0; }
 

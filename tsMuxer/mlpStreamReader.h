@@ -30,7 +30,7 @@ class MLPStreamReader final : public SimplePacketizerReader, public MLPCodec
 
    private:
     int m_demuxedTHDSamples;
-    uint64_t m_totalTHDSamples;
+    int64_t m_totalTHDSamples;
 };
 
 #endif

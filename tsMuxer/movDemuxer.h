@@ -18,7 +18,7 @@ class MovDemuxer final : public IOContextDemuxer
     void readClose() override;
     int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize) override;
     void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
-    int64_t getTrackDelay(const uint32_t pid) override
+    int64_t getTrackDelay(const int32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }
@@ -68,7 +68,7 @@ class MovDemuxer final : public IOContextDemuxer
     int64_t m_mdat_size;
     int64_t m_fileSize;
     uint32_t m_timescale;
-    std::map<uint32_t, int64_t> m_firstTimecode;
+    std::map<int32_t, int64_t> m_firstTimecode;
     // List<chunk offset, chunk size>
     std::vector<std::pair<int64_t, int64_t>> m_mdat_data;
     int itunes_metadata;  ///< metadata are itunes style

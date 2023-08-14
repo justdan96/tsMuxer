@@ -24,7 +24,7 @@ class TSDemuxer final : public AbstractDemuxer
     void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
-    int64_t getTrackDelay(const uint32_t pid) override
+    int64_t getTrackDelay(const int32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
         {

@@ -10,15 +10,15 @@ static constexpr uint8_t PES_DATA_ALIGNMENT = 4;
 
 static int64_t get_pts(const uint8_t *p)
 {
-    int64_t pts = static_cast<int64_t>((p[0] >> 1) & 0x07) << 30;
-    int val = (p[1] << 8) | p[2];
-    pts |= static_cast<int64_t>(val >> 1) << 15;
-    val = (p[3] << 8) | p[4];
-    pts |= static_cast<int64_t>(val >> 1);
+    auto pts = static_cast<int64_t>((p[0] >> 1) & 0x07) << 30;
+    int val = p[1] << 8 | p[2];
+    pts |= (val >> 1) << 15;
+    val = p[3] << 8 | p[4];
+    pts |= val >> 1;
     return pts;
 }
 
-static void set_pts_int(uint8_t *p, int64_t pts, int preffix)
+static void set_pts_int(uint8_t *p, const int64_t pts, const int preffix)
 {
     p[0] = static_cast<uint8_t>(preffix + (((pts >> 30) & 0x07) << 1) + 1);
     uint16_t val = static_cast<uint16_t>(((pts >> 15) & 0x7fff) << 1) + 1;
@@ -174,8 +174,8 @@ struct PESPacket
         flagsLo = flagsLo | 0xc0;
     }
     void serialize(uint8_t streamID);
-    void serialize(uint64_t pts, uint8_t streamID);
-    void serialize(uint64_t pts, uint64_t dts, uint8_t streamID);
+    void serialize(int64_t pts, uint8_t streamID);
+    void serialize(int64_t pts, int64_t dts, uint8_t streamID);
 
     static constexpr int HEADER_SIZE = 9;
     static constexpr int PTS_SIZE = 5;

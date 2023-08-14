@@ -210,9 +210,9 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
         auto srcData = reinterpret_cast<uint32_t*>(m_textRender ? m_textRender->m_pData : m_imageBuffer);
         assert(srcData);
         m_rleLen = 0;
-        m_minLine = INT_MAX;
+        m_minLine = UINT16_MAX;
         m_maxLine = 0;
-        for (int y = 0; y < m_videoHeight; y++)
+        for (uint16_t y = 0; y < m_videoHeight; y++)
         {
             const uint32_t* srcLineEnd = srcData + m_videoWidth;
             const uint8_t* dstLineEnd = curPtr + m_videoWidth + 16;
@@ -277,7 +277,7 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
                     srcData += repCnt;
                 }
             }
-            if (m_minLine != INT_MAX)
+            if (m_minLine != UINT16_MAX)
             {
                 *curPtr++ = 0;  // end of line signal
                 *curPtr++ = 0;  // end of line signal
@@ -289,7 +289,7 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
             if (!isEmptyLine)
                 trimPos = curPtr;
         }
-        if (m_minLine == INT_MAX)
+        if (m_minLine == UINT16_MAX)
             m_minLine = m_maxLine = 0;
         m_rleLen = static_cast<int>(trimPos - m_renderedData);
         // sort by colors indexes
@@ -305,11 +305,11 @@ bool TextToPGSConverter::rlePack(const uint32_t colorMask)
     }
 }
 
-int TextToPGSConverter::renderedHeight() const { return m_maxLine - m_minLine + 1; }
+uint16_t TextToPGSConverter::renderedHeight() const { return m_maxLine - m_minLine + 1; }
 
-int TextToPGSConverter::maxLine() const { return m_maxLine; }
+uint16_t TextToPGSConverter::maxLine() const { return m_maxLine; }
 
-int TextToPGSConverter::minLine() const { return m_minLine; }
+uint16_t TextToPGSConverter::minLine() const { return m_minLine; }
 
 TextToPGSConverter::Palette TextToPGSConverter::buildPalette(const float opacity)
 {

@@ -9,12 +9,9 @@
 class SimplePacketizerReader : public AbstractStreamReader
 {
    public:
-    // static const int NOT_ENOUGH_BUFFER = -10;
     SimplePacketizerReader();
-    ~SimplePacketizerReader() override
-    {
-        // delete [] m_tmpBuffer;
-    }
+    ~SimplePacketizerReader() override = default;
+
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
     void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
@@ -48,8 +45,6 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual double getFrameDuration() = 0;                        // frame duration at nano seconds
     virtual const std::string getStreamInfo() = 0;
     virtual void setTestMode(bool value) {}
-    // virtual bool isSubFrame() {return false;} // used for DTS-HD, Dolby-TRUEHD. returns true for MLP data. Data can't
-    // be splitted in point where subFrame=true
     virtual bool needMPLSCorrection() const { return true; }
     virtual bool needSkipFrame(const AVPacket& packet) { return false; }
 

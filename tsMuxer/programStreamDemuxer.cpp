@@ -7,7 +7,7 @@
 
 using namespace std;
 
-static constexpr uint32_t LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
+static constexpr int LPCM_FREQS[4] = {48000, 96000, 44100, 32000};
 
 // #define min(a,b) a<=b?a:b
 
@@ -79,7 +79,7 @@ int ProgramStreamDemuxer::mpegps_psm_parse(const uint8_t* buff, const uint8_t* e
         /* remember mapping from stream id to stream type */
         m_psm_es_type[es_id] = type;
         /* skip program_stream_info */
-        const uint16_t es_info_length = (*curBuff << 8) + curBuff[1];
+        const int es_info_length = *curBuff << 8 | curBuff[1];
         curBuff += 2;
         curBuff += es_info_length;
         es_map_length -= 4 + es_info_length;
@@ -87,12 +87,12 @@ int ProgramStreamDemuxer::mpegps_psm_parse(const uint8_t* buff, const uint8_t* e
     return 6 + psm_length;
 }
 
-uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader)
+int ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader)
 {
     afterPesHeader = 0;
 
     const auto pesPacket = reinterpret_cast<PESPacket*>(buff);
-    uint8_t startcode = buff[3];
+    int startcode = buff[3];
 
     // find matching stream
     if (!((startcode >= 0xc0 && startcode <= 0xef) /* audio or video */ || (startcode == PES_PRIVATE_DATA1) ||
@@ -104,13 +104,13 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
         curBuf += 10;
     else if ((pesPacket->flagsLo & 0xc0) == 0x80)  // PTS only
         curBuf += 5;
-    if ((pesPacket->flagsLo & 0x20))  // ESCR_flag
+    if (pesPacket->flagsLo & 0x20)  // ESCR_flag
         curBuf += 6;
-    if ((pesPacket->flagsLo & 0x10))  // ES_rate_flag
+    if (pesPacket->flagsLo & 0x10)  // ES_rate_flag
         curBuf += 3;
-    if ((pesPacket->flagsLo & 0x08))  // DSM_trick_mode_flag
+    if (pesPacket->flagsLo & 0x08)  // DSM_trick_mode_flag
         curBuf++;
-    if ((pesPacket->flagsLo & 0x04))  // additional_copy_info_flag
+    if (pesPacket->flagsLo & 0x04)  // additional_copy_info_flag
         curBuf++;
     if (pesPacket->flagsLo & 0x02)  // PES_CRC_flag
         curBuf += 2;
@@ -132,7 +132,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
         {
             const int ext2_len = *curBuf++ & 0x7f;  // PES_extension_field_length
             if (ext2_len > 0)
-                startcode = (startcode << 8) + *curBuf;
+                startcode = startcode << 8 | *curBuf;
         }
     }
     curBuf = buff + pesPacket->getHeaderLength();
@@ -160,7 +160,7 @@ uint8_t ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& after
             afterPesHeader += 6;
 
             uint8_t* payloadData = curBuf + afterPesHeader - 1;
-            const uint32_t pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
+            const int pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
             wave_format::toLittleEndian(payloadData, payloadData, pesPayloadLen, bitdepth);
         }
         else if (startcode >= 0x80 && startcode <= 0xcf)
@@ -255,7 +255,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
     while (curBuf <= end - 9)
     {
         const auto pesPacket = reinterpret_cast<PESPacket*>(curBuf);
-        uint8_t startcode = curBuf[3];
+        int startcode = curBuf[3];
         if ((startcode >= 0xc0 && startcode <= 0xef) || (startcode == PES_PRIVATE_DATA1) || (startcode == PES_VC1_ID) ||
             (startcode == PES_PRIVATE_DATA2))
         {
@@ -272,9 +272,7 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                         m_firstPTS = curPts;
                     if (isVideoPID(startcode) && (m_firstVideoPTS == -1 || curPts < m_firstVideoPTS))
                         m_firstVideoPTS = curPts;
-                    if (m_firstPtsTime.find(startcode) == m_firstPtsTime.end())
-                        m_firstPtsTime[startcode] = curPts;
-                    else if (curPts < m_firstPtsTime[startcode])
+                    if (m_firstPtsTime.find(startcode) == m_firstPtsTime.end() || curPts < m_firstPtsTime[startcode])
                         m_firstPtsTime[startcode] = curPts;
                 }
 

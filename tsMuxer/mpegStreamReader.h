@@ -1,8 +1,6 @@
 #ifndef MPEG_STREAM_READER_H_
 #define MPEG_STREAM_READER_H_
 
-#include <algorithm>
-
 #include "abstractStreamReader.h"
 #include "limits.h"
 #include "vod_common.h"

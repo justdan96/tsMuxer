@@ -16,17 +16,14 @@ class MuxerManager final
     static constexpr int BLURAY_SECTOR_SIZE =
         PHYSICAL_SECTOR_SIZE * 3;  // real sector size is 2048, but M2TS frame required addition rounding by 3 blocks
 
-    MuxerManager(BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
-    virtual ~MuxerManager();
+    MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
+    ~MuxerManager();
 
     void setAsyncMode(const bool val) { m_asyncMode = val; }
 
-    // void setFileBlockSize ( uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
-    // int32_t getFileBlockSize() const { return m_fileBlockSize; }
-
     bool isAsyncMode() const { return m_asyncMode; }
 
-    virtual bool openMetaFile(const std::string& fileName);
+    bool openMetaFile(const std::string& fileName);
     int addStream(const std::string& codecName, const std::string& fileName,
                   const std::map<std::string, std::string>& addParams);
 
@@ -40,8 +37,8 @@ class MuxerManager final
 
     void waitForWriting() const;
 
-    virtual void asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
-    virtual int syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
+    void asyncWriteBuffer(const AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
+    int syncWriteBuffer(AbstractMuxer* muxer, const uint8_t* buff, int len, AbstractOutputStream* dstFile) const;
     void muxBlockFinished(const AbstractMuxer* muxer);
 
     void parseMuxOpt(const std::string& opts);

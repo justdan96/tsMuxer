@@ -690,8 +690,8 @@ int PGSStreamReader::readPacket(AVPacket& avPacket)
         m_avFragmentEnd = m_curPos + segment_len;
     }
     m_curPos += avLen;
-    m_processedSize += 3ll + avLen;
-    avPacket.size = 3ll + avLen;
+    m_processedSize += 3 + avLen;
+    avPacket.size = 3 + avLen;
     if (m_needRescale)
     {
         if (!m_renderedBlocks.empty())

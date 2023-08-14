@@ -1,4 +1,3 @@
-
 #include "mpeg2StreamReader.h"
 
 #include <fs/systemlog.h>

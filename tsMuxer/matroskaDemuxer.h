@@ -17,7 +17,7 @@ class MatroskaDemuxer final : public IOContextDemuxer
     std::vector<AVChapter> getChapters() override;
 
     bool isPidFilterSupported() const override { return true; }
-    int64_t getTrackDelay(const uint32_t pid) override
+    int64_t getTrackDelay(const int32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }

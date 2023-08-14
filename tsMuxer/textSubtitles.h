@@ -39,8 +39,8 @@ static constexpr uint8_t END_DEF_SEGMENT = 0x80;
 static constexpr uint8_t EPOTH_NORMAL = 0;
 static constexpr uint8_t EPOTH_START = 2;
 
-static constexpr double PIXEL_DECODING_RATE = 128 * 1000000 / 8;  // in bytes
-static constexpr double PIXEL_COMPOSITION_RATE = 256 * 1000000 / 8;
+static constexpr double PIXEL_DECODING_RATE = 128.0 / 8 * 1000000;  // in bytes
+static constexpr double PIXEL_COMPOSITION_RATE = 256.0 / 8 * 1000000;
 
 class TextToPGSConverter  //: public TextSubtitlesRenderWin32
 {
@@ -86,11 +86,10 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
     uint8_t color32To8(const uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
-    int renderedHeight() const;
-    int minLine() const;
-    int maxLine() const;
+    uint16_t renderedHeight() const;
+    uint16_t minLine() const;
+    uint16_t maxLine() const;
 
-    // std::vector<uint32_t> m_rleLineLen;
     std::map<YUVQuad, uint8_t> m_paletteYUV;
     uint8_t* m_renderedData;
 
@@ -98,8 +97,8 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     bool palette_update_flag;
     uint8_t m_paletteID;
     uint8_t m_paletteVersion;
-    int m_minLine;
-    int m_maxLine;
+    uint16_t m_minLine;
+    uint16_t m_maxLine;
 };
 };  // namespace text_subtitles
 

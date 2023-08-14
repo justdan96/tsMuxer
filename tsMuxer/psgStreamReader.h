@@ -49,7 +49,7 @@ class PGSStreamReader final : public AbstractStreamReader
     void setVideoInfo(uint16_t width, uint16_t height, double fps);
     void setFontBorder(const int value) { m_fontBorder = value; }
     void setBottomOffset(const int value) const { m_render->setBottomOffset(value); }
-    void setOffsetId(const int value) { m_offsetId = value; }
+    void setOffsetId(const uint8_t value) { m_offsetId = value; }
     uint8_t getOffsetId() const { return m_offsetId; }
 
     // SS PG data
@@ -89,9 +89,11 @@ class PGSStreamReader final : public AbstractStreamReader
         csEpochContinue
     };
     State m_state;
-    uint8_t* m_curPos;
-    uint8_t* m_buffer;
-    size_t m_tmpBufferLen;
+    // JCDR : the three fields below overshadow the fileds in AbstractDemuxer
+    // See whether they can be removed.
+    // uint8_t* m_curPos;
+    // uint8_t* m_buffer;
+    // size_t m_tmpBufferLen;
     std::vector<uint8_t> m_tmpBuffer;
     int64_t m_lastPTS;
     int64_t m_maxPTS;

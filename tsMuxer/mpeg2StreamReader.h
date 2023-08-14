@@ -22,7 +22,7 @@ class MPEG2StreamReader final : public MPEGStreamReader
         m_prevFrameDelay = 0;
     }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
+    CheckStreamRez checkStream(uint8_t* buffer, int len);
 
     unsigned getStreamWidth() const override { return m_sequence.width; }
     unsigned getStreamHeight() const override { return m_sequence.height; }
