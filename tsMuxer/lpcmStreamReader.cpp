@@ -1,8 +1,9 @@
 #include "lpcmStreamReader.h"
 
-#include <fs/systemlog.h>
-
+#include <cmath>
 #include <sstream>
+
+#include <fs/systemlog.h>
 
 #include "ioContextDemuxer.h"
 #include "tsPacket.h"
