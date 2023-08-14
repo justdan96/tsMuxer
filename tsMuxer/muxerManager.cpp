@@ -1,5 +1,7 @@
 #include "muxerManager.h"
 
+#include <cmath>
+
 #include <fs/systemlog.h>
 #include "fs/textfile.h"
 

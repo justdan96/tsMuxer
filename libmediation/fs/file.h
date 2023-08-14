@@ -56,7 +56,7 @@ class File : public AbstractOutputStream
     //! Open the file
     /*!
             If a file is already open, it will be closed.
-    \param fName Name of the file to open.         
+    \param fName Name of the file to open.
     \param oflag A bitmask of the opened file's parameters.
     \param systemDependentFlags System-dependent flags for opening the file.
             In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
