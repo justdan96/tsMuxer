@@ -23,7 +23,7 @@
 #include "mpegAudioStreamReader.h"
 #include "mpegStreamReader.h"
 #include "programStreamDemuxer.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "srtStreamReader.h"
 #include "subTrackFilter.h"
 #include "tsDemuxer.h"
@@ -398,7 +398,7 @@ int METADemuxer::addStream(const string& codec, const string& codecStreamName, c
     }
 
     AbstractStreamReader* codecReader = createCodec(codec, addParams, fileList[0], mergePlayItems(mplsInfoList));
-    codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size()) + 1);
+    codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size() + 1));
     codecReader->setTimeOffset(m_timeOffset);
 
     if (m_codecInfo.empty())
@@ -995,7 +995,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
 
         itr = addParams.find("3d-plane");
         if (itr != addParams.end())
-            dynamic_cast<PGSStreamReader*>(rez)->setOffsetId(strToInt32(itr->second.c_str()));
+            dynamic_cast<PGSStreamReader*>(rez)->setOffsetId(strToInt8u(itr->second.c_str()));
 
         double fps = 0.0;
         uint16_t width = 0;
@@ -1013,18 +1013,6 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
         itr = addParams.find("font-border");
         if (itr != addParams.end())
             dynamic_cast<PGSStreamReader*>(rez)->setFontBorder(strToInt32(itr->second.c_str()));
-
-        /*
-        map<string,string>::const_iterator itr = addParams.find("fps");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setFPS(strToDouble(itr->second.c_str()));
-        itr = addParams.find("video-width");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setVideoWidth(strToInt32(itr->second.c_str()));
-        itr = addParams.find("video-height");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setVideoHeight(strToInt32(itr->second.c_str()));
-        */
     }
     else if (codecName == "S_TEXT/UTF8")
     {

@@ -885,13 +885,13 @@ int LPCMStreamReader::flushPacket(AVPacket& avPacket)
 
     if (m_frameRest > 0 && !m_demuxMode)
     {
-        const int64_t samplesRest = m_frameRest / m_channels;
+        const int32_t samplesRest = m_frameRest / m_channels;
         m_frameRest = samplesRest * ((m_channels + 1) & 0xfe);
         m_frameRest -= avPacket.size - (m_needPCMHdr ? 4 : 0);
         if (avPacket.data != nullptr && m_frameRest > 0)
         {
             memset(avPacket.data + avPacket.size, 0, m_frameRest);
-            avPacket.size += static_cast<int>(m_frameRest);
+            avPacket.size += m_frameRest;
             m_processedBytes -= m_frameRest;
         }
     }

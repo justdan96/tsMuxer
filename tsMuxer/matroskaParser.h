@@ -276,8 +276,8 @@ class ParsedLPCMTrackData final : public ParsedTrackPrivData
 
    private:
     bool m_convertBytes;
-    int m_bitdepth;
-    int m_channels;
+    uint16_t m_bitdepth;
+    uint16_t m_channels;
     MemoryBlock m_waveBuffer;
 };
 
@@ -329,8 +329,8 @@ typedef struct MatroskaVideoTrack : MatroskaTrack
 
 typedef struct MatroskaAudioTrack : MatroskaTrack
 {
-    int channels;
-    int bitdepth;
+    uint16_t channels;
+    uint16_t bitdepth;
     int internal_samplerate;
     int samplerate;
     int block_align;

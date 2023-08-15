@@ -32,7 +32,7 @@ class MemoryBlock
             m_data.resize(m_size);
     }
 
-    void grow(const int64_t num)
+    void grow(const size_t num)
     {
         m_size += num;
         if (m_data.size() < m_size)

@@ -150,7 +150,7 @@ void TSMuxer::setVBVBufferLen(const int value)
     m_prevM2TSPCR = m_fixed_pcr_offset * 300;
 }
 
-void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, const uint16_t streamIndex,
+void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, const int streamIndex,
                            const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     int descriptorLen = 0;

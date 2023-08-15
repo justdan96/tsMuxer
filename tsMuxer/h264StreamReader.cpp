@@ -25,27 +25,22 @@ H264StreamReader::H264StreamReader()
     m_firstAUDWarn = true;
     m_firstSPSWarn = true;
     m_firstSEIWarn = true;
-    m_lastSlicePPS = -1;
-    m_lastSliceSPS = -1;
+    m_lastSlicePPS = UINT_MAX;
+    m_lastSliceSPS = UINT_MAX;
     m_lastSliceIDR = false;
     m_h264SPSCont = false;
     m_spsCounter = 0;
     m_insertSEIMethod = SeiMethod::SEI_DoNotInsert;
     m_needSeiCorrection = false;
     m_firstDecodeNal = true;
-    // m_cpb_removal_delay_baseaddr = 0;
-    // m_cpb_removal_delay_bitpos = 0;
     orig_hrd_parameters_present_flag = false;
     orig_vcl_parameters_present_flag = false;
     m_lastPictStruct = 0;
 
-    // for fixing thundberg streams
-    // m_idrSliceFound = false;
     m_bSliceFound = false;
     m_picOrderOffset = 0;
     m_frameDepth = 1;
     m_lastIFrame = false;
-    // m_openGOP = true;
     m_idrSliceCnt = 0;
     m_firstFileFrame = false;
     m_lastPicStruct = -1;
@@ -295,7 +290,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         }
     }
 
-    if (!m_delimiterFound && m_lastSliceSPS != -1)
+    if (!m_delimiterFound && m_lastSliceSPS != UINT_MAX)
     {
         if (m_firstAUDWarn)
         {
@@ -316,14 +311,14 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         }
     }
 
-    bool needInsTimingSEI = m_needSeiCorrection && m_lastSliceSPS != -1;
+    bool needInsTimingSEI = m_needSeiCorrection && m_lastSliceSPS != UINT_MAX;
     bool srcSpsPpsFound = avPacket.flags & AVPacket::IS_SPS_PPS_IN_GOP;
     bool spsDiscontinue =
         m_h264SPSCont &&
         ((m_spsCounter < 2 && ((m_totalFrameNum > 1 && m_lastSliceIDR) || (m_totalFrameNum > 250 && isIFrame()))) ||
          (m_firstFileFrame && !srcSpsPpsFound));
     bool needInsSpsPps = false;
-    if (isIFrame() && m_lastSliceSPS != -1 && m_lastSlicePPS != -1)
+    if (isIFrame() && m_lastSliceSPS != UINT_MAX && m_lastSlicePPS != UINT_MAX)
     {
         needInsSpsPps = spsDiscontinue || (replaceToOwnSPS() && srcSpsPpsFound);
     }
@@ -1217,9 +1212,6 @@ int H264StreamReader::detectPrimaryPicType(const SliceUnit &firstSlice, uint8_t 
     m_pict_type = -1;
     m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
 
-    // if (firstSlice.orig_slice_type >= 5) // all other slice at this picture must be same type
-    //	return 0; // OK
-
     uint8_t *nextSlice = NALUnit::findNextNAL(buff, m_bufEnd);
     if (nextSlice == m_bufEnd)
     {
@@ -1261,7 +1253,7 @@ int H264StreamReader::detectPrimaryPicType(const SliceUnit &firstSlice, uint8_t 
     }
 }
 
-int H264StreamReader::sliceTypeToPictType(const int slice_type) const
+int H264StreamReader::sliceTypeToPictType(const uint32_t slice_type) const
 {
     switch (slice_type)
     {

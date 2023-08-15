@@ -1,7 +1,7 @@
 #include "mlpCodec.h"
 
 #include "bitStream.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "vod_common.h"
 
 namespace

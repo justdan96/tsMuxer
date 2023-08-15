@@ -148,12 +148,12 @@ int ProgramStreamDemuxer::processPES(uint8_t* buff, uint8_t* end, int& afterPesH
 
             MemoryBlock& waveHeader = m_lpcmWaveHeader[startcode - 0xa0];
 
-            const int bitdepth = 16 + (curBuf[4] >> 6 & 3) * 4;
+            const uint16_t bitdepth = 16 + (curBuf[4] >> 6 & 3) * 4;
 
             if (waveHeader.isEmpty())
             {
                 const int samplerate = LPCM_FREQS[curBuf[4] >> 4 & 3];
-                const int channels = 1 + (curBuf[4] & 7);
+                const uint16_t channels = 1 + (curBuf[4] & 7);
                 wave_format::buildWaveHeader(waveHeader, samplerate, channels, channels >= 6, bitdepth);
             }
 

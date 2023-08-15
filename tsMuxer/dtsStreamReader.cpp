@@ -1,8 +1,9 @@
 #include "dtsStreamReader.h"
 
+#include <cmath>
 #include <sstream>
 
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 
 // static constexpr int DCA_EXT_CORE = 0x001;       ///< core in core substream
 static constexpr int DCA_EXT_XXCH = 0x002;  ///< XXCh channels extension in core substream
@@ -410,7 +411,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
                     m_hdBitrate =
-                        static_cast<int>(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
+                        lround(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
 
                 hd_pi_lfeCnt = 0;
 

@@ -64,7 +64,7 @@ class LPCMStreamReader final : public SimplePacketizerReader
     // bool m_demuxMode;
     // bool m_waveHeaderParsed;
     uint8_t m_tmpFrameBuffer[17280 + 4];  // max PCM frame size
-    int64_t m_frameRest;
+    int32_t m_frameRest;
     bool m_needPCMHdr;
 
     uint16_t m_bitsPerSample;

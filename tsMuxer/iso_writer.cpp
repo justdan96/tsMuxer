@@ -1,3 +1,5 @@
+// ReSharper disable CppExpressionWithoutSideEffects
+
 #include "iso_writer.h"
 
 #include <algorithm>
@@ -877,7 +879,7 @@ void IsoWriter::close()
     m_tagLocationBaseAddr = m_metadataMirrorLBN;
     writeMetadata(m_metadataMirrorLBN);  // write metadata mirror file
 
-    m_file.seek(1024 * 576);
+    m_file.seek(1024LL * 576);
     // metadata file location and length (located at 576K, point to 640K address)
     m_tagLocationBaseAddr = m_partitionStartAddress;
     writeExtendedFileEntryDescriptor(false, 0, FileTypes::Metadata, m_metadataFileLen,

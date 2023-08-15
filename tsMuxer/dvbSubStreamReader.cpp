@@ -1,7 +1,5 @@
 #include "dvbSubStreamReader.h"
 
-#if 1
-
 static constexpr uint64_t TS_FREQ_TO_INT_FREQ_COEFF = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
 static constexpr int BAD_FRAME = -1;
 
@@ -184,5 +182,3 @@ const std::string DVBSubStreamReader::getStreamInfo()
         return "HD-DVD subpicture";
     return "Subpicture";
 }
-
-#endif

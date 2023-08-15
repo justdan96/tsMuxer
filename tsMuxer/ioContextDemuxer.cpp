@@ -65,31 +65,24 @@ int IOContextDemuxer::get_byte()
     return *m_curPos++;
 }
 
-int IOContextDemuxer::get_be16()
+uint16_t IOContextDemuxer::get_be16()
 {
-    int val = get_byte() << 8;
-    val |= get_byte();
-    return val;
+    return static_cast<uint16_t>(get_byte() << 8 | get_byte());
 }
 
 int IOContextDemuxer::get_be24()
 {
-    int val = get_be16() << 8;
-    val |= get_byte();
-    return val;
+    return get_be16() << 8 | get_byte();
 }
+
 unsigned int IOContextDemuxer::get_be32()
 {
-    unsigned int val = get_be16() << 16;
-    val |= get_be16();
-    return val;
+    return get_be16() << 16 | get_be16();
 }
 
 int64_t IOContextDemuxer::get_be64()
 {
-    int64_t val = static_cast<int64_t>(get_be32()) << 32;
-    val |= static_cast<int64_t>(get_be32());
-    return val;
+    return static_cast<int64_t>(get_be32()) << 32 | get_be32();
 }
 
 bool IOContextDemuxer::url_fseek(const int64_t offset)

@@ -80,8 +80,8 @@ class H264StreamReader final : public MPEGStreamReader
     int m_spsCounter;
     bool m_h264SPSCont;
     bool m_lastSliceIDR;
-    int m_lastSliceSPS;
-    int m_lastSlicePPS;
+    uint32_t m_lastSliceSPS;
+    uint32_t m_lastSlicePPS;
     bool m_firstAUDWarn;
     bool m_firstSPSWarn;
     bool m_firstSEIWarn;
@@ -102,9 +102,9 @@ class H264StreamReader final : public MPEGStreamReader
     bool m_firstDecodeNal;
     int8_t m_lastPictStruct;
     bool m_firstFileFrame;
-    std::map<int, SPSUnit*> m_spsMap;
-    std::map<int, PPSUnit*> m_ppsMap;
-    std::set<int> updatedSPSList;
+    std::map<uint32_t, SPSUnit*> m_spsMap;
+    std::map<uint32_t, PPSUnit*> m_ppsMap;
+    std::set<uint32_t> updatedSPSList;
     std::vector<uint8_t> m_lastSeiMvcHeader;
     int m_lastPicStruct;
     int64_t m_lastDtsInc;
@@ -122,7 +122,7 @@ class H264StreamReader final : public MPEGStreamReader
     int processSPS(uint8_t* buff);
     int processPPS(uint8_t* buff);
     int detectPrimaryPicType(const SliceUnit& firstSlice, uint8_t* buff);
-    int sliceTypeToPictType(int slice_type) const;
+    int sliceTypeToPictType(uint32_t slice_type) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;
     bool findPPSForward(uint8_t* buff);
     void updateHRDParam(SPSUnit* sps) const;

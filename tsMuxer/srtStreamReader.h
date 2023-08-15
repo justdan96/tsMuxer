@@ -6,7 +6,7 @@
 #include "abstractStreamReader.h"
 #include "avCodecs.h"
 #include "avPacket.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "textSubtitles.h"
 #include "utf8Converter.h"
 

@@ -13,7 +13,7 @@
 #include "metaDemuxer.h"
 #include "mpegStreamReader.h"
 #include "muxerManager.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "singleFileMuxer.h"
 #include "tsMuxer.h"
 

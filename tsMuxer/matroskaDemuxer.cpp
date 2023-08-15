@@ -2199,7 +2199,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     int64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->bitdepth = static_cast<int>(num);
+                    audiotrack->bitdepth = static_cast<uint16_t>(num);
                     break;
                 }
 
@@ -2209,7 +2209,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     int64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->channels = static_cast<int>(num);
+                    audiotrack->channels = static_cast<uint16_t>(num);
                     break;
                 }
                 case EBML_ID_VOID:

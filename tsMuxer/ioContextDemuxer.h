@@ -21,7 +21,7 @@ class ParsedTrackPrivData
 
     virtual void setPrivData(uint8_t* buff, int size) {}
     virtual void extractData(AVPacket* pkt, uint8_t* buff, int size) = 0;
-    virtual unsigned newBufferSize(uint8_t* buff, unsigned size) { return 0; }
+    virtual int newBufferSize(uint8_t* buff, int size) { return 0; }
 };
 
 enum class IOContextTrackType
@@ -114,7 +114,7 @@ class IOContextDemuxer : public AbstractDemuxer
     bool url_fseek(int64_t offset);
     int64_t get_be64();
     unsigned int get_be32();
-    int get_be16();
+    uint16_t get_be16();
     int get_be24();
     int get_byte();
 

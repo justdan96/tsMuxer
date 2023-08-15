@@ -97,7 +97,7 @@ class BufferedReader : public AbstractReader, TerminatableThread
     bool incSeek(int readerID, int64_t offset);
     bool gotoByte(int readerID, int64_t seekDist) override { return false; }
 
-    void setId(const int value) { m_id = value; }
+    void setId(const uint32_t value) { m_id = value; }
 
    protected:
     virtual ReaderData* intCreateReader() = 0;
@@ -111,7 +111,7 @@ class BufferedReader : public AbstractReader, TerminatableThread
     std::mutex m_readMtx;
 
    private:
-    int m_id;
+    uint32_t m_id;
     std::mutex m_readersMtx;
     std::map<int, ReaderData*> m_readers;
     static int m_newReaderID;

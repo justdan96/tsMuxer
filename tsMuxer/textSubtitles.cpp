@@ -14,7 +14,7 @@
 #include <cassert>
 #include <cmath>
 
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
 

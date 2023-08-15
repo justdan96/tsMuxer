@@ -37,7 +37,7 @@ class TSMuxer final : public AbstractMuxer
    public:
     TSMuxer(MuxerManager* owner);
     ~TSMuxer() override;
-    void intAddStream(const std::string& streamName, const std::string& codecName, uint16_t streamIndex,
+    void intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
                       const std::map<std::string, std::string>& params, AbstractStreamReader* codecReader) override;
     bool doFlush() override;
     bool close() override;

@@ -1,5 +1,4 @@
-
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 
 #include <fs/systemlog.h>
 #include <cmath>

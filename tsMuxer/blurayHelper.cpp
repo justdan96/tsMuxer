@@ -6,7 +6,7 @@
 
 #include "iso_writer.h"
 #include "muxerManager.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "tsMuxer.h"
 
 using namespace std;

@@ -329,10 +329,10 @@ int PPSUnit::deserialize()
     try
     {
         bitReader.setBuffer(m_nalBuffer + 1, nalEnd);
-        pic_parameter_set_id = static_cast<int>(extractUEGolombCode());
+        pic_parameter_set_id = extractUEGolombCode();
         if (pic_parameter_set_id >= 256)
             return 1;
-        seq_parameter_set_id = static_cast<int>(extractUEGolombCode());
+        seq_parameter_set_id = extractUEGolombCode();
         if (seq_parameter_set_id >= 32)
             return 1;
         entropy_coding_mode_flag = bitReader.getBit();
@@ -462,7 +462,7 @@ int SPSUnit::deserialize()
     try
     {
         bitReader.setBuffer(m_nalBuffer + 4, m_nalBuffer + m_nalBufferLen);
-        seq_parameter_set_id = static_cast<int>(extractUEGolombCode());
+        seq_parameter_set_id = extractUEGolombCode();
         if (seq_parameter_set_id >= 32)
             return 1;
         pic_order_cnt_type = 0;
@@ -1208,7 +1208,7 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
         const unsigned sliceType = extractUEGolombCode();
         if (sliceType > 9)
             return 1;
-        orig_slice_type = slice_type = static_cast<int>(sliceType);
+        orig_slice_type = slice_type = sliceType;
         if (slice_type > 4)
             slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
 
@@ -1221,8 +1221,8 @@ int SliceUnit::deserializeSliceType(uint8_t* buffer, uint8_t* end)
     }
 };
 
-int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<int, SPSUnit*>& spsMap,
-                           const std::map<int, PPSUnit*>& ppsMap)
+int SliceUnit::deserialize(uint8_t* buffer, uint8_t* end, const std::map<uint32_t, SPSUnit*>& spsMap,
+                           const std::map<uint32_t, PPSUnit*>& ppsMap)
 {
     if (end - buffer < 2)
         return NOT_ENOUGH_BUFFER;
@@ -1282,7 +1282,8 @@ void NALUnit::updateBits(const int bitOffset, const int bitLen, const unsigned v
     bitWriter.flushBits();
 }
 
-int SliceUnit::deserializeSliceHeader(const std::map<int, SPSUnit*>& spsMap, const std::map<int, PPSUnit*>& ppsMap)
+int SliceUnit::deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap,
+                                      const std::map<uint32_t, PPSUnit*>& ppsMap)
 {
     first_mb_in_slice = extractUEGolombCode();
     const unsigned sliceType = extractUEGolombCode();
@@ -1291,7 +1292,7 @@ int SliceUnit::deserializeSliceHeader(const std::map<int, SPSUnit*>& spsMap, con
     orig_slice_type = slice_type = static_cast<int>(sliceType);
     if (slice_type > 4)
         slice_type -= 5;  // +5 flag is: all other slice at this picture must be same type
-    pic_parameter_set_id = static_cast<int>(extractUEGolombCode());
+    pic_parameter_set_id = extractUEGolombCode();
     if (pic_parameter_set_id >= 256)
         return 1;
     const auto itr = ppsMap.find(pic_parameter_set_id);

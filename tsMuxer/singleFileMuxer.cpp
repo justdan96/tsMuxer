@@ -9,7 +9,7 @@
 #include "lpcmStreamReader.h"
 #include "mpegAudioStreamReader.h"
 #include "muxerManager.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "srtStreamReader.h"
 #include "vodCoreException.h"
 
@@ -33,7 +33,7 @@ SingleFileMuxer::~SingleFileMuxer()
     for (const auto& itr : m_streamInfo) delete itr.second;
 }
 
-void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, uint16_t streamIndex,
+void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
                                    const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     codecReader->setDemuxMode(true);
