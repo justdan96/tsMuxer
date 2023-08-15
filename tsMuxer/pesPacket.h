@@ -138,15 +138,15 @@ struct PESPacket
         return packetLen ? packetLen + 6 : 0;
     }
 
-    void setPacketLength(uint16_t len)
+    void setPacketLength(int32_t len)
     {
         if (len != 0)
         {
             assert(len >= 6);
             len -= 6;
         }
-        m_pesPacketLenHi = len >> 8;
-        m_pesPacketLenLo = len & 0xff;
+        m_pesPacketLenHi = static_cast<uint8_t>(len >> 8);
+        m_pesPacketLenLo = static_cast<uint8_t>(len);
     }
 
     uint8_t getHeaderLength() const { return m_pesHeaderLen + 9; }

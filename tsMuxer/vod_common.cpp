@@ -79,9 +79,9 @@ std::vector<std::string> extractFileList(const std::string& val)
     return rez;
 }
 
-uint16_t AV_RB16(const uint8_t* buffer) { return (*buffer << 8) + buffer[1]; }
-uint32_t AV_RB32(uint8_t* buffer) { return my_ntohl(*reinterpret_cast<int32_t*>(buffer)); }
-uint32_t AV_RB24(const uint8_t* buffer) { return (buffer[0] << 16) + (buffer[1] << 8) + buffer[2]; }
+uint16_t AV_RB16(const uint8_t* buffer) { return static_cast<uint16_t>(*buffer << 8 | buffer[1]); }
+uint32_t AV_RB32(uint8_t* buffer) { return my_ntohl(*reinterpret_cast<uint32_t*>(buffer)); }
+uint32_t AV_RB24(const uint8_t* buffer) { return buffer[0] << 16 | buffer[1] << 8 | buffer[2]; }
 
 void AV_WB16(uint8_t* buffer, const uint16_t value) { *reinterpret_cast<uint16_t*>(buffer) = my_htons(value); }
 

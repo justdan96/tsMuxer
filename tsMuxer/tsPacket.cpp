@@ -950,9 +950,9 @@ void CLPIParser::composeEP_map_for_one_stream_PID(BitStreamWriter& writer, M2TSS
                         endCode = 7;
                 }
             }
-            writer.putBits(3, endCode);                            // I_end_position_offset[EP_fine_id]
-            writer.putBits(11, (fst >> 9) % 2048);                 // PTS_EP_fine[EP_fine_id]
-            writer.putBits(17, indexData.m_pktCnt % (65536 * 2));  // SPN_EP_fine[EP_fine_id]
+            writer.putBits(3, endCode);                          // I_end_position_offset[EP_fine_id]
+            writer.putBits(11, (fst >> 9) % (1 << 11));          // PTS_EP_fine[EP_fine_id]
+            writer.putBits(17, indexData.m_pktCnt % (1 << 17));  // SPN_EP_fine[EP_fine_id]
         }
     }
 }

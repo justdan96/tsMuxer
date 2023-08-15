@@ -27,18 +27,6 @@ static constexpr uint32_t SPEAKER_TOP_BACK_CENTER = 0x10000;
 static constexpr uint32_t SPEAKER_TOP_BACK_RIGHT = 0x20000;
 static constexpr uint32_t SPEAKER_RESERVED = 0x80000000;
 
-/*
-typedef struct{
-  uint16_t  wFormatTag;
-  uint16_t  nChannels;
-  uint32_t nSamplesPerSec;
-  uint32_t nAvgBytesPerSec;
-  uint16_t  nBlockAlign;
-  uint16_t  wBitsPerSample;
-  uint16_t  cbSize;
-} WAVEFORMATEX;
-*/
-
 struct GUID
 {
     uint32_t data1;
@@ -74,7 +62,8 @@ typedef struct
     uint16_t wBitsPerSample;
     uint16_t cbSize;
 
-    union {
+    union
+    {
         uint16_t wValidBitsPerSample; /* bits of precision */
         uint16_t wSamplesPerBlock;    /* valid if wBitsPerSample==0 */
         uint16_t wReserved;           /* If neither applies, set to zero. */
@@ -88,7 +77,7 @@ constexpr uint16_t WAVE_FORMAT_EXTENSIBLE = 0xFFFE;
 static GUID KSDATAFORMAT_SUBTYPE_PCM(0x00000001, 0x0000, 0x0010, "\x80\x00\x00\xaa\x00\x38\x9b\x71");
 static GUID WAVE64GUID(0x66666972, 0x912E, 0x11CF, "\xA5\xD6\x28\xDB\x04\xC1\x00\x00");
 
-void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, int channels, bool lfeExist, int bitdepth);
+void buildWaveHeader(MemoryBlock& waveBuffer, int samplerate, uint16_t channels, bool lfeExist, uint16_t bitdepth);
 uint32_t getWaveChannelMask(int channels, bool lfeExists);
 void toLittleEndian(uint8_t* dstData, uint8_t* srcData, int size, int bitdepth);
 }  // namespace wave_format

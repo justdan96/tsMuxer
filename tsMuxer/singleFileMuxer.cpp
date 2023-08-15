@@ -33,7 +33,7 @@ SingleFileMuxer::~SingleFileMuxer()
     for (const auto& itr : m_streamInfo) delete itr.second;
 }
 
-void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
+void SingleFileMuxer::intAddStream(const std::string& streamName, const std::string& codecName, uint16_t streamIndex,
                                    const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     codecReader->setDemuxMode(true);

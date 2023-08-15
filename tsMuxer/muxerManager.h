@@ -11,7 +11,7 @@ class FileFactory;
 class MuxerManager final
 {
    public:
-    static constexpr uint32_t PHYSICAL_SECTOR_SIZE =
+    static constexpr int32_t PHYSICAL_SECTOR_SIZE =
         2048;  // minimum write align requirement. Should be readed from OS in a next version
     static constexpr int BLURAY_SECTOR_SIZE =
         PHYSICAL_SECTOR_SIZE * 3;  // real sector size is 2048, but M2TS frame required addition rounding by 3 blocks

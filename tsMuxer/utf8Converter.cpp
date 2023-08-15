@@ -10,10 +10,10 @@ using namespace convertUTF;
 
 namespace
 {
-uint16_t read_be16(const uint8_t *p) { return (p[0] << 8) | p[1]; }
-uint16_t read_le16(const uint8_t *p) { return p[0] | (p[1] << 8); }
-uint32_t read_be32(const uint8_t *p) { return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3]; }
-uint32_t read_le32(const uint8_t *p) { return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24); }
+uint16_t read_be16(const uint8_t *p) { return static_cast<uint16_t>(p[0] << 8 | p[1]); }
+uint16_t read_le16(const uint8_t *p) { return static_cast<uint16_t>(p[0] | p[1] << 8); }
+uint32_t read_be32(const uint8_t *p) { return p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]; }
+uint32_t read_le32(const uint8_t *p) { return p[0] | p[1] << 8 | p[2] << 16 | p[3] << 24; }
 
 template <typename R, typename... A>
 R get_fn_ret_type(R (*)(A...));

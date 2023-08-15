@@ -21,7 +21,9 @@ enum class VC1Code
     USER_FIELD,
     USER_FRAME,
     USER_ENTRYPOINT,
-    USER_SEQHDR
+    USER_SEQHDR,
+    // all other start code suffixes are reserved or forbidden
+    RESERVED  
 };
 
 enum class Profile
@@ -32,7 +34,7 @@ enum class Profile
     ADVANCED
 };
 
-const uint8_t ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
+constexpr uint8_t ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
 constexpr uint16_t ff_vc1_fps_dr[2] = {1000, 1001};
 
 const AVRational ff_vc1_pixel_aspect[16] = {
@@ -48,6 +50,7 @@ enum class VC1PictType
     B_TYPE,
     BI_TYPE
 };
+
 extern const char* pict_type_str[4];
 
 class VC1Unit

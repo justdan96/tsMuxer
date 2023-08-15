@@ -128,14 +128,14 @@ struct AdaptiveField
         // return my_ntohl(*pcr) * 0.95;
     }
 
-    uint64_t getPCR33()
+    int64_t getPCR33()
     {
         const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         const auto pcrLo = reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
-        return (static_cast<uint64_t>(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
+        return (static_cast<int64_t>(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
     }
 
-    void setPCR33(const uint64_t value)
+    void setPCR33(const int64_t value)
     {
         const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         *pcr = my_htonl(static_cast<uint32_t>(value >> 1));
@@ -149,7 +149,7 @@ struct TSPacket
 {
     // static const unsigned TS_FRAME_SIZE = 188;
     static constexpr unsigned TS_FRAME_SYNC_BYTE = 0x47;
-    static constexpr unsigned TS_HEADER_SIZE = 4;
+    static constexpr int TS_HEADER_SIZE = 4;
 
     static constexpr unsigned DATA_EXIST_BIT_VAL = 0x10000000;
     static constexpr unsigned PCR_BIT_VAL = 0x1000;
@@ -181,7 +181,7 @@ struct TSPacket
         PIDLow = pid & 0xff;
     }
 
-    unsigned getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
+    int getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
 
     static uint32_t getPCRDif32(const uint32_t nextPCR, const uint32_t curPCR)
     {
@@ -219,8 +219,8 @@ struct BluRayCoarseInfo
 struct PMTIndexData
 {
     uint32_t m_pktCnt;
-    int64_t m_frameLen;
-    PMTIndexData(const uint32_t pktCnt, const int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
+    uint32_t m_frameLen;
+    PMTIndexData(const uint32_t pktCnt, const uint32_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;

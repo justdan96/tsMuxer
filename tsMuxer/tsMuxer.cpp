@@ -1,5 +1,7 @@
 #include "tsMuxer.h"
 
+#include <cmath>
+
 #include <fs/systemlog.h>
 #include <fs/textfile.h>
 
@@ -25,9 +27,9 @@ unsigned HDR10_metadata[6] = {0, 0, 0, 0, 0, 0};
 bool isV3() { return V3_flags & HDMV_V3; }
 bool is4K() { return V3_flags & FOUR_K; }
 
-static constexpr uint64_t M_PCR_DELTA = 7000;
-static constexpr uint64_t SIT_INTERVAL = 76900;
-static constexpr uint64_t M_CBR_PCR_DELTA = 7000;
+static constexpr int64_t M_PCR_DELTA = 7000;
+static constexpr int64_t SIT_INTERVAL = 76900;
+static constexpr int64_t M_CBR_PCR_DELTA = 7000;
 
 static constexpr int64_t DEFAULT_VBV_BUFFER_LEN = 500;  // default 500 ms vbv buffer
 
@@ -94,7 +96,8 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_computeMuxStats = false;
     m_pmtFrames = 0;
     m_curFileStartPts = 0;  // FIXED_PTS_OFFSET;
-    m_splitSize = m_splitDuration = 0;
+    m_splitSize = 0;
+    m_splitDuration = 0;
     m_curFileNum = 0;
     m_bluRayMode = false;
     m_hdmvDescriptors = true;
@@ -147,7 +150,7 @@ void TSMuxer::setVBVBufferLen(const int value)
     m_prevM2TSPCR = m_fixed_pcr_offset * 300;
 }
 
-void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, const int streamIndex,
+void TSMuxer::intAddStream(const std::string& streamName, const std::string& codecName, const uint16_t streamIndex,
                            const map<string, string>& params, AbstractStreamReader* codecReader)
 {
     int descriptorLen = 0;
@@ -155,9 +158,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     if (codecReader != nullptr)
         descriptorLen = codecReader->getTSDescriptor(descrBuffer, m_bluRayMode, m_hdmvDescriptors);
 
-    if (codecName[0] == 'V')
-        m_mainStreamIndex = streamIndex;
-    else if (codecName[0] == 'A' && m_mainStreamIndex == -1)
+    if (codecName[0] == 'V' || (codecName[0] == 'A' && m_mainStreamIndex == -1))
         m_mainStreamIndex = streamIndex;
 
     string lang;
@@ -165,14 +166,14 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     if (itr != params.end())
         lang = itr->second;
 
-    int tsStreamIndex = streamIndex + 16;
+    uint16_t tsStreamIndex = streamIndex + 16;
     const bool isSecondary = codecReader != nullptr ? codecReader->isSecondary() : false;
 
     if (codecName[0] == 'V')
     {
         if (!isSecondary)
         {
-            const int doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
+            const uint16_t doubleMux = (m_subMode || m_masterMode) ? 2 : 1;
             if (codecReader != nullptr && codecReader->getStreamHDR() == 4)
             {
                 tsStreamIndex = 0x1015 + m_DVvideoTrackCnt * doubleMux;
@@ -206,12 +207,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             m_audioTrackCnt++;
         }
     }
-    else if (codecName == "S_HDMV/PGS")
-    {
-        tsStreamIndex = (V3_flags & 0x1e ? 0x12A0 : 0x1200) + m_pgsTrackCnt;
-        m_pgsTrackCnt++;
-    }
-    else if (codecName == "S_TEXT/UTF8")
+    else if (codecName == "S_HDMV/PGS" || codecName == "S_TEXT/UTF8")
     {
         tsStreamIndex = (V3_flags & 0x1e ? 0x12A0 : 0x1200) + m_pgsTrackCnt;
         m_pgsTrackCnt++;
@@ -227,21 +223,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     else
         m_pmt.pcr_pid = DEFAULT_PCR_PID;
 
-    if (codecName == "A_AC3")
-        m_pesType[tsStreamIndex] = PES_INT_AC3_ID;  // m_ac3Cnt++;
-    else if (codecName == "S_SUP")
-        m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;
-    else if (codecName == "S_HDMV/PGS")
-        m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;
-    else if (codecName == "S_TEXT/UTF8")
-        m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;
-    else if (codecName == "A_MP3")
-        m_pesType[tsStreamIndex] = PES_AUDIO_ID;
-    else if (codecName == "A_DTS")
-        m_pesType[tsStreamIndex] = PES_INT_DTS_ID;  // m_dtsCnt++;
-    else if (codecName == "A_LPCM")
-        m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;  // PES_INT_LPCM_ID; //m_lpcmCnt++;
-    else if (codecName[0] == 'V')
+    if (codecName[0] == 'V')
     {
         if (codecName == "V_MS/VFW/WVC1")
         {
@@ -257,17 +239,24 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
         }
         else
         {
-            m_pesType[tsStreamIndex] = PES_VIDEO_ID;  // m_videoCnt++;
+            m_pesType[tsStreamIndex] = PES_VIDEO_ID;
         }
     }
-
     else if (codecName[0] == 'A')
     {
-        m_pesType[tsStreamIndex] = PES_AUDIO_ID;  // m_audioCnt++;
+        if (codecName == "A_AC3")
+            m_pesType[tsStreamIndex] = PES_INT_AC3_ID;
+        else if (codecName == "A_DTS")
+            m_pesType[tsStreamIndex] = PES_INT_DTS_ID;
+        else
+            m_pesType[tsStreamIndex] = PES_AUDIO_ID;
     }
     else if (codecName[0] == 'S')
     {
-        m_pesType[tsStreamIndex] = PES_INT_SUB_ID;  // m_subCnt++;
+        if (codecName == "S_SUP" || codecName == "S_HDMV/PGS" || codecName == "S_TEXT/UTF8")
+            m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;
+        else
+            m_pesType[tsStreamIndex] = PES_INT_SUB_ID;
     }
 
     if (codecName[0] == 'V')
@@ -319,13 +308,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     else if (codecName == "A_AAC")
         m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::AUDIO_AAC, tsStreamIndex, descrBuffer, descriptorLen,
                                                      codecReader, lang, isSecondary);
-    else if (codecName == "S_SUP")
-        m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
-                                                     codecReader, lang, isSecondary);
-    else if (codecName == "S_HDMV/PGS")
-        m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
-                                                     codecReader, lang, isSecondary);
-    else if (codecName == "S_TEXT/UTF8")
+    else if (codecName == "S_SUP" || codecName == "S_HDMV/PGS" || codecName == "S_TEXT/UTF8")
         m_pmt.pidList[tsStreamIndex] = PMTStreamInfo(StreamType::SUB_PGS, tsStreamIndex, descrBuffer, descriptorLen,
                                                      codecReader, lang, isSecondary);
     else if (codecName == "A_AC3")
@@ -414,20 +397,20 @@ bool TSMuxer::doFlush()
     if (!m_lastPts.empty())
         m_lastPts[m_lastPts.size() - 1] += m_additionCLPISize;
 
-    uint64_t newPCR = 0;
+    int64_t newPCR = 0;
     if (m_m2tsMode)
     {
         newPCR = (m_endStreamDTS - m_minDts) / INT_FREQ_TO_TS_FREQ + m_fixed_pcr_offset;
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
-            const auto cbrPCR = static_cast<uint64_t>(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
+            const auto cbrPCR = llround(static_cast<double>(m_lastPCR + m_pcrBits) * 90000.0 / m_cbrBitrate);
             newPCR = FFMAX(newPCR, cbrPCR);
         }
     }
     return doFlush(newPCR, 0);
 }
 
-bool TSMuxer::doFlush(const uint64_t newPCR, const int64_t pcrGAP)
+bool TSMuxer::doFlush(const int64_t newPCR, const int64_t pcrGAP)
 {
     flushTSFrame();
 
@@ -436,15 +419,15 @@ bool TSMuxer::doFlush(const uint64_t newPCR, const int64_t pcrGAP)
         // round file to sector size. It's also can be applied to any file in a m2ts mode
         int nullCnt = 0;
         if (m_processedBlockSize % m_sectorSize)
-            nullCnt = m_sectorSize - (m_processedBlockSize % m_sectorSize);
+            nullCnt = m_sectorSize - static_cast<int>(m_processedBlockSize % m_sectorSize);
         writeNullPackets(nullCnt / m_frameSize);
     }
 
     if (m_m2tsMode)
         processM2TSPCR(newPCR, pcrGAP);
 
-    const unsigned lastBlockSize = m_outBufLen & (MuxerManager::PHYSICAL_SECTOR_SIZE - 1);  // last 64K of data
-    const unsigned roundBufLen = m_outBufLen & ~(MuxerManager::PHYSICAL_SECTOR_SIZE - 1);
+    const int lastBlockSize = m_outBufLen & (MuxerManager::PHYSICAL_SECTOR_SIZE - 1);  // last 64K of data
+    const int roundBufLen = m_outBufLen & ~(MuxerManager::PHYSICAL_SECTOR_SIZE - 1);
     if (m_owner->isAsyncMode())
     {
         if (lastBlockSize > 0)
@@ -506,7 +489,7 @@ bool TSMuxer::close()
 
 int TSMuxer::calcM2tsFrameCnt() const
 {
-    uint32_t byteCnt = 0;
+    int32_t byteCnt = 0;
     for (const auto& i : m_m2tsDelayBlocks) byteCnt += i.second;
     byteCnt -= m_prevM2TSPCROffset;
     byteCnt += m_outBufLen;
@@ -518,8 +501,8 @@ void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
 {
     const int m2tsFrameCnt = calcM2tsFrameCnt();
     const int64_t hiResPCR = pcrVal * 300 - pcrGAP;
-    const uint64_t pcrValDif = hiResPCR - m_prevM2TSPCR;  // m2ts pcr clock based on full 27Mhz counter
-    const double pcrIncPerFrame = (pcrValDif + 0.1) / static_cast<double>(m2tsFrameCnt);
+    const int64_t pcrValDif = hiResPCR - m_prevM2TSPCR;  // m2ts pcr clock based on full 27Mhz counter
+    const double pcrIncPerFrame = static_cast<double>(pcrValDif) / m2tsFrameCnt;
 
     auto curM2TSPCR = static_cast<double>(m_prevM2TSPCR);
     uint8_t* curPos;
@@ -533,7 +516,7 @@ void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
             for (; j < i.second; j += 192)
             {
                 curM2TSPCR += pcrIncPerFrame;
-                writeM2TSHeader(curPos, static_cast<uint64_t>(curM2TSPCR));
+                writeM2TSHeader(curPos, llround(curM2TSPCR));
                 curPos += 192;
             }
             if (m_owner->isAsyncMode())
@@ -553,7 +536,7 @@ void TSMuxer::processM2TSPCR(const int64_t pcrVal, const int64_t pcrGAP)
     for (; curPos < end; curPos += 192)
     {
         curM2TSPCR += pcrIncPerFrame;
-        writeM2TSHeader(curPos, static_cast<uint64_t>(curM2TSPCR));
+        writeM2TSHeader(curPos, llround(curM2TSPCR));
     }
     assert(curPos == end);
     m_prevM2TSPCROffset = m_outBufLen;
@@ -577,7 +560,6 @@ void TSMuxer::writeEmptyPacketWithPCRTest(const int64_t pcrVal)
     tsPacket->setPID(m_pmt.pcr_pid);
     tsPacket->afExists = 1;
     tsPacket->adaptiveField.setPCR33(pcrVal);
-    // tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt++;
     tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt;  // do not increment counter because data_exists == 0
 
     memset(curBuf + tsPacket->getHeaderSize(), 0xff, TS_FRAME_SIZE - tsPacket->getHeaderSize());
@@ -604,7 +586,6 @@ void TSMuxer::writeEmptyPacketWithPCR(const int64_t pcrVal)
     tsPacket->setPID(m_pmt.pcr_pid);
     tsPacket->afExists = 1;
     tsPacket->adaptiveField.setPCR33(pcrVal);
-    // tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt++;
     tsPacket->counter = m_streamInfo[m_pmt.pcr_pid].m_tsCnt;  // do not increment counter becouse data_exists == 0
 
     memset(curBuf + tsPacket->getHeaderSize(), 0xff, TS_FRAME_SIZE - tsPacket->getHeaderSize());
@@ -618,7 +599,7 @@ void TSMuxer::writeEmptyPacketWithPCR(const int64_t pcrVal)
     writeOutBuffer();
 }
 
-void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
+void TSMuxer::buildPesHeader(const uint8_t pesStreamID, AVPacket& avPacket, int pid)
 {
     const int64_t curDts = internalClockToPts(avPacket.dts) + m_timeOffset;
     const int64_t curPts = internalClockToPts(avPacket.pts) + m_timeOffset;
@@ -648,7 +629,7 @@ void TSMuxer::buildPesHeader(const int pesStreamID, AVPacket& avPacket, int pid)
     for (auto& i : tmpPriorityData) m_priorityData.emplace_back(i.first + pesPacket->getHeaderLength(), i.second);
 }
 
-void TSMuxer::addData(const int pesStreamID, const int pid, AVPacket& avPacket)
+void TSMuxer::addData(const uint8_t pesStreamID, const int pid, AVPacket& avPacket)
 {
     int beforePesLen = static_cast<int>(m_pesData.size());
     if (m_pesData.size() == 0)
@@ -738,7 +719,7 @@ std::string TSMuxer::getNextName(const std::string curName)
     return toNativeSeparators(result);
 }
 
-void TSMuxer::gotoNextFile(const uint64_t newPts)
+void TSMuxer::gotoNextFile(const int64_t newPts)
 {
     // 2. CloseCurrentFile
     if (m_owner->isAsyncMode())
@@ -833,12 +814,12 @@ void TSMuxer::writePESPacket()
             }
         }
 
-        uint8_t* curPtr = m_pesData.data();
+        const uint8_t* curPtr = m_pesData.data();
         const uint8_t* dataEnd = curPtr + m_pesData.size();
         bool payloadStart = true;
         for (const auto& i : m_priorityData)
         {
-            uint8_t* blockPtr = m_pesData.data() + i.first;
+            const uint8_t* blockPtr = m_pesData.data() + i.first;
             if (blockPtr > curPtr)
             {
                 tsPackets += writeTSFrames(m_pesPID, curPtr, blockPtr - curPtr, false, payloadStart);
@@ -860,16 +841,16 @@ void TSMuxer::writePESPacket()
     }
 }
 
-void TSMuxer::writePCR(const uint64_t newPCR)
+void TSMuxer::writePCR(const int64_t newPCR)
 {
     int bitsRest = 0;
     if (m_cbrBitrate != -1 && m_minBitrate != -1 && m_lastPCR != -1)
     {
-        int expectedBits = static_cast<int>((newPCR - m_lastPCR) / 90000.0 * m_minBitrate + 0.5);
+        int expectedBits = lroundl(static_cast<double>(newPCR - m_lastPCR) / 90000.0 * m_minBitrate);
         expectedBits -= m_pcrBits;
         if (expectedBits > 0)
         {
-            int tsFrames = (expectedBits / 8 / m_frameSize);
+            int tsFrames = expectedBits / 8 / m_frameSize;
             if (tsFrames * m_frameSize * 8 < expectedBits)
                 tsFrames++;
             writeNullPackets(tsFrames);
@@ -888,7 +869,7 @@ void TSMuxer::flushTSBuffer()
     if (m_owner->isAsyncMode())
         m_owner->waitForWriting();
 
-    const uint64_t fileSize = m_muxFile->size();
+    const int64_t fileSize = m_muxFile->size();
     if (fileSize == -1)
         THROW(ERR_FILE_COMMON, "Can't determine size for file " << m_outFileName)
     m_muxFile->close();
@@ -902,8 +883,7 @@ void TSMuxer::flushTSBuffer()
     m_outBufLen = 0;
 }
 
-void TSMuxer::finishFileBlock(const uint64_t newPts, const uint64_t newPCR, const bool doChangeFile,
-                              const bool recursive)
+void TSMuxer::finishFileBlock(const int64_t newPts, const int64_t newPCR, const bool doChangeFile, const bool recursive)
 {
     if (m_processedBlockSize > 0)
     {
@@ -1007,7 +987,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
 
     if (m_cbrBitrate != -1 && m_lastPCR != -1)
     {
-        const auto cbrPCR = static_cast<int64_t>(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
+        const auto cbrPCR = llround(static_cast<double>(m_lastPCR + m_pcrBits) * 90000.0 / m_cbrBitrate);
         newPCR = FFMAX(newPCR, cbrPCR);
     }
 
@@ -1031,7 +1011,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
 
     m_streamInfo[tsIndex].m_pts = avPacket.pts;
     m_streamInfo[tsIndex].m_dts = avPacket.dts;
-    int pesStreamID = m_pesType[tsIndex];
+    uint8_t pesStreamID = m_pesType[tsIndex];
     if (pesStreamID <= SYSTEM_START_CODE)
     {
         if (m_useNewStyleAudioPES)
@@ -1053,7 +1033,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     return true;
 }
 
-int TSMuxer::writeTSFrames(const int pid, const uint8_t* buffer, const int64_t len, const bool priorityData,
+int TSMuxer::writeTSFrames(const uint16_t pid, const uint8_t* buffer, const int64_t len, const bool priorityData,
                            bool payloadStart)
 {
     int result = 0;
@@ -1068,7 +1048,7 @@ int TSMuxer::writeTSFrames(const int pid, const uint8_t* buffer, const int64_t l
     {
         if (m_cbrBitrate != -1 && m_lastPCR != -1)
         {
-            const auto newPCR = static_cast<int64_t>(m_lastPCR + m_pcrBits * 90000.0 / m_cbrBitrate + 0.5);
+            const auto newPCR = llround(static_cast<double>(m_lastPCR + m_pcrBits) * 90000.0 / m_cbrBitrate);
             if (newPCR - m_lastPCR >= m_pcr_delta && m_lastPCR != -1)
             {
                 m_pcrBits = 0;
@@ -1077,7 +1057,8 @@ int TSMuxer::writeTSFrames(const int pid, const uint8_t* buffer, const int64_t l
                 if (m_lastPESDTS != -1 && m_lastPCR > m_lastPESDTS)
                 {
                     LTRACE(LT_ERROR, 2,
-                           "VBV buffer overflow at position " << (m_lastPCR - m_fixed_pcr_offset) / 90000.0 << " sec");
+                           "VBV buffer overflow at position " << (double)(m_lastPCR - m_fixed_pcr_offset) / 90000.0
+                                                              << " sec");
                 }
             }
         }
@@ -1209,7 +1190,7 @@ void TSMuxer::writeNullPackets(const int cnt)
     }
 }
 
-bool TSMuxer::appendM2TSNullPacketToFile(const uint64_t curFileSize, int counter, int* packetsWrited) const
+bool TSMuxer::appendM2TSNullPacketToFile(const int64_t curFileSize, int counter, int* packetsWrited) const
 {
     *packetsWrited = 0;
     while (counter < 0) counter += 16;
@@ -1223,7 +1204,7 @@ bool TSMuxer::appendM2TSNullPacketToFile(const uint64_t curFileSize, int counter
         return false;
     memcpy(tmpBuff + 4, m_nullBuffer, TS_FRAME_SIZE);
     const auto tsPacket = reinterpret_cast<TSPacket*>(tmpBuff);
-    for (uint64_t newFileSize = curFileSize; newFileSize % (2048 * 3) != 0; newFileSize += 192)
+    for (int64_t newFileSize = curFileSize; newFileSize % (2048LL * 3) != 0; newFileSize += 192)
     {
         tsPacket->counter = counter++;
         if (file->write(tmpBuff, 192) != 192)
@@ -1372,26 +1353,26 @@ void TSMuxer::parseMuxOpt(const std::string& opts)
         }
         else if (paramPair[0] == "--split-size")
         {
-            uint64_t coeff = 1;
+            int64_t coeff = 1;
             string postfix;
             for (const auto& j : paramPair[1])
                 if (!((j >= '0' && j <= '9') || j == '.'))
                     postfix += j;
             postfix = strToUpperCase(postfix);
             if (postfix == "GB")
-                coeff = 1000000000ull;
+                coeff = 1000LL * 1000 * 1000;
             else if (postfix == "GIB")
-                coeff = 1024ull * 1024ull * 1024ull;
+                coeff = 1024LL * 1024 * 1024;
             else if (postfix == "MB")
-                coeff = 1000000;
+                coeff = 1000LL * 1000;
             else if (postfix == "MIB")
-                coeff = 1024 * 1024;
+                coeff = 1024LL * 1024;
             else if (postfix == "KB")
                 coeff = 1000;
             else if (postfix == "KIB")
                 coeff = 1024;
             string prefix = paramPair[1].substr(0, paramPair[1].size() - postfix.size());
-            setSplitSize(static_cast<int64_t>(strToDouble(prefix.c_str()) * coeff));
+            setSplitSize(static_cast<uint32_t>(strToDouble(prefix.c_str()) * static_cast<double>(coeff)));
             m_computeMuxStats = true;
         }
         else if (paramPair[0] == "--blu-ray" || paramPair[0] == "--blu-ray-v3" || paramPair[0] == "--avchd")
@@ -1444,6 +1425,7 @@ void TSMuxer::openDstFile()
 vector<int64_t> TSMuxer::getFirstPts() const
 {
     std::vector<int64_t> rez;
+    rez.reserve(m_firstPts.size());
     for (const auto& i : m_firstPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     return rez;
 }
@@ -1461,6 +1443,7 @@ void TSMuxer::alignPTS(TSMuxer* otherMuxer)
 vector<int64_t> TSMuxer::getLastPts() const
 {
     std::vector<int64_t> rez;
+    rez.reserve(m_lastPts.size());
     for (const auto& i : m_lastPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
     // if (!rez.empty())
     //    *rez.rbegin() += m_mainStreamFrameDuration;
@@ -1490,7 +1473,7 @@ std::string TSMuxer::getFileNameByIdx(const size_t idx)
 void TSMuxer::setMuxFormat(const std::string& format)
 {
     m_m2tsMode = format == "M2TS" || format == "M2T" || format == "MTS" || format == "SSIF";
-    m_writeBlockSize = (m_m2tsMode ? DEFAULT_FILE_BLOCK_SIZE : TS188_ROUND_BLOCK_SIZE);
+    m_writeBlockSize = m_m2tsMode ? DEFAULT_FILE_BLOCK_SIZE : TS188_ROUND_BLOCK_SIZE;
     m_outBuf = new uint8_t[m_writeBlockSize + 1024];
     m_frameSize = m_m2tsMode ? 192 : 188;
     if (m_m2tsMode)

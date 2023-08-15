@@ -2,7 +2,6 @@
 
 #include <fs/systemlog.h>
 
-#include "aac.h"
 #include "abstractStreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -262,7 +261,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         return 0;
     }
 
-    uint8_t* lastFrameAddr = data + readedBytes - TS_FRAME_SIZE;
+    const uint8_t* lastFrameAddr = data + readedBytes - TS_FRAME_SIZE;
 
     if (m_firstCall && !m_m2tsMode)
     {
@@ -379,10 +378,8 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                         m_videoDtsGap = curDts - m_lastVideoDTS;
                 }
 
-                if (m_firstPtsTime.find(pid) == m_firstPtsTime.end())
-                    m_firstPtsTime[pid] = curPts;
-
-                else if (m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
+                if (m_firstPtsTime.find(pid) == m_firstPtsTime.end() ||
+                    m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
                     m_firstPtsTime[pid] = curPts;
             }
 

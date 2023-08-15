@@ -1,6 +1,7 @@
 #ifndef TS_DEMUXER_H
 #define TS_DEMUXER_H
 
+#include <cmath>
 #include <map>
 #include <set>
 #include <string>
@@ -29,7 +30,7 @@ class TSDemuxer final : public AbstractDemuxer
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
         {
             const int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
-            return static_cast<int64_t>(clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5));  // convert to ms
+            return llround(static_cast<double>(clockTicks) / 90.0);  // convert to ms
         }
 
         return 0;

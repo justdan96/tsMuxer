@@ -37,7 +37,7 @@ class TSMuxer final : public AbstractMuxer
    public:
     TSMuxer(MuxerManager* owner);
     ~TSMuxer() override;
-    void intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
+    void intAddStream(const std::string& streamName, const std::string& codecName, uint16_t streamIndex,
                       const std::map<std::string, std::string>& params, AbstractStreamReader* codecReader) override;
     bool doFlush() override;
     bool close() override;
@@ -57,7 +57,7 @@ class TSMuxer final : public AbstractMuxer
     const std::vector<uint32_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
     size_t splitFileCnt() const { return m_fileNames.size(); }
     void setSplitDuration(const int64_t value) { m_splitDuration = value; }
-    void setSplitSize(const int64_t value) { m_splitSize = value; }
+    void setSplitSize(const uint32_t value) { m_splitSize = value; }
     void parseMuxOpt(const std::string& opts) override;
 
     void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
@@ -71,15 +71,15 @@ class TSMuxer final : public AbstractMuxer
 
    protected:
     bool muxPacket(AVPacket& avPacket) override;
-    virtual void internalReset();
+    void internalReset();
     void setMuxFormat(const std::string& format);
     bool isSplitPoint(const AVPacket& avPacket) const;
     bool blockFull() const;
 
    private:
-    bool doFlush(uint64_t newPCR, int64_t pcrGAP);
+    bool doFlush(int64_t newPCR, int64_t pcrGAP);
     void flushTSFrame();
-    int writeTSFrames(int pid, const uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
+    int writeTSFrames(uint16_t pid, const uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
     void writeSIT();
     void writePMT();
     void writePAT();
@@ -90,21 +90,21 @@ class TSMuxer final : public AbstractMuxer
     void buildPAT();
     void buildPMT();
     static void buildSIT();
-    void addData(int pesStreamID, int pid, AVPacket& avPacket);
-    void buildPesHeader(int pesStreamID, AVPacket& avPacket, int pid);
+    void addData(uint8_t pesStreamID, int pid, AVPacket& avPacket);
+    void buildPesHeader(uint8_t pesStreamID, AVPacket& avPacket, int pid);
     void writePESPacket();
     void processM2TSPCR(int64_t pcrVal, int64_t pcrGAP);
     inline int calcM2tsFrameCnt() const;
-    static void writeM2TSHeader(uint8_t* buffer, const uint64_t m2tsPCR)
+    static void writeM2TSHeader(uint8_t* buffer, const int64_t m2tsPCR)
     {
         const auto cur = reinterpret_cast<uint32_t*>(buffer);
         *cur = my_htonl(m2tsPCR & 0x3fffffff);
     }
     void writePATPMT(int64_t pcr, bool force = false);
-    void writePCR(uint64_t newPCR);
+    void writePCR(int64_t newPCR);
     std::string getNextName(std::string curName) override;
     void writeEmptyPacketWithPCRTest(int64_t pcrVal);
-    bool appendM2TSNullPacketToFile(uint64_t curFileSize, int counter, int* packetsWrited) const;
+    bool appendM2TSNullPacketToFile(int64_t curFileSize, int counter, int* packetsWrited) const;
     int writeOutFile(const uint8_t* buffer, int len) const;
 
     void joinToMasterFile() override;
@@ -113,8 +113,8 @@ class TSMuxer final : public AbstractMuxer
 
     AbstractOutputStream* getDstFile() const { return m_muxFile; }
     void flushTSBuffer();
-    void finishFileBlock(uint64_t newPts, uint64_t newPCR, bool doChangeFile, bool recursive = true);
-    void gotoNextFile(uint64_t newPts);
+    void finishFileBlock(int64_t newPts, int64_t newPCR, bool doChangeFile, bool recursive = true);
+    void gotoNextFile(int64_t newPts);
 
     AbstractOutputStream* m_muxFile;
     bool m_isExternalFile;
@@ -129,8 +129,8 @@ class TSMuxer final : public AbstractMuxer
     int m_curFileNum;
     bool m_bluRayMode;
     bool m_hdmvDescriptors;
-    uint64_t m_splitSize;
-    uint64_t m_splitDuration;
+    uint32_t m_splitSize;
+    int64_t m_splitDuration;
 
     bool m_useNewStyleAudioPES;
 
@@ -163,17 +163,17 @@ class TSMuxer final : public AbstractMuxer
     int64_t m_minDts;
     bool m_beforePCRDataWrited;
     std::map<int, int> m_extIndexToTSIndex;
-    int m_videoTrackCnt;
-    int m_DVvideoTrackCnt;
-    int m_videoSecondTrackCnt;
-    int m_audioTrackCnt;
-    int m_secondaryAudioTrackCnt;
-    int m_pgsTrackCnt;
+    uint16_t m_videoTrackCnt;
+    uint16_t m_DVvideoTrackCnt;
+    uint16_t m_videoSecondTrackCnt;
+    uint16_t m_audioTrackCnt;
+    uint16_t m_secondaryAudioTrackCnt;
+    uint16_t m_pgsTrackCnt;
     int64_t m_lastPCR;
     std::map<int, StreamInfo> m_streamInfo;
-    uint64_t m_lastPMTPCR;
+    int64_t m_lastPMTPCR;
     uint8_t* m_outBuf;
-    uint32_t m_outBufLen;
+    int32_t m_outBufLen;
     int m_nullCnt;
     int m_pmtCnt;
     int m_patCnt;
@@ -195,12 +195,12 @@ class TSMuxer final : public AbstractMuxer
     bool m_pesSpsPps;
     bool m_computeMuxStats;
     int64_t m_pmtFrames;
-    uint64_t m_curFileStartPts;
+    int64_t m_curFileStartPts;
     int64_t m_vbvLen;
     int m_mainStreamIndex;
 
     std::string m_outFileName;
-    unsigned m_writeBlockSize;
+    int m_writeBlockSize;
     int m_frameSize;
     int64_t m_processedBlockSize;
     TSMuxer* m_sublingMuxer;

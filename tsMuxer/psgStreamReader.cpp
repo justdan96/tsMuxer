@@ -713,7 +713,7 @@ int PGSStreamReader::flushPacket(AVPacket& avPacket) { return 0; }
 
 void PGSStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock)
 {
-    if (m_tmpBufferLen + dataLen > m_tmpBuffer.size())
+    if (m_tmpBufferLen + dataLen > static_cast<int64_t>(m_tmpBuffer.size()))
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
 
     if (!m_tmpBuffer.empty())

@@ -80,10 +80,8 @@ string VC1SequenceHeader::getStreamDescr() const
     case Profile::ADVANCED:
         rez << "Advanced@" << level;
         break;
-    default:
-        rez << "Unknown";
-        break;
     }
+
     rez << " Resolution: " << coded_width << ':' << coded_height;
     rez << (interlace ? 'i' : 'p') << "  ";
     rez << "Frame rate: ";
@@ -228,8 +226,8 @@ int VC1SequenceHeader::decode_sequence_header_adv()
     if (level >= 5)
         LTRACE(LT_WARN, 0, "Reserved LEVEL " << level);
     bitReader.skipBits(11);  // chromaformat, frmrtq_postproc, bitrtq_postproc, postprocflag
-    coded_width = (bitReader.getBits<uint16_t>(12) + 1) << 1;
-    coded_height = (bitReader.getBits<uint16_t>(12) + 1) << 1;
+    coded_width = (bitReader.getBits<uint16_t>(12) + 1) * 2;
+    coded_height = (bitReader.getBits<uint16_t>(12) + 1) * 2;
     pulldown = bitReader.getBit();
     interlace = bitReader.getBit();
     tfcntrflag = bitReader.getBit();
@@ -319,8 +317,8 @@ int VC1SequenceHeader::decode_entry_point()
 
         if (bitReader.getBit())
         {
-            coded_width = (bitReader.getBits<uint16_t>(12) + 1) << 1;
-            coded_height = (bitReader.getBits<uint16_t>(12) + 1) << 1;
+            coded_width = (bitReader.getBits<uint16_t>(12) + 1) * 2;
+            coded_height = (bitReader.getBits<uint16_t>(12) + 1) * 2;
         }
         if (extended_mv)
             bitReader.skipBit();  // extended_dmv

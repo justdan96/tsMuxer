@@ -22,7 +22,7 @@ class AbstractMuxer
     virtual bool close() = 0;
     virtual void parseMuxOpt(const std::string& opts) = 0;
 
-    virtual void intAddStream(const std::string& streamName, const std::string& codecName, int streamIndex,
+    virtual void intAddStream(const std::string& streamName, const std::string& codecName, uint16_t streamIndex,
                               const std::map<std::string, std::string>& params, AbstractStreamReader* codecReader) = 0;
 
     virtual bool muxPacket(AVPacket& avPacket) = 0;
