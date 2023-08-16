@@ -6,7 +6,7 @@
 class TextFile final : public File
 {
    public:
-    TextFile() {}
+    TextFile() = default;
     TextFile(const char* fName, const unsigned int oflag, const unsigned int systemDependentFlags = 0)
         : File(fName, oflag, systemDependentFlags)
     {

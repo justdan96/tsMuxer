@@ -21,7 +21,7 @@ class ParsedTrackPrivData
 
     virtual void setPrivData(uint8_t* buff, int size) {}
     virtual void extractData(AVPacket* pkt, uint8_t* buff, int size) = 0;
-    virtual int newBufferSize(uint8_t* buff, int size) { return 0; }
+    virtual unsigned newBufferSize(uint8_t* buff, unsigned size) { return 0; }
 };
 
 enum class IOContextTrackType

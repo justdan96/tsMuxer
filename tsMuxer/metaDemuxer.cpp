@@ -1055,7 +1055,7 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
             else if (addParam.first == "font-charset")
                 font.m_charset = strToInt32(addParam.second.c_str());
             else if (addParam.first == "font-border")
-                font.m_borderWidth = strToInt32(addParam.second.c_str());
+                font.m_borderWidth = strToFloat(addParam.second.c_str());
             else if (addParam.first == "fps")
             {
                 fps = strToDouble(addParam.second.c_str());

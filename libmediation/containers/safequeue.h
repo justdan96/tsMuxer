@@ -1,4 +1,3 @@
-
 #ifndef SAFE_QUEUE_H
 #define SAFE_QUEUE_H
 
@@ -18,19 +17,19 @@ class SafeQueue
 
     bool empty() const
     {
-        std::lock_guard<std::mutex> lk(m_mtx);
+        std::lock_guard lk(m_mtx);
 
         return m_queue.empty();
     }
 
     size_type size() const
     {
-        std::lock_guard<std::mutex> lk(m_mtx);
+        std::lock_guard lk(m_mtx);
 
         return m_queue.size();
     }
 
-    bool push(const T& val)
+    virtual bool push(const T& val)
     {
         std::lock_guard<std::mutex> lk(m_mtx);
 
@@ -41,9 +40,9 @@ class SafeQueue
         return true;
     }
 
-    T pop()
+    virtual T pop()
     {
-        std::lock_guard<std::mutex> lk(m_mtx);
+        std::lock_guard lk(m_mtx);
 
         T val = m_queue.front();
         m_queue.pop();
@@ -54,10 +53,7 @@ class SafeQueue
    private:
     mutable std::mutex m_mtx;
     std::queue<T> m_queue;
-    const size_type m_maxSize;
-
-    SafeQueue(const SafeQueue<T>&);
-    SafeQueue& operator=(const SafeQueue<T>&);
+    size_type m_maxSize;
 };
 
 template <typename T>
@@ -70,9 +66,9 @@ class SafeQueueWithNotification : public SafeQueue<T>
     {
     }
 
-    bool push(const T& val)
+    bool push(const T& val) override
     {
-        std::lock_guard<std::mutex> lk(m_mtx);
+        std::lock_guard lk(m_mtx);
 
         if (!SafeQueue<T>::push(val))
             return false;
@@ -85,9 +81,6 @@ class SafeQueueWithNotification : public SafeQueue<T>
    private:
     std::mutex& m_mtx;
     std::condition_variable& m_cond;
-
-    SafeQueueWithNotification(const SafeQueueWithNotification<T>&);
-    SafeQueueWithNotification& operator=(const SafeQueueWithNotification<T>&);
 };
 
 template <typename T>
@@ -98,9 +91,9 @@ class WaitableSafeQueue : public SafeQueueWithNotification<T>
 
     ~WaitableSafeQueue() override {}
 
-    T pop()
+    T pop() override
     {
-        std::unique_lock<std::mutex> lk(m_mtx);
+        std::unique_lock lk(m_mtx);
 
         while (SafeQueue<T>::empty())
         {
@@ -115,9 +108,6 @@ class WaitableSafeQueue : public SafeQueueWithNotification<T>
    private:
     std::mutex m_mtx;
     std::condition_variable m_cond;
-
-    WaitableSafeQueue(const WaitableSafeQueue<T>&);
-    WaitableSafeQueue& operator=(const WaitableSafeQueue<T>&);
 };
 
-#endif  //_SAFE_QUEUE_H
+#endif  // SAFE_QUEUE_H_

@@ -166,7 +166,7 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
     if (itr != params.end())
         lang = itr->second;
 
-    uint16_t tsStreamIndex = streamIndex + 16;
+    int tsStreamIndex = streamIndex + 16;
     const bool isSecondary = codecReader != nullptr ? codecReader->isSecondary() : false;
 
     if (codecName[0] == 'V')
@@ -1445,8 +1445,6 @@ vector<int64_t> TSMuxer::getLastPts() const
     std::vector<int64_t> rez;
     rez.reserve(m_lastPts.size());
     for (const auto& i : m_lastPts) rez.push_back(internalClockToPts(i) + m_timeOffset);
-    // if (!rez.empty())
-    //    *rez.rbegin() += m_mainStreamFrameDuration;
     return rez;
 }
 

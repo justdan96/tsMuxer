@@ -514,7 +514,7 @@ std::vector<wchar_t> toWide(const char* utf8Str, const int sz)
     const auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
     if (requiredSiz != 0)
     {
-        return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
+        return mbtwc_wrapper(CP_UTF8, utf8Str, sz, requiredSiz);
     }
     /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
      * to keep compatibility with meta files saved by older versions of the GUI which put the file name through

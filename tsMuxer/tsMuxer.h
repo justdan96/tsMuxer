@@ -189,7 +189,7 @@ class TSMuxer final : public AbstractMuxer
     bool m_needTruncate;
     int64_t m_lastMuxedDts;
     MemoryBlock m_pesData;
-    int m_pesPID;
+    uint16_t m_pesPID;
     std::vector<uint32_t> m_muxedPacketCnt;
     bool m_pesIFrame;
     bool m_pesSpsPps;

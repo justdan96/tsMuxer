@@ -126,7 +126,7 @@ struct MOVStreamContext : Track
 
     vector<int64_t> chunk_offsets;
     vector<uint32_t> m_index;
-    uint32_t m_indexCur;
+    size_t m_indexCur;
 
     unsigned ffindex;  // the ffmpeg stream id
     int next_chunk;
@@ -136,7 +136,7 @@ struct MOVStreamContext : Track
 
     int ctts_index;
     int ctts_sample;
-    int sample_size;
+    uint32_t sample_size;
     unsigned sample_count;
     unsigned keyframe_count;
     unsigned time_scale;
@@ -206,16 +206,16 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
         }
     }
 
-    int newBufferSize(uint8_t* buff, const int size) override
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
-        int left = size;
-        unsigned i = 0;
+        unsigned left = size;
+        int i = 0;
         for (; left > 4; ++i)
         {
             left -= m_sc->sample_size;
             if (m_sc->sample_size == 0)
             {
-                if (m_sc->m_indexCur + i >= static_cast<unsigned>(m_sc->m_index.size()))
+                if (m_sc->m_indexCur + i >= m_sc->m_index.size())
                     THROW(ERR_MOV_PARSE, "Out of index for AAC track #" << m_sc->ffindex << " at position "
                                                                         << m_demuxer->getProcessedBytes())
                 left -= m_sc->m_index[m_sc->m_indexCur + i];
@@ -333,10 +333,10 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
         }
     }
 
-    int newBufferSize(uint8_t* buff, const int size) override
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         const uint8_t* end = buff + size;
-        size_t nalCnt = 0;
+        unsigned nalCnt = 0;
         while (buff < end)
         {
             if (buff + nal_length_size > end)
@@ -350,10 +350,10 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             buff += nalSize;
             ++nalCnt;
         }
-        size_t spsPpsSize = 0;
+        unsigned spsPpsSize = 0;
         for (auto& i : spsPpsList) spsPpsSize += i.size() + 4;
 
-        return static_cast<int>(size + spsPpsSize + nalCnt * (4 - nal_length_size));
+        return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
 
    protected:
@@ -515,7 +515,7 @@ class MovParsedSRTTrackData final : public ParsedTrackPrivData
         m_timeOffset = endTime;
     }
 
-    int newBufferSize(uint8_t* buff, const int size) override
+    unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         const int64_t stored_sttsCnt = sttsCnt;
         const int64_t stored_sttsPos = sttsPos;
@@ -550,8 +550,8 @@ class MovParsedSRTTrackData final : public ParsedTrackPrivData
 
             while (buff < end)
             {
-                int64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
-                const uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
+                int64_t modifierLen = buff[0] << 24 | buff[1] << 16 | buff[2] << 8 | buff[3];
+                const uint32_t modifierType = buff[4] << 24 | buff[5] << 16 | buff[6] << 8 | buff[7];
                 buff += 8;
                 modifierLen -= 8;
                 if (modifierLen == 1)  // 64-bit length
