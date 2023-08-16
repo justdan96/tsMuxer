@@ -23,7 +23,7 @@ class BlurayHelper final : public FileFactory
               bool useReproducibleIsoHeader = false);
     void createBluRayDirs() const;
     bool writeBluRayFiles(const MuxerManager& muxer, bool usedBlankPL, int mplsNum, int blankNum,
-                                        bool stereoMode) const;
+                          bool stereoMode) const;
     bool createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const;
     bool createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int autoChapterLen,
                         const std::vector<double>& customChapters, DiskType dt, int mplsOffset,

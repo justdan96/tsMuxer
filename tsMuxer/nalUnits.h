@@ -222,7 +222,10 @@ class SPSUnit final : public NALUnit
 
     [[nodiscard]] std::string getStreamDescr() const;
     [[nodiscard]] unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
-    [[nodiscard]] unsigned getHeight() const { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
+    [[nodiscard]] unsigned getHeight() const
+    {
+        return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY();
+    }
     [[nodiscard]] double getFPS() const;
     void setFps(double fps);
 
@@ -293,7 +296,10 @@ class SEIUnit final : public NALUnit
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
 
-    [[nodiscard]] bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
+    [[nodiscard]] bool hasProcessedMessage(const int msg) const
+    {
+        return m_processedMessages.find(msg) != m_processedMessages.end();
+    }
 
    private:
     void sei_payload(const SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,

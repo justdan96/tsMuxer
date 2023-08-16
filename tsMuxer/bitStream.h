@@ -228,7 +228,10 @@ class BitStreamWriter : public BitStream
         *m_buffer = my_htonl(prevVal);
     }
 
-    [[nodiscard]] int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + m_bitWrited); }
+    [[nodiscard]] int getBitsCount() const
+    {
+        return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + m_bitWrited);
+    }
 
    private:
     unsigned m_curVal;
