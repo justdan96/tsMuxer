@@ -80,6 +80,7 @@ File::File(const char* fName, const unsigned int oflag,
 
 File::~File()
 {
+    // TODO: fix use of virtual fucntion inside destructor
     if (isOpen())
         close();
 }
@@ -185,7 +186,7 @@ int64_t File::seek(const int64_t offset, const SeekMethod whence) const
     if (!isOpen())
         return -1;
 
-    DWORD moveMethod;
+    DWORD moveMethod = FILE_BEGIN;
     switch (whence)
     {
     case SeekMethod::smBegin:
@@ -194,7 +195,7 @@ int64_t File::seek(const int64_t offset, const SeekMethod whence) const
     case SeekMethod::smCurrent:
         moveMethod = FILE_CURRENT;
         break;
-    default:  // SeekMethod::smEnd:
+    case SeekMethod::smEnd:
         moveMethod = FILE_END;
         break;
     }
