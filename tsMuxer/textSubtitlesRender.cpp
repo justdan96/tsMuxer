@@ -1,6 +1,7 @@
 #include "textSubtitlesRender.h"
 
 #include <cassert>
+#include <cmath>
 #include <string>
 #include <unordered_map>
 
@@ -404,7 +405,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
 
             curX += xSize[j];
         }
-        curY += static_cast<int>(ySize * m_font.m_lineSpacing);
+        curY += lround(static_cast<float>(ySize) * m_font.m_lineSpacing);
     }
     flushRasterBuffer();
     m_font = m_initFont;
