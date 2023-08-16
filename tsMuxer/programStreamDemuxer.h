@@ -3,8 +3,8 @@
 
 #include <cmath>
 
-#include "bufferedReader.h"
 #include "abstractDemuxer.h"
+#include "bufferedReader.h"
 #include "bufferedReaderManager.h"
 
 class ProgramStreamDemuxer final : public AbstractDemuxer

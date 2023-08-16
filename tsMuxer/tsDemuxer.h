@@ -6,9 +6,9 @@
 #include <set>
 #include <string>
 
-#include "bufferedReader.h"
 #include "aac.h"
 #include "abstractDemuxer.h"
+#include "bufferedReader.h"
 #include "bufferedReaderManager.h"
 #include "tsPacket.h"
 

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "bufferedReader.h"
 #include "abstractDemuxer.h"
+#include "bufferedReader.h"
 #include "bufferedReaderManager.h"
 
 static constexpr int TRACKTYPE_PCM = 0x080;
