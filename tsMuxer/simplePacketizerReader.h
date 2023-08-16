@@ -45,7 +45,7 @@ class SimplePacketizerReader : public AbstractStreamReader
     virtual double getFrameDuration() = 0;                        // frame duration at nano seconds
     virtual const std::string getStreamInfo() = 0;
     virtual void setTestMode(bool value) {}
-    virtual bool needMPLSCorrection() const { return true; }
+    [[nodiscard]] virtual bool needMPLSCorrection() const { return true; }
     virtual bool needSkipFrame(const AVPacket& packet) { return false; }
 
     // uint8_t* m_tmpBuffer;

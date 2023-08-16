@@ -130,9 +130,9 @@ struct PIPParams
 
     PIPParams() : scaleIndex(1), corner(PipCorner::TopLeft), hOffset(0), vOffset(0), lumma(3) {}
 
-    bool isFullScreen() const { return scaleIndex == 5; }
+    [[nodiscard]] bool isFullScreen() const { return scaleIndex == 5; }
 
-    float getScaleCoeff() const
+    [[nodiscard]] float getScaleCoeff() const
     {
         if (scaleIndex == 2)
             return 0.5;

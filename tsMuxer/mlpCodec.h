@@ -23,7 +23,7 @@ class MLPCodec
     static int getFrameSize(const uint8_t* buffer);
     bool decodeFrame(uint8_t* buffer, uint8_t* end);
     bool isMinorSync(const uint8_t* buffer, uint8_t* end) const;
-    uint64_t getFrameDuration() const;
+    [[nodiscard]] uint64_t getFrameDuration() const;
     static int mlp_samplerate(int ratebits);
 
     uint8_t m_channels;

@@ -43,15 +43,16 @@ class MPEGStreamReader : public AbstractStreamReader
             m_pcrIncPerFrame = 0;
         m_pcrIncPerField = m_pcrIncPerFrame / 2;
     }
-    double getFPS() const { return m_fps; }
-    VideoAspectRatio getStreamAR() const { return m_streamAR; }
+
+    [[nodiscard]] double getFPS() const { return m_fps; }
+    [[nodiscard]] VideoAspectRatio getStreamAR() const { return m_streamAR; }
     void setAspectRatio(const VideoAspectRatio ar) { m_ar = ar; }
     int64_t getProcessedSize() override;
     void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
-    virtual unsigned getStreamWidth() const = 0;
-    virtual unsigned getStreamHeight() const = 0;
+    [[nodiscard]] virtual unsigned getStreamWidth() const = 0;
+    [[nodiscard]] virtual unsigned getStreamHeight() const = 0;
     virtual bool getInterlaced() = 0;
     void setRemovePulldown(const bool value) { m_removePulldown = value; }
     virtual int getFrameDepth() { return 1; }
@@ -95,7 +96,7 @@ class MPEGStreamReader : public AbstractStreamReader
     long m_lastDecodeOffset;
     bool m_syncToStream;
     bool m_isFirstFpsWarn;
-    int bufFromNAL() const;
+    [[nodiscard]] int bufFromNAL() const;
     virtual int decodeNal(uint8_t* buff);
     void storeBufferRest();
 };

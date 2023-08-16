@@ -173,7 +173,7 @@ struct TSPacket
     unsigned int afExists : 1;  // adaptive field exist
     unsigned int sc : 2;        // scrambling control
 
-    int getPID() const { return PIDHi << 8 | PIDLow; }
+    [[nodiscard]] int getPID() const { return PIDHi << 8 | PIDLow; }
 
     void setPID(const int pid)
     {
@@ -181,7 +181,7 @@ struct TSPacket
         PIDLow = static_cast<uint8_t>(pid);
     }
 
-    int getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
+    [[nodiscard]] int getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
 
     static uint32_t getPCRDif32(const uint32_t nextPCR, const uint32_t curPCR)
     {
@@ -541,8 +541,8 @@ struct MPLSParser
     void parse(uint8_t* buffer, int len);
     int compose(uint8_t* buffer, int bufferSize, DiskType dt);
 
-    MPLSStreamInfo getStreamByPID(int pid) const;
-    std::vector<MPLSStreamInfo> getPgStreams() const;
+    [[nodiscard]] MPLSStreamInfo getStreamByPID(int pid) const;
+    [[nodiscard]] std::vector<MPLSStreamInfo> getPgStreams() const;
 
     int PlayList_playback_type;
     int playback_count;
@@ -609,7 +609,7 @@ struct MPLSParser
     MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
     static int calcPlayItemID(const MPLSStreamInfo& streamInfo, uint32_t pts);
-    int pgIndexToFullIndex(int value) const;
+    [[nodiscard]] int pgIndexToFullIndex(int value) const;
     void parseSubPathEntryExtension(uint8_t* data, uint32_t dataLen);
 };
 

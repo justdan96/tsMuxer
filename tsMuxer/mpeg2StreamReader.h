@@ -24,9 +24,9 @@ class MPEG2StreamReader final : public MPEGStreamReader
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     CheckStreamRez checkStream(uint8_t* buffer, int len);
 
-    unsigned getStreamWidth() const override { return m_sequence.width; }
-    unsigned getStreamHeight() const override { return m_sequence.height; }
-    int getStreamHDR() const override { return 0; }
+    [[nodiscard]] unsigned getStreamWidth() const override { return m_sequence.width; }
+    [[nodiscard]] unsigned getStreamHeight() const override { return m_sequence.height; }
+    [[nodiscard]] int getStreamHDR() const override { return 0; }
     bool getInterlaced() override { return !m_sequence.progressive_sequence; }
 
    protected:

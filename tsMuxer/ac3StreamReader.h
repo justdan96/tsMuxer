@@ -53,7 +53,7 @@ class AC3StreamReader final : public SimplePacketizerReader, public AC3Codec
     int flushPacket(AVPacket& avPacket) override;
     int readPacketTHD(AVPacket& avPacket);
 
-    bool needMPLSCorrection() const override;
+    [[nodiscard]] bool needMPLSCorrection() const override;
 
    private:
     bool m_useNewStyleAudioPES;

@@ -33,7 +33,7 @@ class ProgramStreamDemuxer final : public AbstractDemuxer
         return 0;
     }
 
-    int64_t getFileDurationNano() const override;
+    [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
     uint32_t m_tmpBufferLen;
@@ -54,7 +54,7 @@ class ProgramStreamDemuxer final : public AbstractDemuxer
     MemoryBlock m_lpcmWaveHeader[16];
     bool m_lpcpHeaderAdded[16];
 
-    bool isVideoPID(uint32_t pid) const;
+    [[nodiscard]] bool isVideoPID(uint32_t pid) const;
     int mpegps_psm_parse(const uint8_t* buff, const uint8_t* end);
     int processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
 };

@@ -46,8 +46,8 @@ class DTSStreamReader final : public SimplePacketizerReader
     }
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     void setDownconvertToDTS(const bool value) { m_downconvertToDTS = value; }
-    bool getDownconvertToDTS() const { return m_downconvertToDTS; }
-    DTSHD_SUBTYPE getDTSHDMode() const { return m_hdType; }
+    [[nodiscard]] bool getDownconvertToDTS() const { return m_downconvertToDTS; }
+    [[nodiscard]] DTSHD_SUBTYPE getDTSHDMode() const { return m_hdType; }
     void setNewStyleAudioPES(const bool value) { m_useNewStyleAudioPES = value; }
     int getFreq() override { return hd_pi_sample_rate ? hd_pi_sample_rate : pi_sample_rate; }
     uint8_t getChannels() override { return hd_pi_channels ? hd_pi_channels : pi_channels; }
@@ -125,7 +125,7 @@ class DTSStreamReader final : public SimplePacketizerReader
     int testSyncInfo16be(const uint8_t* p_buf);
     static int buf14To16(uint8_t* p_out, const uint8_t* p_in, int i_in, int i_le);
     static void BufLeToBe(uint8_t* p_out, const uint8_t* p_in, int i_in);
-    int getSurroundModeCode() const;
+    [[nodiscard]] int getSurroundModeCode() const;
     int decodeHdInfo(uint8_t* buff, const uint8_t* end);
     void checkIfOnlyHDDataExists(uint8_t* buff, const uint8_t* end);
 };

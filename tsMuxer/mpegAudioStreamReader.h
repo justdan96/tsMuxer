@@ -10,7 +10,7 @@ class MpegAudioStreamReader final : public SimplePacketizerReader, MP3Codec
     static constexpr uint32_t DTS_HD_PREFIX = 0x64582025;
     MpegAudioStreamReader() = default;
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    int getLayer() const { return m_layer; }
+    [[nodiscard]] int getLayer() const { return m_layer; }
     int getFreq() override { return m_sample_rate; }
     uint8_t getChannels() override { return 2; }
 

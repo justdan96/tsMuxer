@@ -25,8 +25,8 @@ class MovDemuxer final : public IOContextDemuxer
     double getTrackFps(uint32_t trackId) override;
     static int readPacket(AVPacket&) { return 0; }
     void setFileIterator(FileNameIterator* itr) override;
-    bool isPidFilterSupported() const override { return true; }
-    int64_t getFileDurationNano() const override;
+    [[nodiscard]] bool isPidFilterSupported() const override { return true; }
+    [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
     struct MOVParseTableEntry;

@@ -69,7 +69,8 @@ struct MovieObject
     bool resumeIntentionFlag = true;
     bool menuCallMask = false;
     bool titleSearchMask = false;
-    std::vector<std::uint8_t> serialize() const
+
+    [[nodiscard]] std::vector<std::uint8_t> serialize() const
     {
         std::uint16_t flags = 0;
         flags |= (resumeIntentionFlag << 15);
@@ -89,7 +90,8 @@ struct MovieObject
         }
         return rv;
     }
-    size_t serializedSize() const
+
+    [[nodiscard]] size_t serializedSize() const
     {
         const auto numOfNavCommands = static_cast<std::uint16_t>(navigationCommands.size());
         return (2 * sizeof(std::uint16_t)) /* flags + numOfNavCommands */

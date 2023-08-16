@@ -24,7 +24,7 @@ class VC1StreamReader final : public MPEGStreamReader
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
     CheckStreamRez checkStream(uint8_t* buffer, int len);
     bool skipNal(uint8_t* nal) override;
-    bool needSPSForSplit() const override { return true; }
+    [[nodiscard]] bool needSPSForSplit() const override { return true; }
 
    protected:
     const CodecInfo& getCodecInfo() override { return vc1CodecInfo; }
@@ -34,9 +34,9 @@ class VC1StreamReader final : public MPEGStreamReader
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;
     double getStreamFPS(void* curNalUnit) override { return m_sequence.getFPS(); }
-    unsigned getStreamWidth() const override { return m_sequence.coded_width; }
-    unsigned getStreamHeight() const override { return m_sequence.coded_height; }
-    int getStreamHDR() const override { return 0; }
+    [[nodiscard]] unsigned getStreamWidth() const override { return m_sequence.coded_width; }
+    [[nodiscard]] unsigned getStreamHeight() const override { return m_sequence.coded_height; }
+    [[nodiscard]] int getStreamHDR() const override { return 0; }
     bool getInterlaced() override { return m_sequence.interlace; }
     bool isIFrame() override { return m_lastIFrame; }
     void onSplitEvent() override { m_firstFileFrame = true; }

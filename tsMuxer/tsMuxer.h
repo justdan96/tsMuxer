@@ -42,7 +42,7 @@ class TSMuxer final : public AbstractMuxer
     bool doFlush() override;
     bool close() override;
 
-    int64_t getVBVLength() const { return m_vbvLen / 90; }
+    [[nodiscard]] int64_t getVBVLength() const { return m_vbvLen / 90; }
     void setNewStyleAudioPES(const bool val) { m_useNewStyleAudioPES = val; }
     void setM2TSMode(const bool val) { m_m2tsMode = val; }
     void setPCROnVideoPID(const bool val) { m_pcrOnVideo = val; }
@@ -50,22 +50,22 @@ class TSMuxer final : public AbstractMuxer
     void setMinBitrate(const int val) { m_minBitrate = val; }
     void openDstFile() override;
     void setVBVBufferLen(int value);
-    const PIDListMap& getPidList() const { return m_pmt.pidList; }
-    std::vector<int64_t> getFirstPts() const;
+    [[nodiscard]] const PIDListMap& getPidList() const { return m_pmt.pidList; }
+    [[nodiscard]] std::vector<int64_t> getFirstPts() const;
     void alignPTS(TSMuxer* otherMuxer);
-    std::vector<int64_t> getLastPts() const;
+    [[nodiscard]] std::vector<int64_t> getLastPts() const;
     const std::vector<uint32_t>& getMuxedPacketCnt() { return m_muxedPacketCnt; }
-    size_t splitFileCnt() const { return m_fileNames.size(); }
+    [[nodiscard]] size_t splitFileCnt() const { return m_fileNames.size(); }
     void setSplitDuration(const int64_t value) { m_splitDuration = value; }
     void setSplitSize(const uint32_t value) { m_splitSize = value; }
     void parseMuxOpt(const std::string& opts) override;
 
     void setFileName(const std::string& fileName, FileFactory* fileFactory) override;
     std::string getFileNameByIdx(size_t idx);
-    int getFirstFileNum() const;
-    bool isInterleaveMode() const;
-    std::vector<int32_t> getInterleaveInfo(size_t idx) const;
-    bool isSubStream() const { return m_subMode; }
+    [[nodiscard]] int getFirstFileNum() const;
+    [[nodiscard]] bool isInterleaveMode() const;
+    [[nodiscard]] std::vector<int32_t> getInterleaveInfo(size_t idx) const;
+    [[nodiscard]] bool isSubStream() const { return m_subMode; }
 
     void setPtsOffset(int64_t value);
 
@@ -73,8 +73,8 @@ class TSMuxer final : public AbstractMuxer
     bool muxPacket(AVPacket& avPacket) override;
     void internalReset();
     void setMuxFormat(const std::string& format);
-    bool isSplitPoint(const AVPacket& avPacket) const;
-    bool blockFull() const;
+    [[nodiscard]] bool isSplitPoint(const AVPacket& avPacket) const;
+    [[nodiscard]] bool blockFull() const;
 
    private:
     bool doFlush(int64_t newPCR, int64_t pcrGAP);
@@ -94,7 +94,7 @@ class TSMuxer final : public AbstractMuxer
     void buildPesHeader(uint8_t pesStreamID, AVPacket& avPacket, int pid);
     void writePESPacket();
     void processM2TSPCR(int64_t pcrVal, int64_t pcrGAP);
-    inline int calcM2tsFrameCnt() const;
+    [[nodiscard]] inline int calcM2tsFrameCnt() const;
     static void writeM2TSHeader(uint8_t* buffer, const int64_t m2tsPCR)
     {
         const auto cur = reinterpret_cast<uint32_t*>(buffer);
@@ -111,7 +111,7 @@ class TSMuxer final : public AbstractMuxer
     void setSubMode(AbstractMuxer* mainMuxer, bool flushInterleavedBlock) override;
     void setMasterMode(AbstractMuxer* subMuxer, bool flushInterleavedBlock) override;
 
-    AbstractOutputStream* getDstFile() const { return m_muxFile; }
+    [[nodiscard]] AbstractOutputStream* getDstFile() const { return m_muxFile; }
     void flushTSBuffer();
     void finishFileBlock(int64_t newPts, int64_t newPCR, bool doChangeFile, bool recursive = true);
     void gotoNextFile(int64_t newPts);

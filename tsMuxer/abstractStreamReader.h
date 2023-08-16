@@ -59,10 +59,10 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual int readPacket(AVPacket& avPacket) = 0;
     virtual int flushPacket(AVPacket& avPacket) = 0;
     virtual int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) { return 0; }
-    virtual int getStreamHDR() const { return 0; }
+    [[nodiscard]] virtual int getStreamHDR() const { return 0; }
     virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) {}
     virtual void setStreamIndex(const int index) { m_streamIndex = index; }
-    int getStreamIndex() const { return m_streamIndex; }
+    [[nodiscard]] int getStreamIndex() const { return m_streamIndex; }
     virtual void setTimeOffset(const int64_t offset) { m_timeOffset = offset; }
     unsigned m_flags;
     virtual const CodecInfo& getCodecInfo() = 0;  // get codecInfo struct. (CodecID, codec name)
@@ -71,11 +71,11 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual void onSplitEvent() {}
     virtual void setDemuxMode(const bool value) { m_demuxMode = value; }
     virtual bool isPriorityData(AVPacket* packet) { return false; }
-    virtual bool needSPSForSplit() const { return false; }
+    [[nodiscard]] virtual bool needSPSForSplit() const { return false; }
     virtual bool isSecondary() { return m_secondary; }
     void setIsSecondary(const bool value) { m_secondary = value; }
     void setPipParams(const PIPParams& params) { m_pipParams = params; }
-    PIPParams getPipParams() const { return m_pipParams; }
+    [[nodiscard]] PIPParams getPipParams() const { return m_pipParams; }
 
    protected:
     ContainerType m_containerType;

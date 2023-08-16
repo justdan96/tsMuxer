@@ -92,7 +92,7 @@ class IOContextDemuxer : public AbstractDemuxer
     void setFileIterator(FileNameIterator* itr) override;
     int64_t getDemuxedSize() override;
     int getLastReadRez() override { return m_lastReadRez; }
-    int64_t getProcessedBytes() const { return m_processedBytes; }
+    [[nodiscard]] int64_t getProcessedBytes() const { return m_processedBytes; }
 
    protected:
     static constexpr int MAX_STREAMS = 64;

@@ -18,7 +18,7 @@ class AbstractStream
 
     virtual bool open(const char* fName, unsigned int oflag, unsigned int systemDependentFlags = 0) = 0;
     virtual bool close() = 0;
-    virtual int64_t size() const = 0;
+    [[nodiscard]] virtual int64_t size() const = 0;
 };
 
 class AbstractOutputStream : public AbstractStream
@@ -136,7 +136,7 @@ class FileFactory
    public:
     virtual ~FileFactory() = default;
     virtual AbstractOutputStream* createFile() = 0;
-    virtual bool isVirtualFS() const = 0;
+    [[nodiscard]] virtual bool isVirtualFS() const = 0;
 };
 
 #endif  // LIBMEDIATION_FILE_H

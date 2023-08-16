@@ -127,7 +127,7 @@ class ContainerToReaderWrapper final : public AbstractReader
     bool openStream(int readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
     void resetDelayedMark() const;
-    int64_t getDiscardedSize() const { return m_discardedSize; }
+    [[nodiscard]] int64_t getDiscardedSize() const { return m_discardedSize; }
 
     bool gotoByte(int readerID, int64_t seekDist) override { return false; }
     void terminate();
@@ -165,12 +165,12 @@ class METADemuxer final : public AbstractDemuxer
     int addStream(const std::string& codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
-    const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
+    [[nodiscard]] const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
     static DetectStreamRez DetectStreamReader(const BufferedReaderManager& readManager, const std::string& fileName,
                                               bool calcDuration);
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
     int getLastReadRez() override { return m_lastReadRez; }
-    int64_t totalSize() const { return m_totalSize; }
+    [[nodiscard]] int64_t totalSize() const { return m_totalSize; }
     static std::string mplsTrackToFullName(const std::string& mplsFileName, const std::string& mplsNum);
     static std::string mplsTrackToSSIFName(const std::string& mplsFileName, const std::string& mplsNum);
     bool m_HevcFound;

@@ -89,7 +89,7 @@ class NALUnit
     static unsigned extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value);
     static void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
-    const BitStreamReader& getBitReader() const { return bitReader; }
+    [[nodiscard]] const BitStreamReader& getBitReader() const { return bitReader; }
     static void write_rbsp_trailing_bits(BitStreamWriter& writer);
     static void write_byte_align_bits(BitStreamWriter& writer);
 
@@ -139,7 +139,7 @@ class PPSUnit final : public NALUnit
     }
     ~PPSUnit() override = default;
 
-    bool isReady() const { return m_ready; }
+    [[nodiscard]] bool isReady() const { return m_ready; }
     int deserialize();
 
    private:
@@ -220,25 +220,25 @@ class SPSUnit final : public NALUnit
     // subSPS (SVC/MVC) extension
     std::vector<unsigned> view_id;
 
-    std::string getStreamDescr() const;
-    unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
-    unsigned getHeight() const { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
-    double getFPS() const;
+    [[nodiscard]] std::string getStreamDescr() const;
+    [[nodiscard]] unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
+    [[nodiscard]] unsigned getHeight() const { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
+    [[nodiscard]] double getFPS() const;
     void setFps(double fps);
 
     SPSUnit();
     ~SPSUnit() override = default;
 
-    bool isReady() const { return m_ready; }
+    [[nodiscard]] bool isReady() const { return m_ready; }
     int deserialize();
     using NALUnit::deserialize;
     void insertHrdParameters();
     void updateTimingInfo();
-    unsigned getMaxBitrate() const;
+    [[nodiscard]] unsigned getMaxBitrate() const;
     int hrd_parameters(HRDParams& params);
     int deserializeVuiParameters();
-    unsigned getCropY() const;
-    unsigned getCropX() const;
+    [[nodiscard]] unsigned getCropY() const;
+    [[nodiscard]] unsigned getCropX() const;
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
     static void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
@@ -293,7 +293,7 @@ class SEIUnit final : public NALUnit
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
 
-    bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
+    [[nodiscard]] bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
 
    private:
     void sei_payload(const SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
@@ -361,10 +361,10 @@ class SliceUnit final : public NALUnit
                     const std::map<uint32_t, PPSUnit*>& ppsMap);
     using NALUnit::deserialize;
 
-    const SPSUnit* getSPS() const { return sps; }
-    const PPSUnit* getPPS() const { return pps; }
-    bool isIDR() const;
-    bool isIFrame() const;
+    [[nodiscard]] const SPSUnit* getSPS() const { return sps; }
+    [[nodiscard]] const PPSUnit* getPPS() const { return pps; }
+    [[nodiscard]] bool isIDR() const;
+    [[nodiscard]] bool isIFrame() const;
     int deserializeSliceType(uint8_t* buffer, uint8_t* end);
     int deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap, const std::map<uint32_t, PPSUnit*>& ppsMap);
     void nal_unit_header_svc_extension();

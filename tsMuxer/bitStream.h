@@ -19,8 +19,8 @@ class BitStream
 {
    public:
     BitStream() : m_totalBits(0), m_buffer(nullptr), m_initBuffer(nullptr) {}
-    uint8_t* getBuffer() const { return reinterpret_cast<uint8_t*>(m_initBuffer); }
-    unsigned getBitsLeft() const { return m_totalBits; }
+    [[nodiscard]] uint8_t* getBuffer() const { return reinterpret_cast<uint8_t*>(m_initBuffer); }
+    [[nodiscard]] unsigned getBitsLeft() const { return m_totalBits; }
 
    protected:
     void setBuffer(uint8_t* buffer, const uint8_t* end)
@@ -228,7 +228,7 @@ class BitStreamWriter : public BitStream
         *m_buffer = my_htonl(prevVal);
     }
 
-    int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + m_bitWrited); }
+    [[nodiscard]] int getBitsCount() const { return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + m_bitWrited); }
 
    private:
     unsigned m_curVal;

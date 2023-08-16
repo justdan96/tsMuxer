@@ -90,7 +90,7 @@ class ByteFileWriter
     void doPadding(int padSize);
     void writeTimestamp(time_t time);
 
-    int64_t size() const;
+    [[nodiscard]] int64_t size() const;
 
    private:
     uint8_t* m_buffer;
@@ -132,8 +132,8 @@ struct FileEntryInfo
     void setSubMode(bool value);
     void addExtent(const Extent& extent);
 
-    FileEntryInfo* subDirByName(const std::string& name) const;
-    FileEntryInfo* fileByName(const std::string& name) const;
+    [[nodiscard]] FileEntryInfo* subDirByName(const std::string& name) const;
+    [[nodiscard]] FileEntryInfo* fileByName(const std::string& name) const;
 
    private:
     void addSubDir(FileEntryInfo* dir);
@@ -143,7 +143,7 @@ struct FileEntryInfo
     void writeEntity(ByteFileWriter& writer, const FileEntryInfo* subDir) const;
     void serializeDir() const;
     void serializeFile() const;
-    bool isFile() const;
+    [[nodiscard]] bool isFile() const;
 
     friend class IsoWriter;
     friend class ISOFile;
@@ -281,7 +281,7 @@ class ISOFile final : public AbstractOutputStream
     bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0) override;
     void sync() override;
     bool close() override;
-    int64_t size() const override;
+    [[nodiscard]] int64_t size() const override;
     void setSubMode(bool value) const;
 
    private:

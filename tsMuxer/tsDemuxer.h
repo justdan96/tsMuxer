@@ -36,10 +36,10 @@ class TSDemuxer final : public AbstractDemuxer
         return 0;
     }
     void setMPLSInfo(const std::vector<MPLSPlayItem>& mplsInfo) { m_mplsInfo = mplsInfo; }
-    int64_t getFileDurationNano() const override;
+    [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
-    bool mvcContinueExpected() const;
+    [[nodiscard]] bool mvcContinueExpected() const;
 
     int64_t m_firstPCRTime;
     bool m_m2tsHdrDiscarded;

@@ -79,7 +79,7 @@ class MPEGRawDataHeader : public MPEGHeader
     MPEGRawDataHeader(int maxBufferLen);
     ~MPEGRawDataHeader() override;
     virtual uint32_t serialize(uint8_t* buffer);
-    uint32_t getDataBufferLen() const { return m_data_buffer_len; }
+    [[nodiscard]] uint32_t getDataBufferLen() const { return m_data_buffer_len; }
     virtual void clearRawBuffer() { m_data_buffer_len = 0; }
 
    protected:
@@ -137,10 +137,10 @@ class MPEGSequenceHeader final : public MPEGRawDataHeader
     uint8_t* deserializeExtension(BitStreamReader& bitReader);
     static uint8_t* deserializeMatrixExtension(const BitStreamReader& bitReader);
     uint8_t* deserializeDisplayExtension(BitStreamReader& bitReader);
-    double getFrameRate() const;
+    [[nodiscard]] double getFrameRate() const;
     void setFrameRate(uint8_t* buff, double fps);
     static void setAspectRatio(uint8_t* buff, VideoAspectRatio ar);
-    std::string getStreamDescr() const;
+    [[nodiscard]] std::string getStreamDescr() const;
 };
 
 class MPEGGOPHeader final : public MPEGHeader
@@ -226,7 +226,7 @@ class MPEGPictureHeader final : public MPEGRawDataHeader
     uint8_t* deserializeCodingExtension(BitStreamReader& reader);
 
     uint32_t serialize(uint8_t* buffer) override;
-    uint32_t getPictureSize() const;
+    [[nodiscard]] uint32_t getPictureSize() const;
     void setTempRef(uint16_t number);
     void setVbvDelay(uint16_t val);
 

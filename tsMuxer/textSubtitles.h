@@ -80,15 +80,15 @@ class TextToPGSConverter  //: public TextSubtitlesRenderWin32
     static long composeCompositionDescriptor(uint8_t* buff, uint16_t number, uint8_t state);
     long composeEnd(uint8_t* buff, int64_t pts, int64_t dts, bool needPgHeader = true);
     static long writePGHeader(uint8_t* buff, int64_t pts, int64_t dts);
-    double alignToGrid(double value) const;
+    [[nodiscard]] double alignToGrid(double value) const;
     bool rlePack(uint32_t colorMask);
     void reduceColors(uint8_t mask) const;
     static int getRepeatCnt(const uint32_t* pos, const uint32_t* end, uint32_t colorMask);
     uint8_t color32To8(const uint32_t* buff, uint32_t colorMask);
     Palette buildPalette(float opacity);
-    uint16_t renderedHeight() const;
-    uint16_t minLine() const;
-    uint16_t maxLine() const;
+    [[nodiscard]] uint16_t renderedHeight() const;
+    [[nodiscard]] uint16_t minLine() const;
+    [[nodiscard]] uint16_t maxLine() const;
 
     std::map<YUVQuad, uint8_t> m_paletteYUV;
     uint8_t* m_renderedData;

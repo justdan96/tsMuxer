@@ -48,7 +48,7 @@ struct HevcUnit
     int deserialize();
     int serializeBuffer(uint8_t* dstBuffer, const uint8_t* dstEnd) const;
 
-    int nalBufferLen() const { return m_nalBufferLen; }
+    [[nodiscard]] int nalBufferLen() const { return m_nalBufferLen; }
 
     NalType nal_unit_type;
     uint8_t nuh_layer_id;
@@ -67,7 +67,7 @@ struct HevcUnit
 struct HevcUnitWithProfile : HevcUnit
 {
     HevcUnitWithProfile();
-    std::string getProfileString() const;
+    [[nodiscard]] std::string getProfileString() const;
 
     uint8_t profile_idc;
     uint8_t level_idc;
@@ -81,9 +81,9 @@ struct HevcVpsUnit : HevcUnitWithProfile
 {
     HevcVpsUnit();
     int deserialize();
-    double getFPS() const;
+    [[nodiscard]] double getFPS() const;
     void setFPS(double fps);
-    std::string getDescription() const;
+    [[nodiscard]] std::string getDescription() const;
 
     int vps_id;
     unsigned num_units_in_tick;
@@ -95,8 +95,8 @@ struct HevcSpsUnit : HevcUnitWithProfile
 {
     HevcSpsUnit();
     int deserialize();
-    double getFPS() const;
-    std::string getDescription() const;
+    [[nodiscard]] double getFPS() const;
+    [[nodiscard]] std::string getDescription() const;
 
     uint8_t vps_id;
     uint8_t max_sub_layers;
@@ -160,7 +160,7 @@ struct HevcSliceHeader : HevcUnit
 {
     HevcSliceHeader();
     int deserialize(const HevcSpsUnit* sps, const HevcPpsUnit* pps);
-    bool isIDR() const;
+    [[nodiscard]] bool isIDR() const;
 
     bool first_slice;
     unsigned pps_id;

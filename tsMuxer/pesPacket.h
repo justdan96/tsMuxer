@@ -132,7 +132,7 @@ struct PESPacket
         m_streamID = streamID;
     }
 
-    uint16_t getPacketLength() const
+    [[nodiscard]] uint16_t getPacketLength() const
     {
         const auto packetLen = static_cast<uint16_t>(m_pesPacketLenHi << 8 | m_pesPacketLenLo);
         return packetLen ? packetLen + 6 : 0;
@@ -149,7 +149,7 @@ struct PESPacket
         m_pesPacketLenLo = static_cast<uint8_t>(len);
     }
 
-    uint8_t getHeaderLength() const { return m_pesHeaderLen + 9; }
+    [[nodiscard]] uint8_t getHeaderLength() const { return m_pesHeaderLen + 9; }
 
     void setHeaderLength(const uint8_t val) { m_pesHeaderLen = val - 9; }
 

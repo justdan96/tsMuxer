@@ -21,7 +21,7 @@ class MuxerManager final
 
     void setAsyncMode(const bool val) { m_asyncMode = val; }
 
-    bool isAsyncMode() const { return m_asyncMode; }
+    [[nodiscard]] bool isAsyncMode() const { return m_asyncMode; }
 
     bool openMetaFile(const std::string& fileName);
     int addStream(const std::string& codecName, const std::string& fileName,
@@ -30,10 +30,10 @@ class MuxerManager final
     void doMux(const std::string& outFileName, FileFactory* fileFactory);
 
     void setCutStart(const int64_t value) { m_cutStart = value; }
-    int64_t getCutStart() const { return m_cutStart; }
+    [[nodiscard]] int64_t getCutStart() const { return m_cutStart; }
 
     void setCutEnd(const int64_t value) { m_cutEnd = value; }
-    int64_t getCutEnd() const { return m_cutEnd; }
+    [[nodiscard]] int64_t getCutEnd() const { return m_cutEnd; }
 
     void waitForWriting() const;
 
@@ -43,25 +43,26 @@ class MuxerManager final
 
     void parseMuxOpt(const std::string& opts);
     int getTrackCnt() { return static_cast<int>(m_metaDemuxer.getCodecInfo().size()); }
-    bool getHevcFound() const { return m_metaDemuxer.m_HevcFound; }
-    AbstractMuxer* getMainMuxer() const;
-    AbstractMuxer* getSubMuxer() const;
-    bool isStereoMode() const;
+    [[nodiscard]] bool getHevcFound() const { return m_metaDemuxer.m_HevcFound; }
+    [[nodiscard]] AbstractMuxer* getMainMuxer() const;
+    [[nodiscard]] AbstractMuxer* getSubMuxer() const;
+    [[nodiscard]] bool isStereoMode() const;
 
     void setAllowStereoMux(bool value);
 
-    bool isMvcBaseViewR() const { return m_mvcBaseViewR; }
-    int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
-    int getExtraISOBlocks() const { return m_extraIsoBlocks; }
+    [[nodiscard]] bool isMvcBaseViewR() const { return m_mvcBaseViewR; }
+    [[nodiscard]] int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
+    [[nodiscard]] int getExtraISOBlocks() const { return m_extraIsoBlocks; }
 
-    bool useReproducibleIsoHeader() const { return m_reproducibleIsoHeader; }
+    [[nodiscard]] bool useReproducibleIsoHeader() const { return m_reproducibleIsoHeader; }
 
     enum class SubTrackMode
     {
         All,
         Forced
     };
-    int getDefaultAudioTrackIdx() const;
+
+    [[nodiscard]] int getDefaultAudioTrackIdx() const;
     int getDefaultSubTrackIdx(SubTrackMode& mode) const;
 
    private:

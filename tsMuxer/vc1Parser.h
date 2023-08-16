@@ -135,7 +135,8 @@ class VC1Unit
         dst += srcEnd - srcStart;
         return dst - initDstBuffer;
     }
-    const BitStreamReader& getBitReader() const { return bitReader; }
+
+    [[nodiscard]] const BitStreamReader& getBitReader() const { return bitReader; }
 
    protected:
     void updateBits(int bitOffset, int bitLen, int value) const;
@@ -194,8 +195,8 @@ class VC1SequenceHeader : public VC1Unit
     AVRational sample_aspect_ratio;  // w, h
     int decode_sequence_header();
     int decode_sequence_header_adv();
-    std::string getStreamDescr() const;
-    double getFPS() const;
+    [[nodiscard]] std::string getStreamDescr() const;
+    [[nodiscard]] double getFPS() const;
     void setFPS(double value);
 
    private:

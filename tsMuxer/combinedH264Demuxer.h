@@ -55,7 +55,7 @@ class CombinedH264Demuxer final : public AbstractDemuxer, public CombinedH264Rea
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
 
-    bool isPidFilterSupported() const override { return true; }
+    [[nodiscard]] bool isPidFilterSupported() const override { return true; }
 
    private:
     const BufferedReaderManager& m_readManager;

@@ -50,11 +50,11 @@ class MemoryBlock
         }
     }
 
-    size_t size() const { return m_size; }
+    [[nodiscard]] size_t size() const { return m_size; }
 
     uint8_t* data() { return m_data.empty() ? nullptr : m_data.data(); }
 
-    bool isEmpty() const { return m_size == 0; }
+    [[nodiscard]] bool isEmpty() const { return m_size == 0; }
 
     void clear() { m_size = 0; }
 
@@ -129,8 +129,8 @@ class AbstractDemuxer
         return itr != m_pidFilters.end() ? itr->second : nullptr;
     }
     void setPidFilter(const int pid, SubTrackFilter* pidFilter) { m_pidFilters[pid] = pidFilter; }
-    virtual bool isPidFilterSupported() const { return false; }
-    virtual int64_t getFileDurationNano() const { return 0; }
+    [[nodiscard]] virtual bool isPidFilterSupported() const { return false; }
+    [[nodiscard]] virtual int64_t getFileDurationNano() const { return 0; }
 
    protected:
     int64_t m_timeOffset;

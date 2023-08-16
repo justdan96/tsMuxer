@@ -10,7 +10,7 @@ class SubTrackFilter
     static int pidToSubPid(const int pid, const int subPid) { return (pid << 16) + subPid; }
     static bool isSubTrack(const int pid) { return pid >= 0x10000; }
 
-    bool isSupportedTrack(const int pid) const { return m_srcPID == pid; }
+    [[nodiscard]] bool isSupportedTrack(const int pid) const { return m_srcPID == pid; }
     virtual int demuxPacket(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, AVPacket& avPacket) = 0;
 
    protected:

@@ -59,18 +59,18 @@ class AC3Codec
     virtual ~AC3Codec() = default;
 
     virtual int getHeaderLen() { return AC3_HEADER_SIZE; }
-    bool isEAC3() const { return m_bsid > 10; }
-    bool isAC3() const { return m_bsidBase > 0; }
+    [[nodiscard]] bool isEAC3() const { return m_bsid > 10; }
+    [[nodiscard]] bool isAC3() const { return m_bsidBase > 0; }
     void setDownconvertToAC3(const bool value) { m_downconvertToAC3 = value; }
-    bool getDownconvertToAC3() const { return m_downconvertToAC3; }
-    bool isTrueHD() const { return m_true_hd_mode; }
+    [[nodiscard]] bool getDownconvertToAC3() const { return m_downconvertToAC3; }
+    [[nodiscard]] bool isTrueHD() const { return m_true_hd_mode; }
     virtual void setTestMode(const bool value) { m_testMode = value; }
-    bool getTestMode() const { return m_testMode; }
+    [[nodiscard]] bool getTestMode() const { return m_testMode; }
 
    protected:
     int decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes);
     static uint8_t* findFrame(uint8_t* buffer, const uint8_t* end);
-    uint64_t getFrameDuration() const;
+    [[nodiscard]] uint64_t getFrameDuration() const;
     virtual const CodecInfo& getCodecInfo();
     virtual const std::string getStreamInfo();
 

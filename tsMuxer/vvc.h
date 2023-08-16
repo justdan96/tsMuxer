@@ -48,7 +48,7 @@ struct VvcUnit
     int deserialize();
     int serializeBuffer(uint8_t* dstBuffer, const uint8_t* dstEnd) const;
 
-    int nalBufferLen() const { return m_nalBufferLen; }
+    [[nodiscard]] int nalBufferLen() const { return m_nalBufferLen; }
 
     NalType nal_unit_type;
     uint8_t nuh_layer_id;
@@ -71,7 +71,7 @@ struct VvcUnit
 struct VvcUnitWithProfile : VvcUnit
 {
     VvcUnitWithProfile();
-    std::string getProfileString() const;
+    [[nodiscard]] std::string getProfileString() const;
 
     uint8_t profile_idc;
     uint8_t tier_flag;
@@ -88,9 +88,9 @@ struct VvcVpsUnit : VvcUnitWithProfile
 {
     VvcVpsUnit();
     int deserialize();
-    double getFPS() const;
+    [[nodiscard]] double getFPS() const;
     void setFPS(double fps);
-    std::string getDescription() const;
+    [[nodiscard]] std::string getDescription() const;
 
     uint8_t vps_id;
     uint8_t vps_max_layers;
@@ -105,8 +105,8 @@ struct VvcSpsUnit : VvcUnitWithProfile
 {
     VvcSpsUnit();
     int deserialize();
-    double getFPS() const;
-    std::string getDescription() const;
+    [[nodiscard]] double getFPS() const;
+    [[nodiscard]] std::string getDescription() const;
 
     uint8_t sps_id;
     uint8_t vps_id;
@@ -152,7 +152,7 @@ struct VvcSliceHeader : VvcUnit
 {
     VvcSliceHeader();
     int deserialize(const VvcSpsUnit* sps, const VvcPpsUnit* pps);
-    bool isIDR() const;
+    [[nodiscard]] bool isIDR() const;
 
     uint16_t pic_order_cnt_lsb;
 };
