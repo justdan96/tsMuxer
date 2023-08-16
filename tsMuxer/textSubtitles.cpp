@@ -316,8 +316,7 @@ TextToPGSConverter::Palette TextToPGSConverter::buildPalette(const float opacity
     if (opacity == 1.0)
         return m_paletteByColor;
     Palette result = m_paletteByColor;
-    for (auto& [fst, snd] : result)
-        snd.alpha = static_cast<uint8_t>(FFMIN(255L, lround(snd.alpha * opacity)));
+    for (auto& [fst, snd] : result) snd.alpha = static_cast<uint8_t>(FFMIN(255L, lround(snd.alpha * opacity)));
     return result;
 }
 
