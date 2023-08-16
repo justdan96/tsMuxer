@@ -1,6 +1,8 @@
 
 #include <fs/systemlog.h>
+
 #include <cmath>
+#include <cstring>
 #include <sstream>
 
 #include "bitStream.h"

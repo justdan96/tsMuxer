@@ -1,9 +1,9 @@
-
 #include "vc1StreamReader.h"
 
-#include <fs/systemlog.h>
-
+#include <cstring>
 #include <iostream>
+
+#include <fs/systemlog.h>
 
 #include "avCodecs.h"
 #include "nalUnits.h"

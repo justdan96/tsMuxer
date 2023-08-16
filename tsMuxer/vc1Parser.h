@@ -1,9 +1,10 @@
 #ifndef VC1_PARSER_H
 #define VC1_PARSER_H
 
-#include <types/types.h>
-
+#include <cstring>
 #include <string>
+
+#include <types/types.h>
 
 #include "bitStream.h"
 #include "vod_common.h"

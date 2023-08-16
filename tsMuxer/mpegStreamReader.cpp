@@ -3,9 +3,10 @@
 
 #include <fs/systemlog.h>
 
+#include <cmath>
+#include <cstring>
 #include <iostream>
 
-#include <cmath>
 #include "nalUnits.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
