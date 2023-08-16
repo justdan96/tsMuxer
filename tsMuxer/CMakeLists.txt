@@ -4,7 +4,7 @@ project (tsmuxer LANGUAGES CXX)
 add_executable (tsmuxer
   aac.cpp
   aacStreamReader.cpp
-  AbstractDemuxer.cpp
+  abstractDemuxer.cpp
   abstractMuxer.cpp
   ac3Codec.cpp
   ac3StreamReader.cpp
