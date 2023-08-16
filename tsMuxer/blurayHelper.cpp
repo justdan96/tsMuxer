@@ -566,11 +566,11 @@ bool BlurayHelper::createMPLSFile(TSMuxer* mainMuxer, TSMuxer* subMuxer, int aut
     if (subMuxer)
         pidListMVC = subMuxer->getPidList();
 
-    for (PIDListMap::const_iterator itr = pidList.begin(); itr != pidList.end(); ++itr)
+    for (auto& [index, si] : pidList)
     {
-        mplsParser.m_streamInfo.emplace_back(itr->second);
-        MPLSStreamInfo& info = *(mplsParser.m_streamInfo.rbegin());
-        auto pgStream = dynamic_cast<PGSStreamReader*>(itr->second.m_codecReader);
+        mplsParser.m_streamInfo.emplace_back(si);
+        MPLSStreamInfo& info = *mplsParser.m_streamInfo.rbegin();
+        auto pgStream = dynamic_cast<PGSStreamReader*>(si.m_codecReader);
         if (pgStream)
         {
             info.offsetId = pgStream->getOffsetId();

@@ -170,11 +170,11 @@ void SingleFileMuxer::openDstFile()
     if (m_owner->isAsyncMode())
         systemFlags += FILE_FLAG_NO_BUFFERING;
 #endif
-    for (auto itr = m_streamInfo.begin(); itr != m_streamInfo.end(); ++itr)
+    for (auto [index, si] : m_streamInfo)
     {
-        itr->second->m_fileName = dir + itr->second->m_fileName;
-        if (!itr->second->m_file.open(itr->second->m_fileName.c_str(), File::ofWrite, systemFlags))
-            THROW(ERR_CANT_CREATE_FILE, "Can't create output file " << itr->second->m_fileName)
+        si->m_fileName = dir + si->m_fileName;
+        if (!si->m_file.open(si->m_fileName.c_str(), File::ofWrite, systemFlags))
+            THROW(ERR_CANT_CREATE_FILE, "Can't create output file " << si->m_fileName)
     }
 }
 
