@@ -1006,8 +1006,8 @@ int IsoWriter::writeExtendedFileEntryDescriptor(const bool namedStream, const ui
 
     writeIcbTag(namedStream, m_buffer + 16, fileType);
 
-    buff32[36 / 4] = 0xffffffff;  // uid
-    buff32[40 / 4] = 0xffffffff;  // guid
+    buff32[36 / 4] = UINT_MAX;  // uid
+    buff32[40 / 4] = UINT_MAX;  // guid
     // zero Permissions, File Link Count, Record Format, Record Display Attributes
     if (fileType >= FileTypes::Metadata)
     {

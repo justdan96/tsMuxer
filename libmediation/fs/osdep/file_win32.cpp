@@ -214,8 +214,8 @@ int64_t File::seek(const int64_t offset, const SeekMethod whence) const
 
 bool File::truncate(const uint64_t newFileSize) const
 {
-    const LONG distanceToMoveLow = static_cast<LONG>(newFileSize & 0xffffffff);
-    LONG distanceToMoveHigh = static_cast<LONG>((newFileSize & 0xffffffff00000000ull) >> 32);
+    const LONG distanceToMoveLow = static_cast<LONG>(newFileSize);
+    LONG distanceToMoveHigh = static_cast<LONG>(newFileSize >> 32);
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
     const DWORD errCode = GetLastError();
     if (newPointerLow == INVALID_SET_FILE_POINTER && errCode != NO_ERROR)

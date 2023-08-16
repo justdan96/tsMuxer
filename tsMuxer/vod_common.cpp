@@ -27,7 +27,7 @@ bool isFillerNullPacket(uint8_t* curBuf)
 {
     const auto endPos = reinterpret_cast<uint32_t*>(curBuf + TS_FRAME_SIZE);
     for (auto curBuf32 = reinterpret_cast<uint32_t*>(curBuf + 4); curBuf32 < endPos; curBuf32++)
-        if (*curBuf32 != 0xffffffff && *curBuf32 != 0)
+        if (*curBuf32 != UINT_MAX && *curBuf32 != 0)
             return false;
     return true;
 }

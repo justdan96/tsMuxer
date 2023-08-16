@@ -103,7 +103,7 @@ bool VvcUnit::dpb_parameters(const int MaxSubLayersMinus1, const bool subLayerIn
         if (dpb_max_num_reorder_pics > dpb_max_dec_pic_buffering_minus1)
             return true;
         const unsigned dpb_max_latency_increase_plus1 = extractUEGolombCode();
-        if (dpb_max_latency_increase_plus1 == 0xffffffff)
+        if (dpb_max_latency_increase_plus1 == UINT_MAX)
             return true;
     }
     return false;

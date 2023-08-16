@@ -199,7 +199,7 @@ int HevcVpsUnit::deserialize()
             const unsigned vps_max_dec_pic_buffering_minus1 = extractUEGolombCode();
             if (extractUEGolombCode() > vps_max_dec_pic_buffering_minus1)  // vps_max_num_reorder_pics
                 return 1;
-            if (extractUEGolombCode() == 0xffffffff)  // vps_max_latency_increase_plus1
+            if (extractUEGolombCode() == UINT_MAX)  // vps_max_latency_increase_plus1
                 return 1;
         }
         const auto vps_max_layer_id = m_reader.getBits<uint8_t>(6);
