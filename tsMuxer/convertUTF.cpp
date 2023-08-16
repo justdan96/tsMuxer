@@ -494,7 +494,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
             {
                 result = ConversionResult::sourceIllegal;
                 source -= extraBytesToRead + 1; /* return to the start */
-                break;                            /* Bail out; shouldn't continue */
+                break;                          /* Bail out; shouldn't continue */
             }
             *target++ = UNI_REPLACEMENT_CHAR;
         }

@@ -410,8 +410,7 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
                     m_frameDuration = static_cast<double>(pi_frame_length) * INTERNAL_PTS_FREQ / hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                    m_hdBitrate =
-                        lround(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
+                    m_hdBitrate = lround(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
 
                 hd_pi_lfeCnt = 0;
 

@@ -23,7 +23,7 @@ enum class VC1Code
     USER_ENTRYPOINT,
     USER_SEQHDR,
     // all other start code suffixes are reserved or forbidden
-    RESERVED  
+    RESERVED
 };
 
 enum class Profile

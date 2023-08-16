@@ -25,10 +25,7 @@ class AbstractOutputStream : public AbstractStream
 {
    public:
     virtual int write(const void* buffer, uint32_t count) = 0;
-    int write(const std::vector<std::uint8_t>& data)
-    {
-        return write(data.data(), static_cast<uint32_t>(data.size()));
-    }
+    int write(const std::vector<std::uint8_t>& data) { return write(data.data(), static_cast<uint32_t>(data.size())); }
     virtual void sync() = 0;
 };
 

@@ -1,7 +1,7 @@
 #include "textSubtitlesRenderWin32.h"
 
-#include <cmath>
 #include <gdiplus.h>
+#include <cmath>
 
 #include "../vodCoreException.h"
 #include "../vod_common.h"
@@ -141,7 +141,8 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
-    const int lineSpacingPixel = lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel =
+        lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
 
     const StringFormat strformat;
     GraphicsPath path;
@@ -169,7 +170,8 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(opts);
-    const int lineSpacingPixel = lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel =
+        lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
     return lineSpacingPixel;
 #endif
 }
