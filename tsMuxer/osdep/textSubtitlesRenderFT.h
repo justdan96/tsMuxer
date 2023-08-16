@@ -8,7 +8,7 @@
 #include "../textSubtitlesRender.h"
 
 #include FT_FREETYPE_H
-#include FT_GLYPH_H
+//#include FT_GLYPH_H
 
 namespace text_subtitles
 {

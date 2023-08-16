@@ -79,7 +79,7 @@ class TSMuxer final : public AbstractMuxer
    private:
     bool doFlush(int64_t newPCR, int64_t pcrGAP);
     void flushTSFrame();
-    int writeTSFrames(uint16_t pid, const uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
+    int writeTSFrames(int pid, const uint8_t* buffer, int64_t len, bool priorityData, bool payloadStart);
     void writeSIT();
     void writePMT();
     void writePAT();
@@ -189,7 +189,7 @@ class TSMuxer final : public AbstractMuxer
     bool m_needTruncate;
     int64_t m_lastMuxedDts;
     MemoryBlock m_pesData;
-    uint16_t m_pesPID;
+    int m_pesPID;
     std::vector<uint32_t> m_muxedPacketCnt;
     bool m_pesIFrame;
     bool m_pesSpsPps;

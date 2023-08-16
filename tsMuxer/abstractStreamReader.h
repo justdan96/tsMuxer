@@ -2,7 +2,6 @@
 #define ABSTRACT_STREAM_READER_H_
 
 #include <fs/file.h>
-#include <types/types.h>
 
 #include "avCodecs.h"
 #include "avPacket.h"
@@ -13,8 +12,6 @@
 // PTS and DTS of the returned AV packet is measured in nanoseconds.
 
 static constexpr int PTS_CONST_OFFSET = 0;
-
-// class AbstractStreamReader;
 
 class AbstractStreamReader : public BaseAbstractStreamReader
 {

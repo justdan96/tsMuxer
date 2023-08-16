@@ -104,7 +104,6 @@ TSMuxer::TSMuxer(MuxerManager* owner) : AbstractMuxer(owner)
     m_lastGopNullCnt = 0;
     m_outBufLen = 0;
     m_pesData.reserve(1024 * 128);
-    // m_iFrameFound = false;
     m_mainStreamIndex = -1;
     m_muxFile = nullptr;
     m_isExternalFile = false;
@@ -1033,7 +1032,7 @@ bool TSMuxer::muxPacket(AVPacket& avPacket)
     return true;
 }
 
-int TSMuxer::writeTSFrames(const uint16_t pid, const uint8_t* buffer, const int64_t len, const bool priorityData,
+int TSMuxer::writeTSFrames(const int pid, const uint8_t* buffer, const int64_t len, const bool priorityData,
                            bool payloadStart)
 {
     int result = 0;

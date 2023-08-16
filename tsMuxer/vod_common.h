@@ -57,8 +57,6 @@ constexpr int TS188_ROUND_BLOCK_SIZE = DEFAULT_FILE_BLOCK_SIZE / TS_FRAME_SIZE *
 
 constexpr unsigned PCR_FREQUENCY = 90000;
 
-// const static int64_t FIXED_PTS_OFFSET = 378000000ll; //377910000ll;
-
 static constexpr int64_t INTERNAL_PTS_FREQ = 196 * 27000000ll;
 static constexpr int64_t INT_FREQ_TO_TS_FREQ = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
 

@@ -173,12 +173,12 @@ struct TSPacket
     unsigned int afExists : 1;  // adaptive field exist
     unsigned int sc : 2;        // scrambling control
 
-    uint16_t getPID() const { return static_cast<uint16_t>(PIDHi << 8) + PIDLow; }
+    int getPID() const { return PIDHi << 8 | PIDLow; }
 
-    void setPID(const uint16_t pid)
+    void setPID(const int pid)
     {
-        PIDHi = pid >> 8;
-        PIDLow = pid & 0xff;
+        PIDHi = static_cast<uint8_t>(pid >> 8);
+        PIDLow = static_cast<uint8_t>(pid);
     }
 
     int getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
@@ -275,7 +275,7 @@ struct TS_program_map_section
     int audio_pid;
     int audio_type;
     int sub_pid;
-    uint16_t pcr_pid;
+    int pcr_pid;
 
     int casPID;
     int casID;

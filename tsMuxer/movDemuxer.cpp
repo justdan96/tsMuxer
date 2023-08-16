@@ -351,7 +351,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             ++nalCnt;
         }
         unsigned spsPpsSize = 0;
-        for (auto& i : spsPpsList) spsPpsSize += i.size() + 4;
+        for (auto& i : spsPpsList) spsPpsSize += static_cast<uint32_t>(i.size() + 4);
 
         return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
@@ -829,7 +829,8 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 const unsigned readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
                 if (readed == 0)
                     break;
-                m_deliveredPacket.size = st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize);
+                m_deliveredPacket.size =
+                    static_cast<int32_t>(st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize));
                 if (m_deliveredPacket.size)
                 {
                     if (filterItr != m_pidFilters.end())

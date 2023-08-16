@@ -4,7 +4,7 @@
 #include "../directory.h"
 #include "../file.h"
 
-void throwFileError()
+[[noreturn]] void throwFileError()
 {
     LPVOID msgBuf = nullptr;
     const DWORD dw = GetLastError();
@@ -185,7 +185,7 @@ int64_t File::seek(const int64_t offset, const SeekMethod whence) const
     if (!isOpen())
         return -1;
 
-    DWORD moveMethod = 0;
+    DWORD moveMethod;
     switch (whence)
     {
     case SeekMethod::smBegin:
@@ -216,9 +216,8 @@ bool File::truncate(const uint64_t newFileSize) const
     const LONG distanceToMoveLow = static_cast<LONG>(newFileSize & 0xffffffff);
     LONG distanceToMoveHigh = static_cast<LONG>((newFileSize & 0xffffffff00000000ull) >> 32);
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
-    const int errCode = GetLastError();
-    if ((newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR))
-        // return false;
+    const DWORD errCode = GetLastError();
+    if (newPointerLow == INVALID_SET_FILE_POINTER && errCode != NO_ERROR)
         throwFileError();
 
     return SetEndOfFile(m_impl) > 0;
