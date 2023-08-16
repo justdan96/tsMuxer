@@ -6,7 +6,7 @@
 #include <set>
 #include <string>
 
-#include "BufferedReader.h"
+#include "bufferedReader.h"
 #include "aac.h"
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"

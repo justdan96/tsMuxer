@@ -4,7 +4,7 @@
 #include <fs/file.h>
 #include <types/types.h>
 
-#include "BufferedReader.h"
+#include "bufferedReader.h"
 #include "tsPacket.h"
 #include "vodCoreException.h"
 

@@ -1,5 +1,5 @@
 
-#include "BufferedReader.h"
+#include "bufferedReader.h"
 
 #include <fs/systemlog.h>
 

@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "BufferedReader.h"
+#include "bufferedReader.h"
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"
 
