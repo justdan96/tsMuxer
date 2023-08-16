@@ -2,11 +2,12 @@
 #define ABSTRACT_DEMUXER_H_
 
 #include <assert.h>
-#include <types/types.h>
-
+#include <cstring>
 #include <map>
 #include <set>
 #include <string>
+
+#include <types/types.h>
 
 #include "avPacket.h"
 #include "vod_common.h"

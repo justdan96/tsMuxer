@@ -1,12 +1,12 @@
-
 #include "vod_common.h"
 
-#include <fs/directory.h>
-
+#include <climits>
 #include <cmath>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include <fs/directory.h>
 
 using namespace std;
 
