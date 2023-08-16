@@ -1,6 +1,7 @@
 #ifndef TS_DEMUXER_H
 #define TS_DEMUXER_H
 
+#include <cmath>
 #include <map>
 #include <set>
 #include <string>
@@ -24,21 +25,21 @@ class TSDemuxer final : public AbstractDemuxer
     void getTrackList(std::map<int32_t, TrackInfo>& trackList) override;
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
-    int64_t getTrackDelay(const uint32_t pid) override
+    int64_t getTrackDelay(const int32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
         {
             const int64_t clockTicks = m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS);
-            return static_cast<int64_t>(clockTicks / 90.0 + (clockTicks >= 0 ? 0.5 : -0.5));  // convert to ms
+            return llround(static_cast<double>(clockTicks) / 90.0);  // convert to ms
         }
 
         return 0;
     }
     void setMPLSInfo(const std::vector<MPLSPlayItem>& mplsInfo) { m_mplsInfo = mplsInfo; }
-    int64_t getFileDurationNano() const override;
+    [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
-    bool mvcContinueExpected() const;
+    [[nodiscard]] bool mvcContinueExpected() const;
 
     int64_t m_firstPCRTime;
     bool m_m2tsHdrDiscarded;
@@ -61,8 +62,8 @@ class TSDemuxer final : public AbstractDemuxer
     int m_pmtPid;
     bool m_codecReady;
     bool m_firstCall;
-    uint64_t m_readCnt;
-    uint64_t m_dataProcessed;
+    int64_t m_readCnt;
+    int64_t m_dataProcessed;
     bool m_notificated;
     TS_program_map_section m_pmt;
     uint8_t m_tmpBuffer[TS_FRAME_SIZE + 4];

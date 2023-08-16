@@ -11,60 +11,58 @@ class FileFactory;
 class MuxerManager final
 {
    public:
-    static constexpr uint32_t PHYSICAL_SECTOR_SIZE =
+    static constexpr int32_t PHYSICAL_SECTOR_SIZE =
         2048;  // minimum write align requirement. Should be readed from OS in a next version
     static constexpr int BLURAY_SECTOR_SIZE =
         PHYSICAL_SECTOR_SIZE * 3;  // real sector size is 2048, but M2TS frame required addition rounding by 3 blocks
 
-    MuxerManager(BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
-    virtual ~MuxerManager();
+    MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory);
+    ~MuxerManager();
 
     void setAsyncMode(const bool val) { m_asyncMode = val; }
 
-    // void setFileBlockSize ( uint32_t nFileBlockSize) { m_fileBlockSize = nFileBlockSize; }
-    // int32_t getFileBlockSize() const { return m_fileBlockSize; }
+    [[nodiscard]] bool isAsyncMode() const { return m_asyncMode; }
 
-    bool isAsyncMode() const { return m_asyncMode; }
-
-    virtual bool openMetaFile(const std::string& fileName);
+    bool openMetaFile(const std::string& fileName);
     int addStream(const std::string& codecName, const std::string& fileName,
                   const std::map<std::string, std::string>& addParams);
 
     void doMux(const std::string& outFileName, FileFactory* fileFactory);
 
     void setCutStart(const int64_t value) { m_cutStart = value; }
-    int64_t getCutStart() const { return m_cutStart; }
+    [[nodiscard]] int64_t getCutStart() const { return m_cutStart; }
 
     void setCutEnd(const int64_t value) { m_cutEnd = value; }
-    int64_t getCutEnd() const { return m_cutEnd; }
+    [[nodiscard]] int64_t getCutEnd() const { return m_cutEnd; }
 
     void waitForWriting() const;
 
-    virtual void asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
-    virtual int syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
+    void asyncWriteBuffer(const AbstractMuxer* muxer, uint8_t* buff, int len, AbstractOutputStream* dstFile);
+    int syncWriteBuffer(AbstractMuxer* muxer, const uint8_t* buff, int len, AbstractOutputStream* dstFile) const;
     void muxBlockFinished(const AbstractMuxer* muxer);
 
     void parseMuxOpt(const std::string& opts);
     int getTrackCnt() { return static_cast<int>(m_metaDemuxer.getCodecInfo().size()); }
-    bool getHevcFound() const { return m_metaDemuxer.m_HevcFound; }
-    AbstractMuxer* getMainMuxer() const;
-    AbstractMuxer* getSubMuxer() const;
-    bool isStereoMode() const;
+    [[nodiscard]] bool getHevcFound() const { return m_metaDemuxer.m_HevcFound; }
+    [[nodiscard]] AbstractMuxer* getMainMuxer() const;
+    [[nodiscard]] AbstractMuxer* getSubMuxer() const;
+    [[nodiscard]] bool isStereoMode() const;
 
     void setAllowStereoMux(bool value);
 
-    bool isMvcBaseViewR() const { return m_mvcBaseViewR; }
-    int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
-    int getExtraISOBlocks() const { return m_extraIsoBlocks; }
+    [[nodiscard]] bool isMvcBaseViewR() const { return m_mvcBaseViewR; }
+    [[nodiscard]] int64_t totalSize() const { return m_metaDemuxer.totalSize(); }
+    [[nodiscard]] int getExtraISOBlocks() const { return m_extraIsoBlocks; }
 
-    bool useReproducibleIsoHeader() const { return m_reproducibleIsoHeader; }
+    [[nodiscard]] bool useReproducibleIsoHeader() const { return m_reproducibleIsoHeader; }
 
     enum class SubTrackMode
     {
         All,
         Forced
     };
-    int getDefaultAudioTrackIdx() const;
+
+    [[nodiscard]] int getDefaultAudioTrackIdx() const;
     int getDefaultSubTrackIdx(SubTrackMode& mode) const;
 
    private:

@@ -15,6 +15,7 @@ SimplePacketizerReader::SimplePacketizerReader()
     m_curPts = PTS_CONST_OFFSET;
     m_frameNum = 0;
     m_processedBytes = 0;
+    // JCDR TODO: virtual setTestMode in the constructor does not do anything, can we remove ?
     setTestMode(false);
     m_containerDataType = 0;
     m_containerStreamIndex = 0;
@@ -31,20 +32,19 @@ void SimplePacketizerReader::doMplsCorrection()
 {
     if (m_curMplsIndex == -1)
         return;
-    if (m_curPts >= (m_lastMplsTime - mplsEps) && m_curMplsIndex < m_mplsInfo.size() - 1)
+    if (m_curPts >= (m_lastMplsTime - mplsEps) && m_curMplsIndex < static_cast<int>(m_mplsInfo.size() - 1))
     {
         m_curMplsIndex++;
         if (m_mplsInfo[m_curMplsIndex].connection_condition == 5)
         {
             m_mplsOffset += m_curPts - m_lastMplsTime;
-            // m_curPts = m_lastMplsTime; // fix PTS up
         }
-        m_lastMplsTime += static_cast<int64_t>(
-            (m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) * (INTERNAL_PTS_FREQ / 45000.0));
+        m_lastMplsTime +=
+            (m_mplsInfo[m_curMplsIndex].OUT_time - m_mplsInfo[m_curMplsIndex].IN_time) * (INTERNAL_PTS_FREQ / 45000.0);
     }
 }
 
-void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool lastBlock)
+void SimplePacketizerReader::setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock)
 {
     if (static_cast<size_t>(m_tmpBufferLen + dataLen) > m_tmpBuffer.size())
         m_tmpBuffer.resize(m_tmpBufferLen + dataLen);
@@ -61,7 +61,7 @@ void SimplePacketizerReader::setBuffer(uint8_t* data, const int dataLen, bool la
     m_tmpBufferLen = 0;
 }
 
-uint64_t SimplePacketizerReader::getProcessedSize() { return m_processedBytes; }
+int64_t SimplePacketizerReader::getProcessedSize() { return m_processedBytes; }
 
 int SimplePacketizerReader::flushPacket(AVPacket& avPacket)
 {
@@ -172,7 +172,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
             LTRACE(LT_INFO, 2,
                    getCodecInfo().displayName
                        << " stream (track " << m_streamIndex << "): bad frame detected at position"
-                       << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                       << floatToTime((double)(avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
                        << ". Resync stream.");
             m_needSync = true;
             return 0;
@@ -214,7 +214,7 @@ int SimplePacketizerReader::readPacket(AVPacket& avPacket)
                     LTRACE(LT_INFO, 2,
                            getCodecInfo().displayName
                                << " stream (track " << m_streamIndex << "): overlapped frame detected at position "
-                               << floatToTime((avPacket.pts - PTS_CONST_OFFSET) / (double)INTERNAL_PTS_FREQ, ',')
+                               << floatToTime((double)(avPacket.pts - PTS_CONST_OFFSET) / INTERNAL_PTS_FREQ, ',')
                                << ". Remove frame.");
                 m_mplsOffset -= getFrameDuration();
                 m_curPts -= getFrameDuration();

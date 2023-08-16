@@ -1,6 +1,10 @@
 #include "muxerManager.h"
 
+#include <cmath>
+
+#include <fs/systemlog.h>
 #include "fs/textfile.h"
+
 #include "h264StreamReader.h"
 #include "iso_writer.h"
 #include "tsMuxer.h"
@@ -35,7 +39,7 @@ int seekDefaultTrack(const std::vector<StreamInfo>& tracks, std::string& param, 
 }
 }  // namespace
 
-MuxerManager::MuxerManager(BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
+MuxerManager::MuxerManager(const BufferedReaderManager& readManager, AbstractMuxerFactory& factory)
     : m_metaDemuxer(readManager), m_factory(factory)
 {
     m_asyncMode = true;
@@ -291,7 +295,8 @@ void MuxerManager::muxBlockFinished(const AbstractMuxer* muxer)
     }
 }
 
-void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const int len, AbstractOutputStream* dstFile)
+void MuxerManager::asyncWriteBuffer(const AbstractMuxer* muxer, uint8_t* buff, const int len,
+                                    AbstractOutputStream* dstFile)
 {
     WriterData data;
     data.m_buffer = buff;
@@ -301,7 +306,7 @@ void MuxerManager::asyncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const i
 
     if (m_interleave && muxer == m_mainMuxer)
     {
-        // do interlieave of SSIF blocks. Place sub channel blocks first, delay main muxer blocks
+        // do interleave of SSIF blocks. Place sub channel blocks first, delay main muxer blocks
         m_delayedData.push_back(data);
         return;
     }
@@ -319,13 +324,15 @@ void MuxerManager::asyncWriteBlock(const WriterData& data) const
     m_fileWriter->addWriterData(data);
 }
 
-int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, uint8_t* buff, const int len, AbstractOutputStream* dstFile)
+int MuxerManager::syncWriteBuffer(AbstractMuxer* muxer, const uint8_t* buff, const int len,
+                                  AbstractOutputStream* dstFile) const
 {
     assert(m_interleave == 0);
     const int rez = dstFile->write(buff, len);
     dstFile->sync();
     return rez;
 }
+
 void MuxerManager::parseMuxOpt(const string& opts)
 {
     const vector<string> params = splitQuotedStr(opts.c_str(), ' ');
@@ -338,15 +345,15 @@ void MuxerManager::parseMuxOpt(const string& opts)
         if (paramPair[0] == "--start-time" && paramPair.size() > 1)
         {
             if (paramPair[1].find(":") != string::npos)
-                m_ptsOffset = static_cast<int64_t>(timeToFloat(paramPair[1]) * 90000.0 + 0.5);
+                m_ptsOffset = llround(timeToFloat(paramPair[1]) * 90000.0);
             else
-                m_ptsOffset = strToInt64u(paramPair[1].c_str()) * 2;  // source in a 45Khz clock
+                m_ptsOffset = strToInt64(paramPair[1].c_str()) * 2;  // source in a 45Khz clock
         }
         else if (paramPair[0] == "--no-asyncio")
             setAsyncMode(false);
         else if (paramPair[0] == "--cut-start" || paramPair[0] == "--cut-end")
         {
-            uint64_t coeff = 1;
+            int64_t coeff = 1;
             string postfix;
             for (const auto j : paramPair[1])
             {

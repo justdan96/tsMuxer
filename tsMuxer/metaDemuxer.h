@@ -44,11 +44,6 @@ struct StreamInfo
         m_isSubStream = isSubStream;
     }
 
-    ~StreamInfo()
-    {
-        // delete m_streamReader;
-    }
-
     int read();
 
     int m_lastAVRez;
@@ -56,13 +51,12 @@ struct StreamInfo
     bool m_notificated;
     int m_readerID;
     uint32_t m_blockSize;
-    // int m_readRez;
     int64_t m_lastDTS;
     uint8_t* m_data;
     std::string m_streamName;
     std::string m_fullStreamName;
     int lastReadRez;
-    uint32_t m_pid;
+    int m_pid;
     bool m_flushed;
     int64_t m_timeShift;
     std::string m_lang;
@@ -86,7 +80,7 @@ class ContainerToReaderWrapper final : public AbstractReader
    public:
     struct DemuxerData
     {
-        std::map<uint32_t, DemuxerReadPolicy> m_pids;
+        std::map<int32_t, DemuxerReadPolicy> m_pids;
         PIDSet m_pidSet;  // same as pids
         AbstractDemuxer* m_demuxer;
         std::string m_streamName;
@@ -107,10 +101,10 @@ class ContainerToReaderWrapper final : public AbstractReader
 
     struct ReaderInfo
     {
-        ReaderInfo(DemuxerData& demuxerData, const uint32_t pid) : m_demuxerData(demuxerData), m_pid(pid) {}
+        ReaderInfo(DemuxerData& demuxerData, const int pid) : m_demuxerData(demuxerData), m_pid(pid) {}
 
         DemuxerData& m_demuxerData;
-        uint32_t m_pid;
+        int m_pid;
     };
 
     ContainerToReaderWrapper(const METADemuxer& owner, const BufferedReaderManager& readManager)
@@ -126,22 +120,22 @@ class ContainerToReaderWrapper final : public AbstractReader
         m_discardedSize = 0;
         m_terminated = false;
     }
-    uint8_t* readBlock(uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
-    void notify(uint32_t readerID, uint32_t dataReaded) override { return; }
-    int32_t createReader(int readBuffOffset = 0) override;
-    void deleteReader(uint32_t readerID) override;
-    bool openStream(uint32_t readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
+    uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
+    void notify(int readerID, uint32_t dataReaded) override {}
+    int createReader(int readBuffOffset = 0) override;
+    void deleteReader(int readerID) override;
+    bool openStream(int readerID, const char* streamName, int pid = 0, const CodecInfo* codecInfo = nullptr) override;
     void setFileIterator(const char* streamName, FileNameIterator* itr);
     void resetDelayedMark() const;
-    int64_t getDiscardedSize() const { return m_discardedSize; };
+    [[nodiscard]] int64_t getDiscardedSize() const { return m_discardedSize; }
 
-    bool gotoByte(uint32_t readerID, uint64_t seekDist) override { return false; }
+    bool gotoByte(int readerID, int64_t seekDist) override { return false; }
     void terminate();
     std::map<std::string, DemuxerData> m_demuxers;
 
    private:
     int64_t m_discardedSize;
-    int m_readerCnt;
+    int32_t m_readerCnt;
     size_t m_readBuffOffset;
     const BufferedReaderManager& m_readManager;
     std::map<uint32_t, ReaderInfo> m_readerInfo;
@@ -166,17 +160,17 @@ class METADemuxer final : public AbstractDemuxer
     METADemuxer(const BufferedReaderManager& readManager);
     ~METADemuxer() override;
     int readPacket(AVPacket& avPacket);
-    void readClose() final;
+    void readClose() override;
     int64_t getDemuxedSize() override;
     int addStream(const std::string& codec, const std::string& codecStreamName,
                   const std::map<std::string, std::string>& addParams);
     void openFile(const std::string& streamName) override;
-    const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
+    [[nodiscard]] const std::vector<StreamInfo>& getStreamInfo() const { return m_codecInfo; }
     static DetectStreamRez DetectStreamReader(const BufferedReaderManager& readManager, const std::string& fileName,
                                               bool calcDuration);
     std::vector<StreamInfo>& getCodecInfo() { return m_codecInfo; }
     int getLastReadRez() override { return m_lastReadRez; }
-    int64_t totalSize() const { return m_totalSize; }
+    [[nodiscard]] int64_t totalSize() const { return m_totalSize; }
     static std::string mplsTrackToFullName(const std::string& mplsFileName, const std::string& mplsNum);
     static std::string mplsTrackToSSIFName(const std::string& mplsFileName, const std::string& mplsNum);
     bool m_HevcFound;

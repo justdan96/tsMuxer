@@ -1,32 +1,38 @@
 #include "dtsStreamReader.h"
 
+#include <cmath>
 #include <sstream>
 
-// static const int DCA_EXT_CORE = 0x001;       ///< core in core substream
+#include "pgsStreamReader.h"
+
+// static constexpr int DCA_EXT_CORE = 0x001;       ///< core in core substream
 static constexpr int DCA_EXT_XXCH = 0x002;  ///< XXCh channels extension in core substream
 static constexpr int DCA_EXT_X96 = 0x004;   ///< 96/24 extension in core substream
 static constexpr int DCA_EXT_XCH = 0x008;   ///< XCh channel extension in core substream
-// static const int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
-// static const int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
-// static const int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
-// static const int DCA_EXT_EXSS_X96 = 0x080;   ///< 96/24 extension in ExSS
-// static const int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
-// static const int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
+// static constexpr int DCA_EXT_EXSS_CORE = 0x010;  ///< core in ExSS (extension substream)
+// static constexpr int DCA_EXT_EXSS_XBR = 0x020;   ///< extended bitrate extension in ExSS
+// static constexpr int DCA_EXT_EXSS_XXCH = 0x040;  ///< XXCh channels extension in ExSS
+// static constexpr int DCA_EXT_EXSS_X96 = 0x080;   ///< 96/24 extension in ExSS
+// static constexpr int DCA_EXT_EXSS_LBR = 0x100;   ///< low bitrate component in ExSS
+// static constexpr int DCA_EXT_EXSS_XLL = 0x200;   ///< lossless extension in ExSS
 
-static constexpr int dca_ext_audio_descr_mask[] = {DCA_EXT_XCH, -1, DCA_EXT_X96,  DCA_EXT_XCH | DCA_EXT_X96,
-                                                   -1,          -1, DCA_EXT_XXCH, -1};
+static constexpr int dca_ext_audio_descr_mask[] = {
+    DCA_EXT_XCH, -1, DCA_EXT_X96, DCA_EXT_XCH | DCA_EXT_X96, -1, -1, DCA_EXT_XXCH, -1,
+};
 
-static constexpr unsigned int ppi_dts_samplerate[] = {0,     8000, 16000, 32000, 0,     0,     11025, 22050,
-                                                  44100, 0,    0,     12000, 24000, 48000, 96000, 192000};
+static constexpr int ppi_dts_samplerate[] = {
+    0, 8000, 16000, 32000, 0, 0, 11025, 22050, 44100, 0, 0, 12000, 24000, 48000, 96000, 192000,
+};
 
-static constexpr unsigned int dtshd_samplerate[] = {0x1F40,  0x3E80,  0x7D00,  0x0FA00, 0x1F400, 0x5622,
-                                                    0x0AC44, 0x15888,
-                                                0x2B110, 0x56220, 0x2EE0, 0x5DC0,  0x0BB80, 0x17700, 0x2EE00, 0x5DC00};
+static constexpr int dtshd_samplerate[] = {
+    0x1F40,  0x3E80,  0x7D00, 0x0FA00, 0x1F400, 0x5622,  0x0AC44, 0x15888,
+    0x2B110, 0x56220, 0x2EE0, 0x5DC0,  0x0BB80, 0x17700, 0x2EE00, 0x5DC00,
+};
 
-static constexpr unsigned int ppi_dts_bitrate[] = {
-    32000,   56000,   64000,   96000,   112000,  128000,  192000,  224000,     256000,         320000,  384000,
-    448000,  512000,  576000,  640000,  768000,  896000,  1024000, 1152000,    1280000,        1344000, 1408000,
-    1411200, 1472000, 1536000, 1920000, 2048000, 3072000, 3840000, 1 /*open*/, 2 /*variable*/, 3 /*lossless*/
+static constexpr int ppi_dts_bitrate[] = {
+    32000,   56000,   64000,   96000,   112000,  128000,  192000,  224000,     256000,         320000,         384000,
+    448000,  512000,  576000,  640000,  768000,  896000,  1024000, 1152000,    1280000,        1344000,        1408000,
+    1411200, 1472000, 1536000, 1920000, 2048000, 3072000, 3840000, 1 /*open*/, 2 /*variable*/, 3 /*lossless*/,
 };
 
 static constexpr int64_t AUPR_HDR = 0x415550522D484452ll;
@@ -52,9 +58,9 @@ static constexpr int AOUT_CHAN_REARRIGHT = 0x40;
 static constexpr int AOUT_CHAN_MIDDLELEFT = 0x100;
 static constexpr int AOUT_CHAN_MIDDLERIGHT = 0x200;
 static constexpr int AOUT_CHAN_LFE = 0x1000;
-// static const int AOUT_CHAN_DOLBYSTEREO = 0x10000;
+// static constexpr int AOUT_CHAN_DOLBYSTEREO = 0x10000;
 static constexpr int AOUT_CHAN_DUALMONO = 0x20000;
-// static const int AOUT_CHAN_REVERSESTEREO = 0x40000;
+// static constexpr int AOUT_CHAN_REVERSESTEREO = 0x40000;
 
 using namespace std;
 
@@ -175,12 +181,12 @@ void DTSStreamReader::checkIfOnlyHDDataExists(uint8_t* buff, const uint8_t* end)
         if (reader.getBit())
         {
             reader.skipBits(12);  // headerSize
-            hdFrameSize = reader.getBits(20) + 1;
+            hdFrameSize = reader.getBits<int32_t>(20) + 1;
         }
         else
         {
             reader.skipBits(8);  // headerSize
-            hdFrameSize = reader.getBits(16) + 1;
+            hdFrameSize = reader.getBits<uint16_t>(16) + 1;
         }
         buff += hdFrameSize;
     }
@@ -284,17 +290,17 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
         reader.setBuffer(buff + 5, end);  // skip 4 byte magic and 1 unknown byte
         int headerSize;
         int hdFrameSize;
-        const int nuSubStreamIndex = reader.getBits(2);
+        const auto nuSubStreamIndex = reader.getBits<uint8_t>(2);
         const bool isBlownUpHeader = reader.getBit();
         if (isBlownUpHeader)
         {
-            headerSize = reader.getBits(12) + 1;
-            hdFrameSize = reader.getBits(20) + 1;
+            headerSize = reader.getBits<uint16_t>(12) + 1;
+            hdFrameSize = reader.getBits<int32_t>(20) + 1;
         }
         else
         {
-            headerSize = reader.getBits(8) + 1;
-            hdFrameSize = reader.getBits(16) + 1;
+            headerSize = reader.getBits<uint8_t>(8) + 1;
+            hdFrameSize = reader.getBits<uint16_t>(16) + 1;
         }
         if (m_hdType == DTSHD_SUBTYPE::DTS_SUBTYPE_UNINITIALIZED)
         {
@@ -326,12 +332,12 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
         else
             return hdFrameSize;
 
-        int nuNumAssets = 1;
+        uint8_t nuNumAssets = 1;
         const bool bStaticFieldsPresent = reader.getBit();
         if (bStaticFieldsPresent)
         {
             reader.skipBits(2);  // nuRefClockCode
-            const int nuExSSFrameDurationCode = reader.getBits(3) + 1;
+            const auto nuExSSFrameDurationCode = reader.getBits<uint8_t>(3) + 1;
             if (pi_frame_length == 0)
                 pi_frame_length = nuExSSFrameDurationCode << 9;
 
@@ -340,8 +346,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
                 reader.skipBits(18);  // nuTimeStamp, 18 high bits
                 reader.skipBits(18);  // nuTimeStamp, 18 low bits
             }
-            const int nuNumAudioPresent = reader.getBits(3) + 1;
-            nuNumAssets = reader.getBits(3) + 1;
+            const auto nuNumAudioPresent = reader.getBits<uint8_t>(3) + 1;
+            nuNumAssets = reader.getBits<uint8_t>(3) + 1;
             for (int i = 0; i < nuNumAudioPresent; i++) reader.skipBits(nuSubStreamIndex + 1);
             for (int i = 0; i < nuNumAudioPresent; i++)
             {
@@ -354,8 +360,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
             if (reader.getBit())
             {
                 reader.skipBits(2);  // nuMixMetadataAdjLevel
-                const int nuBits4MixOutMask = reader.getBits(2) * 4 + 4;
-                const int nuNumMixOutConfigs = reader.getBits(2) + 1;
+                const auto nuBits4MixOutMask = reader.getBits<uint8_t>(2) * 4 + 4;
+                const auto nuNumMixOutConfigs = reader.getBits<uint8_t>(2) + 1;
                 for (int i = 0; i < nuNumMixOutConfigs; i++) reader.skipBits(nuBits4MixOutMask);
             }
         }
@@ -375,13 +381,13 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
 
                 if (reader.getBit())  // bInfoTextPresent
                 {
-                    const int nuInfoTextByteSize = reader.getBits(10) + 1;
+                    const auto nuInfoTextByteSize = reader.getBits<uint16_t>(10) + 1;
                     for (int j = 0; j < nuInfoTextByteSize; j++) reader.skipBits(8);
                 }
-                const int nuBitResolution = reader.getBits(5) + 1;
-                const int nuMaxSampleRate = reader.getBits(4);
-                hd_pi_channels = reader.getBits(8) + 1;
-                int nuSpkrActivityMask = 0;
+                const auto nuBitResolution = reader.getBits<uint8_t>(5) + 1;
+                const auto nuMaxSampleRate = reader.getBits<uint8_t>(4);
+                hd_pi_channels = reader.getBits<uint8_t>(8) + 1;
+                uint16_t nuSpkrActivityMask = 0;
                 if (reader.getBit())  // bOne2OneMapChannels2Speakers
                 {
                     if (hd_pi_channels > 2)
@@ -392,8 +398,8 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
 
                     if (reader.getBit())  // bSpkrMaskEnabled
                     {
-                        const int nuNumBits4SAMask = reader.getBits(2) * 4 + 4;
-                        nuSpkrActivityMask = reader.getBits(nuNumBits4SAMask);
+                        const auto nuNumBits4SAMask = reader.getBits<uint8_t>(2) * 4 + 4;
+                        nuSpkrActivityMask = reader.getBits<uint16_t>(nuNumBits4SAMask);
                     }
                     // TODO...
                 }
@@ -401,11 +407,10 @@ int DTSStreamReader::decodeHdInfo(uint8_t* buff, const uint8_t* end)
                 hd_bitDepth = nuBitResolution;
 
                 if (!m_isCoreExists)
-                    m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / static_cast<double>(hd_pi_sample_rate);
+                    m_frameDuration = static_cast<double>(pi_frame_length) * INTERNAL_PTS_FREQ / hd_pi_sample_rate;
 
                 if (m_hdType != DTSHD_SUBTYPE::DTS_SUBTYPE_MASTER_AUDIO)
-                    m_hdBitrate = static_cast<unsigned>(hd_pi_sample_rate / static_cast<double>(pi_frame_length) *
-                                                        hdFrameSize * 8);
+                    m_hdBitrate = lround(static_cast<double>(hd_pi_sample_rate) / pi_frame_length * hdFrameSize * 8);
 
                 hd_pi_lfeCnt = 0;
 
@@ -481,7 +486,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         else
             return 0;
 
-        switch (pi_audio_mode & 0xFFFF)
+        switch (pi_audio_mode & 0xffff)
         {
         case 0x0:
             // Mono
@@ -562,7 +567,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             pi_lfeCnt = 1;
         }
 
-        if (pi_sample_rate_index >= sizeof(ppi_dts_samplerate) / sizeof(ppi_dts_samplerate[0]))
+        if (pi_sample_rate_index >= std::size(ppi_dts_samplerate))
         {
             return 0;
         }
@@ -570,7 +575,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
         if (!pi_sample_rate)
             return 0;
 
-        if (pi_bit_rate_index >= sizeof(ppi_dts_bitrate) / sizeof(ppi_dts_bitrate[0]))
+        if (pi_bit_rate_index >= std::size(ppi_dts_bitrate))
         {
             return 0;
         }
@@ -579,7 +584,7 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
             return 0;
 
         pi_frame_length = (nblks + 1) * 32;
-        m_frameDuration = pi_frame_length * INTERNAL_PTS_FREQ / static_cast<double>(pi_sample_rate);
+        m_frameDuration = static_cast<double>(pi_frame_length) * INTERNAL_PTS_FREQ / pi_sample_rate;
 
         afterFrameData = buff + i_frame_size;
         if (afterFrameData > end - 4)
@@ -630,12 +635,12 @@ int DTSStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, in
 
 int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 {
-    nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    const unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
-    pi_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
+    nblks = (p_buf[4] & 0x01) << 6 | p_buf[5] >> 2;
+    const int frame_size = (p_buf[5] & 0x03) << 12 | p_buf[6] << 4 | p_buf[7] >> 4;
+    pi_audio_mode = (p_buf[7] & 0x0f) << 2 | p_buf[8] >> 6;
     pi_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
     pi_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    const unsigned int i_lfe = (p_buf[10] >> 1) & 0x03;
+    const int i_lfe = (p_buf[10] >> 1) & 0x03;
     if (i_lfe)
         pi_audio_mode |= 0x10000;
 
@@ -655,12 +660,12 @@ int DTSStreamReader::syncInfo16be(const uint8_t* p_buf)
 
 int DTSStreamReader::testSyncInfo16be(const uint8_t* p_buf)
 {
-    nblks = (p_buf[4] & 0x01) << 6 | (p_buf[5] >> 2);
-    const unsigned int frame_size = (p_buf[5] & 0x03) << 12 | (p_buf[6] << 4) | (p_buf[7] >> 4);
-    unsigned int test_audio_mode = (p_buf[7] & 0x0f) << 2 | (p_buf[8] >> 6);
-    const unsigned int test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
-    const unsigned int test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
-    const unsigned int test_lfe = (p_buf[10] >> 1) & 0x03;
+    nblks = (p_buf[4] & 0x01) << 6 | p_buf[5] >> 2;
+    const int frame_size = (p_buf[5] & 0x03) << 12 | p_buf[6] << 4 | p_buf[7] >> 4;
+    int test_audio_mode = (p_buf[7] & 0x0f) << 2 | p_buf[8] >> 6;
+    const unsigned test_sample_rate_index = (p_buf[8] >> 2) & 0x0f;
+    const unsigned test_bit_rate_index = (p_buf[8] & 0x03) << 3 | ((p_buf[9] >> 5) & 0x07);
+    const int test_lfe = (p_buf[10] >> 1) & 0x03;
     if (test_lfe)
         test_audio_mode |= 0x10000;
     if (test_audio_mode == pi_audio_mode && test_sample_rate_index == pi_sample_rate_index &&
@@ -716,8 +721,9 @@ void DTSStreamReader::BufLeToBe(uint8_t* p_out, const uint8_t* p_in, const int i
 {
     for (int i = 0; i < i_in / 2; i++)
     {
-        p_out[i * 2] = p_in[i * 2 + 1];
-        p_out[i * 2 + 1] = p_in[i * 2];
+        const int j = 2 * i;
+        p_out[j] = p_in[j + 1];
+        p_out[j + 1] = p_in[j];
     }
 }
 

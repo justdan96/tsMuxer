@@ -6,7 +6,7 @@
 class TextFile final : public File
 {
    public:
-    TextFile() {}
+    TextFile() = default;
     TextFile(const char* fName, const unsigned int oflag, const unsigned int systemDependentFlags = 0)
         : File(fName, oflag, systemDependentFlags)
     {
@@ -37,7 +37,7 @@ class TextFile final : public File
     }
     bool writeLine(const std::string& line)
     {
-        if (write(line.c_str(), static_cast<uint32_t>(line.size())) != line.size())
+        if (write(line.c_str(), static_cast<uint32_t>(line.size())) != static_cast<int32_t>(line.size()))
             return false;
         return write("\r\n", 2) == 2;
     }

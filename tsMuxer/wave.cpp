@@ -40,8 +40,8 @@ uint32_t getWaveChannelMask(const int channels, const bool lfeExists)
     return 0;  // unknown value
 }
 
-void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const int channels, const bool lfeExist,
-                     const int bitdepth)
+void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const uint16_t channels, const bool lfeExist,
+                     const uint16_t bitdepth)
 {
     waveBuffer.clear();
     waveBuffer.grow(40 + 28);

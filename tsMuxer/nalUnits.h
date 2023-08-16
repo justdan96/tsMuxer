@@ -2,7 +2,6 @@
 #define NAL_UNITS_H_
 
 #include <map>
-#include <set>
 #include <unordered_set>
 #include <vector>
 
@@ -90,7 +89,7 @@ class NALUnit
     static unsigned extractUEGolombCode(BitStreamReader& bitReader);
     static void writeUEGolombCode(BitStreamWriter& bitWriter, uint32_t value);
     static void writeSEGolombCode(BitStreamWriter& bitWriter, int32_t value);
-    const BitStreamReader& getBitReader() const { return bitReader; }
+    [[nodiscard]] const BitStreamReader& getBitReader() const { return bitReader; }
     static void write_rbsp_trailing_bits(BitStreamWriter& writer);
     static void write_byte_align_bits(BitStreamWriter& writer);
 
@@ -140,7 +139,7 @@ class PPSUnit final : public NALUnit
     }
     ~PPSUnit() override = default;
 
-    bool isReady() const { return m_ready; }
+    [[nodiscard]] bool isReady() const { return m_ready; }
     int deserialize();
 
    private:
@@ -158,24 +157,24 @@ struct HRDParams
     int bitLen;
 
     unsigned cpb_cnt_minus1;
-    int bit_rate_scale;
-    int cpb_size_scale;
+    uint8_t bit_rate_scale;
+    uint8_t cpb_size_scale;
     std::vector<unsigned> bit_rate_value_minus1;
     std::vector<unsigned> cpb_size_value_minus1;
     std::vector<uint8_t> cbr_flag;
 
-    int initial_cpb_removal_delay_length_minus1;
-    int cpb_removal_delay_length_minus1;
-    int dpb_output_delay_length_minus1;
-    int time_offset_length;
+    uint8_t initial_cpb_removal_delay_length_minus1;
+    uint8_t cpb_removal_delay_length_minus1;
+    uint8_t dpb_output_delay_length_minus1;
+    uint8_t time_offset_length;
 };
 
 class SPSUnit final : public NALUnit
 {
    public:
     bool m_ready;
-    int sar_width;
-    int sar_height;
+    uint16_t sar_width;
+    uint16_t sar_height;
     uint32_t num_units_in_tick;
     uint32_t time_scale;
     int fixed_frame_rate_flag;
@@ -193,7 +192,7 @@ class SPSUnit final : public NALUnit
     unsigned num_views;
 
     int level_idc;
-    std::vector<int> level_idc_ext;
+    std::vector<uint8_t> level_idc_ext;
     unsigned seq_parameter_set_id;
     unsigned chroma_format_idc;
     unsigned log2_max_frame_num;
@@ -201,7 +200,6 @@ class SPSUnit final : public NALUnit
     unsigned log2_max_pic_order_cnt_lsb;
     int delta_pic_order_always_zero_flag;
     int offset_for_non_ref_pic;
-    // int offset_for_ref_frame[256];
     unsigned num_ref_frames;
     unsigned pic_width_in_mbs;
     unsigned pic_height_in_map_units;
@@ -210,7 +208,7 @@ class SPSUnit final : public NALUnit
 
     int timing_info_present_flag;
     int aspect_ratio_info_present_flag;
-    int aspect_ratio_idc;
+    uint8_t aspect_ratio_idc;
 
     int hrdParamsBitPos;
     HRDParams nalHrdParams;
@@ -222,25 +220,28 @@ class SPSUnit final : public NALUnit
     // subSPS (SVC/MVC) extension
     std::vector<unsigned> view_id;
 
-    std::string getStreamDescr() const;
-    unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
-    unsigned getHeight() const { return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY(); }
-    double getFPS() const;
+    [[nodiscard]] std::string getStreamDescr() const;
+    [[nodiscard]] unsigned getWidth() const { return pic_width_in_mbs * 16 - getCropX(); }
+    [[nodiscard]] unsigned getHeight() const
+    {
+        return (2 - frame_mbs_only_flag) * pic_height_in_map_units * 16 - getCropY();
+    }
+    [[nodiscard]] double getFPS() const;
     void setFps(double fps);
 
     SPSUnit();
     ~SPSUnit() override = default;
 
-    bool isReady() const { return m_ready; }
+    [[nodiscard]] bool isReady() const { return m_ready; }
     int deserialize();
     using NALUnit::deserialize;
     void insertHrdParameters();
     void updateTimingInfo();
-    unsigned getMaxBitrate() const;
+    [[nodiscard]] unsigned getMaxBitrate() const;
     int hrd_parameters(HRDParams& params);
     int deserializeVuiParameters();
-    unsigned getCropY() const;
-    unsigned getCropX() const;
+    [[nodiscard]] unsigned getCropY() const;
+    [[nodiscard]] unsigned getCropX() const;
     void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
     static void serializeHRDParameters(BitStreamWriter& writer, const HRDParams& params);
 
@@ -283,11 +284,11 @@ class SEIUnit final : public NALUnit
     static void updateMetadataPts(uint8_t* metadataPtsPtr, int64_t pts);
     int isMVCSEI();
 
-    int pic_struct;
+    int8_t pic_struct;
     std::unordered_set<int> m_processedMessages;
 
-    int cpb_removal_delay;
-    int dpb_output_delay;
+    uint32_t cpb_removal_delay;
+    uint32_t dpb_output_delay;
     int initial_cpb_removal_delay[32];
     int initial_cpb_removal_delay_offset[32];
     int number_of_offset_sequences;  // used for bluray MVC metadata
@@ -295,7 +296,10 @@ class SEIUnit final : public NALUnit
     int m_mvcHeaderLen;
     uint8_t* m_mvcHeaderStart;
 
-    bool hasProcessedMessage(const int msg) const { return m_processedMessages.find(msg) != m_processedMessages.end(); }
+    [[nodiscard]] bool hasProcessedMessage(const int msg) const
+    {
+        return m_processedMessages.find(msg) != m_processedMessages.end();
+    }
 
    private:
     void sei_payload(const SPSUnit& sps, int payloadType, uint8_t* curBuff, int payloadSize,
@@ -348,12 +352,12 @@ class SliceUnit final : public NALUnit
     int memory_management_control_operation;
 
     unsigned first_mb_in_slice;
-    unsigned slice_type;
-    unsigned orig_slice_type;
+    uint32_t slice_type;
+    uint32_t orig_slice_type;
     unsigned pic_parameter_set_id;
-    int frame_num;
+    uint16_t frame_num;
     int bottom_field_flag;
-    int pic_order_cnt_lsb;
+    uint16_t pic_order_cnt_lsb;
     int anchor_pic_flag;
 
     SliceUnit();
@@ -363,10 +367,10 @@ class SliceUnit final : public NALUnit
                     const std::map<uint32_t, PPSUnit*>& ppsMap);
     using NALUnit::deserialize;
 
-    const SPSUnit* getSPS() const { return sps; }
-    const PPSUnit* getPPS() const { return pps; }
-    bool isIDR() const;
-    bool isIFrame() const;
+    [[nodiscard]] const SPSUnit* getSPS() const { return sps; }
+    [[nodiscard]] const PPSUnit* getPPS() const { return pps; }
+    [[nodiscard]] bool isIDR() const;
+    [[nodiscard]] bool isIFrame() const;
     int deserializeSliceType(uint8_t* buffer, uint8_t* end);
     int deserializeSliceHeader(const std::map<uint32_t, SPSUnit*>& spsMap, const std::map<uint32_t, PPSUnit*>& ppsMap);
     void nal_unit_header_svc_extension();

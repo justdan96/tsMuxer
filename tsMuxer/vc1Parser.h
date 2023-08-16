@@ -21,7 +21,9 @@ enum class VC1Code
     USER_FIELD,
     USER_FRAME,
     USER_ENTRYPOINT,
-    USER_SEQHDR
+    USER_SEQHDR,
+    // all other start code suffixes are reserved or forbidden
+    RESERVED
 };
 
 enum class Profile
@@ -32,8 +34,8 @@ enum class Profile
     ADVANCED
 };
 
-const int ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
-constexpr int ff_vc1_fps_dr[2] = {1000, 1001};
+constexpr uint8_t ff_vc1_fps_nr[7] = {24, 25, 30, 50, 60, 48, 72};
+constexpr uint16_t ff_vc1_fps_dr[2] = {1000, 1001};
 
 const AVRational ff_vc1_pixel_aspect[16] = {
     AVRational(0, 1),   AVRational(1, 1),    AVRational(12, 11), AVRational(10, 11),
@@ -48,6 +50,7 @@ enum class VC1PictType
     B_TYPE,
     BI_TYPE
 };
+
 extern const char* pict_type_str[4];
 
 class VC1Unit
@@ -132,7 +135,8 @@ class VC1Unit
         dst += srcEnd - srcStart;
         return dst - initDstBuffer;
     }
-    const BitStreamReader& getBitReader() const { return bitReader; }
+
+    [[nodiscard]] const BitStreamReader& getBitReader() const { return bitReader; }
 
    protected:
     void updateBits(int bitOffset, int bitLen, int value) const;
@@ -168,13 +172,13 @@ class VC1SequenceHeader : public VC1Unit
     }
     Profile profile;
     int rangered;
-    int max_b_frames;
+    uint8_t max_b_frames;
     int finterpflag;  ///< INTERPFRM present
-    int level;
-    int coded_width;
-    int coded_height;
-    int display_width;
-    int display_height;
+    uint8_t level;
+    uint16_t coded_width;
+    uint16_t coded_height;
+    uint16_t display_width;
+    uint16_t display_height;
     int pulldown;     ///< TFF/RFF present
     bool interlace;   ///< Progressive/interlaced (RPTFTM syntax element)
     bool tfcntrflag;  ///< TFCNTR present
@@ -182,7 +186,7 @@ class VC1SequenceHeader : public VC1Unit
     int time_base_num;
     int time_base_den;
     int hrd_param_flag;
-    int hrd_num_leaky_buckets;
+    uint8_t hrd_num_leaky_buckets;
 
     /* for decoding entry point */
     int decode_entry_point();
@@ -191,8 +195,8 @@ class VC1SequenceHeader : public VC1Unit
     AVRational sample_aspect_ratio;  // w, h
     int decode_sequence_header();
     int decode_sequence_header_adv();
-    std::string getStreamDescr() const;
-    double getFPS() const;
+    [[nodiscard]] std::string getStreamDescr() const;
+    [[nodiscard]] double getFPS() const;
     void setFPS(double value);
 
    private:
@@ -205,7 +209,7 @@ class VC1Frame : public VC1Unit
     VC1Frame() : fcm(0), pict_type(VC1PictType::I_TYPE), rptfrm(0), tff(0), rff(0), rptfrmBitPos(0) {}
     int fcm;
     VC1PictType pict_type;
-    int rptfrm;
+    uint8_t rptfrm;
     int tff;
     int rff;
     int rptfrmBitPos;

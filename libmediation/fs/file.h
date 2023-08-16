@@ -11,21 +11,21 @@ class AbstractStream
 
     static constexpr unsigned int ofRead = 1;
     static constexpr unsigned int ofWrite = 2;
-    static constexpr unsigned int ofAppend = 4;       // file can be exist
-    static constexpr unsigned int ofOpenExisting = 8; // do not create file if absent
-    static constexpr unsigned int ofCreateNew = 16;   // create new file. Return error If file exist
-    static constexpr unsigned int ofNoTruncate = 32;  // keep file data while opening
+    static constexpr unsigned int ofAppend = 4;        // file can be exist
+    static constexpr unsigned int ofOpenExisting = 8;  // do not create file if absent
+    static constexpr unsigned int ofCreateNew = 16;    // create new file. Return error If file exist
+    static constexpr unsigned int ofNoTruncate = 32;   // keep file data while opening
 
     virtual bool open(const char* fName, unsigned int oflag, unsigned int systemDependentFlags = 0) = 0;
     virtual bool close() = 0;
-    virtual int64_t size() const = 0;
+    [[nodiscard]] virtual int64_t size() const = 0;
 };
 
 class AbstractOutputStream : public AbstractStream
 {
    public:
     virtual int write(const void* buffer, uint32_t count) = 0;
-    int write(const std::vector<std::uint8_t>& data) { return write(data.data(), (uint32_t)data.size()); }
+    int write(const std::vector<std::uint8_t>& data) { return write(data.data(), static_cast<uint32_t>(data.size())); }
     virtual void sync() = 0;
 };
 
@@ -56,11 +56,12 @@ class File : public AbstractOutputStream
     //! Open the file
     /*!
             If a file is already open, it will be closed.
+    \param fName Name of the file to open.
     \param oflag A bitmask of the opened file's parameters.
-            \param systemDependentFlags System-dependent flags for opening the file.
-                    In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
-                    In the unix implementation, this is the second parameter to the open function.
-            \return true if the file was opened successfully, false otherwise
+    \param systemDependentFlags System-dependent flags for opening the file.
+            In the win32 implementation, this is the dwFlagsAndAttributes parameter to the CreateFile function,
+            In the unix implementation, this is the second parameter to the open function.
+    \return true if the file was opened successfully, false otherwise
     */
     bool open(const char* fName, unsigned int oflag, unsigned int systemDependentFlags = 0) override;
     //! Close the file
@@ -97,7 +98,7 @@ class File : public AbstractOutputStream
     /*!
             \return Current size of the file
     */
-    bool size(int64_t* const fileSize) const;
+    bool size(int64_t* fileSize) const;
 
     int64_t size() const override
     {
@@ -111,14 +112,14 @@ class File : public AbstractOutputStream
             \param whence
             \return Location of the cursor after relocating it, or uint64_t(-1) in case of an error.
     */
-    uint64_t seek(const int64_t offset, const SeekMethod whence = SeekMethod::smBegin) const;
+    int64_t seek(int64_t offset, SeekMethod whence = SeekMethod::smBegin) const;
 
     //! Change the size of the file
     /*!
             The location of the file cursor after calling this function is undefined.
             \param newFileSize New size of the file. This function can both enlarge, as well as reduce the file size.
     */
-    bool truncate(const uint64_t newFileSize) const;
+    bool truncate(uint64_t newFileSize) const;
 
     std::string getName() { return m_name; }
 
@@ -127,7 +128,7 @@ class File : public AbstractOutputStream
    private:
     void* m_impl;
     std::string m_name;
-    mutable uint64_t m_pos;
+    mutable int64_t m_pos;
 };
 
 class FileFactory
@@ -135,7 +136,7 @@ class FileFactory
    public:
     virtual ~FileFactory() = default;
     virtual AbstractOutputStream* createFile() = 0;
-    virtual bool isVirtualFS() const = 0;
+    [[nodiscard]] virtual bool isVirtualFS() const = 0;
 };
 
 #endif  // LIBMEDIATION_FILE_H

@@ -10,7 +10,6 @@
 
 #include "avPacket.h"
 #include "vod_common.h"
-// #include <system/dynamiclink.h>
 
 class SubTrackFilter;
 
@@ -33,7 +32,7 @@ class MemoryBlock
             m_data.resize(m_size);
     }
 
-    void grow(const int64_t num)
+    void grow(const size_t num)
     {
         m_size += num;
         if (m_data.size() < m_size)
@@ -42,7 +41,7 @@ class MemoryBlock
         }
     }
 
-    void append(const uint8_t* data, const int64_t num)
+    void append(const uint8_t* data, const size_t num)
     {
         if (num > 0)
         {
@@ -51,11 +50,11 @@ class MemoryBlock
         }
     }
 
-    size_t size() const { return m_size; }
+    [[nodiscard]] size_t size() const { return m_size; }
 
-    uint8_t* data() { return m_data.empty() ? nullptr : &m_data[0]; }
+    uint8_t* data() { return m_data.empty() ? nullptr : m_data.data(); }
 
-    bool isEmpty() const { return m_size == 0; }
+    [[nodiscard]] bool isEmpty() const { return m_size == 0; }
 
     void clear() { m_size = 0; }
 
@@ -65,8 +64,8 @@ class MemoryBlock
 };
 
 typedef MemoryBlock StreamData;
-typedef std::map<uint32_t, StreamData> DemuxedData;
-typedef std::set<uint32_t> PIDSet;
+typedef std::map<int32_t, StreamData> DemuxedData;
+typedef std::set<int32_t> PIDSet;
 // typedef std::map<uint32_t, std::vector<uint8_t> > DemuxedData;
 
 // Used to automatically switch to reading the next file while the current one ends.
@@ -107,7 +106,7 @@ class AbstractDemuxer
     virtual int64_t getDemuxedSize() = 0;
 
     virtual uint64_t getDuration() { return 0; }
-    virtual void setTimeOffset(const uint64_t offset) { m_timeOffset = offset; }
+    virtual void setTimeOffset(const int64_t offset) { m_timeOffset = offset; }
     virtual int simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
     {
         discardSize = 0;
@@ -120,7 +119,7 @@ class AbstractDemuxer
 
     virtual uint32_t getFileBlockSize() { return m_fileBlockSize; }
 
-    virtual int64_t getTrackDelay(uint32_t pid) { return 0; }
+    virtual int64_t getTrackDelay(int32_t pid) { return 0; }
     virtual std::vector<AVChapter> getChapters() { return {}; }
     virtual double getTrackFps(uint32_t trackId) { return 0.0; }
 
@@ -130,8 +129,8 @@ class AbstractDemuxer
         return itr != m_pidFilters.end() ? itr->second : nullptr;
     }
     void setPidFilter(const int pid, SubTrackFilter* pidFilter) { m_pidFilters[pid] = pidFilter; }
-    virtual bool isPidFilterSupported() const { return false; }
-    virtual int64_t getFileDurationNano() const { return 0; }
+    [[nodiscard]] virtual bool isPidFilterSupported() const { return false; }
+    [[nodiscard]] virtual int64_t getFileDurationNano() const { return 0; }
 
    protected:
     int64_t m_timeOffset;

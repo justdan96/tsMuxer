@@ -1,7 +1,7 @@
 
 #include "pesPacket.h"
 
-void PESPacket::serialize(const uint64_t pts, const uint8_t streamID)
+void PESPacket::serialize(const int64_t pts, const uint8_t streamID)
 {
     setStreamID(streamID);
     setPacketLength(0);
@@ -10,7 +10,7 @@ void PESPacket::serialize(const uint64_t pts, const uint8_t streamID)
     setPts(pts);
 }
 
-void PESPacket::serialize(const uint64_t pts, const uint64_t dts, const uint8_t streamID)
+void PESPacket::serialize(const int64_t pts, const int64_t dts, const uint8_t streamID)
 {
     setStreamID(streamID);
     setPacketLength(0);

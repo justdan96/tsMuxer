@@ -1,7 +1,7 @@
-
 #include "tsDemuxer.h"
 
-#include "aac.h"
+#include <fs/systemlog.h>
+
 #include "abstractStreamReader.h"
 #include "vodCoreException.h"
 #include "vod_common.h"
@@ -154,11 +154,7 @@ void TSDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
         br->incSeek(m_readerID, -static_cast<int64_t>(totalReadedBytes));
     else
         THROW(ERR_COMMON, "Function TSDemuxer::getTrackList required bufferedReader!")
-    return;
 }
-
-// static int64_t prevPCR = -1;
-// static int pcrFrames = 0;
 
 bool TSDemuxer::isVideoPID(const StreamType streamType)
 {
@@ -199,7 +195,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 {
     if (m_firstDemuxCall)
     {
-        for (const unsigned int acceptedPID : acceptedPIDs) m_acceptedPidCache[acceptedPID] = 1;
+        for (const int acceptedPID : acceptedPIDs) m_acceptedPidCache[acceptedPID] = 1;
         m_firstDemuxCall = false;
     }
 
@@ -208,7 +204,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
     MemoryBlock* vect = nullptr;
     int lastPid = -1;
 
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     discardSize = 0;
     uint32_t readedBytes;
@@ -265,7 +261,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
         return 0;
     }
 
-    uint8_t* lastFrameAddr = data + readedBytes - TS_FRAME_SIZE;
+    const uint8_t* lastFrameAddr = data + readedBytes - TS_FRAME_SIZE;
 
     if (m_firstCall && !m_m2tsMode)
     {
@@ -382,10 +378,8 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                         m_videoDtsGap = curDts - m_lastVideoDTS;
                 }
 
-                if (m_firstPtsTime.find(pid) == m_firstPtsTime.end())
-                    m_firstPtsTime[pid] = curPts;
-
-                else if (m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
+                if (m_firstPtsTime.find(pid) == m_firstPtsTime.end() ||
+                    m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
                     m_firstPtsTime[pid] = curPts;
             }
 

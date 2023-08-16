@@ -25,27 +25,22 @@ H264StreamReader::H264StreamReader()
     m_firstAUDWarn = true;
     m_firstSPSWarn = true;
     m_firstSEIWarn = true;
-    m_lastSlicePPS = -1;
-    m_lastSliceSPS = -1;
+    m_lastSlicePPS = UINT_MAX;
+    m_lastSliceSPS = UINT_MAX;
     m_lastSliceIDR = false;
     m_h264SPSCont = false;
     m_spsCounter = 0;
     m_insertSEIMethod = SeiMethod::SEI_DoNotInsert;
     m_needSeiCorrection = false;
     m_firstDecodeNal = true;
-    // m_cpb_removal_delay_baseaddr = 0;
-    // m_cpb_removal_delay_bitpos = 0;
     orig_hrd_parameters_present_flag = false;
     orig_vcl_parameters_present_flag = false;
     m_lastPictStruct = 0;
 
-    // for fixing thundberg streams
-    // m_idrSliceFound = false;
     m_bSliceFound = false;
     m_picOrderOffset = 0;
     m_frameDepth = 1;
     m_lastIFrame = false;
-    // m_openGOP = true;
     m_idrSliceCnt = 0;
     m_firstFileFrame = false;
     m_lastPicStruct = -1;
@@ -295,7 +290,7 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         }
     }
 
-    if (!m_delimiterFound && m_lastSliceSPS != -1)
+    if (!m_delimiterFound && m_lastSliceSPS != UINT_MAX)
     {
         if (m_firstAUDWarn)
         {
@@ -316,14 +311,14 @@ int H264StreamReader::writeAdditionData(uint8_t *dstBuffer, uint8_t *dstEnd, AVP
         }
     }
 
-    bool needInsTimingSEI = m_needSeiCorrection && m_lastSliceSPS != -1;
+    bool needInsTimingSEI = m_needSeiCorrection && m_lastSliceSPS != UINT_MAX;
     bool srcSpsPpsFound = avPacket.flags & AVPacket::IS_SPS_PPS_IN_GOP;
     bool spsDiscontinue =
         m_h264SPSCont &&
         ((m_spsCounter < 2 && ((m_totalFrameNum > 1 && m_lastSliceIDR) || (m_totalFrameNum > 250 && isIFrame()))) ||
          (m_firstFileFrame && !srcSpsPpsFound));
     bool needInsSpsPps = false;
-    if (isIFrame() && m_lastSliceSPS != -1 && m_lastSlicePPS != -1)
+    if (isIFrame() && m_lastSliceSPS != UINT_MAX && m_lastSlicePPS != UINT_MAX)
     {
         needInsSpsPps = spsDiscontinue || (replaceToOwnSPS() && srcSpsPpsFound);
     }
@@ -442,10 +437,9 @@ int H264StreamReader::getTSDescriptor(uint8_t *dstBuff, bool blurayMode, const b
         *dstBuff++ = 'V';
         *dstBuff++ = 0xff;  // stuffing byte
 
-        int video_format, frame_rate_index, aspect_ratio_index;
+        uint8_t video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
-                                           &aspect_ratio_index);
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
         *dstBuff++ = !m_mvcSubStream ? static_cast<uint8_t>(StreamType::VIDEO_H264)
                                      : static_cast<uint8_t>(StreamType::VIDEO_MVC);  // stream_coding_type
         *dstBuff++ = static_cast<uint8_t>(video_format << 4 | frame_rate_index);     // video_format + frame_rate
@@ -580,11 +574,9 @@ void H264StreamReader::additionalStreamCheck(uint8_t *buff, uint8_t *end)
             if (pps1.pic_parameter_set_id == pps2.pic_parameter_set_id)
             {
                 if (pps2.m_nalBufferLen != pps1.m_nalBufferLen ||
-                    memcmp(pps2.m_nalBuffer, pps1.m_nalBuffer, pps1.m_nalBufferLen))
+                    memcmp(pps2.m_nalBuffer, pps1.m_nalBuffer, pps1.m_nalBufferLen) != 0)
                     differPPS = true;
             }
-            // tmpppsList.push_back(new PPSUnit());
-            // tmpppsList[tmpppsList.size()-1]->decodeBuffer(nal, nalEnd);
             break;
         }
         case NALUnit::NALType::nuSEI:
@@ -775,7 +767,6 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
 {
     const auto nal_unit_type = static_cast<NALUnit::NALType>(*buff & 0x1f);
     int nalRez;
-    uint8_t *nextNal;
     m_spsPpsFound = false;
 
     // First NAL of Access Unit
@@ -787,7 +778,7 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
         if (nalRez != 0)
             return nalRez;
         m_spsPpsFound = true;
-        goto getAU;
+        break;
     case NALUnit::NALType::nuSPS:
     case NALUnit::NALType::nuSubSPS:
         // LTRACE(LT_DEBUG, 0, "SPS");
@@ -795,73 +786,19 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
         if (nalRez != 0)
             return nalRez;
         m_spsCounter++;
-        goto getAU;
+        break;
     case NALUnit::NALType::nuSEI:
         // LTRACE(LT_DEBUG, 0, "SEI");
         nalRez = processSEI(buff);
         if (nalRez != 0)
             return nalRez;
-        goto getAU;
+        break;
     case NALUnit::NALType::nuDRD:
     case NALUnit::NALType::nuDelimiter:
         // LTRACE(LT_DEBUG, 0, "NAUD type " << int32ToStr(buff[1],16));
         m_delimiterFound = true;
+        break;
     // Remaining NALs of Access Unit
-    getAU:
-        nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
-        while (true)
-        {
-            if (nextNal == m_bufEnd)
-                return NOT_ENOUGH_BUFFER;
-            switch (static_cast<NALUnit::NALType>(*nextNal & 0x1f))
-            {
-            case NALUnit::NALType::nuSEI:
-                nalRez = processSEI(nextNal);
-                if (nalRez != 0)
-                    return nalRez;
-
-                break;
-            case NALUnit::NALType::nuDRD:
-                if (m_blurayMode)
-                    m_delimiterFound = true;
-                break;
-            case NALUnit::NALType::nuDelimiter:
-                // LTRACE(LT_DEBUG, 0, "NAUD type " << int32ToStr(nextNal[1],16));
-                m_delimiterFound = true;
-                break;
-            case NALUnit::NALType::nuSPS:
-            case NALUnit::NALType::nuSubSPS:
-                // LTRACE(LT_DEBUG, 0, "SPS");
-                nalRez = processSPS(nextNal);
-                if (nalRez != 0)
-                    return nalRez;
-                m_spsCounter++;
-                break;
-            case NALUnit::NALType::nuPPS:
-                // LTRACE(LT_DEBUG, 0, "PPS");
-                nalRez = processPPS(nextNal);
-                if (nalRez != 0)
-                    return nalRez;
-                m_spsPpsFound = true;
-                break;
-            case NALUnit::NALType::nuSliceIDR:
-                // m_openGOP = false;
-            case NALUnit::NALType::nuSliceNonIDR:
-            case NALUnit::NALType::nuSliceA:
-            case NALUnit::NALType::nuSliceB:
-            case NALUnit::NALType::nuSliceC:
-            case NALUnit::NALType::nuSliceExt:
-                nalRez = processSliceNal(nextNal);
-                if (nalRez == 0)
-                {
-                    m_lastDecodedPos = nextNal;
-                }
-                return nalRez;
-            default:
-                break;
-            }
-            nextNal = NALUnit::findNextNAL(nextNal, m_bufEnd);
-        }
     case NALUnit::NALType::nuSliceIDR:
     case NALUnit::NALType::nuSliceNonIDR:
     case NALUnit::NALType::nuSliceA:
@@ -869,13 +806,65 @@ int H264StreamReader::intDecodeNAL(uint8_t *buff)
     case NALUnit::NALType::nuSliceC:
     case NALUnit::NALType::nuSliceExt:
         nalRez = processSliceNal(buff);
-        if (nalRez != 0)
-            return nalRez;
-        break;
+        return nalRez != 0 ? nalRez : 0;
     default:
-        break;
+        return 0;
     }
-    return 0;
+
+    uint8_t *nextNal = NALUnit::findNextNAL(buff, m_bufEnd);
+    while (true)
+    {
+        if (nextNal == m_bufEnd)
+            return NOT_ENOUGH_BUFFER;
+        switch (static_cast<NALUnit::NALType>(*nextNal & 0x1f))
+        {
+        case NALUnit::NALType::nuSEI:
+            nalRez = processSEI(nextNal);
+            if (nalRez != 0)
+                return nalRez;
+
+            break;
+        case NALUnit::NALType::nuDRD:
+            if (m_blurayMode)
+                m_delimiterFound = true;
+            break;
+        case NALUnit::NALType::nuDelimiter:
+            // LTRACE(LT_DEBUG, 0, "NAUD type " << int32ToStr(nextNal[1],16));
+            m_delimiterFound = true;
+            break;
+        case NALUnit::NALType::nuSPS:
+        case NALUnit::NALType::nuSubSPS:
+            // LTRACE(LT_DEBUG, 0, "SPS");
+            nalRez = processSPS(nextNal);
+            if (nalRez != 0)
+                return nalRez;
+            m_spsCounter++;
+            break;
+        case NALUnit::NALType::nuPPS:
+            // LTRACE(LT_DEBUG, 0, "PPS");
+            nalRez = processPPS(nextNal);
+            if (nalRez != 0)
+                return nalRez;
+            m_spsPpsFound = true;
+            break;
+        case NALUnit::NALType::nuSliceIDR:
+            // m_openGOP = false;
+        case NALUnit::NALType::nuSliceNonIDR:
+        case NALUnit::NALType::nuSliceA:
+        case NALUnit::NALType::nuSliceB:
+        case NALUnit::NALType::nuSliceC:
+        case NALUnit::NALType::nuSliceExt:
+            nalRez = processSliceNal(nextNal);
+            if (nalRez == 0)
+            {
+                m_lastDecodedPos = nextNal;
+            }
+            return nalRez;
+        default:
+            break;
+        }
+        nextNal = NALUnit::findNextNAL(nextNal, m_bufEnd);
+    }
 }
 
 bool H264StreamReader::skipNal(uint8_t *nal)
@@ -885,7 +874,7 @@ bool H264StreamReader::skipNal(uint8_t *nal)
     if (nalType == NALUnit::NALType::nuFillerData)
         return true;
 
-    if ((nalType == NALUnit::NALType::nuEOSeq || nalType == NALUnit::NALType::nuEOStream))
+    if (nalType == NALUnit::NALType::nuEOSeq || nalType == NALUnit::NALType::nuEOStream)
     {
         if (!m_eof || m_bufEnd - nal > 4)
         {
@@ -1223,9 +1212,6 @@ int H264StreamReader::detectPrimaryPicType(const SliceUnit &firstSlice, uint8_t 
     m_pict_type = -1;
     m_pict_type = (std::max)(m_pict_type, sliceTypeToPictType(firstSlice.slice_type));
 
-    // if (firstSlice.orig_slice_type >= 5) // all other slice at this picture must be same type
-    //	return 0; // OK
-
     uint8_t *nextSlice = NALUnit::findNextNAL(buff, m_bufEnd);
     if (nextSlice == m_bufEnd)
     {
@@ -1267,7 +1253,7 @@ int H264StreamReader::detectPrimaryPicType(const SliceUnit &firstSlice, uint8_t 
     }
 }
 
-int H264StreamReader::sliceTypeToPictType(const int slice_type) const
+int H264StreamReader::sliceTypeToPictType(const uint32_t slice_type) const
 {
     switch (slice_type)
     {
@@ -1311,7 +1297,7 @@ int H264StreamReader::processSPS(uint8_t *buff)
         // do not updat SPS in stream because of we are going to insert own sps
         if (m_bufEnd - buff < 8)
             return NOT_ENOUGH_BUFFER;
-        const unsigned seq_parameter_set_id = NALUnit::extractUEGolombCode(buff + 4, m_bufEnd);
+        const int seq_parameter_set_id = static_cast<int>(NALUnit::extractUEGolombCode(buff + 4, m_bufEnd));
         if (updatedSPSList.find(seq_parameter_set_id) != updatedSPSList.end())
             return 0;  // already processed
     }
@@ -1393,25 +1379,19 @@ int H264StreamReader::processPPS(uint8_t *buff)
     return 0;
 }
 
-int H264StreamReader::getStreamWidth() const
+unsigned H264StreamReader::getStreamWidth() const
 {
-    if (m_spsMap.empty())
-        return 0;
-    return m_spsMap.begin()->second->getWidth();
+    return !m_spsMap.empty() ? m_spsMap.begin()->second->getWidth() : 0;
 }
 
-int H264StreamReader::getStreamHeight() const
+unsigned H264StreamReader::getStreamHeight() const
 {
-    if (m_spsMap.empty())
-        return 0;
-    return m_spsMap.begin()->second->getHeight();
+    return !m_spsMap.empty() ? m_spsMap.begin()->second->getHeight() : 0;
 }
 
 bool H264StreamReader::getInterlaced()
 {
-    if (m_spsMap.empty())
-        return true;
-    return !m_spsMap.begin()->second->frame_mbs_only_flag;
+    return !m_spsMap.empty() ? !m_spsMap.begin()->second->frame_mbs_only_flag : true;
 }
 
 void H264StreamReader::onShiftBuffer(const int offset)

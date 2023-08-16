@@ -542,7 +542,7 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
                     m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom, (uint32_t*)m_pData);
 
         pen.x += face->glyph->advance.x >> 6;
-        pen.x += m_font.m_borderWidth / 2;
+        pen.x += lround(m_font.m_borderWidth / 2.0F);
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
         maxX = pen.x + face->glyph->bitmap_left;
@@ -595,7 +595,7 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
         pen.x += face->glyph->advance.x >> 6;
         if (m_emulateBold || m_emulateItalic)
             pen.x += m_line_thickness - 1;
-        pen.x += m_font.m_borderWidth / 2;
+        pen.x += lround(m_font.m_borderWidth / 2.0F);
         mSize->cy = face->size->metrics.height >> 6;
         mSize->cx = pen.x + face->glyph->bitmap_left;
         return true;

@@ -200,6 +200,11 @@ uint32_t roundUp(const uint32_t& value, const uint32_t& roundVal)
     return roundVal ? ((value + roundVal - 1) / roundVal) * roundVal : 0;
 }
 
+int32_t roundUp(const int32_t& value, const int32_t& roundVal)
+{
+    return roundVal ? ((value + roundVal - 1) / roundVal) * roundVal : 0;
+}
+
 uint64_t roundDown64(const uint64_t& value, const uint64_t& roundVal)
 {
     return roundVal ? (value / roundVal) * roundVal : 0;
@@ -509,7 +514,7 @@ std::vector<wchar_t> toWide(const char* utf8Str, const int sz)
     const auto requiredSiz = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8Str, sz, nullptr, 0);
     if (requiredSiz != 0)
     {
-        return mbtwc_wrapper(CP_UTF8, utf8Str, sz, static_cast<std::size_t>(requiredSiz));
+        return mbtwc_wrapper(CP_UTF8, utf8Str, sz, requiredSiz);
     }
     /* utf8Str is not a valid UTF-8 string. try converting it according to the currently active code page in order
      * to keep compatibility with meta files saved by older versions of the GUI which put the file name through

@@ -35,8 +35,8 @@ class PGSStreamReader final : public AbstractStreamReader
     }
     int readPacket(AVPacket& avPacket) override;
     int flushPacket(AVPacket& avPacket) override;
-    void setBuffer(uint8_t* data, int dataLen, bool lastBlock = false) override;
-    uint64_t getProcessedSize() override;
+    void setBuffer(uint8_t* data, uint32_t dataLen, bool lastBlock = false) override;
+    int64_t getProcessedSize() override;
     CheckStreamRez checkStream(uint8_t* buffer, int len, ContainerType containerType, int containerDataType,
                                int containerStreamIndex);
     const CodecInfo& getCodecInfo() override { return pgsCodecInfo; }
@@ -46,11 +46,11 @@ class PGSStreamReader final : public AbstractStreamReader
     // void setVideoWidth(int value);
     // void setVideoHeight(int value);
     // void setFPS(double value);
-    void setVideoInfo(int width, int height, double fps);
+    void setVideoInfo(uint16_t width, uint16_t height, double fps);
     void setFontBorder(const int value) { m_fontBorder = value; }
     void setBottomOffset(const int value) const { m_render->setBottomOffset(value); }
-    void setOffsetId(const int value) { m_offsetId = value; }
-    uint8_t getOffsetId() const { return m_offsetId; }
+    void setOffsetId(const uint8_t value) { m_offsetId = value; }
+    [[nodiscard]] uint8_t getOffsetId() const { return m_offsetId; }
 
     // SS PG data
     bool isSSPG;
@@ -71,7 +71,7 @@ class PGSStreamReader final : public AbstractStreamReader
         }
         int64_t pts;
         int64_t dts;
-        int len;
+        unsigned len;
         uint8_t* data;
     };
 
@@ -89,20 +89,22 @@ class PGSStreamReader final : public AbstractStreamReader
         csEpochContinue
     };
     State m_state;
-    uint8_t* m_curPos;
-    uint8_t* m_buffer;
-    size_t m_tmpBufferLen;
+    // JCDR : the three fields below overshadow the fileds in AbstractDemuxer
+    // See whether they can be removed.
+    // uint8_t* m_curPos;
+    // uint8_t* m_buffer;
+    // size_t m_tmpBufferLen;
     std::vector<uint8_t> m_tmpBuffer;
     int64_t m_lastPTS;
     int64_t m_maxPTS;
     int64_t m_lastDTS;
-    uint64_t m_processedSize;
+    int64_t m_processedSize;
     uint8_t* m_avFragmentEnd;
     int m_afterPesByte;
     int m_fontBorder;
 
-    int m_video_width;
-    int m_video_height;
+    uint16_t m_video_width;
+    uint16_t m_video_height;
     double m_frame_rate;
     double m_newFps;
     double m_scale;
@@ -115,16 +117,16 @@ class PGSStreamReader final : public AbstractStreamReader
     uint8_t* m_rgbBuffer;
     uint8_t* m_scaledRgbBuffer;
     std::map<uint8_t, text_subtitles::YUVQuad> m_palette;
-    int m_scaled_width;
-    int m_scaled_height;
+    uint16_t m_scaled_width;
+    uint16_t m_scaled_height;
     bool m_firstRenderedPacket;
 
     text_subtitles::TextToPGSConverter* m_render;
     uint8_t* m_renderedData;
     std::vector<PGSRenderedBlock> m_renderedBlocks;
 
-    std::map<int, int> composition_object_horizontal_position;
-    std::map<int, int> composition_object_vertical_position;
+    std::map<uint16_t, uint16_t> composition_object_horizontal_position;
+    std::map<uint16_t, uint16_t> composition_object_vertical_position;
     void renderTextShow(int64_t inTime);
     void renderTextHide(int64_t outTime);
 
@@ -132,18 +134,18 @@ class PGSStreamReader final : public AbstractStreamReader
     void composition_descriptor(BitStreamReader& bitReader);
     void composition_object(BitStreamReader& bitReader);
     static void pgs_window(BitStreamReader& bitReader);
-    void readPalette(uint8_t* pos, uint8_t* end);
-    int readObjectDef(uint8_t* pos, uint8_t* end);
+    void readPalette(const uint8_t* pos, const uint8_t* end);
+    int readObjectDef(const uint8_t* pos, const uint8_t* end);
     void decodeRleData(int xOffset, int yOffset) const;
     void yuvToRgb(int minY) const;
-    static void rescaleRGB(BitmapInfo* bmpDest, BitmapInfo* bmpRef);
+    static void rescaleRGB(const BitmapInfo* bmpDest, const BitmapInfo* bmpRef);
     void intDecodeStream(uint8_t* buffer, size_t len);
 
     int m_palleteID;
     int m_paletteVersion;
     bool m_isNewFrame;
-    int m_objectWindowHeight;
-    int m_objectWindowTop;
+    uint16_t m_objectWindowHeight;
+    uint16_t m_objectWindowTop;
     uint8_t m_offsetId;
     bool m_forced_on_flag;
 

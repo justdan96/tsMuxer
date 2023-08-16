@@ -1,6 +1,7 @@
 #include "singleFileMuxer.h"
 
 #include <fs/directory.h>
+#include <fs/systemlog.h>
 #include <fs/textfile.h>
 
 #include "abstractMuxer.h"
@@ -8,7 +9,7 @@
 #include "lpcmStreamReader.h"
 #include "mpegAudioStreamReader.h"
 #include "muxerManager.h"
-#include "psgStreamReader.h"
+#include "pgsStreamReader.h"
 #include "srtStreamReader.h"
 #include "vodCoreException.h"
 
@@ -83,15 +84,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         else
             fileExt = ".ac3";
     }
-    else if (codecName == "S_SUP")
-    {
-        fileExt = ".sup";
-    }
-    else if (codecName == "S_HDMV/PGS")
-    {
-        fileExt = ".sup";
-    }
-    else if (codecName == "S_TEXT/UTF8")
+    else if (codecName == "S_SUP" || codecName == "S_HDMV/PGS" || codecName == "S_TEXT/UTF8")
     {
         fileExt = ".sup";
     }
@@ -187,7 +180,7 @@ void SingleFileMuxer::openDstFile()
 
 void SingleFileMuxer::writeOutBuffer(StreamInfo* streamInfo)
 {
-    constexpr uint32_t blockSize = DEFAULT_FILE_BLOCK_SIZE;
+    constexpr int blockSize = DEFAULT_FILE_BLOCK_SIZE;
     if (streamInfo->m_bufLen >= blockSize)
     {
         constexpr int toFileLen = blockSize & 0xffff0000;
@@ -266,8 +259,8 @@ bool SingleFileMuxer::doFlush()
     for (const auto& [fst, snd] : m_streamInfo)
     {
         StreamInfo* streamInfo = snd;
-        const unsigned lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
-        const unsigned roundBufLen = streamInfo->m_bufLen & 0xffff0000;
+        const int lastBlockSize = streamInfo->m_bufLen & 0xffff;  // last 64K of data
+        const int roundBufLen = streamInfo->m_bufLen & 0x7fff0000;
         if (m_owner->isAsyncMode())
         {
             if (lastBlockSize > 0)

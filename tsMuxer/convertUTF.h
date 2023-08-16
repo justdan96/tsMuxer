@@ -144,7 +144,7 @@ std::tuple<UTF16, UTF16> ConvertUTF32toUTF16(UTF32);
 
 Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd);
 
-Boolean isLegalUTF8String(const UTF8* string, int length);
+Boolean isLegalUTF8String(const UTF8* string, size_t length);
 
 /*
  * Index into the table below with the first byte of a UTF-8 sequence to

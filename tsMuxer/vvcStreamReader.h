@@ -13,16 +13,16 @@ class VVCStreamReader final : public MPEGStreamReader
     VVCStreamReader();
     ~VVCStreamReader() override;
     int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) override;
-    virtual CheckStreamRez checkStream(uint8_t* buffer, int len);
-    bool needSPSForSplit() const override { return false; }
+    CheckStreamRez checkStream(uint8_t* buffer, int len);
+    [[nodiscard]] bool needSPSForSplit() const override { return false; }
 
    protected:
     const CodecInfo& getCodecInfo() override { return vvcCodecInfo; }
     int intDecodeNAL(uint8_t* buff) override;
 
     double getStreamFPS(void* curNalUnit) override;
-    int getStreamWidth() const override;
-    int getStreamHeight() const override;
+    [[nodiscard]] unsigned getStreamWidth() const override;
+    [[nodiscard]] unsigned getStreamHeight() const override;
     bool getInterlaced() override { return false; }
     bool isIFrame() override { return m_lastIFrame; }
 
@@ -34,8 +34,8 @@ class VVCStreamReader final : public MPEGStreamReader
     bool skipNal(uint8_t* nal) override;
 
    private:
-    bool isSlice(VvcUnit::NalType nalType) const;
-    bool isSuffix(VvcUnit::NalType nalType) const;
+    [[nodiscard]] bool isSlice(VvcUnit::NalType nalType) const;
+    [[nodiscard]] bool isSuffix(VvcUnit::NalType nalType) const;
     void incTimings();
     int toFullPicOrder(const VvcSliceHeader* slice, int pic_bits);
     static void storeBuffer(MemoryBlock& dst, const uint8_t* data, const uint8_t* dataEnd);

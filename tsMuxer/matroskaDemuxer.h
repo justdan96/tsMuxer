@@ -11,18 +11,18 @@ class MatroskaDemuxer final : public IOContextDemuxer
     ~MatroskaDemuxer() override { readClose(); }
     void openFile(const std::string &streamName) override;
     int readPacket(AVPacket &avPacket);  // not implemented
-    void readClose() final;
+    void readClose() override;
     int simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize) override;
     void getTrackList(std::map<int32_t, TrackInfo> &trackList) override;
     std::vector<AVChapter> getChapters() override;
 
-    bool isPidFilterSupported() const override { return true; }
-    int64_t getTrackDelay(const uint32_t pid) override
+    [[nodiscard]] bool isPidFilterSupported() const override { return true; }
+    int64_t getTrackDelay(const int32_t pid) override
     {
         return (m_firstTimecode.find(pid) != m_firstTimecode.end()) ? m_firstTimecode[pid] : 0;
     }
 
-    int64_t getFileDurationNano() const override { return fileDuration; }
+    [[nodiscard]] int64_t getFileDurationNano() const override { return fileDuration; }
 
    private:
     typedef Track MatroskaTrack;
@@ -79,7 +79,7 @@ class MatroskaDemuxer final : public IOContextDemuxer
     static int matroska_ebmlnum_sint(const uint8_t *data, int32_t size, int64_t *num);
     int matroska_parse_blockgroup(int64_t cluster_time);
     static int matroska_ebmlnum_uint(const uint8_t *data, int32_t size, uint64_t *num);
-    int matroska_find_track_by_num(int64_t num) const;
+    [[nodiscard]] int matroska_find_track_by_num(int64_t num) const;
     int matroska_parse_block(uint8_t *data, int size, int64_t pos, int64_t cluster_time, int64_t duration,
                              int is_keyframe, int is_bframe);
     static int rv_offset(const uint8_t *data, int slice, int slices);

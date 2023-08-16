@@ -15,17 +15,18 @@ extern bool sLastMsg;
     do                                             \
     {                                              \
         {                                          \
-            if (errIndex & 2)                      \
+            if ((errIndex)&2)                      \
             {                                      \
-                if (level <= LT_WARN)              \
+                if ((level) <= LT_WARN)            \
                     std::cerr << msg << std::endl; \
-                else if (level == LT_INFO)         \
+                else if ((level) == LT_INFO)       \
                     std::cout << msg << std::endl; \
-                if (level <= LT_INFO)              \
+                if ((level) <= LT_INFO)            \
                     sLastMsg = true;               \
             }                                      \
         }                                          \
     } while (0)
+
 class Process
 {
    public:
@@ -49,14 +50,12 @@ static constexpr unsigned LT_ERR_MPEG = 1;
 static constexpr unsigned LT_MUXER = 2;
 static constexpr unsigned LT_TRAFFIC = 3;
 
-constexpr size_t TS_FRAME_SIZE = 188;
+constexpr int TS_FRAME_SIZE = 188;
 
-constexpr unsigned DEFAULT_FILE_BLOCK_SIZE = 1024 * 1024 * 2;
-constexpr unsigned TS188_ROUND_BLOCK_SIZE = DEFAULT_FILE_BLOCK_SIZE / TS_FRAME_SIZE * TS_FRAME_SIZE;
+constexpr int DEFAULT_FILE_BLOCK_SIZE = 1024 * 1024 * 2;
+constexpr int TS188_ROUND_BLOCK_SIZE = DEFAULT_FILE_BLOCK_SIZE / TS_FRAME_SIZE * TS_FRAME_SIZE;
 
 constexpr unsigned PCR_FREQUENCY = 90000;
-
-// const static int64_t FIXED_PTS_OFFSET = 378000000ll; //377910000ll;
 
 static constexpr int64_t INTERNAL_PTS_FREQ = 196 * 27000000ll;
 static constexpr int64_t INT_FREQ_TO_TS_FREQ = INTERNAL_PTS_FREQ / PCR_FREQUENCY;
@@ -131,9 +130,9 @@ struct PIPParams
 
     PIPParams() : scaleIndex(1), corner(PipCorner::TopLeft), hOffset(0), vOffset(0), lumma(3) {}
 
-    bool isFullScreen() const { return scaleIndex == 5; }
+    [[nodiscard]] bool isFullScreen() const { return scaleIndex == 5; }
 
-    float getScaleCoeff() const
+    [[nodiscard]] float getScaleCoeff() const
     {
         if (scaleIndex == 2)
             return 0.5;
@@ -147,8 +146,8 @@ struct PIPParams
 
     int scaleIndex;
     PipCorner corner;
-    int hOffset;
-    int vOffset;
+    unsigned hOffset;
+    unsigned vOffset;
     int lumma;
 };
 

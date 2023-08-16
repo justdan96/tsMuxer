@@ -74,7 +74,7 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
             dstBuff[5] = 0x31;                                             // "1"
             dstBuff[6] = 0x01;                                             // profile and level subdescriptor
 
-            const int profile = static_cast<int>(sequence.profile) << 4;
+            const uint8_t profile = static_cast<uint8_t>(sequence.profile) * 16;
             switch (sequence.profile)
             {
             case Profile::SIMPLE:
@@ -83,12 +83,12 @@ int VC1StreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdm
             case Profile::MAIN:
                 dstBuff[7] = profile + 0x41 + (sequence.level >> 1);
                 break;
+            case Profile::COMPLEX:
+                dstBuff[1] = 0x04;  // remove profile and level descriptor
+                return 6;           // total descriptor length
             case Profile::ADVANCED:
                 dstBuff[7] = profile + 0x61 + sequence.level;
                 break;
-            default:
-                dstBuff[1] = 0x04;  // remove profile and level descriptor
-                return 6;           // total descriptor length
             }
             return 8;
         }

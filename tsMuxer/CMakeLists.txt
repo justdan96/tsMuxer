@@ -41,7 +41,7 @@ add_executable (tsmuxer
   nalUnits.cpp
   pesPacket.cpp
   programStreamDemuxer.cpp
-  psgStreamReader.cpp
+  pgsStreamReader.cpp
   simplePacketizerReader.cpp
   singleFileMuxer.cpp
   srtStreamReader.cpp

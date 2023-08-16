@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <climits>
 
+#include <fs/systemlog.h>
+
 #include "aac.h"
 #include "abstractStreamReader.h"
 #include "avPacket.h"
@@ -16,7 +18,8 @@
 
 using namespace std;
 
-namespace {
+namespace
+{
 const char* mov_mdhd_language_map[] = {
     // see https :  // developer.apple.com/library/archive/documentation/QuickTime/QTFF/QTFFChap4/qtff4.html
     "eng", "fra", "deu", "ita", "dut", "sve", "spa", "dan", "por", "nor", "heb", "jpn", "ara", "fin", "ell", "isl",
@@ -43,8 +46,6 @@ static constexpr int MP4DecConfigDescrTag = 0x04;
 static constexpr int MP4DecSpecificDescrTag = 0x05;
 
 #define MKTAG(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
-
-
 
 struct MOVStts
 {
@@ -125,7 +126,7 @@ struct MOVStreamContext : Track
 
     vector<int64_t> chunk_offsets;
     vector<uint32_t> m_index;
-    uint32_t m_indexCur;
+    size_t m_indexCur;
 
     unsigned ffindex;  // the ffmpeg stream id
     int next_chunk;
@@ -135,7 +136,7 @@ struct MOVStreamContext : Track
 
     int ctts_index;
     int ctts_sample;
-    unsigned sample_size;
+    uint32_t sample_size;
     unsigned sample_count;
     unsigned keyframe_count;
     unsigned time_scale;
@@ -148,7 +149,7 @@ struct MOVStreamContext : Track
     int width;                  ///< tkhd width
     int height;                 ///< tkhd height
     unsigned bits_per_coded_sample;
-    int channels;
+    unsigned channels;
     int packet_size;
     int sample_rate;
     vector<uint32_t> keyframes;
@@ -165,11 +166,12 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
     {
         isAAC = false;
     }
+
     void setPrivData(uint8_t* buff, const int size) override
     {
         m_buff = buff;
         m_size = size;
-        m_aacRaw.m_channels = m_sc->channels;
+        m_aacRaw.m_channels = static_cast<uint8_t>(m_sc->channels);
         m_aacRaw.m_sample_rate = m_sc->sample_rate;
         m_aacRaw.m_id = 1;  // MPEG2
         m_aacRaw.m_profile = 0;
@@ -178,6 +180,7 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
         m_aacRaw.m_layer = 0;
         m_aacRaw.m_rdb = 0;
     }
+
     void extractData(AVPacket* pkt, uint8_t* buff, const int size) override
     {
         uint8_t* dst = pkt->data;
@@ -189,7 +192,7 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
                 frameSize = m_sc->m_index[m_sc->m_indexCur++];
             if (isAAC)
             {
-                m_aacRaw.m_channels = m_sc->channels;
+                m_aacRaw.m_channels = static_cast<uint8_t>(m_sc->channels);
                 m_aacRaw.buildADTSHeader(dst, frameSize + AAC_HEADER_LEN);
                 memcpy(dst + AAC_HEADER_LEN, buff, frameSize);
                 dst += frameSize + AAC_HEADER_LEN;
@@ -206,13 +209,13 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
     unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         unsigned left = size;
-        unsigned i = 0;
+        int i = 0;
         for (; left > 4; ++i)
         {
             left -= m_sc->sample_size;
             if (m_sc->sample_size == 0)
             {
-                if (m_sc->m_indexCur + i >= static_cast<unsigned>(m_sc->m_index.size()))
+                if (m_sc->m_indexCur + i >= m_sc->m_index.size())
                     THROW(ERR_MOV_PARSE, "Out of index for AAC track #" << m_sc->ffindex << " at position "
                                                                         << m_demuxer->getProcessedBytes())
                 left -= m_sc->m_index[m_sc->m_indexCur + i];
@@ -333,7 +336,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     unsigned newBufferSize(uint8_t* buff, const unsigned size) override
     {
         const uint8_t* end = buff + size;
-        size_t nalCnt = 0;
+        unsigned nalCnt = 0;
         while (buff < end)
         {
             if (buff + nal_length_size > end)
@@ -347,10 +350,10 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
             buff += nalSize;
             ++nalCnt;
         }
-        size_t spsPpsSize = 0;
-        for (auto& i : spsPpsList) spsPpsSize += i.size() + 4;
+        unsigned spsPpsSize = 0;
+        for (auto& i : spsPpsList) spsPpsSize += static_cast<uint32_t>(i.size() + 4);
 
-        return static_cast<int>(size + spsPpsSize + nalCnt * (4ll - nal_length_size));
+        return size + spsPpsSize + nalCnt * (4 - nal_length_size);
     }
 
    protected:
@@ -358,7 +361,7 @@ class MovParsedH264TrackData : public ParsedTrackPrivData
     MovDemuxer* m_demuxer;
 
     vector<vector<uint8_t>> spsPpsList;
-    int nal_length_size;
+    uint8_t nal_length_size;
 };
 
 class MovParsedH265TrackData final : public MovParsedH264TrackData
@@ -547,8 +550,8 @@ class MovParsedSRTTrackData final : public ParsedTrackPrivData
 
             while (buff < end)
             {
-                int64_t modifierLen = (buff[0] << 24) | (buff[1] << 16) | (buff[2] << 8) | buff[3];
-                const uint32_t modifierType = (buff[4] << 24) | (buff[5] << 16) | (buff[6] << 8) | buff[7];
+                int64_t modifierLen = buff[0] << 24 | buff[1] << 16 | buff[2] << 8 | buff[3];
+                const uint32_t modifierType = buff[4] << 24 | buff[5] << 16 | buff[6] << 8 | buff[7];
                 buff += 8;
                 modifierLen -= 8;
                 if (modifierLen == 1)  // 64-bit length
@@ -770,7 +773,7 @@ void MovDemuxer::readHeaders()
 
 int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& acceptedPIDs, int64_t& discardSize)
 {
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
     discardSize = m_firstHeaderSize;
     m_firstHeaderSize = 0;
     if (m_firstDemux)
@@ -806,7 +809,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             m_firstDemux = true;
             m_mdat_pos = 0;
         }
-        const auto chunkSize = static_cast<unsigned>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
+        const auto chunkSize = static_cast<int>(found_moof ? m_mdat_data[m_curChunk].second : next - offset);
         const int trackId = static_cast<int>(chunks[m_curChunk].second);
         auto filterItr = m_pidFilters.find(trackId + 1);
         if (filterItr == m_pidFilters.end() && acceptedPIDs.find(trackId + 1) == acceptedPIDs.end())
@@ -821,12 +824,13 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
             const size_t oldSize = vect.size();
             if (st->parsed_priv_data)
             {
-                if (chunkSize > m_tmpChunkBuffer.size())
+                if (static_cast<size_t>(chunkSize) > m_tmpChunkBuffer.size())
                     m_tmpChunkBuffer.resize(chunkSize);
                 const unsigned readed = get_buffer(m_tmpChunkBuffer.data(), chunkSize);
                 if (readed == 0)
                     break;
-                m_deliveredPacket.size = st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize);
+                m_deliveredPacket.size =
+                    static_cast<int32_t>(st->parsed_priv_data->newBufferSize(m_tmpChunkBuffer.data(), chunkSize));
                 if (m_deliveredPacket.size)
                 {
                     if (filterItr != m_pidFilters.end())
@@ -856,7 +860,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 if (filterItr != m_pidFilters.end())
                 {
                     m_filterBuffer.resize(chunkSize);
-                    const unsigned readed = get_buffer(m_filterBuffer.data(), chunkSize);
+                    const int readed = static_cast<int>(get_buffer(m_filterBuffer.data(), chunkSize));
                     if (readed < chunkSize)
                         m_filterBuffer.grow(readed - chunkSize);
                     if (readed == 0)
@@ -869,7 +873,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
                 else
                 {
                     vect.grow(chunkSize);
-                    const unsigned readed = get_buffer(vect.data() + oldSize, chunkSize);
+                    const int readed = static_cast<int>(get_buffer(vect.data() + oldSize, chunkSize));
                     if (readed < chunkSize)
                     {
                         vect.grow(readed - chunkSize);
@@ -1473,7 +1477,7 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
                 {
                     get_be32();                                                  // sizeof struct only
                     st->sample_rate = static_cast<int>(av_int2dbl(get_be64()));  // float 64
-                    st->channels = static_cast<int>(get_be32());
+                    st->channels = get_be32();
                     get_be32();                              // always 0x7F000000
                     st->bits_per_coded_sample = get_be32();  // bits per channel if sound is uncompressed
                     get_be32();                              // lcpm format specific flag

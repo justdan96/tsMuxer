@@ -216,12 +216,12 @@ class ParsedH264TrackData : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 
    protected:
-    int m_nalSize;
+    uint8_t m_nalSize;
     bool m_firstExtract;
 
     std::vector<std::vector<uint8_t>> m_spsPpsList;
     static void writeNalHeader(uint8_t*& dst);
-    size_t getSPSPPSLen() const;
+    [[nodiscard]] size_t getSPSPPSLen() const;
     int writeSPSPPS(uint8_t* dst) const;
     virtual bool spsppsExists(uint8_t* buff, int size);
 };
@@ -276,8 +276,8 @@ class ParsedLPCMTrackData final : public ParsedTrackPrivData
 
    private:
     bool m_convertBytes;
-    int m_bitdepth;
-    int m_channels;
+    uint16_t m_bitdepth;
+    uint16_t m_channels;
     MemoryBlock m_waveBuffer;
 };
 
@@ -312,10 +312,8 @@ class ParsedPGTrackData final : public ParsedTrackPrivData
     void extractData(AVPacket* pkt, uint8_t* buff, int size) override;
 };
 
-typedef struct MatroskaVideoTrack
+typedef struct MatroskaVideoTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
     int pixel_width;
     int pixel_height;
     int display_width;
@@ -329,12 +327,10 @@ typedef struct MatroskaVideoTrack
     //..
 } MatroskaVideoTrack;
 
-typedef struct MatroskaAudioTrack
+typedef struct MatroskaAudioTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
-    int channels;
-    int bitdepth;
+    uint16_t channels;
+    uint16_t bitdepth;
     int internal_samplerate;
     int samplerate;
     int block_align;
@@ -350,10 +346,8 @@ typedef struct MatroskaAudioTrack
     //..
 } MatroskaAudioTrack;
 
-typedef struct MatroskaSubtitleTrack
+typedef struct MatroskaSubtitleTrack : MatroskaTrack
 {
-    MatroskaTrack track;
-
     int ass;
     //..
 } MatroskaSubtitleTrack;

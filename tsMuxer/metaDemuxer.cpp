@@ -1,7 +1,8 @@
-
 #include "metaDemuxer.h"
 
 #include <fs/directory.h>
+#include <fs/systemlog.h>
+
 #include <fs/textfile.h>
 #include <types/types.h>
 #include <climits>
@@ -21,8 +22,8 @@
 #include "mpeg2StreamReader.h"
 #include "mpegAudioStreamReader.h"
 #include "mpegStreamReader.h"
+#include "pgsStreamReader.h"
 #include "programStreamDemuxer.h"
-#include "psgStreamReader.h"
 #include "srtStreamReader.h"
 #include "subTrackFilter.h"
 #include "tsDemuxer.h"
@@ -397,7 +398,7 @@ int METADemuxer::addStream(const string& codec, const string& codecStreamName, c
     }
 
     AbstractStreamReader* codecReader = createCodec(codec, addParams, fileList[0], mergePlayItems(mplsInfoList));
-    codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size()) + 1);
+    codecReader->setStreamIndex(static_cast<int>(m_codecInfo.size() + 1));
     codecReader->setTimeOffset(m_timeOffset);
 
     if (m_codecInfo.empty())
@@ -994,43 +995,31 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
 
         itr = addParams.find("3d-plane");
         if (itr != addParams.end())
-            dynamic_cast<PGSStreamReader*>(rez)->setOffsetId(strToInt32(itr->second.c_str()));
+            dynamic_cast<PGSStreamReader*>(rez)->setOffsetId(strToInt8u(itr->second.c_str()));
 
         double fps = 0.0;
-        int width = 0;
-        int height = 0;
+        uint16_t width = 0;
+        uint16_t height = 0;
         itr = addParams.find("fps");
         if (itr != addParams.end())
             fps = strToDouble(itr->second.c_str());
         itr = addParams.find("video-width");
         if (itr != addParams.end())
-            width = strToInt32(itr->second.c_str());
+            width = strToInt16u(itr->second.c_str());
         itr = addParams.find("video-height");
         if (itr != addParams.end())
-            height = strToInt32(itr->second.c_str());
+            height = strToInt16u(itr->second.c_str());
         dynamic_cast<PGSStreamReader*>(rez)->setVideoInfo(width, height, fps);
         itr = addParams.find("font-border");
         if (itr != addParams.end())
             dynamic_cast<PGSStreamReader*>(rez)->setFontBorder(strToInt32(itr->second.c_str()));
-
-        /*
-        map<string,string>::const_iterator itr = addParams.find("fps");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setFPS(strToDouble(itr->second.c_str()));
-        itr = addParams.find("video-width");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setVideoWidth(strToInt32(itr->second.c_str()));
-        itr = addParams.find("video-height");
-        if (itr != addParams.end())
-                ((PGSStreamReader*) rez)->setVideoHeight(strToInt32(itr->second.c_str()));
-        */
     }
     else if (codecName == "S_TEXT/UTF8")
     {
         auto srtReader = new SRTStreamReader();
         rez = srtReader;
         text_subtitles::Font font;
-        int srtWidth = 0, srtHeight = 0;
+        uint16_t srtWidth = 0, srtHeight = 0;
         double fps = 0.0;
         text_subtitles::TextAnimation animation;
         for (const auto& addParam : addParams)
@@ -1066,15 +1055,15 @@ AbstractStreamReader* METADemuxer::createCodec(const string& codecName, const ma
             else if (addParam.first == "font-charset")
                 font.m_charset = strToInt32(addParam.second.c_str());
             else if (addParam.first == "font-border")
-                font.m_borderWidth = strToInt32(addParam.second.c_str());
+                font.m_borderWidth = strToFloat(addParam.second.c_str());
             else if (addParam.first == "fps")
             {
                 fps = strToDouble(addParam.second.c_str());
             }
             else if (addParam.first == "video-width")
-                srtWidth = strToInt32(addParam.second.c_str());
+                srtWidth = strToInt16u(addParam.second.c_str());
             else if (addParam.first == "video-height")
-                srtHeight = strToInt32(addParam.second.c_str());
+                srtHeight = strToInt16u(addParam.second.c_str());
             else if (addParam.first == "bottom-offset")
                 srtReader->setBottomOffset(strToInt32(addParam.second.c_str()));
             else if (addParam.first == "fadein-time")
@@ -1204,7 +1193,7 @@ void METADemuxer::updateReport(const bool checkTime)
         if (m_totalSize > 0)
         {
             const int64_t currentProcessedSize = getDemuxedSize();
-            progress = static_cast<double>(currentProcessedSize) / m_totalSize * 100.0;
+            progress = static_cast<double>(currentProcessedSize) / static_cast<double>(m_totalSize) * 100.0;
             if (progress > 100.0)
                 progress = 100.0;
         }
@@ -1273,7 +1262,7 @@ int StreamInfo::read()
 
 // ------------------------------ ContainerToReaderWrapper --------------------------------
 
-uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
+uint8_t* ContainerToReaderWrapper::readBlock(const int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar)
 {
     rez = 0;
     uint8_t* data = nullptr;
@@ -1282,7 +1271,7 @@ uint8_t* ContainerToReaderWrapper::readBlock(const uint32_t readerID, uint32_t& 
         return nullptr;
 
     DemuxerData& demuxerData = itr->second.m_demuxerData;
-    const uint32_t pid = itr->second.m_pid;
+    const int pid = itr->second.m_pid;
     const uint32_t nFileBlockSize = demuxerData.m_demuxer->getFileBlockSize();
 
     if (demuxerData.m_firstRead)
@@ -1389,13 +1378,13 @@ void ContainerToReaderWrapper::resetDelayedMark() const
     }
 }
 
-int32_t ContainerToReaderWrapper::createReader(const int readBuffOffset)
+int ContainerToReaderWrapper::createReader(const int readBuffOffset)
 {
     m_readBuffOffset = readBuffOffset;
     return ++m_readerCnt;
 }
 
-void ContainerToReaderWrapper::deleteReader(const uint32_t readerID)
+void ContainerToReaderWrapper::deleteReader(const int readerID)
 {
     const auto itr = m_readerInfo.find(readerID);
     if (itr == m_readerInfo.end())
@@ -1410,8 +1399,7 @@ void ContainerToReaderWrapper::deleteReader(const uint32_t readerID)
     m_readerInfo.erase(itr);
 }
 
-bool ContainerToReaderWrapper::openStream(uint32_t readerID, const char* streamName, int pid,
-                                          const CodecInfo* codecInfo)
+bool ContainerToReaderWrapper::openStream(int readerID, const char* streamName, int pid, const CodecInfo* codecInfo)
 {
     AbstractDemuxer* demuxer = m_demuxers[streamName].m_demuxer;
     if (demuxer == nullptr)

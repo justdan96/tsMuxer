@@ -6,6 +6,7 @@
 
 #include <map>
 
+#include "avPacket.h"
 #include "bitStream.h"
 #include "vod_common.h"
 
@@ -127,14 +128,14 @@ struct AdaptiveField
         // return my_ntohl(*pcr) * 0.95;
     }
 
-    uint64_t getPCR33()
+    int64_t getPCR33()
     {
         const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         const auto pcrLo = reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN + sizeof(uint32_t);
-        return (static_cast<uint64_t>(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
+        return (static_cast<int64_t>(my_ntohl(*pcr)) << 1) + (*pcrLo >> 7);
     }
 
-    void setPCR33(const uint64_t value)
+    void setPCR33(const int64_t value)
     {
         const auto pcr = reinterpret_cast<uint32_t*>(reinterpret_cast<uint8_t*>(this) + ADAPTIVE_FIELD_LEN);
         *pcr = my_htonl(static_cast<uint32_t>(value >> 1));
@@ -148,7 +149,7 @@ struct TSPacket
 {
     // static const unsigned TS_FRAME_SIZE = 188;
     static constexpr unsigned TS_FRAME_SYNC_BYTE = 0x47;
-    static constexpr unsigned TS_HEADER_SIZE = 4;
+    static constexpr int TS_HEADER_SIZE = 4;
 
     static constexpr unsigned DATA_EXIST_BIT_VAL = 0x10000000;
     static constexpr unsigned PCR_BIT_VAL = 0x1000;
@@ -172,15 +173,15 @@ struct TSPacket
     unsigned int afExists : 1;  // adaptive field exist
     unsigned int sc : 2;        // scrambling control
 
-    uint16_t getPID() const { return static_cast<uint16_t>(PIDHi << 8) + PIDLow; }
+    [[nodiscard]] int getPID() const { return PIDHi << 8 | PIDLow; }
 
-    void setPID(const uint16_t pid)
+    void setPID(const int pid)
     {
-        PIDHi = pid >> 8;
-        PIDLow = pid & 0xff;
+        PIDHi = static_cast<uint8_t>(pid >> 8);
+        PIDLow = static_cast<uint8_t>(pid);
     }
 
-    unsigned getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
+    [[nodiscard]] int getHeaderSize() const { return TS_HEADER_SIZE + (afExists ? adaptiveField.length + 1 : 0); }
 
     static uint32_t getPCRDif32(const uint32_t nextPCR, const uint32_t curPCR)
     {
@@ -218,8 +219,8 @@ struct BluRayCoarseInfo
 struct PMTIndexData
 {
     uint32_t m_pktCnt;
-    int64_t m_frameLen;
-    PMTIndexData(const uint32_t pktCnt, const int64_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
+    uint32_t m_frameLen;
+    PMTIndexData(const uint32_t pktCnt, const uint32_t frameLen) : m_pktCnt(pktCnt), m_frameLen(frameLen) {}
 };
 
 typedef std::map<uint64_t, PMTIndexData> PMTIndex;
@@ -251,7 +252,6 @@ struct PMTStreamInfo final
         m_pmtPID = -1;
         isSecondary = secondary;
     }
-    virtual ~PMTStreamInfo() = default;
 
     StreamType m_streamType;
     int m_pid;
@@ -280,7 +280,7 @@ struct TS_program_map_section
     int casPID;
     int casID;
 
-    int program_number;
+    uint16_t program_number;
     // std::vector<PMTStreamInfo> pidList;
     PIDListMap pidList;
     TS_program_map_section();
@@ -296,7 +296,7 @@ struct TS_program_map_section
 
 struct TS_program_association_section
 {
-    int transport_stream_id;
+    uint16_t transport_stream_id;
     int m_nitPID;
     std::map<int, int> pmtPids;  // program pid, program number
 
@@ -308,7 +308,7 @@ struct TS_program_association_section
 struct PS_stream_pack
 {
     bool deserialize(uint8_t* buffer, int buf_size);
-    uint64_t m_pts;
+    int64_t m_pts;
     uint32_t m_pts_ext;
     uint32_t m_program_mux_rate;
     uint32_t m_pack_stuffing_length;
@@ -333,27 +333,28 @@ struct M2TSStreamInfo
           isSecondary(false)
     {
     }
+
     M2TSStreamInfo(const PMTStreamInfo& pmtStreamInfo);
     M2TSStreamInfo(const M2TSStreamInfo& other);
 
     int streamPID;
     StreamType stream_coding_type;  // ts type
-    int video_format;
-    int frame_rate_index;
+    uint8_t video_format;
+    uint8_t frame_rate_index;
     int number_of_offset_sequences;
-    int width;
-    int height;
+    unsigned width;
+    unsigned height;
     int HDR;
-    int aspect_ratio_index;
-    int audio_presentation_type;
-    int sampling_frequency_index;
-    int8_t character_code;
+    uint8_t aspect_ratio_index;
+    uint8_t audio_presentation_type;
+    uint8_t sampling_frequency_index;
+    uint8_t character_code;
     char language_code[4];
     bool isSecondary;
     std::vector<PMTIndex> m_index;
 
-    static void blurayStreamParams(double fps, bool interlaced, int width, int height, int ar, int* video_format,
-                                   int* frame_rate_index, int* aspect_ratio_index);
+    static void blurayStreamParams(double fps, bool interlaced, unsigned width, unsigned height, VideoAspectRatio ar,
+                                   uint8_t* video_format, uint8_t* frame_rate_index, uint8_t* aspect_ratio_index);
 };
 
 struct CLPIStreamInfo : M2TSStreamInfo
@@ -383,7 +384,7 @@ struct CLPIStreamInfo : M2TSStreamInfo
     void parseStreamCodingInfo(BitStreamReader& reader);
     static void readString(char* dest, BitStreamReader& reader, const int size)
     {
-        for (int i = 0; i < size; i++) dest[i] = reader.getBits(8);
+        for (int i = 0; i < size; i++) dest[i] = reader.getBits<char>(8);
         dest[size] = 0;
     }
     static void writeString(const char* dest, BitStreamWriter& writer, const int size)
@@ -454,10 +455,10 @@ class CLPIParser
     bool isDependStream;
 
    private:
-    static void HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, int dataLength);
-    void Extent_Start_Point(uint8_t* buffer, int dataLength);
-    void ProgramInfo_SS(uint8_t* buffer, int dataLength);
-    static void CPI_SS(uint8_t* buffer, int dataLength);
+    static void HDMV_LPCM_down_mix_coefficient(uint8_t* buffer, unsigned dataLength);
+    void Extent_Start_Point(uint8_t* buffer, unsigned dataLength);
+    void ProgramInfo_SS(uint8_t* buffer, unsigned dataLength);
+    static void CPI_SS(uint8_t* buffer, unsigned dataLength);
 
     static void parseProgramInfo(uint8_t* buffer, const uint8_t* end, std::vector<CLPIProgramInfo>& programInfoMap,
                                  std::map<int, CLPIStreamInfo>& streamInfoMap);
@@ -494,7 +495,7 @@ struct MPLSStreamInfo : M2TSStreamInfo
     void composeStreamEntry(BitStreamWriter& writer, size_t entryNum, int subPathID = 0) const;
     void composePGS_SS_StreamEntry(BitStreamWriter& writer, size_t entryNum) const;
 
-    int type;
+    uint8_t type;
     uint8_t offsetId;
     bool isSSPG;
     int SS_PG_offset_sequence_id;
@@ -508,7 +509,7 @@ struct MPLSPlayItem
     uint32_t IN_time = 0;
     uint32_t OUT_time = 0;
     std::string fileName;
-    int connection_condition = 0;
+    uint8_t connection_condition = 0;
 };
 
 struct PlayListMark
@@ -525,7 +526,7 @@ struct ExtDataBlockInfo
     {
         data.resize(a_dataLen);
         if (!data.empty())
-            memcpy(&data[0], a_data, data.size());
+            memcpy(data.data(), a_data, data.size());
     }
     std::vector<uint8_t> data;
     int id1;
@@ -540,16 +541,16 @@ struct MPLSParser
     void parse(uint8_t* buffer, int len);
     int compose(uint8_t* buffer, int bufferSize, DiskType dt);
 
-    MPLSStreamInfo getStreamByPID(int pid) const;
-    std::vector<MPLSStreamInfo> getPgStreams() const;
+    [[nodiscard]] MPLSStreamInfo getStreamByPID(int pid) const;
+    [[nodiscard]] std::vector<MPLSStreamInfo> getPgStreams() const;
 
     int PlayList_playback_type;
     int playback_count;
     int number_of_SubPaths;
     bool is_multi_angle;
-    int ref_to_STC_id;
+    uint8_t ref_to_STC_id;
     bool PlayItem_random_access_flag;
-    int number_of_angles;
+    uint8_t number_of_angles;
     bool is_different_audios;
     bool is_seamless_angle_change;
 
@@ -567,14 +568,14 @@ struct MPLSParser
     bool mvc_base_view_r;
     int subPath_type;
 
-    int number_of_primary_video_stream_entries;
-    int number_of_primary_audio_stream_entries;
-    int number_of_PG_textST_stream_entries;
-    int number_of_IG_stream_entries;
-    int number_of_secondary_audio_stream_entries;
-    int number_of_secondary_video_stream_entries;
-    int number_of_PiP_PG_textST_stream_entries_plus;
-    int number_of_DolbyVision_video_stream_entries;
+    uint8_t number_of_primary_video_stream_entries;
+    uint8_t number_of_primary_audio_stream_entries;
+    uint8_t number_of_PG_textST_stream_entries;
+    uint8_t number_of_IG_stream_entries;
+    uint8_t number_of_secondary_audio_stream_entries;
+    uint8_t number_of_secondary_video_stream_entries;
+    uint8_t number_of_PiP_PG_textST_stream_entries_plus;
+    uint8_t number_of_DolbyVision_video_stream_entries;
 
     std::vector<std::string> m_mvcFiles;
 
@@ -587,7 +588,7 @@ struct MPLSParser
     static void composeExtensionData(BitStreamWriter& writer, const std::vector<ExtDataBlockInfo>& extDataBlockInfo);
     void parseExtensionData(uint8_t* data, const uint8_t* dataEnd);
     void SubPath_extension(BitStreamWriter& writer);
-    void parseStnTableSS(uint8_t* data, int dataLength);
+    void parseStnTableSS(uint8_t* data, unsigned dataLength);
 
     void AppInfoPlayList(BitStreamReader& reader);
     void composeAppInfoPlayList(BitStreamWriter& writer) const;
@@ -608,8 +609,8 @@ struct MPLSParser
     MPLSStreamInfo& getMainStream();
     MPLSStreamInfo& getMVCDependStream();
     static int calcPlayItemID(const MPLSStreamInfo& streamInfo, uint32_t pts);
-    int pgIndexToFullIndex(int value) const;
-    void parseSubPathEntryExtension(uint8_t* data, int dataLen);
+    [[nodiscard]] int pgIndexToFullIndex(int value) const;
+    void parseSubPathEntryExtension(uint8_t* data, uint32_t dataLen);
 };
 
 #endif

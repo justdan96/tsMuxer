@@ -78,7 +78,7 @@ struct Track
     ParsedTrackPrivData* parsed_priv_data;
     uint64_t default_duration;
 
-    uint32_t encodingAlgo;                  // compression algorithm
+    int32_t encodingAlgo;                   // compression algorithm
     std::vector<uint8_t> encodingAlgoPriv;  // compression parameters
     // MatroskaTrackFlags flags;
     int flags;
@@ -92,7 +92,7 @@ class IOContextDemuxer : public AbstractDemuxer
     void setFileIterator(FileNameIterator* itr) override;
     int64_t getDemuxedSize() override;
     int getLastReadRez() override { return m_lastReadRez; }
-    int64_t getProcessedBytes() const { return m_processedBytes; }
+    [[nodiscard]] int64_t getProcessedBytes() const { return m_processedBytes; }
 
    protected:
     static constexpr int MAX_STREAMS = 64;
@@ -114,7 +114,7 @@ class IOContextDemuxer : public AbstractDemuxer
     bool url_fseek(int64_t offset);
     int64_t get_be64();
     unsigned int get_be32();
-    int get_be16();
+    uint16_t get_be16();
     int get_be24();
     int get_byte();
 

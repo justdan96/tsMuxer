@@ -4,7 +4,7 @@
 #include "../directory.h"
 #include "../file.h"
 
-void throwFileError()
+[[noreturn]] void throwFileError()
 {
     LPVOID msgBuf = nullptr;
     const DWORD dw = GetLastError();
@@ -180,12 +180,12 @@ bool File::size(int64_t* const fileSize) const
     return true;
 }
 
-uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
+int64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
-        return static_cast<uint64_t>(-1);
+        return -1;
 
-    DWORD moveMethod = 0;
+    DWORD moveMethod;
     switch (whence)
     {
     case SeekMethod::smBegin:
@@ -199,14 +199,14 @@ uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
         break;
     }
 
-    const LONG distanceToMoveLow = static_cast<LONG>(offset & 0xffffffff);
-    LONG distanceToMoveHigh = static_cast<LONG>((offset & 0xffffffff00000000ull) >> 32);
+    const LONG distanceToMoveLow = static_cast<LONG>(offset);
+    LONG distanceToMoveHigh = static_cast<LONG>(offset >> 32);
 
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, moveMethod);
     if (newPointerLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR)
-        return static_cast<uint64_t>(-1);
+        return -1;
 
-    m_pos = newPointerLow | (static_cast<uint64_t>(distanceToMoveHigh) << 32);
+    m_pos = static_cast<int64_t>(distanceToMoveHigh) << 32 | newPointerLow;
 
     return m_pos;
 }
@@ -216,9 +216,8 @@ bool File::truncate(const uint64_t newFileSize) const
     const LONG distanceToMoveLow = static_cast<LONG>(newFileSize & 0xffffffff);
     LONG distanceToMoveHigh = static_cast<LONG>((newFileSize & 0xffffffff00000000ull) >> 32);
     const DWORD newPointerLow = SetFilePointer(m_impl, distanceToMoveLow, &distanceToMoveHigh, FILE_BEGIN);
-    const int errCode = GetLastError();
-    if ((newPointerLow == INVALID_SET_FILE_POINTER) && (errCode != NO_ERROR))
-        // return false;
+    const DWORD errCode = GetLastError();
+    if (newPointerLow == INVALID_SET_FILE_POINTER && errCode != NO_ERROR)
         throwFileError();
 
     return SetEndOfFile(m_impl) > 0;

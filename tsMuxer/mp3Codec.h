@@ -26,12 +26,12 @@ class MP3Codec
    protected:
     int m_frame_size;
     int m_nb_channels;
-    int m_mode_ext;
-    int m_mode;
-    int m_bitrate_index;
-    int m_sample_rate_index;
+    uint8_t m_mode_ext;
+    uint8_t m_mode;
+    uint8_t m_bitrate_index;
+    uint8_t m_sample_rate_index;
     int m_sample_rate;
-    int m_layer;
+    int8_t m_layer;
     int m_samples;
     int m_bit_rate;
 };

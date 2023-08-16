@@ -27,7 +27,7 @@ class AC3Codec
         SAMPLE_RATE = -3,
         FRAME_SIZE = -4,
         CRC2 = -5,
-        NOT_ENOUGH_BUFFER = -10,
+        NOT_ENOUGH_BUFFER = -10
     };
 
     AC3Codec()
@@ -59,18 +59,18 @@ class AC3Codec
     virtual ~AC3Codec() = default;
 
     virtual int getHeaderLen() { return AC3_HEADER_SIZE; }
-    bool isEAC3() const { return m_bsid > 10; }
-    bool isAC3() const { return m_bsidBase > 0; }
+    [[nodiscard]] bool isEAC3() const { return m_bsid > 10; }
+    [[nodiscard]] bool isAC3() const { return m_bsidBase > 0; }
     void setDownconvertToAC3(const bool value) { m_downconvertToAC3 = value; }
-    bool getDownconvertToAC3() const { return m_downconvertToAC3; }
-    bool isTrueHD() const { return m_true_hd_mode; }
+    [[nodiscard]] bool getDownconvertToAC3() const { return m_downconvertToAC3; }
+    [[nodiscard]] bool isTrueHD() const { return m_true_hd_mode; }
     virtual void setTestMode(const bool value) { m_testMode = value; }
-    bool getTestMode() const { return m_testMode; }
+    [[nodiscard]] bool getTestMode() const { return m_testMode; }
 
    protected:
     int decodeFrame(uint8_t* buf, uint8_t* end, int& skipBytes);
     static uint8_t* findFrame(uint8_t* buffer, const uint8_t* end);
-    uint64_t getFrameDuration() const;
+    [[nodiscard]] uint64_t getFrameDuration() const;
     virtual const CodecInfo& getCodecInfo();
     virtual const std::string getStreamInfo();
 
@@ -78,19 +78,19 @@ class AC3Codec
     bool m_waitMoreData;
     bool m_downconvertToAC3;
     bool m_true_hd_mode;
-    int m_fscod;
+    uint8_t m_fscod;
     int m_frmsizecod;
     uint8_t m_bsid;
     uint8_t m_bsidBase;
-    int m_strmtyp;
-    int m_bsmod;
-    int m_acmod;
-    int m_dsurmod;
-    int m_lfeon;
+    uint8_t m_strmtyp;
+    uint8_t m_bsmod;
+    uint8_t m_acmod;
+    uint8_t m_dsurmod;
+    uint8_t m_lfeon;
     uint8_t m_halfratecod;
     int m_sample_rate;
     int m_bit_rate;
-    int m_channels;
+    uint8_t m_channels;
     int m_frame_size;
     bool m_mixinfoexists;
 

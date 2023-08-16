@@ -1,6 +1,7 @@
 #include "textSubtitlesRender.h"
 
 #include <cassert>
+#include <cmath>
 #include <string>
 #include <unordered_map>
 
@@ -11,146 +12,148 @@ using namespace std;
 
 namespace
 {
-const std::unordered_map<std::string, uint32_t> defaultPallette = {make_pair("black", 0x000000),
-                                                                   make_pair("aqua", 0x00ffff),
-                                                                   make_pair("red", 0xff0000),
-                                                                   make_pair("green", 0x008000),
-                                                                   make_pair("blue", 0x0000ff),
-                                                                   make_pair("fuchsia", 0xff00ff),
-                                                                   make_pair("gray", 0x808080),
-                                                                   make_pair("lime", 0x00ff00),
-                                                                   make_pair("maroon", 0x800000),
-                                                                   make_pair("navy", 0x000080),
-                                                                   make_pair("olive", 0x808000),
-                                                                   make_pair("purple", 0x800080),
-                                                                   make_pair("silver", 0xc0c0c0),
-                                                                   make_pair("tea", 0x008080),
-                                                                   make_pair("white", 0xffffff),
-                                                                   make_pair("yellow", 0xffff00),
-                                                                   make_pair("orange", 0xffa500),
-                                                                   make_pair("violet", 0xEE82EE),
+const std::unordered_map<std::string, uint32_t> defaultPallette = {
+    make_pair("black", 0x000000),
+    make_pair("aqua", 0x00ffff),
+    make_pair("red", 0xff0000),
+    make_pair("green", 0x008000),
+    make_pair("blue", 0x0000ff),
+    make_pair("fuchsia", 0xff00ff),
+    make_pair("gray", 0x808080),
+    make_pair("lime", 0x00ff00),
+    make_pair("maroon", 0x800000),
+    make_pair("navy", 0x000080),
+    make_pair("olive", 0x808000),
+    make_pair("purple", 0x800080),
+    make_pair("silver", 0xc0c0c0),
+    make_pair("tea", 0x008080),
+    make_pair("white", 0xffffff),
+    make_pair("yellow", 0xffff00),
+    make_pair("orange", 0xffa500),
+    make_pair("violet", 0xEE82EE),
 
-                                                                   make_pair("aliceblue", 0xf0f8ff),
-                                                                   make_pair("antiquewhite", 0xfaebd7),
-                                                                   make_pair("aquamarine", 0x7fffd4),
-                                                                   make_pair("azure", 0xf0ffff),
-                                                                   make_pair("beige", 0xf5f5dc),
-                                                                   make_pair("bisque", 0xffe4c4),
-                                                                   make_pair("blanchedalmond", 0xffebcd),
-                                                                   make_pair("blueviolet", 0x8a2be2),
-                                                                   make_pair("brown", 0xa52a2a),
-                                                                   make_pair("burlywood", 0xdeb887),
-                                                                   make_pair("cadetblue", 0x5f9ea0),
-                                                                   make_pair("chartreuse", 0x7fff00),
-                                                                   make_pair("chocolate", 0xd2691e),
-                                                                   make_pair("cora", 0xff7f50),
-                                                                   make_pair("cornflowerblue", 0x6495ed),
-                                                                   make_pair("cornsilk", 0xfff8dc),
-                                                                   make_pair("crimson", 0xdc143c),
-                                                                   make_pair("darkblue", 0x00008b),
-                                                                   make_pair("darkcyan", 0x008b8b),
-                                                                   make_pair("darkgoldenrod", 0xb8860b),
-                                                                   make_pair("darkgray", 0xa9a9a9),
-                                                                   make_pair("darkgreen", 0x006400),
-                                                                   make_pair("darkkhaki", 0xbdb76b),
-                                                                   make_pair("darkmagenta", 0x8b008b),
-                                                                   make_pair("darkolivegreen", 0x556b2f),
-                                                                   make_pair("darkorange", 0xff8c00),
-                                                                   make_pair("darkorchid", 0x9932cc),
-                                                                   make_pair("darkred", 0x8b0000),
-                                                                   make_pair("darksalmon", 0xe9967a),
-                                                                   make_pair("darkseagreen", 0x8fbc8f),
-                                                                   make_pair("darkslateblue", 0x483d8b),
-                                                                   make_pair("darkslategray", 0x2f4f4f),
-                                                                   make_pair("darkturquoise", 0x00ced1),
-                                                                   make_pair("darkviolet", 0x9400d3),
-                                                                   make_pair("deeppink", 0xff1493),
-                                                                   make_pair("deepskyblue", 0x00bfff),
-                                                                   make_pair("dimgray", 0x696969),
-                                                                   make_pair("dodgerblue", 0x1e90ff),
-                                                                   make_pair("firebrick", 0xb22222),
-                                                                   make_pair("floralwhite", 0xfffaf0),
-                                                                   make_pair("forestgreen", 0x228b22),
-                                                                   make_pair("gainsboro", 0xdcdcdc),
-                                                                   make_pair("ghostwhite", 0xf8f8ff),
-                                                                   make_pair("gold", 0xffd700),
-                                                                   make_pair("goldenrod", 0xdaa520),
-                                                                   make_pair("greenyellow", 0xadff2f),
-                                                                   make_pair("honeydew", 0xf0fff0),
-                                                                   make_pair("hotpink", 0xff69b4),
-                                                                   make_pair("indianred", 0xcd5c5c),
-                                                                   make_pair("indigo", 0x4b0082),
-                                                                   make_pair("ivory", 0xfffff0),
-                                                                   make_pair("khaki", 0xf0e68c),
-                                                                   make_pair("lavender", 0xe6e6fa),
-                                                                   make_pair("lavenderblush", 0xfff0f5),
-                                                                   make_pair("lawngreen", 0x7cfc00),
-                                                                   make_pair("lemonchiffon", 0xfffacd),
-                                                                   make_pair("lightblue", 0xadd8e6),
-                                                                   make_pair("lightcora", 0xf08080),
-                                                                   make_pair("lightcyan", 0xe0ffff),
-                                                                   make_pair("lightgoldenrodyellow", 0xfafad2),
-                                                                   make_pair("lightgreen", 0x90ee90),
-                                                                   make_pair("lightgrey", 0xd3d3d3),
-                                                                   make_pair("lightpink", 0xffb6c1),
-                                                                   make_pair("lightsalmon", 0xffa07a),
-                                                                   make_pair("lightseagreen", 0x20b2aa),
-                                                                   make_pair("lightskyblue", 0x87cefa),
-                                                                   make_pair("lightslategray", 0x778899),
-                                                                   make_pair("lightsteelblue", 0xb0c4de),
-                                                                   make_pair("lightyellow", 0xffffe0),
-                                                                   make_pair("limegreen", 0x32cd32),
-                                                                   make_pair("linen", 0xfaf0e6),
-                                                                   make_pair("magenta", 0xff00ff),
-                                                                   make_pair("mediumauqamarine", 0x66cdaa),
-                                                                   make_pair("mediumblue", 0x0000cd),
-                                                                   make_pair("mediumorchid", 0xba55d3),
-                                                                   make_pair("mediumpurple", 0x9370d8),
-                                                                   make_pair("mediumseagreen", 0x3cb371),
-                                                                   make_pair("mediumslateblue", 0x7b68ee),
-                                                                   make_pair("mediumspringgreen", 0x00fa9a),
-                                                                   make_pair("mediumturquoise", 0x48d1cc),
-                                                                   make_pair("mediumvioletred", 0xc71585),
-                                                                   make_pair("midnightblue", 0x191970),
-                                                                   make_pair("mintcream", 0xf5fffa),
-                                                                   make_pair("mistyrose", 0xffe4e1),
-                                                                   make_pair("moccasin", 0xffe4b5),
-                                                                   make_pair("navajowhite", 0xffdead),
-                                                                   make_pair("oldlace", 0xfdf5e6),
-                                                                   make_pair("olivedrab", 0x688e23),
-                                                                   make_pair("orangered", 0xff4500),
-                                                                   make_pair("orchid", 0xda70d6),
-                                                                   make_pair("palegoldenrod", 0xeee8aa),
-                                                                   make_pair("palegreen", 0x98fb98),
-                                                                   make_pair("paleturquoise", 0xafeeee),
-                                                                   make_pair("palevioletred", 0xd87093),
-                                                                   make_pair("papayawhip", 0xffefd5),
-                                                                   make_pair("peachpuff", 0xffdab9),
-                                                                   make_pair("peru", 0xcd853f),
-                                                                   make_pair("pink", 0xffc0cb),
-                                                                   make_pair("plum", 0xdda0dd),
-                                                                   make_pair("powderblue", 0xb0e0e6),
-                                                                   make_pair("rosybrown", 0xbc8f8f),
-                                                                   make_pair("royalblue", 0x4169e1),
-                                                                   make_pair("saddlebrown", 0x8b4513),
-                                                                   make_pair("salmon", 0xfa8072),
-                                                                   make_pair("sandybrown", 0xf4a460),
-                                                                   make_pair("seagreen", 0x2e8b57),
-                                                                   make_pair("seashel", 0xfff5ee),
-                                                                   make_pair("sienna", 0xa0522d),
-                                                                   make_pair("skyblue", 0x87ceeb),
-                                                                   make_pair("slateblue", 0x6a5acd),
-                                                                   make_pair("slategray", 0x708090),
-                                                                   make_pair("snow", 0xfffafa),
-                                                                   make_pair("springgreen", 0x00ff7f),
-                                                                   make_pair("steelblue", 0x4682b4),
-                                                                   make_pair("tan", 0xd2b48c),
-                                                                   make_pair("thistle", 0xd8bfd8),
-                                                                   make_pair("tomato", 0xff6347),
-                                                                   make_pair("turquoise", 0x40e0d0),
-                                                                   make_pair("wheat", 0xf5deb3),
-                                                                   make_pair("whitesmoke", 0xf5f5f5),
-                                                                   make_pair("yellowgreen", 0x9acd32)};
+    make_pair("aliceblue", 0xf0f8ff),
+    make_pair("antiquewhite", 0xfaebd7),
+    make_pair("aquamarine", 0x7fffd4),
+    make_pair("azure", 0xf0ffff),
+    make_pair("beige", 0xf5f5dc),
+    make_pair("bisque", 0xffe4c4),
+    make_pair("blanchedalmond", 0xffebcd),
+    make_pair("blueviolet", 0x8a2be2),
+    make_pair("brown", 0xa52a2a),
+    make_pair("burlywood", 0xdeb887),
+    make_pair("cadetblue", 0x5f9ea0),
+    make_pair("chartreuse", 0x7fff00),
+    make_pair("chocolate", 0xd2691e),
+    make_pair("cora", 0xff7f50),
+    make_pair("cornflowerblue", 0x6495ed),
+    make_pair("cornsilk", 0xfff8dc),
+    make_pair("crimson", 0xdc143c),
+    make_pair("darkblue", 0x00008b),
+    make_pair("darkcyan", 0x008b8b),
+    make_pair("darkgoldenrod", 0xb8860b),
+    make_pair("darkgray", 0xa9a9a9),
+    make_pair("darkgreen", 0x006400),
+    make_pair("darkkhaki", 0xbdb76b),
+    make_pair("darkmagenta", 0x8b008b),
+    make_pair("darkolivegreen", 0x556b2f),
+    make_pair("darkorange", 0xff8c00),
+    make_pair("darkorchid", 0x9932cc),
+    make_pair("darkred", 0x8b0000),
+    make_pair("darksalmon", 0xe9967a),
+    make_pair("darkseagreen", 0x8fbc8f),
+    make_pair("darkslateblue", 0x483d8b),
+    make_pair("darkslategray", 0x2f4f4f),
+    make_pair("darkturquoise", 0x00ced1),
+    make_pair("darkviolet", 0x9400d3),
+    make_pair("deeppink", 0xff1493),
+    make_pair("deepskyblue", 0x00bfff),
+    make_pair("dimgray", 0x696969),
+    make_pair("dodgerblue", 0x1e90ff),
+    make_pair("firebrick", 0xb22222),
+    make_pair("floralwhite", 0xfffaf0),
+    make_pair("forestgreen", 0x228b22),
+    make_pair("gainsboro", 0xdcdcdc),
+    make_pair("ghostwhite", 0xf8f8ff),
+    make_pair("gold", 0xffd700),
+    make_pair("goldenrod", 0xdaa520),
+    make_pair("greenyellow", 0xadff2f),
+    make_pair("honeydew", 0xf0fff0),
+    make_pair("hotpink", 0xff69b4),
+    make_pair("indianred", 0xcd5c5c),
+    make_pair("indigo", 0x4b0082),
+    make_pair("ivory", 0xfffff0),
+    make_pair("khaki", 0xf0e68c),
+    make_pair("lavender", 0xe6e6fa),
+    make_pair("lavenderblush", 0xfff0f5),
+    make_pair("lawngreen", 0x7cfc00),
+    make_pair("lemonchiffon", 0xfffacd),
+    make_pair("lightblue", 0xadd8e6),
+    make_pair("lightcora", 0xf08080),
+    make_pair("lightcyan", 0xe0ffff),
+    make_pair("lightgoldenrodyellow", 0xfafad2),
+    make_pair("lightgreen", 0x90ee90),
+    make_pair("lightgrey", 0xd3d3d3),
+    make_pair("lightpink", 0xffb6c1),
+    make_pair("lightsalmon", 0xffa07a),
+    make_pair("lightseagreen", 0x20b2aa),
+    make_pair("lightskyblue", 0x87cefa),
+    make_pair("lightslategray", 0x778899),
+    make_pair("lightsteelblue", 0xb0c4de),
+    make_pair("lightyellow", 0xffffe0),
+    make_pair("limegreen", 0x32cd32),
+    make_pair("linen", 0xfaf0e6),
+    make_pair("magenta", 0xff00ff),
+    make_pair("mediumauqamarine", 0x66cdaa),
+    make_pair("mediumblue", 0x0000cd),
+    make_pair("mediumorchid", 0xba55d3),
+    make_pair("mediumpurple", 0x9370d8),
+    make_pair("mediumseagreen", 0x3cb371),
+    make_pair("mediumslateblue", 0x7b68ee),
+    make_pair("mediumspringgreen", 0x00fa9a),
+    make_pair("mediumturquoise", 0x48d1cc),
+    make_pair("mediumvioletred", 0xc71585),
+    make_pair("midnightblue", 0x191970),
+    make_pair("mintcream", 0xf5fffa),
+    make_pair("mistyrose", 0xffe4e1),
+    make_pair("moccasin", 0xffe4b5),
+    make_pair("navajowhite", 0xffdead),
+    make_pair("oldlace", 0xfdf5e6),
+    make_pair("olivedrab", 0x688e23),
+    make_pair("orangered", 0xff4500),
+    make_pair("orchid", 0xda70d6),
+    make_pair("palegoldenrod", 0xeee8aa),
+    make_pair("palegreen", 0x98fb98),
+    make_pair("paleturquoise", 0xafeeee),
+    make_pair("palevioletred", 0xd87093),
+    make_pair("papayawhip", 0xffefd5),
+    make_pair("peachpuff", 0xffdab9),
+    make_pair("peru", 0xcd853f),
+    make_pair("pink", 0xffc0cb),
+    make_pair("plum", 0xdda0dd),
+    make_pair("powderblue", 0xb0e0e6),
+    make_pair("rosybrown", 0xbc8f8f),
+    make_pair("royalblue", 0x4169e1),
+    make_pair("saddlebrown", 0x8b4513),
+    make_pair("salmon", 0xfa8072),
+    make_pair("sandybrown", 0xf4a460),
+    make_pair("seagreen", 0x2e8b57),
+    make_pair("seashel", 0xfff5ee),
+    make_pair("sienna", 0xa0522d),
+    make_pair("skyblue", 0x87ceeb),
+    make_pair("slateblue", 0x6a5acd),
+    make_pair("slategray", 0x708090),
+    make_pair("snow", 0xfffafa),
+    make_pair("springgreen", 0x00ff7f),
+    make_pair("steelblue", 0x4682b4),
+    make_pair("tan", 0xd2b48c),
+    make_pair("thistle", 0xd8bfd8),
+    make_pair("tomato", 0xff6347),
+    make_pair("turquoise", 0x40e0d0),
+    make_pair("wheat", 0xf5deb3),
+    make_pair("whitesmoke", 0xf5f5f5),
+    make_pair("yellowgreen", 0x9acd32),
+};
 
 size_t findUnquotedStr(const string& str, const string& substr)
 {
@@ -264,43 +267,29 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                 curFont.m_opts |= Font::ITALIC;
                 isTag = true;
             }
-            else if (ltagStr == "/i" || ltagStr == "/italic")
-            {
-                endTag = true;
-            }
             else if (ltagStr == "b" || ltagStr == "bold")
             {
                 curFont.m_opts |= Font::BOLD;
                 isTag = true;
-            }
-            else if (ltagStr == "/b" || ltagStr == "/bold")
-            {
-                endTag = true;
             }
             else if (ltagStr == "u" || ltagStr == "underline")
             {
                 curFont.m_opts |= Font::UNDERLINE;
                 isTag = true;
             }
-            else if (ltagStr == "/u" || ltagStr == "/underline")
-            {
-                endTag = true;
-            }
             else if (ltagStr == "f" || ltagStr == "force")
             {
                 curFont.m_opts |= Font::FORCED;
                 isTag = true;
-            }
-            else if (ltagStr == "/f" || ltagStr == "/force")
-            {
-                endTag = true;
             }
             else if (ltagStr == "strike")
             {
                 curFont.m_opts |= Font::STRIKE_OUT;
                 isTag = true;
             }
-            else if (ltagStr == "/strike")
+            else if ((ltagStr == "/i" || ltagStr == "/italic") || (ltagStr == "/b" || ltagStr == "/bold") ||
+                     (ltagStr == "/u" || ltagStr == "/underline") || (ltagStr == "/f" || ltagStr == "/force") ||
+                     ltagStr == "/strike" || strStartWith(tagStr, "/font"))
             {
                 endTag = true;
             }
@@ -339,14 +328,10 @@ vector<pair<Font, string>> TextSubtitlesRender::processTxtLine(const std::string
                         if (arg[0] == '+' || arg[0] == '-')
                             curFont.m_size += strToInt32(arg.c_str(), 10);
                         else
-                            curFont.m_size = strToInt32u(arg.c_str(), 10);
+                            curFont.m_size = strToInt32(arg.c_str(), 10);
                     }
                 }
                 isTag = true;
-            }
-            else if (strStartWith(tagStr, "/font"))
-            {
-                endTag = true;
             }
             if (isTag || endTag)
             {
@@ -420,7 +405,7 @@ bool TextSubtitlesRender::rasterText(const std::string& text)
 
             curX += xSize[j];
         }
-        curY += static_cast<int>(ySize * m_font.m_lineSpacing);
+        curY += lround(static_cast<float>(ySize) * m_font.m_lineSpacing);
     }
     flushRasterBuffer();
     m_font = m_initFont;
@@ -482,7 +467,6 @@ void TextSubtitlesRender::addBorder(const int borderWidth, uint8_t* data, const 
                 dst++;
             }
     }
-    return;
 }
 
 }  // namespace text_subtitles

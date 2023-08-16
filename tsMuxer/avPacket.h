@@ -1,8 +1,6 @@
 #ifndef AV_PACKET_H_
 #define AV_PACKET_H_
 
-#include <types/types.h>
-
 #include "vod_common.h"
 
 static constexpr int MAX_AV_PACKET_SIZE = 32768 /*16 * 1024*/;
@@ -48,9 +46,9 @@ struct AVPacket
     int64_t pts;  // presentation time stamp in time_base units
     int64_t dts;  // decompression time stamp in time_base units
     uint8_t* data;
-    unsigned size;  // data len
+    int32_t size;  // data len
     int stream_index;
-    int flags;
+    unsigned flags;
     int64_t duration;  //  presentation duration in time_base units (0 if not available)
     int64_t pos;       //  byte position in stream, -1 if unknown
     int64_t pcr;       // last program clock reference if packet demuxed from TS container. used for VBV streaming in

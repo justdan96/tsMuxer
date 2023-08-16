@@ -1,6 +1,8 @@
 #ifndef PROGRAM_STREAM_DEMUXER_H_
 #define PROGRAM_STREAM_DEMUXER_H_
 
+#include <cmath>
+
 #include "BufferedReader.h"
 #include "abstractDemuxer.h"
 #include "bufferedReaderManager.h"
@@ -21,25 +23,25 @@ class ProgramStreamDemuxer final : public AbstractDemuxer
     int getLastReadRez() override { return m_lastReadRez; }
     void setFileIterator(FileNameIterator* itr) override;
 
-    int64_t getTrackDelay(const uint32_t pid) override
+    int64_t getTrackDelay(const int32_t pid) override
     {
         if (m_firstPtsTime.find(pid) != m_firstPtsTime.end())
-            return static_cast<int64_t>((m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS)) /
-                                            90.0 +
-                                        0.5);  // convert to ms
+            return llround(
+                static_cast<double>(m_firstPtsTime[pid] - (m_firstVideoPTS != -1 ? m_firstVideoPTS : m_firstPTS)) /
+                90.0);  // convert to ms
 
         return 0;
     }
 
-    int64_t getFileDurationNano() const override;
+    [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
     uint32_t m_tmpBufferLen;
     uint8_t m_tmpBuffer[MAX_PES_HEADER_SIZE];  // TS_FRAME_SIZE
     uint32_t m_lastPesLen;
-    uint32_t m_lastPID;
+    int32_t m_lastPID;
     const BufferedReaderManager& m_readManager;
-    uint64_t m_dataProcessed;
+    int64_t m_dataProcessed;
     std::string m_streamName;
     int m_readerID;
     int m_lastReadRez;
@@ -52,9 +54,9 @@ class ProgramStreamDemuxer final : public AbstractDemuxer
     MemoryBlock m_lpcmWaveHeader[16];
     bool m_lpcpHeaderAdded[16];
 
-    bool isVideoPID(uint32_t pid) const;
+    [[nodiscard]] bool isVideoPID(uint32_t pid) const;
     int mpegps_psm_parse(const uint8_t* buff, const uint8_t* end);
-    uint8_t processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
+    int processPES(uint8_t* buff, uint8_t* end, int& afterPesHeader);
 };
 
 #endif

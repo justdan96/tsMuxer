@@ -1,6 +1,7 @@
 #include "textSubtitlesRenderWin32.h"
 
 #include <gdiplus.h>
+#include <cmath>
 
 #include "../vodCoreException.h"
 #include "../vod_common.h"
@@ -117,11 +118,11 @@ void TextSubtitlesRenderWin32::drawText(const std::string& text, RECT* rect)
 
     const uint8_t alpha = m_font.m_color >> 24;
     const uint8_t outColor = (alpha * 48 + 128) / 255;
-    Pen pen(Color(outColor, 0, 0, 0), m_font.m_borderWidth * 2.0f);
+    Pen pen(Color(outColor, 0, 0, 0), m_font.m_borderWidth * 2.0F);
     pen.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&pen, &path);
 
-    Pen penInner(Color(alpha, 0, 0, 0), static_cast<float>(m_font.m_borderWidth));
+    Pen penInner(Color(alpha, 0, 0, 0), m_font.m_borderWidth);
     penInner.SetLineJoin(LineJoinRound);
     graphics.DrawPath(&penInner, &path);
 
@@ -140,7 +141,8 @@ void TextSubtitlesRenderWin32::getTextSize(const std::string& text, SIZE* mSize)
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(FontStyleRegular);
-    const int lineSpacingPixel = static_cast<int>(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel =
+        lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
 
     const StringFormat strformat;
     GraphicsPath path;
@@ -168,7 +170,8 @@ int TextSubtitlesRenderWin32::getLineSpacing()
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int lineSpacing = fontFamily.GetLineSpacing(opts);
-    const int lineSpacingPixel = static_cast<int>(font.GetSize() * lineSpacing / fontFamily.GetEmHeight(opts));
+    const int lineSpacingPixel =
+        lround(font.GetSize() * static_cast<double>(lineSpacing) / fontFamily.GetEmHeight(opts));
     return lineSpacingPixel;
 #endif
 }
@@ -185,7 +188,7 @@ int TextSubtitlesRenderWin32::getBaseline()
     const ::Font font(&fontFamily, static_cast<float>(m_font.m_size), opts, UnitPoint);
 
     const int descentOffset = fontFamily.GetCellDescent(opts);
-    const int descentPixel = static_cast<int>(font.GetSize() * descentOffset / fontFamily.GetEmHeight(opts));
+    const int descentPixel = lround(font.GetSize() * static_cast<double>(descentOffset) / fontFamily.GetEmHeight(opts));
     return descentPixel;
 #endif
 }

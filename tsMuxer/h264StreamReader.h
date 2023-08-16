@@ -2,6 +2,7 @@
 #define H264_STREAM_READER_H_
 
 #include <map>
+#include <set>
 
 #include "avPacket.h"
 #include "mpegStreamReader.h"
@@ -27,16 +28,16 @@ class H264StreamReader final : public MPEGStreamReader
     void setH264SPSCont(const bool val) { m_h264SPSCont = val; }
 
     void setInsertSEI(const SeiMethod value) { m_insertSEIMethod = value; }
-    SeiMethod getInsertSEI() const { return m_insertSEIMethod; }
+    [[nodiscard]] SeiMethod getInsertSEI() const { return m_insertSEIMethod; }
 
     void setIsSubStream(const bool value) { m_mvcSubStream = value; }
-    bool isSubStream() const { return m_mvcSubStream; }
+    [[nodiscard]] bool isSubStream() const { return m_mvcSubStream; }
 
-    int getOffsetSeqCnt() const { return number_of_offset_sequences; }
+    [[nodiscard]] int getOffsetSeqCnt() const { return number_of_offset_sequences; }
 
     // used for correction offset metadata
     void setStartPTS(const int64_t pts) { m_startPts = pts; }
-    bool needSPSForSplit() const override { return true; }
+    [[nodiscard]] bool needSPSForSplit() const override { return true; }
 
    protected:
     void onSplitEvent() override { m_firstFileFrame = true; }
@@ -52,9 +53,9 @@ class H264StreamReader final : public MPEGStreamReader
     int writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVPacket& avPacket,
                           PriorityDataInfo* priorityData) override;
     int getFrameDepth() override { return m_frameDepth; }
-    int getStreamWidth() const override;
-    int getStreamHeight() const override;
-    int getStreamHDR() const override { return 0; }
+    [[nodiscard]] unsigned getStreamWidth() const override;
+    [[nodiscard]] unsigned getStreamHeight() const override;
+    [[nodiscard]] int getStreamHDR() const override { return 0; }
     bool getInterlaced() override;
     bool isIFrame() override { return m_lastIFrame; }
     // virtual bool isIFrame() { return m_lastSliceIDR; }
@@ -64,7 +65,7 @@ class H264StreamReader final : public MPEGStreamReader
     bool skipNal(uint8_t* nal) override;
 
    private:
-    bool replaceToOwnSPS() const;
+    [[nodiscard]] bool replaceToOwnSPS() const;
     int deserializeSliceHeader(SliceUnit& slice, const uint8_t* buff, const uint8_t* sliceEnd);
     void checkPyramid(int frameNum, int* fullPicOrder, bool nextFrameFound);
 
@@ -79,8 +80,8 @@ class H264StreamReader final : public MPEGStreamReader
     int m_spsCounter;
     bool m_h264SPSCont;
     bool m_lastSliceIDR;
-    int m_lastSliceSPS;
-    int m_lastSlicePPS;
+    uint32_t m_lastSliceSPS;
+    uint32_t m_lastSlicePPS;
     bool m_firstAUDWarn;
     bool m_firstSPSWarn;
     bool m_firstSEIWarn;
@@ -99,7 +100,7 @@ class H264StreamReader final : public MPEGStreamReader
     int m_frameNum;
     bool m_lastIFrame;
     bool m_firstDecodeNal;
-    int m_lastPictStruct;
+    int8_t m_lastPictStruct;
     bool m_firstFileFrame;
     std::map<uint32_t, SPSUnit*> m_spsMap;
     std::map<uint32_t, PPSUnit*> m_ppsMap;
@@ -121,7 +122,7 @@ class H264StreamReader final : public MPEGStreamReader
     int processSPS(uint8_t* buff);
     int processPPS(uint8_t* buff);
     int detectPrimaryPicType(const SliceUnit& firstSlice, uint8_t* buff);
-    int sliceTypeToPictType(int slice_type) const;
+    [[nodiscard]] int sliceTypeToPictType(uint32_t slice_type) const;
     uint8_t* writeNalPrefix(uint8_t* curPos) const;
     bool findPPSForward(uint8_t* buff);
     void updateHRDParam(SPSUnit* sps) const;

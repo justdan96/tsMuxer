@@ -1,8 +1,10 @@
 #include "matroskaDemuxer.h"
 
-#include <types/types.h>
 #include <algorithm>
 #include <climits>
+
+#include <fs/systemlog.h>
+#include <types/types.h>
 
 #include "abstractDemuxer.h"
 #include "avPacket.h"
@@ -16,7 +18,7 @@ extern "C"
 
 typedef uint64_t offset_t;
 
-int64_t AV_NOPTS_VALUE = 0x8000000000000000LL;
+static constexpr int64_t AV_NOPTS_VALUE = 0x8000000000000000LL;
 
 static constexpr int PKT_FLAG_KEY = 1;
 static constexpr int AVERROR_INVALIDDATA = -1;
@@ -1791,7 +1793,7 @@ int MatroskaDemuxer::readEncodingCompression(MatroskaTrack *track)
             int64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            track->encodingAlgo = static_cast<uint32_t>(num);
+            track->encodingAlgo = static_cast<int32_t>(num);
             break;
         }
         case MATROSKA_ID_ENCODINGCOMPSETTINGS:
@@ -1888,8 +1890,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]);
-    memset(track, 0, MAX_TRACK_SIZE);
+    auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]{});
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
@@ -2198,7 +2199,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     int64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->bitdepth = static_cast<int>(num);
+                    audiotrack->bitdepth = static_cast<uint16_t>(num);
                     break;
                 }
 
@@ -2208,7 +2209,7 @@ int MatroskaDemuxer::matroska_add_stream()
                     int64_t num;
                     if ((res = ebml_read_uint(&id, &num)) < 0)
                         break;
-                    audiotrack->channels = static_cast<int>(num);
+                    audiotrack->channels = static_cast<uint16_t>(num);
                     break;
                 }
                 case EBML_ID_VOID:
@@ -2366,7 +2367,7 @@ int MatroskaDemuxer::matroska_add_stream()
 
 int MatroskaDemuxer::simpleDemuxBlock(DemuxedData &demuxedData, const PIDSet &acceptedPIDs, int64_t &discardSize)
 {
-    for (unsigned int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
+    for (int acceptedPID : acceptedPIDs) demuxedData[acceptedPID];
 
     AVPacket packet;
     uint32_t demuxedSize = 0;
@@ -2426,7 +2427,8 @@ int MatroskaDemuxer::getTrackType(const MatroskaTrack *track)
 std::vector<AVChapter> MatroskaDemuxer::getChapters()
 {
     std::vector<AVChapter> rez;
-    for (const auto &chapter : chapters) rez.push_back(chapter.second);
+    rez.reserve(chapters.size());
+    for (const auto &[index, avChapter] : chapters) rez.push_back(avChapter);
     std::sort(rez.begin(), rez.end());
     return rez;
 }

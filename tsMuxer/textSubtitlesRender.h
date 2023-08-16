@@ -75,7 +75,7 @@ struct Font
     static constexpr int UNDERLINE = 4;
     static constexpr int STRIKE_OUT = 8;
     static constexpr int FORCED = 16;
-    Font() : m_size(18), m_opts(0), m_borderWidth(0), m_charset(0), m_color(0x00ffffff), m_lineSpacing(1.0) {}
+    Font() : m_size(18), m_opts(0), m_borderWidth(0.0), m_charset(0), m_color(0x00ffffff), m_lineSpacing(1.0) {}
     bool operator!=(const Font& other) const
     {
         return m_name != other.m_name || m_size != other.m_size || m_opts != other.m_opts ||
@@ -86,7 +86,7 @@ struct Font
     std::string m_name;
     int m_size;
     int m_opts;
-    int m_borderWidth;
+    float m_borderWidth;
     uint32_t m_charset;
     uint32_t m_color;
     float m_lineSpacing;
@@ -116,7 +116,7 @@ class TextSubtitlesRender
    protected:
     Font m_font;
 
-    int m_borderWidth;
+    float m_borderWidth;
     std::vector<std::pair<Font, std::string>> processTxtLine(const std::string& line,
                                                              std::vector<Font>& fontStack) const;
     static int browserSizeToRealSize(int bSize, double rSize);

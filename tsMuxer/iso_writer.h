@@ -15,8 +15,8 @@ static constexpr uint32_t NEXT_EXTENT = 0xc0000000;
 static constexpr int64_t META_BLOCK_PER_DATA = 16 * 1000000000ll;
 
 // it can be allocated inside single sector of a extended file
-static constexpr unsigned MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
-static constexpr unsigned MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
+static constexpr int MAX_EXTENTS_IN_EXTFILE = (SECTOR_SIZE - 216 - 32) / 16;
+static constexpr int MAX_EXTENTS_IN_EXTCONT = (SECTOR_SIZE - 24 - 32) / 16;
 
 static constexpr int MAIN_INTERLEAVE_BLOCKSIZE = 6144 * 3168;
 static constexpr int SUB_INTERLEAVE_BLOCKSIZE = 6144 * 1312;
@@ -90,7 +90,7 @@ class ByteFileWriter
     void doPadding(int padSize);
     void writeTimestamp(time_t time);
 
-    int64_t size() const;
+    [[nodiscard]] int64_t size() const;
 
    private:
     uint8_t* m_buffer;
@@ -123,27 +123,27 @@ struct MappingEntry
 
 struct FileEntryInfo
 {
-    FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint32_t objectId, FileTypes fileType);
+    FileEntryInfo(IsoWriter* owner, FileEntryInfo* parent, uint8_t objectId, FileTypes fileType);
     ~FileEntryInfo();
 
-    int write(const uint8_t* data, int32_t len);
+    int32_t write(const uint8_t* data, int32_t len);
     bool setName(const std::string& name);
     void close();
     void setSubMode(bool value);
     void addExtent(const Extent& extent);
 
-    FileEntryInfo* subDirByName(const std::string& name) const;
-    FileEntryInfo* fileByName(const std::string& name) const;
+    [[nodiscard]] FileEntryInfo* subDirByName(const std::string& name) const;
+    [[nodiscard]] FileEntryInfo* fileByName(const std::string& name) const;
 
    private:
     void addSubDir(FileEntryInfo* dir);
     void addFile(FileEntryInfo* file);
-    void serialize();  // flush directory tree to a disk
+    void serialize() const;  // flush directory tree to a disk
     int allocateEntity(int sectorNum);
     void writeEntity(ByteFileWriter& writer, const FileEntryInfo* subDir) const;
     void serializeDir() const;
-    void serializeFile();
-    bool isFile() const;
+    void serializeFile() const;
+    [[nodiscard]] bool isFile() const;
 
     friend class IsoWriter;
     friend class ISOFile;
@@ -216,14 +216,13 @@ class IsoWriter
                                          uint32_t pos, uint16_t linkCount, const ExtentList* extents = nullptr);
     void writeFileSetDescriptor();
     void writeAllocationExtentDescriptor(const ExtentList* extents, size_t start, size_t indexEnd);
-    // void writeFileIdentifierDescriptor();
 
-    static void writeEntity(FileEntryInfo* dir);
+    static void writeEntity(const FileEntryInfo* dir);
     int allocateEntity(FileEntryInfo* entity, int sectorNum);
 
     void sectorSeek(Partition partition, int pos) const;
     void writeSector(const uint8_t* sectorData);
-    uint32_t absoluteSectorNum() const;
+    int32_t absoluteSectorNum() const;
 
     static void writeIcbTag(bool namedStream, uint8_t* buffer, FileTypes fileType);
     void writeDescriptors();
@@ -246,7 +245,7 @@ class IsoWriter
     uint8_t m_buffer[SECTOR_SIZE];
     time_t m_currentTime;
 
-    uint32_t m_objectUniqId;
+    uint8_t m_objectUniqId;
     uint32_t m_totalFiles;
     uint32_t m_totalDirectories;
     uint32_t m_volumeSize;
@@ -281,8 +280,8 @@ class ISOFile final : public AbstractOutputStream
     int write(const void* data, uint32_t len) override;
     bool open(const char* name, unsigned int oflag, unsigned int systemDependentFlags = 0) override;
     void sync() override;
-    bool close() final;
-    int64_t size() const override;
+    bool close() override;
+    [[nodiscard]] int64_t size() const override;
     void setSubMode(bool value) const;
 
    private:

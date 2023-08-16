@@ -25,8 +25,8 @@ class DVBSubStreamReader final : public SimplePacketizerReader
     const CodecInfo& getCodecInfo() override { return dvbSubCodecInfo; }
     const std::string getStreamInfo() override;
     static void setStreamType(int streamType) {}
-    int getChannels() override { return 6; }  // fake. need refactor this class
-    int getFreq() override { return 48000; }  // fake. need refactor this class
+    uint8_t getChannels() override { return 6; }  // fake. need refactor this class
+    int getFreq() override { return 48000; }      // fake. need refactor this class
    private:
     bool m_firstFrame;
     int m_big_offsets;

@@ -251,19 +251,19 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
             }
         }
         /* Figure out how many bytes the result will require */
-        if (ch < static_cast<UTF32>(0x80))
+        if (ch < 0x80)
         {
             bytesToWrite = 1;
         }
-        else if (ch < static_cast<UTF32>(0x800))
+        else if (ch < 0x800)
         {
             bytesToWrite = 2;
         }
-        else if (ch < static_cast<UTF32>(0x10000))
+        else if (ch < 0x10000)
         {
             bytesToWrite = 3;
         }
-        else if (ch < static_cast<UTF32>(0x110000))
+        else if (ch < 0x110000)
         {
             bytesToWrite = 4;
         }
@@ -284,15 +284,15 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
         switch (bytesToWrite)
         { /* note: everything falls through. */
         case 4:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 3:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 2:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 1:
@@ -307,6 +307,8 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
     return result;
 }
 
+namespace
+{
 /* --------------------------------------------------------------------- */
 
 /*
@@ -320,7 +322,7 @@ ConversionResult ConvertUTF16toUTF8(const UTF16** sourceStart, const UTF16* sour
  * definition of UTF-8 goes up to 4-byte sequences.
  */
 
-static Boolean isLegalUTF8(const UTF8* source, const int length)
+Boolean isLegalUTF8(const UTF8* source, const int length)
 {
     UTF8 a;
     const UTF8* srcptr = source + length;
@@ -372,7 +374,7 @@ static Boolean isLegalUTF8(const UTF8* source, const int length)
         return false;
     return true;
 }
-
+}  // namespace
 /* --------------------------------------------------------------------- */
 
 /*
@@ -389,7 +391,7 @@ Boolean isLegalUTF8Sequence(const UTF8* source, const UTF8* sourceEnd)
     return isLegalUTF8(source, length);
 }
 
-Boolean isLegalUTF8String(const UTF8* string, const int length)
+Boolean isLegalUTF8String(const UTF8* string, const size_t length)
 {
     /* same as above, but verify if the whole passed bytestream consists of valid UTF-8 sequences only. */
     const auto stringEnd = string + length;
@@ -418,7 +420,7 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const uint8_t extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;
@@ -491,8 +493,8 @@ ConversionResult ConvertUTF8toUTF16(const UTF8** sourceStart, const UTF8* source
             if (flags == ConversionFlags::strictConversion)
             {
                 result = ConversionResult::sourceIllegal;
-                source -= (extraBytesToRead + 1); /* return to the start */
-                break;                            /* Bail out; shouldn't continue */
+                source -= extraBytesToRead + 1; /* return to the start */
+                break;                          /* Bail out; shouldn't continue */
             }
             *target++ = UNI_REPLACEMENT_CHAR;
         }
@@ -543,15 +545,15 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
          * Figure out how many bytes the result will require. Turn any
          * illegally large UTF32 things (> Plane 17) into replacement chars.
          */
-        if (ch < static_cast<UTF32>(0x80))
+        if (ch < 0x80)
         {
             bytesToWrite = 1;
         }
-        else if (ch < static_cast<UTF32>(0x800))
+        else if (ch < 0x800)
         {
             bytesToWrite = 2;
         }
-        else if (ch < static_cast<UTF32>(0x10000))
+        else if (ch < 0x10000)
         {
             bytesToWrite = 3;
         }
@@ -577,15 +579,15 @@ ConversionResult ConvertUTF32toUTF8(const UTF32** sourceStart, const UTF32* sour
         switch (bytesToWrite)
         { /* note: everything falls through. */
         case 4:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 3:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 2:
-            *--target = static_cast<UTF8>((ch | byteMark) & byteMask);
+            *--target = (ch | byteMark) & byteMask;
             ch >>= 6;
             [[fallthrough]];
         case 1:
@@ -611,7 +613,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8** sourceStart, const UTF8* source
     while (source < sourceEnd)
     {
         UTF32 ch = 0;
-        const unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+        const uint8_t extraBytesToRead = trailingBytesForUTF8[*source];
         if (source + extraBytesToRead >= sourceEnd)
         {
             result = ConversionResult::sourceExhausted;

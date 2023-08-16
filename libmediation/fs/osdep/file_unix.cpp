@@ -131,7 +131,7 @@ bool File::size(int64_t* const fileSize) const
     return res;
 }
 
-uint64_t File::seek(const int64_t offset, const SeekMethod whence) const
+int64_t File::seek(const int64_t offset, const SeekMethod whence) const
 {
     if (!isOpen())
         return UINT64_C(-1);

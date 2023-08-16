@@ -2,7 +2,6 @@
 #define ABSTRACT_STREAM_READER_H_
 
 #include <fs/file.h>
-#include <types/types.h>
 
 #include "avCodecs.h"
 #include "avPacket.h"
@@ -13,8 +12,6 @@
 // PTS and DTS of the returned AV packet is measured in nanoseconds.
 
 static constexpr int PTS_CONST_OFFSET = 0;
-
-// class AbstractStreamReader;
 
 class AbstractStreamReader : public BaseAbstractStreamReader
 {
@@ -52,8 +49,8 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     }
 
     ~AbstractStreamReader() override = default;
-    virtual uint64_t getProcessedSize() = 0;
-    virtual void setBuffer(uint8_t* data, const int dataLen, bool lastBlock = false)
+    virtual int64_t getProcessedSize() = 0;
+    virtual void setBuffer(uint8_t* data, const uint32_t dataLen, bool lastBlock = false)
     {
         m_curPos = m_buffer = data;
         m_bufEnd = m_buffer + dataLen;
@@ -62,10 +59,10 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual int readPacket(AVPacket& avPacket) = 0;
     virtual int flushPacket(AVPacket& avPacket) = 0;
     virtual int getTSDescriptor(uint8_t* dstBuff, bool blurayMode, bool hdmvDescriptors) { return 0; }
-    virtual int getStreamHDR() const { return 0; }
+    [[nodiscard]] virtual int getStreamHDR() const { return 0; }
     virtual void writePESExtension(PESPacket* pesPacket, const AVPacket& avPacket) {}
     virtual void setStreamIndex(const int index) { m_streamIndex = index; }
-    int getStreamIndex() const { return m_streamIndex; }
+    [[nodiscard]] int getStreamIndex() const { return m_streamIndex; }
     virtual void setTimeOffset(const int64_t offset) { m_timeOffset = offset; }
     unsigned m_flags;
     virtual const CodecInfo& getCodecInfo() = 0;  // get codecInfo struct. (CodecID, codec name)
@@ -74,11 +71,11 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     virtual void onSplitEvent() {}
     virtual void setDemuxMode(const bool value) { m_demuxMode = value; }
     virtual bool isPriorityData(AVPacket* packet) { return false; }
-    virtual bool needSPSForSplit() const { return false; }
+    [[nodiscard]] virtual bool needSPSForSplit() const { return false; }
     virtual bool isSecondary() { return m_secondary; }
     void setIsSecondary(const bool value) { m_secondary = value; }
     void setPipParams(const PIPParams& params) { m_pipParams = params; }
-    PIPParams getPipParams() const { return m_pipParams; }
+    [[nodiscard]] PIPParams getPipParams() const { return m_pipParams; }
 
    protected:
     ContainerType m_containerType;
@@ -86,7 +83,6 @@ class AbstractStreamReader : public BaseAbstractStreamReader
     uint8_t* m_buffer;
     uint8_t* m_curPos;
     uint8_t* m_bufEnd;
-    // int m_dataLen;
     int m_streamIndex;
     int64_t m_tmpBufferLen;
     bool m_demuxMode;

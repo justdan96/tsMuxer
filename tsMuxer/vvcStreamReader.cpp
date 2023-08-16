@@ -128,13 +128,12 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bo
         *dstBuff++ = 0xff;
 
         *dstBuff++ = static_cast<int>(StreamType::VIDEO_H266);  // stream_coding_type
-        int video_format, frame_rate_index, aspect_ratio_index;
+        uint8_t video_format, frame_rate_index, aspect_ratio_index;
         M2TSStreamInfo::blurayStreamParams(getFPS(), getInterlaced(), getStreamWidth(), getStreamHeight(),
-                                           static_cast<int>(getStreamAR()), &video_format, &frame_rate_index,
-                                           &aspect_ratio_index);
+                                           getStreamAR(), &video_format, &frame_rate_index, &aspect_ratio_index);
 
-        *dstBuff++ = (video_format << 4) + frame_rate_index;
-        *dstBuff = (aspect_ratio_index << 4) + 0xf;
+        *dstBuff++ = static_cast<uint8_t>(video_format << 4 | frame_rate_index);
+        *dstBuff = static_cast<uint8_t>(aspect_ratio_index << 4 | 0xf);
 
         return 10;  // total descriptor length
     }
@@ -144,20 +143,21 @@ int VVCStreamReader::getTSDescriptor(uint8_t* dstBuff, bool blurayMode, const bo
     // ITU-T Rec.H.222 Table 2-133 - VVC video descriptor
     *dstBuff++ = static_cast<uint8_t>(TSDescriptorTag::VVC);
     uint8_t* descLength = dstBuff++;  // descriptor length, filled at the end
-    *dstBuff++ = (m_sps->profile_idc << 1) | m_sps->tier_flag;
+    *dstBuff++ = static_cast<uint8_t>(m_sps->profile_idc << 1 | m_sps->tier_flag);
     *dstBuff++ = m_sps->ptl_num_sub_profiles;
     auto bufPos = reinterpret_cast<uint32_t*>(dstBuff);
     for (const auto i : m_sps->general_sub_profile_idc) *bufPos++ = i;
     dstBuff = reinterpret_cast<uint8_t*>(bufPos);
-    *dstBuff++ = (m_sps->progressive_source_flag << 7) | (m_sps->interlaced_source_flag << 6) |
-                 (m_sps->non_packed_constraint_flag << 5) | (m_sps->ptl_frame_only_constraint_flag << 4);
+    *dstBuff++ =
+        static_cast<uint8_t>(m_sps->progressive_source_flag << 7 | m_sps->interlaced_source_flag << 6 |
+                             m_sps->non_packed_constraint_flag << 5 | m_sps->ptl_frame_only_constraint_flag << 4);
     *dstBuff++ = m_sps->level_idc;
     *dstBuff++ = 0;
     *dstBuff++ = 0xc0;
 
     const uint8_t* descEnd = dstBuff;
     const auto descSize = static_cast<int>(descEnd - descStart);
-    *descLength = descSize - 2;  // fill descriptor length
+    *descLength = static_cast<uint8_t>(descSize - 2);  // fill descriptor length
 
     return descSize;
 }
@@ -186,9 +186,9 @@ void VVCStreamReader::updateStreamFps(void* nalUnit, uint8_t* buff, uint8_t* nex
     delete[] tmpBuffer;
 }
 
-int VVCStreamReader::getStreamWidth() const { return m_sps ? m_sps->pic_width_max_in_luma_samples : 0; }
+unsigned VVCStreamReader::getStreamWidth() const { return m_sps ? m_sps->pic_width_max_in_luma_samples : 0; }
 
-int VVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height_max_in_luma_samples : 0; }
+unsigned VVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_height_max_in_luma_samples : 0; }
 
 double VVCStreamReader::getStreamFPS(void* curNalUnit)
 {
@@ -429,8 +429,8 @@ uint8_t* VVCStreamReader::writeBuffer(MemoryBlock& srcData, uint8_t* dstBuffer, 
 {
     if (srcData.isEmpty())
         return dstBuffer;
-    const int64_t bytesLeft = dstEnd - dstBuffer;
-    const int64_t requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
+    const size_t bytesLeft = dstEnd - dstBuffer;
+    const size_t requiredBytes = srcData.size() + 3 + (m_shortStartCodes ? 0 : 1);
     if (bytesLeft < requiredBytes)
         return dstBuffer;
 

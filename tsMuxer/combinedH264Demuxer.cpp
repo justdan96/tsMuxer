@@ -1,4 +1,3 @@
-
 #include "combinedH264Demuxer.h"
 
 #include "abstractStreamReader.h"
