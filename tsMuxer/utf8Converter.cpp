@@ -64,7 +64,7 @@ std::string toUtf8(const uint8_t *start, const size_t numBytes, const SourceForm
     switch (srcFormat)
     {
     case SourceFormat::sfUTF8:
-        return {};
+        return {start, start + numBytes};
     case SourceFormat::sfUTF16be:
         return from_utf_nn(make_vector(start, numBytes, read_be16), ConvertUTF16toUTF8);
     case SourceFormat::sfUTF16le:
