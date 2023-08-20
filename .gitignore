@@ -49,3 +49,4 @@ CMakeCache.txt
 #Actual build output
 bin/tsMuxeR
 build/
+/build.ninja
