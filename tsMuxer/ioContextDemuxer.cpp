@@ -17,7 +17,7 @@ double av_int2dbl(const uint64_t v)
 {
     if (v + v > 0xFFEULL << 52)
         return 0;  // 0.0/0.0;
-    return ldexp(static_cast<double>((v & (1LL << 52) - 1) + (1LL << 52) * (v >> 63 | 1)),
+    return ldexp(static_cast<double>(((v & (1LL << 52) - 1) + (1LL << 52)) * (v >> 63 | 1)),
                  static_cast<int>(v >> 52 & 0x7FF) - 1075);
 }
 
@@ -25,7 +25,7 @@ float av_int2flt(const uint32_t v)
 {
     if (v + v > 0xFF000000U)
         return 0;  // 0.0/0.0;
-    return ldexp(static_cast<float>((v & 0x7FFFFF) + (1 << 23) * (v >> 31 | 1)),
+    return ldexp(static_cast<float>(((v & 0x7FFFFF) + (1 << 23)) * (v >> 31 | 1)),
                  static_cast<int>(v >> 23 & 0xFF) - 150);
 }
 
