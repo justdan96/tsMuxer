@@ -1,4 +1,4 @@
-#if !defined(_WIN32) || defined(WIN32_DEBUG_FREETYPE)
+// #if !defined(_WIN32) || defined(WIN32_DEBUG_FREETYPE)
 
 #ifdef _WIN32
 #pragma comment(lib, "../../freetype/lib/freetype.lib")
@@ -11,13 +11,13 @@
 #include "../vod_common.h"
 // #include "../math.h"
 #include <fs/directory.h>
-#include <math.h>
+#include <cmath>
 
 #include <algorithm>
 #include <map>
 
 #if defined(_WIN32)
-const static char FONT_ROOT[] = "c:/WINDOWS/Fonts";  // for debug only
+static constexpr char FONT_ROOT[] = "c:/WINDOWS/Fonts";  // for debug only
 #elif __linux__ == 1
 const static char FONT_ROOT[] = "/usr/share/fonts/";
 #elif defined(__APPLE__) && defined(__MACH__)
@@ -35,7 +35,7 @@ namespace tsmuxer
 {
 std::string realpath(const std::string& path)
 {
-    std::unique_ptr<char, decltype(::free)*> resolved{::realpath(path.c_str(), nullptr), ::free};
+    const std::unique_ptr<char, decltype(::free)*> resolved{::realpath(path.c_str(), nullptr), ::free};
     return resolved ? resolved.get() : std::string();
 }
 }  // namespace tsmuxer
@@ -45,13 +45,13 @@ namespace text_subtitles
 FT_Library TextSubtitlesRenderFT::library;
 std::map<std::string, std::string> TextSubtitlesRenderFT::m_fontNameToFile;
 
-const double PI = 3.1415926f;
-const double angle = -PI / 10.0f;
+constexpr double PI = 3.1415926f;
+constexpr double angle = -PI / 10.0f;
 
 uint32_t convertColor(uint32_t color)
 {
-    uint8_t* arr = (uint8_t*)&color;
-    uint8_t tmp = arr[0];
+    const auto arr = reinterpret_cast<uint8_t*>(&color);
+    const uint8_t tmp = arr[0];
     arr[0] = arr[2];
     arr[2] = tmp;
     return color;
@@ -68,21 +68,21 @@ TextSubtitlesRenderFT::TextSubtitlesRenderFT() : TextSubtitlesRender()
         loadFontMap();
         initialized = true;
     }
-    m_pData = 0;
-    italic_matrix.xx = (FT_Fixed)(cos(angle) * 0x10000L);
-    italic_matrix.xy = (FT_Fixed)(-sin(angle) * 0x10000L);
-    italic_matrix.yx = (FT_Fixed)(0 * 0x10000L);
-    italic_matrix.yy = (FT_Fixed)(1 * 0x10000L);
+    m_pData = nullptr;
+    italic_matrix.xx = static_cast<FT_Fixed>(cos(angle) * 0x10000L);
+    italic_matrix.xy = static_cast<FT_Fixed>(-sin(angle) * 0x10000L);
+    italic_matrix.yx = 0 * 0x10000L;
+    italic_matrix.yy = 1 * 0x10000L;
 
-    bold_matrix.xx = (FT_Fixed)(1.5 * 0x10000L);
-    bold_matrix.xy = (FT_Fixed)(0.0 * 0x10000L);
-    bold_matrix.yx = (FT_Fixed)(0.0 * 0x10000L);
-    bold_matrix.yy = (FT_Fixed)(1.0 * 0x10000L);
+    bold_matrix.xx = static_cast<FT_Fixed>(1.5 * 0x10000L);
+    bold_matrix.xy = static_cast<FT_Fixed>(0.0 * 0x10000L);
+    bold_matrix.yx = static_cast<FT_Fixed>(0.0 * 0x10000L);
+    bold_matrix.yy = static_cast<FT_Fixed>(1.0 * 0x10000L);
 
-    italic_bold_matrix.xx = (FT_Fixed)(cos(angle) * 1.5 * 0x10000L);
-    italic_bold_matrix.xy = (FT_Fixed)(-sin(angle) * 1.5 * 0x10000L);
-    italic_bold_matrix.yx = (FT_Fixed)(0 * 0x10000L);
-    italic_bold_matrix.yy = (FT_Fixed)(1 * 0x10000L);
+    italic_bold_matrix.xx = static_cast<FT_Fixed>(cos(angle) * 1.5 * 0x10000L);
+    italic_bold_matrix.xy = static_cast<FT_Fixed>(-sin(angle) * 1.5 * 0x10000L);
+    italic_bold_matrix.yx = 0 * 0x10000L;
+    italic_bold_matrix.yy = 1 * 0x10000L;
 }
 
 void TextSubtitlesRenderFT::loadFontMap()
@@ -105,12 +105,12 @@ void TextSubtitlesRenderFT::loadFontMap()
             continue;
 
         FT_Face font;
-        int error = FT_New_Face(library, fontFile.c_str(), 0, &font);
+        const int error = FT_New_Face(library, fontFile.c_str(), 0, &font);
         if (error == 0)
         {
             string fontFamily = strToLowerCase(font->family_name);
 
-            std::map<std::string, std::string>::iterator itr = m_fontNameToFile.find(fontFamily);
+            auto itr = m_fontNameToFile.find(fontFamily);
 
             if (itr == m_fontNameToFile.end() || fontFile.length() < itr->second.length())
             {
@@ -129,7 +129,8 @@ void TextSubtitlesRenderFT::setRenderSize(int width, int height)
     m_width = width;
     m_height = height;
     delete m_pData;
-    m_pData = new uint8_t[width * height * 4];  // 32bpp ARGB buffer
+    const int size = width * height * 4;
+    m_pData = new uint8_t[size];  // 32bpp ARGB buffer
 }
 
 string TextSubtitlesRenderFT::findAdditionFontFile(const string& fontName, const string& fontExt, bool isBold,
@@ -141,77 +142,68 @@ string TextSubtitlesRenderFT::findAdditionFontFile(const string& fontName, const
     {
         if (fileExists(fontName + string("BI") + fontExt))
             return fontName + string("BI") + fontExt;
-        else if (fileExists(fontName + string("Bi") + fontExt))
+        if (fileExists(fontName + string("Bi") + fontExt))
             return fontName + string("Bi") + fontExt;
-        else if (fileExists(fontName + string("Bd") + fontExt))
+        if (fileExists(fontName + string("Bd") + fontExt))
         {
             m_emulateItalic = true;
             return fontName + string("Bd") + fontExt;
         }
-        else if (fileExists(fontName + string("B") + fontExt))
+        if (fileExists(fontName + string("B") + fontExt))
         {
             m_emulateItalic = true;
             return fontName + string("B") + fontExt;
         }
-        else if (fileExists(fontName + string("It") + fontExt))
+        if (fileExists(fontName + string("It") + fontExt))
         {
             m_emulateBold = true;
             return fontName + string("It") + fontExt;
         }
-        else if (fileExists(fontName + string("I") + fontExt))
+        if (fileExists(fontName + string("I") + fontExt))
         {
             m_emulateBold = true;
             return fontName + string("I") + fontExt;
         }
-        else
-        {
-            m_emulateBold = true;
-            m_emulateItalic = true;
-            return fontName + fontExt;
-        }
+        m_emulateBold = true;
+        m_emulateItalic = true;
+        return fontName + fontExt;
     }
-    else if (isBold)
+    if (isBold)
     {
         if (fileExists(fontName + string("Bd") + fontExt))
         {
             return fontName + string("Bd") + fontExt;
         }
-        else if (fileExists(fontName + string("B") + fontExt))
+        if (fileExists(fontName + string("B") + fontExt))
         {
             return fontName + string("B") + fontExt;
         }
-        else
-        {
-            m_emulateBold = true;
-            return fontName + fontExt;
-        }
+        m_emulateBold = true;
+        return fontName + fontExt;
     }
-    else if (isItalic)
+    if (isItalic)
     {
         if (fileExists(fontName + string("It") + fontExt))
         {
             return fontName + string("It") + fontExt;
         }
-        else if (fileExists(fontName + string("I") + fontExt))
+        if (fileExists(fontName + string("I") + fontExt))
         {
             return fontName + string("I") + fontExt;
         }
-        else
-        {
-            m_emulateItalic = true;
-            return fontName + fontExt;
-        }
-    }
-    else
+        m_emulateItalic = true;
         return fontName + fontExt;
+    }
+
+    return fontName + fontExt;
 }
 
 int TextSubtitlesRenderFT::loadFont(const string& fontName, FT_Face& face)
 {
-    map<string, FT_Face>::iterator itr = m_fontMap.find(fontName);
+    const auto itr = m_fontMap.find(fontName);
     if (itr == m_fontMap.end())
     {
-        int error = FT_New_Face(library, fontName.c_str(), 0, &face);
+        const int error = FT_New_Face(library, fontName.c_str(), 0, &face);
         if (error)
             return error;
         // m_fontMap.insert(make_pair<string, FT_Face>(fontName, face));
@@ -231,11 +223,11 @@ void TextSubtitlesRenderFT::setFont(const Font& font)
         if (!strEndWith(fontName, string(".ttf")))
         {
             std::string fontLower = strToLowerCase(fontName);
-            map<string, string>::iterator itr = m_fontNameToFile.find(fontLower);
+            auto itr = m_fontNameToFile.find(fontLower);
             if (itr != m_fontNameToFile.end())
                 fontName = itr->second;
             else
-                THROW(ERR_COMMON, "Can't find ttf file for font " << fontName);
+                THROW(ERR_COMMON, "Can't find ttf file for font " << fontName)
         }
         string fileExt = extractFileExt(fontName);
         if (fileExt.length() > 0)
@@ -244,36 +236,36 @@ void TextSubtitlesRenderFT::setFont(const Font& font)
         string postfix;
         string modFontName =
             findAdditionFontFile(fontName, fileExt, font.m_opts & Font::BOLD, font.m_opts & Font::ITALIC);
-        int error = loadFont(modFontName, face);
+        int error = loadFont(modFontName, m_face);
         if (error == FT_Err_Unknown_File_Format)
         {
-            THROW(ERR_COMMON, "Unknown font format for file " << modFontName.c_str());
+            THROW(ERR_COMMON, "Unknown font format for file " << modFontName.c_str())
         }
         else if (error)
         {
-            THROW(ERR_COMMON, "Can't load font file " << modFontName.c_str());
+            THROW(ERR_COMMON, "Can't load font file " << modFontName.c_str())
         }
 
-        error = FT_Set_Char_Size(face,             /* handle to face object */
+        error = FT_Set_Char_Size(m_face,           /* handle to face object */
                                  0,                /* char_width in 1/64th of points */
                                  font.m_size * 64, /* char_height in 1/64th of points */
                                  64,               /* horizontal device resolution */
                                  64);              /* vertical device resolution */
         if (error)
-            THROW(ERR_COMMON, "Invalid font size " << font.m_size);
+            THROW(ERR_COMMON, "Invalid font size " << font.m_size)
 
-        m_line_thickness = FT_MulFix(face->underline_thickness, face->size->metrics.y_scale) >> 6;
+        m_line_thickness = FT_MulFix(m_face->underline_thickness, m_face->size->metrics.y_scale) >> 6;
         if (m_line_thickness < 1)
             m_line_thickness = 1;
-        m_underline_position = -FT_MulFix(face->underline_position, face->size->metrics.y_scale);
+        m_underline_position = -FT_MulFix(m_face->underline_position, m_face->size->metrics.y_scale);
         m_underline_position >>= 6;
 
         if (m_font.m_charset)
         {
-            FT_Encoding* encoding = (FT_Encoding*)&m_font.m_charset;
-            error = FT_Select_Charmap(face, *encoding);
+            auto encoding = reinterpret_cast<FT_Encoding*>(&m_font.m_charset);
+            error = FT_Select_Charmap(m_face, *encoding);
             if (error)
-                THROW(ERR_COMMON, "Can't load charset " << m_font.m_charset << " for font " << modFontName.c_str());
+                THROW(ERR_COMMON, "Can't load charset " << m_font.m_charset << " for font " << modFontName.c_str())
         }
     }
 }
@@ -281,22 +273,24 @@ void TextSubtitlesRenderFT::setFont(const Font& font)
 uint32_t grayColorToARGB(unsigned char gray, uint32_t color)
 {
     uint32_t rez = color;
-    uint8_t* bPtr = (uint8_t*)&rez;
+    const auto bPtr = reinterpret_cast<uint8_t*>(&rez);
     gray &= 0xF0;
-    for (int i = 0; i < 4; ++i) bPtr[i] = (float)bPtr[i] * (float)gray / 240.0f + 0.5;
+    for (int i = 0; i < 4; ++i)
+        bPtr[i] = static_cast<uint8_t>(lround(static_cast<float>(bPtr[i]) * static_cast<float>(gray) / 240.0f));
     return rez;
 }
 
 uint32_t clrMax(uint32_t first, uint32_t second)
 {
-    RGBQUAD* rgba = (RGBQUAD*)&first;
-    RGBQUAD* rgba2 = (RGBQUAD*)&second;
-    int first_yuv = (0.257 * rgba->rgbRed) + (0.504 * rgba->rgbGreen) + (0.098 * rgba->rgbBlue) + 16;
-    int second_yuv = (0.257 * rgba2->rgbRed) + (0.504 * rgba2->rgbGreen) + (0.098 * rgba2->rgbBlue) + 16;
+    const auto rgba = reinterpret_cast<RGBQUAD*>(&first);
+    const auto rgba2 = reinterpret_cast<RGBQUAD*>(&second);
+    const int first_yuv = static_cast<int>(0.257 * rgba->rgbRed + 0.504 * rgba->rgbGreen + 0.098 * rgba->rgbBlue) + 16;
+    const int second_yuv =
+        static_cast<int>(0.257 * rgba2->rgbRed + 0.504 * rgba2->rgbGreen + 0.098 * rgba2->rgbBlue) + 16;
     return first_yuv > second_yuv ? first : second;
 }
 
-void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, RECT* rect)
+void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, const RECT* rect) const
 {
     if (top < rect->top || top >= rect->bottom)
         return;
@@ -304,17 +298,21 @@ void TextSubtitlesRenderFT::drawHorLine(int left, int right, int top, RECT* rect
         left = rect->left;
     if (right > rect->right)
         right = rect->right;
-    uint32_t* dst = (uint32_t*)m_pData + m_width * top + left;
+    const int offset = m_width * top + left;
+    auto dst = reinterpret_cast<uint32_t*>(m_pData) + offset;
     for (int x = left; x <= right; ++x) *dst++ = convertColor(m_font.m_color);
 }
 
 struct Pixel32
 {
-    Pixel32(uint32_t val = 0)
-        : b(val & 0xff), g((val & 0xff00) >> 8), r((val & 0xff0000) >> 16), a((val & 0xff000000) >> 24)
+    Pixel32(const uint32_t val = 0)
+        : b(static_cast<uint8_t>(val)),
+          g(static_cast<uint8_t>(val >> 8)),
+          r(static_cast<uint8_t>(val >> 16)),
+          a(static_cast<uint8_t>(val >> 24))
     {
     }
-    Pixel32(uint8_t bi, uint8_t gi, uint8_t ri, uint8_t ai = 255)
+    Pixel32(const uint8_t bi, const uint8_t gi, const uint8_t ri, const uint8_t ai = 255)
     {
         b = bi;
         g = gi;
@@ -327,16 +325,20 @@ struct Pixel32
 
 struct Vec2
 {
-    Vec2() {}
-    Vec2(float a, float b) : x(a), y(b) {}
+    Vec2() = default;
+    Vec2(const int a, const int b) : x(a), y(b) {}
 
-    float x, y;
+    int x, y;
 };
 
 struct Rect
 {
-    Rect() {}
-    Rect(float left, float top, float right, float bottom) : xmin(left), xmax(right), ymin(top), ymax(bottom) {}
+    Rect() : xmin(0), xmax(0), ymin(0), ymax(0) {}
+
+    Rect(const int left, const int top, const int right, const int bottom)
+        : xmin(left), xmax(right), ymin(top), ymax(bottom)
+    {
+    }
 
     void Include(const Vec2& r)
     {
@@ -346,32 +348,33 @@ struct Rect
         ymax = FFMAX(ymax, r.y);
     }
 
-    float Width() const { return xmax - xmin + 1; }
-    float Height() const { return ymax - ymin + 1; }
+    int Width() const { return xmax - xmin + 1; }
+    int Height() const { return ymax - ymin + 1; }
 
-    float xmin, xmax, ymin, ymax;
+    int xmin, xmax, ymin, ymax;
 };
 
 struct Span
 {
-    Span() {}
-    Span(int _x, int _y, int _width, int _coverage) : x(_x), y(_y), width(_width), coverage(_coverage) {}
+    Span() : x(0), y(0), width(0), coverage(0) {}
 
-    int x, y, width, coverage;
+    Span(int _x, int _y, int _width, uint8_t _coverage) : x(_x), y(_y), width(_width), coverage(_coverage) {}
+
+    int x, y, width;
+    uint8_t coverage;
 };
 
 typedef std::vector<Span> Spans;
 
 void RasterCallback(const int y, const int count, const FT_Span* const spans, void* const user)
 {
-    Spans* sptr = (Spans*)user;
+    const auto sptr = static_cast<Spans*>(user);
     for (int i = 0; i < count; ++i) sptr->push_back(Span(spans[i].x, y, spans[i].len, spans[i].coverage));
 }
 
-void RenderSpans(FT_Library& library, FT_Outline* const outline, Spans* spans)
+void RenderSpans(const FT_Library& library, FT_Outline* const outline, Spans* spans)
 {
-    FT_Raster_Params params;
-    memset(&params, 0, sizeof(params));
+    FT_Raster_Params params = {};
     params.flags = FT_RASTER_FLAG_AA | FT_RASTER_FLAG_DIRECT;
     params.gray_spans = RasterCallback;
     params.user = spans;
@@ -379,12 +382,12 @@ void RenderSpans(FT_Library& library, FT_Outline* const outline, Spans* spans)
     FT_Outline_Render(library, outline, &params);
 }
 
-void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, const Pixel32& fontCol, const Pixel32 outlineColOut,
-                 const Pixel32 outlineColIner, float outlineWidth, int left, int top, int width, int height,
-                 uint32_t* dstData)
+void RenderGlyph(const FT_Library& library, const uint32_t ch, const FT_Face& face, const Pixel32& fontCol,
+                 const Pixel32 outlineColOut, const Pixel32 outlineColIner, const float outlineWidth, int left, int top,
+                 const int width, const int height, uint32_t* dstData)
 {
     // Load the glyph we are looking for.
-    FT_UInt gindex = FT_Get_Char_Index(face, ch);
+    const FT_UInt gindex = FT_Get_Char_Index(face, ch);
     // Need an outline for this to work.
     if (FT_Load_Glyph(face, gindex, FT_LOAD_NO_BITMAP) != 0 || face->glyph->format != FT_GLYPH_FORMAT_OUTLINE)
         return;
@@ -402,7 +405,8 @@ void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, const Pixel32&
     {
         FT_Stroker strokerOut;
         FT_Stroker_New(library, &strokerOut);
-        FT_Stroker_Set(strokerOut, (int)(outlineWidth * 64), FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+        FT_Stroker_Set(strokerOut, static_cast<int>(outlineWidth * 64), FT_STROKER_LINECAP_ROUND,
+                       FT_STROKER_LINEJOIN_ROUND, 0);
         FT_Glyph_StrokeBorder(&glyph, strokerOut, 0, 1);
         // Again, this needs to be an outline to work.
         if (glyph->format == FT_GLYPH_FORMAT_OUTLINE)
@@ -417,7 +421,8 @@ void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, const Pixel32&
         FT_Get_Glyph(face->glyph, &glyph);
         FT_Stroker strokerIn;
         FT_Stroker_New(library, &strokerIn);
-        FT_Stroker_Set(strokerIn, (int)(outlineWidth * 32), FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+        FT_Stroker_Set(strokerIn, static_cast<int>(outlineWidth * 32), FT_STROKER_LINECAP_ROUND,
+                       FT_STROKER_LINEJOIN_ROUND, 0);
         FT_Glyph_StrokeBorder(&glyph, strokerIn, 0, 1);
         if (glyph->format == FT_GLYPH_FORMAT_OUTLINE)
         {
@@ -430,82 +435,86 @@ void RenderGlyph(FT_Library& library, uint32_t ch, FT_Face& face, const Pixel32&
         if (!spans.empty())
         {
             // Figure out what the bounding rect is for both the span lists.
-            Rect rect(spans.front().x, spans.front().y, spans.front().x, spans.front().y);
-            for (Spans::iterator s = spans.begin(); s != spans.end(); ++s)
+            Rect rect(spans[0].x, spans[0].y, spans[0].x, spans[0].y);
+            for (const auto& span : spans)
             {
-                rect.Include(Vec2(s->x, s->y));
-                rect.Include(Vec2(s->x + s->width - 1, s->y));
+                rect.Include(Vec2(span.x, span.y));
+                rect.Include(Vec2(span.x + span.width - 1, span.y));
             }
-            for (Spans::iterator s = outlineSpansOut.begin(); s != outlineSpansOut.end(); ++s)
+            for (const auto& span : outlineSpansOut)
             {
-                rect.Include(Vec2(s->x, s->y));
-                rect.Include(Vec2(s->x + s->width - 1, s->y));
+                rect.Include(Vec2(span.x, span.y));
+                rect.Include(Vec2(span.x + span.width - 1, span.y));
             }
-            for (Spans::iterator s = outlineSpansIner.begin(); s != outlineSpansIner.end(); ++s)
+            for (const auto& span : outlineSpansIner)
             {
-                rect.Include(Vec2(s->x, s->y));
-                rect.Include(Vec2(s->x + s->width - 1, s->y));
+                rect.Include(Vec2(span.x, span.y));
+                rect.Include(Vec2(span.x + span.width - 1, span.y));
             }
 
             // This is unused in this test but you would need this to draw
             // more than one glyph.
-            float bearingX = face->glyph->metrics.horiBearingX >> 6;
-            float bearingY = face->glyph->metrics.horiBearingY >> 6;
+            const int bearingX = face->glyph->metrics.horiBearingX >> 6;
+            const int bearingY = face->glyph->metrics.horiBearingY >> 6;
 
             // Get some metrics of our image.
-            int imgHeight = rect.Height();
+            const int imgHeight = rect.Height();
 
             top += (face->size->metrics.ascender >> 6) - bearingY;
             left += bearingX;
 
             // Loop over the outline spans and just draw them into the image.
-            for (Spans::iterator s = outlineSpansOut.begin(); s != outlineSpansOut.end(); ++s)
+            for (const auto& span : outlineSpansOut)
             {
-                for (int w = 0; w < s->width; ++w)
+                for (int w = 0; w < span.width; ++w)
                 {
-                    int y = imgHeight - 1 - (s->y - rect.ymin) + top;
-                    int x = s->x + w + left;
+                    const int y = imgHeight - 1 - (span.y - rect.ymin) + top;
+                    const int x = span.x + w + left;
                     if (y >= 0 && y < height && x >= 0 && x < width)
                     {
-                        Pixel32* dst = (Pixel32*)dstData + y * width + x;
-                        if (*(uint32_t*)dst == 0)
-                            *dst = Pixel32(outlineColOut.r, outlineColOut.g, outlineColOut.b,
-                                           s->coverage * outlineColOut.a / 255.0);
+                        const int offset = y * width + x;
+                        const auto dst = reinterpret_cast<Pixel32*>(dstData) + offset;
+                        if (*reinterpret_cast<uint32_t*>(dst) == 0)
+                            *dst = Pixel32(
+                                outlineColOut.r, outlineColOut.g, outlineColOut.b,
+                                static_cast<uint8_t>(static_cast<float>(span.coverage * outlineColOut.a) / 255.0F));
                     }
                 }
             }
 
             // Loop over the outline spans and just draw them into the image.
-            for (Spans::iterator s = outlineSpansIner.begin(); s != outlineSpansIner.end(); ++s)
+            for (const auto& span : outlineSpansIner)
             {
-                for (int w = 0; w < s->width; ++w)
+                for (int w = 0; w < span.width; ++w)
                 {
-                    int y = imgHeight - 1 - (s->y - rect.ymin) + top;
-                    int x = s->x + w + left;
+                    const int y = imgHeight - 1 - (span.y - rect.ymin) + top;
+                    const int x = span.x + w + left;
                     if (y >= 0 && y < height && x >= 0 && x < width)
                     {
-                        Pixel32* dst = (Pixel32*)dstData + y * width + x;
-                        *dst = Pixel32(outlineColIner.r, outlineColIner.g, outlineColIner.b, s->coverage);
+                        const int offset = y * width + x;
+                        Pixel32* dst = reinterpret_cast<Pixel32*>(dstData) + offset;
+                        *dst = Pixel32(outlineColIner.r, outlineColIner.g, outlineColIner.b, span.coverage);
                     }
                 }
             }
 
             // Then loop over the regular glyph spans and blend them into the image.
-            for (Spans::iterator s = spans.begin(); s != spans.end(); ++s)
+            for (const auto& span : spans)
             {
-                for (int w = 0; w < s->width; ++w)
+                for (int w = 0; w < span.width; ++w)
                 {
-                    int y = imgHeight - 1 - (s->y - rect.ymin) + top;
-                    int x = s->x + w + left;
+                    const int y = imgHeight - 1 - (span.y - rect.ymin) + top;
+                    const int x = span.x + w + left;
 
                     if (y >= 0 && y < height && x >= 0 && x < width)
                     {
-                        Pixel32* dst = (Pixel32*)dstData + y * width + x;
+                        const int offset = y * width + x;
+                        const auto dst = reinterpret_cast<Pixel32*>(dstData) + offset;
 
-                        Pixel32 src = Pixel32(fontCol.r, fontCol.g, fontCol.b, s->coverage);
-                        dst->r = (int)(dst->r + ((src.r - dst->r) * src.a) / 255.0f);
-                        dst->g = (int)(dst->g + ((src.g - dst->g) * src.a) / 255.0f);
-                        dst->b = (int)(dst->b + ((src.b - dst->b) * src.a) / 255.0f);
+                        const auto src = Pixel32(fontCol.r, fontCol.g, fontCol.b, span.coverage);
+                        dst->r = static_cast<uint8_t>(static_cast<float>(dst->r + (src.r - dst->r) * src.a) / 255.0f);
+                        dst->g = static_cast<uint8_t>(static_cast<float>(dst->g + (src.g - dst->g) * src.a) / 255.0f);
+                        dst->b = static_cast<uint8_t>(static_cast<float>(dst->b + (src.b - dst->b) * src.a) / 255.0f);
                         dst->a = FFMIN(255, dst->a + src.a);
                     }
                 }
@@ -527,40 +536,41 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
     int maxX = 0;
 
     if (m_emulateItalic && m_emulateBold)
-        FT_Set_Transform(face, &italic_bold_matrix, &pen);
+        FT_Set_Transform(m_face, &italic_bold_matrix, &pen);
     else if (m_emulateItalic)
-        FT_Set_Transform(face, &italic_matrix, &pen);
+        FT_Set_Transform(m_face, &italic_matrix, &pen);
     else if (m_emulateBold)
-        FT_Set_Transform(face, &bold_matrix, &pen);
+        FT_Set_Transform(m_face, &bold_matrix, &pen);
     else
-        FT_Set_Transform(face, 0, &pen);
+        FT_Set_Transform(m_face, nullptr, &pen);
 
-    uint8_t alpha = m_font.m_color >> 24;
-    uint8_t outColor = (float)alpha / 255.0 * 48.0 + 0.5;
-    convertUTF::IterateUTF8Chars(text, [&](auto c) {
-        RenderGlyph(library, c, face, m_font.m_color, Pixel32(0, 0, 0, outColor), Pixel32(0, 0, 0, alpha),
-                    m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom, (uint32_t*)m_pData);
-
-        pen.x += face->glyph->advance.x >> 6;
-        pen.x += lround(m_font.m_borderWidth / 2.0F);
-        if (m_emulateBold || m_emulateItalic)
-            pen.x += m_line_thickness - 1;
-        maxX = pen.x + face->glyph->bitmap_left;
-        return true;
-    });
-    if ((m_font.m_opts & m_font.UNDERLINE) || (m_font.m_opts & m_font.STRIKE_OUT))
+    const uint8_t alpha = m_font.m_color >> 24;
+    const auto outColor = static_cast<uint8_t>(lround(static_cast<float>(alpha) / 255.0 * 48.0));
+    convertUTF::IterateUTF8Chars(text,
+                                 [&](auto c)
+                                 {
+                                     RenderGlyph(library, c, m_face, m_font.m_color, Pixel32(0, 0, 0, outColor),
+                                                 Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y,
+                                                 rect->right, rect->bottom, reinterpret_cast<uint32_t*>(m_pData));
+                                     pen.x += m_face->glyph->advance.x >> 6;
+                                     pen.x += lround(m_font.m_borderWidth / 2.0F);
+                                     if (m_emulateBold || m_emulateItalic)
+                                         pen.x += m_line_thickness - 1;
+                                     maxX = pen.x + m_face->glyph->bitmap_left;
+                                     return true;
+                                 });
+    if (m_font.m_opts & Font::UNDERLINE || m_font.m_opts & Font::STRIKE_OUT)
     {
-        // SIZE size;
-        // getTextSize(text, &size);
-        if (m_font.m_opts & m_font.UNDERLINE)
+        if (m_font.m_opts & Font::UNDERLINE)
         {
-            int y = pen.y + (face->size->metrics.ascender >> 6) + m_underline_position - m_line_thickness / 2;
+            const int y = pen.y + (m_face->size->metrics.ascender >> 6) + m_underline_position - m_line_thickness / 2;
             for (int i = 0; i < m_line_thickness; ++i)
                 drawHorLine(rect->left, /*rect->left + size.cx*/ maxX, y + i, rect);
         }
-        if (m_font.m_opts & m_font.STRIKE_OUT)
+        if (m_font.m_opts & Font::STRIKE_OUT)
         {
-            int y = pen.y + (face->size->metrics.ascender >> 6) * 2.0 / 3.0 - m_line_thickness / 2;
+            const int y =
+                pen.y + static_cast<int>((m_face->size->metrics.ascender >> 6) * 2.0 / 3.0) - m_line_thickness / 2;
             for (int i = 0; i < m_line_thickness; ++i)
                 drawHorLine(rect->left, /*rect->left + size.cx*/ pen.x, y + i, rect);
         }
@@ -575,36 +585,38 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
     mSize->cy = mSize->cx = 0;
 
     if (m_emulateItalic && m_emulateBold)
-        FT_Set_Transform(face, &italic_bold_matrix, &pen);
+        FT_Set_Transform(m_face, &italic_bold_matrix, &pen);
     else if (m_emulateItalic)
-        FT_Set_Transform(face, &italic_matrix, &pen);
+        FT_Set_Transform(m_face, &italic_matrix, &pen);
     else if (m_emulateBold)
-        FT_Set_Transform(face, &bold_matrix, &pen);
+        FT_Set_Transform(m_face, &bold_matrix, &pen);
     else
-        FT_Set_Transform(face, 0, &pen);
+        FT_Set_Transform(m_face, nullptr, &pen);
 
-    convertUTF::IterateUTF8Chars(text, [&](auto c) {
-        int glyph_index = FT_Get_Char_Index(face, c);
-        int error = FT_Load_Glyph(face, glyph_index, 0);
-        if (error)
-            THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font");
+    convertUTF::IterateUTF8Chars(text,
+                                 [&](auto c)
+                                 {
+                                     const int glyph_index = FT_Get_Char_Index(m_face, c);
+                                     int error = FT_Load_Glyph(m_face, glyph_index, 0);
+                                     if (error)
+                                         THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font")
 
-        error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-        if (error)
-            THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font");
-        pen.x += face->glyph->advance.x >> 6;
-        if (m_emulateBold || m_emulateItalic)
-            pen.x += m_line_thickness - 1;
-        pen.x += lround(m_font.m_borderWidth / 2.0F);
-        mSize->cy = face->size->metrics.height >> 6;
-        mSize->cx = pen.x + face->glyph->bitmap_left;
-        return true;
-    });
+                                     error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+                                     if (error)
+                                         THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font")
+                                     pen.x += m_face->glyph->advance.x >> 6;
+                                     if (m_emulateBold || m_emulateItalic)
+                                         pen.x += m_line_thickness - 1;
+                                     pen.x += lround(m_font.m_borderWidth / 2.0F);
+                                     mSize->cy = m_face->size->metrics.height >> 6;
+                                     mSize->cx = pen.x + m_face->glyph->bitmap_left;
+                                     return true;
+                                 });
 }
 
-int TextSubtitlesRenderFT::getLineSpacing() { return face->size->metrics.height >> 6; }
+int TextSubtitlesRenderFT::getLineSpacing() { return m_face->size->metrics.height >> 6; }
 
-int TextSubtitlesRenderFT::getBaseline() { return abs(face->size->metrics.descender) >> 6; }
+int TextSubtitlesRenderFT::getBaseline() { return abs(m_face->size->metrics.descender) >> 6; }
 
 void TextSubtitlesRenderFT::flushRasterBuffer() { return; }
 

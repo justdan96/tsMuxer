@@ -28,7 +28,7 @@ class TextSubtitlesRenderFT final : public TextSubtitlesRender
    private:
     static FT_Library library;
     static std::map<std::string, std::string> m_fontNameToFile;
-    FT_Face face;
+    FT_Face m_face;
     bool m_emulateItalic;
     bool m_emulateBold;
     int m_underline_position;
@@ -36,11 +36,11 @@ class TextSubtitlesRenderFT final : public TextSubtitlesRender
     FT_Matrix italic_matrix;
     FT_Matrix bold_matrix;
     FT_Matrix italic_bold_matrix;
-    void drawHorLine(int left, int right, int top, RECT* rect);
+    void drawHorLine(int left, int right, int top, const RECT* rect) const;
     std::string findAdditionFontFile(const std::string& fontName, const std::string& fontExt, bool isBold,
                                      bool isItalic);
     int loadFont(const std::string& fontName, FT_Face& face);
-    void loadFontMap();
+    static void loadFontMap();
 
     std::map<std::string, FT_Face> m_fontMap;
 };
