@@ -146,7 +146,7 @@ uint8_t* BufferedReader::readBlock(const int readerID, uint32_t& readCnt, int& r
         std::unique_lock lk(m_readMtx);
         while (data->m_nextBlockSize == 0 && !data->m_eof) m_readCond.wait(lk);
     }
-    readCnt = data->m_nextBlockSize;
+    readCnt = data->m_nextBlockSize >= 0 ? data->m_nextBlockSize : 0;
     rez = data->m_eof ? DATA_EOF : NO_ERROR;
     const uint8_t prevIndex = data->m_bufferIndex;
     data->m_bufferIndex = 1 - data->m_bufferIndex;
@@ -200,7 +200,7 @@ void BufferedReader::thread_main()
                 uint8_t* buffer = data->m_nextBlock[data->m_bufferIndex] + data->m_readOffset;
                 if (!data->m_deleted)
                 {
-                    uint32_t bytesReaded = data->readBlock(buffer, data->m_blockSize);
+                    int bytesReaded = data->readBlock(buffer, data->m_blockSize);
                     if (data->m_lastBlock)
                     {
                         data->m_lastBlock = false;
@@ -211,7 +211,7 @@ void BufferedReader::thread_main()
                         data->m_firstBlock = false;
                     }
 
-                    if ((bytesReaded < data->m_blockSize && data->itr) || bytesReaded <= 0)
+                    if (bytesReaded <= 0 || (bytesReaded < static_cast<int>(data->m_blockSize) && data->itr))
                     {
                         if (data->itr)
                         {
@@ -227,7 +227,7 @@ void BufferedReader::thread_main()
                                         // data->m_nextFileInfo = NEXT_FILE_FIRST_BLOCK;
                                         data->m_firstBlock = true;
                                         bytesReaded = data->readBlock(buffer, m_blockSize);
-                                        if (bytesReaded < m_blockSize)
+                                        if (bytesReaded < static_cast<int> (m_blockSize))
                                         {
                                             data->m_eof = true;
                                             data->m_lastBlock = true;

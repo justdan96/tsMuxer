@@ -60,13 +60,13 @@ virtual void deleteNextBlocks()
         return false;
     }
 
-    virtual uint32_t readBlock(uint8_t* buffer, uint32_t max_size) = 0;
+    virtual int readBlock(uint8_t* buffer, uint32_t max_size) = 0;
 
     virtual bool closeStream() = 0;
 
     uint8_t m_bufferIndex;
     bool m_notified;
-    uint32_t m_nextBlockSize;
+    int m_nextBlockSize;
     bool m_deleted;
     bool m_firstBlock;
     bool m_lastBlock;

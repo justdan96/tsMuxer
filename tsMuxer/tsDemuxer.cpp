@@ -379,7 +379,7 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
                 }
 
                 if (m_firstPtsTime.find(pid) == m_firstPtsTime.end() ||
-                    m_curFileNum == 0 && curPts < m_firstPtsTime[pid])
+                    (m_curFileNum == 0 && curPts < m_firstPtsTime[pid]))
                     m_firstPtsTime[pid] = curPts;
             }
 
