@@ -227,7 +227,7 @@ void BufferedReader::thread_main()
                                         // data->m_nextFileInfo = NEXT_FILE_FIRST_BLOCK;
                                         data->m_firstBlock = true;
                                         bytesReaded = data->readBlock(buffer, m_blockSize);
-                                        if (bytesReaded < static_cast<int> (m_blockSize))
+                                        if (bytesReaded < static_cast<int>(m_blockSize))
                                         {
                                             data->m_eof = true;
                                             data->m_lastBlock = true;

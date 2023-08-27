@@ -545,19 +545,17 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
 
     const uint8_t alpha = m_font.m_color >> 24;
     const auto outColor = static_cast<uint8_t>(lround(static_cast<float>(alpha) / 255.0 * 48.0));
-    convertUTF::IterateUTF8Chars(text,
-                                 [&](auto c)
-                                 {
-                                     RenderGlyph(library, c, m_face, m_font.m_color, Pixel32(0, 0, 0, outColor),
-                                                 Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y,
-                                                 rect->right, rect->bottom, reinterpret_cast<uint32_t*>(m_pData));
-                                     pen.x += m_face->glyph->advance.x >> 6;
-                                     pen.x += lround(m_font.m_borderWidth / 2.0F);
-                                     if (m_emulateBold || m_emulateItalic)
-                                         pen.x += m_line_thickness - 1;
-                                     maxX = pen.x + m_face->glyph->bitmap_left;
-                                     return true;
-                                 });
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        RenderGlyph(library, c, m_face, m_font.m_color, Pixel32(0, 0, 0, outColor),
+                    Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y,
+                    rect->right, rect->bottom, reinterpret_cast<uint32_t*>(m_pData));
+        pen.x += m_face->glyph->advance.x >> 6;
+        pen.x += lround(m_font.m_borderWidth / 2.0F);
+        if (m_emulateBold || m_emulateItalic)
+            pen.x += m_line_thickness - 1;
+        maxX = pen.x + m_face->glyph->bitmap_left;
+        return true;
+    });
     if (m_font.m_opts & Font::UNDERLINE || m_font.m_opts & Font::STRIKE_OUT)
     {
         if (m_font.m_opts & Font::UNDERLINE)
@@ -592,25 +590,23 @@ void TextSubtitlesRenderFT::getTextSize(const string& text, SIZE* mSize)
     else
         FT_Set_Transform(m_face, nullptr, &pen);
 
-    convertUTF::IterateUTF8Chars(text,
-                                 [&](auto c)
-                                 {
-                                     const int glyph_index = FT_Get_Char_Index(m_face, c);
-                                     int error = FT_Load_Glyph(m_face, glyph_index, 0);
-                                     if (error)
-                                         THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font")
+    convertUTF::IterateUTF8Chars(text, [&](auto c) {
+        const int glyph_index = FT_Get_Char_Index(m_face, c);
+        int error = FT_Load_Glyph(m_face, glyph_index, 0);
+        if (error)
+            THROW(ERR_COMMON, "Can't load symbol code '" << c << "' from font")
 
-                                     error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
-                                     if (error)
-                                         THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font")
-                                     pen.x += m_face->glyph->advance.x >> 6;
-                                     if (m_emulateBold || m_emulateItalic)
-                                         pen.x += m_line_thickness - 1;
-                                     pen.x += lround(m_font.m_borderWidth / 2.0F);
-                                     mSize->cy = m_face->size->metrics.height >> 6;
-                                     mSize->cx = pen.x + m_face->glyph->bitmap_left;
-                                     return true;
-                                 });
+        error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+        if (error)
+            THROW(ERR_COMMON, "Can't render symbol code '" << c << "' from font")
+        pen.x += m_face->glyph->advance.x >> 6;
+        if (m_emulateBold || m_emulateItalic)
+            pen.x += m_line_thickness - 1;
+        pen.x += lround(m_font.m_borderWidth / 2.0F);
+        mSize->cy = m_face->size->metrics.height >> 6;
+        mSize->cx = pen.x + m_face->glyph->bitmap_left;
+        return true;
+    });
 }
 
 int TextSubtitlesRenderFT::getLineSpacing() { return m_face->size->metrics.height >> 6; }
