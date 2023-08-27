@@ -8,7 +8,7 @@
 #include <string>
 
 #include "abstractDemuxer.h"
-#include "abstractreader.h"
+#include "abstractReader.h"
 
 struct ReaderData
 {

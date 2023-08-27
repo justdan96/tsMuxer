@@ -3,7 +3,7 @@
 
 #include <fs/systemlog.h>
 
-#include "abstractreader.h"
+#include "abstractReader.h"
 #include "vod_common.h"
 
 #ifndef NO_ERROR
