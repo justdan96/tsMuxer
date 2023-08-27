@@ -1,5 +1,4 @@
-// #if !defined(_WIN32) || defined(WIN32_DEBUG_FREETYPE)
-
+#if !defined(_WIN32) || defined(WIN32_DEBUG_FREETYPE)
 #ifdef _WIN32
 #pragma comment(lib, "../../freetype/lib/freetype.lib")
 #endif
