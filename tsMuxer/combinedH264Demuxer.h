@@ -5,7 +5,7 @@
 #include <string>
 
 #include "abstractDemuxer.h"
-#include "abstractreader.h"
+#include "abstractReader.h"
 #include "bufferedReaderManager.h"
 #include "subTrackFilter.h"
 
