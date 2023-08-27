@@ -546,9 +546,9 @@ void TextSubtitlesRenderFT::drawText(const string& text, RECT* rect)
     const uint8_t alpha = m_font.m_color >> 24;
     const auto outColor = static_cast<uint8_t>(lround(static_cast<float>(alpha) / 255.0 * 48.0));
     convertUTF::IterateUTF8Chars(text, [&](auto c) {
-        RenderGlyph(library, c, m_face, m_font.m_color, Pixel32(0, 0, 0, outColor),
-                    Pixel32(0, 0, 0, alpha), m_font.m_borderWidth, pen.x, pen.y,
-                    rect->right, rect->bottom, reinterpret_cast<uint32_t*>(m_pData));
+        RenderGlyph(library, c, m_face, m_font.m_color, Pixel32(0, 0, 0, outColor), Pixel32(0, 0, 0, alpha),
+                    m_font.m_borderWidth, pen.x, pen.y, rect->right, rect->bottom,
+                    reinterpret_cast<uint32_t*>(m_pData));
         pen.x += m_face->glyph->advance.x >> 6;
         pen.x += lround(m_font.m_borderWidth / 2.0F);
         if (m_emulateBold || m_emulateItalic)
