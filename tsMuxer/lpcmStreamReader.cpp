@@ -585,7 +585,7 @@ int LPCMStreamReader::decodeFrame(uint8_t* buff, uint8_t* end, int& skipBytes, i
         }
         if (end - buff < m_frameRest + hdrSize)
             return NOT_ENOUGH_BUFFER;
-        const int frameLen = static_cast<int>(m_frameRest);
+        const int frameLen = m_frameRest;
         m_frameRest = 0;
         m_needPCMHdr = false;
         return frameLen;

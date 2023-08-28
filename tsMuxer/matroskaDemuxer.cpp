@@ -741,7 +741,7 @@ int MatroskaDemuxer::matroska_parse_blockgroup(const int64_t cluster_time)
             int64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            duration = static_cast<int64_t>(num);
+            duration = num;
             break;
         }
 
@@ -936,7 +936,7 @@ int MatroskaDemuxer::matroska_parse_cluster()
             int64_t num;
             if ((res = ebml_read_uint(&id, &num)) < 0)
                 break;
-            cluster_time = static_cast<int64_t>(num);
+            cluster_time = num;
             break;
         }
 
