@@ -247,8 +247,10 @@ void TSMuxer::intAddStream(const std::string& streamName, const std::string& cod
             m_pesType[tsStreamIndex] = PES_INT_AC3_ID;
         else if (codecName == "A_DTS")
             m_pesType[tsStreamIndex] = PES_INT_DTS_ID;
-        else
+        else if(codecName == "A_MP3")
             m_pesType[tsStreamIndex] = PES_AUDIO_ID;
+        else
+            m_pesType[tsStreamIndex] = PES_PRIVATE_DATA1;
     }
     else if (codecName[0] == 'S')
     {
