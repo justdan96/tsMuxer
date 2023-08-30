@@ -21,7 +21,7 @@ const std::string MLPStreamReader::getStreamInfo()
     str << ". ";
     str << "Peak bitrate: " << m_bitrate / 1000 << "Kbps ";
     str << "Sample Rate: " << m_samplerate / 1000 << "KHz ";
-    str << "Channels: " << m_channels;
+    str << "Channels: " << static_cast<int>(m_channels);
     return str.str();
 }
 

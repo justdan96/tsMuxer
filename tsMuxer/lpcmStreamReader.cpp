@@ -416,7 +416,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
 
         m_channels = static_cast<uint8_t>(waveFormatPCMEx->nChannels);
         if (m_channels > 8)
-            THROW(ERR_COMMON, "Too many channels: " << m_channels << ". Maximum supported value is 8(7.1)")
+            THROW(ERR_COMMON, "Too many channels: " << static_cast<int>(m_channels) << ". Maximum supported value is 8(7.1)")
         if (m_channels == 0)
             THROW(ERR_COMMON, "Invalid channels count: 0. WAVE header is invalid.")
         m_freq = waveFormatPCMEx->nSamplesPerSec;
