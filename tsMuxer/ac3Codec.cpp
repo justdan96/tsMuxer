@@ -381,7 +381,7 @@ int AC3Codec::decodeFrame(uint8_t *buf, uint8_t *end, int &skipBytes)
             int trueHDFrameLen = (trueHDData[0] & 0x0f) << 8;
             trueHDFrameLen += trueHDData[1];
             trueHDFrameLen *= 2;
-            if (end - trueHDData < static_cast<int64_t>(trueHDFrameLen) + 7)
+            if (end - trueHDData < static_cast<int64_t>(trueHDFrameLen))
                 return NOT_ENOUGH_BUFFER;
             if (!m_true_hd_mode)
             {
