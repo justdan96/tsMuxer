@@ -482,7 +482,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
 
         string dstDir = string("BDMV") + getDirSeparator() + string("CLIPINF") + getDirSeparator();
         string clipName = extractFileName(muxer->getFileNameByIdx(i));
-        if (!file->open(prefix.append(dstDir).append(clipName).append(".clpi").c_str(), File::ofWrite))
+        if (!file->open((prefix + dstDir + clipName + ".clpi").c_str(), File::ofWrite))
         {
             delete[] clpiBuffer;
             delete file;
@@ -499,7 +499,7 @@ bool BlurayHelper::createCLPIFile(TSMuxer* muxer, int clpiNum, bool doLog) const
 
         dstDir = string("BDMV") + getDirSeparator() + string("BACKUP") + getDirSeparator() + string("CLIPINF") +
                  getDirSeparator();
-        if (!file->open(prefix.append(dstDir).append(clipName).append(".clpi").c_str(), File::ofWrite))
+        if (!file->open((prefix + dstDir + clipName + ".clpi").c_str(), File::ofWrite))
         {
             delete[] clpiBuffer;
             delete file;
