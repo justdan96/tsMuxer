@@ -106,7 +106,7 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
         if (m_frame_size < AC3_HEADER_SIZE)
             return AC3ParseError::FRAME_SIZE;  // invalid header size
 
-        if (end < m_frame_size + buf)
+        if (end + 2 < m_frame_size + buf)
             return AC3ParseError::NOT_ENOUGH_BUFFER;
 
         if (!crc32(buf, m_frame_size - 4))
