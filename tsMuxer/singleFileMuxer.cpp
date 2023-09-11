@@ -74,7 +74,7 @@ void SingleFileMuxer::intAddStream(const std::string& streamName, const std::str
         const auto ac3Reader = dynamic_cast<AC3StreamReader*>(codecReader);
         if (ac3Reader->isTrueHD() && !ac3Reader->getDownconvertToAC3())
             fileExt = ".ac3+thd";
-        else if (ac3Reader->isEAC3())
+        else if (ac3Reader->isEAC3() && !ac3Reader->getDownconvertToAC3())
         {
             if (ac3Reader->isAC3())
                 fileExt = ".ac3+ec3";
