@@ -590,7 +590,7 @@ DetectStreamRez METADemuxer::DetectStreamReader(const BufferedReaderManager& rea
         demuxer = new ProgramStreamDemuxer(readManager);
         containerType = AbstractStreamReader::ContainerType::ctEVOB;
     }
-    else if (fileExt == "mkv" || fileExt == "mka")
+    else if (fileExt == "mkv" || fileExt == "mka" || fileExt == "mks")
     {
         demuxer = new MatroskaDemuxer(readManager);
         containerType = AbstractStreamReader::ContainerType::ctMKV;
