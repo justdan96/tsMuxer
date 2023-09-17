@@ -449,7 +449,7 @@ int METADemuxer::addStream(const string& codec, const string& codecStreamName, c
         else
             codecReader->setSrcContainerType(AbstractStreamReader::ContainerType::ctVOB);
     }
-    else if (strEndWith(tmpname, ".mkv") || strEndWith(tmpname, ".mka"))
+    else if (strEndWith(tmpname, ".mkv") || strEndWith(tmpname, ".mka") || strEndWith(tmpname, ".mks"))
     {
         if (pid)
             dataReader = &m_containerReader;
@@ -1420,7 +1420,7 @@ bool ContainerToReaderWrapper::openStream(int readerID, const char* streamName, 
             demuxer = m_demuxers[streamName].m_demuxer = new ProgramStreamDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;
         }
-        else if (ext == "MKV" || ext == "MKA")
+        else if (ext == "MKV" || ext == "MKA" || ext == "MKS")
         {
             demuxer = m_demuxers[streamName].m_demuxer = new MatroskaDemuxer(m_readManager);
             m_demuxers[streamName].m_streamName = streamName;
