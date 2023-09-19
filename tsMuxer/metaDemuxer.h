@@ -121,6 +121,7 @@ class ContainerToReaderWrapper final : public AbstractReader
         m_terminated = false;
     }
     uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) override;
+    bool incSeek(int readerID, int64_t offset) override { return false; }
     void notify(int readerID, uint32_t dataReaded) override {}
     int createReader(int readBuffOffset = 0) override;
     void deleteReader(int readerID) override;

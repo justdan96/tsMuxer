@@ -19,6 +19,7 @@ class AbstractReader
     AbstractReader() : m_blockSize(0), m_allocSize(0), m_prereadThreshold(0) {}
     virtual ~AbstractReader() = default;
     virtual uint8_t* readBlock(int readerID, uint32_t& readCnt, int& rez, bool* firstBlockVar = nullptr) = 0;
+    virtual bool incSeek(int readerID, int64_t offset) = 0;
     virtual void notify(int readerID, uint32_t dataReaded) = 0;
     virtual int createReader(int readBuffOffset = 0) = 0;
     virtual void deleteReader(int readerID) = 0;

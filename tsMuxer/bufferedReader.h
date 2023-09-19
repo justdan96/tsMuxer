@@ -94,7 +94,7 @@ class BufferedReader : public AbstractReader, TerminatableThread
     uint32_t getReaderCount();
     void terminate();
     void setFileIterator(FileNameIterator* itr, int readerID);
-    bool incSeek(int readerID, int64_t offset);
+    bool incSeek(int readerID, int64_t offset) override;
     bool gotoByte(int readerID, int64_t seekDist) override { return false; }
 
     void setId(const uint32_t value) { m_id = value; }

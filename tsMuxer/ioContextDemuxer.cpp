@@ -87,15 +87,17 @@ unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
     int readRez = 0;
     uint8_t* dst = binary;
     const uint8_t* dstEnd = dst + size;
+
     if (m_curPos < m_bufEnd)
     {
-        const unsigned copyLen = min((unsigned)(m_bufEnd - m_curPos), size);
+        const unsigned copyLen = min(static_cast<unsigned>(m_bufEnd - m_curPos), size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
         m_processedBytes += copyLen;
         size -= copyLen;
     }
+
     while (dst < dstEnd)
     {
         uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez);
@@ -104,30 +106,41 @@ unsigned IOContextDemuxer::get_buffer(uint8_t* binary, unsigned size)
 
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        const unsigned copyLen = min((unsigned)(m_bufEnd - m_curPos), size);
+        if (readedBytes == 0)
+            break;
+        const unsigned copyLen = min(readedBytes, size);
         memcpy(dst, m_curPos, copyLen);
         dst += copyLen;
         m_curPos += copyLen;
         size -= copyLen;
         m_processedBytes += copyLen;
-        if (readedBytes == 0)
-            break;
     }
     return static_cast<uint32_t>(dst - binary);
 }
 
 void IOContextDemuxer::skip_bytes(const int64_t size)
 {
+    if (size == 0)
+        return;
     uint32_t readedBytes = 0;
     int readRez = 0;
     int64_t skipLeft = size;
-    if (m_curPos < m_bufEnd)
+
+    if (skipLeft < m_bufEnd - m_curPos)
     {
-        const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
-        skipLeft -= copyLen;
-        m_curPos += copyLen;
-        m_processedBytes += copyLen;
+        m_curPos += skipLeft;
+        m_processedBytes += skipLeft;
+        return;
     }
+
+    if (skipLeft > 2LL * m_fileBlockSize)
+    {
+        const int64_t offset = skipLeft - 2LL * m_fileBlockSize;
+        m_bufferedReader->incSeek(m_readerID, offset);
+        m_processedBytes += offset;
+        skipLeft = 2LL * m_fileBlockSize;
+    }
+
     while (skipLeft > 0)
     {
         uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez);
@@ -135,12 +148,12 @@ void IOContextDemuxer::skip_bytes(const int64_t size)
             m_bufferedReader->notify(m_readerID, readedBytes);
         m_curPos = data + 188;
         m_bufEnd = m_curPos + readedBytes;
-        const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
+        if (readedBytes == 0)
+            break;
+        const int64_t copyLen = min(readedBytes, skipLeft);
         m_curPos += copyLen;
         m_processedBytes += copyLen;
         skipLeft -= copyLen;
-        if (readedBytes == 0)
-            break;
     }
 }
 
