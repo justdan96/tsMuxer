@@ -126,11 +126,12 @@ void IOContextDemuxer::skip_bytes(const int64_t size)
     int readRez = 0;
     int64_t skipLeft = size;
 
-    if (skipLeft < m_bufEnd - m_curPos)
+    if (m_curPos < m_bufEnd)
     {
-        m_curPos += skipLeft;
-        m_processedBytes += skipLeft;
-        return;
+        const int64_t copyLen = min(m_bufEnd - m_curPos, skipLeft);
+        skipLeft -= copyLen;
+        m_curPos += copyLen;
+        m_processedBytes += copyLen;
     }
 
     if (skipLeft > 2LL * m_fileBlockSize)
