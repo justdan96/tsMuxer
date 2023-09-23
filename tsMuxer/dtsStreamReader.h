@@ -104,10 +104,10 @@ class DTSStreamReader final : public SimplePacketizerReader
     int pi_frame_length;
     int pi_channels_conf;
 
-    uint8_t pi_channels;
+    int pi_channels;
     int pi_lfeCnt;
 
-    uint8_t hd_pi_channels;
+    int hd_pi_channels;
     int hd_pi_lfeCnt;
 
     int hd_bitDepth;
