@@ -789,7 +789,7 @@ const std::string DTSStreamReader::getStreamInfo()
         if (hd_pi_lfeCnt)
             str << hd_pi_channels - hd_pi_lfeCnt << '.' << hd_pi_lfeCnt;
         else
-            str << hd_pi_channels;
+            str << static_cast<int>(hd_pi_channels);
     }
     else
     {
