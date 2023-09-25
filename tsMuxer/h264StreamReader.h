@@ -92,6 +92,7 @@ class H264StreamReader final : public MPEGStreamReader
     int prevPicOrderCntMsb;
     int prevPicOrderCntLsb;
     int m_forceLsbDiv;
+    int m_fieldFirst;
     int m_lastMessageLen;
     bool m_isFirstFrame;
     SeiMethod m_insertSEIMethod;

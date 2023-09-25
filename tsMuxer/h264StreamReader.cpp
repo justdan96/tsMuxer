@@ -14,6 +14,7 @@ H264StreamReader::H264StreamReader()
     m_frameNum = 0;
     m_lastMessageLen = -1;
     m_forceLsbDiv = 0;
+    m_fieldFirst = 0;
     prevPicOrderCntMsb = prevPicOrderCntLsb = 0;
     m_iFramePtsOffset = 0;
     m_isFirstFrame = true;
@@ -672,6 +673,8 @@ void H264StreamReader::additionalStreamCheck(uint8_t *buff, uint8_t *end)
                 int picOrder = calcPicOrder(slice);
                 if (slice.isIDR())
                     frameNum = -1;
+                if (slice.isIFrame())
+                    m_fieldFirst = slice.bottom_field_flag;
                 checkPyramid(++frameNum, &picOrder, true);
             }
             break;
@@ -1079,7 +1082,7 @@ int H264StreamReader::processSliceNal(uint8_t *buff)
     if (slice.first_mb_in_slice != 0)
         return 0;
 
-    if (slice.bottom_field_flag == 1)  // insrease PTS/DTS only for whole frame
+    if (m_fieldFirst != slice.bottom_field_flag)  // insrease PTS/DTS only for whole frame
         return 0;
 
     if (detectPrimaryPicType(slice, buff) != 0)
