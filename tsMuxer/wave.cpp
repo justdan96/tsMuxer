@@ -47,6 +47,7 @@ void buildWaveHeader(MemoryBlock& waveBuffer, const int samplerate, const uint16
     waveBuffer.grow(40 + 28);
     uint8_t* curPos = waveBuffer.data();
     for (const char c : "RIFF\x00\x00\x00\x00WAVEfmt ") *curPos++ = c;
+    curPos--;
     const auto fmtSize = reinterpret_cast<uint32_t*>(curPos);
     *fmtSize = sizeof(WAVEFORMATPCMEX);
     curPos += 4;

@@ -639,6 +639,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
                 THROW(ERR_COMMON, "LPCM stream error: Not enough buffer for writing headers")
             // write wave header
             for (const char c : "RIFF\xff\xff\xff\xffWAVEfmt ") *curPos++ = c;
+            curPos--;
             const auto fmtSize = reinterpret_cast<uint32_t*>(curPos);
             *fmtSize = sizeof(WAVEFORMATPCMEX);
             curPos += 4;
@@ -656,6 +657,7 @@ int LPCMStreamReader::writeAdditionData(uint8_t* dstBuffer, uint8_t* dstEnd, AVP
             waveFormatPCMEx->SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             curPos += sizeof(WAVEFORMATPCMEX);
             for (const char c : "data\xff\xff\xff\xff") *curPos++ = c;
+            curPos--;
         }
     }
     /*
