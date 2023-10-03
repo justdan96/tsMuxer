@@ -29,7 +29,6 @@ class MovDemuxer final : public IOContextDemuxer
     [[nodiscard]] int64_t getFileDurationNano() const override;
 
    private:
-    struct MOVParseTableEntry;
     struct MOVAtom
     {
         MOVAtom() : type(0), offset(0), size(0) {}
@@ -88,15 +87,12 @@ class MovDemuxer final : public IOContextDemuxer
     MemoryBlock m_filterBuffer;
     int64_t m_firstHeaderSize;
 
-    static const MOVParseTableEntry mov_default_parse_table[];
-
     void readHeaders();
     void buildIndex();
-
+    int ParseTableEntry(MOVAtom atom);
     int mov_read_default(MOVAtom atom);
     int mov_read_extradata(MOVAtom atom);
     int mov_read_mdat(MOVAtom atom);
-    int mov_read_smi(MOVAtom atom);
     int mov_read_stss(MOVAtom atom);
     int mov_read_stsz(MOVAtom atom);
     int mov_read_stts(MOVAtom atom);

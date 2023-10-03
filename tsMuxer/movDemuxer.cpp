@@ -35,12 +35,6 @@ const char* mov_mdhd_language_map[] = {
     nullptr, nullptr, "cym", "eus", "cat", "lat", "que", "grn", "aym", "crh", "uig", "dzo", "jav"};
 }
 
-struct MovDemuxer::MOVParseTableEntry
-{
-    uint32_t type;
-    int (MovDemuxer::*parse)(MOVAtom atom);
-};
-
 static constexpr int MP4ESDescrTag = 0x03;
 static constexpr int MP4DecConfigDescrTag = 0x04;
 static constexpr int MP4DecSpecificDescrTag = 0x05;
@@ -611,73 +605,6 @@ class MovParsedSRTTrackData final : public ParsedTrackPrivData
     int64_t m_timeOffset;
 };
 
-const MovDemuxer::MOVParseTableEntry MovDemuxer::mov_default_parse_table[] = {
-    {MKTAG('a', 'v', 's', 's'), &MovDemuxer::mov_read_extradata},
-    {MKTAG('c', 'o', '6', '4'), &MovDemuxer::mov_read_stco},  //
-    {MKTAG('c', 't', 't', 's'), &MovDemuxer::mov_read_ctts},  //  // composition time to sample
-    {MKTAG('d', 'i', 'n', 'f'), &MovDemuxer::mov_read_default},
-    {MKTAG('d', 'r', 'e', 'f'), &MovDemuxer::mov_read_dref},  //
-    {MKTAG('e', 'd', 't', 's'), &MovDemuxer::mov_read_default},
-    {MKTAG('e', 'l', 's', 't'), &MovDemuxer::mov_read_elst},  //
-    //{ MKTAG('e','n','d','a'), &MovDemuxer::mov_read_enda }, //
-    {MKTAG('f', 'i', 'e', 'l'), &MovDemuxer::mov_read_extradata},  //
-    {MKTAG('f', 't', 'y', 'p'), &MovDemuxer::mov_read_ftyp},       //
-    {MKTAG('g', 'l', 'b', 'l'), &MovDemuxer::mov_read_glbl},       //
-    {MKTAG('h', 'd', 'l', 'r'), &MovDemuxer::mov_read_hdlr},       //
-    //{ MKTAG('i','l','s','t'), &MovDemuxer::mov_read_ilst }, //
-    {MKTAG('j', 'p', '2', 'h'), &MovDemuxer::mov_read_extradata},  //
-    {MKTAG('m', 'd', 'a', 't'), &MovDemuxer::mov_read_mdat},
-    {MKTAG('m', 'd', 'h', 'd'), &MovDemuxer::mov_read_mdhd},  //
-    {MKTAG('m', 'd', 'i', 'a'), &MovDemuxer::mov_read_default},
-    //{ MKTAG('m','e','t','a'), &MovDemuxer::mov_read_meta }, //
-    {MKTAG('m', 'i', 'n', 'f'), &MovDemuxer::mov_read_default},
-    {MKTAG('m', 'o', 'o', 'f'), &MovDemuxer::mov_read_moof},  //
-    {MKTAG('m', 'o', 'o', 'v'), &MovDemuxer::mov_read_moov},  //
-    {MKTAG('m', 'v', 'e', 'x'), &MovDemuxer::mov_read_default},
-    {MKTAG('m', 'v', 'h', 'd'), &MovDemuxer::mov_read_mvhd},       //
-    {MKTAG('S', 'M', 'I', ' '), &MovDemuxer::mov_read_smi},        //  // Sorenson extension ???
-    {MKTAG('a', 'l', 'a', 'c'), &MovDemuxer::mov_read_extradata},  //  // alac specific atom
-
-    {MKTAG('a', 'v', 'c', 'C'), &MovDemuxer::mov_read_glbl},  //
-    {MKTAG('m', 'v', 'c', 'C'), &MovDemuxer::mov_read_glbl},  //
-    {MKTAG('h', 'v', 'c', 'C'), &MovDemuxer::mov_read_glbl},
-
-    //{ MKTAG('p','a','s','p'), &MovDemuxer::mov_read_pasp }, //
-    {MKTAG('s', 't', 'b', 'l'), &MovDemuxer::mov_read_default},
-    {MKTAG('s', 't', 'c', 'o'), &MovDemuxer::mov_read_stco},  //
-    {MKTAG('s', 't', 's', 'c'), &MovDemuxer::mov_read_stsc},  //
-    {MKTAG('s', 't', 's', 'd'), &MovDemuxer::mov_read_stsd},  // sample description
-    {MKTAG('s', 't', 's', 's'), &MovDemuxer::mov_read_stss},  // sync sample
-    {MKTAG('s', 't', 's', 'z'), &MovDemuxer::mov_read_stsz},  // sample size
-    {MKTAG('s', 't', 't', 's'), &MovDemuxer::mov_read_stts},
-    {MKTAG('t', 'k', 'h', 'd'), &MovDemuxer::mov_read_tkhd},  // track header
-    {MKTAG('t', 'f', 'h', 'd'), &MovDemuxer::mov_read_tfhd},  // track fragment header
-    {MKTAG('t', 'r', 'a', 'k'), &MovDemuxer::mov_read_trak},
-    {MKTAG('t', 'r', 'a', 'f'), &MovDemuxer::mov_read_default},
-    {MKTAG('t', 'r', 'e', 'x'), &MovDemuxer::mov_read_trex},
-    {MKTAG('t', 'r', 'k', 'n'), &MovDemuxer::mov_read_trkn},
-    {MKTAG('t', 'r', 'u', 'n'), &MovDemuxer::mov_read_trun},
-    {MKTAG('u', 'd', 't', 'a'), &MovDemuxer::mov_read_default},
-    {MKTAG('w', 'a', 'v', 'e'), &MovDemuxer::mov_read_wave},  //
-    {MKTAG('e', 's', 'd', 's'), &MovDemuxer::mov_read_esds},  //
-    {MKTAG('w', 'i', 'd', 'e'), &MovDemuxer::mov_read_wide},  // place holder
-    {MKTAG('c', 'm', 'o', 'v'), &MovDemuxer::mov_read_cmov},
-    {MKTAG(0xa9, 'n', 'a', 'm'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'w', 'r', 't'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'c', 'p', 'y'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'i', 'n', 'f'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'i', 'n', 'f'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'A', 'R', 'T'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'a', 'l', 'b'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'c', 'm', 't'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'a', 'u', 't'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'd', 'a', 'y'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'g', 'e', 'n'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 'e', 'n', 'c'), &MovDemuxer::mov_read_udta_string},
-    {MKTAG(0xa9, 't', 'o', 'o'), &MovDemuxer::mov_read_udta_string},
-
-    {0, nullptr}};
-
 MovDemuxer::MovDemuxer(const BufferedReaderManager& readManager)
     : IOContextDemuxer(readManager), m_mdat_size(0), m_fileSize(0), m_timescale(0), fragment()
 {
@@ -915,6 +842,102 @@ void MovDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
     }
 }
 
+int MovDemuxer::ParseTableEntry(MOVAtom atom)
+{
+    switch (atom.type)
+    {
+    case MKTAG('a', 'v', 's', 's'):
+        return mov_read_extradata(atom);
+    case MKTAG('c', 'm', 'o', 'v'):
+        return mov_read_cmov(atom);
+    case MKTAG('c', 'o', '6', '4'):
+        return mov_read_stco(atom);
+    case MKTAG('c', 't', 't', 's'):
+        return mov_read_ctts(atom);
+    case MKTAG('d', 'i', 'n', 'f'):
+    case MKTAG('e', 'd', 't', 's'):
+    case MKTAG('m', 'd', 'i', 'a'):
+    case MKTAG('m', 'i', 'n', 'f'):
+    case MKTAG('m', 'v', 'e', 'x'):
+    case MKTAG('s', 't', 'b', 'l'):
+    case MKTAG('t', 'r', 'a', 'f'):
+    case MKTAG('u', 'd', 't', 'a'):
+        return mov_read_default(atom);
+    case MKTAG('d', 'r', 'e', 'f'):
+        return mov_read_dref(atom);
+    case MKTAG('e', 'l', 's', 't'):
+        return mov_read_elst(atom);
+    case MKTAG('e', 's', 'd', 's'):
+        return mov_read_esds(atom);
+    case MKTAG('a', 'l', 'a', 'c'):
+    case MKTAG('f', 'i', 'e', 'l'):
+    case MKTAG('j', 'p', '2', 'h'):
+        return mov_read_extradata(atom);
+    case MKTAG('f', 't', 'y', 'p'):
+        return mov_read_ftyp(atom);
+    case MKTAG('a', 'v', 'c', 'C'):
+    case MKTAG('g', 'l', 'b', 'l'):
+    case MKTAG('m', 'v', 'c', 'C'):
+    case MKTAG('h', 'v', 'c', 'C'):
+        return mov_read_glbl(atom);
+    case MKTAG('h', 'd', 'l', 'r'):
+        return mov_read_hdlr(atom);
+    case MKTAG('m', 'd', 'a', 't'):
+        return mov_read_mdat(atom);
+    case MKTAG('m', 'd', 'h', 'd'):
+        return mov_read_mdhd(atom);
+    case MKTAG('m', 'o', 'o', 'f'):
+        return mov_read_moof(atom);
+    case MKTAG('m', 'o', 'o', 'v'):
+        return mov_read_moov(atom);
+    case MKTAG('m', 'v', 'h', 'd'):
+        return mov_read_mvhd(atom);
+    case MKTAG('s', 't', 'c', 'o'):
+        return mov_read_stco(atom);
+    case MKTAG('s', 't', 's', 'c'):
+        return mov_read_stsc(atom);
+    case MKTAG('s', 't', 's', 'd'):
+        return mov_read_stsd(atom);
+    case MKTAG('s', 't', 's', 's'):
+        return mov_read_stss(atom);
+    case MKTAG('s', 't', 's', 'z'):
+        return mov_read_stsz(atom);
+    case MKTAG('s', 't', 't', 's'):
+        return mov_read_stts(atom);
+    case MKTAG('t', 'k', 'h', 'd'):
+        return mov_read_tkhd(atom);
+    case MKTAG('t', 'f', 'h', 'd'):
+        return mov_read_tfhd(atom);
+    case MKTAG('t', 'r', 'a', 'k'):
+        return mov_read_trak(atom);
+    case MKTAG('t', 'r', 'e', 'x'):
+        return mov_read_trex(atom);
+    case MKTAG('t', 'r', 'k', 'n'):
+        return mov_read_trkn(atom);
+    case MKTAG('t', 'r', 'u', 'n'):
+        return mov_read_trun(atom);
+    case MKTAG('w', 'a', 'v', 'e'):
+        return mov_read_wave(atom);
+    case MKTAG('w', 'i', 'd', 'e'):
+        return mov_read_wide(atom);
+    case MKTAG(0xa9, 'n', 'a', 'm'):
+    case MKTAG(0xa9, 'w', 'r', 't'):
+    case MKTAG(0xa9, 'c', 'p', 'y'):
+    case MKTAG(0xa9, 'i', 'n', 'f'):
+    case MKTAG(0xa9, 'A', 'R', 'T'):
+    case MKTAG(0xa9, 'a', 'l', 'b'):
+    case MKTAG(0xa9, 'c', 'm', 't'):
+    case MKTAG(0xa9, 'a', 'u', 't'):
+    case MKTAG(0xa9, 'd', 'a', 'y'):
+    case MKTAG(0xa9, 'g', 'e', 'n'):
+    case MKTAG(0xa9, 'e', 'n', 'c'):
+    case MKTAG(0xa9, 't', 'o', 'o'):
+        return mov_read_udta_string(atom);
+    default:
+        return 0;
+    }
+}
+
 int MovDemuxer::mov_read_default(MOVAtom atom)
 {
     int64_t total_size = 0;
@@ -953,18 +976,10 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
             break;
         a.size = FFMIN(a.size, atom.size - total_size);
 
-        int64_t left = a.size;
-        for (int i = 0; mov_default_parse_table[i].type; i++)
-        {
-            if (mov_default_parse_table[i].type == a.type)
-            {
-                const int64_t start_pos = m_processedBytes;
-                err = (this->*(mov_default_parse_table[i].parse))(a);
-                // if (url_is_streamed(pb) && found_moov && found_mdat) break;
-                left = a.size - m_processedBytes + start_pos;
-                break;
-            }
-        }
+        const int64_t start_pos = m_processedBytes;
+        err = ParseTableEntry(a);
+        const int64_t left = a.size - m_processedBytes + start_pos;
+
         if ((!found_moof && m_mdat_pos && found_moov) || (found_moof && m_processedBytes + left >= m_fileSize))
             return 0;
 
@@ -1713,9 +1728,6 @@ int MovDemuxer::mov_read_stsc(MOVAtom atom)
     }
     return 0;
 }
-
-// ReSharper disable once CppMemberFunctionMayBeStatic
-int MovDemuxer::mov_read_smi(MOVAtom atom) { return 0; }
 
 int MovDemuxer::mov_read_wave(MOVAtom atom)
 {
