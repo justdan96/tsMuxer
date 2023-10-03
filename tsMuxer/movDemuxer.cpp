@@ -39,7 +39,7 @@ static constexpr int MP4ESDescrTag = 0x03;
 static constexpr int MP4DecConfigDescrTag = 0x04;
 static constexpr int MP4DecSpecificDescrTag = 0x05;
 
-#define MKTAG(a, b, c, d) ((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+#define MKTAG(a, b, c, d) ((a) | (b) << 8 | (c) << 16 | (d) << 24)
 
 struct MOVStts
 {
@@ -920,22 +920,15 @@ int MovDemuxer::ParseTableEntry(MOVAtom atom)
         return mov_read_wave(atom);
     case MKTAG('w', 'i', 'd', 'e'):
         return mov_read_wide(atom);
-    case MKTAG(0xa9, 'n', 'a', 'm'):
-    case MKTAG(0xa9, 'w', 'r', 't'):
-    case MKTAG(0xa9, 'c', 'p', 'y'):
-    case MKTAG(0xa9, 'i', 'n', 'f'):
-    case MKTAG(0xa9, 'A', 'R', 'T'):
-    case MKTAG(0xa9, 'a', 'l', 'b'):
-    case MKTAG(0xa9, 'c', 'm', 't'):
-    case MKTAG(0xa9, 'a', 'u', 't'):
-    case MKTAG(0xa9, 'd', 'a', 'y'):
-    case MKTAG(0xa9, 'g', 'e', 'n'):
-    case MKTAG(0xa9, 'e', 'n', 'c'):
-    case MKTAG(0xa9, 't', 'o', 'o'):
-        return mov_read_udta_string(atom);
     default:
-        return 0;
+        break;
     }
+
+    // Apple QuickTime tags
+    if ((atom.type & 0xff) == 0xa9)
+        return mov_read_udta_string(atom);
+
+    return 0;
 }
 
 int MovDemuxer::mov_read_default(MOVAtom atom)
@@ -997,8 +990,7 @@ int MovDemuxer::mov_read_default(MOVAtom atom)
 
 int MovDemuxer::mov_read_udta_string(MOVAtom atom)
 {
-    char str[1024]{}, language[4] = {0};
-    const char* key = nullptr;
+    char str[1024]{}, key[4]{0}, language[4]{0};
     unsigned str_size;
 
     if (itunes_metadata)
@@ -1021,42 +1013,12 @@ int MovDemuxer::mov_read_udta_string(MOVAtom atom)
         ff_mov_lang_to_iso639(get_be16(), language);
         atom.size -= 4;
     }
-    switch (atom.type)
-    {
-    case MKTAG(0xa9, 'n', 'a', 'm'):
-        key = "title";
-        break;
-    case MKTAG(0xa9, 'a', 'u', 't'):
-    case MKTAG(0xa9, 'A', 'R', 'T'):
-    case MKTAG(0xa9, 'w', 'r', 't'):
-        key = "author";
-        break;
-    case MKTAG(0xa9, 'c', 'p', 'y'):
-        key = "copyright";
-        break;
-    case MKTAG(0xa9, 'c', 'm', 't'):
-    case MKTAG(0xa9, 'i', 'n', 'f'):
-        key = "comment";
-        break;
-    case MKTAG(0xa9, 'a', 'l', 'b'):
-        key = "album";
-        break;
-    case MKTAG(0xa9, 'd', 'a', 'y'):
-        key = "year";
-        break;
-    case MKTAG(0xa9, 'g', 'e', 'n'):
-        key = "genre";
-        break;
-    case MKTAG(0xa9, 't', 'o', 'o'):
-    case MKTAG(0xa9, 'e', 'n', 'c'):
-        key = "muxer";
-        break;
-    default:;
-    }
-    if (!key)
-        return 0;
     if (atom.size < 0)
         return -1;
+
+    key[0] = static_cast<char>(atom.type >> 8);
+    key[1] = static_cast<char>(atom.type >> 16);
+    key[2] = static_cast<char>(atom.type >> 24);
 
     str_size = static_cast<uint16_t>(FFMIN(FFMIN((int)(sizeof(str) - 1), str_size), atom.size));
     get_buffer(reinterpret_cast<uint8_t*>(str), str_size);
