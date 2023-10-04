@@ -1399,7 +1399,6 @@ int MovDemuxer::mov_read_stsd(MOVAtom atom)
             break;
         case MKTAG('m', 'p', '4', 'a'):
         case MKTAG('a', 'c', '-', '3'):
-        case MKTAG('e', 'c', '-', '3'):
             st->type = IOContextTrackType::AUDIO;
             st->parsed_priv_data = new MovParsedAudioTrackData(this, st);
             break;
