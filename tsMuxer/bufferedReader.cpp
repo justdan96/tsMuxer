@@ -35,6 +35,17 @@ ReaderData* BufferedReader::getReader(const int readerID)
     return itr != m_readers.end() ? itr->second : nullptr;
 }
 
+bool BufferedReader::seek(const int readerID, const int64_t offset)
+{
+    const auto itr = m_readers.find(readerID);
+    if (itr != m_readers.end())
+    {
+        ReaderData* data = itr->second;
+        return data->incSeek(offset);
+    }
+    return false;
+}
+
 bool BufferedReader::incSeek(const int readerID, const int64_t offset)
 {
     std::lock_guard lock(m_readersMtx);
