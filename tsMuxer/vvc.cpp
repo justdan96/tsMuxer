@@ -322,9 +322,9 @@ int VvcVpsUnit::deserialize()
                     }
                 }
 
-                int r = 0;
                 for (int i = 0; i < vps_max_layers; i++)
                 {
+                    int r = 0;
                     for (int j = 0; j < vps_max_layers; j++)
                     {
                         if (dependencyFlag[i][j])
