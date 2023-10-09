@@ -1360,7 +1360,7 @@ void SEIUnit::deserialize(const SPSUnit& sps, const int orig_hrd_parameters_pres
             if (curBuff >= nalEnd)
                 return;
             payloadSize += *curBuff++;
-            if (nalEnd - curBuff < payloadSize - 1)
+            if (nalEnd - curBuff < payloadSize)
             {
                 LTRACE(LT_WARN, 2, "Bad SEI detected. SEI too short");
                 return;
