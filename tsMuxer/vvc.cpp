@@ -279,12 +279,10 @@ int VvcVpsUnit::deserialize()
         vector<uint8_t> vps_pt_present_flag(vps_num_ptls, true);
         vector<uint8_t> vps_ptl_max_tid(vps_num_ptls, vps_max_sublayers - 1);
 
-        if (!vps_default_ptl_dpb_hrd_max_tid_flag)
-            vps_ptl_max_tid[0] = m_reader.getBits<uint8_t>(3);
-
-        for (int i = 1; i < vps_num_ptls; i++)
+        for (int i = 0; i < vps_num_ptls; i++)
         {
-            vps_pt_present_flag[i] = m_reader.getBit();
+            if (i > 0)
+                vps_pt_present_flag[i] = m_reader.getBit();
             if (!vps_default_ptl_dpb_hrd_max_tid_flag)
                 vps_ptl_max_tid[i] = m_reader.getBits<uint8_t>(3);
         }
