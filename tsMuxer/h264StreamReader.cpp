@@ -101,6 +101,11 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
                 delete sps;
                 return rez;
             }
+            if (m_spsMap.find(sps->seq_parameter_set_id) != m_spsMap.end())
+            {
+                delete sps;
+                break;
+            }
             m_spsMap.insert(make_pair(sps->seq_parameter_set_id, sps));
             if (tmpDescr.empty())
                 tmpDescr = sps->getStreamDescr();
@@ -115,7 +120,8 @@ CheckStreamRez H264StreamReader::checkStream(uint8_t *buffer, int len)
                 delete pps;
                 return rez;
             }
-            if (m_spsMap.find(pps->seq_parameter_set_id) == m_spsMap.end())
+            if (m_spsMap.find(pps->seq_parameter_set_id) == m_spsMap.end() ||
+                m_ppsMap.find(pps->pic_parameter_set_id) != m_ppsMap.end())
             {
                 delete pps;
                 break;
