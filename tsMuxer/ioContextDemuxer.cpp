@@ -137,7 +137,7 @@ void IOContextDemuxer::skip_bytes(const int64_t size)
     if (skipLeft > 2LL * m_fileBlockSize)
     {
         const int64_t offset = skipLeft - 2LL * m_fileBlockSize;
-        m_bufferedReader->seek(m_readerID, offset);
+        m_bufferedReader->seek(m_readerID, m_fileBlockSize);
         m_processedBytes += offset;
         skipLeft = 2LL * m_fileBlockSize;
     }
