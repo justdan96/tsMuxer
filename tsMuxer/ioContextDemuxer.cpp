@@ -133,14 +133,14 @@ void IOContextDemuxer::skip_bytes(const int64_t size)
         m_curPos += copyLen;
         m_processedBytes += copyLen;
     }
-    
+    /*
     while (skipLeft > 4LL * m_fileBlockSize)
     {
         m_bufferedReader->seek(m_readerID, m_fileBlockSize);
         m_processedBytes += m_fileBlockSize;
         skipLeft -= m_fileBlockSize;
     }
-    
+    */
     while (skipLeft > 0)
     {
         uint8_t* data = m_bufferedReader->readBlock(m_readerID, readedBytes, readRez);
