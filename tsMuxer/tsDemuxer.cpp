@@ -11,7 +11,7 @@ using namespace std;
 bool isM2TSExt(const std::string& streamName)
 {
     const string sName = strToLowerCase(unquoteStr(streamName));
-    return strEndWith(sName, ".m2ts") || strEndWith(sName, ".ssif");
+    return strEndWith(sName, ".m2ts") || strEndWith(sName, ".mts") || strEndWith(sName, ".ssif");
 }
 
 TSDemuxer::TSDemuxer(const BufferedReaderManager& readManager, const char* streamName)
