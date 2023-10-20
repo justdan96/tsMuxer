@@ -1038,7 +1038,8 @@ void MatroskaDemuxer::readClose()
         delete pkt;
         packets.pop();
     }
-    for (int i = 0; i < num_tracks; i++) tracks[i] = nullptr;
+    for (int i = 0; i < num_tracks; i++)
+        delete[] reinterpret_cast<char*>(tracks[i]);
 }
 
 // --------------------------- refactored from ffmpeg matroska decoder -----------------------
@@ -1890,7 +1891,7 @@ int MatroskaDemuxer::matroska_add_stream()
     uint32_t id;
 
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
-    auto *track = new MatroskaTrack[MAX_TRACK_SIZE];
+    auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]{});
     track->encodingAlgo = -1;
     num_tracks++;
     if (num_tracks > MAX_STREAMS)
