@@ -1038,8 +1038,7 @@ void MatroskaDemuxer::readClose()
         delete pkt;
         packets.pop();
     }
-    for (int i = 0; i < num_tracks; i++)
-        delete[] reinterpret_cast<char*>(tracks[i]);
+    for (int i = 0; i < num_tracks; i++) delete[] reinterpret_cast<char*>(tracks[i]);
 }
 
 // --------------------------- refactored from ffmpeg matroska decoder -----------------------
