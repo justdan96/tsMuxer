@@ -395,7 +395,7 @@ unsigned HEVCStreamReader::getStreamHeight() const { return m_sps ? m_sps->pic_h
 
 int HEVCStreamReader::getStreamHDR() const
 {
-    return (m_hdr->isDVEL) ? 4 : (m_hdr->isHDR10plus ? 16 : (m_hdr->isHDR10 ? 2 : 1));
+    return (m_hdr->isDVRPU || m_hdr->isDVEL) ? 4 : (m_hdr->isHDR10plus ? 16 : (m_hdr->isHDR10 ? 2 : 1));
 }
 
 double HEVCStreamReader::getStreamFPS(void* curNalUnit)
