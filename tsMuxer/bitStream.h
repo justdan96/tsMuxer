@@ -144,6 +144,13 @@ class BitStreamReader : public BitStream
         m_totalBits--;
     }
 
+    void alignByte()
+    {
+        const unsigned tmp = m_bitLeft & 0b111;
+        if (tmp > 0)
+            skipBits(8 - tmp);
+    }
+
     [[nodiscard]] int getBitsCount() const
     {
         return static_cast<int>((m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft);

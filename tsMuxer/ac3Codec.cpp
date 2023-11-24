@@ -166,11 +166,12 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                     m_extChannelsExists = true;
             }
         }
+
         if (gbc.getBit())  // mixing metadata
         {
             if (acmod > 2)
                 gbc.skipBits(2);  // dmixmod
-            if ((acmod & 1) && (acmod > 0x2))
+            if (acmod & 1 && acmod > 0x2)
                 gbc.skipBits(6);  // ltrtcmixlev, lorocmixlev
             if (acmod & 4)
                 gbc.skipBits(6);  // ltrtsurmixlev, lorosurmixlev
@@ -178,13 +179,11 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                 gbc.skipBits(5);  // lfemixlevcod
             if (m_strmtyp == 0)   // independent EAC3 frame
             {
-                pgmscle = gbc.getBit();
-                if (pgmscle)
+                if (gbc.getBit())     // pgmscle
                     gbc.skipBits(6);  // pgmscl
                 if (acmod == 0 && gbc.getBit())
                     gbc.skipBits(6);  // pgmscl2
-                extpgmscle = gbc.getBit();
-                if (extpgmscle)
+                if (gbc.getBit())     // extpgmscle
                     gbc.skipBits(6);  // extpgmscl
                 mixdef = gbc.getBits<uint8_t>(2);
                 if (mixdef == 1)
@@ -193,8 +192,8 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                     gbc.skipBits(12);  // mixdata
                 else if (mixdef == 3)
                 {
-                    const auto mixdeflen = gbc.getBits<uint8_t>(5);  //
-                    if (gbc.getBit())                                // mixdata2e
+                    const auto mixdeflen = gbc.getBits<uint8_t>(5);
+                    if (gbc.getBit())  // mixdata2e
                     {
                         gbc.skipBits(5);  // premixcmpsel, drcsrc, premixcmpscl
                         if (gbc.getBit())
@@ -211,37 +210,32 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                             gbc.skipBits(4);  // extpgmlfescl
                         if (gbc.getBit())
                             gbc.skipBits(4);  // dmixscl
-                        if (gbc.getBit())
+                        if (gbc.getBit())     // addch exist
                         {
-                            if (gbc.getBit())
+                            if (gbc.getBit())     // extpgmaux1scl exist
                                 gbc.skipBits(4);  // extpgmaux1scl
-                            if (gbc.getBit())
+                            if (gbc.getBit())     // extpgmaux2scl exist
                                 gbc.skipBits(4);  // extpgmaux2scl
                         }
                     }
                     if (gbc.getBit())  // mixdata3e
                     {
-                        gbc.skipBits(5);  // spchdat
-                        if (gbc.getBit())
+                        gbc.skipBits(5);   // spchdat
+                        if (gbc.getBit())  // addspchdat exist
                         {
-                            gbc.skipBits(7);  // spchdat1, spchan1att
-                            if (gbc.getBit())
+                            gbc.skipBits(7);      // spchdat1, spchan1att
+                            if (gbc.getBit())     // addspchdat2 exist
                                 gbc.skipBits(7);  // spchdat2, spchan2att
                         }
                     }
-                    for (int i = 0; i < mixdeflen; i++) gbc.skipBits(8);  // mixdata
-                    for (int i = 0; i < 7; i++)                           // mixdatafill
-                        if (!gbc.showBits(1))
-                            gbc.skipBit();
-                        else
-                            break;
+                    for (int i = 0; i < mixdeflen + 2; i++) gbc.skipBits(8);  // mixdata
+                    gbc.alignByte();                                          // mixdatafill
                 }
                 if (acmod < 2)
                 {
-                    paninfoe = gbc.getBit();
-                    if (paninfoe)
+                    if (gbc.getBit())      // paninfoe
                         gbc.skipBits(14);  // panmean, paninfo
-                    if (acmod == 0x0 && gbc.getBit())
+                    if (acmod == 0 && gbc.getBit())
                         gbc.skipBits(14);  // panmean2, paninfo2
                 }
                 if (gbc.getBit())
@@ -255,13 +249,56 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                 }
             }
         }
-        if (gbc.getBit())
+
+        if (gbc.getBit()) /* informational metadata */
         {
             bsmod = gbc.getBits<uint8_t>(3);
             gbc.skipBits(2);  // copyrightb, origbs
             if (acmod == 2)
+            {
                 dsurmod = gbc.getBits<uint8_t>(2);
+                gbc.skipBits(2);  // dheadphonmod
+            }
+            else if (acmod >= 6)  /* if both surround channels exist */
+                gbc.skipBits(2);  // dsurexmod
+            if (gbc.getBit())     // audprodie
+                gbc.skipBits(8);  // mixlevel, roomtype, adconvtyp
+            if (acmod == 0)       /* if 1+1 mode (dual mono, so some items need a second value) */
+            {
+                if (gbc.getBit())     // audprodi2e
+                    gbc.skipBits(8);  // mixlevel2, roomtype2, adconvtyp2
+            }
+            if (fscod < 3)      /* if not half sample rate */
+                gbc.skipBit();  // sourcefscod
         }
+
+        if (m_strmtyp == 0 && numblkscod != 3)
+            gbc.skipBit();  // convsync
+
+        if (m_strmtyp == 2) /* if bit stream converted from AC-3 */
+        {
+            if (numblkscod == 3 || gbc.getBit())  // blkid
+                gbc.skipBits(6);                  // frmsizecod
+        }
+
+        if (gbc.getBit())  // addbsi exist
+        {
+            if (gbc.getBits(6) == 1)  // addbsi length
+            {
+                // ETSI TS 103 420 - Backwards-compatible object audio carriage using Enhanced AC-3
+                // para. 8.3 Extensions contained in the addbsi bitstream field
+                // TODO: conditions below might not be sufficient to detect Atmos
+                // ideally, detect payload syncword (but where is it located ?)
+                const auto flag_ec3_extension_type_a = gbc.getBits(8) == 1;
+                if (flag_ec3_extension_type_a)
+                {
+                    const auto complexity_index_type_a = gbc.getBits(8);
+                    if (complexity_index_type_a <= 16)
+                        m_isAtmos = true;
+                }
+            }
+        }
+
         m_mixinfoexists = pgmscle || extpgmscle || mixdef > 0 || paninfoe;
 
         if (m_channels == 0)  // no AC3 interleave
@@ -520,7 +557,7 @@ const std::string AC3Codec::getStreamInfo()
             str << "E-";
         str << "AC3 core + ";
         str << hd_type;
-        if (mlp.m_substreams == 4)
+        if (mlp.m_substreams == 4 || m_isAtmos)
             str << " + ATMOS";
         str << ". ";
 

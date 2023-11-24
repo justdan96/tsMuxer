@@ -54,6 +54,7 @@ class AC3Codec
         m_strmtyp = 0;
         m_dsurmod = 0;
         m_mixinfoexists = false;
+        m_isAtmos = false;
     }
 
     virtual ~AC3Codec() = default;
@@ -93,6 +94,7 @@ class AC3Codec
     uint8_t m_channels;
     int m_frame_size;
     bool m_mixinfoexists;
+    bool m_isAtmos;
 
     MLPCodec mlp;
 
