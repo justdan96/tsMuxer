@@ -179,11 +179,13 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                 gbc.skipBits(5);  // lfemixlevcod
             if (m_strmtyp == 0)   // independent EAC3 frame
             {
-                if (gbc.getBit())     // pgmscle
+                pgmscle = gbc.getBit();
+                if (pgmscle)
                     gbc.skipBits(6);  // pgmscl
                 if (acmod == 0 && gbc.getBit())
                     gbc.skipBits(6);  // pgmscl2
-                if (gbc.getBit())     // extpgmscle
+                extpgmscle = gbc.getBit();
+                if (extpgmscle)
                     gbc.skipBits(6);  // extpgmscl
                 mixdef = gbc.getBits<uint8_t>(2);
                 if (mixdef == 1)
@@ -233,7 +235,8 @@ AC3Codec::AC3ParseError AC3Codec::parseHeader(uint8_t *buf, const uint8_t *end)
                 }
                 if (acmod < 2)
                 {
-                    if (gbc.getBit())      // paninfoe
+                    paninfoe = gbc.getBit();
+                    if (paninfoe)
                         gbc.skipBits(14);  // panmean, paninfo
                     if (acmod == 0 && gbc.getBit())
                         gbc.skipBits(14);  // panmean2, paninfo2
