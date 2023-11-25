@@ -572,9 +572,9 @@ const std::string AC3Codec::getStreamInfo()
     else
     {
         if (isEAC3())
-            str << "EAC3";
+            str << "EAC3 ";
         if (m_isAtmos)
-            str << " + ATMOS, ";
+            str << "+ ATMOS, ";
 
         str << "Bitrate: " << (m_bit_rate + m_bit_rateExt) / 1000 << "Kbps ";
         if (m_bit_rateExt)
