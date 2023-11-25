@@ -557,10 +557,10 @@ const std::string AC3Codec::getStreamInfo()
     if (m_true_hd_mode)
     {
         if (isEAC3())
-            str << "E-";
+            str << "E";
         str << "AC3 core + ";
         str << hd_type;
-        if (mlp.m_substreams == 4 || m_isAtmos)
+        if (mlp.m_substreams == 4)
             str << " + ATMOS";
         str << ". ";
 
@@ -571,6 +571,11 @@ const std::string AC3Codec::getStreamInfo()
     }
     else
     {
+        if (isEAC3())
+            str << "EAC3";
+        if (m_isAtmos)
+            str << " + ATMOS, ";
+
         str << "Bitrate: " << (m_bit_rate + m_bit_rateExt) / 1000 << "Kbps ";
         if (m_bit_rateExt)
             str << "(core " << m_bit_rate / 1000 << "Kbps) ";
