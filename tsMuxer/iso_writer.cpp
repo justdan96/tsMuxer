@@ -84,9 +84,10 @@ void calcDescriptorCRC(uint8_t *buffer, const uint16_t len)
     buff16[4] = crc16(buffer + 16, len - 16);
     buff16[5] = len - 16;
 
-    // calc tag checksum
+    // calc tag checksum of bytes 0-3 and 5-15 of the tag
     uint8_t sum = 0;
-    for (int i = 0; i < 16; ++i) sum += buffer[i];
+    for (int i = 0; i < 4; ++i) sum += buffer[i];
+    for (int i = 5; i < 16; ++i) sum += buffer[i];
     buffer[4] = sum;
 }
 
