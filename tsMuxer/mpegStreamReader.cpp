@@ -36,6 +36,7 @@ void MPEGStreamReader::setBuffer(uint8_t* data, const uint32_t dataLen, const bo
 int MPEGStreamReader::flushPacket(AVPacket& avPacket)
 {
     m_eof = true;
+    m_flush = true;
     avPacket.codec = this;
     avPacket.duration = 0;
     avPacket.data = nullptr;
