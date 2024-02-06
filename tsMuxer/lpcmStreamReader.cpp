@@ -387,7 +387,7 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
     if (end - buff < 20)
         return NOT_ENOUGH_BUFFER;
     uint8_t* curPos = buff;
-    if (m_channels == 0)
+    // if (m_channels == 0)
     {
         WAVEFORMATPCMEX* waveFormatPCMEx;
         uint64_t fmtSize;
@@ -494,6 +494,17 @@ int LPCMStreamReader::decodeWaveHeader(uint8_t* buff, uint8_t* end)
         else
             THROW(ERR_COMMON, "Unsupported WAVE format. wFormatTag: " << waveFormatPCMEx->wFormatTag)
         curPos += fmtSize;
+    }
+
+    // in case there is a 'FLLR' (IPhone filler), skip it
+    if (curPos[0] == 'F' && curPos[1] == 'L' && curPos[2] == 'L' && curPos[3] == 'R')
+    {
+        curPos += 4;
+        int64_t fllrSize = *reinterpret_cast<int64_t*>(curPos);
+        curPos += 4;
+        if (end - curPos < fllrSize)
+            return NOT_ENOUGH_BUFFER;
+        curPos += fllrSize;
     }
 
     curPos = findSubstr("data", curPos, FFMIN(curPos + MAX_HEADER_SIZE, end));
