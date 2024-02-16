@@ -1154,7 +1154,7 @@ int MatroskaDemuxer::readPacket(AVPacket &avPacket)
 
 int MatroskaDemuxer::matroska_read_header()
 {
-    for (int i = 0; i < num_tracks; i++) delete tracks[i];
+    for (int i = 0; i < num_tracks; i++) delete[] reinterpret_cast<char *>(tracks[i]);
     num_tracks = 0;
 
     // MatroskaDemuxContext *matroska = s->priv_data;
