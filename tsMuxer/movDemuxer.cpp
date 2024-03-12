@@ -184,6 +184,7 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
             unsigned frameSize = m_sc->sample_size;
             if (frameSize == 0)
                 frameSize = m_sc->m_index[m_sc->m_indexCur++];
+	    if (buff + frameSize > srcEnd) break;
             if (isAAC)
             {
                 m_aacRaw.m_channels = static_cast<uint8_t>(m_sc->channels);
