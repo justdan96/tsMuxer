@@ -356,7 +356,7 @@ int64_t getLastPCR(const File& file, const int bufferSize, const int64_t fileSiz
     int64_t lastPcrVal = -1;
 
     curPtr = MPEGHeader::findNextMarker(curPtr, bufEnd);
-    while (curPtr <= bufEnd - 9)
+    while (curPtr <= bufEnd - 9 - 8)
     {
         const auto pesPacket = reinterpret_cast<PESPacket*>(curPtr);
         const uint8_t startcode = curPtr[3];
