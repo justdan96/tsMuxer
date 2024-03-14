@@ -1889,12 +1889,12 @@ int MatroskaDemuxer::matroska_add_stream()
     int res = 0;
     uint32_t id;
 
+    if (num_tracks >= MAX_STREAMS)
+        THROW(ERR_COMMON, "Too many tracks. Max supported tracks count: " << MAX_STREAMS)
+
     /* Allocate a generic track. As soon as we know its type we'll realloc. */
     auto *track = reinterpret_cast<MatroskaTrack *>(new char[MAX_TRACK_SIZE]{});
     track->encodingAlgo = -1;
-    num_tracks++;
-    if (num_tracks > MAX_STREAMS)
-        THROW(ERR_COMMON, "Too many tracks. Max supported tracks count: " << MAX_STREAMS)
     strcpy(track->language, "eng");
 
     /* start with the master */
@@ -1966,7 +1966,7 @@ int MatroskaDemuxer::matroska_add_stream()
                 LTRACE(LT_INFO, 0, "Unknown or unsupported track type " << (uint64_t)track->type);
                 track->type = static_cast<MatroskaTrackType>(0);
             }
-            tracks[num_tracks - 1] = track;
+            tracks[num_tracks++] = track;
             break;
         }
 
