@@ -576,7 +576,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
         case 0x3: /* EBML lacing */
         {
             n = matroska_ebmlnum_uint(data, size, &num);
-            if (n < 0)
+            if (n < 0 || n >= laces) 
             {
                 LTRACE(LT_INFO, 0, "EBML block data error");
                 break;
