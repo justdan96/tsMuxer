@@ -625,6 +625,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             if (real_v)
             {
                 slices = *data++ + 1;
+                size--;
                 lace_size[n]--;
             }
 
@@ -649,6 +650,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
 
                 int offset = 0;
                 uint8_t *curPtr = data + slice_offset;
+                int curPtr_size = size - slice_offset;
                 m_tmpBuffer.clear();
                 if (tracks[track]->encodingAlgo == COMPRESSION_STRIP_HEADERS)
                 {
@@ -656,6 +658,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                     if (offset)
                     {
                         curPtr -= offset;
+                        curPtr_size += offset;
                         m_tmpBuffer.append(curPtr, offset);  // save data
                         memcpy(curPtr, tracks[track]->encodingAlgoPriv.data(),
                                offset);  // place extra header direct to data
@@ -665,7 +668,15 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                 {
                     decompressData(curPtr, slice_size);
                     curPtr = m_tmpBuffer.data();
-                    slice_size = static_cast<int>(m_tmpBuffer.size());
+                    curPtr_size = slice_size = static_cast<int>(m_tmpBuffer.size());
+                }
+
+                if (curPtr_size < 0 || slice_size + offset < 0 || curPtr_size < slice_size + offset)
+                {
+                    LTRACE(LT_ERROR, 0, "invalid slice size");
+                    delete[] origdata;
+                    delete[] lace_size;
+                    return res;
                 }
 
                 if (tracks[track]->parsed_priv_data != nullptr)
@@ -691,6 +702,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                     timecode = duration ? timecode + duration : AV_NOPTS_VALUE;
             }
             data += lace_size[n];
+            size -= lace_size[n];
         }
     }
 
