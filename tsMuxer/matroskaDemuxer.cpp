@@ -2410,6 +2410,9 @@ void MatroskaDemuxer::getTrackList(std::map<int32_t, TrackInfo> &trackList)
 
 int MatroskaDemuxer::getTrackType(const MatroskaTrack *track)
 {
+    if (track->codec_id == nullptr)
+        return 0;
+    
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
         return TRACKTYPE_SRT;
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
