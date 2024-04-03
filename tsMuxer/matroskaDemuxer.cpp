@@ -1912,7 +1912,7 @@ int MatroskaDemuxer::matroska_add_stream()
     /* start with the master */
     if ((res = ebml_read_master(&id)) < 0)
     {
-        delete[] track;
+        delete[] reinterpret_cast<char *>(track);
         return res;
     }
 
