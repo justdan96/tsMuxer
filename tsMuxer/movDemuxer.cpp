@@ -1189,6 +1189,8 @@ int MovDemuxer::mov_read_ctts(MOVAtom atom)
     get_be24();  // flags
     const unsigned entries = get_be32();
     st->ctts_data.resize(entries);
+    st->ctts_data.shrink_to_fit();
+    st->ctts_count = 0;
     for (unsigned i = 0; i < entries; i++)
     {
         st->ctts_data[i].count = get_be32();
