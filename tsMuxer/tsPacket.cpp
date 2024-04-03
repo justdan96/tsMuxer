@@ -292,6 +292,11 @@ bool TS_program_map_section::deserialize(uint8_t* buffer, const int buf_size)
         bitReader.skipBits(4);  // reserved
         const auto program_info_len = bitReader.getBits<uint16_t>(12);
         uint8_t* curPos = bitReader.getBuffer() + bitReader.getBitsCount() / 8;
+        if (curPos + program_info_len + 4 > bufferEnd)
+        {
+            LTRACE(LT_WARN, 0, "Bad PMT table. skipped");
+            return false;
+        }
         extractPMTDescriptors(curPos, program_info_len);
         curPos += program_info_len;
         while (curPos < crcPos)
