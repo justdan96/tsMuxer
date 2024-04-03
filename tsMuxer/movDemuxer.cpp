@@ -1636,7 +1636,7 @@ int MovDemuxer::mov_read_esds(MOVAtom atom)
         const int len = mp4_read_descr(&tag);
         if (tag == MP4DecSpecificDescrTag)
         {
-            if (static_cast<uint64_t>(len) > (1 << 30))
+            if (static_cast<uint64_t>(len) > (1 << 30) || static_cast<uint64_t>(len) < 2)
                 return -1;
             st->codec_priv = new unsigned char[len];
             st->codec_priv_size = len;
