@@ -103,6 +103,11 @@ void TSDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
             auto tsPacket = reinterpret_cast<TSPacket*>(curPos);
             int pid = tsPacket->getPID();
 
+            if (TS_FRAME_SIZE < tsPacket->getHeaderSize())
+            {
+                THROW(ERR_COMMON, "Invalid tsPacket->getHeaderSize")
+                break;
+            }
             if (pid == 0)
             {  // PAT
                 pat.deserialize(curPos + tsPacket->getHeaderSize(), TS_FRAME_SIZE - tsPacket->getHeaderSize());
@@ -286,6 +291,11 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
 
             const auto tsPacket = reinterpret_cast<TSPacket*>(m_curPos);
             int pid = tsPacket->getPID();
+            if (TS_FRAME_SIZE < tsPacket->getHeaderSize())
+            {
+                THROW(ERR_COMMON, "Invalid tsPacket->getHeaderSize")
+                break;
+            }
             if (pid == 0)
             {  // PAT
                 pat.deserialize(m_curPos + tsPacket->getHeaderSize(), TS_FRAME_SIZE - tsPacket->getHeaderSize());
