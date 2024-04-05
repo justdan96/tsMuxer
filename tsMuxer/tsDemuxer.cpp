@@ -116,6 +116,8 @@ void TSDemuxer::getTrackList(std::map<int32_t, TrackInfo>& trackList)
             {  // PMT
                 if (tsPacket->payloadStart || pmtBufferLen > 0)
                 {
+                    if (pmtBufferLen + TS_FRAME_SIZE - tsPacket->getHeaderSize() > 4096)
+                        break;
                     memcpy(pmtBuffer + pmtBufferLen, curPos + tsPacket->getHeaderSize(),
                            TS_FRAME_SIZE - tsPacket->getHeaderSize());
                     pmtBufferLen += TS_FRAME_SIZE - tsPacket->getHeaderSize();
@@ -292,6 +294,8 @@ int TSDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepted
             {  // PMT
                 if (tsPacket->payloadStart || pmtBufferLen > 0)
                 {
+                    if (pmtBufferLen + TS_FRAME_SIZE - tsPacket->getHeaderSize() > 4096)
+                        break;
                     memcpy(pmtBuffer + pmtBufferLen, m_curPos + tsPacket->getHeaderSize(),
                            TS_FRAME_SIZE - tsPacket->getHeaderSize());
                     pmtBufferLen += TS_FRAME_SIZE - tsPacket->getHeaderSize();
