@@ -288,6 +288,9 @@ int ProgramStreamDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSe
                 const uint8_t* payloadData = curBuf + pesPacket->getHeaderLength() + afterPesHeader;
                 const int pesPayloadLen = pesPacket->getPacketLength() - pesPacket->getHeaderLength() - afterPesHeader;
                 const int copyLen = FFMIN(pesPayloadLen, (int)(end - payloadData));
+                if (copyLen < 0) {
+                    THROW(ERR_COMMON, "Invalid copyLen")
+                }
                 vect.append(payloadData, copyLen);
                 m_dataProcessed += copyLen;
                 discardSize += payloadData - curBuf;
