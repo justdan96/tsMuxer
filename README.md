@@ -63,7 +63,6 @@ The following is a list of changes that will need to be made to the original sou
 
 * the program doesn't support MPEG-4 ASP, even though MPEG-4 ASP is defined in the TS specification
 * no Opus audio support
-* [several](https://forum.doom9.org/showthread.php?p=1880216#post1880216) [muxing](https://forum.doom9.org/showthread.php?p=1881372#post1881372) [bugs](https://forum.doom9.org/showthread.php?p=1881509#post1881509) when muxing a HEVC/UHD stream - results in an out-of-sync stream
 * has issues with 24-bit DTS Express
 * issues with the 3D plane lists when there are mismatches between the MPLS and M2TS
 
