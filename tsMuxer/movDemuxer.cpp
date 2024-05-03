@@ -185,7 +185,7 @@ class MovParsedAudioTrackData final : public ParsedTrackPrivData
             if (frameSize == 0)
                 frameSize = m_sc->m_index[m_sc->m_indexCur++];
             if (buff + frameSize > srcEnd)
-	        break;
+                break;
             if (isAAC)
             {
                 m_aacRaw.m_channels = static_cast<uint8_t>(m_sc->channels);
@@ -727,7 +727,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
     }
     const int64_t startPos = m_processedBytes;
     while (m_processedBytes - startPos < m_fileBlockSize && m_curChunk < chunks.size() &&
-	   m_curChunk < m_mdat_data.size())
+           m_curChunk < m_mdat_data.size())
     {
         const int64_t offset = chunks[m_curChunk].first;
         int64_t next;
