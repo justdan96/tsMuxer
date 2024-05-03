@@ -576,7 +576,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
         case 0x3: /* EBML lacing */
         {
             n = matroska_ebmlnum_uint(data, size, &num);
-            if (n < 0 || n >= laces) 
+            if (n < 0 || n >= laces)
             {
                 LTRACE(LT_INFO, 0, "EBML block data error");
                 break;
@@ -2424,7 +2424,7 @@ int MatroskaDemuxer::getTrackType(const MatroskaTrack *track)
 {
     if (track->codec_id == nullptr)
         return 0;
-    
+
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_SRT))
         return TRACKTYPE_SRT;
     if (!strcmp(track->codec_id, MATROSKA_CODEC_ID_AUDIO_PCM_BIG))
