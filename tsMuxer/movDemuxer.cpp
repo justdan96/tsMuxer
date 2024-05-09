@@ -1525,6 +1525,9 @@ if (bits_per_sample) {
 
         // this will read extra atoms at the end (wave, alac, damr, avcC, SMI ...)
         a.size = size - (m_processedBytes - start_pos);
+        if (a.size > atom.size) {
+            THROW(ERR_MOV_PARSE, "MP4/MOV error: Invalid a.size in mov_read_stsd")
+        }
         if (a.size > 8)
         {
             if (mov_read_default(a) < 0)
