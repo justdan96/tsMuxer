@@ -602,7 +602,10 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                 lace_size[n] = lace_size[n - 1] + static_cast<int32_t>(snum);
                 total += lace_size[n];
             }
-            lace_size[n] = size - total;
+            // if more  than one frame in the lace,
+            // remaining size is size of last frame
+            if (laces > 1) 
+                lace_size[n] = size - total;
 
             // check that all read frame sizes are > 0
             for (n = 0; res == 0 && n < laces; n++)
