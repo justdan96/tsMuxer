@@ -528,6 +528,8 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
         lace_size[0] = size;
         break;
 
+    // see https://www.matroska.org/technical/notes.html
+    // for explanations on types of lacing
     case 0x1: /* xiph lacing */
     case 0x2: /* fixed-size lacing */
     case 0x3: /* EBML lacing */
@@ -536,6 +538,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             res = -1;
             break;
         }
+        // laces = number of laced frames
         laces = (*data) + 1;
         data += 1;
         size -= 1;
@@ -576,7 +579,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
         case 0x3: /* EBML lacing */
         {
             n = matroska_ebmlnum_uint(data, size, &num);
-            if (n < 0 || n > laces)
+            if (n < 0)
             {
                 LTRACE(LT_INFO, 0, "EBML block data error");
                 break;
@@ -584,20 +587,32 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             data += n;
             size -= n;
             int32_t total = lace_size[0] = static_cast<int32_t>(num);
+
             for (n = 1; res == 0 && n < laces - 1; n++)
             {
                 const int r = matroska_ebmlnum_sint(data, size, &snum);
-                if (r < 0)
+                if (r < 0 || r > size)
                 {
                     LTRACE(LT_INFO, 0, "EBML block data error");
                     break;
                 }
                 data += r;
                 size -= r;
+
                 lace_size[n] = lace_size[n - 1] + static_cast<int32_t>(snum);
                 total += lace_size[n];
             }
             lace_size[n] = size - total;
+
+            // check that all read frame sizes are > 0
+            for (n = 0; res == 0 && n < laces; n++)
+            {
+                if (lace_size[n] < 0)
+                {
+                    LTRACE(LT_INFO, 0, "EBML block data error");
+                    break;
+                }                
+            }
             break;
         }
         default:;
