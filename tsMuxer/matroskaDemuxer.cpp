@@ -613,7 +613,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
             }
             // if more  than one frame in the lace,
             // size of last frame is remaining size
-            if (laces > 1) 
+            if (laces > 1)
                 lace_size[n] = size - total;
 
             // check that all read frame sizes are > 0
@@ -623,7 +623,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                 {
                     LTRACE(LT_INFO, 0, "EBML block data error");
                     break;
-                }                
+                }       
             }
             break;
         }
