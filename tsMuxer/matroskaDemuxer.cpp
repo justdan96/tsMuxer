@@ -623,7 +623,7 @@ int MatroskaDemuxer::matroska_parse_block(uint8_t *data, int size, const int64_t
                 {
                     LTRACE(LT_INFO, 0, "EBML block data error");
                     break;
-                }       
+                }
             }
             break;
         }
