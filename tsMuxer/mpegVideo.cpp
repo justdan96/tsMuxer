@@ -229,7 +229,7 @@ std::string MPEGSequenceHeader::getStreamDescr() const
         break;
     }
     if (level >= 0)
-        rez << level << ". ";
+        rez << std::to_string(level) << ". ";
     rez << "Resolution: " << width << ':' << height;
     rez << (progressive_sequence ? 'p' : 'i') << ". ";
     rez << "Frame rate: ";
