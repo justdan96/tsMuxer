@@ -726,8 +726,7 @@ int MovDemuxer::simpleDemuxBlock(DemuxedData& demuxedData, const PIDSet& accepte
         }
     }
     const int64_t startPos = m_processedBytes;
-    while (m_processedBytes - startPos < m_fileBlockSize && m_curChunk < chunks.size() &&
-           m_curChunk < m_mdat_data.size())
+    while (m_processedBytes - startPos < m_fileBlockSize && m_curChunk < chunks.size())
     {
         const int64_t offset = chunks[m_curChunk].first;
         int64_t next;
