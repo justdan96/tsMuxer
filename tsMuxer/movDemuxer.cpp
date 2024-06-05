@@ -1137,6 +1137,8 @@ int MovDemuxer::mov_read_trex(MOVAtom atom)
 int MovDemuxer::mov_read_trak(MOVAtom atom)
 {
     const auto sc = new MOVStreamContext();
+    if (num_tracks >= MAX_STREAMS)
+        THROW(ERR_COMMON, "too many trak detected")
     Track* st = tracks[num_tracks] = sc;
     num_tracks++;
     st->type = IOContextTrackType::DATA;
