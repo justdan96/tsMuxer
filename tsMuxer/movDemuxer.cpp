@@ -1072,7 +1072,7 @@ int MovDemuxer::mov_read_trun(MOVAtom atom)
     MOVFragment* frag = &fragment;
     unsigned data_offset = 0;
 
-    if (frag->track_id == 0 || frag->track_id > num_tracks)
+    if (frag->track_id <= 0 || frag->track_id > num_tracks)
         return -1;
     Track* st = tracks[frag->track_id - 1];
     const auto sc = reinterpret_cast<MOVStreamContext*>(st);
@@ -1155,7 +1155,7 @@ int MovDemuxer::mov_read_tfhd(MOVAtom atom)
     const int flags = get_be24();
 
     const int track_id = static_cast<int>(get_be32());
-    if (!track_id || track_id > num_tracks)
+    if (track_id <= 0 || track_id > num_tracks)
         return -1;
     frag->track_id = track_id;
     for (const auto& i : trex_data)
