@@ -42,12 +42,11 @@ class BufferedFileWriter final : public TerminatableThread
     {
         if (m_lastErrorCode == 0)
         {
-            m_nothingToExecute = false;
             return m_writeQueue.push(data);
         }
         throw std::runtime_error(m_lastErrorStr);
     }
-    bool isQueueEmpty() const { return m_nothingToExecute; }
+    bool isQueueEmpty() const { return m_writeQueue.empty(); }
 
    protected:
     void thread_main() override;
