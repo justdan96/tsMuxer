@@ -168,8 +168,8 @@ void ParsedH264TrackData::extractData(AVPacket* pkt, uint8_t* buff, const int si
         else
             THROW(ERR_COMMON, "Unsupported nal unit size " << elSize)
         writeNalHeader(dst);
-        assert((curPos[m_nalSize] & 0x80) == 0);
-        memcpy(dst, curPos + m_nalSize, FFMIN(elSize, (uint32_t)(end - curPos)));
+        assert((curPos < end - m_nalSize) && (curPos[m_nalSize] & 0x80) == 0);
+        memcpy(dst, curPos + m_nalSize, FFMIN(elSize, (uint32_t)(end - curPos - m_nalSize)));
         curPos += elSize + m_nalSize;
         dst += elSize;
     }
