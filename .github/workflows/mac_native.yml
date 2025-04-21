@@ -18,7 +18,7 @@ jobs:
       name: checkout
       
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v4
       with:
          setup-python: false
          py7zrversion: '==0.20.*'
