@@ -2,7 +2,9 @@ name: Build GUI for Windows XP
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+      - 'release-**'
     paths:
     - 'tsMuxerGUI/**'
   pull_request:
