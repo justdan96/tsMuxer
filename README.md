@@ -1,3 +1,9 @@
+# PROJECT NO LONGER UNDER DEVELOPMENT
+
+Please note this project is no longer under development, please see the release notes on [2.7.0](https://github.com/justdan96/tsMuxer/releases/tag/2.7.0).
+
+<hr/>
+
 # tsMuxer
 
 ## Vision
