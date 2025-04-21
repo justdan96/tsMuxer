@@ -16,12 +16,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
       name: checkout
+
+    - name: Install lcov
+      run: brew install bash lcov python-setuptools
       
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
-      with:
-         setup-python: false
-         py7zrversion: '==0.20.*'
       
     - run: ./scripts/build_macos_native.sh
       name: build-for-mac
