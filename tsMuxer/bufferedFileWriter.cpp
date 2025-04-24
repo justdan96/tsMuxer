@@ -22,7 +22,6 @@ void WriterData::execute() const
 BufferedFileWriter::BufferedFileWriter() : m_terminated(false), m_writeQueue(WRITE_QUEUE_MAX_SIZE)
 {
     m_lastErrorCode = 0;
-    m_nothingToExecute = true;
     run(this);
 }
 
@@ -40,7 +39,7 @@ void BufferedFileWriter::thread_main()
 {
     while (!m_terminated)
     {
-        WriterData writerData = m_writeQueue.pop();
+        WriterData writerData = m_writeQueue.peek();
         try
         {
             writerData.execute();
@@ -63,7 +62,7 @@ void BufferedFileWriter::thread_main()
             m_lastErrorCode = -1;
             LTRACE(LT_ERROR, 0, "BufferedFileWriter::thread_main() throws unknown exception");
         }
-        m_nothingToExecute = m_writeQueue.empty();
+        m_writeQueue.pop();
     }
 }
 
