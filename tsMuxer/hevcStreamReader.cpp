@@ -601,6 +601,12 @@ int HEVCStreamReader::intDecodeNAL(uint8_t* buff)
     if (m_eof)
     {
         m_lastDecodedPos = m_bufEnd;
+        if (sliceFound && !m_flush)
+        {
+            // we expect there will not be any more data because EOF is met, if we found any slice, we can update DTS
+            // PTS such that the found slice could be wrapped in a new PES
+            incTimings();
+        }
         return 0;
     }
     return NEED_MORE_DATA;
