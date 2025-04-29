@@ -469,18 +469,11 @@ bool TSMuxer::close()
     if (m_sectorSize)
     {
         assert(m_outBufLen == 0 && m_muxFile->size() % m_sectorSize == 0);
+        return m_muxFile->close();
     }
-
-    if (!m_muxFile->close())
-        return false;
-
-    if (m_sectorSize)
-        return true;
 
     if (m_outBufLen > 0)
     {
-        if (!m_muxFile->open(m_outFileName.c_str(), AbstractOutputStream::ofWrite + AbstractOutputStream::ofAppend))
-            return false;
         if (!writeOutFile(m_outBuf, m_outBufLen))
             return false;
     }
@@ -873,10 +866,6 @@ void TSMuxer::flushTSBuffer()
     const int64_t fileSize = m_muxFile->size();
     if (fileSize == -1)
         THROW(ERR_FILE_COMMON, "Can't determine size for file " << m_outFileName)
-    m_muxFile->close();
-
-    if (!m_muxFile->open(m_outFileName.c_str(), File::ofWrite + File::ofAppend))
-        THROW(ERR_FILE_COMMON, "Can't reopen file " << m_outFileName)
 
     if (writeOutFile(m_outBuf, m_outBufLen) != m_outBufLen)
         THROW(ERR_FILE_COMMON, "Can't write last data block to file " << m_outFileName)
